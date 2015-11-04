@@ -1,0 +1,59 @@
+%Process multiple files into plots
+function makeConvergencePlots
+    %Colours (https://kuler.adobe.com):
+    desat = 0.9;
+    y = desat*[1 1 0]; %[127 127 0]/255; %[1 1 0];
+    m = desat*[1 0 1]; %[127 0 127]/255; %[1 0 1];
+    c = desat*[0 1 1]; %[0 127 127]/255; %[0 1 1];
+    r = desat*[1 0 0]; %[127 0 0]/255; %[1 0 0];
+    g = desat*[0 1 0]; %[0 127 0]/255; %[0 1 0];
+    b = desat*[0 0 1]; %[0 0 127]/255; %[0 0 1];
+    w = [1 1 1];
+	k = [0 0 0];
+    
+    %The minimum
+    minCost = 1.0;
+    numMean = 35;
+
+    %The filesnames (ommit the data/ and the .csv), the dimension, the number of experiments, the spacing for the mean-cost plotting, whether to plot predicted, whether to plot fitted
+    filenames = {
+                 %%% Steer: Infinite. Rewire: Infinite
+                 'ConvergeR2S3599049271SteerinfRewireinf', 2, 10000, true, true;
+                 'ConvergeR4S4138350479SteerinfRewireinf', 4, 10000, true, true;
+                 'ConvergeR8S4235719018SteerinfRewireinf', 8, 10000, true, true;
+                 
+                 %%% Steer: Finite. Rewire: Infinite
+%                  'ConvergeR2S505806321Steer0.4Rewireinf', 2, 10000, true, true;
+%                  'ConvergeR4S673083786Steer0.4Rewireinf', 4, 10000, true, true;
+%                  'ConvergeR8S201999010Steer0.4Rewireinf', 8, 10000, true, true;
+                 
+                 %%% Steer: Infinite. Rewire: Finite
+%                  'ConvergeR2S3380876990SteerinfRewire1.1', 2, 10000, false, false;
+%                  'ConvergeR4S2607726372SteerinfRewire1.1', 4, 10000, false, false;
+%                  'ConvergeR8S1735541730SteerinfRewire1.1', 8, 10000, false, false;
+                 
+                 %%% Steer: Finite. Rewire: Finite
+%                  'ConvergeR2S3687473251Steer0.4Rewire1.1', 2, 10000, false, false;
+%                  'ConvergeR4S3223027747Steer0.4Rewire1.1', 4, 10000, false, false;
+%                  'ConvergeR8S105787506Steer0.4Rewire1.1', 8, 10000, false, false
+                 };
+
+    %The planner names
+    planners = {'Informed RRT*'};
+
+    ignorePlanners = {};
+
+    for i = 1:size(filenames,1)
+        data = processIterCostData(['data/' filenames{i,1} '.csv'], filenames{i,3}, minCost);
+        [rateHandl errorHandl] = plotConvergences(data, planners, filenames{i,2}, minCost, c, b, k, numMean, filenames{i,4}, filenames{i,5}, ignorePlanners);
+
+        for j = 1:size(planners,1)
+            saveEpsToPdf(rateHandl(j), ['data/' filenames{i,1} '_Planner' num2str(j) '.pdf']);
+            close(rateHandl(j));
+            if ~isnan(errorHandl(j))
+               saveEpsToPdf(errorHandl(j), ['data/' filenames{i,1} '_Planner' num2str(j) '_Error.pdf']);
+               close(errorHandl(j));
+            end
+        end
+    end
+end
