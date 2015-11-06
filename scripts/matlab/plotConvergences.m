@@ -1,4 +1,4 @@
-function [rateHandles, diffHandles] = plotConvergences(rawPlannerData, plannerNames, dimension, minimumCost, trialColour, meanColour, expectColour, numMean, plotPredicted, plotFitted, ignorePlanners)
+function rateHandles = plotConvergences(rawPlannerData, plannerNames, dimension, minimumCost, trialColour, meanColour, expectColour, numMean, plotPredicted, plotFitted, ignorePlanners)
     %rawPlannerData is :  numPlanners x {iter_number,cost} x numTrials x datapoints
     
     %Bah
@@ -16,10 +16,11 @@ function [rateHandles, diffHandles] = plotConvergences(rawPlannerData, plannerNa
 
     %Preallocate:
     rateHandles = nan(size(rawPlannerData,1),1);
-    diffHandles = nan(size(rawPlannerData,1),1);
     plotPlanners = true(size(rawPlannerData,1),1);
     
     for p = 1:size(rawPlannerData,1)
+        rateHandles(p) = figure;
+        hold on;
 
         skipPlanner = false;
         for j = 1:size(ignorePlanners,1)
@@ -41,9 +42,6 @@ function [rateHandles, diffHandles] = plotConvergences(rawPlannerData, plannerNa
         
         %Plot:
         if plotPlanners(p) == true
-            rateHandles(p) = figure;
-            hold on;
-            
             %Plot the trials as a thin mess of things:
             for j = 1:numTrials
                 trialHandl = plot(thisIters(j,:), thisError(j,:));

@@ -89,7 +89,7 @@ const double MILLISEC_SLEEP = 1.0; //Period for logging data
 
 //Others:
 const double PRUNE_FRACTION = 0.00;
-const double GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
+const double GOAL_BIAS = 0.005;
 const bool KNEAREST_RRT = false;
 const double REWIRE_SCALE_RRT = 2.0; //The factor scaling the RGG term
 
@@ -419,7 +419,7 @@ int main(int argc, char **argv)
     }
 
     //Variables
-//    ompl::RNG::setSeed(1214063428);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
+    ompl::RNG::setSeed(1186638665);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
     boost::uint32_t masterSeed = ompl::RNG::getSeed();
     //The filename for progress
@@ -559,27 +559,28 @@ int main(int argc, char **argv)
                 //Store the final run time and cost
                 runTime = runTime + (ompl::time::now() - startTime);
                 runResults.push_back( std::make_pair(runTime, plnr->bestCost().value()) );
-
-                if (p == 0u && pdef->hasExactSolution() == false)
-                {
-                    //If we didn't find a solution on the first attempt, leave the planner loop and retry this experiment
-                    --q;
-                    badExperiment = true;
-                }
-                else if (p == 0u)
-                {
-                    //If this is the reference-time planner store the solution time:
-                    firstSolnTime = runTime;
-                }
-                else
-                {
-                    //If not, the data
-                    progressHistory.addResult(plnr->getName(), runResults);
-                }
             }
 
             //Save the map:
             writeMatlabMap(experiment, plannersToTest.at(p), plnr, masterSeed+q, true, false, false, false, "plots/");
+
+            if (p == 0u && pdef->hasExactSolution() == false)
+            {
+                //If we didn't find a solution on the first attempt, leave the planner loop and retry this experiment
+                --q;
+                badExperiment = true;
+            }
+            else if (p == 0u)
+            {
+                //If this is the reference-time planner store the solution time:
+                firstSolnTime = runTime;
+                badExperiment = false;
+            }
+            else
+            {
+                //If not, the data
+                progressHistory.addResult(plnr->getName(), runResults);
+            }
 
             if (badExperiment == false)
             {
@@ -603,11 +604,6 @@ int main(int argc, char **argv)
                 {
                     std::cout << std::setprecision(6) << std::setw(8) << std::setfill(' ') << plnr->bestCost().value()/refValue << "x" << std::flush;
                 }
-            }
-            else
-            {
-                //Skip out of this loop
-                p = plannersToTest.size();
             }
         }
         //Get the next planner
