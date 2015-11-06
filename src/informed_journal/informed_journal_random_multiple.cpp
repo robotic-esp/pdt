@@ -88,8 +88,8 @@ const double MILLISEC_SLEEP = 1.0; //Period for logging data
 
 
 //Others:
-const double PRUNE_FRACTION = 0.00;
-const double GOAL_BIAS = 0.005;
+const double PRUNE_FRACTION = 0.05;
+const double GOAL_BIAS = 0.05;
 const bool KNEAREST_RRT = false;
 const double REWIRE_SCALE_RRT = 2.0; //The factor scaling the RGG term
 
@@ -419,7 +419,7 @@ int main(int argc, char **argv)
     }
 
     //Variables
-    ompl::RNG::setSeed(1186638665);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
+    //ompl::RNG::setSeed(1186638665);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
     boost::uint32_t masterSeed = ompl::RNG::getSeed();
     //The filename for progress

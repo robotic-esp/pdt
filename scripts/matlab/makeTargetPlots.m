@@ -28,8 +28,8 @@ function makeTargetPlots(type)
         variateType = 'Tol'; %'Map', 'Gap'
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {%'R2S3880217150TimeVTarget';
-                     %'R4S1770665411TimeVTarget'
+        filenames = {'R2S3880217150TimeVTarget';
+                     'R4S1770665411TimeVTarget'
                      'R8S4232850725TimeVTarget'};
         firstTarget = 1;
        
@@ -55,8 +55,8 @@ function makeTargetPlots(type)
         variateType = 'Map'; %'Tol', 'Gap'
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {%'R2S750588957TimeVMap';
-                     %'R4S1310937456TimeVMap'
+        filenames = {'R2S750588957TimeVMap';
+                     'R4S1310937456TimeVMap'
                      'R8S4051726383TimeVMap'};
         firstTarget = 1;
        
