@@ -85,7 +85,7 @@ THIS CODE ONLY COMPILES ON THE set_rrtstar_seeds BRANCH!!!!
 //World:
 const double CHECK_RESOLUTION = 0.001;
 const double WORLD_WIDTH = 4.0;
-const unsigned int NUM_INTER_OBS = 7u;
+const unsigned int NUM_INTER_OBS = 5u;
 const double MILLISEC_SLEEP = 1.0; //Period for logging data
 
 

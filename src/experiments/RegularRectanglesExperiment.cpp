@@ -117,9 +117,10 @@ RegularRectanglesExperiment::RegularRectanglesExperiment(const unsigned int dim,
     BaseExperiment::startStates_.push_back( ompl::base::ScopedState<>(ss) );
 
     //Assign to each component
-    for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j)
+    BaseExperiment::startStates_.back()[0u] = startPos_;
+    for (unsigned int j = 1u; j < BaseExperiment::dim_; ++j)
     {
-        BaseExperiment::startStates_.back()[j] = startPos_;
+        BaseExperiment::startStates_.back()[j] = 0.0;
     }
 
     // Create my goal:
@@ -127,9 +128,10 @@ RegularRectanglesExperiment::RegularRectanglesExperiment(const unsigned int dim,
     BaseExperiment::goalStates_.push_back( ompl::base::ScopedState<>(ss) );
 
     //Assign to each component
-    for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j)
+    BaseExperiment::goalStates_.back()[0u] = goalPos_;
+    for (unsigned int j = 1u; j < BaseExperiment::dim_; ++j)
     {
-        BaseExperiment::goalStates_.back()[j] = goalPos_;
+        BaseExperiment::goalStates_.back()[j] = 0.0;
     }
 
     // Allocate the goal:
