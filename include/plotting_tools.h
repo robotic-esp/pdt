@@ -1,9 +1,3 @@
-
-//For boost time
-#include <boost/date_time/posix_time/posix_time.hpp>
-//For boost tuple (pre C++11 tuple)
-#include <boost/tuple/tuple.hpp>
-
 //The states
 #include "ompl/base/State.h"
 //The planners:
@@ -13,6 +7,9 @@
 
 //The experiments:
 #include "ExperimentDefinitions.h"
+
+//The data recording
+#include "recording_tools.h"
 
 //ompl::time::duration == boost::posix_time::time_duration
 
@@ -47,9 +44,6 @@ std::string plotVertex(const ompl::base::State* vertex, std::string vertexColour
 /** \brief Create the matlab plot command for an edge*/
 std::string plotEdge(const ompl::base::State* vertex, const ompl::base::State* parent, std::string edgeColour, std::string lineStyle, std::string edgeWeight);
 
-/** \brief A helper function to create directories using boost filesystem */
-void createDirectories(std::string fileName);
-
 /** \brief A helper function to create the filledCircle.m file */
 void createMatlabHelpers(std::string path);
 
@@ -61,52 +55,3 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 
 /** \brief Create an iteration-by-iteration animation of the planner */
 ompl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, ompl::time::duration timeToRun, bool informedWorldEllipse, bool bitStarEllipse, bool bitStarEdge, bool bitStarQueue, unsigned int initialIterNumber = 0u, bool monochrome = false);
-
-
-
-typedef std::pair<boost::posix_time::time_duration, double> progress_pair_t;
-typedef boost::tuple<boost::posix_time::time_duration, unsigned int, double> progress_tuple_t;
-typedef std::vector<progress_pair_t> progress_pair_vector_t;
-typedef std::vector<progress_tuple_t> progress_tuple_vector_t;
-/** \brief A class to write planner results to file as they run. */
-class ProgressFile
-{
-    public:
-        ProgressFile(const std::string& fullFileName, bool storeTuple);
-
-        void addResult(const std::string& plannerName, const progress_pair_vector_t& progress);
-        void addResult(const std::string& plannerName, const progress_tuple_vector_t& progress);
-
-    private:
-        std::string filename_;
-        bool storeTuple_;
-};
-
-
-typedef std::pair<double, boost::posix_time::time_duration> target_pair_t;
-typedef std::vector<target_pair_t> target_pair_vector_t;
-class TargetFile
-{
-    public:
-
-        TargetFile(const std::string& fullFileName);
-
-        void addResult(const std::string& plannerName, const target_pair_vector_t& progress);
-
-    private:
-        std::string filename_;
-};
-
-typedef std::pair<unsigned int, double> iteration_pair_t;
-typedef std::vector<iteration_pair_t> iteration_pair_vector_t;
-class IterationFile
-{
-    public:
-
-        IterationFile(const std::string& fullFileName);
-
-        void addResult(const std::string& plannerName, const iteration_pair_vector_t& progress);
-
-    private:
-        std::string filename_;
-};

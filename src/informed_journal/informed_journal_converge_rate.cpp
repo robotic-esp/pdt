@@ -371,7 +371,7 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocatePlanner(const PlannerType pl
     }
 };
 
-void outputResult(iteration_pair_vector_t history)
+void outputResult(IterationCostHistory history)
 {
     //Output info to the terminal, this column can be up to 25 chars wide:
     //Padding:
@@ -437,7 +437,7 @@ int main(int argc, char **argv)
     std::cout << "Output: " << fileName.str() << std::endl;
 
     //The iteration/cost results:
-    IterationFile costPerIteration(fileName.str());
+    ResultsFile<IterationCostHistory> costPerIteration(fileName.str());
 
 
     //Perform numTrials
@@ -451,7 +451,7 @@ int main(int argc, char **argv)
             //The optimization objective used by this planner
             ompl::base::OptimizationObjectivePtr opt = expDefn->getOptimizationObjective();
             //The results from this planner:
-            iteration_pair_vector_t iterCostResults;
+            IterationCostHistory iterCostResults(numIterations);
             //A 1-iteration PTC:
             ompl::base::IterationTerminationCondition iterationPtc(1u);
             //The target number of extra iterations after the first solution:

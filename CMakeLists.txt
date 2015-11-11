@@ -71,6 +71,7 @@ add_custom_command(
 
 #Plotting library
 add_library(plotting_tools
+  src/recording_tools.cpp
   src/plotting_tools.cpp
 )
 

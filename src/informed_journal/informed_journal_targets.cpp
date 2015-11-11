@@ -600,7 +600,7 @@ int main(int argc, char **argv)
     std::cout << "Seed: " << masterSeed << std::endl;
     std::cout << "Output: " << fileName.str() << std::endl;
 
-    TargetFile timeToTarget(fileName.str());
+    ResultsFile<TargetTimeResults> timeToTarget(fileName.str());
 
     //Perform numRuns
     for (unsigned int q = 0u; q < numRuns; ++q)
@@ -635,7 +635,7 @@ int main(int argc, char **argv)
             //The cumulative runtime
             ompl::time::duration runTime(0,0,0,0);
             //The results from this planners run across all the variates:
-            target_pair_vector_t runResults;
+            TargetTimeResults runResults(indepVariables.size());
 
             //Now iterate over the variables:
             for (unsigned int v = 0u; v < indepVariables.size(); ++v)

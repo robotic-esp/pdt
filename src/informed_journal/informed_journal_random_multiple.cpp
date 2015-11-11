@@ -447,7 +447,7 @@ int main(int argc, char **argv)
     std::cout << "Seed: " << masterSeed << std::endl;
     std::cout << "Output: " << fileName.str() << std::endl;
 
-    ProgressFile progressHistory(fileName.str(), false);
+    ResultsFile<TimeCostHistory> progressHistory(fileName.str());
 
     //Perform numRuns
     for (unsigned int q = 0u; q < numExperiments; ++q)
@@ -477,7 +477,7 @@ int main(int argc, char **argv)
             //The problem defintion used by this planner
             ompl::base::ProblemDefinitionPtr pdef;
             //The results from this planners run across all the variates:
-            progress_pair_vector_t runResults;
+            TimeCostHistory runResults(experiment->getTargetTime(), MILLISEC_SLEEP);
 
             //Allocate a planner
             plnr = allocatePlanner(plannersToTest.at(p), experiment, steerEta);

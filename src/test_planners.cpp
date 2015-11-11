@@ -506,7 +506,8 @@ int main(int argc, char **argv)
 
     //The results output file:
     fileName << "R" << N << "S" << masterSeed << expDefn->getName() << ".csv";
-    ProgressFile plannerProgress(fileName.str(), logIterationsAndCost);
+    ResultsFile<TimeCostHistory> plannerProgress(fileName.str());
+    ResultsFile<TimeIterationCostHistory> plannerProgressIters(fileName.str());
 
 
     for (unsigned int q = 0u; q < numExperiments; ++q)
@@ -575,8 +576,8 @@ int main(int argc, char **argv)
             else if (logProgress == true)
             {
                 //A vector of the planner progress
-                progress_pair_vector_t progressPair;
-                progress_tuple_vector_t progressTuple;
+                TimeCostHistory progressPair(expDefn->getTargetTime(), millisecSleep);
+                TimeIterationCostHistory progressTuple(expDefn->getTargetTime(), millisecSleep);
 
                 //Store the starting time:
                 startTime = ompl::time::now();
@@ -687,7 +688,7 @@ int main(int argc, char **argv)
                     }
 
                     //Save the progress:
-                    plannerProgress.addResult(plannersToTest.at(i).second->getName(), progressTuple);
+                    plannerProgressIters.addResult(plannersToTest.at(i).second->getName(), progressTuple);
                 }
                 else
                 {

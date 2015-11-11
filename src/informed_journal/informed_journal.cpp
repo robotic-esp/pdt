@@ -488,7 +488,7 @@ int main(int argc, char **argv)
     //No else
     fileName << ".csv";
 
-    ProgressFile plannerProgress(fileName.str(), false);
+    ResultsFile<TimeCostHistory> plannerProgress(fileName.str());
 
 
     for (unsigned int q = 0u; q < numExperiments; ++q)
@@ -578,7 +578,7 @@ int main(int argc, char **argv)
             {
                 // Create run histories
                 //A vector of the planner progress
-                progress_pair_vector_t progressPair;
+                TimeCostHistory progressPair(expDefn->getTargetTime(), millisecSleep);
 
                 //Store the starting time:
                 startTime = ompl::time::now();
