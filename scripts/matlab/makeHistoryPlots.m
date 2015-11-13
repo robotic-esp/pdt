@@ -91,9 +91,7 @@ function makeHistoryPlots(R)
         yLimMargin = 0.25; 
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {'R8S3273344990Random';
-                     'R8S3349575148Random';
-                     'R8S3426995241Random'
+        filenames = {'R8S633746805RegularRects';
                     };
 
         figures = {};
