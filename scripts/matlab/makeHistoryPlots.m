@@ -15,33 +15,7 @@ function makeHistoryPlots(R)
 	k = [0 0 0];
     
     %Plot time:
-    if (R == 0)
-        %Interp spacing:
-        interpTime = 0.001;
-
-        useMedian = true;
-        unsolvedAsNan = false;
-        
-        %Number of experiments in each file:
-        numExp = 25;
-    
-        plotTime = 300;
-        
-        %The relative margin above the medians that we're willing to plot...
-        yLimMargin = 0.25; 
-
-        %The filesnames ommit the data/ and the .csv.
-        filenames = {'R8S1664403761RegularRects'
-                     };
-
-        figures = {};
-
-        %The planner names (log and plot) and colours:
-        planners = { 'RRTstar_Trio',                'RRT* trio',                b;
-                     'Informed_RRTstar',            'Informed RRT*',            g};
-       
-       ignorePlanners = {};
-    elseif (R == 2)
+    if (R == 2)
         %Interp spacing:
         interpTime = 0.001;
 
@@ -57,16 +31,7 @@ function makeHistoryPlots(R)
         yLimMargin = 0.25; 
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {'R2S431254373Random';
-                     'R2S1033176963Random';
-                     'R2S1638379583Random';
-                     'R2S1674882576Random';
-                     'R2S2238807225Random';
-                     'R2S2278048979Random';
-                     'R2S2878783453Random';
-                     'R2S3483583633Random';
-                     'R2S4084286803Random';
-                     'R2S4120957129Random'
+        filenames = {'R2S4008035615RegularRects'
                      };
 
         figures = {};
@@ -96,16 +61,7 @@ function makeHistoryPlots(R)
         yLimMargin = 0.25; 
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {'R4S23022343Random';
-                     'R4S70368211Random';
-                     'R4S866562609Random';
-                     'R4S943802410Random';
-                     'R4S1739490818Random';
-                     'R4S1787630856Random';
-                     'R4S2583261783Random';
-                     'R4S2630985384Random';
-                     'R4S3474382323Random';
-                     'R4S3521488590Random'
+        filenames = {'R4S1810018230RegularRects'
                     };
 
         figures = {};

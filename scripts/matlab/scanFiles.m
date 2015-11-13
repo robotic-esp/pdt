@@ -11,7 +11,16 @@ function scanFiles(filename, expectedPattern, stopOnError, runQuietly)
     if runQuietly == true
         stopOnError = true;
     end
-
+    
+    %Find the longest label
+    if runQuietly == false
+        labelLength = 0;
+        for i = 1:size(expectedPattern)
+            labelLength = max(labelLength, length(expectedPattern{i}));
+        end
+    end
+   
+    
     %Open the file
     [fid theMessage] = fopen(filename);
 	if fid < 0
@@ -80,7 +89,19 @@ function scanFiles(filename, expectedPattern, stopOnError, runQuietly)
         
         %Output the labels:
         if (~runQuietly)
-            fprintf('Lines %d--%d: %s: %3.3f %3.3f \n', lineNum-1, lineNum, label1, str2double(string1(delimPos1(end):end)), str2double(string2(delimPos2(end):end)));
+            %Find the initial solution
+            firstIdx = 0;
+            foundStart = false;
+            while firstIdx < (size(delimPos2,2)-1) && foundStart == false
+                firstIdx = firstIdx + 1;
+                foundStart = isfinite(str2double(string2(delimPos2(firstIdx):delimPos2(firstIdx+1))));
+            end
+            
+            fprintf(['Lines %06d--%06d: %' num2str(labelLength) 's: %7.3f (%7.3fs) to %7.3f (%7.3fs) \n'], lineNum-1, lineNum, label1, str2double(string2(delimPos2(firstIdx):delimPos2(firstIdx+1))), str2double(string1(delimPos1(firstIdx):delimPos1(firstIdx+1))), str2double(string2(delimPos2(end):end)), str2double(string1(delimPos1(end):end)));
+            
+            if tokenNum == 1
+                fprintf('\n');
+            end
         end
     end
     
