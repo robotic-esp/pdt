@@ -91,7 +91,6 @@ const bool RRT_KNEAREST = false;
 
 //BITStar:
 const unsigned int BITSTAR_SAMPLES = 100u;
-const bool BITSTAR_TRACK_FAILURES = false;
 const bool BITSTAR_STRICT_QUEUE = false;
 const bool BITSTAR_DELAY_REWIRE = false;
 const bool BITSTAR_PRUNE = true;
@@ -256,7 +255,6 @@ boost::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::Sp
     //Configure it
     plnr->setRewireFactor(BITSTAR_REWIRE_SCALE);
     plnr->setSamplesPerBatch(numSamples);
-    plnr->setUseFailureTracking(BITSTAR_TRACK_FAILURES);
     plnr->setKNearest(BITSTAR_KNEAREST);
     plnr->setStrictQueueOrdering(BITSTAR_STRICT_QUEUE);
     plnr->setPruning(BITSTAR_PRUNE);

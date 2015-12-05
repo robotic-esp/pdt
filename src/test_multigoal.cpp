@@ -95,7 +95,6 @@ const double pruneFraction = 0.01;
 const bool kNearestBIT = false;
 const double rewireFactorBIT = 1.1; //The factor scaling the RGG term
 const bool strictQueue = false;
-const bool useFailureTracking = false;
 const bool delayRewire = false;
 
 //Hybrid BIT*
@@ -374,7 +373,6 @@ ompl::base::PlannerPtr allocateBitStar(const ompl::base::SpaceInformationPtr &si
     //Configure it
     base->as<ompl::geometric::BITstar>()->setRewireFactor(rewireFactorBIT);
     base->as<ompl::geometric::BITstar>()->setSamplesPerBatch(numSamples);
-    base->as<ompl::geometric::BITstar>()->setUseFailureTracking(useFailureTracking);
     base->as<ompl::geometric::BITstar>()->setKNearest(kNearestBIT);
     base->as<ompl::geometric::BITstar>()->setStrictQueueOrdering(strictQueue);
     base->as<ompl::geometric::BITstar>()->setPruning(bitStarPrune);
@@ -401,7 +399,6 @@ ompl::base::PlannerPtr allocateHybridBitStar(const ompl::base::SpaceInformationP
 //    //BIT* settings:
 //    base->as<ompl::geometric::HybridBITstar>()->setRewireFactor(rewireFactorBIT);
 //    base->as<ompl::geometric::HybridBITstar>()->setSamplesPerBatch(numSamples);
-//    base->as<ompl::geometric::HybridBITstar>()->setUseFailureTracking(useFailureTracking);
 //    base->as<ompl::geometric::HybridBITstar>()->setKNearest(kNearestBIT);
 //    base->as<ompl::geometric::HybridBITstar>()->setStrictQueueOrdering(strictQueue);
 //    base->as<ompl::geometric::HybridBITstar>()->setPruning(bitStarPrune);
