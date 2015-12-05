@@ -57,7 +57,7 @@ function makeTargetPlots(type)
         %The filesnames ommit the data/ and the .csv.
         filenames = {'R2S750588957TimeVMap';
                      'R4S1310937456TimeVMap'
-                     'R8S4051726383TimeVMap'};
+                     'R8S576679592TimeVMap'};
         firstTarget = 1;
        
         %The planner names and colours:

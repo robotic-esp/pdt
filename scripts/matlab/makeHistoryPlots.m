@@ -13,9 +13,61 @@ function makeHistoryPlots(R)
     b = desat*[0 0 1]; %[0 0 127]/255; %[0 0 1];
     w = [1 1 1];
 	k = [0 0 0];
-    
+
     %Plot time:
-    if (R == 2)
+    if (R == 0.2)
+        %Interp spacing:
+        interpTime = 0.001;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+
+        %Number of experiments in each file:
+        numExp = 50;
+
+        plotTime = 1;
+
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25; 
+
+        %The filesnames ommit the data/ and the .csv.
+        filenames = {'R2S3363361588RandRect'};
+
+        figures = {};
+
+        %The planner names (log and plot) and colours:
+        planners = { 'dBITstar100',                     'dBIT*',                     g;
+                     'BITstar100',                    'BIT*',                    b};
+
+        ignorePlanners = {};
+    elseif (R == 0.8)
+        %Interp spacing:
+        interpTime = 0.001;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+
+        %Number of experiments in each file:
+        numExp = 30;
+
+        plotTime = 15;
+
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25; 
+
+        %The filesnames ommit the data/ and the .csv.
+        filenames = {'R8S1924116974RandRect';
+                     'R8S2830163973RandRect';
+                     'R8S3737591797RandRect'};
+
+        figures = {};
+
+        %The planner names (log and plot) and colours:
+        planners = { 'kBITstar100',                     'kBIT*',                     g;
+                     'BITstar100',                    'BIT*',                    b};
+
+        ignorePlanners = {};
+    elseif (R == 2)
         %Interp spacing:
         interpTime = 0.001;
 

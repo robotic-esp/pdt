@@ -84,22 +84,24 @@
 
 
 //World:
-const double lowerLimit = -1.0;
-const double upperLimit = 1.0;
-const bool separateObstacles = false;
-const double checkResolution = 0.001;
+const double CHECK_RESOLUTION = 0.001;
+
+//Common
+const double PRUNE_FRACTION = 0.01;
+const double REWIRE_SCALE = 2.0; //The factor scaling the RGG term
+const bool K_NEAREST = false;
+
 
 //BIT*
-const unsigned int bitStarSamples = 100u;
-const bool bitStarPrune = true;
-const double pruneFraction = 0.01;
-const bool kNearestBIT = false;
-const double rewireFactorBIT = 1.1; //The factor scaling the RGG term
-const bool strictQueue = false;
-const bool useFailureTracking = false;
-const bool delayRewire = false;
-const bool jitSampling = false;
-const bool dropUnconnected = false;
+const unsigned int BATCH_SIZE_BITSTAR = 100u;
+const bool PRUNE_BITSTAR = true;
+const bool K_NEAREST_BITSTAR = K_NEAREST;
+const double REWIRE_SCALE_BITSTAR = REWIRE_SCALE;
+const bool STRICT_QUEUE_BITSTAR = false;
+const bool TRACK_FAILS_BITSTAR = false;
+const bool DELAY_REWIRE_BITSTAR = false;
+const bool JIT_BITSTAR = false;
+const bool DROP_BATCH_BITSTAR = false;
 
 //Hybrid BIT*
 const unsigned int numShortcuts = 25u;
@@ -113,23 +115,23 @@ const bool shareInfo = true;
 const bool parallelQueues = true;
 
 //Others:
-const double goalBias = 0.05; //8D: 0.05; //2D: 0.05
-const double steerEta2D = 0.2;
-const double steerEta8D = 1.25;
-const bool kNearestRRT = kNearestBIT;
-const double rewireFactorRRT = rewireFactorBIT; //The factor scaling the RGG term
-const double rewireFactorFMT = rewireFactorBIT; //The factor scaling the RGG term
+const double GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
+const double STEER_ETA_2D_RRT = 0.2;
+const double STEER_ETA_8D_RRT = 1.25;
+const bool K_NEAREST_RRT = K_NEAREST;
+const double REWIRE_SCALE_RRT = REWIRE_SCALE;
+const double REWIRE_SCALE_FMT = REWIRE_SCALE;
 
 //Experiment:
-const bool logProgress = true;
-const bool logIterationsAndCost = false;
-const double millisecSleep = 1.0; //Period for logging data
+const bool LOG_PROGRESS = true;
+const bool LOG_ITERATIONS_AND_COST = false;
+const double MILLISEC_SLEEP = 1.0; //Period for logging data
 
 //Plotting:
-const bool informedEllipse = true;
-const bool bitStarEllipse = true;
-const bool bitStarEdge = true;
-const bool bitStarQueue = false;
+const bool PLOT_WORLD_ELLIPSE = true;
+const bool PLOT_BITSTAR_ELLIPSE = true;
+const bool PLOT_BITSTAR_EDGE = true;
+const bool PLOT_BITSTAR_QUEUE = false;
 
 
 bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPtr, unsigned int* dimensionPtr, unsigned int* numTrialsPtr, double* runTimePtr, bool* animatePtr)
@@ -279,7 +281,7 @@ ompl::base::PlannerPtr allocateRrt(const ompl::base::SpaceInformationPtr &si, do
     ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::RRT>(si);
 
     //Configure it
-    base->as<ompl::geometric::RRT>()->setGoalBias(goalBias);
+    base->as<ompl::geometric::RRT>()->setGoalBias(GOAL_BIAS);
     base->as<ompl::geometric::RRT>()->setRange(steerEta);
     base->setName("RRT");
 
@@ -309,10 +311,10 @@ ompl::base::PlannerPtr allocateRrtStar(const ompl::base::SpaceInformationPtr &si
     ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::RRTstar>(si);
 
     //Configure it
-    base->as<ompl::geometric::RRTstar>()->setGoalBias(goalBias);
+    base->as<ompl::geometric::RRTstar>()->setGoalBias(GOAL_BIAS);
     base->as<ompl::geometric::RRTstar>()->setRange(steerEta);
-    base->as<ompl::geometric::RRTstar>()->setKNearest(kNearestRRT);
-    base->as<ompl::geometric::RRTstar>()->setRewireFactor(rewireFactorRRT);
+    base->as<ompl::geometric::RRTstar>()->setKNearest(K_NEAREST_RRT);
+    base->as<ompl::geometric::RRTstar>()->setRewireFactor(REWIRE_SCALE_RRT);
     base->as<ompl::geometric::RRTstar>()->setDelayCC(true);
     base->as<ompl::geometric::RRTstar>()->setTreePruning(false);
     base->as<ompl::geometric::RRTstar>()->setPruneThreshold(1.0);
@@ -341,7 +343,7 @@ ompl::base::PlannerPtr allocateFmtStar(const ompl::base::SpaceInformationPtr &si
 
     //Configure it
     base->as<ompl::geometric::FMT>()->setNumSamples(numSamples);
-    base->as<ompl::geometric::FMT>()->setRadiusMultiplier(rewireFactorFMT);
+    base->as<ompl::geometric::FMT>()->setRadiusMultiplier(REWIRE_SCALE_FMT);
     base->as<ompl::geometric::FMT>()->setFreeSpaceVolume(si->getSpaceMeasure());
     base->setName(plannerName.str());
 
@@ -356,12 +358,12 @@ ompl::base::PlannerPtr allocateInformedRrtStar(const ompl::base::SpaceInformatio
     ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::InformedRRTstar>(si);
 
     //Configure it
-    base->as<ompl::geometric::RRTstar>()->setGoalBias(goalBias);
+    base->as<ompl::geometric::RRTstar>()->setGoalBias(GOAL_BIAS);
     base->as<ompl::geometric::RRTstar>()->setRange(steerEta);
-    base->as<ompl::geometric::RRTstar>()->setKNearest(kNearestRRT);
-    base->as<ompl::geometric::RRTstar>()->setRewireFactor(rewireFactorRRT);
+    base->as<ompl::geometric::RRTstar>()->setKNearest(K_NEAREST_RRT);
+    base->as<ompl::geometric::RRTstar>()->setRewireFactor(REWIRE_SCALE_RRT);
     base->as<ompl::geometric::RRTstar>()->setDelayCC(true);
-    base->as<ompl::geometric::RRTstar>()->setPruneThreshold(pruneFraction);
+    base->as<ompl::geometric::RRTstar>()->setPruneThreshold(PRUNE_FRACTION);
     base->as<ompl::geometric::RRTstar>()->setAdmissibleCostToCome(true);
     base->setName("Informed_RRTstar");
 
@@ -370,30 +372,36 @@ ompl::base::PlannerPtr allocateInformedRrtStar(const ompl::base::SpaceInformatio
 }
 
 //Allocate and configure BiT*
-ompl::base::PlannerPtr allocateBitStar(const ompl::base::SpaceInformationPtr &si, unsigned int numSamples)
+ompl::base::PlannerPtr allocateBitStar(const ompl::base::SpaceInformationPtr &si, unsigned int numSamples, bool kNearest, bool delay)
 {
     std::stringstream plannerName;
 
-    if (kNearestBIT == true)
+    if (delay == true)
+    {
+        plannerName << "d";
+    }
+
+    if (kNearest == true)
     {
         plannerName << "k";
     }
+
     plannerName << "BITstar" << numSamples;
 
     //Create a BIT* planner
     ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::BITstar>(si);
 
     //Configure it
-    base->as<ompl::geometric::BITstar>()->setRewireFactor(rewireFactorBIT);
+    base->as<ompl::geometric::BITstar>()->setRewireFactor(REWIRE_SCALE_BITSTAR);
     base->as<ompl::geometric::BITstar>()->setSamplesPerBatch(numSamples);
-    base->as<ompl::geometric::BITstar>()->setUseFailureTracking(useFailureTracking);
-    base->as<ompl::geometric::BITstar>()->setKNearest(kNearestBIT);
-    base->as<ompl::geometric::BITstar>()->setStrictQueueOrdering(strictQueue);
-    base->as<ompl::geometric::BITstar>()->setPruning(bitStarPrune);
-    base->as<ompl::geometric::BITstar>()->setPruneThresholdFraction(pruneFraction);
-    base->as<ompl::geometric::BITstar>()->setDelayRewiringUntilInitialSolution(delayRewire);
-    base->as<ompl::geometric::BITstar>()->setJustInTimeSampling(jitSampling);
-    base->as<ompl::geometric::BITstar>()->setDropSamplesOnPrune(dropUnconnected);
+    base->as<ompl::geometric::BITstar>()->setUseFailureTracking(TRACK_FAILS_BITSTAR);
+    base->as<ompl::geometric::BITstar>()->setKNearest(kNearest);
+    base->as<ompl::geometric::BITstar>()->setStrictQueueOrdering(STRICT_QUEUE_BITSTAR);
+    base->as<ompl::geometric::BITstar>()->setPruning(PRUNE_BITSTAR);
+    base->as<ompl::geometric::BITstar>()->setPruneThresholdFraction(PRUNE_FRACTION);
+    base->as<ompl::geometric::BITstar>()->setDelayRewiringUntilInitialSolution(delay);
+    base->as<ompl::geometric::BITstar>()->setJustInTimeSampling(JIT_BITSTAR);
+    base->as<ompl::geometric::BITstar>()->setDropSamplesOnPrune(DROP_BATCH_BITSTAR);
     base->as<ompl::geometric::BITstar>()->setStopOnSolnImprovement(false);
     base->setName(plannerName.str());
 
@@ -414,13 +422,13 @@ ompl::base::PlannerPtr allocateHybridBitStar(const ompl::base::SpaceInformationP
 //
 //    //Configure it
 //    //BIT* settings:
-//    base->as<ompl::geometric::HybridBITstar>()->setRewireFactor(rewireFactorBIT);
+//    base->as<ompl::geometric::HybridBITstar>()->setRewireFactor(REWIRE_SCALE_BITSTAR);
 //    base->as<ompl::geometric::HybridBITstar>()->setSamplesPerBatch(numSamples);
-//    base->as<ompl::geometric::HybridBITstar>()->setUseFailureTracking(useFailureTracking);
-//    base->as<ompl::geometric::HybridBITstar>()->setKNearest(kNearestBIT);
-//    base->as<ompl::geometric::HybridBITstar>()->setStrictQueueOrdering(strictQueue);
-//    base->as<ompl::geometric::HybridBITstar>()->setPruning(bitStarPrune);
-//    base->as<ompl::geometric::HybridBITstar>()->setPruneThresholdFraction(pruneFraction);
+//    base->as<ompl::geometric::HybridBITstar>()->setUseFailureTracking(TRACK_FAILS_BITSTAR);
+//    base->as<ompl::geometric::HybridBITstar>()->setKNearest(K_NEAREST_BITSTAR);
+//    base->as<ompl::geometric::HybridBITstar>()->setStrictQueueOrdering(STRICT_QUEUE_BITSTAR);
+//    base->as<ompl::geometric::HybridBITstar>()->setPruning(PRUNE_BITSTAR);
+//    base->as<ompl::geometric::HybridBITstar>()->setPruneThresholdFraction(PRUNE_FRACTION);
 //    //Hybrid BIT* settings:
 //    base->as<ompl::geometric::HybridBITstar>()->setMaxNumberOfLocalIterations(numShortcuts);
 //    base->as<ompl::geometric::HybridBITstar>()->setMaxNumberofLocalFailures(numShortcutFailures);
@@ -465,7 +473,7 @@ int main(int argc, char **argv)
 
 
     //Variables
-//    ompl::RNG::setSeed(2584387590);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
+    ompl::RNG::setSeed(3363361588);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
     boost::uint32_t masterSeed = ompl::RNG::getSeed();
     //Convenience typedefs:
@@ -478,21 +486,21 @@ int main(int argc, char **argv)
     //The world name
     std::stringstream worldName;
     //The experiment
-    //BaseExperimentPtr expDefn = boost::make_shared<CentreSquareExperiment>(N, 0.25, targetTime, checkResolution);
-    //BaseExperimentPtr expDefn = boost::make_shared<DeadEndExperiment>(0.4, targetTime, checkResolution);
-    //BaseExperimentPtr expDefn = boost::make_shared<SpiralExperiment>(0.4, targetTime, checkResolution);
-    //BaseExperimentPtr expDefn = boost::make_shared<WallGapExperiment>(true, N, targetTime, checkResolution);
-    //BaseExperimentPtr expDefn = boost::make_shared<FlankingGapExperiment>(false, 0.01, targetTime, checkResolution);
-    BaseExperimentPtr expDefn = boost::make_shared<RandomRectanglesExperiment>(N, numObs, obsRatio, targetTime, checkResolution);
-    //BaseExperimentPtr expDefn = boost::make_shared<RegularRectanglesExperiment>(N, 2.0, 10, targetTime, checkResolution);
+    //BaseExperimentPtr expDefn = boost::make_shared<CentreSquareExperiment>(N, 0.25, targetTime, CHECK_RESOLUTION);
+    //BaseExperimentPtr expDefn = boost::make_shared<DeadEndExperiment>(0.4, targetTime, CHECK_RESOLUTION);
+    //BaseExperimentPtr expDefn = boost::make_shared<SpiralExperiment>(0.4, targetTime, CHECK_RESOLUTION);
+    //BaseExperimentPtr expDefn = boost::make_shared<WallGapExperiment>(true, N, targetTime, CHECK_RESOLUTION);
+    //BaseExperimentPtr expDefn = boost::make_shared<FlankingGapExperiment>(false, 0.01, targetTime, CHECK_RESOLUTION);
+    BaseExperimentPtr expDefn = boost::make_shared<RandomRectanglesExperiment>(N, numObs, obsRatio, targetTime, CHECK_RESOLUTION);
+    //BaseExperimentPtr expDefn = boost::make_shared<RegularRectanglesExperiment>(N, 2.0, 10, targetTime, CHECK_RESOLUTION);
 
     if (N == 2u)
     {
-        steerEta = steerEta2D;
+        steerEta = STEER_ETA_2D_RRT;
     }
     else if (N == 8u)
     {
-        steerEta = steerEta8D;
+        steerEta = STEER_ETA_8D_RRT;
     }
     else
     {
@@ -521,8 +529,12 @@ int main(int argc, char **argv)
 //        plannersToTest.push_back( std::make_pair(PLANNER_RRT, allocateRrtConnect(expDefn->getSpaceInformation(), steerEta) ) );
 //        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR, allocateRrtStar(expDefn->getSpaceInformation(), steerEta) ) );
 //        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR_INFORMED, allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta) ) );
-        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), bitStarSamples) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_HYBRID_BITSTAR, allocateHybridBitStar(expDefn->getSpaceInformation(), bitStarSamples) ) );
+//        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BATCH_SIZE_BITSTAR, K_NEAREST_BITSTAR, DELAY_REWIRE_BITSTAR) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BATCH_SIZE_BITSTAR, K_NEAREST_BITSTAR, true) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BATCH_SIZE_BITSTAR, K_NEAREST_BITSTAR, false) ) );
+//        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BATCH_SIZE_BITSTAR, true, DELAY_REWIRE_BITSTAR) ) );
+//        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BATCH_SIZE_BITSTAR, false, DELAY_REWIRE_BITSTAR) ) );
+//        plannersToTest.push_back( std::make_pair(PLANNER_HYBRID_BITSTAR, allocateHybridBitStar(expDefn->getSpaceInformation(), BATCH_SIZE_BITSTAR) ) );
 
         if (q == 0u)
         {
@@ -570,14 +582,14 @@ int main(int argc, char **argv)
                 }
                 else
                 {
-                    runTime = runTime + createAnimation(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, expDefn->getTargetTime() - runTime, informedEllipse, bitStarEllipse, bitStarEdge, bitStarQueue);
+                    runTime = runTime + createAnimation(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, expDefn->getTargetTime() - runTime, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
                 }
             }
-            else if (logProgress == true)
+            else if (LOG_PROGRESS == true)
             {
                 //A vector of the planner progress
-                TimeCostHistory progressPair(expDefn->getTargetTime(), millisecSleep);
-                TimeIterationCostHistory progressTuple(expDefn->getTargetTime(), millisecSleep);
+                TimeCostHistory progressPair(expDefn->getTargetTime(), MILLISEC_SLEEP);
+                TimeIterationCostHistory progressTuple(expDefn->getTargetTime(), MILLISEC_SLEEP);
 
                 //Store the starting time:
                 startTime = ompl::time::now();
@@ -594,7 +606,7 @@ int main(int argc, char **argv)
                     }
                     else if (plannersToTest.at(i).first == PLANNER_FMT)
                     {
-                        if (logIterationsAndCost == true)
+                        if (LOG_ITERATIONS_AND_COST == true)
                         {
                             //If FMT* is modified, 1 of 2:
                             //progressTuple.push_back( boost::make_tuple(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::FMT>()->iterationProgressProperty(), boost::lexical_cast<std::string>(ASRL_DBL_INFINITY)) );
@@ -606,7 +618,7 @@ int main(int argc, char **argv)
                     else if (isRrtStar(plannersToTest.at(i).first))
                     {
                         //Store the runtime and the current cost
-                        if (logIterationsAndCost == true)
+                        if (LOG_ITERATIONS_AND_COST == true)
                         {
                             progressTuple.push_back( boost::make_tuple(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::RRTstar>()->numIterations(), plannersToTest.at(i).second->as<ompl::geometric::RRTstar>()->bestCost().value()) );
                         }
@@ -617,7 +629,7 @@ int main(int argc, char **argv)
                     }
                     else if (plannersToTest.at(i).first == PLANNER_BITSTAR || plannersToTest.at(i).first == PLANNER_BITSTAR_SEED)
                     {
-                        if (logIterationsAndCost == true)
+                        if (LOG_ITERATIONS_AND_COST == true)
                         {
                             progressTuple.push_back( boost::make_tuple(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::BITstar>()->numIterations(), plannersToTest.at(i).second->as<ompl::geometric::BITstar>()->bestCost().value()) );
                         }
@@ -628,7 +640,7 @@ int main(int argc, char **argv)
                     }
 //                    else if (plannersToTest.at(i).first == PLANNER_HYBRID_BITSTAR)
 //                    {
-//                        if (logIterationsAndCost == true)
+//                        if (LOG_ITERATIONS_AND_COST == true)
 //                        {
 //                            progressTuple.push_back( boost::make_tuple(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::HybridBITstar>()->numIterations(), plannersToTest.at(i).second->as<ompl::geometric::HybridBITstar>()->bestCost().value()) );
 //                        }
@@ -642,12 +654,12 @@ int main(int argc, char **argv)
                         throw ompl::Exception("Planner not recognized for progress logging.");
                     }
                 }
-                while ( solveThread.timed_join(boost::posix_time::milliseconds(millisecSleep)) == false);
+                while ( solveThread.timed_join(boost::posix_time::milliseconds(MILLISEC_SLEEP)) == false);
 
                 //Store the final run time
                 runTime = runTime + (ompl::time::now() - startTime);
 
-                if (logIterationsAndCost == true)
+                if (LOG_ITERATIONS_AND_COST == true)
                 {
                     double finalCost;
 
@@ -727,7 +739,7 @@ int main(int argc, char **argv)
             }
 
             //Save the map?
-            writeMatlabMap(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, informedEllipse, bitStarEllipse, bitStarEdge, bitStarQueue);
+            writeMatlabMap(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
 
             std::cout << myResult.first << ", " << std::setw(4) << myResult.second;
             if (i != plannersToTest.size() - 1u)

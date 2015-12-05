@@ -90,119 +90,120 @@ target_link_libraries(plotting_tools
 
 
 # Executables
-#add_executable(test_nn
-#  src/test_nn.cpp
-#)
-#add_executable(test_sampling
-#  src/test_sampling.cpp
-#)
-#add_executable(test_planners
-#  src/test_planners.cpp
-#)
-#add_executable(test_multigoal
-#  src/test_multigoal.cpp
-#)
-#add_executable(asrl_logo
-#  src/asrl_logo.cpp
-#)
-add_executable(informed_journal
-  src/informed_journal/informed_journal.cpp
+add_executable(test_nn
+  src/test_nn.cpp
 )
-add_executable(informed_journal_targets
-  src/informed_journal/informed_journal_targets.cpp
+add_executable(test_sampling
+  src/test_sampling.cpp
 )
-add_executable(informed_journal_random_multiple
-  src/informed_journal/informed_journal_random_multiple.cpp
+add_executable(test_planners
+  src/test_planners.cpp
 )
-add_executable(informed_journal_random_single
-  src/informed_journal/informed_journal_random_single.cpp
+add_executable(test_multigoal
+  src/test_multigoal.cpp
 )
-add_executable(informed_journal_regular
-  src/informed_journal/informed_journal_regular.cpp
+add_executable(asrl_logo
+  src/asrl_logo.cpp
 )
-add_executable(informed_journal_converge_rate
-  src/informed_journal/informed_journal_converge_rate.cpp
+target_link_libraries(test_nn
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
 )
-add_executable(informed_journal_prune
-  src/informed_journal/informed_journal_prune.cpp
+target_link_libraries(test_sampling
+  experiments
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
+target_link_libraries(test_planners
+  obstacles
+  experiments
+  plotting_tools
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
+target_link_libraries(test_multigoal
+  obstacles
+  experiments
+  plotting_tools
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
+target_link_libraries(asrl_logo
+  obstacles
+  experiments
+  plotting_tools
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
 )
 
-#target_link_libraries(test_nn
-#  ${Boost_LIBRARIES}
-#  ${OMPL_LIBRARIES}
+
+#add_executable(informed_journal
+#  src/informed_journal/informed_journal.cpp
 #)
-#target_link_libraries(test_sampling
-#  experiments
-#  ${Boost_LIBRARIES}
-#  ${OMPL_LIBRARIES}
+#add_executable(informed_journal_targets
+#  src/informed_journal/informed_journal_targets.cpp
 #)
-#target_link_libraries(test_planners
+#add_executable(informed_journal_random_multiple
+#  src/informed_journal/informed_journal_random_multiple.cpp
+#)
+#add_executable(informed_journal_random_single
+#  src/informed_journal/informed_journal_random_single.cpp
+#)
+#add_executable(informed_journal_regular
+#  src/informed_journal/informed_journal_regular.cpp
+#)
+#add_executable(informed_journal_converge_rate
+#  src/informed_journal/informed_journal_converge_rate.cpp
+#)
+#add_executable(informed_journal_prune
+#  src/informed_journal/informed_journal_prune.cpp
+#)
+#target_link_libraries(informed_journal
 #  obstacles
 #  experiments
 #  plotting_tools
 #  ${Boost_LIBRARIES}
 #  ${OMPL_LIBRARIES}
 #)
-#target_link_libraries(test_multigoal
+#target_link_libraries(informed_journal_targets
 #  obstacles
 #  experiments
 #  plotting_tools
 #  ${Boost_LIBRARIES}
 #  ${OMPL_LIBRARIES}
 #)
-#target_link_libraries(asrl_logo
+#target_link_libraries(informed_journal_random_multiple
 #  obstacles
 #  experiments
 #  plotting_tools
 #  ${Boost_LIBRARIES}
 #  ${OMPL_LIBRARIES}
 #)
-target_link_libraries(informed_journal
-  obstacles
-  experiments
-  plotting_tools
-  ${Boost_LIBRARIES}
-  ${OMPL_LIBRARIES}
-)
-target_link_libraries(informed_journal_targets
-  obstacles
-  experiments
-  plotting_tools
-  ${Boost_LIBRARIES}
-  ${OMPL_LIBRARIES}
-)
-target_link_libraries(informed_journal_random_multiple
-  obstacles
-  experiments
-  plotting_tools
-  ${Boost_LIBRARIES}
-  ${OMPL_LIBRARIES}
-)
-target_link_libraries(informed_journal_random_single
-  obstacles
-  experiments
-  plotting_tools
-  ${Boost_LIBRARIES}
-  ${OMPL_LIBRARIES}
-)
-target_link_libraries(informed_journal_regular
-  obstacles
-  experiments
-  plotting_tools
-  ${Boost_LIBRARIES}
-  ${OMPL_LIBRARIES}
-)
-target_link_libraries(informed_journal_converge_rate
-  obstacles
-  experiments
-  plotting_tools
-  ${Boost_LIBRARIES}
-  ${OMPL_LIBRARIES}
-)
-target_link_libraries(informed_journal_prune
-  obstacles
-  experiments
-  plotting_tools
-  ${Boost_LIBRARIES}
-  ${OMPL_LIBRARIES}
-)
+#target_link_libraries(informed_journal_random_single
+#  obstacles
+#  experiments
+#  plotting_tools
+#  ${Boost_LIBRARIES}
+#  ${OMPL_LIBRARIES}
+#)
+#target_link_libraries(informed_journal_regular
+#  obstacles
+#  experiments
+#  plotting_tools
+#  ${Boost_LIBRARIES}
+#  ${OMPL_LIBRARIES}
+#)
+#target_link_libraries(informed_journal_converge_rate
+#  obstacles
+#  experiments
+#  plotting_tools
+#  ${Boost_LIBRARIES}
+#  ${OMPL_LIBRARIES}
+#)
+#target_link_libraries(informed_journal_prune
+#  obstacles
+#  experiments
+#  plotting_tools
+#  ${Boost_LIBRARIES}
+#  ${OMPL_LIBRARIES}
+#)
