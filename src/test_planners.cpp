@@ -98,9 +98,9 @@ const double MILLISEC_SLEEP = 1.0; //Period for logging data
 
 //BIT*
 const unsigned int BITSTAR_BATCH_SIZE = 100u;
-const bool BITSTAR_PRUNE = true;
 const bool BITSTAR_K_NEAREST = K_NEAREST;
 const double BITSTAR_REWIRE_SCALE = REWIRE_SCALE;
+const double BITSTAR_PRUNE_FRACTION = PRUNE_FRACTION;
 const bool BITSTAR_STRICT_QUEUE = false;
 const bool BITSTAR_DELAY_REWIRE = false;
 const bool BITSTAR_JIT = false;
@@ -123,6 +123,7 @@ const double RRT_STEER_ETA_2D = 0.2;
 const double RRT_STEER_ETA_8D = 1.25;
 const bool RRT_K_NEAREST = K_NEAREST;
 const double RRT_REWIRE_SCALE = REWIRE_SCALE;
+const double RRT_PRUNE_FRACTION = PRUNE_FRACTION;
 const double FMT_REWIRE_SCALE = REWIRE_SCALE;
 const bool FMT_K_NEAREST = K_NEAREST;
 const bool FMT_CACHE_CC = false;
@@ -275,142 +276,6 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
     return true;
 }
 
-//Allocate and configure RRT*
-ompl::base::PlannerPtr allocateRrt(const ompl::base::SpaceInformationPtr &si, double steerEta)
-{
-    //Create a RRT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::RRT>(si);
-
-    //Configure it
-    base->as<ompl::geometric::RRT>()->setGoalBias(GOAL_BIAS);
-    base->as<ompl::geometric::RRT>()->setRange(steerEta);
-    base->setName("RRT");
-
-    //Return
-    return base;
-}
-
-//Allocate and configure RRT*
-ompl::base::PlannerPtr allocateRrtConnect(const ompl::base::SpaceInformationPtr &si, double steerEta)
-{
-    //Create a RRT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::RRTConnect>(si);
-
-    //Configure it
-    base->as<ompl::geometric::RRTConnect>()->setRange(steerEta);
-    base->setName("RRTConnect");
-
-    //Return
-    return base;
-}
-
-
-//Allocate and configure RRT*
-ompl::base::PlannerPtr allocateRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta)
-{
-    //Create a RRT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::RRTstar>(si);
-
-    //Configure it
-    base->as<ompl::geometric::RRTstar>()->setGoalBias(GOAL_BIAS);
-    base->as<ompl::geometric::RRTstar>()->setRange(steerEta);
-    base->as<ompl::geometric::RRTstar>()->setKNearest(RRT_K_NEAREST);
-    base->as<ompl::geometric::RRTstar>()->setRewireFactor(RRT_REWIRE_SCALE);
-    base->as<ompl::geometric::RRTstar>()->setDelayCC(true);
-    base->as<ompl::geometric::RRTstar>()->setTreePruning(false);
-    base->as<ompl::geometric::RRTstar>()->setPruneThreshold(1.0);
-    base->as<ompl::geometric::RRTstar>()->setPrunedMeasure(false);
-    base->as<ompl::geometric::RRTstar>()->setSampleRejection(false);
-    base->as<ompl::geometric::RRTstar>()->setNewStateRejection(false);
-    base->as<ompl::geometric::RRTstar>()->setAdmissibleCostToCome(true);
-    base->as<ompl::geometric::RRTstar>()->setInformedSampling(false);
-
-    base->setName("RRTstar");
-
-    //Return
-    return base;
-}
-
-
-//Allocate and configure FMT*
-ompl::base::PlannerPtr allocateFmtStar(const ompl::base::SpaceInformationPtr &si, unsigned int numSamples)
-{
-    std::stringstream plannerName;
-
-    plannerName << "FMTstar" << numSamples;
-
-    //Create a RRT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::FMT>(si);
-
-    //Configure it
-    base->as<ompl::geometric::FMT>()->setNumSamples(numSamples);
-    base->as<ompl::geometric::FMT>()->setRadiusMultiplier(FMT_REWIRE_SCALE);
-    base->as<ompl::geometric::FMT>()->setFreeSpaceVolume(si->getSpaceMeasure());
-    base->as<ompl::geometric::FMT>()->setNearestK(FMT_K_NEAREST);
-    base->as<ompl::geometric::FMT>()->setCacheCC(FMT_CACHE_CC);
-    base->as<ompl::geometric::FMT>()->setHeuristics(FMT_USE_HEURISTICS);
-    base->setName(plannerName.str());
-
-    //Return
-    return base;
-}
-
-//Allocate and configure Informed RRT*
-ompl::base::PlannerPtr allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta)
-{
-    //Create a RRT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::InformedRRTstar>(si);
-
-    //Configure it
-    base->as<ompl::geometric::RRTstar>()->setGoalBias(GOAL_BIAS);
-    base->as<ompl::geometric::RRTstar>()->setRange(steerEta);
-    base->as<ompl::geometric::RRTstar>()->setKNearest(RRT_K_NEAREST);
-    base->as<ompl::geometric::RRTstar>()->setRewireFactor(RRT_REWIRE_SCALE);
-    base->as<ompl::geometric::RRTstar>()->setDelayCC(true);
-    base->as<ompl::geometric::RRTstar>()->setPruneThreshold(PRUNE_FRACTION);
-    base->setName("Informed_RRTstar");
-
-    //Return
-    return base;
-}
-
-//Allocate and configure BiT*
-ompl::base::PlannerPtr allocateBitStar(const ompl::base::SpaceInformationPtr &si, unsigned int numSamples, bool kNearest, bool delay)
-{
-    std::stringstream plannerName;
-
-    if (delay == true)
-    {
-        plannerName << "d";
-    }
-
-    if (kNearest == true)
-    {
-        plannerName << "k";
-    }
-
-    plannerName << "BITstar" << numSamples;
-
-    //Create a BIT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::BITstar>(si);
-
-    //Configure it
-    base->as<ompl::geometric::BITstar>()->setRewireFactor(BITSTAR_REWIRE_SCALE);
-    base->as<ompl::geometric::BITstar>()->setSamplesPerBatch(numSamples);
-    base->as<ompl::geometric::BITstar>()->setKNearest(kNearest);
-    base->as<ompl::geometric::BITstar>()->setStrictQueueOrdering(BITSTAR_STRICT_QUEUE);
-    base->as<ompl::geometric::BITstar>()->setPruning(BITSTAR_PRUNE);
-    base->as<ompl::geometric::BITstar>()->setPruneThresholdFraction(PRUNE_FRACTION);
-    base->as<ompl::geometric::BITstar>()->setDelayRewiringUntilInitialSolution(delay);
-    base->as<ompl::geometric::BITstar>()->setJustInTimeSampling(BITSTAR_JIT);
-    base->as<ompl::geometric::BITstar>()->setDropSamplesOnPrune(BITSTAR_DROP_BATCH);
-    base->as<ompl::geometric::BITstar>()->setStopOnSolnImprovement(false);
-    base->setName(plannerName.str());
-
-    //Return
-    return base;
-}
-
 //Allocate Hybrid BIT*
 ompl::base::PlannerPtr allocateHybridBitStar(const ompl::base::SpaceInformationPtr& /*si*/, unsigned int /*numSamples*/)
 {
@@ -526,16 +391,14 @@ int main(int argc, char **argv)
         std::vector<std::pair<PlannerType, ompl::base::PlannerPtr> > plannersToTest;
 
         //Add the planners to test:
-//        plannersToTest.push_back( std::make_pair(PLANNER_RRT, allocateRrt(expDefn->getSpaceInformation(), steerEta) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_RRT, allocateRrtConnect(expDefn->getSpaceInformation(), steerEta) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR, allocateRrtStar(expDefn->getSpaceInformation(), steerEta) ) );
-        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR_INFORMED, allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta) ) );
-        plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), 100u) ) );
-        plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), 1000u) ) );
-        plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), 5000u) ) );
-        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE, BITSTAR_K_NEAREST, BITSTAR_DELAY_REWIRE) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE, true, BITSTAR_DELAY_REWIRE) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE, false, BITSTAR_DELAY_REWIRE) ) );
+//        plannersToTest.push_back( std::make_pair(PLANNER_RRT, allocateRrt(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS) ) );
+//        plannersToTest.push_back( std::make_pair(PLANNER_RRTCONNECT, allocateRrtConnect(expDefn->getSpaceInformation(), steerEta) ) );
+//        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR, allocateRrtStar(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST, REWIRE_SCALE) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR_INFORMED, allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST, RRT_REWIRE_SCALE, RRT_PRUNE_FRACTION) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), FMT_K_NEAREST, FMT_REWIRE_SCALE, 100u, FMT_CACHE_CC, FMT_USE_HEURISTICS) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), FMT_K_NEAREST, FMT_REWIRE_SCALE, 1000u, FMT_CACHE_CC, FMT_USE_HEURISTICS) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), FMT_K_NEAREST, FMT_REWIRE_SCALE, 10000u, FMT_CACHE_CC, FMT_USE_HEURISTICS) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, BITSTAR_BATCH_SIZE, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH) ) );
 //        plannersToTest.push_back( std::make_pair(PLANNER_HYBRID_BITSTAR, allocateHybridBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE) ) );
 
         if (q == 0u)

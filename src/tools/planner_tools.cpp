@@ -114,6 +114,22 @@ boost::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::Sp
     plnr->setStopOnSolnImprovement(false);
 
     std::stringstream plannerName;
+    if (delayRewire == true)
+    {
+        plannerName << "d";
+    }
+    if (jit == true)
+    {
+        plannerName << "j";
+    }
+    if (refreshBatches == true)
+    {
+        plannerName << "x";
+    }
+    if (kNearest == true)
+    {
+        plannerName << "k";
+    }
     plannerName << "BITstar" << numSamples;
     plnr->setName(plannerName.str());
 

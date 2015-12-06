@@ -96,6 +96,8 @@ const bool kNearestBIT = false;
 const double rewireFactorBIT = 1.1; //The factor scaling the RGG term
 const bool strictQueue = false;
 const bool delayRewire = false;
+const bool jit = false;
+const bool dropBatches = false;
 
 //Hybrid BIT*
 const unsigned int numShortcuts = 25u;
@@ -268,153 +270,6 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
     return true;
 }
 
-//Allocate and configure RRT*
-ompl::base::PlannerPtr allocateRrt(const ompl::base::SpaceInformationPtr &si, double steerEta)
-{
-    //Create a RRT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::RRT>(si);
-
-    //Configure it
-    base->as<ompl::geometric::RRT>()->setGoalBias(goalBias);
-    base->as<ompl::geometric::RRT>()->setRange(steerEta);
-    base->setName("RRT");
-
-    //Return
-    return base;
-}
-
-//Allocate and configure RRT*
-ompl::base::PlannerPtr allocateRrtConnect(const ompl::base::SpaceInformationPtr &si, double steerEta)
-{
-    //Create a RRT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::RRTConnect>(si);
-
-    //Configure it
-    base->as<ompl::geometric::RRTConnect>()->setRange(steerEta);
-    base->setName("RRTConnect");
-
-    //Return
-    return base;
-}
-
-
-//Allocate and configure RRT*
-ompl::base::PlannerPtr allocateRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta)
-{
-    //Create a RRT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::RRTstar>(si);
-
-    //Configure it
-    base->as<ompl::geometric::RRTstar>()->setGoalBias(goalBias);
-    base->as<ompl::geometric::RRTstar>()->setRange(steerEta);
-//    base->as<ompl::geometric::RRTstar>()->setKNearest(kNearestRRT);
-//    base->as<ompl::geometric::RRTstar>()->setRewireFactor(rewireFactorRRT);
-    base->as<ompl::geometric::RRTstar>()->setDelayCC(true);
-    /* // Was:
-    base->as<ompl::geometric::RRTstar>()->setPruneStatesImprovementThreshold(0.0);
-    base->as<ompl::geometric::RRTstar>()->setPrune(false);
-    */ // Proposed:
-    base->as<ompl::geometric::RRTstar>()->setTreePruning(false);
-    base->as<ompl::geometric::RRTstar>()->setSampleRejection(false);
-    base->as<ompl::geometric::RRTstar>()->setNewStateRejection(false);
-//    base->as<ompl::geometric::RRTstar>()->setInformedSampling(false);
-    base->setName("RRTstar");
-
-    //Return
-    return base;
-}
-
-
-//Allocate and configure FMT*
-ompl::base::PlannerPtr allocateFmtStar(const ompl::base::SpaceInformationPtr &si, unsigned int numSamples)
-{
-    std::stringstream plannerName;
-
-    plannerName << "FMTstar" << numSamples;
-
-    //Create a RRT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::FMT>(si);
-
-    //Configure it
-    base->as<ompl::geometric::FMT>()->setNumSamples(numSamples);
-    base->as<ompl::geometric::FMT>()->setRadiusMultiplier(rewireFactorFMT);
-    base->as<ompl::geometric::FMT>()->setFreeSpaceVolume(si->getSpaceMeasure());
-    base->setName(plannerName.str());
-
-    //Return
-    return base;
-}
-
-//Allocate and configure Informed RRT*
-ompl::base::PlannerPtr allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta)
-{
-    //Create an RRT* planner
-    ompl::base::PlannerPtr base = allocateRrtStar(si, steerEta);
-    OMPL_ERROR("This branch does not have Informed RRT* yet.");
-
-    //Configure it to be Informed
-//    base->as<ompl::geometric::RRTstar>()->setInformedSampling(true);
-    base->setName("Informed_RRTstar");
-
-    //Return
-    return base;
-}
-
-//Allocate and configure BiT*
-ompl::base::PlannerPtr allocateBitStar(const ompl::base::SpaceInformationPtr &si, unsigned int numSamples)
-{
-    std::stringstream plannerName;
-
-    plannerName << "BITstar" << numSamples;
-
-    //Create a BIT* planner
-    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::BITstar>(si);
-
-    //Configure it
-    base->as<ompl::geometric::BITstar>()->setRewireFactor(rewireFactorBIT);
-    base->as<ompl::geometric::BITstar>()->setSamplesPerBatch(numSamples);
-    base->as<ompl::geometric::BITstar>()->setKNearest(kNearestBIT);
-    base->as<ompl::geometric::BITstar>()->setStrictQueueOrdering(strictQueue);
-    base->as<ompl::geometric::BITstar>()->setPruning(bitStarPrune);
-    base->as<ompl::geometric::BITstar>()->setPruneThresholdFraction(pruneFraction);
-    base->as<ompl::geometric::BITstar>()->setDelayRewiringUntilInitialSolution(delayRewire);
-    base->setName(plannerName.str());
-
-    //Return
-    return base;
-}
-
-//Allocate Hybrid BIT*
-ompl::base::PlannerPtr allocateHybridBitStar(const ompl::base::SpaceInformationPtr& /*si*/, unsigned int /*numSamples*/)
-{
-    OMPL_ERROR("Hybrid BIT* is not implemented in this branch."); return ompl::base::PlannerPtr();
-//    std::stringstream plannerName;
-//
-//    plannerName << "HybridBITstar" << numSamples;
-//
-//    //Create a BIT* planner
-//    ompl::base::PlannerPtr base = boost::make_shared<ompl::geometric::HybridBITstar>(si);
-//
-//    //Configure it
-//    //BIT* settings:
-//    base->as<ompl::geometric::HybridBITstar>()->setRewireFactor(rewireFactorBIT);
-//    base->as<ompl::geometric::HybridBITstar>()->setSamplesPerBatch(numSamples);
-//    base->as<ompl::geometric::HybridBITstar>()->setKNearest(kNearestBIT);
-//    base->as<ompl::geometric::HybridBITstar>()->setStrictQueueOrdering(strictQueue);
-//    base->as<ompl::geometric::HybridBITstar>()->setPruning(bitStarPrune);
-//    base->as<ompl::geometric::HybridBITstar>()->setPruneThresholdFraction(pruneFraction);
-//    //Hybrid BIT* settings:
-//    base->as<ompl::geometric::HybridBITstar>()->setMaxNumberOfLocalIterations(numShortcuts);
-//    base->as<ompl::geometric::HybridBITstar>()->setMaxNumberofLocalFailures(numShortcutFailures);
-//    base->as<ompl::geometric::HybridBITstar>()->setShortcutWindowFraction(shortcutWidth);
-//    base->as<ompl::geometric::HybridBITstar>()->setShortcutTolerance(shortcutTol);
-//    base->as<ompl::geometric::HybridBITstar>()->setInterpolationTolerance(interpTol);
-//    base->setName(plannerName.str());
-//
-//    //Return
-//    return base;
-}
-
 void callSolve(const ompl::base::PlannerPtr& planner, const ompl::time::duration& solveDuration)
 {
     //planner->solve( solveDuration );
@@ -493,12 +348,7 @@ int main(int argc, char **argv)
         std::vector<std::pair<PlannerType, ompl::base::PlannerPtr> > plannersToTest;
 
         //Add the planners to test:
-//        plannersToTest.push_back( std::make_pair(PLANNER_RRT, allocateRrt(expDefn->getSpaceInformation(), steerEta) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_RRT, allocateRrtConnect(expDefn->getSpaceInformation(), steerEta) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR, allocateRrtStar(expDefn->getSpaceInformation(), steerEta) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR_INFORMED, allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta) ) );
-        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), bitStarSamples) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_HYBRID_BITSTAR, allocateHybridBitStar(expDefn->getSpaceInformation(), bitStarSamples) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), kNearestBIT, rewireFactorBIT, bitStarSamples, pruneFraction, strictQueue, delayRewire, jit, dropBatches) ) );
 
         if (q == 0u)
         {
