@@ -77,7 +77,7 @@
 #include "ExperimentDefinitions.h"
 
 //The helper functions for plotting:
-#include <plotting_tools.h>
+#include "tools/plotting_tools.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
 

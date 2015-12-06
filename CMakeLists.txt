@@ -71,9 +71,9 @@ add_custom_command(
 
 #Plotting library
 add_library(ompl_tools
-  src/planner_tools.cpp
-  src/recording_tools.cpp
-  src/plotting_tools.cpp
+  src/tools/planner_tools.cpp
+  src/tools/recording_tools.cpp
+  src/tools/plotting_tools.cpp
 )
 
 target_link_libraries(experiments

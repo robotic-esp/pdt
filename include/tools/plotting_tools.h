@@ -9,10 +9,10 @@
 #include "ExperimentDefinitions.h"
 
 //The planner tools
-#include "planner_tools.h"
+#include <tools/planner_tools.h>
 
 //The data recording
-#include "recording_tools.h"
+#include "tools/recording_tools.h"
 
 //ompl::time::duration == boost::posix_time::time_duration
 /** \brief Create the matlab plot command for a vertex */
