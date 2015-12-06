@@ -34,6 +34,10 @@
 
 /* Authors: Jonathan Gammell */
 
+/*********************************************************************
+THIS CODE ONLY COMPILES ON THE set_rrtstar_seeds BRANCH!!!!
+*********************************************************************/
+
 //For std::cout
 #include <iostream>
 //For std::ifstream and std::ofstream
@@ -106,9 +110,6 @@ const bool BITSTAR_DROP_BATCHES = false;
 const double RRT_GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
 const bool FMT_CACHE_CC = false;
 const bool FMT_USE_HEURISTICS = false;
-
-//Others:
-
 
 //Plotting:
 const bool PLOT_WORLD_ELLIPSE = true;
@@ -384,6 +385,12 @@ int main(int argc, char **argv)
             startTime = ompl::time::now();
             plnr->setup();
             runTime = ompl::time::now() - startTime;
+
+            //Set the planner seed:
+            if (isRrtStar(plannersToTest.at(p).first) == true)
+            {
+                plnr->as<ompl::geometric::RRTstar>()->setLocalSeed(seedRNG.getLocalSeed());
+            }
 
             //This must come after setup to get the steer info!
             //If this is the first planner of a trial, output at least the trial number:

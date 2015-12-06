@@ -138,22 +138,22 @@ target_link_libraries(asrl_logo
 )
 
 
-#add_executable(bitstar_journal_targets
-#  src/bitstar_journal/bitstarjournal_targets.cpp
-#)
+add_executable(bitstar_journal_targets
+  src/bitstar_journal/bitstar_journal_targets.cpp
+)
 add_executable(bitstar_journal_random_single
   src/bitstar_journal/bitstar_journal_random_single.cpp
 )
 add_executable(bitstar_journal_regular
   src/bitstar_journal/bitstar_journal_regular.cpp
 )
-#target_link_libraries(bitstar_journal_targets
-#  obstacles
-#  experiments
-#  ompl_tools
-#  ${Boost_LIBRARIES}
-#  ${OMPL_LIBRARIES}
-#)
+target_link_libraries(bitstar_journal_targets
+  obstacles
+  experiments
+  ompl_tools
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
 target_link_libraries(bitstar_journal_random_single
   obstacles
   experiments

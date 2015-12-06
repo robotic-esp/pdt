@@ -34,6 +34,10 @@
 
 /* Authors: Jonathan Gammell */
 
+/*********************************************************************
+THIS CODE ONLY COMPILES ON THE set_rrtstar_seeds BRANCH!!!!
+*********************************************************************/
+
 //For std::cout
 #include <iostream>
 //For std::ifstream and std::ofstream
@@ -103,9 +107,6 @@ const bool BITSTAR_DROP_BATCHES = false;
 const double RRT_GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
 const bool FMT_CACHE_CC = false;
 const bool FMT_USE_HEURISTICS = false;
-
-//Others:
-
 
 //Plotting:
 const bool PLOT_WORLD_ELLIPSE = true;
@@ -546,7 +547,7 @@ int main(int argc, char **argv)
             //The current experiment
             BaseExperimentPtr expDefn;
             //The current planner:
-            boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+            ompl::base::PlannerPtr plnr;
             //The cumulative runtime
             ompl::time::duration runTime(0,0,0,0);
             //The results from this planners run across all the variates:
@@ -573,7 +574,7 @@ int main(int argc, char **argv)
                     //This is TIME_V_GAPSIZE or TIME_V_MAPSIZE, we always just get the next
                     expDefn = runExperiments.at(v);
                     //allocate,
-                    plnr = allocatePlanner(plannersToTest.at(p), expDefn, steerEta);
+                    plnr = allocatePlanner(plannersToTest.at(p).first, expDefn, steerEta, plannersToTest.at(p).second);
                     //and reset the run time. Easy.
                     runTime = ompl::time::duration(0,0,0,0);
                 }
@@ -583,7 +584,7 @@ int main(int argc, char **argv)
                     if (v == 0u)
                     {
                         expDefn = runExperiments.at(0u);
-                        plnr = allocatePlanner(plannersToTest.at(p), expDefn, steerEta);
+                        plnr = allocatePlanner(plannersToTest.at(p).first, expDefn, steerEta, plannersToTest.at(p).second);
                         runTime = ompl::time::duration(0,0,0,0);
                     }
 
@@ -609,7 +610,10 @@ int main(int argc, char **argv)
                     runTime = ompl::time::now() - startTime;
 
                     //Set the planner seed:
-                    plnr->setLocalSeed(seedRNGs.at(v)->getLocalSeed());
+                    if (isRrtStar(plannersToTest.at(p).first) == true)
+                    {
+                        plnr->as<ompl::geometric::RRTstar>()->setLocalSeed(seedRNGs.at(v)->getLocalSeed());
+                    }
                 }
 
                 //This must come after setup to get the steer info!
@@ -626,7 +630,6 @@ int main(int argc, char **argv)
                             {
                                 runExperiments.at(i)->print(false);
                             }
-                            std::cout << "Very first steer: " << plnr->getRange() << std::endl;
 
 
                             //The first column is 25 wide for planner names
@@ -653,13 +656,13 @@ int main(int argc, char **argv)
                 //Run the planner:
                 if (createAnimationFrames == true)
                 {
-                    runTime = runTime + createAnimation(expDefn, plannersToTest.at(p), plnr, masterSeed, expDefn->getTargetTime() - runTime, false, false, false, false);
+                    runTime = runTime + createAnimation(expDefn, plannersToTest.at(p).first, plnr, masterSeed, expDefn->getTargetTime() - runTime, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
                 }
                 else
                 {
                     //Get the end result:
                     startTime = ompl::time::now();
-                    static_cast<ompl::base::PlannerPtr>(plnr)->solve(expDefn->getTargetTime() - runTime);
+                    plnr->solve( ompl::time::seconds(expDefn->getTargetTime() - runTime) );
                     runTime = runTime + (ompl::time::now() - startTime);
                 }
 
@@ -676,7 +679,7 @@ int main(int argc, char **argv)
                 //Save the map:
                 std::stringstream postFix;
                 postFix << problemPostfix(problemType) << indepVariables.at(v) << "E" << q;
-                writeMatlabMap(expDefn, plannersToTest.at(p), plnr, masterSeed, false, false, false, false, "plots/", postFix.str());
+                writeMatlabMap(expDefn, plannersToTest.at(p).first, plnr, masterSeed, false, false, false, false, "plots/", postFix.str());
 
                 //Output info to the terminal:
                 //If the result is infinite, pad with an extra 6 white spaces, as the word "+infinity" is 9 chars long.:
@@ -693,7 +696,7 @@ int main(int argc, char **argv)
             std::cout << std::endl;
 
             //Store this information in the time file.
-            timeToTarget.addResult(plannerName(plannersToTest.at(p)), runResults);
+            timeToTarget.addResult(plnr->getName(), runResults);
         }
         //Get the next planner
     }
