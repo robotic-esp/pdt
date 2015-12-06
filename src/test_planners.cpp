@@ -124,6 +124,9 @@ const double RRT_STEER_ETA_8D = 1.25;
 const bool RRT_K_NEAREST = K_NEAREST;
 const double RRT_REWIRE_SCALE = REWIRE_SCALE;
 const double FMT_REWIRE_SCALE = REWIRE_SCALE;
+const bool FMT_K_NEAREST = K_NEAREST;
+const bool FMT_CACHE_CC = false;
+const bool FMT_USE_HEURISTICS = false;
 
 //Plotting:
 const bool PLOT_WORLD_ELLIPSE = true;
@@ -343,6 +346,9 @@ ompl::base::PlannerPtr allocateFmtStar(const ompl::base::SpaceInformationPtr &si
     base->as<ompl::geometric::FMT>()->setNumSamples(numSamples);
     base->as<ompl::geometric::FMT>()->setRadiusMultiplier(FMT_REWIRE_SCALE);
     base->as<ompl::geometric::FMT>()->setFreeSpaceVolume(si->getSpaceMeasure());
+    base->as<ompl::geometric::FMT>()->setNearestK(FMT_K_NEAREST);
+    base->as<ompl::geometric::FMT>()->setCacheCC(FMT_CACHE_CC);
+    base->as<ompl::geometric::FMT>()->setHeuristics(FMT_USE_HEURISTICS);
     base->setName(plannerName.str());
 
     //Return
@@ -362,7 +368,6 @@ ompl::base::PlannerPtr allocateInformedRrtStar(const ompl::base::SpaceInformatio
     base->as<ompl::geometric::RRTstar>()->setRewireFactor(RRT_REWIRE_SCALE);
     base->as<ompl::geometric::RRTstar>()->setDelayCC(true);
     base->as<ompl::geometric::RRTstar>()->setPruneThreshold(PRUNE_FRACTION);
-    base->as<ompl::geometric::RRTstar>()->setAdmissibleCostToCome(true);
     base->setName("Informed_RRTstar");
 
     //Return
@@ -469,7 +474,7 @@ int main(int argc, char **argv)
 
 
     //Variables
-    ompl::RNG::setSeed(3363361588);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
+    //ompl::RNG::setSeed(3363361588);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
     boost::uint32_t masterSeed = ompl::RNG::getSeed();
     //Convenience typedefs:
@@ -524,10 +529,11 @@ int main(int argc, char **argv)
 //        plannersToTest.push_back( std::make_pair(PLANNER_RRT, allocateRrt(expDefn->getSpaceInformation(), steerEta) ) );
 //        plannersToTest.push_back( std::make_pair(PLANNER_RRT, allocateRrtConnect(expDefn->getSpaceInformation(), steerEta) ) );
 //        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR, allocateRrtStar(expDefn->getSpaceInformation(), steerEta) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR_INFORMED, allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta) ) );
-//        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE, BITSTAR_K_NEAREST, BITSTAR_DELAY_REWIRE) ) );
-        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE, BITSTAR_K_NEAREST, true) ) );
-        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE, BITSTAR_K_NEAREST, false) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR_INFORMED, allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), 100u) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), 1000u) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), 5000u) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE, BITSTAR_K_NEAREST, BITSTAR_DELAY_REWIRE) ) );
 //        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE, true, BITSTAR_DELAY_REWIRE) ) );
 //        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE, false, BITSTAR_DELAY_REWIRE) ) );
 //        plannersToTest.push_back( std::make_pair(PLANNER_HYBRID_BITSTAR, allocateHybridBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE) ) );
@@ -600,7 +606,7 @@ int main(int argc, char **argv)
                     {
                         //Do nothing, these do not have intermediate data
                     }
-                    else if (plannersToTest.at(i).first == PLANNER_FMT)
+                    else if (plannersToTest.at(i).first == PLANNER_FMTSTAR)
                     {
                         if (LOG_ITERATIONS_AND_COST == true)
                         {
@@ -673,7 +679,7 @@ int main(int argc, char **argv)
                     {
                         //Do nothing, these do not have intermediate data
                     }
-                    else if (plannersToTest.at(i).first == PLANNER_FMT)
+                    else if (plannersToTest.at(i).first == PLANNER_FMTSTAR)
                     {
                         //If FMT* is modified, 2 of 2:
                         //progressTuple.push_back( boost::make_tuple(runTime, plannersToTest.at(i).second->as<ompl::geometric::FMT>()->iterationProgressProperty(), finalCost) );

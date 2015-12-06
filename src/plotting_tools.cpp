@@ -24,87 +24,6 @@
 //#include <ompl/geometric/planners/bitstar/ICRA16.h>
 #include <ompl/util/Exception.h>
 
-bool isRrtStar(PlannerType plnrType)
-{
-    return (plnrType == PLANNER_RRTSTAR ||
-            plnrType == PLANNER_RRTSTAR_INFORMED ||
-            plnrType == PLANNER_RRTSTAR_NEW_REJECT ||
-            plnrType == PLANNER_RRTSTAR_PRUNE ||
-            plnrType == PLANNER_RRTSTAR_SAMPLE_REJECT ||
-            plnrType == PLANNER_RRTSTAR_SEED ||
-            plnrType == PLANNER_RRTSTAR_TRIO);
-}
-bool isBitStar(PlannerType plnrType)
-{
-    return (plnrType == PLANNER_BITSTAR ||
-            plnrType == PLANNER_HYBRID_BITSTAR ||
-            plnrType == PLANNER_DUALTREE_BITSTAR ||
-            plnrType == PLANNER_BITSTAR_SEED);
-}
-
-std::string plannerName(PlannerType plnrType)
-{
-    switch (plnrType)
-    {
-        case PLANNER_RRT:
-        {
-            return "RRT";
-            break;
-        }
-        case PLANNER_RRTCONNECT:
-        {
-            return "RRTConnect";
-            break;
-        }
-        case PLANNER_RRTSTAR:
-        {
-            return "RRTStar";
-            break;
-        }
-        case PLANNER_RRTSTAR_PRUNE:
-        {
-            return "RRTstar_Prune";
-            break;
-        }
-        case PLANNER_RRTSTAR_NEW_REJECT:
-        {
-            return "RRTstar_NewStateRejection";
-            break;
-        }
-        case PLANNER_RRTSTAR_SAMPLE_REJECT:
-        {
-            return "RRTstar_SampleRejection";
-            break;
-        }
-        case PLANNER_RRTSTAR_TRIO:
-        {
-            return "RRTstar_Trio";
-            break;
-        }
-        case PLANNER_RRTSTAR_INFORMED:
-        {
-            return "Informed_RRTstar";
-            break;
-        }
-        case PLANNER_FMT:
-        {
-            return "FMTstar";
-            break;
-        }
-        case PLANNER_BITSTAR:
-        {
-            return "BITstar";
-            break;
-        }
-        default:
-        {
-            throw ompl::Exception("Unimplemented PlannerType in plannerName()");
-        }
-    }
-
-    return std::string();
-}
-
 std::string plotVertex(BaseExperimentPtr experiment, const ompl::base::State* vertex, std::string vertexColour, std::string vertexSize)
 {
     //A scoped state
@@ -659,7 +578,7 @@ ompl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
         ++iter;
     }
 
-    while (runTime < timeToRun && optimized == false && (plannerType != PLANNER_FMT || (plannerStatus != ompl::base::PlannerStatus::EXACT_SOLUTION && plannerStatus != ompl::base::PlannerStatus::CRASH)))
+    while (runTime < timeToRun && optimized == false && (plannerType != PLANNER_FMTSTAR || (plannerStatus != ompl::base::PlannerStatus::EXACT_SOLUTION && plannerStatus != ompl::base::PlannerStatus::CRASH)))
     {
         //The iteration as a string
         std::stringstream iterStream;

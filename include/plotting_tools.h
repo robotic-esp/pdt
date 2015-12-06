@@ -8,36 +8,13 @@
 //The experiments:
 #include "ExperimentDefinitions.h"
 
+//The planner tools
+#include "planner_tools.h"
+
 //The data recording
 #include "recording_tools.h"
 
 //ompl::time::duration == boost::posix_time::time_duration
-
-enum PlannerType
-{
-    PLANNER_RRT,
-    PLANNER_RRTCONNECT,
-    PLANNER_RRTSTAR,
-    PLANNER_RRTSTAR_INFORMED,
-    PLANNER_RRTSTAR_PRUNE,
-    PLANNER_RRTSTAR_NEW_REJECT,
-    PLANNER_RRTSTAR_SAMPLE_REJECT,
-    PLANNER_RRTSTAR_TRIO,
-    PLANNER_FMT,
-    PLANNER_BITSTAR,
-    PLANNER_HYBRID_BITSTAR,
-    PLANNER_DUALTREE_BITSTAR,
-    PLANNER_RRTSTAR_SEED,
-    PLANNER_BITSTAR_SEED
-};
-
-/** \brief Return true if the planner is any of the RRTstar types */
-bool isRrtStar(PlannerType plnrType);
-/** \brief Return true if the planner is any of the BITstar types */
-bool isBitStar(PlannerType plnrType);
-
-std::string plannerName(PlannerType plnrType);
-
 /** \brief Create the matlab plot command for a vertex */
 std::string plotVertex(const ompl::base::State* vertex, std::string vertexColour, std::string vertexSize);
 

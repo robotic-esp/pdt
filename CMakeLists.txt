@@ -70,7 +70,8 @@ add_custom_command(
 )
 
 #Plotting library
-add_library(plotting_tools
+add_library(ompl_tools
+  src/planner_tools.cpp
   src/recording_tools.cpp
   src/plotting_tools.cpp
 )
@@ -81,7 +82,7 @@ target_link_libraries(experiments
   ${OMPL_LIBRARIES}
 )
 
-target_link_libraries(plotting_tools
+target_link_libraries(ompl_tools
   obstacles
   experiments
   ${Boost_LIBRARIES}
@@ -117,21 +118,53 @@ target_link_libraries(test_sampling
 target_link_libraries(test_planners
   obstacles
   experiments
-  plotting_tools
+  ompl_tools
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
 )
 target_link_libraries(test_multigoal
   obstacles
   experiments
-  plotting_tools
+  ompl_tools
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
 )
 target_link_libraries(asrl_logo
   obstacles
   experiments
-  plotting_tools
+  ompl_tools
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
+
+
+#add_executable(bitstar_journal_targets
+#  src/bitstar_journal/bitstarjournal_targets.cpp
+#)
+add_executable(bitstar_journal_random_single
+  src/bitstar_journal/bitstar_journal_random_single.cpp
+)
+add_executable(bitstar_journal_regular
+  src/bitstar_journal/bitstar_journal_regular.cpp
+)
+#target_link_libraries(bitstar_journal_targets
+#  obstacles
+#  experiments
+#  ompl_tools
+#  ${Boost_LIBRARIES}
+#  ${OMPL_LIBRARIES}
+#)
+target_link_libraries(bitstar_journal_random_single
+  obstacles
+  experiments
+  ompl_tools
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
+target_link_libraries(bitstar_journal_regular
+  obstacles
+  experiments
+  ompl_tools
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
 )
@@ -161,49 +194,49 @@ target_link_libraries(asrl_logo
 #target_link_libraries(informed_journal
 #  obstacles
 #  experiments
-#  plotting_tools
+#  ompl_tools
 #  ${Boost_LIBRARIES}
 #  ${OMPL_LIBRARIES}
 #)
 #target_link_libraries(informed_journal_targets
 #  obstacles
 #  experiments
-#  plotting_tools
+#  ompl_tools
 #  ${Boost_LIBRARIES}
 #  ${OMPL_LIBRARIES}
 #)
 #target_link_libraries(informed_journal_random_multiple
 #  obstacles
 #  experiments
-#  plotting_tools
+#  ompl_tools
 #  ${Boost_LIBRARIES}
 #  ${OMPL_LIBRARIES}
 #)
 #target_link_libraries(informed_journal_random_single
 #  obstacles
 #  experiments
-#  plotting_tools
+#  ompl_tools
 #  ${Boost_LIBRARIES}
 #  ${OMPL_LIBRARIES}
 #)
 #target_link_libraries(informed_journal_regular
 #  obstacles
 #  experiments
-#  plotting_tools
+#  ompl_tools
 #  ${Boost_LIBRARIES}
 #  ${OMPL_LIBRARIES}
 #)
 #target_link_libraries(informed_journal_converge_rate
 #  obstacles
 #  experiments
-#  plotting_tools
+#  ompl_tools
 #  ${Boost_LIBRARIES}
 #  ${OMPL_LIBRARIES}
 #)
 #target_link_libraries(informed_journal_prune
 #  obstacles
 #  experiments
-#  plotting_tools
+#  ompl_tools
 #  ${Boost_LIBRARIES}
 #  ${OMPL_LIBRARIES}
 #)

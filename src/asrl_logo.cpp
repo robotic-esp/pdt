@@ -400,7 +400,7 @@ int main(int argc, char **argv)
         //Run the planner:
         if (createAnimationFrames == true)
         {
-            if (plannersToTest.at(p) == PLANNER_RRT || plannersToTest.at(p) == PLANNER_RRTCONNECT || plannersToTest.at(p) == PLANNER_FMT)
+            if (plannersToTest.at(p) == PLANNER_RRT || plannersToTest.at(p) == PLANNER_RRTCONNECT || plannersToTest.at(p) == PLANNER_FMTSTAR)
             {
                 //No video to make
             }

@@ -568,7 +568,7 @@ int main(int argc, char **argv)
                     {
                         //Do nothing, these do not have intermediate data
                     }
-                    else if (plannersToTest.at(i).first == PLANNER_FMT)
+                    else if (plannersToTest.at(i).first == PLANNER_FMTSTAR)
                     {
                         if (logIterationsAndCost == true)
                         {
@@ -641,7 +641,7 @@ int main(int argc, char **argv)
                     {
                         //Do nothing, these do not have intermediate data
                     }
-                    else if (plannersToTest.at(i).first == PLANNER_FMT)
+                    else if (plannersToTest.at(i).first == PLANNER_FMTSTAR)
                     {
                         //If FMT* is modified, 2 of 2:
                         //progressTuple.push_back( boost::make_tuple(runTime, plannersToTest.at(i).second->as<ompl::geometric::FMT>()->iterationProgressProperty(), finalCost) );
