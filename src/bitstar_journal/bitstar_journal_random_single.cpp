@@ -324,15 +324,15 @@ int main(int argc, char **argv)
     RandomRectanglesExperimentPtr experiment;
 
     //Specify the planners:
-    plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 500u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 5000u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
+    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
+    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000000u));
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
     //Create one experiment for all runs:
@@ -420,7 +420,7 @@ int main(int argc, char **argv)
             //Run the planner:
             if (createAnimationFrames == true)
             {
-                runTime = runTime + createAnimation(experiment, plannersToTest.at(p).first, plnr, masterSeed, experiment->getTargetTime() - runTime, true, false, false, false);
+                runTime = runTime + createAnimation(experiment, plannersToTest.at(p).first, plnr, masterSeed, experiment->getTargetTime() - runTime, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
                 runResults.push_back( std::make_pair(runTime, currentSolution(plannersToTest.at(p).first, plnr)) );
             }
             else

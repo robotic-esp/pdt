@@ -56,23 +56,30 @@ function makeHistoryPlots(R)
         unsolvedAsNan = false;
 
         %Number of experiments in each file:
-        numExp = 30;
+        numExp = 10;
 
-        plotTime = 15;
+        plotTime = 150;
 
         %The relative margin above the medians that we're willing to plot...
         yLimMargin = 0.25; 
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {'R8S1924116974RandRect';
-                     'R8S2830163973RandRect';
-                     'R8S3737591797RandRect'};
+        filenames = {%'R8S818691838RandRect';
+                     'R8S4122305078RegularRects'};
 
         figures = {};
 
         %The planner names (log and plot) and colours:
-        planners = { 'kBITstar100',                     'kBIT*',                     g;
-                     'BITstar100',                    'BIT*',                    b};
+        planners = { %'RRT',                     'RRT',                      k;
+                     'RRTConnect',              'RRTConnect',               c;
+                     %'RRTstar',                 'RRT*',                     m;
+                     'Informed_RRTstar',        'Informed RRT*',            b;
+                     %'FMTstar100',              'FMT*',                     r;
+                     %'FMTstar500',              'FMT*',                     r;
+                     %'FMTstar1000',             'FMT*',                     r;
+                     %'FMTstar5000',             'FMT*',                     r;
+                     %'FMTstar10000',             'FMT*',                     r;
+                     'BITstar100',              'BIT*',                     g};
 
         ignorePlanners = {};
     elseif (R == 2)

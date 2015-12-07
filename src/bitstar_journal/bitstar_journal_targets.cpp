@@ -98,7 +98,6 @@ const double REWIRE_SCALE = 2.0; //The factor scaling the RGG term
 //BITstar
 const unsigned int BITSTAR_BATCH_SIZE = 100u;
 const bool BITSTAR_STRICT_QUEUE = true;
-const bool BITSTAR_PRUNE = true;
 const bool BITSTAR_DELAY_REWIRE = false;
 const bool BITSTAR_JIT = false;
 const bool BITSTAR_DROP_BATCHES = false;
@@ -508,15 +507,15 @@ int main(int argc, char **argv)
     std::vector<std::pair<PlannerType, unsigned int> > plannersToTest;
 
     //Specify the planners:
-    plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 500u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 5000u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
+    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
+    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000000u));
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
     //The results output file:
