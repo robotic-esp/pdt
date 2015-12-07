@@ -75,7 +75,7 @@ boost::shared_ptr<ompl::geometric::InformedRRTstar> allocateInformedRrtStar(cons
     return plnr;
 }
 
-boost::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const unsigned int rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics)
+boost::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics)
 {
     //Create a RRT* planner
     boost::shared_ptr<ompl::geometric::FMT> plnr = boost::make_shared<ompl::geometric::FMT>(si);
@@ -96,7 +96,7 @@ boost::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceI
     return plnr;
 }
 
-boost::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const unsigned int rewireScale, const unsigned int numSamples, const bool pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches)
+boost::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches)
 {
     //Create a BIT* planner
     boost::shared_ptr<ompl::geometric::BITstar> plnr = boost::make_shared<ompl::geometric::BITstar>(si);

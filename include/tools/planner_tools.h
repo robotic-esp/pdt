@@ -36,10 +36,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::Sp
 boost::shared_ptr<ompl::geometric::InformedRRTstar> allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const double pruneFraction);
 
 /** \brief Allocation function for FMT* */
-boost::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const unsigned int rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics);
+boost::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics);
 
 /** \brief Allocation function for BIT* */
-boost::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const unsigned int rewireScale, const unsigned int numSamples, const bool pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches);
+boost::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches);
 
 /** \brief Return true if the planner is any of the RRT types */
 bool isRrt(PlannerType plnrType);
