@@ -514,8 +514,19 @@ int main(int argc, char **argv)
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000000u));
+    if (N == 2u)
+    {
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 250000u));
+    }
+    else if (N == 8u)
+    {
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 25000u));
+    }
+    else if (N == 16u)
+    {
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 25000u));
+    }
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
     //The results output file:
@@ -678,7 +689,11 @@ int main(int argc, char **argv)
                 //Save the map:
                 std::stringstream postFix;
                 postFix << problemPostfix(problemType) << indepVariables.at(v) << "E" << q;
-                writeMatlabMap(expDefn, plannersToTest.at(p).first, plnr, masterSeed, false, false, false, false, "plots/", postFix.str());
+
+                if (plannersToTest.at(p).second <=  5000u)
+                {
+                    writeMatlabMap(expDefn, plannersToTest.at(p).first, plnr, masterSeed, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE, "plots/", postFix.str());
+                }
 
                 //Output info to the terminal:
                 //If the result is infinite, pad with an extra 6 white spaces, as the word "+infinity" is 9 chars long.:

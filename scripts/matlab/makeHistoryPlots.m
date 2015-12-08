@@ -56,7 +56,7 @@ function makeHistoryPlots(R)
         unsolvedAsNan = false;
 
         %Number of experiments in each file:
-        numExp = 10;
+        numExp = 5;
 
         plotTime = 150;
 
@@ -64,8 +64,7 @@ function makeHistoryPlots(R)
         yLimMargin = 0.25; 
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {%'R8S818691838RandRect';
-                     'R8S4122305078RegularRects'};
+        filenames = {'R8S4015782698RegularRects'};
 
         figures = {};
 

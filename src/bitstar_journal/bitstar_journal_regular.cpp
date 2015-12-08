@@ -331,8 +331,19 @@ int main(int argc, char **argv)
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000000u));
+    if (N == 2u)
+    {
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 250000u));
+    }
+    else if (N == 8u)
+    {
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 25000u));
+    }
+    else if (N == 16u)
+    {
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 25000u));
+    }
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
     //Create one experiment for all runs:
@@ -482,7 +493,10 @@ int main(int argc, char **argv)
             }
 
             //Save the map:
-            writeMatlabMap(experiment, plannersToTest.at(p).first, plnr, masterSeed, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE, "plots/");
+            if (plannersToTest.at(p).second <= 5000u)
+            {
+                writeMatlabMap(experiment, plannersToTest.at(p).first, plnr, masterSeed, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE, "plots/");
+            }
 
             if (badExperiment == false)
             {
