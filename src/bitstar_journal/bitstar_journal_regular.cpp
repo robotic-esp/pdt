@@ -94,7 +94,7 @@ const unsigned int NUM_INTER_OBS = 5u;
 const double MILLISEC_SLEEP = 1.0; //Period for logging data
 
 //Common:
-const double PRUNE_FRACTION = 0.05;
+const double PRUNE_FRACTION = 0.01;
 const bool K_NEAREST = false;
 const double REWIRE_SCALE = 2.0; //The factor scaling the RGG term
 
@@ -334,15 +334,15 @@ int main(int argc, char **argv)
     if (N == 2u)
     {
         plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
-        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 250000u));
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 400000u));
     }
     else if (N == 8u)
     {
-        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 25000u));
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 35000u));
     }
     else if (N == 16u)
     {
-        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 25000u));
+        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 30000u));
     }
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
