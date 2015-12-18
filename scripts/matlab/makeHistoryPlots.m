@@ -15,73 +15,7 @@ function makeHistoryPlots(R)
 	k = [0 0 0];
 
     %Plot time:
-    if (R == 0.2)
-        %Interp spacing:
-        interpTime = 0.001;
-
-        useMedian = true;
-        unsolvedAsNan = false;
-
-        %Number of experiments in each file:
-        numExp = 100;
-
-        plotTime = 3;
-
-        %The relative margin above the medians that we're willing to plot...
-        yLimMargin = 0.25; 
-
-        %The filesnames ommit the data/ and the .csv.
-        filenames = {'R2S2593717009RegularRects'};
-
-        figures = {};
-
-        %The planner names (log and plot) and colours:
-        planners = { 'RRT',                     'RRT',                      k;
-                     'RRTConnect',              'RRTConnect',               c;
-                     'RRTstar',                 'RRT*',                     m;
-                     'Informed_RRTstar',        'Informed RRT*',            b;
-                     'FMTstar100',              'FMT*',                     r;
-                     'FMTstar500',              'FMT*',                     r;
-                     'FMTstar1000',             'FMT*',                     r;
-                     'FMTstar5000',             'FMT*',                     r;
-                     'FMTstar10000',             'FMT*',                     r;
-                     'BITstar100',              'BIT*',                     g};
-
-        ignorePlanners = {};
-    elseif (R == 0.8)
-        %Interp spacing:
-        interpTime = 0.001;
-
-        useMedian = true;
-        unsolvedAsNan = false;
-
-        %Number of experiments in each file:
-        numExp = 5;
-
-        plotTime = 150;
-
-        %The relative margin above the medians that we're willing to plot...
-        yLimMargin = 0.25; 
-
-        %The filesnames ommit the data/ and the .csv.
-        filenames = {'R8S4015782698RegularRects'};
-
-        figures = {};
-
-        %The planner names (log and plot) and colours:
-        planners = { %'RRT',                     'RRT',                      k;
-                     'RRTConnect',              'RRTConnect',               c;
-                     %'RRTstar',                 'RRT*',                     m;
-                     'Informed_RRTstar',        'Informed RRT*',            b;
-                     %'FMTstar100',              'FMT*',                     r;
-                     %'FMTstar500',              'FMT*',                     r;
-                     %'FMTstar1000',             'FMT*',                     r;
-                     %'FMTstar5000',             'FMT*',                     r;
-                     %'FMTstar10000',             'FMT*',                     r;
-                     'BITstar100',              'BIT*',                     g};
-
-        ignorePlanners = {};
-    elseif (R == 2)
+    if (R == 2)
         %Interp spacing:
         interpTime = 0.001;
 
@@ -97,18 +31,25 @@ function makeHistoryPlots(R)
         yLimMargin = 0.25; 
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {'R2S4008035615RegularRects'
+        filenames = {'R2S3250431324RegularRects';
+                     'R2S130884612RandRect';
+                     'R2S1619363706RandRect';
+                     'R2S2914381183RandRect'
                      };
 
         figures = {};
 
         %The planner names (log and plot) and colours:
-        planners = { 'RRTstar',                     'RRT*',                     k;
-                     'RRTstar_Prune',               'RRT* w/ pruning',          r;
-                     'RRTstar_NewStateRejection',   'RRT* w/ new reject',       m;
-                     'RRTstar_SampleRejection',     'RRT* w/ sample reject',    c;
-                     'RRTstar_Trio',                'RRT* trio',                b;
-                     'Informed_RRTstar',            'Informed RRT*',            g};
+        planners = {'RRTConnect',              'RRTConnect',               c;
+                    'RRT',                     'RRT',                      k;
+                    'RRTstar',                 'RRT*',                     m;
+                    'Informed_RRTstar',        'Informed RRT*',            b;
+                    'FMTstar100',              'FMT*',                     r;
+                    'FMTstar1000',             'FMT*',                     r;
+                    'FMTstar10000',            'FMT*',                     r;
+                    'FMTstar100000',           'FMT*',                     r;
+                    'FMTstar400000',           'FMT*',                     r;
+                    'BITstar100',              'BIT*',                     g};
        
        ignorePlanners = {};
     elseif (R == 4)
@@ -157,18 +98,60 @@ function makeHistoryPlots(R)
         yLimMargin = 0.25; 
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {'R8S633746805RegularRects';
+        filenames = {'R8S229934342RegularRects';
+                     'R8S2312993822RandRect';
+                     'R8S3157356755RandRect';
+                     'R8S3826958238RandRect'
                     };
 
         figures = {};
 
         %The planner names (log and plot) and colours:
-        planners = { 'RRTstar',                     'RRT*',                     k;
-                     'RRTstar_Prune',               'RRT* w/ pruning',          r;
-                     'RRTstar_NewStateRejection',   'RRT* w/ new reject',       m;
-                     'RRTstar_SampleRejection',     'RRT* w/ sample reject',    c;
-                     'RRTstar_Trio',                'RRT* trio',                b;
-                     'Informed_RRTstar',            'Informed RRT*',            g};
+        planners = {'RRTConnect',              'RRTConnect',               c;
+                    'RRT',                     'RRT',                      k;
+                    'RRTstar',                 'RRT*',                     m;
+                    'Informed_RRTstar',        'Informed RRT*',            b;
+                    'FMTstar100',              'FMT*',                     r;
+                    'FMTstar1000',             'FMT*',                     r;
+                    'FMTstar10000',            'FMT*',                     r;
+                    'FMTstar35000',            'FMT*',                     r;
+                    'BITstar100',              'BIT*',                     g};
+       
+       ignorePlanners = {};
+    elseif (R == 16)
+        %Interp spacing:
+        interpTime = 0.001;
+    
+        useMedian = true;
+        unsolvedAsNan = false;
+        
+        %Number of experiments in each file:
+        numExp = 100;
+    
+        plotTime = 300;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25; 
+
+        %The filesnames ommit the data/ and the .csv.
+        filenames = {%'R16S3209264102RegularRects';
+                     'R16S530875199RandRect';
+                     'R16S3720434557RandRect';
+                     'R16S4153856203RandRect';
+                    };
+
+        figures = {};
+
+        %The planner names (log and plot) and colours:
+        planners = {'RRTConnect',              'RRTConnect',               c;
+                    'RRT',                     'RRT',                      k;
+                    'RRTstar',                 'RRT*',                     m;
+                    'Informed_RRTstar',        'Informed RRT*',            b;
+                    'FMTstar100',              'FMT*',                     r;
+                    'FMTstar1000',             'FMT*',                     r;
+                    'FMTstar10000',            'FMT*',                     r;
+                    'FMTstar30000',            'FMT*',                     r;
+                    'BITstar100',              'BIT*',                     g};
        
        ignorePlanners = {};
     else

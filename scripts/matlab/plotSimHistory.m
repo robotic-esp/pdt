@@ -303,7 +303,13 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
                         errHandle = errorbar(barTimes(barMask), barCentres(barMask), barLowers(barMask), barUppers(barMask));
                         set(errHandle, 'Color', plannerColours{i});
                         set(errHandle, 'LineStyle', 'none');
-                        errorbar_tick(errHandle, vErrTick); %Set errorbar width
+                        
+                        %It can happen that, even though we have some
+                        %solutions, we never have enough to have a median
+                        %line. In which case, the error handles are empty
+                        if (~isempty(errHandle))
+                            errorbar_tick(errHandle, vErrTick); %Set errorbar width
+                        end
                     end
                 end
             %End history plotting
