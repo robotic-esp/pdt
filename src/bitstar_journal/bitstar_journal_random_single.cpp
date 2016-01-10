@@ -96,17 +96,20 @@ const double MILLISEC_SLEEP = 1.0; //Period for logging data
 //Common:
 const double PRUNE_FRACTION = 0.01;
 const bool K_NEAREST = false;
-const double REWIRE_SCALE = 2.0; //The factor scaling the RGG term
+const double REWIRE_SCALE = 2.0;
 
 //BITstar
+const double BITSTAR_REWIRE_SCALE = REWIRE_SCALE;
 const unsigned int BITSTAR_BATCH_SIZE = 100u;
-const bool BITSTAR_STRICT_QUEUE = true;
+const bool BITSTAR_STRICT_QUEUE = false;
 const bool BITSTAR_DELAY_REWIRE = false;
 const bool BITSTAR_JIT = false;
 const bool BITSTAR_DROP_BATCHES = false;
 
 //Others:
+const double RRT_REWIRE_SCALE = REWIRE_SCALE;
 const double RRT_GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
+const double FMT_REWIRE_SCALE = REWIRE_SCALE;
 const bool FMT_CACHE_CC = false;
 const bool FMT_USE_HEURISTICS = false;
 
@@ -243,22 +246,22 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
         }
         case PLANNER_RRTSTAR:
         {
-            return allocateRrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, REWIRE_SCALE);
+            return allocateRrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE);
             break;
         }
         case PLANNER_RRTSTAR_INFORMED:
         {
-            return allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, REWIRE_SCALE, PRUNE_FRACTION);
+            return allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE, PRUNE_FRACTION);
             break;
         }
         case PLANNER_FMTSTAR:
         {
-            return allocateFmtStar(expDefn->getSpaceInformation(), K_NEAREST, REWIRE_SCALE, numSamples, FMT_CACHE_CC, FMT_USE_HEURISTICS);
+            return allocateFmtStar(expDefn->getSpaceInformation(), K_NEAREST, FMT_REWIRE_SCALE, numSamples, FMT_CACHE_CC, FMT_USE_HEURISTICS);
             break;
         }
         case PLANNER_BITSTAR:
         {
-            return allocateBitStar(expDefn->getSpaceInformation(), K_NEAREST, REWIRE_SCALE, numSamples, PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCHES);
+            return allocateBitStar(expDefn->getSpaceInformation(), K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCHES);
             break;
         }
         default:
@@ -311,7 +314,7 @@ int main(int argc, char **argv)
     }
 
     //Variables
-//    ompl::RNG::setSeed(3330966526);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
+//    ompl::RNG::setSeed(2612667340);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
     boost::uint32_t masterSeed = ompl::RNG::getSeed();
     //The filename for progress
@@ -331,19 +334,6 @@ int main(int argc, char **argv)
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
-    if (N == 2u)
-    {
-        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
-        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 400000u));
-    }
-    else if (N == 8u)
-    {
-        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 35000u));
-    }
-    else if (N == 16u)
-    {
-        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 30000u));
-    }
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
     //Create one experiment for all runs:
@@ -400,6 +390,10 @@ int main(int argc, char **argv)
             if (isRrtStar(plannersToTest.at(p).first) == true)
             {
                 plnr->as<ompl::geometric::RRTstar>()->setLocalSeed(seedRNG.getLocalSeed());
+            }
+            if (isBitStar(plannersToTest.at(p).first) == true)
+            {
+                plnr->as<ompl::geometric::BITstar>()->setLocalSeed(seedRNG.getLocalSeed());
             }
 
             //This must come after setup to get the steer info!

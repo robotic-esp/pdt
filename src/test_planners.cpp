@@ -119,7 +119,7 @@ const bool parallelQueues = true;
 
 //Others:
 const double GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
-const double RRT_STEER_ETA_2D = 0.2;
+const double RRT_STEER_ETA_2D = 0.3;
 const double RRT_STEER_ETA_8D = 1.25;
 const bool RRT_K_NEAREST = K_NEAREST;
 const double RRT_REWIRE_SCALE = REWIRE_SCALE;
@@ -390,14 +390,15 @@ int main(int argc, char **argv)
         //The vector of planners:
         std::vector<std::pair<PlannerType, ompl::base::PlannerPtr> > plannersToTest;
 
-        //Add the planners to test:
-//        plannersToTest.push_back( std::make_pair(PLANNER_RRT, allocateRrt(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS) ) );
+        //Add the planners to test. Be careful, too large of FMT batch size (i.e., ~100000u) fucks up wall time of other planners
 //        plannersToTest.push_back( std::make_pair(PLANNER_RRTCONNECT, allocateRrtConnect(expDefn->getSpaceInformation(), steerEta) ) );
+//        plannersToTest.push_back( std::make_pair(PLANNER_RRT, allocateRrt(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS) ) );
 //        plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR, allocateRrtStar(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST, REWIRE_SCALE) ) );
         plannersToTest.push_back( std::make_pair(PLANNER_RRTSTAR_INFORMED, allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST, RRT_REWIRE_SCALE, RRT_PRUNE_FRACTION) ) );
         plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), FMT_K_NEAREST, FMT_REWIRE_SCALE, 100u, FMT_CACHE_CC, FMT_USE_HEURISTICS) ) );
         plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), FMT_K_NEAREST, FMT_REWIRE_SCALE, 1000u, FMT_CACHE_CC, FMT_USE_HEURISTICS) ) );
         plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), FMT_K_NEAREST, FMT_REWIRE_SCALE, 10000u, FMT_CACHE_CC, FMT_USE_HEURISTICS) ) );
+//        plannersToTest.push_back( std::make_pair(PLANNER_FMTSTAR, allocateFmtStar(expDefn->getSpaceInformation(), FMT_K_NEAREST, FMT_REWIRE_SCALE, 100000u, FMT_CACHE_CC, FMT_USE_HEURISTICS) ) );
         plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, BITSTAR_BATCH_SIZE, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH) ) );
 //        plannersToTest.push_back( std::make_pair(PLANNER_HYBRID_BITSTAR, allocateHybridBitStar(expDefn->getSpaceInformation(), BITSTAR_BATCH_SIZE) ) );
 
@@ -465,7 +466,7 @@ int main(int argc, char **argv)
                 //Log data
                 do
                 {
-                    if  (plannersToTest.at(i).first == PLANNER_RRT)
+                    if (plannersToTest.at(i).first == PLANNER_RRT || plannersToTest.at(i).first == PLANNER_RRTCONNECT)
                     {
                         //Do nothing, these do not have intermediate data
                     }

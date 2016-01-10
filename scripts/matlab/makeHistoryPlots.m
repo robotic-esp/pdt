@@ -15,6 +15,7 @@ function makeHistoryPlots(R)
 	k = [0 0 0];
 
     %Plot time:
+    
     if (R == 2)
         %Interp spacing:
         interpTime = 0.001;
@@ -31,10 +32,17 @@ function makeHistoryPlots(R)
         yLimMargin = 0.25; 
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {'R2S3250431324RegularRects';
-                     'R2S130884612RandRect';
-                     'R2S1619363706RandRect';
-                     'R2S2914381183RandRect'
+        filenames = {'R2S1768893106RegularRects';
+                     'R2S69304096RandRect';
+                     'R2S1318982274RandRect';
+                     'R2S1392623785RandRect';
+                     'R2S1474871623RandRect';
+                     'R2S1559415480RandRect';
+                     'R2S2793489766RandRect';
+                     'R2S2879561549RandRect';
+                     'R2S2959607242RandRect';
+                     'R2S4210929957RandRect';
+                     'R2S4275578477RandRect'
                      };
 
         figures = {};
@@ -47,8 +55,6 @@ function makeHistoryPlots(R)
                     'FMTstar100',              'FMT*',                     r;
                     'FMTstar1000',             'FMT*',                     r;
                     'FMTstar10000',            'FMT*',                     r;
-                    'FMTstar100000',           'FMT*',                     r;
-                    'FMTstar400000',           'FMT*',                     r;
                     'BITstar100',              'BIT*',                     g};
        
        ignorePlanners = {};
@@ -98,10 +104,17 @@ function makeHistoryPlots(R)
         yLimMargin = 0.25; 
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {'R8S229934342RegularRects';
-                     'R8S2312993822RandRect';
-                     'R8S3157356755RandRect';
-                     'R8S3826958238RandRect'
+        filenames = {'R8S2931786282RegularRects';
+                     'R8S611884414RandRect';
+                     'R8S666381624RandRect';
+                     'R8S1005043852RandRect';
+                     'R8S16758865RandRect';
+                     'R8S2090761801RandRect';
+                     'R8S2563592664RandRect';
+                     'R8S2733150352RandRect';
+                     'R8S3119022076RandRect';
+                     'R8S3999221943RandRect';
+                     'R8S4243632470RandRect'
                     };
 
         figures = {};
@@ -114,7 +127,6 @@ function makeHistoryPlots(R)
                     'FMTstar100',              'FMT*',                     r;
                     'FMTstar1000',             'FMT*',                     r;
                     'FMTstar10000',            'FMT*',                     r;
-                    'FMTstar35000',            'FMT*',                     r;
                     'BITstar100',              'BIT*',                     g};
        
        ignorePlanners = {};
@@ -134,10 +146,10 @@ function makeHistoryPlots(R)
         yLimMargin = 0.25; 
 
         %The filesnames ommit the data/ and the .csv.
-        filenames = {%'R16S3209264102RegularRects';
-                     'R16S530875199RandRect';
-                     'R16S3720434557RandRect';
-                     'R16S4153856203RandRect';
+        filenames = {'R16S704792960RegularRects';
+%                      'R16S530875199RandRect';
+%                      'R16S3720434557RandRect';
+%                      'R16S4153856203RandRect';
                     };
 
         figures = {};
@@ -150,7 +162,6 @@ function makeHistoryPlots(R)
                     'FMTstar100',              'FMT*',                     r;
                     'FMTstar1000',             'FMT*',                     r;
                     'FMTstar10000',            'FMT*',                     r;
-                    'FMTstar30000',            'FMT*',                     r;
                     'BITstar100',              'BIT*',                     g};
        
        ignorePlanners = {};
