@@ -2,6 +2,7 @@
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
+#include <ompl/geometric/planners/rrt/SORRTstar.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 
@@ -11,6 +12,7 @@ enum PlannerType
     PLANNER_RRTCONNECT,
     PLANNER_RRTSTAR,
     PLANNER_RRTSTAR_INFORMED,
+    PLANNER_SORRTSTAR,
     PLANNER_RRTSTAR_PRUNE,
     PLANNER_RRTSTAR_NEW_REJECT,
     PLANNER_RRTSTAR_SAMPLE_REJECT,
@@ -34,6 +36,9 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::Sp
 
 /** \brief Allocation function for Informed RRT* */
 boost::shared_ptr<ompl::geometric::InformedRRTstar> allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const double pruneFraction);
+
+/** \brief Allocation function for SORRT* */
+boost::shared_ptr<ompl::geometric::SORRTstar> allocateSorrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const double pruneFraction, const unsigned int numSamples);
 
 /** \brief Allocation function for FMT* */
 boost::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics);

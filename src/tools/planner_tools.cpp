@@ -75,6 +75,31 @@ boost::shared_ptr<ompl::geometric::InformedRRTstar> allocateInformedRrtStar(cons
     return plnr;
 }
 
+boost::shared_ptr<ompl::geometric::SORRTstar> allocateSorrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const double pruneFraction, const unsigned int numSamples)
+{
+    //Create an RRT* planner
+    boost::shared_ptr<ompl::geometric::SORRTstar> plnr  = boost::make_shared<ompl::geometric::SORRTstar>(si);
+
+    //Configure it to be Informed
+    plnr->setOrderedSampling(true);
+    plnr->setBatchSize(numSamples);
+    plnr->setRange(steerEta);
+    plnr->setGoalBias(goalBias);
+    plnr->setKNearest(kNearest);
+    plnr->setRewireFactor(rewireScale);
+    plnr->setPruneThreshold(pruneFraction);
+    plnr->setDelayCC(true);
+
+    std::stringstream plannerName;
+
+    plannerName << "SORRTstar" << numSamples;
+
+    plnr->setName(plannerName.str());
+
+    //Return
+    return plnr;
+}
+
 boost::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics)
 {
     //Create a RRT* planner
@@ -147,6 +172,7 @@ bool isRrtStar(PlannerType plnrType)
 {
     return (plnrType == PLANNER_RRTSTAR ||
             plnrType == PLANNER_RRTSTAR_INFORMED ||
+            plnrType == PLANNER_SORRTSTAR ||
             plnrType == PLANNER_RRTSTAR_NEW_REJECT ||
             plnrType == PLANNER_RRTSTAR_PRUNE ||
             plnrType == PLANNER_RRTSTAR_SAMPLE_REJECT ||
@@ -203,6 +229,11 @@ std::string plannerName(PlannerType plnrType)
         case PLANNER_RRTSTAR_INFORMED:
         {
             return "Informed_RRTstar";
+            break;
+        }
+        case PLANNER_SORRTSTAR:
+        {
+            return "SORRTstar";
             break;
         }
         case PLANNER_FMTSTAR:

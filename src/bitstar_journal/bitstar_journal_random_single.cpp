@@ -107,6 +107,7 @@ const bool BITSTAR_JIT = false;
 const bool BITSTAR_DROP_BATCHES = false;
 
 //Others:
+const unsigned int SORRTSTAR_BATCH_SIZE = 100u;
 const double RRT_REWIRE_SCALE = REWIRE_SCALE;
 const double RRT_GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
 const double FMT_REWIRE_SCALE = REWIRE_SCALE;
@@ -254,6 +255,11 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
             return allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE, PRUNE_FRACTION);
             break;
         }
+        case PLANNER_SORRTSTAR:
+        {
+            return allocateSorrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE, PRUNE_FRACTION, numSamples);
+            break;
+        }
         case PLANNER_FMTSTAR:
         {
             return allocateFmtStar(expDefn->getSpaceInformation(), K_NEAREST, FMT_REWIRE_SCALE, numSamples, FMT_CACHE_CC, FMT_USE_HEURISTICS);
@@ -286,6 +292,11 @@ double currentSolution(const PlannerType& plnrType, const ompl::base::PlannerPtr
     else if (isBitStar(plnrType) == true)
     {
         return plnr->as<ompl::geometric::BITstar>()->bestCost().value();
+    }
+    else if (isRrt(plnrType) == true)
+    {
+        OMPL_WARN("RRT planners are not implemented for animations.");
+        return 0.0;
     }
     else
     {
@@ -331,6 +342,7 @@ int main(int argc, char **argv)
     plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, SORRTSTAR_BATCH_SIZE));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
