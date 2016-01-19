@@ -67,7 +67,7 @@ SpiralExperiment::SpiralExperiment(const double distFraction, const double runSe
     double startPos;
     double goalPos;
     // Some parameters of the spiral
-    double uHeight;
+    double passThickness;
     double uDepth;
 
     // Make the state space Rn:
@@ -149,8 +149,8 @@ SpiralExperiment::SpiralExperiment(const double distFraction, const double runSe
 
     // Define the obstacles
     //The parameters for the spiral walls:
-    uHeight = obsThickness_;
-    uDepth = 0.5*goalDist - 4.0*obsThickness_;
+    passThickness = 2.0*obsThickness_;
+    uDepth = 0.5*goalDist - 2.0*obsThickness_ - 2.0*passThickness;
 
     if ( (1.5*obsThickness_ + uDepth >= goalDist) || (goalDist < 4.0*obsThickness_) )
     {
@@ -161,83 +161,83 @@ SpiralExperiment::SpiralExperiment(const double distFraction, const double runSe
     // Allocate the obstacles' lower-left corners and widths:
     //////OBSTACLE 0//////
     obsCorners_.push_back( ompl::base::ScopedState<>(ss) );
-    obsCorners_.back()[0u] = 0.5*obsThickness_ - 0.5*goalDist;
-    obsCorners_.back()[1u] = 0.5*uHeight;
+    obsCorners_.back()[0u] = 0.5*passThickness - 0.5*goalDist;
+    obsCorners_.back()[1u] = 0.5*passThickness;
     obsWidths_.push_back( std::vector<double>(2u, 0.0) );
     obsWidths_.back().at(0u) = obsThickness_ + uDepth;;
     obsWidths_.back().at(1u) = obsThickness_;
 
     //////OBSTACLE 1//////
     obsCorners_.push_back( ompl::base::ScopedState<>(ss) );
-    obsCorners_.back()[0u] = 0.5*obsThickness_ + uDepth - 0.5*goalDist;
-    obsCorners_.back()[1u] = -0.5*uHeight - obsThickness_;
+    obsCorners_.back()[0u] = 0.5*passThickness + uDepth - 0.5*goalDist;
+    obsCorners_.back()[1u] = -0.5*passThickness - obsThickness_;
     obsWidths_.push_back( std::vector<double>(2u, 0.0) );
     obsWidths_.back().at(0u) = obsThickness_;
-    obsWidths_.back().at(1u) = uHeight + obsThickness_;
+    obsWidths_.back().at(1u) = passThickness + obsThickness_;
 
     //////OBSTACLE 2//////
     obsCorners_.push_back( ompl::base::ScopedState<>(ss) );
-    obsCorners_.back()[0u] = -1.5*obsThickness_ - 0.5*goalDist;
-    obsCorners_.back()[1u] = -0.5*uHeight - obsThickness_;
+    obsCorners_.back()[0u] = -0.5*passThickness - obsThickness_- 0.5*goalDist;
+    obsCorners_.back()[1u] = -0.5*passThickness - obsThickness_;
     obsWidths_.push_back( std::vector<double>(2u, 0.0) );
-    obsWidths_.back().at(0u) = 2.0*obsThickness_ + uDepth;
+    obsWidths_.back().at(0u) = passThickness + obsThickness_ + uDepth;
     obsWidths_.back().at(1u) = obsThickness_;
 
     //////OBSTACLE 3//////
     obsCorners_.push_back( ompl::base::ScopedState<>(ss) );
-    obsCorners_.back()[0u] = -1.5*obsThickness_ - 0.5*goalDist;
-    obsCorners_.back()[1u] =  -0.5*uHeight;
+    obsCorners_.back()[0u] = -0.5*passThickness - obsThickness_ - 0.5*goalDist;
+    obsCorners_.back()[1u] =  -0.5*passThickness;
     obsWidths_.push_back( std::vector<double>(2u, 0.0) );
     obsWidths_.back().at(0u) = obsThickness_;
-    obsWidths_.back().at(1u) = uHeight + 3.0*obsThickness_;
+    obsWidths_.back().at(1u) = 2.0*passThickness + 2.0*obsThickness_;
 
     //////OBSTACLE 4//////
     obsCorners_.push_back( ompl::base::ScopedState<>(ss) );
-    obsCorners_.back()[0u] = -0.5*obsThickness_ - 0.5*goalDist;
-    obsCorners_.back()[1u] = 0.5*uHeight + 2.0*obsThickness_;
+    obsCorners_.back()[0u] = -0.5*passThickness - 0.5*goalDist;
+    obsCorners_.back()[1u] = 1.5*passThickness + obsThickness_;
     obsWidths_.push_back( std::vector<double>(2u, 0.0) );
-    obsWidths_.back().at(0u) = 4.0*obsThickness_ + uDepth;
+    obsWidths_.back().at(0u) = 2.0*passThickness + 2.0*obsThickness_ + uDepth;
     obsWidths_.back().at(1u) = obsThickness_;
 
     //////OBSTACLE 5//////
     obsCorners_.push_back( ompl::base::ScopedState<>(ss) );
-    obsCorners_.back()[0u] = 2.5*obsThickness_ + uDepth - 0.5*goalDist;
-    obsCorners_.back()[1u] = -0.5*uHeight - 3.0*obsThickness_;
+    obsCorners_.back()[0u] = 1.5*passThickness + obsThickness_ + uDepth - 0.5*goalDist;
+    obsCorners_.back()[1u] = -1.5*passThickness - 2.0*obsThickness_;
     obsWidths_.push_back( std::vector<double>(2u, 0.0) );
     obsWidths_.back().at(0u) = obsThickness_;
-    obsWidths_.back().at(1u) = uHeight + 5.0*obsThickness_;
+    obsWidths_.back().at(1u) = 3.0*passThickness + 3.0*obsThickness_;
 
     //////OBSTACLE 6//////
     obsCorners_.push_back( ompl::base::ScopedState<>(ss) );
-    obsCorners_.back()[0u] = -3.5*obsThickness_ - 0.5*goalDist;
-    obsCorners_.back()[1u] = -0.5*uHeight - 3.0*obsThickness_;
+    obsCorners_.back()[0u] = -1.5*passThickness - 2.0*obsThickness_ - 0.5*goalDist;
+    obsCorners_.back()[1u] = -1.5*passThickness - 2.0*obsThickness_;
     obsWidths_.push_back( std::vector<double>(2u, 0.0) );
-    obsWidths_.back().at(0u) = 6.0*obsThickness_ + uDepth;;
+    obsWidths_.back().at(0u) = 3.0*passThickness + 3.0*obsThickness_ + uDepth;;
     obsWidths_.back().at(1u) = obsThickness_;
 
     //////OBSTACLE 7//////
     obsCorners_.push_back( ompl::base::ScopedState<>(ss) );
-    obsCorners_.back()[0u] = -3.5*obsThickness_ - 0.5*goalDist;
-    obsCorners_.back()[1u] = -0.5*uHeight - 2.0*obsThickness_;
+    obsCorners_.back()[0u] = -1.5*passThickness - 2.0*obsThickness_ - 0.5*goalDist;
+    obsCorners_.back()[1u] = -1.5*passThickness - 1.0*obsThickness_;
     obsWidths_.push_back( std::vector<double>(2u, 0.0) );
     obsWidths_.back().at(0u) = obsThickness_;
-    obsWidths_.back().at(1u) = uHeight + 7.0*obsThickness_;
+    obsWidths_.back().at(1u) = 4.0*passThickness + 4.0*obsThickness_;
 
     //////OBSTACLE 8//////
     obsCorners_.push_back( ompl::base::ScopedState<>(ss) );
-    obsCorners_.back()[0u] = -2.5*obsThickness_ - 0.5*goalDist;
-    obsCorners_.back()[1u] = 0.5*uHeight + 4.0*obsThickness_;
+    obsCorners_.back()[0u] = -1.5*passThickness - 1.0*obsThickness_ - 0.5*goalDist;
+    obsCorners_.back()[1u] = 2.5*passThickness + 2.0*obsThickness_;
     obsWidths_.push_back( std::vector<double>(2u, 0.0) );
-    obsWidths_.back().at(0u) = 8.0*obsThickness_ + uDepth;
+    obsWidths_.back().at(0u) = 4.0*passThickness + 4.0*obsThickness_ + uDepth;
     obsWidths_.back().at(1u) = obsThickness_;
 
     //////OBSTACLE 9//////
     obsCorners_.push_back( ompl::base::ScopedState<>(ss) );
-    obsCorners_.back()[0u] = 4.5*obsThickness_ + uDepth - 0.5*goalDist;
-    obsCorners_.back()[1u] = -0.5*uHeight - 3.0*obsThickness_;
+    obsCorners_.back()[0u] = 2.5*passThickness + 2.0*obsThickness_ + uDepth - 0.5*goalDist;
+    obsCorners_.back()[1u] = -1.5*passThickness - 2.0*obsThickness_;
     obsWidths_.push_back( std::vector<double>(2u, 0.0) );
     obsWidths_.back().at(0u) = obsThickness_;
-    obsWidths_.back().at(1u) = uHeight + 7.0*obsThickness_;
+    obsWidths_.back().at(1u) = 4.0*passThickness + 4.0*obsThickness_;
 
     // Add the pairs
     for (unsigned int i = 0u; i < obsCorners_.size(); ++i)
