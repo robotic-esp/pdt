@@ -519,11 +519,11 @@ int main(int argc, char **argv)
     plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, SORRTSTAR_BATCH_SIZE));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, SORRTSTAR_BATCH_SIZE));
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
     //The results output file:
