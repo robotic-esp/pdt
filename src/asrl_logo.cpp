@@ -83,24 +83,28 @@
 const double CHECK_RESOLUTION = 0.001;
 const double MILLISEC_SLEEP = 1.0; //Period for logging data
 
-
-//RRTStar:
-const double RRT_PRUNE_FRACTION = 0.05;
-const double RRT_GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
-const bool RRT_KNEAREST = false;
+//Common:
+const double PRUNE_FRACTION = 0.01;
+const bool K_NEAREST = false;
+const double REWIRE_SCALE = 2.0;
 
 //BITStar:
 const unsigned int BITSTAR_SAMPLES = 100u;
 const bool BITSTAR_STRICT_QUEUE = false;
 const bool BITSTAR_DELAY_REWIRE = false;
-const bool BITSTAR_PRUNE = true;
-const double BITSTAR_PRUNE_FRACTION = 0.01;
-const bool BITSTAR_KNEAREST = false;
+const bool BITSTAR_JIT = false;
+const bool BITSTAR_DROP_BATCHES = false;
+const double BITSTAR_PRUNE_FRACTION = PRUNE_FRACTION;
+const bool BITSTAR_KNEAREST = K_NEAREST;
+const double BITSTAR_REWIRE_SCALE = REWIRE_SCALE;
 
-//The factor scaling the RGG term
-const double RRT_REWIRE_SCALE = 2.0;
-const double FMT_REWIRE_SCALE = RRT_REWIRE_SCALE;
-const double BITSTAR_REWIRE_SCALE = RRT_REWIRE_SCALE;
+//Others:
+const unsigned int SORRTSTAR_BATCH_SIZE = 100u;
+const double RRT_REWIRE_SCALE = REWIRE_SCALE;
+const double RRT_GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
+const double FMT_REWIRE_SCALE = REWIRE_SCALE;
+const bool FMT_CACHE_CC = false;
+const bool FMT_USE_HEURISTICS = false;
 
 
 bool argParse(int argc, char** argv, double* steerPtr, double* runTimePtr, bool* animatePtr)
