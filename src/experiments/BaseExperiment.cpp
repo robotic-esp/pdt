@@ -84,6 +84,11 @@ ompl::time::duration BaseExperiment::getTargetTime() const
     return targetTime_;
 }
 
+ompl::base::GoalPtr BaseExperiment::getGoalPtr() const
+{
+    return goalPtr_;
+}
+
 std::vector<ompl::base::ScopedState<> > BaseExperiment::getStartStates() const
 {
     return startStates_;

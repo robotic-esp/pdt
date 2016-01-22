@@ -186,105 +186,43 @@ bool argParse(int argc, char** argv, double* steerPtr, double* runTimePtr, bool*
     return true;
 };
 
-/*
-//Allocate and configure RRT*
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta)
-{
-    //Create a RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
-    plnr = boost::make_shared<ompl::geometric::RRTstar>(si);
-
-    //Configure it
-    plnr->setGoalBias(RRT_GOAL_BIAS);
-    plnr->setKNearest(RRT_KNEAREST);
-    plnr->setRewireFactor(RRT_REWIRE_SCALE);
-    plnr->setDelayCC(true);
-
-    plnr->setPruneThreshold(1.0);
-    plnr->setTreePruning(false);
-
-    plnr->setNumSamplingAttempts(1000u);
-    plnr->setSampleRejection(false);
-    plnr->setNewStateRejection(false);
-    plnr->setAdmissibleCostToCome(true);
-
-    plnr->setPrunedMeasure(false);
-    plnr->setInformedSampling(false);
-
-    if (steerEta > 0.0)
-    {
-        plnr->setRange(steerEta);
-    }
-    plnr->setName("RRTstar");
-    // No else, use default
-
-    //Return
-    return plnr;
-};
-
-//Allocate and configure Informed RRT*
-boost::shared_ptr<ompl::geometric::RRTstar> allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta)
-{
-    //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
-    plnr = allocateRrtStar(si, steerEta);
-
-    //Configure it to be Informed
-    plnr->setPruneThreshold(RRT_PRUNE_FRACTION);
-    plnr->setInformedSampling(true);
-    plnr->setTreePruning(true);
-    plnr->setPrunedMeasure(true);
-    plnr->setName("Informed_RRTstar");
-
-    //Return
-    return plnr;
-};
-*/
-
-//Allocate and configure BiT*
-boost::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, unsigned int numSamples)
-{
-    std::stringstream plannerName;
-
-    plannerName << "BITstar" << numSamples;
-
-    //Create a BIT* planner
-    boost::shared_ptr<ompl::geometric::BITstar> plnr;
-    plnr = boost::make_shared<ompl::geometric::BITstar>(si);
-
-    //Configure it
-    plnr->setRewireFactor(BITSTAR_REWIRE_SCALE);
-    plnr->setSamplesPerBatch(numSamples);
-    plnr->setKNearest(BITSTAR_KNEAREST);
-    plnr->setStrictQueueOrdering(BITSTAR_STRICT_QUEUE);
-    plnr->setPruning(BITSTAR_PRUNE);
-    plnr->setPruneThresholdFraction(BITSTAR_PRUNE_FRACTION);
-    plnr->setDelayRewiringUntilInitialSolution(BITSTAR_DELAY_REWIRE);
-    plnr->setName(plannerName.str());
-
-    //Return
-    return plnr;
-}
-
-ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExperimentPtr& expDefn, const double steerEta, unsigned int numSamples)
+ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExperimentPtr& expDefn, const double steerEta, const unsigned int numSamples)
 {
     switch(plnrType)
     {
-        /*
+        case PLANNER_RRT:
+        {
+            return allocateRrt(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS);
+            break;
+        }
+        case PLANNER_RRTCONNECT:
+        {
+            return allocateRrtConnect(expDefn->getSpaceInformation(), steerEta);
+            break;
+        }
         case PLANNER_RRTSTAR:
         {
-            return allocateRrtStar(expDefn->getSpaceInformation(), steerEta);
+            return allocateRrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE);
             break;
         }
         case PLANNER_RRTSTAR_INFORMED:
         {
-            return allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta);
+            return allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE, PRUNE_FRACTION);
             break;
         }
-        */
+        case PLANNER_SORRTSTAR:
+        {
+            return allocateSorrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE, PRUNE_FRACTION, numSamples);
+            break;
+        }
+        case PLANNER_FMTSTAR:
+        {
+            return allocateFmtStar(expDefn->getSpaceInformation(), K_NEAREST, FMT_REWIRE_SCALE, numSamples, FMT_CACHE_CC, FMT_USE_HEURISTICS);
+            break;
+        }
         case PLANNER_BITSTAR:
         {
-            return allocateBitStar(expDefn->getSpaceInformation(), numSamples);
+            return allocateBitStar(expDefn->getSpaceInformation(), K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCHES);
             break;
         }
         default:

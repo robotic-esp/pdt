@@ -79,6 +79,9 @@ public:
     /** \brief Return the maximum experiment runtime */
     ompl::time::duration getTargetTime() const;
 
+    /** \brief Get the goal */
+    ompl::base::GoalPtr getGoalPtr() const;
+
     /** \brief Get the starts */
     std::vector<ompl::base::ScopedState<> > getStartStates() const;
 
