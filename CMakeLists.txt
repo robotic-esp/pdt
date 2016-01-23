@@ -53,6 +53,7 @@ add_library(experiments
   src/experiments/CentreSquareExperiment.cpp
   src/experiments/DeadEndExperiment.cpp
   src/experiments/DividingWallExperiment.cpp
+  src/experiments/DoubleEnclosureExperiment.cpp
   src/experiments/FlankingGapExperiment.cpp
   src/experiments/MultiStartGoalExperiment.cpp
   src/experiments/RandomRectanglesExperiment.cpp
@@ -147,6 +148,9 @@ add_executable(bitstar_journal_random_single
 add_executable(bitstar_journal_regular
   src/bitstar_journal/bitstar_journal_regular.cpp
 )
+add_executable(bitstar_journal_first_soln
+  src/bitstar_journal/bitstar_journal_first_soln.cpp
+)
 target_link_libraries(bitstar_journal_targets
   obstacles
   experiments
@@ -162,6 +166,13 @@ target_link_libraries(bitstar_journal_random_single
   ${OMPL_LIBRARIES}
 )
 target_link_libraries(bitstar_journal_regular
+  obstacles
+  experiments
+  ompl_tools
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
+target_link_libraries(bitstar_journal_first_soln
   obstacles
   experiments
   ompl_tools

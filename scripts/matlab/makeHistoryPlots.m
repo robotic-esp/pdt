@@ -15,8 +15,69 @@ function makeHistoryPlots(R)
 	k = [0 0 0];
 
     %Plot time:
+    if (R == 0.2)
+        %Interp spacing:
+        interpTime = 0.001;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+        
+        %Number of experiments in each file:
+        numExp = 100;
     
-    if (R == 2)
+        plotTime = 1;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25; 
+
+        %The filesnames ommit the data/ and the .csv.
+        filenames = {'R2S1916971778SpiralExperiment'
+                     };
+
+        figures = {};
+
+        %The planner names (log and plot) and colours:
+        planners = {'RRTConnect',              'RRTConnect',               k;
+                    'RRT',                     'RRT',                      y;
+                    'RRTstar',                 'RRT*',                     m;
+                    'Informed_RRTstar',        'Informed RRT*',            c;
+                    'SORRTstar100',            'SORRT*',                   b;
+                    'FMTstar100',              'FMT*',                     r;
+                    'FMTstar1000',             'FMT*',                     r;
+                    'FMTstar10000',            'FMT*',                     r;
+                    'BITstar100',              'BIT*',                     g};
+
+       
+       ignorePlanners = {};
+    elseif (R == 0.8)
+        %Interp spacing:
+        interpTime = 0.001;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+        
+        %Number of experiments in each file:
+        numExp = 50;
+    
+        plotTime = 1.0*60;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25; 
+
+        %The filesnames ommit the data/ and the .csv.
+        filenames = {'R8S2926895744RandRect'
+                     };
+
+        figures = {};
+
+        %The planner names (log and plot) and colours:
+        planners = {'RRTConnect',              'RRTConnect',               k;
+                    'Informed_RRTstar',        'Informed RRT*',            c;
+                    'SORRTstar100',            'SORRT*',                   b;
+                    'BITstar100',              'BIT*',                     g};
+       
+       ignorePlanners = {};
+    elseif (R == 2)
         %Interp spacing:
         interpTime = 0.001;
 

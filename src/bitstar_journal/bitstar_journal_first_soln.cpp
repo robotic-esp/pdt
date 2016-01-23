@@ -89,9 +89,6 @@ THIS CODE ONLY COMPILES ON THE set_rrtstar_seeds BRANCH!!!!
 
 //World:
 const double CHECK_RESOLUTION = 0.001;
-const double WORLD_WIDTH = 4.0;
-const unsigned int NUM_INTER_OBS = 5u;
-const double MILLISEC_SLEEP = 1.0; //Period for logging data
 
 //Common:
 const double PRUNE_FRACTION = 0.01;
@@ -109,7 +106,7 @@ const bool BITSTAR_DROP_BATCHES = false;
 //Others:
 const unsigned int SORRTSTAR_BATCH_SIZE = 100u;
 const double RRT_REWIRE_SCALE = REWIRE_SCALE;
-const double RRT_GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
+const double RRT_GOAL_BIAS = 0.0;
 const double FMT_REWIRE_SCALE = REWIRE_SCALE;
 const bool FMT_CACHE_CC = false;
 const bool FMT_USE_HEURISTICS = false;
@@ -120,8 +117,15 @@ const bool PLOT_BITSTAR_ELLIPSE = true;
 const bool PLOT_BITSTAR_EDGE = true;
 const bool PLOT_BITSTAR_QUEUE = false;
 
+enum ProblemType
+{
+    TIME_V_GAPSIZE,
+    TIME_V_MAPSIZE,
+    TIME_V_TARGET
+};
 
-bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPtr, unsigned int* numExperimentsPtr, double* runTimePtr, bool* animatePtr)
+
+bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPtr, unsigned int* numTrialsPtr, double* runTimePtr, bool* animatePtr)
 {
     // Declare the supported options.
     boost::program_options::options_description desc("Allowed options");
@@ -162,7 +166,7 @@ bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPt
 
     if (vm.count("experiments"))
     {
-        *numExperimentsPtr = vm["experiments"].as<unsigned int>();
+        *numTrialsPtr = vm["experiments"].as<unsigned int>();
     }
     else
     {
@@ -277,40 +281,13 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
     }
 };
 
-void callSolve(const ompl::base::PlannerPtr& planner, const ompl::time::duration& solveDuration)
-{
-    //planner->solve( solveDuration );
-    planner->solve( ompl::time::seconds(solveDuration) );
-}
-
-double currentSolution(const PlannerType& plnrType, const ompl::base::PlannerPtr& plnr)
-{
-    if (isRrtStar(plnrType) == true)
-    {
-        return plnr->as<ompl::geometric::RRTstar>()->bestCost().value();
-    }
-    else if (isBitStar(plnrType) == true)
-    {
-        return plnr->as<ompl::geometric::BITstar>()->bestCost().value();
-    }
-    else if (isRrt(plnrType) == true)
-    {
-        OMPL_WARN("RRT planners are not implemented for animations.");
-        return 0.0;
-    }
-    else
-    {
-        throw ompl::Exception("Unrecognized planner type in currentSolution");
-    }
-};
-
 int main(int argc, char **argv)
 {
     //Argument Variables
     //The dimension size:
     unsigned int N;
     //The number of experiments
-    unsigned int numExperiments;
+    unsigned int numRuns;
     //The time for which to run the planners
     double maxTime;
     //The steer / range of RRT
@@ -319,13 +296,13 @@ int main(int argc, char **argv)
     bool createAnimationFrames;
 
     //Get the command line arguments
-    if (argParse(argc, argv, &N, &steerEta, &numExperiments, &maxTime, &createAnimationFrames) == false)
+    if (argParse(argc, argv, &N, &steerEta, &numRuns, &maxTime, &createAnimationFrames) == false)
     {
         return 1;
     }
 
     //Variables
-//    ompl::RNG::setSeed(3348892111);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
+//    ompl::RNG::setSeed(2971235666);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
     boost::uint32_t masterSeed = ompl::RNG::getSeed();
     //The filename for progress
@@ -334,62 +311,65 @@ int main(int argc, char **argv)
     std::stringstream worldName;
     //The vector of planner types:
     std::vector<std::pair<PlannerType, unsigned int> > plannersToTest;
-    //The experiment
-    RegularRectanglesExperimentPtr experiment;
+    //The experiment definitions for this run
+    BaseExperimentPtr expDefn = boost::make_shared<ObstacleFreeExperiment>(N, 1u, 1u, maxTime);;
 
     //Specify the planners:
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+//    plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, SORRTSTAR_BATCH_SIZE));
-    plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
-
-    //Create one experiment for all runs:
-    experiment = boost::make_shared<RegularRectanglesExperiment>(N, WORLD_WIDTH, NUM_INTER_OBS, maxTime, CHECK_RESOLUTION);
+//    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
+//    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
+//    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
+//    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
+//    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
+//    plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, SORRTSTAR_BATCH_SIZE));
+//    plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
     //The results output file:
-    fileName << "R" << N << "S" << masterSeed << experiment->getName() << ".csv";
+    fileName << "R" << N << "S" << masterSeed << "SolnTime.csv";
 
     //Let people know what's going on:
     std::cout << "Seed: " << masterSeed << std::endl;
     std::cout << "Output: " << fileName.str() << std::endl;
-    std::cout << experiment->paraInfo() << std::endl;
 
-    ResultsFile<TimeCostHistory> progressHistory(fileName.str());
+    ResultsFile<TargetTimeResults> timePerSoln(fileName.str());
+
+    //Make the goal a goal region of radius 0.1 (?)
+    expDefn->getGoalPtr()->as<ompl::base::GoalRegion>()->setThreshold(0.1);
 
     //Perform numRuns
-    for (unsigned int q = 0u; q < numExperiments; ++q)
+    for (unsigned int q = 0u; q < numRuns; ++q)
     {
-        //A RNG, we will use it's seed for all the planners, but not actually use the RNG...
-        ompl::RNG seedRNG;
-        bool badExperiment = false;
+        //Variables:
+        //A vector of RNGs, we will use their seeds for all the planners, but not actually use the RNG...
+        boost::shared_ptr<ompl::RNG> seedRNG;
 
         //Iterate over the planners:
-        for (unsigned int p = 0u; p < plannersToTest.size() && badExperiment == false; ++p)
+        for (unsigned int p = 0u; p < plannersToTest.size(); ++p)
         {
             //Variables
-            //The start time for a call
-            ompl::time::point startTime;
-            //The run time
-            ompl::time::duration runTime(0,0,0,0);
             //The current planner:
             ompl::base::PlannerPtr plnr;
+            //The cumulative runtime
+            ompl::time::duration runTime(0,0,0,0);
+            //The results from this planners for this one trial
+            TargetTimeResults runResults(1u);
+            //The start time for a call
+            ompl::time::point startTime;
             //The problem defintion used by this planner
             ompl::base::ProblemDefinitionPtr pdef;
-            //The results from this planners run across all the variates:
-            TimeCostHistory runResults(experiment->getTargetTime(), MILLISEC_SLEEP);
-            //The final cost of this planner:
-            ompl::base::Cost finalCost;
 
-            //Allocate a planner
-            plnr = allocatePlanner(plannersToTest.at(p).first, experiment, steerEta, plannersToTest.at(p).second);
+            //If this is the first planner of this experiment, create the seed for this target variable
+            if (p == 0u)
+            {
+                seedRNG = boost::make_shared<ompl::RNG>();
+            }
+
+            //allocate,
+            plnr = allocatePlanner(plannersToTest.at(p).first, expDefn, steerEta, plannersToTest.at(p).second);
 
             //Get the problem definition
-            pdef = experiment->newProblemDefinition();
+            pdef = expDefn->newProblemDefinition();
 
             //Give to the planner
             plnr->setProblemDefinition(pdef);
@@ -402,124 +382,84 @@ int main(int argc, char **argv)
             //Set the planner seed:
             if (isRrtStar(plannersToTest.at(p).first) == true)
             {
-                plnr->as<ompl::geometric::RRTstar>()->setLocalSeed(seedRNG.getLocalSeed());
+                plnr->as<ompl::geometric::RRTstar>()->setLocalSeed(seedRNG->getLocalSeed());
             }
             if (isBitStar(plannersToTest.at(p).first) == true)
             {
-                plnr->as<ompl::geometric::BITstar>()->setLocalSeed(seedRNG.getLocalSeed());
+                plnr->as<ompl::geometric::BITstar>()->setLocalSeed(seedRNG->getLocalSeed());
             }
 
             //This must come after setup to get the steer info!
-            //If this is the first planner of a trial, output at least the trial number:
+            //If this is the first run of the first planner, we have info to output
             if (p == 0u)
             {
-                //If this is also the first run ever, output start info:
+                //First, if this is also the first run ever, output start info:
                 if (q == 0u)
                 {
-                    std::cout << "First experiment: " << std::endl;
-                    experiment->print(false);
-                    //The first column is 7 wide for a 6-digit trial number and a ":"
-                    std::cout << std::setw(7) << std::setfill(' ') << " ";
-
-                    //The subsequent columns are 30 wide for planner names, skip the first planner which is the reference solution:
-                    for (unsigned int i = 0u; i < plannersToTest.size(); ++i)
-                    {
-                        std::cout << std::setw(30) << std::setfill(' ') << plannerName(plannersToTest.at(i).first) << std::flush;
-                    }
-                    std::cout << std::endl;
+                    //The first column is 25 wide for planner names
+                    std::cout << std::setw(25) << std::setfill(' ') << " ";
+                    //The subsequent columns are 20 wide for 15 chars of time and 5 of padding
+                    std::cout << std::setw(20) << std::setfill(' ') << ASRL_DBL_INFINITY << std::endl;
                 }
                 //No else
 
-                //The trial number is 6-digits with 3 of padding
-                std::cout << std::setw(6) << std::setfill(' ') << q << ":" << std::flush;
+                //Then, output the trial number
+                std::cout << std::setw(3) << std::setfill('0') << q << std::flush;// << std::endl;
             }
             //No else
+
+            //Output the planner name:
+            std::cout << std::setw(25) << std::setfill(' ') << plnr->getName() << std::flush;
 
             //Run the planner:
             if (createAnimationFrames == true)
             {
-                runTime = runTime + createAnimation(experiment, plannersToTest.at(p).first, plnr, masterSeed, experiment->getTargetTime() - runTime, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
-                runResults.push_back( std::make_pair(runTime, currentSolution(plannersToTest.at(p).first, plnr)) );
+                runTime = runTime + createAnimation(expDefn, plannersToTest.at(p).first, plnr, masterSeed, expDefn->getTargetTime() - runTime, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
             }
             else
             {
-                //Store the starting time:
+                //Get the end result:
                 startTime = ompl::time::now();
-
-                //Start solving in another thread. We use an intermediate function for this as the class function is overloaded.
-                boost::thread solveThread(callSolve, plnr, experiment->getTargetTime() - runTime);
-
-                //Log data
-                do
-                {
-                    if (isRrt(plannersToTest.at(p).first) == true || plannersToTest.at(p).first == PLANNER_FMTSTAR)
-                    {
-                        //Do nothing, these planners have no intermediate data to store
-                    }
-                    else
-                    {
-                        //Store the runtime and the current cost
-                        runResults.push_back( std::make_pair(ompl::time::now() - startTime + runTime, currentSolution(plannersToTest.at(p).first, plnr)) );
-                    }
-                }
-                while ( solveThread.timed_join(boost::posix_time::milliseconds(MILLISEC_SLEEP)) == false);
-
-                //Store the final run time and cost
+                plnr->solve( ompl::time::seconds(expDefn->getTargetTime() - runTime) );
                 runTime = runTime + (ompl::time::now() - startTime);
-
-                //Find the final cost
-                if (pdef->hasExactSolution() == false)
-                {
-                    //The final cost is infinite
-                    finalCost = ompl::base::Cost(ASRL_DBL_INFINITY);
-
-                    //If we didn't find a solution on the first attempt, mark as a bad experiment
-                    if (p == 0u)
-                    {
-                        badExperiment = true;
-                    }
-                }
-                else
-                {
-                    //The final cost is finite
-                    finalCost = pdef->getSolutionPath()->cost(experiment->getOptimizationObjective());
-                }
-
-                //Is this a good experiment?
-                if (badExperiment == true)
-                {
-                    //It's not a good experiment, so try a different one
-                    --q;
-                }
-                else
-                {
-                    //It is, store the results
-                    runResults.push_back( std::make_pair(runTime, finalCost.value()) );
-                    progressHistory.addResult(plnr->getName(), runResults);
-                }
             }
 
-            //Save the map:
-            if (plannersToTest.at(p).second <= 5000u)
+            //Store the result:
+            if (pdef->hasExactSolution() == true)
             {
-                writeMatlabMap(experiment, plannersToTest.at(p).first, plnr, masterSeed, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE, "plots/");
+                runResults.push_back(std::make_pair(ASRL_DBL_INFINITY, runTime));
+            }
+            else
+            {
+                runResults.push_back(std::make_pair(ASRL_DBL_INFINITY, ompl::time::duration(boost::date_time::neg_infin)));
             }
 
-            if (badExperiment == false)
+//            if (plannersToTest.at(p).second <=  5000u)
+//            {
+//                //Save the map:
+//                std::stringstream postFix;
+//                postFix << problemPostfix(problemType) << indepVariables.at(v) << "E" << q;
+//                writeMatlabMap(expDefn, plannersToTest.at(p).first, plnr, masterSeed, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE, "plots/", postFix.str());
+//            }
+
+            //Output info to the terminal:
+            //If the result is infinite, pad with an extra 6 white spaces, as the word "+infinity" is 9 chars long.:
+            if (runResults.back().second.is_special() == true)
             {
-                //Output 3 characters of white space and then the time, which is 15 chars wide:
-                std::cout << std::setw(5) << std::setfill(' ') << " " << std::flush;
-                std::cout << runTime << std::flush;
-                //Then a comma and 1 space,
-                std::cout << " " << std::flush;
-                //And the cost using the remaining 30 - 5 - 15 - 1 = 9 characters:
-                std::cout << std::setprecision(6) << std::setw(9) << std::setfill(' ') << finalCost.value() << std::flush;
+                std::cout << std::setw(6) << std::setfill(' ') << " ";
             }
+
+            //Finally, output the time padded with 5 whitespaces in the front (manually, as it doesn't work on time), as the number is (nominally) of the form 00:00:00.123456
+            std::cout << std::setw(5) << std::setfill(' ') << " " << runResults.back().second << std::flush;
+
+            std::cout << std::endl;
+
+            //Store this information in the time file.
+            timePerSoln.addResult(plnr->getName(), runResults);
         }
         //Get the next planner
-        std::cout << std::endl;
     }
-    //Perform the next experiment
+    //Perform the next run
 
     return 0;
 }

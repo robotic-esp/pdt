@@ -3,6 +3,7 @@
 #include "experiments/CentreSquareExperiment.h"
 #include "experiments/DeadEndExperiment.h"
 #include "experiments/DividingWallExperiment.h"
+#include "experiments/DoubleEnclosureExperiment.h"
 #include "experiments/FlankingGapExperiment.h"
 #include "experiments/MultiStartGoalExperiment.h"
 #include "experiments/ObstacleFreeExperiment.h"
