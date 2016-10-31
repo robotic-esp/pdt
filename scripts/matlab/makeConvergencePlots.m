@@ -19,11 +19,11 @@ function makeConvergencePlots
     filenames = {
                  %%% Steer: Infinite. Rewire: Infinite
                  'ConvergeR2S3599049271SteerinfRewireinf', 2, 10000, true, true;
-%                  'ConvergeR4S4138350479SteerinfRewireinf', 4, 10000, true, true;
-%                  'ConvergeR8S4235719018SteerinfRewireinf', 8, 10000, true, true;
+                 'ConvergeR4S4138350479SteerinfRewireinf', 4, 10000, true, true;
+                 'ConvergeR8S4235719018SteerinfRewireinf', 8, 10000, true, true;
                  
 %                  %%% Steer: Finite. Rewire: Infinite
-                 'ConvergeR2S505806321Steer0.4Rewireinf', 2, 10000, true, true;
+%                 'ConvergeR2S505806321Steer0.4Rewireinf', 2, 10000, true, true;
 %                  'ConvergeR4S673083786Steer0.4Rewireinf', 4, 10000, true, true;
 %                  'ConvergeR8S201999010Steer0.4Rewireinf', 8, 10000, true, true;
 %                  
@@ -48,7 +48,7 @@ function makeConvergencePlots
         [rateHandl, errorHandl] = plotConvergences(data, planners, filenames{i,2}, minCost, c, b, k, numMean, filenames{i,4}, filenames{i,5}, ignorePlanners);
 
         for j = 1:size(planners,1)
-%             saveEpsToPdf(rateHandl(j), ['data/' filenames{i,1} '_Planner' num2str(j) '.pdf']);
+            saveEpsToPdf(rateHandl(j), ['data/' filenames{i,1} '_Planner' num2str(j) '.pdf']);
             close(rateHandl(j));
             if isgraphics(errorHandl(j),'Figure')
                saveEpsToPdf(errorHandl(j), ['data/' filenames{i,1} '_Planner' num2str(j) '_Error.pdf']);
