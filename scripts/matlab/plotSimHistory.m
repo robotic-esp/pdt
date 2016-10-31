@@ -242,26 +242,26 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
                 %Now plot history:
                 figure(histHandl);
                 
-                %The initial solution first:
-                histHandles(i,1) = plot(centralInitSolnTime, centralInitSolnCost);
-                set(histHandles(i,1), 'Color', plannerColours{i});
-                set(histHandles(i,1), 'LineStyle', 'none');
-                set(histHandles(i,1), 'Marker', '.');
-                set(histHandles(i,1), 'MarkerSize', 15);
-                
-                %Plot both error bars on the median initial solution
-                if plotMedianCIErrorBars == true || plotAverageSTDErrorBars == true
-                    %The min, 2*maxHistCost remaps infinite costs to a finite value off the plot...
-                    errHandle = errorbar(centralInitSolnTime, centralInitSolnCost, lowerBoundInitCost, min( [higherBoundInitCost, (1 + 1.1*yLimMargin)*maxHistCost] ));
-                    set(errHandle, 'Color', plannerColours{i});
-                    set(errHandle, 'LineStyle', 'none');
-                    
-                    errorbar_tick(errHandle, vErrTick); %Set errorbar width
-                    errHandle = herrorbar(centralInitSolnTime, centralInitSolnCost, lowerBoundInitTime, min( [higherBoundInitTime, 1.1*maxPlotTime] ), 'k', hErrTick); %'k' is a place  holder
-                    set(errHandle(1), 'Color', plannerColours{i});
-                    set(errHandle(2), 'LineStyle', 'none');
-                    %DO NOT try and set the herrorbar height with errobar_tick, it will actually change the width (i.e., length)
-                end
+%                 %The initial solution first:
+%                 histHandles(i,1) = plot(centralInitSolnTime, centralInitSolnCost);
+%                 set(histHandles(i,1), 'Color', plannerColours{i});
+%                 set(histHandles(i,1), 'LineStyle', 'none');
+%                 set(histHandles(i,1), 'Marker', '.');
+%                 set(histHandles(i,1), 'MarkerSize', 15);
+%                 
+%                 %Plot both error bars on the median initial solution
+%                 if plotMedianCIErrorBars == true || plotAverageSTDErrorBars == true
+%                     %The min, 2*maxHistCost remaps infinite costs to a finite value off the plot...
+%                     errHandle = errorbar(centralInitSolnTime, centralInitSolnCost, lowerBoundInitCost, min( [higherBoundInitCost, (1 + 1.1*yLimMargin)*maxHistCost] ));
+%                     set(errHandle, 'Color', plannerColours{i});
+%                     set(errHandle, 'LineStyle', 'none');
+%                     
+% %                     errorbar_tick(errHandle, vErrTick); %Set errorbar width
+%                     errHandle = herrorbar(centralInitSolnTime, centralInitSolnCost, lowerBoundInitTime, min( [higherBoundInitTime, 1.1*maxPlotTime] ), 'k', hErrTick); %'k' is a place  holder
+%                     set(errHandle(1), 'Color', plannerColours{i});
+%                     set(errHandle(2), 'LineStyle', 'none');
+%                     %DO NOT try and set the herrorbar height with errobar_tick, it will actually change the width (i.e., length)
+%                 end
                 
                 if ~isScalar
                     %Plot the incomplete trend
@@ -308,7 +308,7 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
                         %solutions, we never have enough to have a median
                         %line. In which case, the error handles are empty
                         if (~isempty(errHandle))
-                            errorbar_tick(errHandle, vErrTick); %Set errorbar width
+%                             errorbar_tick(errHandle, vErrTick); %Set errorbar width
                         end
                     end
                 end
@@ -368,7 +368,7 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
             ylim([0 101]);
 
             %Set the ratio
-            pbaspect([3 1 1]); %ICRA/IROS: [6 1 1]
+            pbaspect([6 1 1]); %ICRA/IROS: [6 1 1]
         elseif handles(i) == histHandl
             title('Solution cost vs. time', 'FontSize', labelFontSize, 'Interpreter', 'latex');        
         
@@ -391,7 +391,7 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
             ylim([yMin - 0.01*mean([minHistCost, maxHistCost]) yMax + 0.01*mean([minHistCost, maxHistCost])]);
 
             %Set the ratio
-            pbaspect([2 1 1]); %ICRA/IROS: [3 1 1]
+            pbaspect([3 1 1]); %ICRA/IROS: [3 1 1]
         else
             error('Unacceptable handle')
         end
@@ -421,8 +421,8 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
 %             set(lHandle, 'OuterPosition', [lPos(1) lPos(2)-0.23 lPos(3:4)] )
 %         elseif handles(i) == histHandl
 %             %Fudge vertical position
-            lPos = get(lHandle, 'OuterPosition');
-            set(lHandle, 'OuterPosition', [lPos(1) lPos(2)-0.1 lPos(3:4)] )
+            lPos = get(lHandle, 'Position');
+            set(lHandle, 'Position', [lPos(1) lPos(2)-0.1 lPos(3:4)] )
 %         else
 %             error('Unacceptable handle')
 %         end

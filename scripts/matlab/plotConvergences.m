@@ -1,4 +1,4 @@
-function rateHandles = plotConvergences(rawPlannerData, plannerNames, dimension, minimumCost, trialColour, meanColour, expectColour, numMean, plotPredicted, plotFitted, ignorePlanners)
+function [rateHandles, diffHandles] = plotConvergences(rawPlannerData, plannerNames, dimension, minimumCost, trialColour, meanColour, expectColour, numMean, plotPredicted, plotFitted, ignorePlanners)
     %rawPlannerData is :  numPlanners x {iter_number,cost} x numTrials x datapoints
     
     %Bah
@@ -16,6 +16,7 @@ function rateHandles = plotConvergences(rawPlannerData, plannerNames, dimension,
 
     %Preallocate:
     rateHandles = nan(size(rawPlannerData,1),1);
+    diffHandles = nan(size(rawPlannerData,1),1);
     plotPlanners = true(size(rawPlannerData,1),1);
     
     for p = 1:size(rawPlannerData,1)
@@ -129,6 +130,7 @@ function rateHandles = plotConvergences(rawPlannerData, plannerNames, dimension,
             
             %Configure the experimental plot:
             grid on;
+            box off;
             set(gca, 'YScale','log');
             set(gca, 'YMinorGrid','on')
 
@@ -143,6 +145,9 @@ function rateHandles = plotConvergences(rawPlannerData, plannerNames, dimension,
 
             %Set the x axis
             xlabel('Iteration', 'FontSize', labelFontSize, 'Interpreter', 'latex');
+                    
+            %Set the ratio
+            pbaspect([3 1 1]);
 
             if (plotPredicted && plotFitted)
                 lHandle = legend([trialHandl, meanHandl, trendHandl, expectHandl], {'Trials' 'Mean', 'Regression', 'Predicted'});
@@ -171,7 +176,7 @@ function rateHandles = plotConvergences(rawPlannerData, plannerNames, dimension,
                     
                     %Plot the difference between theory and mean. Skipping
                     %the first value which is 0 by definition.
-                    errorHandl = plot((firstIter+1):lastIter, abs(theoryError(1,2:end) - meanError(1,(firstIdx+1):lastIdx)));
+                    errorHandl = plot((firstIter+1):lastIter, 100*abs((meanError(1,(firstIdx+1):lastIdx) - theoryError(1,2:end))./meanError(1,(firstIdx+1):lastIdx)));
 
                     set(errorHandl, 'Color', 'r');
                     set(errorHandl, 'LineStyle', '-');
@@ -179,23 +184,23 @@ function rateHandles = plotConvergences(rawPlannerData, plannerNames, dimension,
                     
                     %Configure the plot:
                     grid on;
-                    set(gca, 'YScale','log');
+                    box off;
                     set(gca, 'YMinorGrid','on')
 
                     %Set the x limit
                     xlim([0.999*firstIter 1.001*max(max(thisIters(thisError~=0)))]);
-                    ylim([1e-16 1e-2]);
+                    ylim([0 100]);
 
                     title(['R$^{' num2str(dimension) '}$ prediction error'], 'FontSize', labelFontSize, 'Interpreter', 'latex');
 
                     %Set the y axes
-                    ylabel('Logarithmic prediction error', 'FontSize', labelFontSize, 'Interpreter', 'latex');
+                    ylabel('Relative prediction error', 'FontSize', labelFontSize, 'Interpreter', 'latex');
 
                     %Set the x axis
                     xlabel('Iteration', 'FontSize', labelFontSize, 'Interpreter', 'latex');
                     
                     %Set the ratio
-                    pbaspect([2 1 1]);
+                    pbaspect([6 1 1]);
 
                     lHandle = legend(errorHandl, 'Prediction Error');
 

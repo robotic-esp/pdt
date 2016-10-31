@@ -172,7 +172,7 @@ function [succHandl, timeHandl] = plotTargetTimes(variateType, rawPlannerData, p
                     errHandle = errorbar(thisTarget, barCentres, barLowers, barUppers);
                     set(errHandle, 'Color', plannerColours{i});
                     set(errHandle, 'LineStyle', 'none');
-                    errorbar_tick(errHandle, vErrTick); %Set errorbar width
+%                     errorbar_tick(errHandle, vErrTick); %Set errorbar width
                 end
         else
             %This planner has no data, do not plot:
@@ -209,6 +209,7 @@ function [succHandl, timeHandl] = plotTargetTimes(variateType, rawPlannerData, p
         figure(handles(i));
         
         grid on;
+        box off;
         
         %Set the x limit (y is in if)
         xlim([0.9999*minTargetVal 1.0001*maxTargetVal]);
@@ -236,7 +237,7 @@ function [succHandl, timeHandl] = plotTargetTimes(variateType, rawPlannerData, p
             xlabel('Target', 'FontSize', labelFontSize, 'Interpreter', 'latex');
             
             %Set the ratio
-            pbaspect([3 1 1]);
+            pbaspect([6 1 1]);
         elseif handles(i) == timeHandl
             title('Computational time vs. target', 'FontSize', labelFontSize, 'Interpreter', 'latex');        
         
@@ -263,7 +264,7 @@ function [succHandl, timeHandl] = plotTargetTimes(variateType, rawPlannerData, p
             set(gca,'YMinorGrid','on')
 
             %Set the ratio
-            pbaspect([2 1 1]);
+            pbaspect([3 1 1]);
         else
             error('Unacceptable handle')
         end

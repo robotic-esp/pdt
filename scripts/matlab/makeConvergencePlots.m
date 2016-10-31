@@ -19,18 +19,18 @@ function makeConvergencePlots
     filenames = {
                  %%% Steer: Infinite. Rewire: Infinite
                  'ConvergeR2S3599049271SteerinfRewireinf', 2, 10000, true, true;
-                 'ConvergeR4S4138350479SteerinfRewireinf', 4, 10000, true, true;
-                 'ConvergeR8S4235719018SteerinfRewireinf', 8, 10000, true, true;
+%                  'ConvergeR4S4138350479SteerinfRewireinf', 4, 10000, true, true;
+%                  'ConvergeR8S4235719018SteerinfRewireinf', 8, 10000, true, true;
                  
-                 %%% Steer: Finite. Rewire: Infinite
-%                  'ConvergeR2S505806321Steer0.4Rewireinf', 2, 10000, true, true;
+%                  %%% Steer: Finite. Rewire: Infinite
+                 'ConvergeR2S505806321Steer0.4Rewireinf', 2, 10000, true, true;
 %                  'ConvergeR4S673083786Steer0.4Rewireinf', 4, 10000, true, true;
 %                  'ConvergeR8S201999010Steer0.4Rewireinf', 8, 10000, true, true;
-                 
-                 %%% Steer: Infinite. Rewire: Finite
-%                  'ConvergeR2S3380876990SteerinfRewire1.1', 2, 10000, false, false;
-%                  'ConvergeR4S2607726372SteerinfRewire1.1', 4, 10000, false, false;
-%                  'ConvergeR8S1735541730SteerinfRewire1.1', 8, 10000, false, false;
+%                  
+%                  %%% Steer: Infinite. Rewire: Finite
+%                  'ConvergeR2S3380876990SteerinfRewire1.1', 2, 10000, true, false;
+%                  'ConvergeR4S2607726372SteerinfRewire1.1', 4, 10000, true, false;
+%                  'ConvergeR8S1735541730SteerinfRewire1.1', 8, 10000, true, false;
                  
                  %%% Steer: Finite. Rewire: Finite
 %                  'ConvergeR2S3687473251Steer0.4Rewire1.1', 2, 10000, false, false;
@@ -45,12 +45,12 @@ function makeConvergencePlots
 
     for i = 1:size(filenames,1)
         data = processIterCostData(['data/' filenames{i,1} '.csv'], filenames{i,3}, minCost);
-        [rateHandl errorHandl] = plotConvergences(data, planners, filenames{i,2}, minCost, c, b, k, numMean, filenames{i,4}, filenames{i,5}, ignorePlanners);
+        [rateHandl, errorHandl] = plotConvergences(data, planners, filenames{i,2}, minCost, c, b, k, numMean, filenames{i,4}, filenames{i,5}, ignorePlanners);
 
         for j = 1:size(planners,1)
-            saveEpsToPdf(rateHandl(j), ['data/' filenames{i,1} '_Planner' num2str(j) '.pdf']);
+%             saveEpsToPdf(rateHandl(j), ['data/' filenames{i,1} '_Planner' num2str(j) '.pdf']);
             close(rateHandl(j));
-            if ~isnan(errorHandl(j))
+            if isgraphics(errorHandl(j),'Figure')
                saveEpsToPdf(errorHandl(j), ['data/' filenames{i,1} '_Planner' num2str(j) '_Error.pdf']);
                close(errorHandl(j));
             end
