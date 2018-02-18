@@ -132,9 +132,6 @@ add_executable(time_prune
 add_executable(asrl_logo
   src/asrl_logo.cpp
 )
-add_executable(rrtsharp_response
-  src/rrtsharp_response.cpp
-)
 target_link_libraries(learn_binary_heap
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_LIBRARIES}
@@ -183,15 +180,6 @@ target_link_libraries(asrl_logo
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
 )
-target_link_libraries(rrtsharp_response
-  obstacles
-  experiments
-  ompl_tools
-  ${CMAKE_THREAD_LIBS_INIT}
-  ${Boost_LIBRARIES}
-  ${OMPL_LIBRARIES}
-)
-
 
 #These require set-seed functions (?)
 add_executable(bitstar_journal_random_single
@@ -202,6 +190,9 @@ add_executable(bitstar_journal_regular
 )
 add_executable(bitstar_journal_double_enclosure
   src/bitstar_journal/bitstar_journal_double_enclosure.cpp
+)
+add_executable(bitstar_journal_rrtsharp_response
+  src/bitstar_journal/bitstar_journal_rrtsharp_response.cpp
 )
 target_link_libraries(bitstar_journal_random_single
   obstacles
@@ -220,6 +211,14 @@ target_link_libraries(bitstar_journal_regular
   ${OMPL_LIBRARIES}
 )
 target_link_libraries(bitstar_journal_double_enclosure
+  obstacles
+  experiments
+  ompl_tools
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
+target_link_libraries(bitstar_journal_rrtsharp_response
   obstacles
   experiments
   ompl_tools

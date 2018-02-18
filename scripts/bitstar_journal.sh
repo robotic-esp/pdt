@@ -15,6 +15,10 @@ R4_TIME=30
 R8_TIME=150
 R16_TIME=300
 
+###Response Problems###
+#$BIN_PATH/bitstar_journal_rrtsharp_response -p 1 -s $R2_STEER -e $NUM_EXP -t $R2_TIME
+#$BIN_PATH/bitstar_journal_rrtsharp_response -p 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME
+
 ###Regular worlds###
 #echo && echo && echo && echo "Regular-grid problems require using children.reserve() in RRT* constructor. Recompile BOTH OMPL and the tests." && echo && echo && echo
 $BIN_PATH/bitstar_journal_regular -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME

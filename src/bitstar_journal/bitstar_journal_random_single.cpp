@@ -92,7 +92,7 @@ THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 const double CHECK_RESOLUTION = 0.001;
 const unsigned int MEAN_NUM_OBS = 75u;
 const double MEAN_OBS_RATIO = 0.33;
-const unsigned int MICROSEC_SLEEP = 500u; //Period for logging data, 1000us = 1ms
+const unsigned int MICROSEC_SLEEP = 100u; //Period for logging data, 1000us = 1ms
 const PlannerType refreshPlanner = PLANNER_RRTCONNECT; //Use PLANNER_NOPLANNER to disable palette cleansing
 
 //Common:

@@ -92,7 +92,7 @@ THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 const double CHECK_RESOLUTION = 0.001;
 const double WORLD_WIDTH = 4.0;
 const unsigned int NUM_INTER_OBS = 5u;
-const unsigned int MICROSEC_SLEEP = 100u; //Period for logging data, 1000us = 1ms
+const unsigned int MICROSEC_SLEEP = 500u; //Period for logging data, 1000us = 1ms
 const PlannerType refreshPlanner = PLANNER_RRTCONNECT; //Use PLANNER_NOPLANNER to disable palette cleansing
 
 //Common:
@@ -125,13 +125,13 @@ const bool PLOT_BITSTAR_EDGE = true;
 const bool PLOT_BITSTAR_QUEUE = false;
 
 
-bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPtr, unsigned int* numExperimentsPtr, double* runTimePtr, bool* animatePtr)
+bool argParse(int argc, char** argv, unsigned int* probNum, double* steerPtr, unsigned int* numExperimentsPtr, double* runTimePtr, bool* animatePtr)
 {
     // Declare the supported options.
     boost::program_options::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "produce help message")
-        ("state,r", boost::program_options::value<unsigned int>(), "The state dimension.")
+        ("problem-number,p", boost::program_options::value<unsigned int>(), "The problem number (1 or 2) to run.")
         ("steer-eta,s", boost::program_options::value<double>()->default_value(0.0), "The steer eta, or maximum edge length, to use. Defaults to 0.0 which uses the OMPL auto calculation.")
         ("experiments,e", boost::program_options::value<unsigned int>(), "The number of unique experiments to run on the random world.")
         ("runtime,t", boost::program_options::value<double>(), "The CPU time in seconds for which to run the planners, (0,infty)")
@@ -147,18 +147,18 @@ bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPt
         return false;
     }
 
-    if (vm.count("state"))
+    if (vm.count("problem-number"))
     {
-        *dimensionPtr = vm["state"].as<unsigned int>();
-        if (*dimensionPtr  < 2)
+        *probNum = vm["problem-number"].as<unsigned int>();
+        if ( (*probNum  != 1) && (*probNum  != 2) )
         {
-            std::cout << "State dimension must be greater or equal to 2. " << std::endl << std::endl << desc << std::endl;
+            std::cout << "There are only 2 problems posed in the RRT# review. " << std::endl << std::endl << desc << std::endl;
             return false;
         }
     }
     else
     {
-        std::cout << "state dimension not set" << std::endl << std::endl << desc << std::endl;
+        std::cout << "Problem number not set" << std::endl << std::endl << desc << std::endl;
         return false;
     }
 
@@ -327,8 +327,8 @@ double currentSolution(const PlannerType& plnrType, const ompl::base::PlannerPtr
 int main(int argc, char **argv)
 {
     //Argument Variables
-    //The dimension size:
-    unsigned int N;
+    //The problem number:
+    unsigned int probNum;
     //The number of experiments
     unsigned int numExperiments;
     //The time for which to run the planners
@@ -339,7 +339,7 @@ int main(int argc, char **argv)
     bool createAnimationFrames;
 
     //Get the command line arguments
-    if (argParse(argc, argv, &N, &steerEta, &numExperiments, &maxTime, &createAnimationFrames) == false)
+    if (argParse(argc, argv, &probNum, &steerEta, &numExperiments, &maxTime, &createAnimationFrames) == false)
     {
         return 1;
     }
@@ -355,26 +355,23 @@ int main(int argc, char **argv)
     //The vector of planner types:
     std::vector<std::pair<PlannerType, unsigned int> > plannersToTest;
     //The experiment
-    RegularRectanglesExperimentPtr experiment;
+    RRTsharpResponseExperimentPtr experiment;
 
     //Specify the planners:
     plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 0u)); //Abuse number of samples as the variant number
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 1u)); //Abuse number of samples as the variant number
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 2u)); //Abuse number of samples as the variant number
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 3u)); //Abuse number of samples as the variant number
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, SORRTSTAR_BATCH_SIZE));
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
     //Create one experiment for all runs:
-    // Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
-    BaseExperimentPtr expDefn = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.8, maxTime, CHECK_RESOLUTION); // worldHalfWidth, insideWidth, wallThickness, gapWidth.
+    experiment = std::make_shared<RRTsharpResponseExperiment>(probNum, maxTime, CHECK_RESOLUTION);
 
     //The results output file:
-    fileName << "R" << N << "S" << masterSeed << experiment->getName() << ".csv";
+    fileName << "R2S" << masterSeed << experiment->getName() << ".csv";
 
     //Let people know what's going on:
     std::cout << "Seed: " << masterSeed << std::endl;
