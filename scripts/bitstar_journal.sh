@@ -16,8 +16,8 @@ R8_TIME=150
 R16_TIME=300
 
 ###Response Problems###
-#$BIN_PATH/bitstar_journal_rrtsharp_response -p 1 -s $R2_STEER -e $NUM_EXP -t $R2_TIME
-#$BIN_PATH/bitstar_journal_rrtsharp_response -p 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME
+$BIN_PATH/bitstar_journal_rrtsharp_response -p 1 -s $R2_STEER -e $NUM_EXP -t $R2_TIME
+$BIN_PATH/bitstar_journal_rrtsharp_response -p 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME
 
 ###Regular worlds###
 #echo && echo && echo && echo "Regular-grid problems require using children.reserve() in RRT* constructor. Recompile BOTH OMPL and the tests." && echo && echo && echo
@@ -28,8 +28,8 @@ $BIN_PATH/bitstar_journal_regular -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME
 
 ###Enclosure worlds###
 #echo && echo && echo && echo "Regular-grid problems require using children.reserve() in RRT* constructor. Recompile BOTH OMPL and the tests." && echo && echo && echo
-#$BIN_PATH/bitstar_journal_double_enclosure -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME
-#$BIN_PATH/bitstar_journal_double_enclosure -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME
+$BIN_PATH/bitstar_journal_double_enclosure -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME
+$BIN_PATH/bitstar_journal_double_enclosure -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME
 #$BIN_PATH/bitstar_journal_double_enclosure -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_TIME
 ##Do not use the reserve trick for R16, it hits swap.
 #####$BIN_PATH/bitstar_journal_double_enclosure -r 16 -s $R16_STEER -e $NUM_EXP -t $R16_TIME

@@ -103,7 +103,7 @@ const double REWIRE_SCALE = 2.0;
 //BITstar
 const double BITSTAR_REWIRE_SCALE = REWIRE_SCALE;
 const unsigned int BITSTAR_BATCH_SIZE = 100u;
-const bool BITSTAR_STRICT_QUEUE = false;
+const bool BITSTAR_STRICT_QUEUE = true;
 const bool BITSTAR_DELAY_REWIRE = false;
 const bool BITSTAR_JIT = false;
 const bool BITSTAR_DROP_BATCHES = false;

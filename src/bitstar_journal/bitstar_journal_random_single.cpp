@@ -103,7 +103,7 @@ const double REWIRE_SCALE = 2.0;
 //BITstar
 const double BITSTAR_REWIRE_SCALE = REWIRE_SCALE;
 const unsigned int BITSTAR_BATCH_SIZE = 100u;
-const bool BITSTAR_STRICT_QUEUE = false;
+const bool BITSTAR_STRICT_QUEUE = true;
 const bool BITSTAR_DELAY_REWIRE = false;
 const bool BITSTAR_JIT = false;
 const bool BITSTAR_DROP_BATCHES = false;
@@ -361,11 +361,11 @@ int main(int argc, char **argv)
     plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 3u)); //Abuse number of samples as the variant number
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 3u)); //Abuse number of samples as the variant number
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, SORRTSTAR_BATCH_SIZE));
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
