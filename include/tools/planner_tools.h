@@ -8,7 +8,7 @@
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 
 // Compile hooks for a planner called BITstarRegression:
-#define BITSTAR_REGRESSION
+//#define BITSTAR_REGRESSION
 
 /*
 How to make a copy of BIT* for regression testing:
