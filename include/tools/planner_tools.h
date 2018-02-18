@@ -32,6 +32,7 @@ sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regressi
 
 enum PlannerType
 {
+    PLANNER_NOPLANNER,
     PLANNER_RRT,
     PLANNER_RRTCONNECT,
     PLANNER_RRTSTAR,

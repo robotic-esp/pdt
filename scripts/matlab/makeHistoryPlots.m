@@ -85,7 +85,7 @@ function makeHistoryPlots(R)
 
     elseif (R == 2)
         %Interp spacing (us):
-        interpTime = 1000*1e-6;
+        interpTime = 500*1e-6;
 
         useMedian = true;
         unsolvedAsNan = false;
@@ -102,7 +102,7 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439039667909981350RegularRects'};
+        filenames = {'R2S18439039674584900915RegularRects'};
 
         figures = {};
 
