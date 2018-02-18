@@ -72,6 +72,6 @@ protected:
     double dTrans_;
 };
 
-typedef boost::shared_ptr<TightlyBoundingRectangle> TightlyBoundingRectanglePtr;
+typedef std::shared_ptr<TightlyBoundingRectangle> TightlyBoundingRectanglePtr;
 
 #endif //EXPERIMENTS_TIGHTLY_BOUNDING_RECTANGLE_EXPERIMENT

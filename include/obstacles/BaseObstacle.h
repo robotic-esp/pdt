@@ -64,7 +64,7 @@ public:
     virtual bool isValid (const std::vector<const ompl::base::State*>& states) const;
 
     /** \brief The obstacle map as a series of Matlab plot functions */
-    virtual std::string mfile() const = 0;
+    virtual std::string mfile(const std::string& obsColour = "k", const std::string& spaceColour = "w") const = 0;
 };
 
 #endif //OBSTACLES_BASE_OBSTACLE

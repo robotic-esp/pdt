@@ -42,14 +42,14 @@
 #include <iomanip>
 //For std::stringstream
 #include <sstream>
-//For boost::make_shared
-#include <boost/make_shared.hpp>
+//For std::make_shared
+#include <memory>
 //For boost program options
 #include <boost/program_options.hpp>
 //For boost lexical cast
 #include <boost/lexical_cast.hpp>
 //For boost time
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/chrono/chrono.hpp>
 //For boost thread:
 #include <boost/thread/thread.hpp>
 
@@ -67,7 +67,6 @@
 //#include <ompl/geometric/planners/bitstar/HybridBITstar.h>
 #include "ompl/base/objectives/PathLengthOptimizationObjective.h"
 //#include <ompl/tools/benchmark/Benchmark.h>
-#include <ompl/util/Time.h>
 #include "ompl/util/Console.h" //For OMPL_INFORM et al.
 #include "ompl/tools/config/MagicConstants.h" //For BETTER_PATH_COST_MARGIN
 #include <ompl/util/Exception.h>
@@ -75,7 +74,8 @@
 //Our Experiments
 #include "ExperimentDefinitions.h"
 
-//The helper functions for plotting:
+//The helper functions for general and plotting:
+#include "tools/general_tools.h"
 #include "tools/plotting_tools.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
@@ -121,14 +121,14 @@ const double rewireFactorFMT = rewireFactorBIT; //The factor scaling the RGG ter
 //Experiment:
 const bool logProgress = true;
 const bool logIterationsAndCost = false;
-const double millisecSleep = 1.0; //Period for logging data
+const unsigned int MICROSEC_SLEEP = 1000u; //Period for logging data, 1000us = 1ms
 
 //Plotting:
-const bool informedEllipse = true;
-const bool bitStarEllipse = false;
-const bool bitStarEdge = true;
-const bool bitStarQueue = false;
-
+const bool PLOT_VERTICES = true;
+const bool PLOT_WORLD_ELLIPSE = true;
+const bool PLOT_BITSTAR_ELLIPSE = false;
+const bool PLOT_BITSTAR_EDGE = true;
+const bool PLOT_BITSTAR_QUEUE = false;
 
 bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPtr, unsigned int* dimensionPtr, unsigned int* numTrialsPtr, double* runTimePtr, bool* animatePtr)
 {
@@ -270,10 +270,10 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
     return true;
 }
 
-void callSolve(const ompl::base::PlannerPtr& planner, const ompl::time::duration& solveDuration)
+void callSolve(asrl::time::point* startTime, const ompl::base::PlannerPtr& planner, const asrl::time::duration& solveDuration)
 {
-    //planner->solve( solveDuration );
-    planner->solve( ompl::time::seconds(solveDuration) );
+    *startTime = asrl::time::now();
+    planner->solve( asrl::time::seconds(solveDuration) );
 }
 
 
@@ -304,10 +304,10 @@ int main(int argc, char **argv)
     //Variables
 //    ompl::RNG::setSeed(3210443914);     std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
-    boost::uint32_t masterSeed = ompl::RNG::getSeed();
+    std::uint_fast32_t masterSeed = ompl::RNG::getSeed();
     //Convenience typedefs:
-    typedef std::pair<ompl::time::duration, ompl::base::Cost> planner_result_t;
-    typedef std::vector<planner_result_t> experiment_result_t;
+    typedef std::pair<asrl::time::duration, ompl::base::Cost> planner_result_t;
+//    typedef std::vector<planner_result_t> experiment_result_t;
     //The steer eta used
     double steerEta;
     //The filename for progress
@@ -315,7 +315,7 @@ int main(int argc, char **argv)
     //The world name
     std::stringstream worldName;
     //The experiment
-    BaseExperimentPtr expDefn = boost::make_shared<MultiStartGoalExperiment>(N, numObs, obsRatio, targetTime, checkResolution);
+    BaseExperimentPtr expDefn = std::make_shared<MultiStartGoalExperiment>(N, numObs, obsRatio, targetTime, checkResolution);
 
     if (N == 2u)
     {
@@ -370,8 +370,8 @@ int main(int argc, char **argv)
         {
             //Variables
             //The start time for a call, and the running time
-            ompl::time::point startTime;
-            ompl::time::duration runTime(0,0,0,0);
+            asrl::time::point startTime;
+            asrl::time::duration runTime(0);
             //The problem defintion used by this planner
             ompl::base::ProblemDefinitionPtr pdef = expDefn->newProblemDefinition();
 
@@ -379,37 +379,42 @@ int main(int argc, char **argv)
             plannersToTest.at(i).second->setProblemDefinition(pdef);
 
             //Set up the planner
-            startTime = ompl::time::now();
+            startTime = asrl::time::now();
             plannersToTest.at(i).second->setup();
-            runTime = ompl::time::now() - startTime;
+            runTime = asrl::time::now() - startTime;
 
             //Run the planner
             if (createAnimationFrames == true)
             {
                 if (plannersToTest.at(i).first == PLANNER_RRT)
                 {
-                        startTime = ompl::time::now();
+                        startTime = asrl::time::now();
                         //plannersToTest.at(i).second->solve( expDefn->getTargetTime() - runTime );
-                        plannersToTest.at(i).second->solve( ompl::time::seconds(expDefn->getTargetTime() - runTime) );
-                        runTime = runTime + (ompl::time::now() - startTime);
+                        plannersToTest.at(i).second->solve( asrl::time::seconds(expDefn->getTargetTime() - runTime) );
+                        runTime = runTime + (asrl::time::now() - startTime);
                     //runTime = runTime + createAnimation(expDefn plannersToTest.at(i), masterSeed, expDefn->getTargetTime());
                 }
                 else
                 {
-                    runTime = runTime + createAnimation(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, expDefn->getTargetTime() - runTime, informedEllipse, bitStarEllipse, bitStarEdge, bitStarQueue);
+                    runTime = runTime + createAnimation(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, expDefn->getTargetTime() - runTime, PLOT_VERTICES, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
                 }
             }
             else if (logProgress == true)
             {
+                //Variables
                 //A vector of the planner progress
-                TimeCostHistory progressPair(expDefn->getTargetTime(), millisecSleep);
-                TimeIterationCostHistory progressTuple(expDefn->getTargetTime(), millisecSleep);
+                TimeCostHistory progressPair(expDefn->getTargetTime(), MICROSEC_SLEEP);
+                TimeIterationCostHistory progressTuple(expDefn->getTargetTime(), MICROSEC_SLEEP);
 
-                //Store the starting time:
-                startTime = ompl::time::now();
+                //Start solving in another thread. It will record startTime, but so we notice if it doesn't we will clear startTime first.
+                startTime = asrl::time::point();
+                boost::thread solveThread(callSolve, &startTime, plannersToTest.at(i).second, expDefn->getTargetTime() - runTime);
 
-                //Start solving in another thread. We use an intermediate function for this as the class function is overloaded.
-                boost::thread solveThread(callSolve, plannersToTest.at(i).second, expDefn->getTargetTime() - runTime);
+                //If the clock is not steady, sleep for 1us so that the upcoming first entry is not backwards in time.
+                if (asrl::time::clock::is_steady == false)
+                {
+                    usleep(1u);
+                }
 
                 //Log data
                 do
@@ -423,7 +428,7 @@ int main(int argc, char **argv)
                         if (logIterationsAndCost == true)
                         {
                             //If FMT* is modified, 1 of 2:
-                            //progressTuple.push_back( boost::make_tuple(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::FMT>()->iterationProgressProperty(), boost::lexical_cast<std::string>(ASRL_DBL_INFINITY)) );
+                            //progressTuple.push_back( std::make_tuple(runTime + (asrl::time::now() - startTime), plannersToTest.at(i).second->as<ompl::geometric::FMT>()->iterationProgressProperty(), boost::lexical_cast<std::string>(ASRL_DBL_INFINITY)) );
                         }
                         else
                         {
@@ -434,33 +439,33 @@ int main(int argc, char **argv)
                         //Store the runtime and the current cost
                         if (logIterationsAndCost == true)
                         {
-                            progressTuple.push_back( boost::make_tuple(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::RRTstar>()->numIterations(), plannersToTest.at(i).second->as<ompl::geometric::RRTstar>()->bestCost().value()) );
+                            progressTuple.push_back( std::make_tuple(runTime + (asrl::time::now() - startTime), plannersToTest.at(i).second->as<ompl::geometric::RRTstar>()->numIterations(), plannersToTest.at(i).second->as<ompl::geometric::RRTstar>()->bestCost().value()) );
                         }
                         else
                         {
-                            progressPair.push_back( std::make_pair(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::RRTstar>()->bestCost().value()) );
+                            progressPair.push_back( std::make_pair(runTime + (asrl::time::now() - startTime), plannersToTest.at(i).second->as<ompl::geometric::RRTstar>()->bestCost().value()) );
                         }
                     }
                     else if (plannersToTest.at(i).first == PLANNER_BITSTAR || plannersToTest.at(i).first == PLANNER_BITSTAR_SEED)
                     {
                         if (logIterationsAndCost == true)
                         {
-                            progressTuple.push_back( boost::make_tuple(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::BITstar>()->numIterations(), plannersToTest.at(i).second->as<ompl::geometric::BITstar>()->bestCost().value()) );
+                            progressTuple.push_back( std::make_tuple(runTime + (asrl::time::now() - startTime), plannersToTest.at(i).second->as<ompl::geometric::BITstar>()->numIterations(), plannersToTest.at(i).second->as<ompl::geometric::BITstar>()->bestCost().value()) );
                         }
                         else
                         {
-                            progressPair.push_back( std::make_pair(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::BITstar>()->bestCost().value()) );
+                            progressPair.push_back( std::make_pair(runTime + (asrl::time::now() - startTime), plannersToTest.at(i).second->as<ompl::geometric::BITstar>()->bestCost().value()) );
                         }
                     }
 //                    else if (plannersToTest.at(i).first == PLANNER_HYBRID_BITSTAR)
 //                    {
 //                        if (logIterationsAndCost == true)
 //                        {
-//                            progressTuple.push_back( boost::make_tuple(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::HybridBITstar>()->numIterations(), plannersToTest.at(i).second->as<ompl::geometric::HybridBITstar>()->bestCost().value()) );
+//                            progressTuple.push_back( std::make_tuple(runTime + (asrl::time::now() - startTime), plannersToTest.at(i).second->as<ompl::geometric::HybridBITstar>()->numIterations(), plannersToTest.at(i).second->as<ompl::geometric::HybridBITstar>()->bestCost().value()) );
 //                        }
 //                        else
 //                        {
-//                            progressPair.push_back( std::make_pair(ompl::time::now() - startTime + runTime, plannersToTest.at(i).second->as<ompl::geometric::HybridBITstar>()->bestCost().value()) );
+//                            progressPair.push_back( std::make_pair(runTime + (asrl::time::now() - startTime), plannersToTest.at(i).second->as<ompl::geometric::HybridBITstar>()->bestCost().value()) );
 //                        }
 //                    }
                     else
@@ -468,10 +473,10 @@ int main(int argc, char **argv)
                         throw ompl::Exception("Planner not recognized for progress logging.");
                     }
                 }
-                while ( solveThread.timed_join(boost::posix_time::milliseconds(millisecSleep)) == false);
+                while (solveThread.try_join_for(boost::chrono::microseconds(MICROSEC_SLEEP)) == false);
 
                 //Store the final run time
-                runTime = runTime + (ompl::time::now() - startTime);
+                runTime = runTime + (asrl::time::now() - startTime);
 
                 if (logIterationsAndCost == true)
                 {
@@ -494,19 +499,19 @@ int main(int argc, char **argv)
                     else if (plannersToTest.at(i).first == PLANNER_FMTSTAR)
                     {
                         //If FMT* is modified, 2 of 2:
-                        //progressTuple.push_back( boost::make_tuple(runTime, plannersToTest.at(i).second->as<ompl::geometric::FMT>()->iterationProgressProperty(), finalCost) );
+                        //progressTuple.push_back( std::make_tuple(runTime, plannersToTest.at(i).second->as<ompl::geometric::FMT>()->iterationProgressProperty(), finalCost) );
                     }
                     else if (isRrtStar(plannersToTest.at(i).first))
                     {
-                        progressTuple.push_back( boost::make_tuple(runTime, plannersToTest.at(i).second->as<ompl::geometric::RRTstar>()->numIterations(), finalCost) );
+                        progressTuple.push_back( std::make_tuple(runTime, plannersToTest.at(i).second->as<ompl::geometric::RRTstar>()->numIterations(), finalCost) );
                     }
                     else if (plannersToTest.at(i).first == PLANNER_BITSTAR || plannersToTest.at(i).first == PLANNER_BITSTAR_SEED)
                     {
-                        progressTuple.push_back( boost::make_tuple(runTime, plannersToTest.at(i).second->as<ompl::geometric::BITstar>()->numIterations(), finalCost) );
+                        progressTuple.push_back( std::make_tuple(runTime, plannersToTest.at(i).second->as<ompl::geometric::BITstar>()->numIterations(), finalCost) );
                     }
 //                    else if (plannersToTest.at(i).first == PLANNER_HYBRID_BITSTAR)
 //                    {
-//                        progressTuple.push_back( boost::make_tuple(runTime, plannersToTest.at(i).second->as<ompl::geometric::HybridBITstar>()->numIterations(), finalCost) );
+//                        progressTuple.push_back( std::make_tuple(runTime, plannersToTest.at(i).second->as<ompl::geometric::HybridBITstar>()->numIterations(), finalCost) );
 //                    }
                     else
                     {
@@ -534,10 +539,10 @@ int main(int argc, char **argv)
             }
             else
             {
-                startTime = ompl::time::now();
+                startTime = asrl::time::now();
                 //plannersToTest.at(i).second->solve( expDefn->getTargetTime() - runTime );
-                plannersToTest.at(i).second->solve( ompl::time::seconds(expDefn->getTargetTime() - runTime) );
-                runTime = runTime + (ompl::time::now() - startTime);
+                plannersToTest.at(i).second->solve( asrl::time::seconds(expDefn->getTargetTime() - runTime) );
+                runTime = runTime + (asrl::time::now() - startTime);
             }
 
 
@@ -553,7 +558,7 @@ int main(int argc, char **argv)
             }
 
             //Save the map?
-            writeMatlabMap(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, informedEllipse, bitStarEllipse, bitStarEdge, bitStarQueue);
+            writeMatlabMap(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, PLOT_VERTICES, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
 
             std::cout << myResult.first << ", " << std::setw(4) << myResult.second;
             if (i != plannersToTest.size() - 1u)

@@ -1,13 +1,13 @@
 //Me
 #include <tools/planner_tools.h>
 
-//For boost::make_shared
-#include <boost/make_shared.hpp>
+//For std::make_shared
+#include <memory>
 
-boost::shared_ptr<ompl::geometric::RRT> allocateRrt(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias)
+std::shared_ptr<ompl::geometric::RRT> allocateRrt(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias)
 {
     //Create a RRT planner
-    boost::shared_ptr<ompl::geometric::RRT> plnr = boost::make_shared<ompl::geometric::RRT>(si);
+    std::shared_ptr<ompl::geometric::RRT> plnr = std::make_shared<ompl::geometric::RRT>(si);
 
     //Configure it
     plnr->setRange(steerEta);
@@ -18,10 +18,10 @@ boost::shared_ptr<ompl::geometric::RRT> allocateRrt(const ompl::base::SpaceInfor
     return plnr;
 }
 
-boost::shared_ptr<ompl::geometric::RRTConnect> allocateRrtConnect(const ompl::base::SpaceInformationPtr &si, const double steerEta)
+std::shared_ptr<ompl::geometric::RRTConnect> allocateRrtConnect(const ompl::base::SpaceInformationPtr &si, const double steerEta)
 {
     //Create a RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTConnect> plnr = boost::make_shared<ompl::geometric::RRTConnect>(si);
+    std::shared_ptr<ompl::geometric::RRTConnect> plnr = std::make_shared<ompl::geometric::RRTConnect>(si);
 
     //Configure it
     plnr->setRange(steerEta);
@@ -31,10 +31,10 @@ boost::shared_ptr<ompl::geometric::RRTConnect> allocateRrtConnect(const ompl::ba
     return plnr;
 }
 
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale)
 {
     //Create a RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr = boost::make_shared<ompl::geometric::RRTstar>(si);
+    std::shared_ptr<ompl::geometric::RRTstar> plnr = std::make_shared<ompl::geometric::RRTstar>(si);
 
     //Configure it
     plnr->setRange(steerEta);
@@ -56,10 +56,61 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::Sp
     return plnr;
 }
 
-boost::shared_ptr<ompl::geometric::InformedRRTstar> allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const double pruneFraction)
+std::shared_ptr<ompl::geometric::RRTsharp> allocateRrtSharp(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const bool reject, const bool informed, const unsigned int variant)
+{
+    //Create a RRT* planner
+    std::shared_ptr<ompl::geometric::RRTsharp> plnr = std::make_shared<ompl::geometric::RRTsharp>(si);
+
+    //Configure it
+    plnr->setRange(steerEta);
+    plnr->setGoalBias(goalBias);
+    plnr->setKNearest(kNearest);
+    plnr->setRewireFactor(rewireScale);
+    plnr->setVariant(variant);
+    plnr->setAlpha(1.0); //This shouldn't matter when the variant is 0.
+    plnr->setInformedSampling(informed);
+    plnr->setSampleRejection(reject);
+    //plnr->setNumSamplingAttempts(0u)
+    plnr->setUpdateChildren(true);
+
+//    std::cout << "RRT# - Informed Sampling: " << (plnr->getInformedSampling() ? "yes" : "no") << std::endl;
+//    std::cout << "RRT# - Rejection Sampling: " << (plnr->getSampleRejection() ? "yes" : "no") << std::endl;
+//    std::cout << "RRT# - Update Children: " << (plnr->getUpdateChildren() ? "yes" : "no") << std::endl;
+//    std::cout << "RRT# - Num. Sampling Attempts: " << plnr->getNumSamplingAttempts()<< std::endl;
+//    std::cout << "RRT# - Variant: " << plnr->getVariant()<< std::endl;
+//    std::cout << "RRT# - Alpha: " << plnr->getAlpha()<< std::endl;
+//    std::cout << "RRT# - Epsilon: " << plnr->getEpsilon()<< std::endl;
+
+
+    std::stringstream plannerName;
+
+    if (plnr->getInformedSampling() == true)
+    {
+        plannerName << "Informed_";
+    }
+
+    if (plnr->getSampleRejection())
+    {
+        plannerName << "Reject_";
+    }
+
+    plannerName << "RRTsharp";
+
+    if (variant != 0)
+    {
+        plannerName << variant;
+    }
+
+    plnr->setName(plannerName.str());
+
+    //Return
+    return plnr;
+}
+
+std::shared_ptr<ompl::geometric::InformedRRTstar> allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const double pruneFraction)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::InformedRRTstar> plnr  = boost::make_shared<ompl::geometric::InformedRRTstar>(si);
+    std::shared_ptr<ompl::geometric::InformedRRTstar> plnr  = std::make_shared<ompl::geometric::InformedRRTstar>(si);
 
     //Configure it to be Informed
     plnr->setRange(steerEta);
@@ -75,10 +126,10 @@ boost::shared_ptr<ompl::geometric::InformedRRTstar> allocateInformedRrtStar(cons
     return plnr;
 }
 
-boost::shared_ptr<ompl::geometric::SORRTstar> allocateSorrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const double pruneFraction, const unsigned int numSamples)
+std::shared_ptr<ompl::geometric::SORRTstar> allocateSorrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const double pruneFraction, const unsigned int numSamples)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::SORRTstar> plnr  = boost::make_shared<ompl::geometric::SORRTstar>(si);
+    std::shared_ptr<ompl::geometric::SORRTstar> plnr  = std::make_shared<ompl::geometric::SORRTstar>(si);
 
     //Configure it to be Informed
     plnr->setOrderedSampling(true);
@@ -100,10 +151,10 @@ boost::shared_ptr<ompl::geometric::SORRTstar> allocateSorrtStar(const ompl::base
     return plnr;
 }
 
-boost::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics)
+std::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics)
 {
     //Create a RRT* planner
-    boost::shared_ptr<ompl::geometric::FMT> plnr = boost::make_shared<ompl::geometric::FMT>(si);
+    std::shared_ptr<ompl::geometric::FMT> plnr = std::make_shared<ompl::geometric::FMT>(si);
 
     //Configure it
     plnr->setNearestK(kNearest);
@@ -121,13 +172,13 @@ boost::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceI
     return plnr;
 }
 
-boost::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches)
+std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double weight /*= 1.0*/, const bool adapt /*= false*/)
 {
     //Create a BIT* planner
-    boost::shared_ptr<ompl::geometric::BITstar> plnr = boost::make_shared<ompl::geometric::BITstar>(si);
+    std::shared_ptr<ompl::geometric::BITstar> plnr = std::make_shared<ompl::geometric::BITstar>(si);
 
     //Configure it
-    plnr->setKNearest(kNearest);
+    plnr->setUseKNearest(kNearest);
     plnr->setRewireFactor(rewireScale);
     plnr->setSamplesPerBatch(numSamples);
     plnr->setPruning(true);
@@ -137,6 +188,15 @@ boost::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::Sp
     plnr->setJustInTimeSampling(jit);
     plnr->setDropSamplesOnPrune(refreshBatches);
     plnr->setStopOnSolnImprovement(false);
+    plnr->setConsiderApproximateSolutions(false);
+    #warning "ABIT* support disabled here"
+    //plnr->setSearchWeight(weight);
+    //plnr->setAdaptWeight(adapt);
+
+    if (weight != 1 || adapt == true)
+    {
+        throw ompl::Exception("ABIT* has been disabled in this code.");
+    }
 
     std::stringstream plannerName;
     if (delayRewire == true)
@@ -155,12 +215,80 @@ boost::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::Sp
     {
         plannerName << "k";
     }
+    if (strictQueue == false)
+    {
+        plannerName << "l";
+    }
+    if (weight > 1.0)
+    {
+        plannerName << "A";
+    }
     plannerName << "BITstar" << numSamples;
     plnr->setName(plannerName.str());
 
     //Return
     return plnr;
 }
+
+#ifdef BITSTAR_REGRESSION
+std::shared_ptr<ompl::geometric::BITstarRegression> allocateBitStarRegression(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double weight /*= 1.0*/, const bool adapt /*= false*/)
+{
+    //Create a BIT* planner
+    std::shared_ptr<ompl::geometric::BITstarRegression> plnr = std::make_shared<ompl::geometric::BITstarRegression>(si);
+
+    //Configure it
+    plnr->setUseKNearest(kNearest);
+    plnr->setRewireFactor(rewireScale);
+    plnr->setSamplesPerBatch(numSamples);
+    plnr->setPruning(true);
+    plnr->setPruneThresholdFraction(pruneFraction);
+    plnr->setStrictQueueOrdering(strictQueue);
+    plnr->setDelayRewiringUntilInitialSolution(delayRewire);
+    plnr->setJustInTimeSampling(jit);
+    plnr->setDropSamplesOnPrune(refreshBatches);
+    plnr->setStopOnSolnImprovement(false);
+    plnr->setConsiderApproximateSolutions(false);
+    #warning "ABIT* support disabled here"
+    //plnr->setSearchWeight(weight);
+    //plnr->setAdaptWeight(adapt);
+
+    if (weight != 1 || adapt == true)
+    {
+        throw ompl::Exception("ABIT* has been disabled in this code.");
+    }
+
+    std::stringstream plannerName;
+    if (delayRewire == true)
+    {
+        plannerName << "d";
+    }
+    if (jit == true)
+    {
+        plannerName << "j";
+    }
+    if (refreshBatches == true)
+    {
+        plannerName << "x";
+    }
+    if (kNearest == true)
+    {
+        plannerName << "k";
+    }
+    if (strictQueue == false)
+    {
+        plannerName << "l";
+    }
+    if (weight > 1.0)
+    {
+        plannerName << "A";
+    }
+    plannerName << "BITstarRegression" << numSamples;
+    plnr->setName(plannerName.str());
+
+    //Return
+    return plnr;
+}
+#endif  // BITSTAR_REGRESSION
 
 bool isRrt(PlannerType plnrType)
 {
@@ -179,9 +307,17 @@ bool isRrtStar(PlannerType plnrType)
             plnrType == PLANNER_RRTSTAR_SEED ||
             plnrType == PLANNER_RRTSTAR_TRIO);
 }
+
+bool isRrtSharp(PlannerType plnrType)
+{
+    return (plnrType == PLANNER_RRTSHARP ||
+            plnrType == PLANNER_RRTSHARP_INFORMED);
+}
+
 bool isBitStar(PlannerType plnrType)
 {
     return (plnrType == PLANNER_BITSTAR ||
+            plnrType == PLANNER_ABITSTAR ||
             plnrType == PLANNER_HYBRID_BITSTAR ||
             plnrType == PLANNER_DUALTREE_BITSTAR ||
             plnrType == PLANNER_BITSTAR_SEED);
@@ -244,6 +380,11 @@ std::string plannerName(PlannerType plnrType)
         case PLANNER_BITSTAR:
         {
             return "BITstar";
+            break;
+        }
+        case PLANNER_ABITSTAR:
+        {
+            return "ABITstar";
             break;
         }
         default:

@@ -76,10 +76,10 @@ protected:
     /** \brief Whether to stop on class switch */
     bool stopClassSwitch_;
     /** \brief The obstacle world */
-    boost::shared_ptr<HyperrectangleObstacles> rectObs_;
+    std::shared_ptr<HyperrectangleObstacles> rectObs_;
     /** \brief The lower-left corners of the obstacles*/
-    boost::shared_ptr<ompl::base::ScopedState<> > upperObs_;
-    boost::shared_ptr<ompl::base::ScopedState<> > lowerObs_;
+    std::shared_ptr<ompl::base::ScopedState<> > upperObs_;
+    std::shared_ptr<ompl::base::ScopedState<> > lowerObs_;
     /** The widths of the obstacles */
     std::vector<double> upperWidths_;
     std::vector<double> lowerWidths_;
@@ -94,6 +94,6 @@ protected:
     double goalPos_;
 };
 
-typedef boost::shared_ptr<WallGapExperiment> WallGapExperimentPtr;
+typedef std::shared_ptr<WallGapExperiment> WallGapExperimentPtr;
 
 #endif //EXPERIMENTS_WALL_GAP_EXPERIMENT

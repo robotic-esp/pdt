@@ -68,7 +68,7 @@ public:
 protected:
     // Variables
     /** \brief The obstacle world */
-    boost::shared_ptr<RepeatingHyperrectangleObstacles> regObs_;
+    std::shared_ptr<RepeatingHyperrectangleObstacles> regObs_;
 
     // Constant Parameters
     /** \brief The start position */
@@ -83,6 +83,6 @@ protected:
     std::vector<double> origin_;
 };
 
-typedef boost::shared_ptr<RegularRectanglesExperiment> RegularRectanglesExperimentPtr;
+typedef std::shared_ptr<RegularRectanglesExperiment> RegularRectanglesExperimentPtr;
 
 #endif //EXPERIMENTS_REGULAR_RECTANGLES_EXPERIMENT

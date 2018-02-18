@@ -40,7 +40,7 @@
 #include "experiments/BaseExperiment.h"
 
 // An Obstacle-World
-#include "obstacles/HyperrectangleObstacles.h"
+#include "obstacles/CutoutObstacles.h"
 
 
 /** \brief A homotopy-breaking, "bug trap" style experiment that scales to N dimensions. I.e., The start and goal are both enclosed in a box with a opening away from the other. 2D is a slice of higher-D */
@@ -48,7 +48,7 @@ class DoubleEnclosureExperiment : public BaseExperiment
 {
 public:
     /** \brief Constructor */
-    DoubleEnclosureExperiment(const unsigned int dim, const double gapWidth, const double runSeconds, const double checkResolution);
+    DoubleEnclosureExperiment(const unsigned int dim, const double worldHalfWidth, const double insideWidth, const double wallThickness, const double gapWidth, const double runSeconds, const double checkResolution);
 
     /** \brief This problem could knows its optimum, but doesn't right now */
     virtual bool knowsOptimum() const;
@@ -67,27 +67,54 @@ public:
 
 protected:
     // Variables
-    /** \brief The obstacle world */
-    boost::shared_ptr<HyperrectangleObstacles> rectObs_;
-    /** \brief The lower-left corners of the enclosures*/
-    std::vector< boost::shared_ptr<ompl::base::ScopedState<> > > startEnclObs_;
-    std::vector< boost::shared_ptr<ompl::base::ScopedState<> > > goalEnclObs_;
-    /** The widths of the obstacles */
-    std::vector<std::vector<double> > startEnclWidths_;
-    std::vector<std::vector<double> > goalEnclWidths_;
+    /** \brief The actual enclosures */
+    std::shared_ptr<CutoutObstacles> enclObs_;
+
+    /** \brief Construction variables: The lower-left corners (1 obs, 2 anti) */
+    std::vector<std::shared_ptr<ompl::base::ScopedState<> > > startEnclCorners_;
+    std::vector<std::shared_ptr<ompl::base::ScopedState<> > > goalEnclCorners_;
+        /** \brief Construction variables: The associated widths */
+    std::vector< std::vector<double> > startEnclWidths_;
+    std::vector< std::vector<double> > goalEnclWidths_;
 
     // Constant Parameters
-    /** \brief The basic thickness of the obstacle. */
-    double obsThickness_;
-    /** \brief The basic width of the enclosure. */
-    double enclWidth_;
-    /** \brief The gap width. */
+    /** \brief The inside-width of the enclosure. */
+    double insideWidth_;
+    /** \brief The enclosure-wall thickness. */
+    double wallThickness_;
+    /** \brief The width of the opening in directions perpendicular to the wall thickness. */
     double gapWidth_;
     /** \brief The start and goal positions */
     double startPos_;
     double goalPos_;
+
+    // Helper function
+    std::string printRectangle(std::shared_ptr<ompl::base::ScopedState<> > llCorner, std::vector<double> widths) const;
 };
 
-typedef boost::shared_ptr<DoubleEnclosureExperiment> DoubleEnclosureExperimentPtr;
+typedef std::shared_ptr<DoubleEnclosureExperiment> DoubleEnclosureExperimentPtr;
 
 #endif //DOUBLE_ENCLOSURE_EXPERIMENT
+
+
+///This is the version of the code that made "channels" in higher dimensions:
+//// Variables
+///** \brief The obstacle world */
+//std::shared_ptr<HyperrectangleObstacles> rectObs_;
+///** \brief The lower-left corners of the enclosures*/
+//std::vector< std::shared_ptr<ompl::base::ScopedState<> > > startEnclObs_;
+//std::vector< std::shared_ptr<ompl::base::ScopedState<> > > goalEnclObs_;
+///** The widths of the obstacles */
+//std::vector<std::vector<double> > startEnclWidths_;
+//std::vector<std::vector<double> > goalEnclWidths_;
+//
+//// Constant Parameters
+///** \brief The basic thickness of the obstacle. */
+//double obsThickness_;
+///** \brief The basic width of the enclosure. */
+//double enclWidth_;
+///** \brief The gap width. */
+//double gapWidth_;
+///** \brief The start and goal positions */
+//double startPos_;
+//double goalPos_;

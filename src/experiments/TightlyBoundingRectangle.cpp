@@ -40,9 +40,10 @@
 // An Obstacle-World
 #include "obstacles/HyperrectangleObstacles.h"
 
-// Boost
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
+//For std::shared_ptr, etc.
+#include <memory>
+//For std::bind
+#include <functional>
 
 // OMPL
 #include "ompl/base/spaces/RealVectorStateSpace.h"
@@ -60,7 +61,7 @@ TightlyBoundingRectangle::TightlyBoundingRectangle(const unsigned int dim, const
 {
     // Variables
     // The state space
-    boost::shared_ptr<ompl::base::RealVectorStateSpace> ss;
+    std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
     // The problem bounds
     ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
     // The validity checker:
@@ -69,16 +70,16 @@ TightlyBoundingRectangle::TightlyBoundingRectangle(const unsigned int dim, const
     double dConj;
 
     // Make the state space Rn:
-    ss = boost::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+    ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
 
     // Create the space information class:
-    BaseExperiment::si_ = boost::make_shared<ompl::base::SpaceInformation>(ss);
+    BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
     // Make an empty obstacle pointer:
-    BaseExperiment::obs_ = boost::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
+    BaseExperiment::obs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
 
     // Make the validity checker all-true
-    vc = boost::make_shared<ompl::base::AllValidStateValidityChecker> (BaseExperiment::si_);
+    vc = std::make_shared<ompl::base::AllValidStateValidityChecker> (BaseExperiment::si_);
 
     //Calculate the conjugate diameter:
     dConj = std::sqrt(dTrans_*dTrans_ - dFoci_*dFoci_);
@@ -122,13 +123,13 @@ TightlyBoundingRectangle::TightlyBoundingRectangle(const unsigned int dim, const
     BaseExperiment::si_->setup();
 
     // Allocate the optimization objective
-    BaseExperiment::opt_ = boost::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+    BaseExperiment::opt_ = std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
 
     // Set the heuristic to the default:
-    BaseExperiment::opt_->setCostToGoHeuristic(boost::bind(&ompl::base::goalRegionCostToGo, _1, _2));
+    BaseExperiment::opt_->setCostToGoHeuristic(std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
     // Allocate the goal:
-    BaseExperiment::goalPtr_ = boost::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
+    BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
 
     // Create my start and goal states on the vector:
     BaseExperiment::startStates_.push_back( ompl::base::ScopedState<>(ss) );

@@ -71,7 +71,7 @@ public:
 protected:
     // Variables
     /** \brief The obstacle world */
-    boost::shared_ptr<HyperrectangleObstacles> rectObs_;
+    std::shared_ptr<HyperrectangleObstacles> rectObs_;
     /** \brief The number of walls */
     unsigned int numWalls_;
     /** \brief The separation between walls */
@@ -87,7 +87,7 @@ protected:
     /** \brief The resulting obstacle width. */
     std::vector<double> wallWidths_;
     /** \brief The lower-left corners of the obstacles*/
-    std::vector< std::vector<boost::shared_ptr<ompl::base::ScopedState<> > > > obsCorners_;
+    std::vector< std::vector<std::shared_ptr<ompl::base::ScopedState<> > > > obsCorners_;
     /** The widths of an obstacles */
     std::vector< std::vector<double> > allObsWidths_;
 
@@ -100,6 +100,6 @@ protected:
     void common_constructor(const std::vector<double> wallThickness, const std::vector<unsigned int> numGaps, const std::vector<double> gapWidth, const std::vector<double> wallSpacings, const double checkResolution);
 };
 
-typedef boost::shared_ptr<DividingWallExperiment> DividingWallExperimentPtr;
+typedef std::shared_ptr<DividingWallExperiment> DividingWallExperimentPtr;
 
 #endif //DIVIDING_WALL_EXPERIMENT

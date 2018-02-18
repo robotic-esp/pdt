@@ -153,7 +153,7 @@ bool RepeatingHyperrectangleObstacles::isValid(const ompl::base::State* state) c
     return validState;
 }
 
-std::string RepeatingHyperrectangleObstacles::mfile() const
+std::string RepeatingHyperrectangleObstacles::mfile(const std::string& obsColour, const std::string& /*spaceColour*/) const
 {
     //Variables
     //The string stream:
@@ -175,7 +175,7 @@ std::string RepeatingHyperrectangleObstacles::mfile() const
     rval << "        y_lr = y_ll;" << std::endl;
     rval << "        y_ur = y_ll + yWidth;" << std::endl;
     rval << "        y_ul = y_ur;" << std::endl;
-    rval << "        fill([x_ll, x_lr, x_ur, x_ul], [y_ll, y_lr, y_ur, y_ul], 'k');" << std::endl;
+    rval << "        fill([x_ll, x_lr, x_ur, x_ul], [y_ll, y_lr, y_ur, y_ul], " << obsColour << ");" << std::endl;
     rval << "    end" << std::endl;
     rval << "end" << std::endl;
 

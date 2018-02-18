@@ -41,7 +41,7 @@ BaseExperiment::BaseExperiment(const unsigned int dim, const limits_t limits, co
         :   name_(name),
             dim_(dim),
             limits_(limits),
-            targetTime_(ompl::time::seconds(runSeconds))
+            targetTime_(asrl::time::seconds(runSeconds))
 {
 }
 
@@ -56,7 +56,7 @@ ompl::base::ProblemDefinitionPtr BaseExperiment::newProblemDefinition() const
     // The problem definition
     ompl::base::ProblemDefinitionPtr pdef;
     // Allocate
-    pdef = boost::make_shared<ompl::base::ProblemDefinition>(si_);
+    pdef = std::make_shared<ompl::base::ProblemDefinition>(si_);
 
     // Store the optimization objective
     pdef->setOptimizationObjective(opt_);
@@ -79,7 +79,7 @@ ompl::base::OptimizationObjectivePtr BaseExperiment::getOptimizationObjective() 
     return opt_;
 }
 
-ompl::time::duration BaseExperiment::getTargetTime() const
+asrl::time::duration BaseExperiment::getTargetTime() const
 {
     return targetTime_;
 }
@@ -126,7 +126,13 @@ ompl::base::Cost BaseExperiment::getMinimum() const
 
 void BaseExperiment::print(const bool verbose /* == false */) const
 {
-    std::cout << name_ << " in R^" << dim_ << ". runtime: " << targetTime_.total_seconds() << ". target: " << opt_->getCostThreshold() << ". map: (" << limits_.at(0u).first << ", " << limits_.at(0u).second << "). " << this->lineInfo() << std::endl;
+    std::cout << name_ << " in R^" << dim_ << ". runtime: " << asrl::time::seconds(targetTime_) << ". target: " << opt_->getCostThreshold();
+    if (this->knowsOptimum())
+    {
+        std::cout << " (opt: " << this->getOptimum() << ")";
+    }
+    //No else
+    std::cout << ". map: (" << limits_.at(0u).first << ", " << limits_.at(0u).second << "). " << this->lineInfo() << std::endl;
 
     if (verbose == true)
     {
@@ -146,39 +152,44 @@ void BaseExperiment::print(const bool verbose /* == false */) const
     }
 }
 
-std::string BaseExperiment::mfileHeader(bool monochrome, double whiteShift /*= 0.0*/) const
+std::string BaseExperiment::mfileHeader(bool monochrome) const
 {
     std::stringstream rval;
 
     rval << "%%%%%% Pre config %%%%%%" << std::endl;
     rval << "cla;" << std::endl;
     rval << "hold on;" << std::endl;
-    rval << "desat = 0.9;" << std::endl;
-    rval << "whiteShift = " << whiteShift << ";" << std::endl;
-    rval << "y = desat*[1 1 0]; %[127 127 0]/255; %[1 1 0];" << std::endl;
-    rval << "m = desat*[1 0 1]; %[127 0 127]/255; %[1 0 1];" << std::endl;
-    rval << "c = desat*[0 1 1]; %[0 127 127]/255; %[0 1 1];" << std::endl;
-    rval << "r = desat*[1 0 0]; %[127 0 0]/255; %[1 0 0];" << std::endl;
-    rval << "g = desat*[0 1 0]; %[0 127 0]/255; %[0 1 0];" << std::endl;
-    rval << "b = desat*[0 0 1]; %[0 0 127]/255; %[0 0 1];" << std::endl;
+    rval << "% colours = permute(get(gca, 'colororder'), [1 3 2]);" << std::endl;
+    rval << "% colours_resize = imresize(colours, 50.0, 'nearest');" << std::endl;
+    rval << "% imshow(colours_resize);" << std::endl;
+    rval << "% get(gca, 'colororder')" << std::endl;
+    rval << "y = [0.9290 0.6940 0.1250]; %3" << std::endl;
+    rval << "m = [0.4940 0.1840 0.5560]; %4" << std::endl;
+    rval << "c = [0.3010 0.7450 0.9330]; %6" << std::endl;
+    rval << "r = [0.6350 0.0780 0.1840]; %7" << std::endl;
+    rval << "g = [0.4660 0.6740 0.1880]; %5" << std::endl;
+    rval << "b = [0 0.4470 0.7410]; %1" << std::endl;
+    rval << "o = [0.8500 0.3250 0.0980]; %2" << std::endl;
     rval << "w = [1 1 1];" << std::endl;
     rval << "k = [0 0 0];" << std::endl;
     if (monochrome == false)
     {
         rval << "startColour = g;" << std::endl;
         rval << "goalColour = r;" << std::endl;
-        rval << "vertexColour = [0.0; 139/255; 139/255] + 0.5*whiteShift;" << std::endl;
-        rval << "vertexColour(vertexColour > 1) = 1;" << std::endl;
-        rval << "startEdgeColour = b + whiteShift;" << std::endl;
-        rval << "goalEdgeColour = goalColour + whiteShift;" << std::endl;
-        rval << "startEdgeColour(startEdgeColour > 1) = 1;" << std::endl;
-        rval << "goalEdgeColour(goalEdgeColour > 1) = 1;" << std::endl;
+        rval << "vertexColour = [0.0 139/255 139/255];" << std::endl;
+//        rval << "vertexColour(vertexColour > 1) = 1;" << std::endl;
+        rval << "startEdgeColour = b;" << std::endl;
+        rval << "goalEdgeColour = goalColour;" << std::endl;
+//        rval << "startEdgeColour(startEdgeColour > 1) = 1;" << std::endl;
+//        rval << "goalEdgeColour(goalEdgeColour > 1) = 1;" << std::endl;
         rval << "solnColour = m;" << std::endl;
-        rval << "nextEdgeColour = g;" << std::endl;
-        rval << "queueColour = c + 0.5*whiteShift;" << std::endl;
-        rval << "queueColour(queueColour > 1) = 1;" << std::endl;
+        rval << "nextEdgeColour = y;" << std::endl;
+        rval << "queueColour = c;" << std::endl;
+//        rval << "queueColour(queueColour > 1) = 1;" << std::endl;
 
-        rval << "vertexSize = 4;" << std::endl;
+        rval << "vertexSize = 1;" << std::endl;
+        rval << "startVertexSize = 5;" << std::endl;
+        rval << "goalVertexSize = startVertexSize ;" << std::endl;
         rval << "edgeWeight = 1;" << std::endl;
         rval << "solnWeight = 2*edgeWeight;" << std::endl;
     }
@@ -194,7 +205,9 @@ std::string BaseExperiment::mfileHeader(bool monochrome, double whiteShift /*= 0
         rval << "nextEdgeColour = gray;" << std::endl;
         rval << "queueColour = gray;" << std::endl;
 
-        rval << "vertexSize = 4;" << std::endl;
+        rval << "vertexSize = 1;" << std::endl;
+        rval << "startVertexSize = 5;" << std::endl;
+        rval << "goalVertexSize = startVertexSize ;" << std::endl;
         rval << "edgeWeight = 1;" << std::endl;
         rval << "solnWeight = 3*edgeWeight;" << std::endl;
     }
@@ -244,10 +257,10 @@ std::string BaseExperiment::mfileFooter() const
 
     //Plot the start and goal vertices:
     rval << "for i = 1:size(xstarts,2)" << std::endl;
-    rval << "    plot(xstarts(1,i), xstarts(2,i), '.', 'Color', startColour, 'MarkerSize', 5*vertexSize);" << std::endl;
+    rval << "    plot(xstarts(1,i), xstarts(2,i), 'o', 'Color', startColour, 'MarkerFaceColor', startColour, 'MarkerSize', startVertexSize);" << std::endl;
     rval << "end" << std::endl;
     rval << "for i = 1:size(xgoals,2)" << std::endl;
-    rval << "    plot(xgoals(1,i), xgoals(2,i), '.', 'Color', goalColour, 'MarkerSize', 5*vertexSize);" << std::endl;
+    rval << "    plot(xgoals(1,i), xgoals(2,i), 'o', 'Color', goalColour, 'MarkerFaceColor', goalColour, 'MarkerSize', goalVertexSize);" << std::endl;
     rval << "end" << std::endl;
 
     //Write some post config:

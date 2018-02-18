@@ -72,6 +72,6 @@ protected:
     double outsidePos_;
 };
 
-typedef boost::shared_ptr<ObstacleFreeExperiment> ObstacleFreeExperimentPtr;
+typedef std::shared_ptr<ObstacleFreeExperiment> ObstacleFreeExperimentPtr;
 
 #endif //EXPERIMENTS_OBSTACLE_FREE_EXPERIMENT

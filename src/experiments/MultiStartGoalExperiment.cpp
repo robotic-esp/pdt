@@ -39,10 +39,10 @@
 
 // STL
 #include <cmath>
-
-// Boost
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
+//For std::shared_ptr, etc.
+#include <memory>
+//For std::bind
+#include <functional>
 
 // OMPL
 #include "ompl/base/spaces/RealVectorStateSpace.h"
@@ -57,7 +57,7 @@ MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim, const
 {
     // Variable
     // The state space
-    boost::shared_ptr<ompl::base::RealVectorStateSpace> ss;
+    std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
     // The problem bounds
     ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
     // The mean width of the obstacles:
@@ -66,13 +66,13 @@ MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim, const
     double obsMeasure;
 
     // Make the state space Rn:
-    ss = boost::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+    ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
 
     // Create the space information class:
-    BaseExperiment::si_ = boost::make_shared<ompl::base::SpaceInformation>(ss);
+    BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
     // Allocate the obstacle world
-    rectObs_ = boost::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
+    rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
     BaseExperiment::obs_ = rectObs_;
 
     //Set the problem bounds:
@@ -90,10 +90,10 @@ MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim, const
     BaseExperiment::si_->setup();
 
     // Allocate the optimization objective
-    BaseExperiment::opt_ = boost::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+    BaseExperiment::opt_ = std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
 
     // Set the heuristic to the default:
-    BaseExperiment::opt_->setCostToGoHeuristic(boost::bind(&ompl::base::goalRegionCostToGo, _1, _2));
+    BaseExperiment::opt_->setCostToGoHeuristic(std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
     // Set the starts and goals (http://www.mathopenref.com/coordpolycalc.html):
     // Create my starts:
@@ -129,7 +129,7 @@ MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim, const
 
     // Create my goals:
     // Allocate the goal pointer:
-    BaseExperiment::goalPtr_ = boost::make_shared<ompl::base::GoalStates>(BaseExperiment::si_);
+    BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalStates>(BaseExperiment::si_);
 
     // Create each one
     for (unsigned int i = 0u; i < 3u; ++i)

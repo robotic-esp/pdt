@@ -68,7 +68,7 @@ public:
 protected:
     // Variables
     /** \brief The obstacle world */
-    boost::shared_ptr<CsvObstacle> asrl_;
+    std::shared_ptr<CsvObstacle> asrl_;
 
     // Constant Parameters
     /** \brief The start position */
@@ -79,6 +79,6 @@ protected:
     double goalPosY_;
 };
 
-typedef boost::shared_ptr<AsrlExperiment> AsrlExperimentPtr;
+typedef std::shared_ptr<AsrlExperiment> AsrlExperimentPtr;
 
 #endif //EXPERIMENTS_ASRL_EXPERIMENT

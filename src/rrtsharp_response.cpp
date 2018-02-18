@@ -141,16 +141,14 @@ const bool PLOT_BITSTAR_EDGE = true;
 const bool PLOT_BITSTAR_QUEUE = false;
 
 
-bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPtr, unsigned int* dimensionPtr, unsigned int* numTrialsPtr, double* runTimePtr, bool* animatePtr)
+bool argParse(int argc, char** argv, unsigned int* probNum, unsigned int* numTrialsPtr, double* runTimePtr, bool* animatePtr)
 {
     // Declare the supported options.
     boost::program_options::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "produce help message")
-        ("state,r", boost::program_options::value<unsigned int>(), "The state dimension.")
         ("experiments,e", boost::program_options::value<unsigned int>(), "The number of unique experiments to run on the random world.")
-        ("number-obstacles,n", boost::program_options::value<unsigned int>(), "The number of obstacles used to calculate the max obstacle radius to give the desired obstacle coverage, [1, 2, ...). Note: radius is selected from 0.5x - 1x max radius, so the actual number of obstacles will vary.")
-        ("obstacle-coverage,o", boost::program_options::value<double>(), "The mean percentage of volume taken up by obstacles in the random world, [0,1).")
+        ("problem-number,p", boost::program_options::value<unsigned int>(), "The problem number (1 or 2) to run.")
         ("runtime,t", boost::program_options::value<double>(), "The CPU time in seconds for which to run the planners, (0,infty)")
         ("animate,a", boost::program_options::value<bool>()->zero_tokens(), "Create frame-by-frame animations.")
         ("log-level,l", boost::program_options::value<unsigned int>(), "Set the OMPL log level. 0 for WARN, 1 for INFO, 2 for DEBUG. Defaults to 0 if not set.");
@@ -164,48 +162,18 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
         return false;
     }
 
-    if (vm.count("number-obstacles"))
+    if (vm.count("problem-number"))
     {
-        *numObsPtr = vm["number-obstacles"].as<unsigned int>();
-        if ( (*numObsPtr  < 1) )
+        *probNum = vm["problem-number"].as<unsigned int>();
+        if ( (*probNum  != 1) && (*probNum  != 2) )
         {
-            std::cout << "number-obstacles must be >= 1" << std::endl << std::endl << desc << std::endl;
+            std::cout << "There are only 2 problems posed in the RRT# review. " << std::endl << std::endl << desc << std::endl;
             return false;
         }
     }
     else
     {
-        std::cout << "number-obstacles not set" << std::endl << std::endl << desc << std::endl;
-        return false;
-    }
-
-    if (vm.count("obstacle-coverage"))
-    {
-        *obsRatioPtr = vm["obstacle-coverage"].as<double>();
-        if ( (*obsRatioPtr < 0) || (*obsRatioPtr >= 1) )
-        {
-            std::cout << "obstacle-coverage must be [0, 1)" << std::endl << std::endl << desc << std::endl;
-            return false;
-        }
-    }
-    else
-    {
-        std::cout << "obstacle-coverage not set" << std::endl << std::endl << desc << std::endl;
-        return false;
-    }
-
-    if (vm.count("state"))
-    {
-        *dimensionPtr = vm["state"].as<unsigned int>();
-        if ( (*dimensionPtr  != 2) && (*dimensionPtr  != 4) && (*dimensionPtr  != 8) && (*dimensionPtr  != 16) )
-        {
-            std::cout << "Due to hard-coded RRT* paramenters, state dimension must be 2, 4, 8, or 16 for now " << std::endl << std::endl << desc << std::endl;
-            return false;
-        }
-    }
-    else
-    {
-        std::cout << "state dimension not set" << std::endl << std::endl << desc << std::endl;
+        std::cout << "Problem number not set" << std::endl << std::endl << desc << std::endl;
         return false;
     }
 
@@ -280,37 +248,6 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
 
     return true;
 }
-
-//Allocate Hybrid BIT*
-//ompl::base::PlannerPtr allocateHybridBitStar(const ompl::base::SpaceInformationPtr& /*si*/, unsigned int /*numSamples*/)
-//{
-//    OMPL_ERROR("Hybrid BIT* is not implemented in this branch."); return ompl::base::PlannerPtr();
-//    std::stringstream plannerName;
-//
-//    plannerName << "HybridBITstar" << numSamples;
-//
-//    //Create a BIT* planner
-//    ompl::base::PlannerPtr base = std::make_shared<ompl::geometric::HybridBITstar>(si);
-//
-//    //Configure it
-//    //BIT* settings:
-//    base->as<ompl::geometric::HybridBITstar>()->setRewireFactor(BITSTAR_REWIRE_SCALE);
-//    base->as<ompl::geometric::HybridBITstar>()->setSamplesPerBatch(numSamples);
-//    base->as<ompl::geometric::HybridBITstar>()->setKNearest(BITSTAR_K_NEAREST);
-//    base->as<ompl::geometric::HybridBITstar>()->setStrictQueueOrdering(BITSTAR_STRICT_QUEUE);
-//    base->as<ompl::geometric::HybridBITstar>()->setPruning(BITSTAR_PRUNE);
-//    base->as<ompl::geometric::HybridBITstar>()->setPruneThresholdFraction(PRUNE_FRACTION);
-//    //Hybrid BIT* settings:
-//    base->as<ompl::geometric::HybridBITstar>()->setMaxNumberOfLocalIterations(numShortcuts);
-//    base->as<ompl::geometric::HybridBITstar>()->setMaxNumberofLocalFailures(numShortcutFailures);
-//    base->as<ompl::geometric::HybridBITstar>()->setShortcutWindowFraction(shortcutWidth);
-//    base->as<ompl::geometric::HybridBITstar>()->setShortcutTolerance(shortcutTol);
-//    base->as<ompl::geometric::HybridBITstar>()->setInterpolationTolerance(interpTol);
-//    base->setName(plannerName.str());
-//
-//    //Return
-//    return base;
-//}
 
 ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExperimentPtr& expDefn, const double steerEta, const unsigned int numSamples)
 {
@@ -403,21 +340,17 @@ void callSolve(asrl::time::point* startTime, const ompl::base::PlannerPtr& plann
 int main(int argc, char **argv)
 {
     //Argument Variables
-    //The dimension size:
-    unsigned int N;
+    //The problem number:
+    unsigned int probNum;
     //The number of experiments
     unsigned int numExperiments;
-    //The (maximum) percent of space covered by obstacles
-    double obsRatio;
-    //The number of obstacles to create
-    unsigned int numObs;
     //The time for which to run the planners
     double targetTime;
     //Whether to make frame-by-frame animations
     bool createAnimationFrames;
 
     //Get the command line arguments
-    if (argParse(argc, argv, &numObs, &obsRatio, &N, &numExperiments, &targetTime, &createAnimationFrames) == false)
+    if (argParse(argc, argv, &probNum, &numExperiments, &targetTime, &createAnimationFrames) == false)
     {
         return 1;
     }
@@ -438,48 +371,23 @@ int main(int argc, char **argv)
     //The world name
     std::stringstream worldName;
     //The experiment
-    //BaseExperimentPtr expDefn = std::make_shared<CentreSquareExperiment>(N, 0.25, targetTime, CHECK_RESOLUTION);
-    //BaseExperimentPtr expDefn = std::make_shared<DeadEndExperiment>(0.4, targetTime, CHECK_RESOLUTION);
-    //BaseExperimentPtr expDefn = std::make_shared<SpiralExperiment>(0.4, targetTime, CHECK_RESOLUTION);
-//    BaseExperimentPtr expDefn = std::make_shared<WallGapExperiment>(N, false, 0.05, targetTime, CHECK_RESOLUTION);
-    //BaseExperimentPtr expDefn = std::make_shared<FlankingGapExperiment>(false, 0.05, targetTime, CHECK_RESOLUTION);
-//    BaseExperimentPtr expDefn = std::make_shared<RandomRectanglesExperiment>(N, numObs, obsRatio, targetTime, CHECK_RESOLUTION);
-//    BaseExperimentPtr expDefn = std::make_shared<RegularRectanglesExperiment>(N, 4.0, 5, targetTime, CHECK_RESOLUTION);
-    BaseExperimentPtr expDefn = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.8, targetTime, CHECK_RESOLUTION); //worldHalfWidth, insideWidth, wallThickness, gapWidth. Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
+    BaseExperimentPtr expDefn = std::make_shared<RRTsharpResponseExperiment>(probNum, targetTime, CHECK_RESOLUTION);
 
     if (INITIAL_SOLN_ONLY == true)
     {
         expDefn->setTarget(std::numeric_limits<double>::infinity());
     }
 
-    if (N == 2u)
-    {
-        steerEta = RRT_STEER_ETA_2D;
-    }
-    else if (N == 4)
-    {
-        steerEta = RRT_STEER_ETA_4D;
-    }
-    else if (N == 8u)
-    {
-        steerEta = RRT_STEER_ETA_8D;
-    }
-    else if (N == 16u)
-    {
-        steerEta = RRT_STEER_ETA_16D;
-    }
-    else
-    {
-        throw ompl::Exception("No recorded steer eta for this dimension.");
-    }
+
+    steerEta = RRT_STEER_ETA_2D;
 
     //Let people know what's going on:
-    std::cout <<  expDefn->getName() << " in R^" << N << " with an RRT edge length of " << steerEta << "." << std::endl;
+    std::cout <<  expDefn->getName() << " in R^2" << " with an RRT edge length of " << steerEta << "." << std::endl;
     std::cout << "Seed: " << masterSeed << std::endl;
     expDefn->print();
 
     //The results output file:
-    fileName << "R" << N << "S" << masterSeed << expDefn->getName() << ".csv";
+    fileName << "R2" << "S" << masterSeed << expDefn->getName() << ".csv";
     ResultsFile<TimeCostHistory> plannerProgress(fileName.str());
     ResultsFile<TimeIterationCostHistory> plannerProgressIters(fileName.str());
 

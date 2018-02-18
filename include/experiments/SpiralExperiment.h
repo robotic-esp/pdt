@@ -69,7 +69,7 @@ public:
 protected:
     // Variables
     /** \brief The obstacle world */
-    boost::shared_ptr<HyperrectangleObstacles> rectObs_;
+    std::shared_ptr<HyperrectangleObstacles> rectObs_;
     /** \brief The lower-left corners of the obstacles*/
     std::vector<ompl::base::ScopedState<> > obsCorners_;
     /** The widths of the obstacles */
@@ -80,6 +80,6 @@ protected:
     double obsThickness_;
 };
 
-typedef boost::shared_ptr<SpiralExperiment> SpiralExperimentPtr;
+typedef std::shared_ptr<SpiralExperiment> SpiralExperimentPtr;
 
 #endif //EXPERIMENTS_SPIRAL_EXPERIMENT

@@ -199,8 +199,8 @@ bool CsvObstacle::isValid(const ompl::base::State* state) const
     return validState;
 }
 
-
-std::string CsvObstacle::mfile() const
+//Discard arguments
+std::string CsvObstacle::mfile(const std::string& /*obsColour*/, const std::string& /*spaceColour*/) const
 {
     //Variables
     //The string stream:

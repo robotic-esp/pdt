@@ -14,7 +14,10 @@
 //The data recording
 #include "tools/recording_tools.h"
 
-//ompl::time::duration == boost::posix_time::time_duration
+//Some general time helpers
+#include "tools/general_tools.h"
+
+//asrl::time::duration == std::chrono::duration
 /** \brief Create the matlab plot command for a vertex */
 std::string plotVertex(const ompl::base::State* vertex, std::string vertexColour, std::string vertexSize);
 
@@ -25,10 +28,10 @@ std::string plotEdge(const ompl::base::State* vertex, const ompl::base::State* p
 void createMatlabHelpers(std::string path);
 
 /** \brief Write the matlab plot header */
-std::string matlabExtraHeader(std::string plannerName, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue);
+std::string matlabExtraHeader(std::string plannerName, bool plotVertices, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue);
 
 /** \brief Create the matlab plot commands for a problem */
-void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue, std::string path = "plots/", std::string postFix = std::string(), bool monochrome = false);
+void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, bool plotVertices, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue, std::string path = "plots/", std::string postFix = std::string(), bool monochrome = false);
 
 /** \brief Create an iteration-by-iteration animation of the planner */
-ompl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, ompl::time::duration timeToRun, bool informedWorldEllipse, bool bitStarEllipse, bool bitStarEdge, bool bitStarQueue, unsigned int initialIterNumber = 0u, bool monochrome = false);
+asrl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, asrl::time::duration timeToRun, bool plotVertices, bool informedWorldEllipse, bool bitStarEllipse, bool bitStarEdge, bool bitStarQueue, unsigned int initialIterNumber = 0u, bool monochrome = false);

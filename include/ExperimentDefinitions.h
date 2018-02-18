@@ -13,3 +13,4 @@
 #include "experiments/SpiralExperiment.h"
 #include "experiments/TightlyBoundingRectangle.h"
 #include "experiments/WallGapExperiment.h"
+#include "experiments/RRTsharpResponseExperiment.h"

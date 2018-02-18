@@ -42,16 +42,12 @@
 #include <iomanip>
 //For std::stringstream
 #include <sstream>
-//For boost::make_shared
-#include <boost/make_shared.hpp>
+//For std::make_shared
+#include <memory>
 //For boost program options
 #include <boost/program_options.hpp>
 //For boost lexical cast
 #include <boost/lexical_cast.hpp>
-//For boost time
-#include <boost/date_time/posix_time/posix_time.hpp>
-//For boost thread:
-#include <boost/thread/thread.hpp>
 
 //OMPL:
 #include "ompl/base/spaces/RealVectorStateSpace.h"
@@ -65,12 +61,14 @@
 #include "ompl/base/samplers/informed/RejectionInfSampler.h"
 #include "ompl/util/GeometricEquations.h"
 
-#include <ompl/util/Time.h>
 #include "ompl/util/Console.h" //For OMPL_INFORM et al.
 #include "ompl/tools/config/MagicConstants.h" //For BETTER_PATH_COST_MARGIN
 #include <ompl/util/Exception.h>
 
 #include "ExperimentDefinitions.h"
+
+//The general helper functions
+#include "tools/general_tools.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
 
@@ -340,7 +338,7 @@ int main(int argc, char **argv)
 {
     //Variables
     //ompl::RNG::setSeed(4059103542);   std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;//Master seed:
-    boost::uint32_t masterSeed = ompl::RNG::getSeed();
+    std::uint_fast32_t masterSeed = ompl::RNG::getSeed();
 
     //The number of samples to create
     unsigned int targetSamples;
@@ -385,11 +383,11 @@ int main(int argc, char **argv)
 
         if (tightBounding == false)
         {
-            expPtr = boost::make_shared<ObstacleFreeExperiment> (i, maxNumStarts, maxNumGoals, 1.0); //1.0 is gibberish runtime, not used.
+            expPtr = std::make_shared<ObstacleFreeExperiment> (i, maxNumStarts, maxNumGoals, 1.0); //1.0 is gibberish runtime, not used.
         }
         else
         {
-            expPtr = boost::make_shared<TightlyBoundingRectangle> (i, dFoci, dTrans, 1.0); //1.0 is gibberish runtime, not used.
+            expPtr = std::make_shared<TightlyBoundingRectangle> (i, dFoci, dTrans, 1.0); //1.0 is gibberish runtime, not used.
         }
         //The problem definition
         ompl::base::ProblemDefinitionPtr pdef = expPtr->newProblemDefinition();
@@ -398,9 +396,9 @@ int main(int argc, char **argv)
         ompl::base::InformedSamplerPtr directInfSampler;
         ompl::base::InformedSamplerPtr rejInfSampler;
         //The time spent sampling
-        ompl::time::duration rawTime(0,0,0,0);
-        ompl::time::duration directTime(0,0,0,0);
-        ompl::time::duration rejectTime(0,0,0,0);
+        asrl::time::duration rawTime(0);
+        asrl::time::duration directTime(0);
+        asrl::time::duration rejectTime(0);
         //The number of samples drawn
         unsigned int numSampled = 0u;
         unsigned int numFailed = 0u;
@@ -440,7 +438,7 @@ int main(int argc, char **argv)
         //Allocate the samplers:
         rawSampler = expPtr->getSpaceInformation()->allocStateSampler();
         directInfSampler = expPtr->getOptimizationObjective()->allocInformedStateSampler(pdef, numAttempts);
-        rejInfSampler = boost::make_shared<ompl::base::RejectionInfSampler>(pdef, numAttempts);
+        rejInfSampler = std::make_shared<ompl::base::RejectionInfSampler>(pdef, numAttempts);
 
         //Make an mfile
         if (plotResults == true && (i == 2u || i == 3u))
@@ -463,15 +461,15 @@ int main(int argc, char **argv)
             //The state:
             ompl::base::State* statePtr = NULL;
             //The start time
-            ompl::time::point startTime;
+            asrl::time::point startTime;
 
             //Allocate
             statePtr = expPtr->getSpaceInformation()->allocState();
 
             //Calculate the time for a sample from the general space
-            startTime = ompl::time::now();
+            startTime = asrl::time::now();
             rawSampler->sampleUniform(statePtr);
-            rawTime = (ompl::time::now() - startTime) + rawTime;
+            rawTime = (asrl::time::now() - startTime) + rawTime;
 
             //Increment the number of samples
             ++numSampled;
@@ -493,7 +491,7 @@ int main(int argc, char **argv)
             //The state:
             ompl::base::State* statePtr = NULL;
             //The start time
-            ompl::time::point startTime;
+            asrl::time::point startTime;
             //The return value
             bool successRval = false;
             //The costs:
@@ -506,15 +504,15 @@ int main(int argc, char **argv)
             //Generate a sample:
             if (minCostValue == 0.0)
             {
-                startTime = ompl::time::now();
+                startTime = asrl::time::now();
                 successRval = directInfSampler->sampleUniform(statePtr, maxCost);
-                directTime = (ompl::time::now() - startTime) + directTime;
+                directTime = (asrl::time::now() - startTime) + directTime;
             }
             else
             {
-                startTime = ompl::time::now();
+                startTime = asrl::time::now();
                 successRval = directInfSampler->sampleUniform(statePtr, minCost, maxCost);
-                directTime = (ompl::time::now() - startTime) + directTime;
+                directTime = (asrl::time::now() - startTime) + directTime;
             }
 
             //If successful, increment the number
@@ -544,8 +542,15 @@ int main(int argc, char **argv)
         //Predicted rejection sampling:
         if (tightBounding == true)
         {
+            //This was all broken out as a result of the boost->std time change. Kind of untested
+            double timeFraction;
+            double predictedTimeSecs;
+
+            timeFraction = 1/(ompl::prolateHyperspheroidMeasure(i, dFoci, dTrans)/expPtr->getSpaceInformation()->getSpaceMeasure());
+            predictedTimeSecs = timeFraction*asrl::time::seconds(rawTime);
+
             std::cout << std::setw(5) << std::setfill(' ') << " ";
-            std::cout << rawTime*(1/(ompl::prolateHyperspheroidMeasure(i, dFoci, dTrans)/expPtr->getSpaceInformation()->getSpaceMeasure())) << std::flush;
+            std::cout << asrl::time::seconds(predictedTimeSecs) << std::flush;
         }
 
         //Rejection sample, if asked for
@@ -559,7 +564,7 @@ int main(int argc, char **argv)
                 //The state:
                 ompl::base::State* statePtr = NULL;
                 //The start time
-                ompl::time::point startTime;
+                asrl::time::point startTime;
                 //The return value
                 bool successRval = false;
                 //The costs:
@@ -572,15 +577,15 @@ int main(int argc, char **argv)
                 //Generate a sample:
                 if (minCostValue == 0.0)
                 {
-                    startTime = ompl::time::now();
+                    startTime = asrl::time::now();
                     successRval = rejInfSampler->sampleUniform(statePtr, maxCost);
-                    rejectTime = (ompl::time::now() - startTime) + rejectTime;
+                    rejectTime = (asrl::time::now() - startTime) + rejectTime;
                 }
                 else
                 {
-                    startTime = ompl::time::now();
+                    startTime = asrl::time::now();
                     successRval = rejInfSampler->sampleUniform(statePtr, minCost, maxCost);
-                    rejectTime = (ompl::time::now() - startTime) + rejectTime;
+                    rejectTime = (asrl::time::now() - startTime) + rejectTime;
                 }
 
                 //If successful, increment the number

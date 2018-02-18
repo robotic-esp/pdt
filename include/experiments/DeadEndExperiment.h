@@ -68,11 +68,11 @@ public:
 protected:
     // Variables
     /** \brief The obstacle world */
-    boost::shared_ptr<HyperrectangleObstacles> rectObs_;
+    std::shared_ptr<HyperrectangleObstacles> rectObs_;
     /** \brief The lower-left corners of the obstacles*/
-    boost::shared_ptr<ompl::base::ScopedState<> > topHorizontal_;
-    boost::shared_ptr<ompl::base::ScopedState<> > sideVertical_;
-    boost::shared_ptr<ompl::base::ScopedState<> > bottomHorizontal_;
+    std::shared_ptr<ompl::base::ScopedState<> > topHorizontal_;
+    std::shared_ptr<ompl::base::ScopedState<> > sideVertical_;
+    std::shared_ptr<ompl::base::ScopedState<> > bottomHorizontal_;
     /** The widths of the obstacles */
     std::vector<double> topHorizontalWidths_;
     std::vector<double> sideVerticalWidths_;
@@ -83,6 +83,6 @@ protected:
     double obsThickness_;
 };
 
-typedef boost::shared_ptr<DeadEndExperiment> DeadEndExperimentPtr;
+typedef std::shared_ptr<DeadEndExperiment> DeadEndExperimentPtr;
 
 #endif //EXPERIMENTS_DEAD_END_EXPERIMENT

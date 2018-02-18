@@ -36,6 +36,9 @@
 
 #include "obstacles/HyperrectangleObstacles.h"
 
+//For std::bind
+#include <functional>
+
 #include "ompl/util/Exception.h"
 
 //The default metric NN class:
@@ -63,7 +66,7 @@ void HyperrectangleObstacles::construct()
 {
     //Setup the NN structure
     nnObstacles_.reset(new ompl::NearestNeighborsGNAT<obstacle_corner_widths_t>());
-    nnObstacles_->setDistanceFunction(boost::bind(&HyperrectangleObstacles::distanceFunction, this, _1, _2));
+    nnObstacles_->setDistanceFunction(std::bind(&HyperrectangleObstacles::distanceFunction, this, std::placeholders::_1, std::placeholders::_2));
 
     //Allocate a sampler
     stateSampler_ = StateValidityChecker::si_->allocStateSampler();
@@ -112,7 +115,7 @@ bool HyperrectangleObstacles::isValid(const ompl::base::State* state) const
 
         //Get the obstacles that I could be in collision with. Pretend I myself am an obstacle
         //nnObstacles_->nearestR(std::make_pair(state,0.0), maxWidth_, neighbours);
-        nnObstacles_->nearestR(std::make_pair(state,0.0), std::sqrt( static_cast<double>(StateValidityChecker::si_->getStateDimension())*std::pow(maxWidth_, 2.0) ), neighbours);
+        nnObstacles_->nearestR(std::make_pair(state,std::vector<double>(0.0)), std::sqrt( static_cast<double>(StateValidityChecker::si_->getStateDimension())*std::pow(maxWidth_, 2.0) ), neighbours);
 
         //Check each obstacle
         for (unsigned int j = 0u; j < neighbours.size() && validState == true; ++j)
@@ -127,6 +130,27 @@ bool HyperrectangleObstacles::isValid(const ompl::base::State* state) const
 
 void HyperrectangleObstacles::addObstacle(const obstacle_corner_widths_t& newObstacle)
 {
+//    //Print the obstacle out to the terminal:
+//    std::cout << "ll = [";
+//    for (unsigned int i = 0u; i < newObstacle.second.size(); ++i)
+//    {
+//        std::cout << newObstacle.first->as<ompl::base::RealVectorStateSpace::StateType>()->values[i];
+//        if (i != (newObstacle.second.size() - 1u))
+//        {
+//            std::cout << ", ";
+//        }
+//    }
+//    std::cout << "], ur = [";
+//    for (unsigned int i = 0u; i < newObstacle.second.size(); ++i)
+//    {
+//        std::cout << newObstacle.first->as<ompl::base::RealVectorStateSpace::StateType>()->values[i] + newObstacle.second.at(i);
+//        if (i != (newObstacle.second.size() - 1u))
+//        {
+//            std::cout << ", ";
+//        }
+//    }
+//    std::cout << "]" << std::endl;
+
     //Add the obstacle
     nnObstacles_->add(newObstacle);
 
@@ -237,7 +261,7 @@ void HyperrectangleObstacles::randomize(double minObsSize, double maxObsSize, do
     }
 }
 
-std::string HyperrectangleObstacles::mfile() const
+std::string HyperrectangleObstacles::mfile(const std::string& obsColour, const std::string& /*spaceColour*/) const
 {
     //Variables
     //The string stream:
@@ -251,7 +275,7 @@ std::string HyperrectangleObstacles::mfile() const
     for (unsigned int i = 0u; i < obsVect.size(); ++i)
     {
         rval << "fill([" << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[0] << ", " << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[0] + obsVect.at(i).second.at(0u) << ", " << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[0] + obsVect.at(i).second.at(0u) << ", " << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[0] << "],";
-        rval << " [" << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[1] << ", " << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[1] << ", " << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[1] + obsVect.at(i).second.at(1u) << ", " << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[1] + obsVect.at(i).second.at(1u)  << "], 'k');\n";
+        rval << " [" << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[1] << ", " << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[1] << ", " << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[1] + obsVect.at(i).second.at(1u) << ", " << obsVect.at(i).first->as<ompl::base::RealVectorStateSpace::StateType>()->values[1] + obsVect.at(i).second.at(1u)  << "], " << obsColour << ", 'LineStyle', 'none');\n";
     }
 
     return rval.str();

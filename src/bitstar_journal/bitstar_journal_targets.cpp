@@ -46,16 +46,12 @@ THIS CODE ONLY COMPILES ON THE set_rrtstar_seeds BRANCH!!!!
 #include <iomanip>
 //For std::stringstream
 #include <sstream>
-//For boost::make_shared
-#include <boost/make_shared.hpp>
+//For std::make_shared
+#include <memory>
 //For boost program options
 #include <boost/program_options.hpp>
 //For boost lexical cast
 #include <boost/lexical_cast.hpp>
-//For boost time
-#include <boost/date_time/posix_time/posix_time.hpp>
-//For boost thread:
-#include <boost/thread/thread.hpp>
 // For string comparison (boost::iequals)
 #include <boost/algorithm/string.hpp>
 
@@ -72,7 +68,6 @@ THIS CODE ONLY COMPILES ON THE set_rrtstar_seeds BRANCH!!!!
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 //#include <ompl/tools/benchmark/Benchmark.h>
-#include <ompl/util/Time.h>
 #include "ompl/util/Console.h" //For OMPL_INFORM et al.
 #include "ompl/tools/config/MagicConstants.h" //For BETTER_PATH_COST_MARGIN
 #include <ompl/util/Exception.h>
@@ -80,7 +75,8 @@ THIS CODE ONLY COMPILES ON THE set_rrtstar_seeds BRANCH!!!!
 //Our Experiments
 #include "ExperimentDefinitions.h"
 
-//The helper functions for plotting:
+//The helper functions for general and plotting:
+#include "tools/general_tools.h"
 #include "tools/plotting_tools.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
@@ -112,6 +108,7 @@ const bool FMT_CACHE_CC = false;
 const bool FMT_USE_HEURISTICS = false;
 
 //Plotting:
+const bool PLOT_VERTICES = true;
 const bool PLOT_WORLD_ELLIPSE = true;
 const bool PLOT_BITSTAR_ELLIPSE = true;
 const bool PLOT_BITSTAR_EDGE = true;
@@ -407,7 +404,7 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
 
 WallGapExperimentPtr allocateGapExperiment(const unsigned int dim, const double gapWidth, const double runTime, const double resolution)
 {
-    return boost::make_shared<WallGapExperiment> (dim, true, gapWidth, runTime, resolution);
+    return std::make_shared<WallGapExperiment> (dim, true, gapWidth, runTime, resolution);
 };
 
 CentreSquareExperimentPtr allocateMapExperiment(const unsigned int dim, const double mapWidth, const double goalTol, const double runTime, const double resolution)
@@ -418,7 +415,7 @@ CentreSquareExperimentPtr allocateMapExperiment(const unsigned int dim, const do
     // A random number generator
     ompl::RNG rng;
 
-    exp = boost::make_shared<CentreSquareExperiment> (dim, rng.uniformReal(0.25,0.5), mapWidth, runTime, resolution/(0.5*mapWidth));
+    exp = std::make_shared<CentreSquareExperiment> (dim, rng.uniformReal(0.25,0.5), mapWidth, runTime, resolution/(0.5*mapWidth));
 
     exp->setTarget(goalTol);
 
@@ -431,7 +428,7 @@ CentreSquareExperimentPtr allocateTargetExperiment(const unsigned int dim, const
     // A random number generator
     ompl::RNG rng;
 
-    return boost::make_shared<CentreSquareExperiment> (dim, rng.uniformReal(0.25,0.5), 2.0, runTime, resolution);
+    return std::make_shared<CentreSquareExperiment> (dim, rng.uniformReal(0.25,0.5), 2.0, runTime, resolution);
 };
 
 
@@ -507,7 +504,7 @@ int main(int argc, char **argv)
     //Variables
 //    ompl::RNG::setSeed(2971235666);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
-    boost::uint32_t masterSeed = ompl::RNG::getSeed();
+    std::uint_fast32_t masterSeed = ompl::RNG::getSeed();
     //The filename for progress
     std::stringstream fileName;
     //The world name
@@ -542,7 +539,7 @@ int main(int argc, char **argv)
         //The experiment definitions for this run
         std::vector<BaseExperimentPtr> runExperiments;
         //A vector of RNGs, we will use their seeds for all the planners, but not actually use the RNG...
-        std::vector< boost::shared_ptr<ompl::RNG> > seedRNGs;
+        std::vector< std::shared_ptr<ompl::RNG> > seedRNGs;
 
         //Create all the experiments for this run:
         runExperiments = allocateRunExperiments(problemType, N, maxTime, CHECK_RESOLUTION, indepVariables, goalTol);
@@ -556,7 +553,7 @@ int main(int argc, char **argv)
             //The current planner:
             ompl::base::PlannerPtr plnr;
             //The cumulative runtime
-            ompl::time::duration runTime(0,0,0,0);
+            asrl::time::duration runTime(0);
             //The results from this planners run across all the variates:
             TargetTimeResults runResults(indepVariables.size());
 
@@ -565,14 +562,14 @@ int main(int argc, char **argv)
             {
                 //Variables
                 //The start time for a call
-                ompl::time::point startTime;
+                asrl::time::point startTime;
                 //The problem defintion used by this planner
                 ompl::base::ProblemDefinitionPtr pdef;
 
                 //If this is the first planner of this experiment, create the seed for this target variable
                 if (p == 0u)
                 {
-                    seedRNGs.push_back( boost::make_shared<ompl::RNG>() );
+                    seedRNGs.push_back( std::make_shared<ompl::RNG>() );
                 }
 
                 //Ok, what we do depends on the problem type.
@@ -583,7 +580,7 @@ int main(int argc, char **argv)
                     //allocate,
                     plnr = allocatePlanner(plannersToTest.at(p).first, expDefn, steerEta, plannersToTest.at(p).second);
                     //and reset the run time. Easy.
-                    runTime = ompl::time::duration(0,0,0,0);
+                    runTime = asrl::time::duration(0);
                 }
                 else if (problemType == TIME_V_TARGET)
                 {
@@ -592,7 +589,7 @@ int main(int argc, char **argv)
                     {
                         expDefn = runExperiments.at(0u);
                         plnr = allocatePlanner(plannersToTest.at(p).first, expDefn, steerEta, plannersToTest.at(p).second);
-                        runTime = ompl::time::duration(0,0,0,0);
+                        runTime = asrl::time::duration(0);
                     }
 
                     //But we always specify the target:
@@ -612,9 +609,9 @@ int main(int argc, char **argv)
                 //If necessary, setup
                 if (plnr->isSetup() == false)
                 {
-                    startTime = ompl::time::now();
+                    startTime = asrl::time::now();
                     plnr->setup();
-                    runTime = ompl::time::now() - startTime;
+                    runTime = asrl::time::now() - startTime;
 
                     //Set the planner seed:
                     if (isRrtStar(plannersToTest.at(p).first) == true)
@@ -667,14 +664,14 @@ int main(int argc, char **argv)
                 //Run the planner:
                 if (createAnimationFrames == true)
                 {
-                    runTime = runTime + createAnimation(expDefn, plannersToTest.at(p).first, plnr, masterSeed, expDefn->getTargetTime() - runTime, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
+                    runTime = runTime + createAnimation(expDefn, plannersToTest.at(p).first, plnr, masterSeed, expDefn->getTargetTime() - runTime, PLOT_VERTICES, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
                 }
                 else
                 {
                     //Get the end result:
-                    startTime = ompl::time::now();
-                    plnr->solve( ompl::time::seconds(expDefn->getTargetTime() - runTime) );
-                    runTime = runTime + (ompl::time::now() - startTime);
+                    startTime = asrl::time::now();
+                    plnr->solve( asrl::time::seconds(expDefn->getTargetTime() - runTime) );
+                    runTime = runTime + (asrl::time::now() - startTime);
                 }
 
                 //Store the result:
@@ -684,7 +681,7 @@ int main(int argc, char **argv)
                 }
                 else
                 {
-                    runResults.push_back(std::make_pair(indepVariables.at(v), ompl::time::duration(boost::date_time::neg_infin)));
+                    runResults.push_back(std::make_pair(indepVariables.at(v), ASRL_DURATION_INFINITY));
                 }
 
                 //Save the map:
@@ -693,12 +690,12 @@ int main(int argc, char **argv)
 
                 if (plannersToTest.at(p).second <=  5000u)
                 {
-                    writeMatlabMap(expDefn, plannersToTest.at(p).first, plnr, masterSeed, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE, "plots/", postFix.str());
+                    writeMatlabMap(expDefn, plannersToTest.at(p).first, plnr, masterSeed, PLOT_VERTICES, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE, "plots/", postFix.str());
                 }
 
                 //Output info to the terminal:
                 //If the result is infinite, pad with an extra 6 white spaces, as the word "+infinity" is 9 chars long.:
-                if (runResults.back().second.is_special() == true)
+                if (asrl::time::isfinite(runResults.back().second) == false)
                 {
                     std::cout << std::setw(6) << std::setfill(' ') << " ";
                 }

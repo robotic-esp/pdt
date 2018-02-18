@@ -34,8 +34,8 @@
 
 /* Authors: Jonathan Gammell */
 
-#ifndef EXPERIMENTS_RANDOM_RECTANGLES_EXPERIMENT
-#define EXPERIMENTS_RANDOM_RECTANGLES_EXPERIMENT
+#ifndef EXPERIMENTS_RRTSHARP_RESPONSE1_EXPERIMENT
+#define EXPERIMENTS_RRTSHARP_RESPONSE1_EXPERIMENT
 
 #include "experiments/BaseExperiment.h"
 
@@ -43,20 +43,20 @@
 #include "obstacles/HyperrectangleObstacles.h"
 
 
-/** \brief An experiment with a singularly placed square obstacle*/
-class RandomRectanglesExperiment : public BaseExperiment
+/** \brief An experiment with the obstacles presented in the RRT# review of IJRR BIT* */
+class RRTsharpResponseExperiment : public BaseExperiment
 {
 public:
-    /** \brief Constructor. */
-    RandomRectanglesExperiment(const unsigned int dim, const unsigned int numObs, const double obsRatio, const double runSeconds, const double checkResolution);
+    /** \brief Constructor */
+    RRTsharpResponseExperiment(const unsigned int expNum, const double runSeconds, const double checkResolution);
 
-    /** \brief This problem \e does \e not know its optimum */
+    /** \brief Whether the problem has an exact expression for the optimum */
     virtual bool knowsOptimum() const;
 
-    /** \brief As the optimum is unknown, throw. */
+    /** \brief This problem knows its optimum */
     virtual ompl::base::Cost getOptimum() const;
 
-    /** \brief Set the optimization target as the specified cost. */
+    /** \brief Set the target cost as the specified multiplier of the optimum. */
     virtual void setTarget(double targetSpecifier);
 
     /** \brief Derived class specific information to include in the title line. */
@@ -69,18 +69,20 @@ protected:
     // Variables
     /** \brief The obstacle world */
     std::shared_ptr<HyperrectangleObstacles> rectObs_;
-    /** \brief The lower-left corner of an obstacle half-way between the start and goal */
-    std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_;
 
     // Constant Parameters
+    /** \brief The lower-left corner of the obstacles */
+    std::vector<std::shared_ptr<ompl::base::ScopedState<> > > obs_;
+    /** \brief The experiment number */
+    unsigned int expNum_;
+    /** \brief The x position */
+    double posX_;
     /** \brief The start position */
-    double startPos_;
+    double startPosY_;
     /** \brief The goal position */
-    double goalPos_;
-    /** \brief The mean obstacle width*/
-    double meanObsWidth_;
+    double goalPosY_;
 };
 
-typedef std::shared_ptr<RandomRectanglesExperiment> RandomRectanglesExperimentPtr;
+typedef std::shared_ptr<RRTsharpResponseExperiment> RRTsharpResponseExperimentPtr;
 
-#endif //EXPERIMENTS_RANDOM_RECTANGLES_EXPERIMENT
+#endif //EXPERIMENTS_RRTSHARP_RESPONSE1_EXPERIMENT

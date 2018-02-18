@@ -68,9 +68,9 @@ public:
 protected:
     // Variables
     /** \brief The obstacle world */
-    boost::shared_ptr<HyperrectangleObstacles> rectObs_;
+    std::shared_ptr<HyperrectangleObstacles> rectObs_;
 };
 
-typedef boost::shared_ptr<MultiStartGoalExperiment> MultiStartGoalExperimentPtr;
+typedef std::shared_ptr<MultiStartGoalExperiment> MultiStartGoalExperimentPtr;
 
 #endif //EXPERIMENTS_MULTI_START_GOAL_EXPERIMENT

@@ -40,9 +40,12 @@
 // An Obstacle-World
 #include "obstacles/HyperrectangleObstacles.h"
 
-// Boost
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
+// STL
+#include <memory>
+//For std::shared_ptr, etc.
+#include <memory>
+//For std::bind
+#include <functional>
 
 // OMPL
 #include "ompl/base/spaces/RealVectorStateSpace.h"
@@ -57,7 +60,7 @@ ObstacleFreeExperiment::ObstacleFreeExperiment(const unsigned int dim, const uns
 {
     // Variables
     // The state space
-    boost::shared_ptr<ompl::base::RealVectorStateSpace> ss;
+    std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
     // The problem bounds
     ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
     // The validity checker:
@@ -82,16 +85,16 @@ ObstacleFreeExperiment::ObstacleFreeExperiment(const unsigned int dim, const uns
     }
 
     // Make the state space Rn:
-    ss = boost::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+    ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
 
     // Create the space information class:
-    BaseExperiment::si_ = boost::make_shared<ompl::base::SpaceInformation>(ss);
+    BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
     // Make an empty obstacle pointer:
-    BaseExperiment::obs_ = boost::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
+    BaseExperiment::obs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
 
     // Make the validity checker all-true
-    vc = boost::make_shared<ompl::base::AllValidStateValidityChecker> (BaseExperiment::si_);
+    vc = std::make_shared<ompl::base::AllValidStateValidityChecker> (BaseExperiment::si_);
 
     //Set the problem bounds:
     problemBounds.setLow(BaseExperiment::limits_.at(0u).first);
@@ -108,10 +111,10 @@ ObstacleFreeExperiment::ObstacleFreeExperiment(const unsigned int dim, const uns
     BaseExperiment::si_->setup();
 
     // Allocate the optimization objective
-    BaseExperiment::opt_ = boost::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+    BaseExperiment::opt_ = std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
 
     // Set the heuristic to the default:
-    BaseExperiment::opt_->setCostToGoHeuristic(boost::bind(&ompl::base::goalRegionCostToGo, _1, _2));
+    BaseExperiment::opt_->setCostToGoHeuristic(std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
     // Given the way we define goals, We can only have 2 per dimension (i.e., 4 in 2D, 6 in 3D, etc)
     numStarts = std::min(maxNumStarts, 2u*BaseExperiment::dim_);
@@ -120,11 +123,11 @@ ObstacleFreeExperiment::ObstacleFreeExperiment(const unsigned int dim, const uns
     // Allocate the goal:
     if (numGoals == 1u)
     {
-        BaseExperiment::goalPtr_ = boost::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
+        BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
     }
     else
     {
-        BaseExperiment::goalPtr_ = boost::make_shared<ompl::base::GoalStates>(BaseExperiment::si_);
+        BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalStates>(BaseExperiment::si_);
     }
 
     // Assign positions

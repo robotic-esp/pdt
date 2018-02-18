@@ -42,14 +42,14 @@
 #include <iomanip>
 //For std::stringstream
 #include <sstream>
-//For boost::make_shared
-#include <boost/make_shared.hpp>
+//For std::shared_ptr, etc.
+#include <memory>
+//For std::bind
+#include <functional>
 //For boost program options
 #include <boost/program_options.hpp>
 
 //OMPL:
-//For ompl::time
-#include "ompl/util/Time.h"
 //For OMPL_INFORM et al.
 #include "ompl/util/Console.h"
 //For exceptions
@@ -60,6 +60,9 @@
 //NN structs:
 #include "ompl/datastructures/NearestNeighborsGNAT.h"
 #include "ompl/datastructures/NearestNeighborsGNATNoThreadSafety.h"
+
+//The general helper functions
+#include "tools/general_tools.h"
 
 const unsigned int N = 2u;
 
@@ -93,7 +96,7 @@ public:
     bool locked_;
 };
 
-  typedef boost::shared_ptr<TestElement> test_element_ptr_t;
+  typedef std::shared_ptr<TestElement> test_element_ptr_t;
 
 //L2 norm
 double distanceFunction(const test_element_ptr_t& a, const test_element_ptr_t& b)
@@ -123,16 +126,16 @@ double distanceFunction(const test_element_ptr_t& a, const test_element_ptr_t& b
 class NnTestingData
 {
 public:
-    typedef boost::shared_ptr<ompl::NearestNeighbors<test_element_ptr_t> > nn_ptr_t;
+    typedef std::shared_ptr<ompl::NearestNeighbors<test_element_ptr_t> > nn_ptr_t;
 
     NnTestingData(std::string name, nn_ptr_t ptr)
       : name_(name),
-        insertTime_(0,0,0,0),
-        removeTime_(0,0,0,0),
+        insertTime_(0),
+        removeTime_(0),
         nn_(ptr)
     {
         //Set the distance function
-        nn_->setDistanceFunction(boost::bind(&distanceFunction, _1, _2));
+        nn_->setDistanceFunction(std::bind(&distanceFunction, std::placeholders::_1, std::placeholders::_2));
     };
 
     NnTestingData()
@@ -140,19 +143,19 @@ public:
     };
 
     std::string name_;
-    ompl::time::duration insertTime_;
-    ompl::time::duration removeTime_;
+    asrl::time::duration insertTime_;
+    asrl::time::duration removeTime_;
     nn_ptr_t nn_;
 
 };
 
-bool argParse(int argc, char** argv, boost::uint32_t* seedPtr)
+bool argParse(int argc, char** argv, std::uint_fast32_t* seedPtr)
 {
     // Declare the supported options.
     boost::program_options::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "produce help message")
-        ("seed,s", boost::program_options::value<boost::uint32_t>()->default_value(11u), "The seed for the number sequence.");
+        ("seed,s", boost::program_options::value<std::uint_fast32_t>()->default_value(11u), "The seed for the number sequence.");
     boost::program_options::variables_map vm;
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
     boost::program_options::notify(vm);
@@ -165,7 +168,7 @@ bool argParse(int argc, char** argv, boost::uint32_t* seedPtr)
 
     if (vm.count("seed"))
     {
-        *seedPtr = vm["seed"].as<boost::uint32_t>();
+        *seedPtr = vm["seed"].as<std::uint_fast32_t>();
     }
     else
     {
@@ -177,10 +180,10 @@ bool argParse(int argc, char** argv, boost::uint32_t* seedPtr)
 
 int main(int argc, char **argv)
 {
-    typedef boost::shared_ptr<TestElement> test_element_ptr_t;
+    typedef std::shared_ptr<TestElement> test_element_ptr_t;
     //Configuration
     //The seed
-    boost::uint32_t masterSeed;
+    std::uint_fast32_t masterSeed;
 
     //Get the command line arguments
     if (argParse(argc, argv, &masterSeed) == false)
@@ -204,10 +207,10 @@ int main(int argc, char **argv)
     unsigned int numPasses;
     //A vector of NN structs to test, as a helper testing data class:
     std::vector<NnTestingData> nnToTest;
-    nnToTest.push_back( NnTestingData("GNAT",  boost::make_shared<ompl::NearestNeighborsGNAT<test_element_ptr_t> >()) );
-    nnToTest.push_back( NnTestingData("GNAT(4, 2, 6, 50, 50, false)",  boost::make_shared<ompl::NearestNeighborsGNAT<test_element_ptr_t> >(4, 2, 6, 50, 50, false)) ); //Old GNAT settings.
-//    nnToTest.push_back( NnTestingData("GNAT(3, 2, 3, 4, 50, false)",  boost::make_shared<ompl::NearestNeighborsGNAT<test_element_ptr_t> >(3, 2, 3, 4, 50, false)) ); //Old GNATNoThreadSafety settings.
-//    nnToTest.push_back( NnTestingData("GNATNoThreadSafety",  boost::make_shared<ompl::NearestNeighborsGNATNoThreadSafety<test_element_ptr_t> >()) );
+    nnToTest.push_back( NnTestingData("GNAT",  std::make_shared<ompl::NearestNeighborsGNAT<test_element_ptr_t> >()) );
+    nnToTest.push_back( NnTestingData("GNAT(4, 2, 6, 50, 50, false)",  std::make_shared<ompl::NearestNeighborsGNAT<test_element_ptr_t> >(4, 2, 6, 50, 50, false)) ); //Old GNAT settings.
+//    nnToTest.push_back( NnTestingData("GNAT(3, 2, 3, 4, 50, false)",  std::make_shared<ompl::NearestNeighborsGNAT<test_element_ptr_t> >(3, 2, 3, 4, 50, false)) ); //Old GNATNoThreadSafety settings.
+//    nnToTest.push_back( NnTestingData("GNATNoThreadSafety",  std::make_shared<ompl::NearestNeighborsGNATNoThreadSafety<test_element_ptr_t> >()) );
 
     //Pick the number of elements to insert/remove per pass, and the number of passes
     numToCreate = rng.uniformInt(100u, 1000u);
@@ -228,7 +231,7 @@ int main(int argc, char **argv)
         for (unsigned int j = 0u; j < nnToTest.size(); ++j)
         {
             //The timing at the start of this pass:
-            ompl::time::duration oldTime(nnToTest.at(j).insertTime_);
+            asrl::time::duration oldTime(nnToTest.at(j).insertTime_);
 
             //Insert numToCreate elements:
             for (unsigned int k = 0u; k < numToCreate; ++k)
@@ -237,7 +240,7 @@ int main(int argc, char **argv)
                 if (j == 0u)
                 {
                     //Allocate the element
-                    passElements.push_back(boost::make_shared<TestElement> (++id));
+                    passElements.push_back(std::make_shared<TestElement> (++id));
 
                     //Put data in the element
                     rng.uniformNormalVector(N, &passElements.back()->data_[0]);
@@ -245,13 +248,13 @@ int main(int argc, char **argv)
                 //No else, allocated earlier
 
                 //Store the time:
-                ompl::time::point startTime = ompl::time::now();
+                asrl::time::point startTime = asrl::time::now();
 
                 //Add
                 nnToTest.at(j).nn_->add(passElements.at(k));
 
                 //Store the change in time:
-                nnToTest.at(j).insertTime_ = nnToTest.at(j).insertTime_ + (ompl::time::now() - startTime);
+                nnToTest.at(j).insertTime_ = nnToTest.at(j).insertTime_ + (asrl::time::now() - startTime);
             }
 
             //Results
@@ -263,7 +266,7 @@ int main(int argc, char **argv)
         for (unsigned int j = 0u; j < nnToTest.size(); ++j)
         {
             //The timing at the start of this pass:
-            ompl::time::duration oldTime(nnToTest.at(j).removeTime_);
+            asrl::time::duration oldTime(nnToTest.at(j).removeTime_);
 
             //Unlock all the elements for this NN struct
             for (unsigned int k = 0u; k < passElements.size(); ++k)
@@ -297,13 +300,13 @@ int main(int argc, char **argv)
                 }
 
                 //Store the time
-                ompl::time::point startTime = ompl::time::now();
+                asrl::time::point startTime = asrl::time::now();
 
                 //Remove
                 nnToTest.at(j).nn_->remove(passElements.at(k));
 
                 //Store the change in time:
-                nnToTest.at(j).removeTime_ = nnToTest.at(j).removeTime_ + (ompl::time::now() - startTime);
+                nnToTest.at(j).removeTime_ = nnToTest.at(j).removeTime_ + (asrl::time::now() - startTime);
 
                 //Mark the element as deleted by locking it for the remainder of this struct's run:
                 passElements.at(k)->lock();

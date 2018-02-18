@@ -46,16 +46,12 @@ THIS CODE ONLY COMPILES ON THE set_seeds BRANCH!!!!
 #include <iomanip>
 //For std::stringstream
 #include <sstream>
-//For boost::make_shared
-#include <boost/make_shared.hpp>
+//For std::make_shared
+#include <memory>
 //For boost program options
 #include <boost/program_options.hpp>
 //For boost lexical cast
 #include <boost/lexical_cast.hpp>
-//For boost time
-#include <boost/date_time/posix_time/posix_time.hpp>
-//For boost thread:
-#include <boost/thread/thread.hpp>
 // For string comparison (boost::iequals)
 #include <boost/algorithm/string.hpp>
 
@@ -67,7 +63,6 @@ THIS CODE ONLY COMPILES ON THE set_seeds BRANCH!!!!
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 //#include <ompl/tools/benchmark/Benchmark.h>
-#include <ompl/util/Time.h>
 #include "ompl/util/Console.h" //For OMPL_INFORM et al.
 #include "ompl/tools/config/MagicConstants.h" //For BETTER_PATH_COST_MARGIN
 #include <ompl/util/Exception.h>
@@ -89,6 +84,9 @@ const double GOAL_BIAS = 0.025;
 const bool KNEAREST_RRT = false;
 const double INITIAL_REWIRE_SCALE = 1.1; //The factor scaling the RGG term
 const double INITIAL_STEER_ETA = 0.25; //Quarter the distance from start to goal.
+
+//Plotting:
+const bool PLOT_VERTICES = true;
 
 bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPtr, double* rewirePtr, unsigned int* numTrialsPtr, unsigned int* numIterationsPtr, bool* animatePtr)
 {
@@ -220,11 +218,11 @@ bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPt
 
 
 //Allocate and configure RRT*
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
 {
     //Create a RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
-    plnr = boost::make_shared<ompl::geometric::RRTstar>(si);
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
+    plnr = std::make_shared<ompl::geometric::RRTstar>(si);
 
     //Configure it
     plnr->setGoalBias(GOAL_BIAS);
@@ -251,10 +249,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::Sp
 };
 
 //Allocate and configure RRT* with sample rejection
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_SampRej(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_SampRej(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
     plnr = allocateRrtStar(si, steerEta, rewireScale);
 
     //Configure it to be Informed
@@ -266,10 +264,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_SampRej(const ompl::
 };
 
 //Allocate and configure RRT* with new-state rejection
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_NewRej(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_NewRej(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
     plnr = allocateRrtStar(si, steerEta, rewireScale);
 
     //Configure it to be Informed
@@ -281,10 +279,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_NewRej(const ompl::b
 };
 
 //Allocate and configure RRT* with pruning
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Prune(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Prune(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
     plnr = allocateRrtStar(si, steerEta, rewireScale);
 
     //Configure it to be Informed
@@ -297,10 +295,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Prune(const ompl::ba
 };
 
 //Allocate and configure RRT* with pruning
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Trio(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Trio(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
     plnr = allocateRrtStar(si, steerEta, rewireScale);
 
     //Configure it to be Informed
@@ -315,10 +313,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Trio(const ompl::bas
 };
 
 //Allocate and configure Informed RRT*
-boost::shared_ptr<ompl::geometric::RRTstar> allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
+std::shared_ptr<ompl::geometric::RRTstar> allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta, double rewireScale)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
     plnr = allocateRrtStar(si, steerEta, rewireScale);
 
     //Configure it to be Informed
@@ -330,7 +328,7 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateInformedRrtStar(const ompl::
     return plnr;
 };
 
-boost::shared_ptr<ompl::geometric::RRTstar> allocatePlanner(const PlannerType plnrType, const BaseExperimentPtr& expDefn, const double steerEta, double rewireScale)
+std::shared_ptr<ompl::geometric::RRTstar> allocatePlanner(const PlannerType plnrType, const BaseExperimentPtr& expDefn, const double steerEta, double rewireScale)
 {
     switch(plnrType)
     {
@@ -409,13 +407,13 @@ int main(int argc, char **argv)
     //Variables
     //ompl::RNG::setSeed(107965365);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
-    boost::uint32_t masterSeed = ompl::RNG::getSeed();
+    std::uint_fast32_t masterSeed = ompl::RNG::getSeed();
     //The filename for progress
     std::stringstream fileName;
     //The world name
     std::stringstream worldName;
     //The current experiment
-    ObstacleFreeExperimentPtr expDefn = boost::make_shared<ObstacleFreeExperiment>(N, 1u, 1u, ASRL_DBL_INFINITY);
+    ObstacleFreeExperimentPtr expDefn = std::make_shared<ObstacleFreeExperiment>(N, 1u, 1u, ASRL_DBL_INFINITY);
     //The vector of planner types:
     std::vector<PlannerType> plannersToTest;
 
@@ -447,7 +445,7 @@ int main(int argc, char **argv)
         {
             //Variables
             //The current planner:
-            boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+            std::shared_ptr<ompl::geometric::RRTstar> plnr;
             //The optimization objective used by this planner
             ompl::base::OptimizationObjectivePtr opt = expDefn->getOptimizationObjective();
             //The results from this planner:
@@ -476,7 +474,7 @@ int main(int argc, char **argv)
             if (createAnimationFrames == true)
             {
                 //Create the animation:
-                createAnimation(expDefn, plannersToTest.at(p), plnr, masterSeed + q, boost::date_time::pos_infin, true, false, false, false);
+                createAnimation(expDefn, plannersToTest.at(p), plnr, masterSeed + q, ASRL_DURATION_INFINITY, PLOT_VERTICES, true, false, false, false);
 
                 //Push back the initial value
                 iterCostResults.push_back(std::make_pair(plnr->numIterations(), plnr->bestCost().value()));
@@ -550,7 +548,7 @@ int main(int argc, char **argv)
             //And either make an (arbitrary) number of further animation frames or run for the specified number of iterations:
             if (createAnimationFrames == true)
             {
-                createAnimation(expDefn, plannersToTest.at(p), plnr, masterSeed + q, ompl::time::seconds(1.0), true, false, false, false, plnr->numIterations()+1u);
+                createAnimation(expDefn, plannersToTest.at(p), plnr, masterSeed + q, asrl::time::seconds(1.0), PLOT_VERTICES, true, false, false, false, plnr->numIterations()+1u);
 
                 //Push back the last value
                 iterCostResults.push_back(std::make_pair(plnr->numIterations(), plnr->bestCost().value()));
@@ -576,7 +574,7 @@ int main(int argc, char **argv)
             //Save the map:
             std::stringstream postFix;
             postFix << "E" << q;
-            writeMatlabMap(expDefn, plannersToTest.at(p), plnr, masterSeed, false, false, false, false, "plots/", postFix.str());
+            writeMatlabMap(expDefn, plannersToTest.at(p), plnr, masterSeed, PLOT_VERTICES, false, false, false, false, "plots/", postFix.str());
 
             if (q%OUTPUT_PERIOD == 0u)
             {

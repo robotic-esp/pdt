@@ -42,18 +42,18 @@
 #include <iomanip>
 //For std::stringstream
 #include <sstream>
-//For boost::make_shared
-#include <boost/make_shared.hpp>
+//For std::make_shared
+#include <memory>
 //For boost program options
 #include <boost/program_options.hpp>
 //For boost lexical cast
 #include <boost/lexical_cast.hpp>
-//For boost time
-#include <boost/date_time/posix_time/posix_time.hpp>
-//For boost thread:
-#include <boost/thread/thread.hpp>
 // For string comparison (boost::iequals)
 #include <boost/algorithm/string.hpp>
+//For boost time
+#include <boost/chrono/chrono.hpp>
+//For boost thread:
+#include <boost/thread/thread.hpp>
 
 //OMPL:
 #include <ompl/base/spaces/RealVectorStateSpace.h>
@@ -64,7 +64,6 @@
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 //#include <ompl/tools/benchmark/Benchmark.h>
-#include <ompl/util/Time.h>
 #include "ompl/util/Console.h" //For OMPL_INFORM et al.
 #include "ompl/tools/config/MagicConstants.h" //For BETTER_PATH_COST_MARGIN
 #include <ompl/util/Exception.h>
@@ -72,7 +71,8 @@
 //Our Experiments
 #include "ExperimentDefinitions.h"
 
-//The helper functions for plotting:
+//The helper functions for general and plotting:
+#include "tools/general_tools.h"
 #include "tools/plotting_tools.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
@@ -81,7 +81,7 @@
 
 //World:
 const double CHECK_RESOLUTION = 0.001;
-const double MILLISEC_SLEEP = 1.0; //Period for logging data
+const unsigned int MICROSEC_SLEEP = 1000u; //Period for logging data, 1000us = 1ms
 
 //Common:
 const double PRUNE_FRACTION = 0.01;
@@ -105,6 +105,9 @@ const double RRT_GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
 const double FMT_REWIRE_SCALE = REWIRE_SCALE;
 const bool FMT_CACHE_CC = false;
 const bool FMT_USE_HEURISTICS = false;
+
+//Plotting:
+const bool PLOT_VERTICES = true;
 
 
 bool argParse(int argc, char** argv, double* steerPtr, double* runTimePtr, bool* animatePtr)
@@ -236,9 +239,10 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
     }
 };
 
-void callSolve(const ompl::base::PlannerPtr& planner, const ompl::time::duration& solveDuration)
+void callSolve(asrl::time::point* startTime, const ompl::base::PlannerPtr& planner, const asrl::time::duration& solveDuration)
 {
-    planner->solve( ompl::time::seconds(solveDuration) );
+    *startTime = asrl::time::now();
+    planner->solve( asrl::time::seconds(solveDuration) );
 }
 
 int main(int argc, char **argv)
@@ -260,7 +264,7 @@ int main(int argc, char **argv)
     //Variables
     ompl::RNG::setSeed(240822352);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
-    boost::uint32_t masterSeed = ompl::RNG::getSeed();
+    std::uint_fast32_t masterSeed = ompl::RNG::getSeed();
     //The filename for progress
     std::stringstream fileName;
     //The world name
@@ -278,7 +282,7 @@ int main(int argc, char **argv)
     plannersToTest.push_back(PLANNER_BITSTAR);              numSamples.push_back(BITSTAR_SAMPLES);
 
     //Create one experiment for all runs:
-    experiment = boost::make_shared<AsrlExperiment>(false, !createAnimationFrames, maxTime, CHECK_RESOLUTION);
+    experiment = std::make_shared<AsrlExperiment>(false, !createAnimationFrames, maxTime, CHECK_RESOLUTION);
 
     //The results output file:
     fileName << experiment->getName() << "S" << masterSeed << ".csv";
@@ -294,15 +298,15 @@ int main(int argc, char **argv)
     {
         //Variables
         //The start time for a call
-        ompl::time::point startTime;
+        asrl::time::point startTime;
         //The run time
-        ompl::time::duration runTime(0,0,0,0);
+        asrl::time::duration runTime(0);
         //The current planner:
         ompl::base::PlannerPtr plnr;
         //The problem defintion used by this planner
         ompl::base::ProblemDefinitionPtr pdef;
         //The results from this planners run across all the variates:
-        TimeCostHistory runResults(experiment->getTargetTime(), MILLISEC_SLEEP);
+        TimeCostHistory runResults(experiment->getTargetTime(), MICROSEC_SLEEP);
 
         //Allocate a planner
         plnr = allocatePlanner(plannersToTest.at(p), experiment, steerEta, numSamples.at(p));
@@ -314,9 +318,9 @@ int main(int argc, char **argv)
         plnr->setProblemDefinition(pdef);
 
         //Setup
-        startTime = ompl::time::now();
+        startTime = asrl::time::now();
         plnr->setup();
-        runTime = ompl::time::now() - startTime;
+        runTime = asrl::time::now() - startTime;
 
         //This must come after setup to get the steer info!
         //If this is the first planner of a trial, output at least the trial number:
@@ -348,22 +352,26 @@ int main(int argc, char **argv)
             }
             else if (isRrtStar(plannersToTest.at(p)) == true)
             {
-                runTime = runTime + createAnimation(experiment, plannersToTest.at(p), plnr, masterSeed, experiment->getTargetTime() - runTime, false, false, false, false, 0u, true);
+                runTime = runTime + createAnimation(experiment, plannersToTest.at(p), plnr, masterSeed, experiment->getTargetTime() - runTime, PLOT_VERTICES, false, false, false, false, 0u, true);
                 runResults.push_back( std::make_pair(runTime, plnr->as<ompl::geometric::RRTstar>()->bestCost().value()) );
             }
             else if (isBitStar(plannersToTest.at(p)) == true)
             {
-                runTime = runTime + createAnimation(experiment, plannersToTest.at(p), plnr, masterSeed, experiment->getTargetTime() - runTime, false, false, false, false, 0u, true);
+                runTime = runTime + createAnimation(experiment, plannersToTest.at(p), plnr, masterSeed, experiment->getTargetTime() - runTime, PLOT_VERTICES, false, false, false, false, 0u, true);
                 runResults.push_back( std::make_pair(runTime, plnr->as<ompl::geometric::BITstar>()->bestCost().value()) );
             }
         }
         else
         {
-            //Store the starting time:
-            startTime = ompl::time::now();
+            //Start solving in another thread. It will record startTime, but so we notice if it doesn't we will clear startTime first.
+            startTime = asrl::time::point();
+            boost::thread solveThread(callSolve, &startTime, plnr, experiment->getTargetTime() - runTime);
 
-            //Start solving in another thread. We use an intermediate function for this as the class function is overloaded.
-            boost::thread solveThread(callSolve, plnr, experiment->getTargetTime() - runTime);
+            //If the clock is not steady, sleep for 1us so that the upcoming first entry is not backwards in time.
+            if (asrl::time::clock::is_steady == false)
+            {
+                usleep(1u);
+            }
 
             //If we can, log the intermediate data:
             if (isRrtStar(plannersToTest.at(p)) == true)
@@ -374,9 +382,9 @@ int main(int argc, char **argv)
                 do
                 {
                     //Store the runtime and the current cost
-                    runResults.push_back( std::make_pair(ompl::time::now() - startTime + runTime, rrtstar->bestCost().value()) );
+                    runResults.push_back( std::make_pair(runTime + (asrl::time::now() - startTime), rrtstar->bestCost().value()) );
                 }
-                while ( solveThread.timed_join(boost::posix_time::milliseconds(MILLISEC_SLEEP)) == false);
+                while (solveThread.try_join_for(boost::chrono::microseconds(MICROSEC_SLEEP)) == false);
             }
             else if (isBitStar(plannersToTest.at(p)) == true)
             {
@@ -386,9 +394,9 @@ int main(int argc, char **argv)
                 do
                 {
                     //Store the runtime and the current cost
-                    runResults.push_back( std::make_pair(ompl::time::now() - startTime + runTime, bitstar->bestCost().value()) );
+                    runResults.push_back( std::make_pair(runTime + (asrl::time::now() - startTime), bitstar->bestCost().value()) );
                 }
-                while ( solveThread.timed_join(boost::posix_time::milliseconds(MILLISEC_SLEEP)) == false);
+                while (solveThread.try_join_for(boost::chrono::microseconds(MICROSEC_SLEEP)) == false);
             }
             else
             {
@@ -396,11 +404,11 @@ int main(int argc, char **argv)
                 do
                 {
                 }
-                while ( solveThread.timed_join(boost::posix_time::milliseconds(MILLISEC_SLEEP)) == false);
+                while (solveThread.try_join_for(boost::chrono::microseconds(MICROSEC_SLEEP)) == false);
             }
 
             //Store the final run time and cost
-            runTime = runTime + (ompl::time::now() - startTime);
+            runTime = runTime + (asrl::time::now() - startTime);
 
             if (pdef->hasExactSolution() == true)
             {
@@ -416,7 +424,7 @@ int main(int argc, char **argv)
         }
 
         //Save the map:
-        writeMatlabMap(experiment, plannersToTest.at(p), plnr, masterSeed, false, false, true, false, "plots/");
+        writeMatlabMap(experiment, plannersToTest.at(p), plnr, masterSeed, PLOT_VERTICES, false, false, true, false, "plots/");
 
         //Output 3 characters of white space and then the time, which is 15 chars wide:
         std::cout << std::setw(5) << std::setfill(' ') << " " << std::flush;

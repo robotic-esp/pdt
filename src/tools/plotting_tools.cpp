@@ -5,10 +5,10 @@
 #include <fstream>
 //For std::setfill and std::setw and std::setprecision
 #include <iomanip>
+//C++11 Tuple
+#include <tuple>
 //For boost::filesystem
 #include <boost/filesystem.hpp>
-//boost::tuple (pre-C++11 std::tuple)
-#include <boost/tuple/tuple.hpp>
 
 //R^n
 #include <ompl/base/spaces/RealVectorStateSpace.h>
@@ -19,6 +19,7 @@
 #include "ompl/base/goals/GoalStates.h"
 #include "ompl/base/OptimizationObjective.h"
 #include <ompl/geometric/planners/bitstar/BITstar.h>
+#include "ompl/geometric/planners/bitstar/datastructures/Vertex.h"
 //#include <ompl/geometric/planners/bitstar/HybridBITstar.h>
 //#include <ompl/geometric/planners/bitstar/BITstarOld.h>
 //#include <ompl/geometric/planners/bitstar/ICRA16.h>
@@ -30,7 +31,7 @@ std::string plotVertex(BaseExperimentPtr experiment, const ompl::base::State* ve
     ompl::base::ScopedState<> scopedVertex(experiment->getSpaceInformation()->getStateSpace(), vertex);
 
     std::stringstream rval;
-    rval << "plot(" <<  scopedVertex[0] << ", " << scopedVertex[1] << ", '.', 'Color', " << vertexColour << ", 'MarkerSize', " << vertexSize << ");" << std::endl;
+    rval << "plot(" <<  scopedVertex[0] << ", " << scopedVertex[1] << ", 'o', 'Color', " << vertexColour << ", 'MarkerFaceColor', " << vertexColour << ", 'MarkerSize', " << vertexSize << ");" << std::endl;
     return rval.str();
 }
 
@@ -45,12 +46,14 @@ std::string plotEdge(BaseExperimentPtr experiment, const ompl::base::State* pare
     return rval.str();
 }
 
-std::string matlabExtraHeader(std::string plannerName, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue)
+std::string matlabExtraHeader(std::string plannerName, bool plotVertices, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue)
 {
     std::stringstream rval;
 
     rval << "%%%%%% Extra Config %%%%%%" << std::endl;
-    rval << "title('" << plannerName << "');" << std::endl;
+    rval << "titleText = '" << plannerName << "';" << std::endl;
+    rval << "xLabelText = [];" << std::endl;
+    rval << "plotVertices = " << (plotVertices ? "true" : "false") << ";" << std::endl; //<condition> ? <true-case-code> : <false-case-code>;
     rval << "plotInformedEllipse = " << (informedWorldEllipse ? "true" : "false") << ";" << std::endl; //<condition> ? <true-case-code> : <false-case-code>;
     rval << "plotBitStarQueueEllipse = " << (bitStarQueueEllipse ? "true" : "false") << ";" << std::endl; //<condition> ? <true-case-code> : <false-case-code>;
     rval << "plotBitStarNextEdge = " << (bitStarNextEdge ? "true" : "false") << ";" << std::endl; //<condition> ? <true-case-code> : <false-case-code>;
@@ -86,13 +89,14 @@ void createMatlabHelpers(std::string path)
         mfile << "    Y=Y+center(2);" << std::endl;
         mfile << "    h=fill(X,Y,color);" << std::endl;
         mfile << "end" << std::endl;
+        mfile.flush();
         mfile.close();
     }
     //No else
 }
 
 
-void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue, std::string path /*= "plots/"*/, std::string postFix /*= std::string()*/, bool monochrome /*= false*/)
+void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, bool plotVertices, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue, std::string path /*= "plots/"*/, std::string postFix /*= std::string()*/, bool monochrome /*= false*/)
 {
     //If we're 2D, plot:
     if (planner->getSpaceInformation()->getStateDimension() == 2u)
@@ -150,7 +154,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 
         //Write the experiment header as well as the extra information
         mfile << experiment->mfileHeader(monochrome);
-        mfile << matlabExtraHeader(planner->getName(), informedWorldEllipse, bitStarQueueEllipse, bitStarNextEdge, bitStarFullQueue);
+        mfile << matlabExtraHeader(planner->getName(), plotVertices, informedWorldEllipse, bitStarQueueEllipse, bitStarNextEdge, bitStarFullQueue);
 
         if (postFix != "I000000")
         {
@@ -170,6 +174,11 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 
                 //Annotate:
                 mfile << "%%%%%% Queue edges %%%%%%" << std::endl;
+                #warning "ABIT* support disabled here"
+//                mfile << "heuristicWeight = " << planner->as<ompl::geometric::BITstar>()->getSearchWeight() << ";" << std::endl;
+//                mfile << "if heuristicWeight > 1" << std::endl;
+//                mfile << "    titleText = [titleText ' (' num2str(heuristicWeight) ')'];" << std::endl;
+//                mfile << "end" << std::endl;
                 mfile << "if plotBitStarFullQueue" << std::endl;
 
                 //Iterate over the list of edges, calling the edge-plot function:
@@ -186,7 +195,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 //                //The vector of edges in the queue
 //                std::vector<std::pair<ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr> > queueEdges;
 //                //The vector of shortcuts in the queue:
-//                std::vector<boost::tuple<ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr> > queueShortcuts;
+//                std::vector<std::tuple<ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr> > queueShortcuts;
 //
 //                //Get the queue edges
 //                planner->as<ompl::geometric::HybridBITstar>()->getEdgeQueue(&queueEdges);
@@ -329,7 +338,26 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                 //Get the data to output the results:
                 planner->getPlannerData(pdata);
 
-                //Write the planner data to file:
+                //Write the planner data to file. Vertices and edges separately:
+                //Vertices only
+                mfile << "%%%%%% Vertices %%%%%%" << std::endl;
+                mfile << "if plotVertices" << std::endl;
+                for (unsigned int i = 0u; i < pdata.numVertices(); ++i)
+                {
+                    //The vertex being processed:
+                    ompl::base::PlannerDataVertex vertex = pdata.getVertex(i);
+
+                    //Not all indexes exist I think?
+                    if (vertex != ompl::base::PlannerData::NO_VERTEX)
+                    {
+                        //Print it's coordinates to file:
+                        mfile << "    " << plotVertex(experiment, vertex.getState(), "vertexColour", "vertexSize");
+                    }
+                }
+                mfile << "end" << std::endl;
+
+                //Edges only
+                mfile << "%%%%%% Edges %%%%%%" << std::endl;
                 for (unsigned int i = 0u; i < pdata.numVertices(); ++i)
                 {
                     //The vertex being processed:
@@ -340,9 +368,6 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                     //Not all indexes exist I think?
                     if (vertex != ompl::base::PlannerData::NO_VERTEX)
                     {
-                        //Print it's coordinates to file:
-                        mfile << plotVertex(experiment, vertex.getState(), "vertexColour", "vertexSize");
-
                         //Get it's incoming edge, if it has one:
                         if (pdata.getIncomingEdges(i, parentIds) > 0u)
                         {
@@ -395,7 +420,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                 //Append the queue value to the xlabel if plotting ellipse or edge
                 if (std::isfinite(planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value()))
                 {
-                    mfile << "xlabel(['q=' num2str(" << planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value() << ", '%.6f') ', ' get(get(gca, 'xlabel'), 'String')]);" << std::endl;
+                    mfile << "xLabelText = [xLabelText ' q=' num2str(" << planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value() << ", '%.6f')];" << std::endl;
                 }
             }
 //            else if (plannerType == PLANNER_HYBRID_BITSTAR)
@@ -419,7 +444,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 //
 //                //Best edge in queue
 //                std::pair<ompl::base::State const*, ompl::base::State const*> edge;
-//                boost::tuple<ompl::base::State const*, ompl::base::State const*, ompl::base::State const*, ompl::base::State const*> shortcut;
+//                std::tuple<ompl::base::State const*, ompl::base::State const*, ompl::base::State const*, ompl::base::State const*> shortcut;
 //
 //                edge = planner->as<ompl::geometric::HybridBITstar>()->getNextEdgeInQueue();
 //
@@ -452,7 +477,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 //                //Append the queue value to the xlabel if plotting ellipse or edge
 //                if (std::isfinite(planner->as<ompl::geometric::HybridBITstar>()->getNextEdgeValueInQueue().value()))
 //                {
-//                    mfile << "xlabel(['q=' num2str(" << planner->as<ompl::geometric::HybridBITstar>()->getNextEdgeValueInQueue().value() << ", '%.6f') ', ' get(get(gca, 'xlabel'), 'String')]);" << std::endl;
+//                    mfile << "xLabelText = [xLabelText ' q=' num2str(" << planner->as<ompl::geometric::HybridBITstar>()->getNextEdgeValueInQueue().value() << ", '%.6f')];" << std::endl;
 //                }
 //            }
 //            else if (plannerType == PLANNER_DUALTREE_BITSTAR)
@@ -493,7 +518,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 //                //Append the queue value to the xlabel if plotting ellipse or edge
 //                if (std::isfinite(planner->as<ompl::geometric::ICRA16>()->getNextEdgeValueInQueue().value()))
 //                {
-//                    mfile << "xlabel(['q=' num2str(" << planner->as<ompl::geometric::ICRA16>()->getNextEdgeValueInQueue().value() << ", '%.6f') ', ' get(get(gca, 'xlabel'), 'String')]);" << std::endl;
+//                    mfile << "xLabelText = [xLabelText ' q=' num2str(" << planner->as<ompl::geometric::ICRA16>()->getNextEdgeValueInQueue().value() << ", '%.6f')];" << std::endl;
 //                }
 //            }
 
@@ -529,21 +554,21 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                 {
                     mfile << plotEdge(experiment, path.at(i - 1u), path.at(i), "solnColour", "solnStyle", "solnWeight");
                 }
-                mfile << "xlabel(['c=' num2str(" << pdef->getSolutionPath()->cost(opt).value() << ", '%.6f')]);" << std::endl;
-            }
-            else
-            {
-                mfile << "xlabel('');" << std::endl;
+                mfile << "xLabelText = [xLabelText ' c=' num2str(" << pdef->getSolutionPath()->cost(opt).value() << ", '%.6f')];" << std::endl;
             }
         }
 
+        mfile << "xlabel(xLabelText);" << std::endl;
+        mfile << "title(titleText);" << std::endl;
+
         mfile << experiment->mfileFooter();
 
+        mfile.flush();
         mfile.close();
     }
 }
 
-ompl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, ompl::time::duration timeToRun, bool informedWorldEllipse, bool bitStarEllipse, bool bitStarEdge, bool bitStarQueue, unsigned int initialIterNumber /*= 0u*/, bool monochrome /*= false*/)
+asrl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, asrl::time::duration timeToRun, bool plotVertices, bool informedWorldEllipse, bool bitStarEllipse, bool bitStarEdge, bool bitStarQueue, unsigned int initialIterNumber /*= 0u*/, bool monochrome /*= false*/)
 {
     //Variables:
     //A 1-iteration class:
@@ -551,9 +576,9 @@ ompl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
     //Met the optimization objective
     bool optimized;
     //The start time
-    ompl::time::point startTime;
+    asrl::time::point startTime;
     //The total run time of the algorithm:
-    ompl::time::duration runTime(0,0,0,0);
+    asrl::time::duration runTime(0);
     //The path
     std::stringstream pathStream;
     //The number of iterations
@@ -573,8 +598,8 @@ ompl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
     //Write initial map:
     if (iter == 0u)
     {
-        writeMatlabMap(experiment, plannerType, planner, worldSeed, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), "I000000", monochrome);
-        writeMatlabMap(experiment, plannerType, planner, worldSeed, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), "I000001", monochrome);
+        writeMatlabMap(experiment, plannerType, planner, worldSeed, plotVertices, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), "I000000", monochrome);
+        writeMatlabMap(experiment, plannerType, planner, worldSeed, plotVertices, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), "I000001", monochrome);
         ++iter;
     }
 
@@ -587,14 +612,14 @@ ompl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
 
         iterationPtc.reset();
 
-        startTime = ompl::time::now();
+        startTime = asrl::time::now();
         plannerStatus = planner->solve(iterationPtc);
-        runTime = runTime + (ompl::time::now() - startTime);
+        runTime = runTime + (asrl::time::now() - startTime);
 
         //Make frame:
         iterStream << "I" << std::setfill('0') << std::setw(6) << iter;
 
-        writeMatlabMap(experiment, plannerType, planner, worldSeed, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), iterStream.str(), monochrome);
+        writeMatlabMap(experiment, plannerType, planner, worldSeed, plotVertices, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), iterStream.str(), monochrome);
 
         if (planner->getProblemDefinition()->hasExactSolution() == true)
         {
@@ -631,12 +656,13 @@ ompl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
     mfile << "warning('on', 'ASRL:Ellipses')" << std::endl;
     mfile << std::endl;
 
-    mfile << "system('LD_LIBRARY_PATH="" && mencoder mf://./*.png -mf w=1200:h=900:fps=30:type=png -ovc lavc -lavcopts vcodec=mpeg4 -o " << planner->getName() << "S" << worldSeed <<".avi');" << std::endl;
+    mfile << "system('/opt/ffmpeg -r 30 -i %06d.png -pix_fmt yuv420p -vcodec libx264 -qp 0 -r 30 " << planner->getName() << "S" << worldSeed <<".mp4');" << std::endl;
     mfile << "system('mkdir -p src');" << std::endl;
     mfile << "system('mv *.m ./src/');" << std::endl;
     mfile << "system('mkdir -p png');" << std::endl;
     mfile << "system('mv *.png ./png/');" << std::endl;
     mfile << "cd ../;" << std::endl;
+    mfile.flush();
     mfile.close();
 
     return runTime;

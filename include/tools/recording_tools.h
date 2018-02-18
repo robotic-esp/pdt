@@ -38,14 +38,15 @@
 //For std::ifstream and std::ofstream
 #include <fstream>
 
-//For boost time
-#include <boost/date_time/posix_time/posix_time.hpp>
-//For boost tuple (pre C++11 tuple)
-#include <boost/tuple/tuple.hpp>
+//For vector and tuple
+#include <vector>
+#include <tuple>
 
 //For ompl exceptions
 #include "ompl/util/Exception.h"
-#include <ompl/util/Time.h>
+
+//For some general time helpers
+#include "tools/general_tools.h"
 
 /** \brief A helper function to create directories using boost filesystem */
 void createDirectories(std::string fileName);
@@ -56,11 +57,11 @@ class TimeCostHistory
 {
     public:
         /** \brief Data type */
-        typedef std::pair<boost::posix_time::time_duration, double> data_t;
+        typedef std::pair<asrl::time::duration, double> data_t;
 
         /** \brief Constructors */
-        TimeCostHistory(double runTimeSeconds, double recordPeriodMillisecond);
-        TimeCostHistory(const ompl::time::duration& runTime, double recordPeriodMillisecond);
+        TimeCostHistory(double runTimeSeconds, unsigned int recordPeriodMicrosecond);
+        TimeCostHistory(const asrl::time::duration& runTime, unsigned int recordPeriodMicrosecond);
 
         /** \brief Output the data with the appropriate label*/
         std::string output(const std::string& labelPrefix);
@@ -82,6 +83,9 @@ class TimeCostHistory
     private:
         /** \brief Raw data */
         std::vector<data_t> data_;
+
+        /** \brief Preallocated size */
+        unsigned int allocSize_;
 
 };
 
@@ -90,11 +94,11 @@ class TimeIterationCostHistory
 {
     public:
         /** \brief Data type */
-        typedef boost::tuple<boost::posix_time::time_duration, unsigned int, double> data_t;
+        typedef std::tuple<asrl::time::duration, unsigned int, double> data_t;
 
         /** \brief Constructors */
-        TimeIterationCostHistory(double runTimeSeconds, double recordPeriodMillisecond);
-        TimeIterationCostHistory(const ompl::time::duration& runTime, double recordPeriodMillisecond);
+        TimeIterationCostHistory(double runTimeSeconds, unsigned int recordPeriodMicrosecond);
+        TimeIterationCostHistory(const asrl::time::duration& runTime, unsigned int recordPeriodMicrosecond);
 
         /** \brief Output the data with the appropriate label*/
         std::string output(const std::string& labelPrefix);
@@ -116,6 +120,9 @@ class TimeIterationCostHistory
     private:
         /** \brief Raw data */
         std::vector<data_t> data_;
+
+        /** \brief Preallocated size */
+        unsigned int allocSize_;
 };
 
 /** \brief A vector of iteration & cost */
@@ -127,8 +134,8 @@ class IterationCostHistory
 
         /** \brief Constructors */
         IterationCostHistory(unsigned int numIterations);
-        IterationCostHistory(double runTimeSeconds, double recordPeriodMillisecond);
-        IterationCostHistory(const ompl::time::duration& runTime, double recordPeriodMillisecond);
+        IterationCostHistory(double runTimeSeconds, unsigned int recordPeriodMicrosecond);
+        IterationCostHistory(const asrl::time::duration& runTime, unsigned int recordPeriodMicrosecond);
 
         /** \brief Output the data with the appropriate label*/
         std::string output(const std::string& labelPrefix);
@@ -154,6 +161,9 @@ class IterationCostHistory
     private:
         /** \brief Raw data */
         std::vector<data_t> data_;
+
+        /** \brief Preallocated size */
+        unsigned int allocSize_;
 };
 
 /** \brief A vector of "target" & time */
@@ -161,7 +171,7 @@ class TargetTimeResults
 {
     public:
         /** \brief Data type */
-        typedef std::pair<double, boost::posix_time::time_duration> data_t;
+        typedef std::pair<double, asrl::time::duration> data_t;
 
         /** \brief Constructors */
         TargetTimeResults(unsigned int numTargets);
@@ -186,6 +196,9 @@ class TargetTimeResults
     private:
         /** \brief Raw data */
         std::vector<data_t> data_;
+
+        /** \brief Preallocated size */
+        unsigned int allocSize_;
 };
 
 
@@ -218,6 +231,9 @@ class ResultsFile
 
             //Write the data
             mfile << data.output(plannerName);
+
+            //Flush the file:
+            mfile.flush();
 
             //Close the file:
             mfile.close();

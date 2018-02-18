@@ -68,9 +68,9 @@ public:
 protected:
     // Variables
     /** \brief The obstacle world */
-    boost::shared_ptr<HyperrectangleObstacles> rectObs_;
+    std::shared_ptr<HyperrectangleObstacles> rectObs_;
     /** \brief The lower-left corner of an obstacle half-way between the start and goal */
-    boost::shared_ptr<ompl::base::ScopedState<> > sightLineObs_;
+    std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_;
     /** The widths of the sight-line obstacle */
     double obsWidth_;
 
@@ -81,6 +81,6 @@ protected:
     double goalPos_;
 };
 
-typedef boost::shared_ptr<CentreSquareExperiment> CentreSquareExperimentPtr;
+typedef std::shared_ptr<CentreSquareExperiment> CentreSquareExperimentPtr;
 
 #endif //EXPERIMENTS_CENTRE_SQUARE_EXPERIMENT

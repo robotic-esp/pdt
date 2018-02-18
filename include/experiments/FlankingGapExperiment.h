@@ -78,10 +78,10 @@ protected:
     /** \brief The gap width. */
     double gapWidth_;
     /** \brief The obstacle world */
-    boost::shared_ptr<HyperrectangleObstacles> rectObs_;
+    std::shared_ptr<HyperrectangleObstacles> rectObs_;
     /** \brief The lower-left corners of the obstacles*/
-    boost::shared_ptr<ompl::base::ScopedState<> > upperObs_;
-    boost::shared_ptr<ompl::base::ScopedState<> > lowerObs_;
+    std::shared_ptr<ompl::base::ScopedState<> > upperObs_;
+    std::shared_ptr<ompl::base::ScopedState<> > lowerObs_;
     /** The widths of the obstacles */
     std::vector<double> upperWidths_;
     std::vector<double> lowerWidths_;
@@ -96,6 +96,6 @@ protected:
     double goalPos_;
 };
 
-typedef boost::shared_ptr<FlankingGapExperiment> FlankingGapExperimentPtr;
+typedef std::shared_ptr<FlankingGapExperiment> FlankingGapExperimentPtr;
 
 #endif //EXPERIMENTS_FLANKING_GAP_EXPERIMENT

@@ -42,18 +42,18 @@
 #include <iomanip>
 //For std::stringstream
 #include <sstream>
-//For boost::make_shared
-#include <boost/make_shared.hpp>
+//For std::make_shared
+#include <memory>
 //For boost program options
 #include <boost/program_options.hpp>
 //For boost lexical cast
 #include <boost/lexical_cast.hpp>
-//For boost time
-#include <boost/date_time/posix_time/posix_time.hpp>
-//For boost thread:
-#include <boost/thread/thread.hpp>
 // For string comparison (boost::iequals)
 #include <boost/algorithm/string.hpp>
+//For boost time
+#include <boost/chrono/chrono.hpp>
+//For boost thread:
+#include <boost/thread/thread.hpp>
 
 //OMPL:
 #include <ompl/base/spaces/RealVectorStateSpace.h>
@@ -63,7 +63,6 @@
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 //#include <ompl/tools/benchmark/Benchmark.h>
-#include <ompl/util/Time.h>
 #include "ompl/util/Console.h" //For OMPL_INFORM et al.
 #include "ompl/tools/config/MagicConstants.h" //For BETTER_PATH_COST_MARGIN
 #include <ompl/util/Exception.h>
@@ -71,7 +70,8 @@
 //Our Experiments
 #include "ExperimentDefinitions.h"
 
-//The helper functions for plotting:
+//The helper functions for general and plotting:
+#include "tools/general_tools.h"
 #include "tools/plotting_tools.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
@@ -89,7 +89,10 @@ const double rewireFactorRRT = 1.1; //The factor scaling the RGG term
 
 //Experiment:
 const bool logProgress = true;
-const double millisecSleep = 1.0; //Period for logging data
+const unsigned int MICROSEC_SLEEP = 1000u; //Period for logging data, 1000us = 1ms
+
+//Plotting:
+const bool PLOT_VERTICES = true;
 
 enum ProblemType
 {
@@ -285,11 +288,11 @@ bool argParse(int argc, char** argv, unsigned int* dimensionPtr, ProblemType* pr
 
 
 //Allocate and configure RRT*
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
 {
     //Create a RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
-    plnr = boost::make_shared<ompl::geometric::RRTstar>(si);
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
+    plnr = std::make_shared<ompl::geometric::RRTstar>(si);
 
     //Configure it
     plnr->setGoalBias(goalBias);
@@ -315,10 +318,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::Sp
 }
 
 //Allocate and configure RRT* with sample rejection
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_SampRej(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_SampRej(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
     plnr = allocateRrtStar(si, steerEta);
 
     //Configure it to be Informed
@@ -330,10 +333,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_SampRej(const ompl::
 }
 
 //Allocate and configure RRT* with new-state rejection
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_NewRej(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_NewRej(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
     plnr = allocateRrtStar(si, steerEta);
 
     //Configure it to be Informed
@@ -345,10 +348,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_NewRej(const ompl::b
 }
 
 //Allocate and configure RRT* with pruning
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Prune(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Prune(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
     plnr = allocateRrtStar(si, steerEta);
 
     //Configure it to be Informed
@@ -361,10 +364,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Prune(const ompl::ba
 }
 
 //Allocate and configure RRT* with pruning
-boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Trio(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
+std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Trio(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
     plnr = allocateRrtStar(si, steerEta);
 
     //Configure it to be Informed
@@ -379,10 +382,10 @@ boost::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar_Trio(const ompl::bas
 }
 
 //Allocate and configure Informed RRT*
-boost::shared_ptr<ompl::geometric::RRTstar> allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
+std::shared_ptr<ompl::geometric::RRTstar> allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, double steerEta = 0.0)
 {
     //Create an RRT* planner
-    boost::shared_ptr<ompl::geometric::RRTstar> plnr;
+    std::shared_ptr<ompl::geometric::RRTstar> plnr;
     plnr = allocateRrtStar(si, steerEta);
 
     //Configure it to be Informed
@@ -403,28 +406,28 @@ BaseExperimentPtr allocateExperiment(const ProblemType pType, const unsigned int
     {
         case COST_V_TIME:
         {
-            return boost::make_shared<RandomRectanglesExperiment> (dim, 75u, 0.33, runTime, checkResolution);
+            return std::make_shared<RandomRectanglesExperiment> (dim, 75u, 0.33, runTime, checkResolution);
             break;
         }
         case TIME_V_GAPSIZE:
         {
-            return boost::make_shared<WallGapExperiment> (dim, true, 0.02, runTime, checkResolution);
+            return std::make_shared<WallGapExperiment> (dim, true, 0.02, runTime, checkResolution);
             break;
         }
         case TIME_V_MAPSIZE:
         {
             //Only use the default resolution for a map width of 2
-            return boost::make_shared<CentreSquareExperiment> (dim, rng.uniformReal(0.25,0.5), mapWidth, runTime, checkResolution/(0.5*mapWidth));
+            return std::make_shared<CentreSquareExperiment> (dim, rng.uniformReal(0.25,0.5), mapWidth, runTime, checkResolution/(0.5*mapWidth));
             break;
         }
         case TIME_V_RN:
         {
-            return boost::make_shared<CentreSquareExperiment> (dim, rng.uniformReal(0.25,0.5), 2.0, runTime, checkResolution);
+            return std::make_shared<CentreSquareExperiment> (dim, rng.uniformReal(0.25,0.5), 2.0, runTime, checkResolution);
             break;
         }
         case TIME_V_TARGET:
         {
-            return boost::make_shared<CentreSquareExperiment> (dim, rng.uniformReal(0.25,0.5), 2.0, runTime, checkResolution);
+            return std::make_shared<CentreSquareExperiment> (dim, rng.uniformReal(0.25,0.5), 2.0, runTime, checkResolution);
             break;
         }
         default:
@@ -436,9 +439,10 @@ BaseExperimentPtr allocateExperiment(const ProblemType pType, const unsigned int
     throw ompl::Exception("Write me");
 }
 
-void callSolve(const ompl::base::PlannerPtr& planner, const ompl::time::duration& solveDuration)
+void callSolve(asrl::time::point* startTime, const ompl::base::PlannerPtr& planner, const asrl::time::duration& solveDuration)
 {
-    planner->solve( solveDuration );
+    *startTime = asrl::time::now();
+    planner->solve(  asrl::time::seconds(solveDuration) );
 }
 
 int main(int argc, char **argv)
@@ -467,7 +471,7 @@ int main(int argc, char **argv)
     //Variables
 //    ompl::RNG::setSeed(2971235666);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
-    boost::uint32_t masterSeed = ompl::RNG::getSeed();
+    std::uint_fast32_t masterSeed = ompl::RNG::getSeed();
     //The filename for progress
     std::stringstream fileName;
     //The world name
@@ -517,7 +521,7 @@ int main(int argc, char **argv)
 
         //Variables:
         //The vector of planners:
-        std::vector<std::pair<PlannerType, boost::shared_ptr<ompl::geometric::RRTstar> > > plannersToTest;
+        std::vector<std::pair<PlannerType, std::shared_ptr<ompl::geometric::RRTstar> > > plannersToTest;
 
         //Add the planners to test, steer values <= 0 use the SelfConfig default:
         double steerEta = 0.0;
@@ -546,8 +550,8 @@ int main(int argc, char **argv)
         {
             //Variables
             //The start time for a call, and the running time
-            ompl::time::point startTime;
-            ompl::time::duration runTime(0,0,0,0);
+            asrl::time::point startTime;
+            asrl::time::duration runTime(0);
             //The problem defintion used by this planner
             ompl::base::ProblemDefinitionPtr pdef = expDefn->newProblemDefinition();
 
@@ -555,9 +559,9 @@ int main(int argc, char **argv)
             plannersToTest.at(i).second->setProblemDefinition(pdef);
 
             //Set up the planner
-            startTime = ompl::time::now();
+            startTime = asrl::time::now();
             plannersToTest.at(i).second->setup();
-            runTime = ompl::time::now() - startTime;
+            runTime = asrl::time::now() - startTime;
 
             //This is here so I can output steer eta before it
             if (i == 0u)
@@ -572,19 +576,26 @@ int main(int argc, char **argv)
             //Run the planner
             if (createAnimationFrames == true)
             {
-                runTime = runTime + createAnimation(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, expDefn->getTargetTime() - runTime, true, false, false, false);
+                runTime = runTime + createAnimation(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, expDefn->getTargetTime() - runTime, PLOT_VERTICES, true, false, false, false);
             }
             else if (logProgress == true)
             {
                 // Create run histories
+                //Variables
                 //A vector of the planner progress
-                TimeCostHistory progressPair(expDefn->getTargetTime(), millisecSleep);
+                TimeCostHistory progressPair(expDefn->getTargetTime(), MICROSEC_SLEEP);
 
                 //Store the starting time:
-                startTime = ompl::time::now();
+                startTime = asrl::time::now();
 
                 //Start solving in another thread. We use an intermediate function for this as the class function is overloaded.
-                boost::thread solveThread(callSolve, plannersToTest.at(i).second, expDefn->getTargetTime() - runTime);
+                boost::thread solveThread(plannersToTest.at(i).second, expDefn->getTargetTime() - runTime);
+
+                //If the clock is not steady, sleep for 1us so that the upcoming first entry is not backwards in time.
+                if (asrl::time::clock::is_steady == false)
+                {
+                    usleep(1u);
+                }
 
                 //Log data
                 do
@@ -594,17 +605,17 @@ int main(int argc, char **argv)
                     case PLANNER_RRTSTAR:
                     case PLANNER_RRTSTAR_SEED:
                     case PLANNER_RRTSTAR_INFORMED:
-                        progressPair.push_back( std::make_pair(ompl::time::now() - startTime + runTime, costFactor*plannersToTest.at(i).second->bestCost().value()) );
+                        progressPair.push_back( std::make_pair(runTime + (asrl::time::now() - startTime), costFactor*plannersToTest.at(i).second->bestCost().value()) );
                         break;
                     default:
                         throw ompl::Exception("Planner not recognized for progress logging.");
                         break;
                     }
                 }
-                while ( solveThread.timed_join(boost::posix_time::milliseconds(millisecSleep)) == false);
+                while (solveThread.try_join_for(boost::chrono::microseconds(MICROSEC_SLEEP)) == false);
 
                 //Store the final run time
-                runTime = runTime + (ompl::time::now() - startTime);
+                runTime = runTime + (asrl::time::now() - startTime);
 
                 //Push back the final solution:
                 if (pdef->hasExactSolution() == true)
@@ -622,13 +633,13 @@ int main(int argc, char **argv)
             else
             {
                 //  Just running to get the end result:
-                startTime = ompl::time::now();
+                startTime = asrl::time::now();
                 static_cast<ompl::base::PlannerPtr>(plannersToTest.at(i).second)->solve( expDefn->getTargetTime() - runTime );
-                runTime = runTime + (ompl::time::now() - startTime);
+                runTime = runTime + (asrl::time::now() - startTime);
             }
 
             //Save the map?
-            writeMatlabMap(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, true, false, false, false);
+            writeMatlabMap(expDefn, plannersToTest.at(i).first, plannersToTest.at(i).second, masterSeed, PLOT_VERTICES, true, false, false, false);
 
             double finalCost;
 

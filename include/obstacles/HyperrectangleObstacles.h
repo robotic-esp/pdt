@@ -37,13 +37,15 @@
 #ifndef OBSTACLES_HYPERRECTANGLE_OBSTACLES
 #define OBSTACLES_HYPERRECTANGLE_OBSTACLES
 
+#include <vector>
+#include <memory>
+
 #include "obstacles/BaseObstacle.h"
 #include "ompl/util/RandomNumbers.h"
 #include "ompl/base/ScopedState.h"
 #include "ompl/base/StateValidityChecker.h"
 #include "ompl/base/SpaceInformation.h"
 #include "ompl/datastructures/NearestNeighbors.h"
-#include <vector>
 
 /** \brief A world consisting of random hyperrectangular obstacles.*/
 class HyperrectangleObstacles : public BaseObstacle
@@ -89,15 +91,15 @@ public:
     /** \brief The volume an n-dimensional sphere */
     static double rectangleVolume(const std::vector<double>& widths);
 
-    /** \brief The obstacle map as a series of Matlab plot functions */
-    virtual std::string mfile() const;
+    /** \brief The obstacle map as a series of Matlab plot functions. Discard the space-colour argument. */
+    virtual std::string mfile(const std::string& obsColour, const std::string& /*spaceColour*/) const;
 
 protected:
 
 
 private:
     /** \brief The individual obstacles in a nearest neighbours structure */
-    boost::shared_ptr< ompl::NearestNeighbors<obstacle_corner_widths_t> > nnObstacles_;
+    std::shared_ptr< ompl::NearestNeighbors<obstacle_corner_widths_t> > nnObstacles_;
     /** \brief A vector of states that I allocated (and therefore must free) */
     std::vector<ompl::base::State*> statesToFree_;
     /** \brief The largest obstacle, used to find a small set of obstacles to check */

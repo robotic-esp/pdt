@@ -42,11 +42,7 @@
 //STL
 //std::pair
 #include <utility>
-
-//Boost
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-
+#include <memory>
 
 //OMPL:
 #include "ompl/base/SpaceInformation.h"
@@ -56,7 +52,9 @@
 #include "ompl/base/Cost.h"
 #include <ompl/util/Exception.h>
 #include <ompl/util/Console.h>
-#include <ompl/util/Time.h>
+
+//For some general time helpers
+#include "tools/general_tools.h"
 
 /** \brief The base class for an experiment */
 class BaseExperiment : boost::noncopyable
@@ -77,7 +75,7 @@ public:
     ompl::base::OptimizationObjectivePtr getOptimizationObjective() const;
 
     /** \brief Return the maximum experiment runtime */
-    ompl::time::duration getTargetTime() const;
+    asrl::time::duration getTargetTime() const;
 
     /** \brief Get the goal */
     ompl::base::GoalPtr getGoalPtr() const;
@@ -101,7 +99,7 @@ public:
     void print(const bool verbose = false) const;
 
     /** \brief The MATLAB plot file header*/
-    std::string mfileHeader(bool monochrome, double whiteShift = 0.0) const;
+    std::string mfileHeader(bool monochrome) const;
 
     /** \brief The MATLAB plot file footer*/
     std::string mfileFooter() const;
@@ -133,9 +131,9 @@ protected:
     /** \brief The optimization objective */
     ompl::base::OptimizationObjectivePtr opt_;
     /** \brief The obstacle world */
-    boost::shared_ptr<BaseObstacle> obs_;
+    std::shared_ptr<BaseObstacle> obs_;
     /** \brief The runtime for the experiment */
-    ompl::time::duration targetTime_;
+    asrl::time::duration targetTime_;
     /** \brief The start states */
     std::vector<ompl::base::ScopedState<> > startStates_;
     /** \brief The goal states */
@@ -144,6 +142,6 @@ protected:
     ompl::base::GoalPtr goalPtr_;
 };
 
-typedef boost::shared_ptr<BaseExperiment> BaseExperimentPtr;
+typedef std::shared_ptr<BaseExperiment> BaseExperimentPtr;
 
 #endif //BASE_EXPERIMENT_DEFINITION

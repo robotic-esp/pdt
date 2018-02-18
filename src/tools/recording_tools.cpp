@@ -5,6 +5,7 @@
 //For boost::filesystem
 #include <boost/filesystem.hpp>
 
+#define ALLOC_TIME_SAFETY_FACTOR 10.0
 
 void createDirectories(std::string fileName)
 {
@@ -34,13 +35,15 @@ void createDirectories(std::string fileName)
 
 
 //******* The different pieces of data to be recorded*******//
-TimeCostHistory::TimeCostHistory(double runTimeSeconds, double recordPeriodMillisecond)
+TimeCostHistory::TimeCostHistory(double runTimeSeconds, unsigned int recordPeriodMicrosecond)
 {
-    data_.reserve(1.1*runTimeSeconds/(recordPeriodMillisecond/1000.0));
+    allocSize_ = ALLOC_TIME_SAFETY_FACTOR*runTimeSeconds/(static_cast<double>(recordPeriodMicrosecond)/1e6);
+    data_.reserve(allocSize_);
 }
-TimeCostHistory::TimeCostHistory(const ompl::time::duration& runTime, double recordPeriodMillisecond)
+TimeCostHistory::TimeCostHistory(const asrl::time::duration& runTime, unsigned int recordPeriodMicrosecond)
 {
-    data_.reserve(1.1*ompl::time::seconds(runTime)/(recordPeriodMillisecond/1000.0));
+    allocSize_ = ALLOC_TIME_SAFETY_FACTOR*asrl::time::seconds(runTime)/(static_cast<double>(recordPeriodMicrosecond)/1e6);
+    data_.reserve(allocSize_);
 }
 std::string TimeCostHistory::output(const std::string& labelPrefix)
 {
@@ -48,11 +51,18 @@ std::string TimeCostHistory::output(const std::string& labelPrefix)
     //The return value
     std::stringstream rval;
 
+    if (data_.capacity() > allocSize_)
+    {
+        std::cout << std::endl;
+        std::cout << "WARNING. The result file was under allocated (reserved: " << allocSize_ << ", used: " << data_.size() << ", capacity: " << data_.capacity() << "). This will affect the accuracy of timings." << std::endl;
+        std::cout << std::endl;
+    }
+
     //Write the time first:
     rval << labelPrefix << ", ";
     for (unsigned int i = 0u; i < data_.size(); ++i)
     {
-        rval << std::setprecision(21) << data_.at(i).first.total_nanoseconds()/1e9;
+        rval << std::setprecision(21) << asrl::time::seconds(data_.at(i).first);
         if (i != data_.size() - 1u)
         {
             rval << ", ";
@@ -76,13 +86,15 @@ std::string TimeCostHistory::output(const std::string& labelPrefix)
     return rval.str();
 }
 
-TimeIterationCostHistory::TimeIterationCostHistory(double runTimeSeconds, double recordPeriodMillisecond)
+TimeIterationCostHistory::TimeIterationCostHistory(double runTimeSeconds, unsigned int recordPeriodMicrosecond)
 {
-    data_.reserve(1.1*runTimeSeconds/(recordPeriodMillisecond/1000.0));
+    allocSize_ = ALLOC_TIME_SAFETY_FACTOR*runTimeSeconds/(static_cast<double>(recordPeriodMicrosecond)/1e6);
+    data_.reserve(allocSize_);
 }
-TimeIterationCostHistory::TimeIterationCostHistory(const ompl::time::duration& runTime, double recordPeriodMillisecond)
+TimeIterationCostHistory::TimeIterationCostHistory(const asrl::time::duration& runTime, unsigned int recordPeriodMicrosecond)
 {
-    data_.reserve(1.1*ompl::time::seconds(runTime)/(recordPeriodMillisecond/1000.0));
+    allocSize_ = ALLOC_TIME_SAFETY_FACTOR*asrl::time::seconds(runTime)/(static_cast<double>(recordPeriodMicrosecond)/1e6);
+    data_.reserve(allocSize_);
 }
 std::string TimeIterationCostHistory::output(const std::string& labelPrefix)
 {
@@ -90,11 +102,18 @@ std::string TimeIterationCostHistory::output(const std::string& labelPrefix)
     //The return value
     std::stringstream rval;
 
+    if (data_.capacity() > allocSize_)
+    {
+        std::cout << std::endl;
+        std::cout << "WARNING. The result file was under allocated (reserved: " << allocSize_ << ", used: " << data_.size() << ", capacity: " << data_.capacity() << "). This will affect the accuracy of timings." << std::endl;
+        std::cout << std::endl;
+    }
+
     //Write the time first:
     rval << labelPrefix << ", ";
     for (unsigned int i = 0u; i < data_.size(); ++i)
     {
-        rval << std::setprecision(21) << data_.at(i).get<0u>().total_nanoseconds()/1e9;
+        rval << std::setprecision(21) << asrl::time::seconds(std::get<0u>(data_.at(i)));
         if (i != data_.size() - 1u)
         {
             rval << ", ";
@@ -106,7 +125,7 @@ std::string TimeIterationCostHistory::output(const std::string& labelPrefix)
     rval << labelPrefix << ", ";
     for (unsigned int i = 0u; i < data_.size(); ++i)
     {
-        rval << std::setprecision(21) << data_.at(i).get<1u>();
+        rval << std::setprecision(21) << std::get<1u>(data_.at(i));
         if (i != data_.size() - 1u)
         {
             rval << ", ";
@@ -118,7 +137,7 @@ std::string TimeIterationCostHistory::output(const std::string& labelPrefix)
     rval << labelPrefix << ", ";
     for (unsigned int i = 0u; i < data_.size(); ++i)
     {
-        rval << std::setprecision(21) << data_.at(i).get<2u>();
+        rval << std::setprecision(21) << std::get<2u>(data_.at(i));
         if (i != data_.size() - 1u)
         {
             rval << ", ";
@@ -132,21 +151,31 @@ std::string TimeIterationCostHistory::output(const std::string& labelPrefix)
 
 IterationCostHistory::IterationCostHistory(unsigned int numIterations)
 {
-    data_.reserve(numIterations+5u);
+    allocSize_ = numIterations + 5u;
+    data_.reserve(allocSize_);
 }
-IterationCostHistory::IterationCostHistory(double runTimeSeconds, double recordPeriodMillisecond)
+IterationCostHistory::IterationCostHistory(double runTimeSeconds, unsigned int recordPeriodMicrosecond)
 {
-    data_.reserve(1.1*runTimeSeconds/(recordPeriodMillisecond/1000.0));
+    allocSize_ = ALLOC_TIME_SAFETY_FACTOR*runTimeSeconds/(static_cast<double>(recordPeriodMicrosecond)/1e6);
+    data_.reserve(allocSize_);
 }
-IterationCostHistory::IterationCostHistory(const ompl::time::duration& runTime, double recordPeriodMillisecond)
+IterationCostHistory::IterationCostHistory(const asrl::time::duration& runTime, unsigned int recordPeriodMicrosecond)
 {
-    data_.reserve(1.1*ompl::time::seconds(runTime)/(recordPeriodMillisecond/1000.0));
+    allocSize_ = ALLOC_TIME_SAFETY_FACTOR*asrl::time::seconds(runTime)/(static_cast<double>(recordPeriodMicrosecond)/1e6);
+    data_.reserve(allocSize_);
 }
 std::string IterationCostHistory::output(const std::string& labelPrefix)
 {
     //Variable
     //The return value
     std::stringstream rval;
+
+    if (data_.capacity() > allocSize_)
+    {
+        std::cout << std::endl;
+        std::cout << "WARNING. The result file was under allocated (reserved: " << allocSize_ << ", used: " << data_.size() << ", capacity: " << data_.capacity() << "). This will affect the accuracy of timings." << std::endl;
+        std::cout << std::endl;
+    }
 
     //Write the iteration first:
     rval << labelPrefix << ", ";
@@ -178,13 +207,21 @@ std::string IterationCostHistory::output(const std::string& labelPrefix)
 
 TargetTimeResults::TargetTimeResults(unsigned int numTargets)
 {
-    data_.reserve(numTargets+2u);
+    allocSize_ = numTargets + 2u;
+    data_.reserve(allocSize_);
 }
 std::string TargetTimeResults::output(const std::string& labelPrefix)
 {
     //Variable
     //The return value
     std::stringstream rval;
+
+    if (data_.capacity() > allocSize_)
+    {
+        std::cout << std::endl;
+        std::cout << "WARNING. The result file was under allocated (reserved: " << allocSize_ << ", used: " << data_.size() << ", capacity: " << data_.capacity() << "). This will affect the accuracy of timings." << std::endl;
+        std::cout << std::endl;
+    }
 
     //Write the targets first:
     rval << labelPrefix << ", ";
@@ -202,7 +239,7 @@ std::string TargetTimeResults::output(const std::string& labelPrefix)
     rval << labelPrefix << ", ";
     for (unsigned int i = 0u; i < data_.size(); ++i)
     {
-        rval << std::setprecision(21) << data_.at(i).second.total_nanoseconds()/1e9;
+        rval << std::setprecision(21) << asrl::time::seconds(data_.at(i).second);
         if (i != data_.size() - 1u)
         {
             rval << ", ";

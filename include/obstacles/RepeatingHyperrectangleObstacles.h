@@ -65,8 +65,8 @@ public:
     /** \brief Check for state validity */
     virtual bool isValid (const ompl::base::State* state) const;
 
-    /** \brief The obstacle map as a series of Matlab plot functions */
-    virtual std::string mfile() const;
+    /** \brief The obstacle map as a series of Matlab plot functions. (Discard the space-colour argument) */
+    virtual std::string mfile(const std::string& obsColour, const std::string& /*spaceColour*/) const;
 
 protected:
 

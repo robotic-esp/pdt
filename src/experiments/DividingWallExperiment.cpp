@@ -39,10 +39,10 @@
 
 // STL
 #include <cmath>
-
-// Boost
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
+//For std::shared_ptr, etc.
+#include <memory>
+//For std::bind
+#include <functional>
 
 // OMPL
 #include "ompl/base/spaces/RealVectorStateSpace.h"
@@ -68,7 +68,7 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
 {
     // Variable
     // The state space
-    boost::shared_ptr<ompl::base::RealVectorStateSpace> ss;
+    std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
     // The problem bounds
     ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
     // Whether one wall has an odd number of wall segments.
@@ -85,13 +85,13 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
     goalPos_ = 0.5;
 
     // Make the state space Rn:
-    ss = boost::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+    ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
 
     // Create the space information class:
-    BaseExperiment::si_ = boost::make_shared<ompl::base::SpaceInformation>(ss);
+    BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
     // Allocate the obstacle world
-    rectObs_ = boost::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
+    rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
     BaseExperiment::obs_ = rectObs_;
 
     // Set the problem bounds:
@@ -109,10 +109,10 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
     BaseExperiment::si_->setup();
 
     // Allocate the optimization objective
-    BaseExperiment::opt_ = boost::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+    BaseExperiment::opt_ = std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
 
     // Set the heuristic to the default:
-    BaseExperiment::opt_->setCostToGoHeuristic(boost::bind(&ompl::base::goalRegionCostToGo, _1, _2));
+    BaseExperiment::opt_->setCostToGoHeuristic(std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
     // Create my start:
     // Create a start state on the vector:
@@ -149,7 +149,7 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
     }
 
     // Allocate the goal:
-    BaseExperiment::goalPtr_ = boost::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
+    BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
 
     // Add
     BaseExperiment::goalPtr_->as<ompl::base::GoalState>()->setState(BaseExperiment::goalStates_.back());
@@ -177,7 +177,7 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
     numObs_ = std::vector<unsigned int>(numWalls_, 0u);
     wallWidths_ = std::vector<double>(numWalls_, 0.0);
     allObsWidths_ = std::vector<std::vector<double> >(numWalls_, std::vector<double>(BaseExperiment::dim_, 0.0));
-    obsCorners_ = std::vector<std::vector<boost::shared_ptr<ompl::base::ScopedState<> > > >(numWalls_, std::vector<boost::shared_ptr<ompl::base::ScopedState<> > >() );
+    obsCorners_ = std::vector<std::vector<std::shared_ptr<ompl::base::ScopedState<> > > >(numWalls_, std::vector<std::shared_ptr<ompl::base::ScopedState<> > >() );
 
     //Now, iterate through each wall. We have to do this multiple times to be cleaner. First calculate parameters:
     hasOddNumObs = false;
@@ -246,7 +246,7 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
             double obsNum = static_cast<double>(i);
 
             // Allocate the obstacle
-            obsCorners_.at(w).push_back( boost::make_shared<ompl::base::ScopedState<> >(ss) );
+            obsCorners_.at(w).push_back( std::make_shared<ompl::base::ScopedState<> >(ss) );
 
             // Specify it's lower-left corner:
             (*(obsCorners_.at(w).back()))[0u] = leftXPos; // x

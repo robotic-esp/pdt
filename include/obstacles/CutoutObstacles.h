@@ -34,53 +34,52 @@
 
 /* Authors: Jonathan Gammell */
 
-#ifndef EXPERIMENTS_RANDOM_RECTANGLES_EXPERIMENT
-#define EXPERIMENTS_RANDOM_RECTANGLES_EXPERIMENT
+#ifndef OBSTACLES_CUTOUT_OBSTACLES
+#define OBSTACLES_CUTOUT_OBSTACLES
 
-#include "experiments/BaseExperiment.h"
+#include <vector>
+#include <memory>
 
-// An Obstacle-World
-#include "obstacles/HyperrectangleObstacles.h"
+#include "obstacles/BaseObstacle.h"
 
-
-/** \brief An experiment with a singularly placed square obstacle*/
-class RandomRectanglesExperiment : public BaseExperiment
+/** \brief A world consisting of obstacles defined by obstacles and "anti-obstacles". A state is in collision if it is in an obstacle and not in an anti-obstacle. */
+class CutoutObstacles : public BaseObstacle
 {
 public:
+    /** \brief A shared pointer to the base obstacle type. (Pointer as we're being polymorphic). */
+    typedef std::shared_ptr<BaseObstacle> base_obstacle_ptr_t;
+
     /** \brief Constructor. */
-    RandomRectanglesExperiment(const unsigned int dim, const unsigned int numObs, const double obsRatio, const double runSeconds, const double checkResolution);
+    CutoutObstacles(ompl::base::SpaceInformation* si);
+    /** \brief Constructor. */
+    CutoutObstacles(const ompl::base::SpaceInformationPtr& si);
+    /** \brief Destructor */
+    ~CutoutObstacles() override;
 
-    /** \brief This problem \e does \e not know its optimum */
-    virtual bool knowsOptimum() const;
+    /** \brief Clear the obstacle space */
+    void clear() override;
 
-    /** \brief As the optimum is unknown, throw. */
-    virtual ompl::base::Cost getOptimum() const;
+    /** \brief Check for state validity */
+    bool isValid (const ompl::base::State* state) const override;
 
-    /** \brief Set the optimization target as the specified cost. */
-    virtual void setTarget(double targetSpecifier);
+    /** \brief Add an obstacle to the obstacle space */
+    void addObstacle(const base_obstacle_ptr_t& newObstaclePtr);
 
-    /** \brief Derived class specific information to include in the title line. */
-    virtual std::string lineInfo() const;
+    /** \brief Add an anti-obstacle to the obstacle space */
+    void addAntiObstacle(const base_obstacle_ptr_t& newAntiObstaclePtr);
 
-    /** \brief Derived class specific information to include at the end. */
-    virtual std::string paraInfo() const;
+    /** \brief The obstacle map as a series of Matlab plot functions */
+    std::string mfile(const std::string& obsColour, const std::string& spaceColour) const override;
 
 protected:
-    // Variables
-    /** \brief The obstacle world */
-    std::shared_ptr<HyperrectangleObstacles> rectObs_;
-    /** \brief The lower-left corner of an obstacle half-way between the start and goal */
-    std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_;
 
-    // Constant Parameters
-    /** \brief The start position */
-    double startPos_;
-    /** \brief The goal position */
-    double goalPos_;
-    /** \brief The mean obstacle width*/
-    double meanObsWidth_;
+
+private:
+    /** \brief A vector of obstacles */
+    std::vector<base_obstacle_ptr_t> obstaclePtrs_;
+
+    /** \brief A vector of anti-obstacles */
+    std::vector<base_obstacle_ptr_t> antiObstaclePtrs_;
 };
 
-typedef std::shared_ptr<RandomRectanglesExperiment> RandomRectanglesExperimentPtr;
-
-#endif //EXPERIMENTS_RANDOM_RECTANGLES_EXPERIMENT
+#endif //OBSTACLES_CUTOUT_OBSTACLES
