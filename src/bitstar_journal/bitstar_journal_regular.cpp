@@ -35,7 +35,7 @@
 /* Authors: Jonathan Gammell */
 
 /*********************************************************************
-THIS CODE ONLY COMPILES ON THE set_rrtstar_seeds BRANCH!!!!
+THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 *********************************************************************/
 
 //For std::cout
@@ -68,6 +68,7 @@ THIS CODE ONLY COMPILES ON THE set_rrtstar_seeds BRANCH!!!!
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
+#include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
@@ -252,6 +253,18 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
             return allocateRrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE);
             break;
         }
+        case PLANNER_RRTSHARP:
+        {
+            // Abuse numSamples as the variant number.
+            return allocateRrtSharp(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE, true, false, numSamples);
+            break;
+        }
+        case PLANNER_RRTSHARP_INFORMED:
+        {
+            // Abuse numSamples as the variant number.
+            return allocateRrtSharp(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE, false, true, numSamples);
+            break;
+        }
         case PLANNER_RRTSTAR_INFORMED:
         {
             return allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE, PRUNE_FRACTION);
@@ -290,6 +303,10 @@ double currentSolution(const PlannerType& plnrType, const ompl::base::PlannerPtr
     if (isRrtStar(plnrType) == true)
     {
         return plnr->as<ompl::geometric::RRTstar>()->bestCost().value();
+    }
+    else if (isRrtSharp(plnrType) == true)
+    {
+        return plnr->as<ompl::geometric::RRTsharp>()->bestCost().value();
     }
     else if (isBitStar(plnrType) == true)
     {
@@ -405,6 +422,10 @@ int main(int argc, char **argv)
             if (isRrtStar(plannersToTest.at(p).first) == true)
             {
                 plnr->as<ompl::geometric::RRTstar>()->setLocalSeed(seedRNG.getLocalSeed());
+            }
+            if (isRrtSharp(plannersToTest.at(p).first) == true)
+            {
+                plnr->as<ompl::geometric::RRTsharp>()->setLocalSeed(seedRNG.getLocalSeed());
             }
             if (isBitStar(plannersToTest.at(p).first) == true)
             {

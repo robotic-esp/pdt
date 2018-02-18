@@ -90,9 +90,10 @@ THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 
 //World:
 const double CHECK_RESOLUTION = 0.001;
-const unsigned int MEAN_NUM_OBS = 75u;
-const double MEAN_OBS_RATIO = 0.33;
+const double WORLD_WIDTH = 4.0;
+const unsigned int NUM_INTER_OBS = 5u;
 const unsigned int MICROSEC_SLEEP = 1000u; //Period for logging data, 1000us = 1ms
+
 
 //Common:
 const double PRUNE_FRACTION = 0.01;
@@ -343,7 +344,7 @@ int main(int argc, char **argv)
     }
 
     //Variables
-//    ompl::RNG::setSeed(2612667340);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
+//    ompl::RNG::setSeed(3348892111);    std::cout << std::endl << "                   ---------> Seed set! <---------                   " << std::endl << std::endl;
     //Master seed:
     std::uint_fast32_t masterSeed = ompl::RNG::getSeed();
     //The filename for progress
@@ -353,7 +354,7 @@ int main(int argc, char **argv)
     //The vector of planner types:
     std::vector<std::pair<PlannerType, unsigned int> > plannersToTest;
     //The experiment
-    RandomRectanglesExperimentPtr experiment;
+    RegularRectanglesExperimentPtr experiment;
 
     //Specify the planners:
     plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
@@ -367,7 +368,8 @@ int main(int argc, char **argv)
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
     //Create one experiment for all runs:
-    experiment = std::make_shared<RandomRectanglesExperiment>(N, MEAN_NUM_OBS, MEAN_OBS_RATIO, maxTime, CHECK_RESOLUTION);
+    // Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
+    BaseExperimentPtr expDefn = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.8, maxTime, CHECK_RESOLUTION); // worldHalfWidth, insideWidth, wallThickness, gapWidth.
 
     //The results output file:
     fileName << "R" << N << "S" << masterSeed << experiment->getName() << ".csv";
@@ -375,6 +377,7 @@ int main(int argc, char **argv)
     //Let people know what's going on:
     std::cout << "Seed: " << masterSeed << std::endl;
     std::cout << "Output: " << fileName.str() << std::endl;
+    std::cout << experiment->paraInfo() << std::endl;
 
     ResultsFile<TimeCostHistory> progressHistory(fileName.str());
 

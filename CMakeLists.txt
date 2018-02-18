@@ -194,48 +194,39 @@ target_link_libraries(rrtsharp_response
 
 
 #These require set-seed functions (?)
-#add_executable(bitstar_journal_targets
-#  src/bitstar_journal/bitstar_journal_targets.cpp
-#)
-#add_executable(bitstar_journal_random_single
-#  src/bitstar_journal/bitstar_journal_random_single.cpp
-#)
-#add_executable(bitstar_journal_regular
-#  src/bitstar_journal/bitstar_journal_regular.cpp
-#)
-#add_executable(bitstar_journal_first_soln
-#  src/bitstar_journal/bitstar_journal_first_soln.cpp
-#)
-#target_link_libraries(bitstar_journal_targets
-#  obstacles
-#  experiments
-#  ompl_tools
-#  ${Boost_LIBRARIES}
-#  ${OMPL_LIBRARIES}
-#)
-#target_link_libraries(bitstar_journal_random_single
-#  obstacles
-#  experiments
-#  ompl_tools
-#  ${CMAKE_THREAD_LIBS_INIT}
-#  ${Boost_LIBRARIES}
-#  ${OMPL_LIBRARIES}
-#)
-#target_link_libraries(bitstar_journal_regular
-#  obstacles
-#  experiments
-#  ompl_tools
-#  ${CMAKE_THREAD_LIBS_INIT}
-#  ${Boost_LIBRARIES}
-#  ${OMPL_LIBRARIES}
-#)
-#target_link_libraries(bitstar_journal_first_soln
-#  obstacles
-#  experiments
-#  ompl_tools
-#  ${Boost_LIBRARIES}
-#  ${OMPL_LIBRARIES}
-#)
+add_executable(bitstar_journal_random_single
+  src/bitstar_journal/bitstar_journal_random_single.cpp
+)
+add_executable(bitstar_journal_regular
+  src/bitstar_journal/bitstar_journal_regular.cpp
+)
+add_executable(bitstar_journal_double_enclosure
+  src/bitstar_journal/bitstar_journal_double_enclosure.cpp
+)
+target_link_libraries(bitstar_journal_random_single
+  obstacles
+  experiments
+  ompl_tools
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
+target_link_libraries(bitstar_journal_regular
+  obstacles
+  experiments
+  ompl_tools
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
+target_link_libraries(bitstar_journal_double_enclosure
+  obstacles
+  experiments
+  ompl_tools
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
 
 
 #add_executable(informed_journal
