@@ -410,12 +410,11 @@ int main(int argc, char **argv)
             // Run a palette cleansing planner as appropriate
             if (p != 0u && refreshPlanner != PLANNER_NOPLANNER)
             {
-                TimeCostHistory noResult(experiment->getTargetTime(), MICROSEC_SLEEP);
                 plnr = allocatePlanner(refreshPlanner, experiment, steerEta, 0u);
                 plnr->setProblemDefinition(experiment->newProblemDefinition());
                 plnr->setup();
-                callSolve(&startTime, plnr, experiment->getTargetTime());
-                progressHistory.addResult(plnr->getName(), noResult);
+                boost::thread cleanse(callSolve, &startTime, plnr, experiment->getTargetTime());
+                cleanse.join();
             }
 
             //Allocate a planner
