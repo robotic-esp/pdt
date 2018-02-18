@@ -112,6 +112,7 @@ const bool BITSTAR_DROP_BATCHES = false;
 const unsigned int SORRTSTAR_BATCH_SIZE = 100u;
 const double RRT_REWIRE_SCALE = REWIRE_SCALE;
 const double RRT_GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
+const bool RRTSHARP_REJECT = false;
 const double FMT_REWIRE_SCALE = REWIRE_SCALE;
 const bool FMT_CACHE_CC = false;
 const bool FMT_USE_HEURISTICS = false;
@@ -256,7 +257,7 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
         case PLANNER_RRTSHARP:
         {
             // Abuse numSamples as the variant number.
-            return allocateRrtSharp(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE, true, false, numSamples);
+            return allocateRrtSharp(expDefn->getSpaceInformation(), steerEta, RRT_GOAL_BIAS, K_NEAREST, RRT_REWIRE_SCALE, RRTSHARP_REJECT, false, numSamples);
             break;
         }
         case PLANNER_RRTSHARP_INFORMED:
@@ -363,6 +364,7 @@ int main(int argc, char **argv)
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 3u)); //Abuse number of samples as the variant number
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, SORRTSTAR_BATCH_SIZE));
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
