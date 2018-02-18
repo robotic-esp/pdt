@@ -128,6 +128,7 @@ const double RRT_STEER_ETA_16D = 3.0;
 const bool RRT_K_NEAREST = K_NEAREST;
 const double RRT_REWIRE_SCALE = REWIRE_SCALE;
 const double RRT_PRUNE_FRACTION = PRUNE_FRACTION;
+const bool RRTSHARP_REJECT = false;
 const double FMT_REWIRE_SCALE = REWIRE_SCALE;
 const bool FMT_K_NEAREST = K_NEAREST;
 const bool FMT_CACHE_CC = false;
@@ -338,7 +339,7 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
         case PLANNER_RRTSHARP:
         {
             // Abuse numSamples as the variant number.
-            plnr = allocateRrtSharp(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST, REWIRE_SCALE, true, false, numSamples);
+            plnr = allocateRrtSharp(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST, REWIRE_SCALE, RRTSHARP_REJECT, false, numSamples);
             break;
         }
         case PLANNER_RRTSHARP_INFORMED:

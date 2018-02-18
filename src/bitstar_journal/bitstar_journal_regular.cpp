@@ -92,7 +92,7 @@ THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 const double CHECK_RESOLUTION = 0.001;
 const double WORLD_WIDTH = 4.0;
 const unsigned int NUM_INTER_OBS = 5u;
-const unsigned int MICROSEC_SLEEP = 1000u; //Period for logging data, 1000us = 1ms
+const unsigned int MICROSEC_SLEEP = 500u; //Period for logging data, 1000us = 1ms
 
 
 //Common:

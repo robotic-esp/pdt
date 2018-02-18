@@ -9,7 +9,7 @@ function makeHistoryPlots(R)
     % imshow(colours_resize);
     % get(gca, 'colororder')
     y = [0.9290 0.6940 0.1250]; %3
-    m = [0.4940 0.1840 0.5560]; %4
+    p = [0.4940 0.1840 0.5560]; %4
     c = [0.3010 0.7450 0.9330]; %6
     r = [0.6350 0.0780 0.1840]; %7
     g = [0.4660 0.6740 0.1880]; %5
@@ -30,36 +30,8 @@ function makeHistoryPlots(R)
 %     k = [0 0 0];
 
 
-
-    %The planner names (log and plot) and colours:
-    planners = {'RRTConnect',               'RRTConnect',          k, '-';
-                'RRTstar',                  'DELETEME',            b, '-';
-                'RRTConnect',               'DELETEME',            k, '-';
-                'Reject_RRTsharp',          'RRT\#',               r, '-';
-                'RRTConnect',               'DELETEME',            k, '-';
-                'Informed_RRTsharp',        'DELETEME',            r, '--';
-                'RRTConnect',               'DELETEME',            k, '-';
-                'Reject_RRTsharp1',         'RRT\#1',              m, '-';
-                'RRTConnect',               'DELETEME',            k, '-';
-                'Informed_RRTsharp1',       'DELETEME',            m, '--';
-                'RRTConnect',               'DELETEME',            k, '-';
-                'Reject_RRTsharp2',         'RRT\#2',              o, '-';
-                'RRTConnect',               'DELETEME',            k, '-';
-                'Informed_RRTsharp2',       'DELETEME',            o, '--';
-                'RRTConnect',               'DELETEME',            k, '-';
-                'Reject_RRTsharp3',         'RRT\#3',              y, '-';
-                'RRTConnect',               'DELETEME',            k, '-';
-                'Informed_RRTsharp3',       'DELETEME',            y, '--';
-                'RRTConnect',               'DELETEME',            k, '-';
-                'Informed_RRTstar',         'DELETEME',            c, '-';
-                'RRTConnect',               'DELETEME',            k, '-';
-                'BITstar100',               'BIT*',                g, '-';};
-                %'dABITstar100',             'dABIT*',             g, '-';};
-
-    ignorePlanners = {'DELETEME'};
-
     %Plot time:
-    if (R == 2)
+    if (R == 0)
         %Interp spacing (us):
         interpTime = 100*1e-6;
 
@@ -67,7 +39,7 @@ function makeHistoryPlots(R)
         unsolvedAsNan = false;
         
         %Number of experiments in each file:
-        numExp = 250;
+        numExp = 100;
     
         plotTime = 1.0;
         
@@ -78,10 +50,77 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439039607778168491WallGap'};
+        filenames = {'R2S18439039668116020036RRTsharpResponse1';
+                     'R2S18439039669496224894RRTsharpResponse2'};
 
         figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'RRTConnect',               'RRTConnect',          k, '-';
+                    'RRTstar',                  'DELETEME',            b, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'RRTsharp',          'RRT\#',               r, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp',        'DELETEME',            r, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'RRTsharp1',         'RRT\#1',              p, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp1',       'DELETEME',            p, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'RRTsharp2',         'RRT\#2',              o, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp2',       'DELETEME',            o, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'RRTsharp3',         'RRT\#3',              y, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp3',       'DELETEME',            y, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTstar',         'DELETEME',            c, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'BITstar100',               'BIT*',                g, '-';};
+                    %'dABITstar100',             'dABIT*',             g, '-';};
+
+        ignorePlanners = {'DELETEME'};
+
+    elseif (R == 2)
+        %Interp spacing (us):
+        interpTime = 1000*1e-6;
+
+        useMedian = true;
+        unsolvedAsNan = false;
         
+        %Number of experiments in each file:
+        numExp = 100;
+    
+        plotTime = 3.0;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25;
+        
+        %Whether to plot CIs with an infinite range:
+        plotInfiniteCIs = false;
+
+        %The filesnames. Ommit the data/ and the .csv.
+        filenames = {'R2S18439039667909981350RegularRects'};
+
+        figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'RRTConnect',           'RRT-Connect'     k, '-';
+                    'RRT',                  'RRT',            y, '-';
+                    'RRTstar',              'RRT*',           p, '-';
+                    'FMTstar100',           'FMT*',           o, '-';
+                    'FMTstar1000',          'FMT*',           o, '-';
+                    'FMTstar10000',         'FMT*',           o, '-';
+                    'RRTsharp3',            'RRT\#',          r, '-';
+                    'Informed_RRTstar',     'Informed RRT*',  c, '-';
+                    'SORRTstar100',         'SORRT*',         b, '-';
+                    'lBITstar100',          'BIT*',           g, '-';};
+                    %'dABITstar100',             'dABIT*',             g, '-';};
+
+        ignorePlanners = {'DELETEME'};   
     elseif (R == 4)
         %Interp spacing (us):
         interpTime = 100*1e-6;
@@ -104,6 +143,34 @@ function makeHistoryPlots(R)
         filenames = {'R4S18439039510954659234DblEncl'};
 
         figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'RRTConnect',               'RRTConnect',          k, '-';
+                    'RRTstar',                  'DELETEME',            b, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Reject_RRTsharp',          'RRT\#',               r, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp',        'DELETEME',            r, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Reject_RRTsharp1',         'RRT\#1',              p, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp1',       'DELETEME',            p, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Reject_RRTsharp2',         'RRT\#2',              o, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp2',       'DELETEME',            o, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Reject_RRTsharp3',         'RRT\#3',              y, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp3',       'DELETEME',            y, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTstar',         'DELETEME',            c, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'BITstar100',               'BIT*',                g, '-';};
+                    %'dABITstar100',             'dABIT*',             g, '-';};
+
+        ignorePlanners = {'DELETEME'};
         
     elseif (R == 8)
         %Interp spacing (us):
@@ -127,6 +194,34 @@ function makeHistoryPlots(R)
         filenames = {'R8S18439039522079872659DblEncl'};
 
         figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'RRTConnect',               'RRTConnect',          k, '-';
+                    'RRTstar',                  'DELETEME',            b, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Reject_RRTsharp',          'RRT\#',               r, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp',        'DELETEME',            r, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Reject_RRTsharp1',         'RRT\#1',              p, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp1',       'DELETEME',            p, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Reject_RRTsharp2',         'RRT\#2',              o, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp2',       'DELETEME',            o, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Reject_RRTsharp3',         'RRT\#3',              y, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTsharp3',       'DELETEME',            y, '--';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'Informed_RRTstar',         'DELETEME',            c, '-';
+                    'RRTConnect',               'DELETEME',            k, '-';
+                    'BITstar100',               'BIT*',                g, '-';};
+                    %'dABITstar100',             'dABIT*',             g, '-';};
+
+        ignorePlanners = {'DELETEME'};
     else
         error('Unhandled argument');
     end
