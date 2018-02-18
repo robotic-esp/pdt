@@ -102,7 +102,7 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439039674584900915RegularRects'};
+        filenames = {'R2S18439039677679202010RegularRects'};
 
         figures = {};
 

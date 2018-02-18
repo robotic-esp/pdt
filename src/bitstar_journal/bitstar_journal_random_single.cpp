@@ -93,7 +93,6 @@ const double CHECK_RESOLUTION = 0.001;
 const unsigned int MEAN_NUM_OBS = 75u;
 const double MEAN_OBS_RATIO = 0.33;
 const unsigned int MICROSEC_SLEEP = 500u; //Period for logging data, 1000us = 1ms
-const PlannerType refreshPlanner = PLANNER_RRTCONNECT; //Use PLANNER_NOPLANNER to disable palette cleansing
 
 //Common:
 const double PRUNE_FRACTION = 0.01;
@@ -405,20 +404,11 @@ int main(int argc, char **argv)
             //The final cost of this planner:
             ompl::base::Cost finalCost;
 
-            //Get the problem definition
-            pdef = experiment->newProblemDefinition();
-
-            // Run a palette cleansing planner as appropriate
-            if (p != 0u && refreshPlanner != PLANNER_NOPLANNER)
-            {
-                plnr = allocatePlanner(refreshPlanner, experiment, steerEta, 0u);
-                plnr->setProblemDefinition(pdef);
-                plnr->setup();
-                callSolve(&startTime, plnr, experiment->getTargetTime());
-            }
-
             //Allocate a planner
             plnr = allocatePlanner(plannersToTest.at(p).first, experiment, steerEta, plannersToTest.at(p).second);
+
+            //Get the problem definition
+            pdef = experiment->newProblemDefinition();
 
             //Give to the planner
             plnr->setProblemDefinition(pdef);
