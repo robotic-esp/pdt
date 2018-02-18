@@ -362,6 +362,16 @@ std::string plannerName(PlannerType plnrType)
             return "RRTstar_Trio";
             break;
         }
+        case PLANNER_RRTSHARP:
+        {
+            return "RRTsharp";
+            break;
+        }
+        case PLANNER_RRTSHARP_INFORMED:
+        {
+            return "Informed_RRTsharp";
+            break;
+        }
         case PLANNER_RRTSTAR_INFORMED:
         {
             return "Informed_RRTstar";
