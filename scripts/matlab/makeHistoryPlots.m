@@ -94,12 +94,12 @@ function makeHistoryPlots(R)
         %The planner names (log and plot) and colours:
         planners = {'RRTConnect',           'RRT-Connect'     k, '-';
                     'RRT',                  'RRT',            y, '-';
-                    'RRTstar',              'RRT*',           p, '-';
-                    'RRTsharp3',            'RRT\#',          r, '-';
+                    'RRTstar',              'RRT*',           r, '-';
+                    'RRTsharp3',            'RRT\#',          o, '-';
                     'Informed_RRTstar',     'Informed RRT*',  c, '-';
-                    'FMTstar100',           'FMT*',           o, '-';
-                    'FMTstar1000',          'FMT*',           o, '-';
-                    'FMTstar10000',         'FMT*',           o, '-';
+                    'FMTstar100',           'FMT*',           p, '-';
+                    'FMTstar1000',          'FMT*',           p, '-';
+                    'FMTstar10000',         'FMT*',           p, '-';
                     'SORRTstar100',         'SORRT*',         b, '-';
                     'BITstar100',           'BIT*',           g, '-';};
 
@@ -131,12 +131,12 @@ function makeHistoryPlots(R)
         %The planner names (log and plot) and colours:
         planners = {'RRTConnect',           'RRT-Connect'     k, '-';
                     'RRT',                  'RRT',            y, '-';
-                    'RRTstar',              'RRT*',           p, '-';
-                    'RRTsharp3',            'RRT\#',          r, '-';
+                    'RRTstar',              'RRT*',           r, '-';
+                    'RRTsharp3',            'RRT\#',          o, '-';
                     'Informed_RRTstar',     'Informed RRT*',  c, '-';
-                    'FMTstar100',           'FMT*',           o, '-';
-                    'FMTstar1000',          'FMT*',           o, '-';
-                    'FMTstar10000',         'FMT*',           o, '-';
+                    'FMTstar100',           'FMT*',           p, '-';
+                    'FMTstar1000',          'FMT*',           p, '-';
+                    'FMTstar10000',         'FMT*',           p, '-';
                     'SORRTstar100',         'SORRT*',         b, '-';
                     'BITstar100',           'BIT*',           g, '-';};
 
@@ -169,12 +169,12 @@ function makeHistoryPlots(R)
         %The planner names (log and plot) and colours:
         planners = {'RRTConnect',           'RRT-Connect'     k, '-';
                     'RRT',                  'RRT',            y, '-';
-                    'RRTstar',              'RRT*',           p, '-';
-                    'RRTsharp3',            'RRT\#',          r, '-';
+                    'RRTstar',              'RRT*',           r, '-';
+                    'RRTsharp3',            'RRT\#',          o, '-';
                     'Informed_RRTstar',     'Informed RRT*',  c, '-';
-                    'FMTstar100',           'FMT*',           o, '-';
-                    'FMTstar1000',          'FMT*',           o, '-';
-                    'FMTstar10000',         'FMT*',           o, '-';
+                    'FMTstar100',           'FMT*',           p, '-';
+                    'FMTstar1000',          'FMT*',           p, '-';
+                    'FMTstar10000',         'FMT*',           p, '-';
                     'SORRTstar100',         'SORRT*',         b, '-';
                     'BITstar100',           'BIT*',           g, '-';};
 

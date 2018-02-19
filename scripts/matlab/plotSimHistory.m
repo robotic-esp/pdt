@@ -441,7 +441,7 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
             ylim([0 101]);
 
             %Set the ratio
-            pbaspect([6 1 1]); %ICRA/IROS: [6 1 1]
+            pbaspect([4 1 1]); %ICRA/IROS: [6 1 1]
         elseif handles(i) == histHandl
             title('Solution cost vs. time', 'FontSize', labelFontSize, 'Interpreter', 'latex');        
         

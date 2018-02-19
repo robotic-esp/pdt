@@ -89,6 +89,7 @@ THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 
 
 //World:
+const bool VERIFY_EXPERIMENT = false;
 const double CHECK_RESOLUTION = 0.001;
 const double WORLD_WIDTH = 4.0;
 const unsigned int NUM_INTER_OBS = 5u;
@@ -408,13 +409,17 @@ int main(int argc, char **argv)
             ompl::base::Cost finalCost;
 
             // Run a palette cleansing planner as appropriate
-            if (p != 0u && refreshPlanner != PLANNER_NOPLANNER)
+            if (p != 0u)
             {
-                plnr = allocatePlanner(refreshPlanner, experiment, steerEta, 0u);
-                plnr->setProblemDefinition(experiment->newProblemDefinition());
-                plnr->setup();
-                boost::thread cleanse(callSolve, &startTime, plnr, experiment->getTargetTime());
-                cleanse.join();
+                if (refreshPlanner != PLANNER_NOPLANNER)
+                {
+                    plnr = allocatePlanner(refreshPlanner, experiment, steerEta, 0u);
+                    plnr->setProblemDefinition(experiment->newProblemDefinition());
+                    plnr->setup();
+                    boost::thread cleanse(callSolve, &startTime, plnr, experiment->getTargetTime());
+                    cleanse.join();
+                }
+                std::cout << "," << std::flush;
             }
 
             //Allocate a planner
@@ -454,13 +459,13 @@ int main(int argc, char **argv)
                 {
                     std::cout << "First experiment: " << std::endl;
                     experiment->print(false);
-                    //The first column is 7 wide for a 6-digit trial number and a ":"
-                    std::cout << std::setw(7) << std::setfill(' ') << " ";
+                    //The first column is 6 wide for a 6-digit trial number
+                    std::cout << std::setw(6) << std::setfill(' ') << " ";
 
-                    //The subsequent columns are 30 wide for planner names, skip the first planner which is the reference solution:
+                    //The subsequent columns are 31 wide for planner names
                     for (unsigned int i = 0u; i < plannersToTest.size(); ++i)
                     {
-                        std::cout << std::setw(30) << std::setfill(' ') << plannerName(plannersToTest.at(i).first) << std::flush;
+                        std::cout << std::setw(31) << std::setfill(' ') << plannerName(plannersToTest.at(i).first) << std::flush;
                     }
                     std::cout << std::endl;
                 }
@@ -514,7 +519,7 @@ int main(int argc, char **argv)
                     finalCost = ompl::base::Cost(ASRL_DBL_INFINITY);
 
                     //If we didn't find a solution on the first attempt, mark as a bad experiment
-                    if (p == 0u)
+                    if (p == 0u && VERIFY_EXPERIMENT == true)
                     {
                         badExperiment = true;
                     }
