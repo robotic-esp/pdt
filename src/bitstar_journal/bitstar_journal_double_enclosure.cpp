@@ -355,7 +355,7 @@ int main(int argc, char **argv)
     //The vector of planner types:
     std::vector<std::pair<PlannerType, unsigned int> > plannersToTest;
     //The experiment
-    RegularRectanglesExperimentPtr experiment;
+    DoubleEnclosureExperimentPtr experiment;
 
     //Specify the planners:
     plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
@@ -371,7 +371,7 @@ int main(int argc, char **argv)
 
     //Create one experiment for all runs:
     // Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
-    BaseExperimentPtr expDefn = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.8, maxTime, CHECK_RESOLUTION); // worldHalfWidth, insideWidth, wallThickness, gapWidth.
+    experiment = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.8, maxTime, CHECK_RESOLUTION); // worldHalfWidth, insideWidth, wallThickness, gapWidth.
 
     //The results output file:
     fileName << "R" << N << "S" << masterSeed << experiment->getName() << ".csv";
