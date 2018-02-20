@@ -446,7 +446,7 @@ int main(int argc, char **argv)
                     plnr = allocatePlanner(refreshPlanner, experiment, steerEta, 0u);
                     plnr->setProblemDefinition(experiment->newProblemDefinition());
                     plnr->setup();
-                    boost::thread cleanse(callSolve, &startTime, &endTime, plnr, experiment->getTargetTime());
+                    boost::thread cleanse(callSolve, &startTime, &endTime, plnr, asrl::time::duration(0));
                     cleanse.join();
                 }
                 std::cout << "," << std::flush;
