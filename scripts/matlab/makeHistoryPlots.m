@@ -41,7 +41,7 @@ function makeHistoryPlots(R)
         %Number of experiments in each file:
         numExp = 100;
     
-        plotTime = 3.0;
+        plotTime = 1.0;
         
         %The relative margin above the medians that we're willing to plot...
         yLimMargin = 0.25;
@@ -50,7 +50,8 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {''};
+        filenames = {'R2S18439039769392547863RRTsharpResponse1';
+                     'R2S18439039770165904113RRTsharpResponse2'};
 
         figures = {};
 
@@ -77,7 +78,7 @@ function makeHistoryPlots(R)
         %Number of experiments in each file:
         numExp = 100;
     
-        plotTime = 3.0;
+        plotTime = 1.0;
         
         %The relative margin above the medians that we're willing to plot...
         yLimMargin = 0.25;
@@ -86,7 +87,7 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439039726546219644DblEncl'};
+        filenames = {'R2S18439039776036557756RandRect'};
 
         figures = {};
 
@@ -123,7 +124,8 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R4S18439039728190501169DblEncl'};
+        filenames = {'R4S18439039770911829401RegularRects';
+                     'R4S18439039776599638769RandRect'};
 
         figures = {};
 
@@ -150,9 +152,9 @@ function makeHistoryPlots(R)
         unsolvedAsNan = false;
         
         %Number of experiments in each file:
-        numExp = 250;
+        numExp = 100;
     
-        plotTime = 10;
+        plotTime = 30;
         
         %The relative margin above the medians that we're willing to plot...
         yLimMargin = 0.25;
@@ -161,7 +163,7 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439039522079872659DblEncl'};
+        filenames = {'R8S18439039782593579710RandRect'};
 
         figures = {};
 

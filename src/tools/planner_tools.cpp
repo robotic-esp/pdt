@@ -392,6 +392,11 @@ std::string plannerName(PlannerType plnrType)
             return "BITstar";
             break;
         }
+        case PLANNER_REGRESSION_BITSTAR:
+        {
+            return "BITstarRegress";
+            break;
+        }
         case PLANNER_ABITSTAR:
         {
             return "ABITstar";

@@ -93,7 +93,7 @@ const bool VERIFY_EXPERIMENT = false;
 const double CHECK_RESOLUTION = 0.001;
 const double WORLD_WIDTH = 4.0;
 const unsigned int NUM_INTER_OBS = 5u;
-const unsigned int MICROSEC_SLEEP = 100u; //Period for logging data, 1000us = 1ms
+const unsigned int DEFAULT_MICROSEC_SLEEP = 100u; //Period for logging data, 1000us = 1ms
 const PlannerType refreshPlanner = PLANNER_RRTCONNECT; //Use PLANNER_NOPLANNER to disable palette cleansing
 
 //Common:
@@ -126,7 +126,7 @@ const bool PLOT_BITSTAR_EDGE = true;
 const bool PLOT_BITSTAR_QUEUE = false;
 
 
-bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPtr, unsigned int* numExperimentsPtr, double* runTimePtr, bool* animatePtr)
+bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPtr, unsigned int* numExperimentsPtr, double* runTimePtr, unsigned int* usecPtr, bool* animatePtr)
 {
     // Declare the supported options.
     boost::program_options::options_description desc("Allowed options");
@@ -136,6 +136,7 @@ bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPt
         ("steer-eta,s", boost::program_options::value<double>()->default_value(0.0), "The steer eta, or maximum edge length, to use. Defaults to 0.0 which uses the OMPL auto calculation.")
         ("experiments,e", boost::program_options::value<unsigned int>(), "The number of unique experiments to run on the random world.")
         ("runtime,t", boost::program_options::value<double>(), "The CPU time in seconds for which to run the planners, (0,infty)")
+        ("interval-to-record,i", boost::program_options::value<unsigned int>(), "(optional) The CPU time in microseconds at which to record planner histories")
         ("animate,a", boost::program_options::value<bool>()->zero_tokens(), "Create frame-by-frame animations.")
         ("log-level,l", boost::program_options::value<unsigned int>(), "Set the OMPL log level. 0 for WARN, 1 for INFO, 2 for DEBUG. Defaults to 0 if not set.");
     boost::program_options::variables_map vm;
@@ -194,6 +195,12 @@ bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPt
         std::cout << "runtime not set" << std::endl << std::endl << desc << std::endl;
         return false;
     }
+
+    if (vm.count("interval-to-record"))
+    {
+        *usecPtr = vm["interval-to-record"].as<unsigned int>();
+    }
+    // No else, an optional variable
 
     if (vm.count("animate"))
     {
@@ -287,6 +294,13 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
             return allocateBitStar(expDefn->getSpaceInformation(), K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCHES);
             break;
         }
+#ifdef BITSTAR_REGRESSION
+        case PLANNER_REGRESSION_BITSTAR:
+        {
+            return allocateBitStarRegression(expDefn->getSpaceInformation(), K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCHES);
+            break;
+        }
+#endif  // BITSTAR_REGRESSION
         default:
         {
             throw ompl::Exception("Unrecognized planner type in allocatePlanner()");
@@ -294,11 +308,12 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
     }
 };
 
-void callSolve(asrl::time::point* startTime, const ompl::base::PlannerPtr& planner, const asrl::time::duration& solveDuration)
+void callSolve(asrl::time::point* startTime, asrl::time::point* endTime, const ompl::base::PlannerPtr& planner, const asrl::time::duration& solveDuration)
 {
     *startTime = asrl::time::now();
     planner->solve( asrl::time::seconds(solveDuration) );
-}
+    *endTime = asrl::time::now();
+};
 
 double currentSolution(const PlannerType& plnrType, const ompl::base::PlannerPtr& plnr)
 {
@@ -314,6 +329,12 @@ double currentSolution(const PlannerType& plnrType, const ompl::base::PlannerPtr
     {
         return plnr->as<ompl::geometric::BITstar>()->bestCost().value();
     }
+#ifdef BITSTAR_REGRESSION
+    else if (plnrType == PLANNER_REGRESSION_BITSTAR)
+    {
+        return plnr->as<ompl::geometric::BITstarRegression>()->bestCost().value();
+    }
+#endif // BITSTAR_REGRESSION
     else if (isRrt(plnrType) == true)
     {
         OMPL_WARN("RRT planners are not implemented for animations.");
@@ -334,15 +355,24 @@ int main(int argc, char **argv)
     unsigned int numExperiments;
     //The time for which to run the planners
     double maxTime;
+    //The interval at which to log data
+    unsigned int recordInterval = DEFAULT_MICROSEC_SLEEP;
     //The steer / range of RRT
     double steerEta;
     //Whether to make frame-by-frame animations
     bool createAnimationFrames;
 
     //Get the command line arguments
-    if (argParse(argc, argv, &N, &steerEta, &numExperiments, &maxTime, &createAnimationFrames) == false)
+    if (argParse(argc, argv, &N, &steerEta, &numExperiments, &maxTime, &recordInterval, &createAnimationFrames) == false)
     {
         return 1;
+    }
+
+    if (maxTime > 30.0 && recordInterval < 1000u)
+    {
+        std::cout << std::endl;
+        std::cout << "WARNING: Recording data every " << recordInterval << "us for " << maxTime << "s may result in excessively large log files." << std::endl;
+        std::cout << std::endl;
     }
 
     //Variables
@@ -396,6 +426,8 @@ int main(int argc, char **argv)
             //Variables
             //The start time for a call
             asrl::time::point startTime;
+            //The end time of a call
+            asrl::time::point endTime;
             //The run time
             asrl::time::duration runTime(0);
             //The current planner:
@@ -403,7 +435,7 @@ int main(int argc, char **argv)
             //The problem defintion used by this planner
             ompl::base::ProblemDefinitionPtr pdef;
             //The results from this planners run across all the variates:
-            TimeCostHistory runResults(experiment->getTargetTime(), MICROSEC_SLEEP);
+            TimeCostHistory runResults(experiment->getTargetTime(), recordInterval);
             //The final cost of this planner:
             ompl::base::Cost finalCost;
 
@@ -415,7 +447,7 @@ int main(int argc, char **argv)
                     plnr = allocatePlanner(refreshPlanner, experiment, steerEta, 0u);
                     plnr->setProblemDefinition(experiment->newProblemDefinition());
                     plnr->setup();
-                    boost::thread cleanse(callSolve, &startTime, plnr, experiment->getTargetTime());
+                    boost::thread cleanse(callSolve, &startTime, &endTime, plnr, experiment->getTargetTime());
                     cleanse.join();
                 }
                 std::cout << "," << std::flush;
@@ -485,7 +517,7 @@ int main(int argc, char **argv)
             {
                 //Start solving in another thread. It will record startTime, but so we notice if it doesn't we will clear startTime first.
                 startTime = asrl::time::point();
-                boost::thread solveThread(callSolve, &startTime, plnr, experiment->getTargetTime() - runTime);
+                boost::thread solveThread(callSolve, &startTime, &endTime, plnr, experiment->getTargetTime() - runTime);
 
                 //If the clock is not steady, sleep for 1us so that the upcoming first entry is not backwards in time.
                 if (asrl::time::clock::is_steady == false)
@@ -506,10 +538,10 @@ int main(int argc, char **argv)
                         runResults.push_back( std::make_pair(runTime + (asrl::time::now() - startTime), currentSolution(plannersToTest.at(p).first, plnr)) );
                     }
                 }
-                while (solveThread.try_join_for(boost::chrono::microseconds(MICROSEC_SLEEP)) == false);
+                while (solveThread.try_join_for(boost::chrono::microseconds(recordInterval)) == false);
 
                 //Store the final run time and cost
-                runTime = runTime + (asrl::time::now() - startTime);
+                runTime = runTime + (endTime - startTime);
 
                 //Find the final cost
                 if (pdef->hasExactSolution() == false)

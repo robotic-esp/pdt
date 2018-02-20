@@ -52,6 +52,55 @@
 void createDirectories(std::string fileName);
 
 //******* The different pieces of data to be recorded*******//
+/** \brief A null-logging class */
+template <class T, class U>
+class NoHistory
+{
+    public:
+        /** \brief Data type */
+        typedef std::pair<T, U> data_t;
+
+        /** \brief Constructors */
+        NoHistory(double /*runTimeSeconds*/, unsigned int /*recordPeriodMicrosecond*/)
+        {
+            empty_ = false;
+        };
+        NoHistory(const asrl::time::duration& /*runTime*/, unsigned int /*recordPeriodMicrosecond*/)
+        {
+            empty_ = false;
+        };
+
+        /** \brief Output the data with the appropriate label*/
+        std::string output(const std::string& labelPrefix)
+        {
+            //Variable
+            //The return value
+            std::stringstream rval;
+
+            rval << labelPrefix << ", Null" << std::endl;
+
+            return rval.str();
+        };
+
+        /** \brief std::vector pass-throughs */
+        bool empty() const
+        {
+            return empty_;
+        };
+        void push_back(const data_t& /*newData*/)
+        {
+            empty_ = true;
+        };
+
+        data_t back()
+        {
+            return std::pair<T, U>();
+        };
+
+    private:
+        bool empty_;
+};
+
 /** \brief A vector of time & cost */
 class TimeCostHistory
 {
