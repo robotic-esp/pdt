@@ -86,7 +86,7 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439039695385943296RegularRects'};
+        filenames = {'R2S18439039726546219644DblEncl'};
 
         figures = {};
 
@@ -112,9 +112,9 @@ function makeHistoryPlots(R)
         unsolvedAsNan = false;
         
         %Number of experiments in each file:
-        numExp = 250;
+        numExp = 100;
     
-        plotTime = 3;
+        plotTime = 10;
         
         %The relative margin above the medians that we're willing to plot...
         yLimMargin = 0.25;
@@ -123,7 +123,7 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R4S18439039510954659234DblEncl'};
+        filenames = {'R4S18439039728190501169DblEncl'};
 
         figures = {};
 
