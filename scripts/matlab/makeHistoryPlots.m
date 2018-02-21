@@ -50,8 +50,8 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439039769392547863RRTsharpResponse1';
-                     'R2S18439039770165904113RRTsharpResponse2'};
+        filenames = {'R2S18439039860290564768RRTsharpResponse1';
+                     'R2S18439039861066065777RRTsharpResponse2'};
 
         figures = {};
 
@@ -87,9 +87,9 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439039856007708605RegularRects_0s_thread';
-                     'R2S18439039857062823080RegularRects_no_thread';
-                     'R2S18439039858401079725RegularRects'};
+        filenames = {'R2S18439039861811245041RegularRects';
+                     'R2S18439039867512165930DblEncl';
+                     'R2S18439039873286466910RandRect'};
 
         figures = {};
 
@@ -126,8 +126,9 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R4S18439039770911829401RegularRects';
-                     'R4S18439039776599638769RandRect'};
+        filenames = {'R4S18439039862382734898RegularRects';
+                     'R4S18439039868072092074DblEncl';
+                     'R4S18439039873843433712RandRect'};
 
         figures = {};
 
