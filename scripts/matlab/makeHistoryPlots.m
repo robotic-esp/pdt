@@ -162,7 +162,8 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439039901184623634DblEncl'};
+        filenames = {'R8S18439039942295947880RegularRects';
+                     'R8S18439039958228742083RandRect'};
 
         figures = {};
 
