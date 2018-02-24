@@ -87,7 +87,14 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439039920116103538RandRect'};
+        filenames = {'R2S18439039985805592473RandRect';
+                     'R2S18439039986363589420RandRect';
+                     'R2S18439039986928702695RandRect';
+                     'R2S18439039987491435433RandRect';
+                     'R2S18439039988056253719RandRect';
+                     'R2S18439039988612206970RandRect';
+                     'R2S18439039989177777565RandRect';
+                     'R2S18439039989734726635RandRect'};
 
         figures = {};
 
@@ -162,8 +169,7 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439039942295947880RegularRects';
-                     'R8S18439039958228742083RandRect'};
+        filenames = {'R8S18439039990292181803RandRect'};
 
         figures = {};
 
