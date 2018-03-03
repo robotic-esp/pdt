@@ -176,7 +176,13 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439039990292181803RandRect'};
+        filenames = {'R8S18439040320362512614RandRect';
+                     'R8S18439040339175994007RandRect';
+                     'R8S18439040357818370309RandRect';
+                     'R8S18439040376589143662RandRect';
+                     'R8S18439040394996171974RandRect';
+                     'R8S18439040413533217303RandRect';
+                     'R8S18439040432153071426RandRect'};
 
         figures = {};
 
@@ -214,8 +220,45 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R16S18439040010558288241RegularRects';
-                     'R16S18439040071998264653RandRect'};
+        filenames = {'R16S18439040191204426294DblEncl'};
+
+        figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'RRTConnect',           'RRT-Connect'     k, '-';
+                    'RRT',                  'RRT',            y, '-';
+                    'RRTstar',              'RRT*',           r, '-';
+                    'RRTsharp3',            'RRT\#',          o, '-';
+                    'Informed_RRTstar',     'Informed RRT*',  c, '-';
+                    'FMTstar100',           'FMT*',           p, '-';
+                    'FMTstar1000',          'FMT*',           p, '-';
+                    'FMTstar10000',         'FMT*',           p, '-';
+                    'SORRTstar100',         'SORRT*',         b, '-';
+                    'BITstar100',           'BIT*',           g, '-';};
+
+        ignorePlanners = {'DELETEME'};     
+        
+    elseif (R == 16.300)
+        %Interp spacing (us):
+        interpTime = 1000*1e-6;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+        
+        %Number of experiments in each file:
+        numExp = 100;
+    
+        plotTime = 300;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25;
+        
+        %Whether to plot CIs with an infinite range:
+        plotInfiniteCIs = true;
+
+        %The filesnames. Ommit the data/ and the .csv.
+        filenames = {'R16S18439040499652745418DblEncl'};
 
         figures = {};
 
