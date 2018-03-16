@@ -111,6 +111,41 @@ function makeHistoryPlots(R)
                     'SORRTstar100',         'SORRT*',         b, '-';
                     'BITstar100',           'BIT*',           g, '-';};
 
+        ignorePlanners = {'DELETEME'};
+    elseif (R == 2.1)
+        %Interp spacing (us):
+        interpTime = 100*1e-6;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+        
+        %Number of experiments in each file:
+        numExp = 100;
+    
+        plotTime = 1.0;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25;
+        
+        %Whether to plot CIs with an infinite range:
+        plotInfiniteCIs = false;
+
+        %The filesnames. Ommit the data/ and the .csv.
+        filenames = {'R2S18439041897355338338DblEncl';
+                     'R2S18439041898093619436RegularRects'};
+
+        figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'BITstar1',           'BIT* (1)'      r, '-';
+                    'BITstar10',          'BIT* (10)'     o, '-';
+                    'BITstar50',          'BIT* (50)'     y, '-';
+                    'BITstar100',         'BIT* (100)'    g, '-';
+                    'BITstar500',         'BIT* (500)'    b, '-';
+                    'BITstar1000',        'BIT* (1000)'   c, '-';
+                    'BITstar5000',        'BIT* (5000)'   p, '-';};
+
         ignorePlanners = {'DELETEME'};   
     elseif (R == 4)
         %Interp spacing (us):

@@ -90,6 +90,7 @@ THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 
 //World:
 const bool VERIFY_EXPERIMENT = false;
+const bool INITIAL_SOLN_ONLY = false;
 const double CHECK_RESOLUTION = 0.001;
 const unsigned int DEFAULT_MICROSEC_SLEEP = 100u; //Period for logging data, 1000us = 1ms
 const PlannerType refreshPlanner = PLANNER_RRTCONNECT; //Use PLANNER_NOPLANNER to disable palette cleansing
@@ -401,6 +402,11 @@ int main(int argc, char **argv)
     //Create one experiment for all runs:
     // Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
     experiment = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.8, maxTime, CHECK_RESOLUTION); // worldHalfWidth, insideWidth, wallThickness, gapWidth.
+
+    if (INITIAL_SOLN_ONLY == true)
+    {
+        experiment->setTarget(std::numeric_limits<double>::infinity());
+    }
 
     //The results output file:
     fileName << "R" << N << "S" << masterSeed << experiment->getName() << ".csv";

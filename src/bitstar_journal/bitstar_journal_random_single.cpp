@@ -90,6 +90,7 @@ THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 
 //World:
 const bool VERIFY_EXPERIMENT = false;
+const bool INITIAL_SOLN_ONLY = false;
 const double CHECK_RESOLUTION = 0.001;
 const unsigned int MEAN_NUM_OBS = 75u;
 const double MEAN_OBS_RATIO = 0.33;
@@ -402,6 +403,11 @@ int main(int argc, char **argv)
 
     //Create one experiment for all runs:
     experiment = std::make_shared<RandomRectanglesExperiment>(N, MEAN_NUM_OBS, MEAN_OBS_RATIO, maxTime, CHECK_RESOLUTION);
+
+    if (INITIAL_SOLN_ONLY == true)
+    {
+        experiment->setTarget(std::numeric_limits<double>::infinity());
+    }
 
     //The results output file:
     fileName << "R" << N << "S" << masterSeed << experiment->getName() << ".csv";

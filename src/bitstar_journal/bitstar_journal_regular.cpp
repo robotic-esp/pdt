@@ -90,6 +90,7 @@ THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 
 //World:
 const bool VERIFY_EXPERIMENT = false;
+const bool INITIAL_SOLN_ONLY = false;
 const double CHECK_RESOLUTION = 0.001;
 const double WORLD_WIDTH = 4.0;
 const unsigned int NUM_INTER_OBS = 5u;
@@ -402,6 +403,11 @@ int main(int argc, char **argv)
 
     //Create one experiment for all runs:
     experiment = std::make_shared<RegularRectanglesExperiment>(N, WORLD_WIDTH, NUM_INTER_OBS, maxTime, CHECK_RESOLUTION);
+
+    if (INITIAL_SOLN_ONLY == true)
+    {
+        experiment->setTarget(std::numeric_limits<double>::infinity());
+    }
 
     //The results output file:
     fileName << "R" << N << "S" << masterSeed << experiment->getName() << ".csv";

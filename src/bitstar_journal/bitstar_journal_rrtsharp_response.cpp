@@ -90,6 +90,7 @@ THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 
 //World:
 const bool VERIFY_EXPERIMENT = false;
+const bool INITIAL_SOLN_ONLY = false;
 const double CHECK_RESOLUTION = 0.001;
 const double WORLD_WIDTH = 4.0;
 const unsigned int NUM_INTER_OBS = 5u;
@@ -434,6 +435,11 @@ int main(int argc, char **argv)
     else
     {
         throw ompl::Exception("Invalid problem number.");
+    }
+
+    if (INITIAL_SOLN_ONLY == true)
+    {
+        experiment->setTarget(std::numeric_limits<double>::infinity());
     }
 
     //The results output file:
