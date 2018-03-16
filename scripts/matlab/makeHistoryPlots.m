@@ -176,13 +176,7 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439040320362512614RandRect';
-                     'R8S18439040339175994007RandRect';
-                     'R8S18439040357818370309RandRect';
-                     'R8S18439040376589143662RandRect';
-                     'R8S18439040394996171974RandRect';
-                     'R8S18439040413533217303RandRect';
-                     'R8S18439040432153071426RandRect'};
+        filenames = {'R8S18439040432153071426RandRect'};
 
         figures = {};
 
@@ -220,7 +214,9 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R16S18439040191204426294DblEncl'};
+        filenames = {'R16S18439041176350903913RandRect';
+                     'R16S18439041240782437746RandRect';
+                     'R16S18439041304299108091RandRect'};
 
         figures = {};
 
@@ -286,7 +282,7 @@ function makeHistoryPlots(R)
         scanFiles(['data/' filenames{i} '.csv'], planners(:,1), true, true);
         
         data = processSimHistory(['data/' filenames{i} '.csv'], numExp, plotTime, interpTime);
-        [succHandl, histHandl, succRates(:,:,i)] = plotSimHistory(data, planners(:,2), planners(:,3), planners(:,4), ignorePlanners, useMedian, unsolvedAsNan, plotInfiniteCIs, yLimMargin);
+        [succHandl, histHandl, succRates(:,:,i)] = plotSimHistory(data, planners(:,2), planners(:,3), planners(:,4), plotTime, ignorePlanners, useMedian, unsolvedAsNan, plotInfiniteCIs, yLimMargin);
 
         saveEpsToPdf(succHandl, ['data/' filenames{i} '_success.pdf'], true);
         close(succHandl)

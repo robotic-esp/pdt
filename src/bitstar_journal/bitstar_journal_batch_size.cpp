@@ -91,6 +91,8 @@ THIS CODE ONLY COMPILES ON THE set_planner_seeds BRANCH!!!!
 //World:
 const bool VERIFY_EXPERIMENT = false;
 const double CHECK_RESOLUTION = 0.001;
+const double WORLD_WIDTH = 4.0;
+const unsigned int NUM_INTER_OBS = 5u;
 const unsigned int DEFAULT_MICROSEC_SLEEP = 100u; //Period for logging data, 1000us = 1ms
 const PlannerType refreshPlanner = PLANNER_RRTCONNECT; //Use PLANNER_NOPLANNER to disable palette cleansing
 
@@ -101,7 +103,6 @@ const double REWIRE_SCALE = 2.0;
 
 //BITstar
 const double BITSTAR_REWIRE_SCALE = REWIRE_SCALE;
-const unsigned int BITSTAR_BATCH_SIZE = 100u;
 const bool BITSTAR_STRICT_QUEUE = true;
 const bool BITSTAR_DELAY_REWIRE = false;
 const bool BITSTAR_JIT = false;
@@ -124,14 +125,15 @@ const bool PLOT_BITSTAR_EDGE = true;
 const bool PLOT_BITSTAR_QUEUE = false;
 
 
-bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPtr, unsigned int* numExperimentsPtr, double* runTimePtr, unsigned int* usecPtr, bool* animatePtr)
+bool argParse(int argc, char** argv, unsigned int* dimensionPtr, std::vector<unsigned int>* batchSizePtr, unsigned int* probNum, unsigned int* numExperimentsPtr, double* runTimePtr, unsigned int* usecPtr, bool* animatePtr)
 {
     // Declare the supported options.
     boost::program_options::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "produce help message")
         ("state,r", boost::program_options::value<unsigned int>(), "The state dimension.")
-        ("steer-eta,s", boost::program_options::value<double>()->default_value(0.0), "The steer eta, or maximum edge length, to use. Defaults to 0.0 which uses the OMPL auto calculation.")
+        ("batch-size,b", boost::program_options::value<std::vector<unsigned int> >()->multitoken(), "The batch sizes to test.")
+        ("problem-number,p", boost::program_options::value<unsigned int>(), "The problem number (1 or 2) to run.")
         ("experiments,e", boost::program_options::value<unsigned int>(), "The number of unique experiments to run on the random world.")
         ("runtime,t", boost::program_options::value<double>(), "The CPU time in seconds for which to run the planners, (0,infty)")
         ("interval-to-record,i", boost::program_options::value<unsigned int>(), "(optional) The CPU time in microseconds at which to record planner histories")
@@ -162,7 +164,30 @@ bool argParse(int argc, char** argv, unsigned int* dimensionPtr, double* steerPt
         return false;
     }
 
-    *steerPtr = vm["steer-eta"].as<double>();
+    if (vm.count("batch-size"))
+    {
+        *batchSizePtr = vm["batch-size"].as<std::vector<unsigned int> >();
+    }
+    else
+    {
+        std::cout << "batch size not set" << std::endl << std::endl << desc << std::endl;
+        return false;
+    }
+
+    if (vm.count("problem-number"))
+    {
+        *probNum = vm["problem-number"].as<unsigned int>();
+        if ( (*probNum  != 1u) && (*probNum  != 2u))
+        {
+            std::cout << "There are only 2 problem types implemented. " << std::endl << std::endl << desc << std::endl;
+            return false;
+        }
+    }
+    else
+    {
+        std::cout << "Problem number not set" << std::endl << std::endl << desc << std::endl;
+        return false;
+    }
 
     if (vm.count("experiments"))
     {
@@ -349,19 +374,21 @@ int main(int argc, char **argv)
     //Argument Variables
     //The dimension size:
     unsigned int N;
+    //The vector of batch sizes
+    std::vector<unsigned int> batchSizes;
+    //The problem number
+    unsigned int probNum;
     //The number of experiments
     unsigned int numExperiments;
     //The time for which to run the planners
     double maxTime;
     //The interval at which to log data
     unsigned int recordInterval = DEFAULT_MICROSEC_SLEEP;
-    //The steer / range of RRT
-    double steerEta;
     //Whether to make frame-by-frame animations
     bool createAnimationFrames;
 
     //Get the command line arguments
-    if (argParse(argc, argv, &N, &steerEta, &numExperiments, &maxTime, &recordInterval, &createAnimationFrames) == false)
+    if (argParse(argc, argv, &N, &batchSizes, &probNum, &numExperiments, &maxTime, &recordInterval, &createAnimationFrames) == false)
     {
         return 1;
     }
@@ -384,23 +411,28 @@ int main(int argc, char **argv)
     //The vector of planner types:
     std::vector<std::pair<PlannerType, unsigned int> > plannersToTest;
     //The experiment
-    DoubleEnclosureExperimentPtr experiment;
+    BaseExperimentPtr experiment;
 
     //Specify the planners:
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 3u)); //Abuse number of samples as the variant number
-    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
-    plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, SORRTSTAR_BATCH_SIZE));
-    plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
+    for (auto batch : batchSizes)
+    {
+        plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, batch));
+    }
 
     //Create one experiment for all runs:
-    // Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
-    experiment = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.8, maxTime, CHECK_RESOLUTION); // worldHalfWidth, insideWidth, wallThickness, gapWidth.
+    if (probNum == 1u)
+    {
+        // Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
+        experiment = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.8, maxTime, CHECK_RESOLUTION); // worldHalfWidth, insideWidth, wallThickness, gapWidth.
+    }
+    else if (probNum == 2u)
+    {
+        experiment = std::make_shared<RegularRectanglesExperiment>(N, WORLD_WIDTH, NUM_INTER_OBS, maxTime, CHECK_RESOLUTION);
+    }
+    else
+    {
+        throw ompl::Exception("Invalid problem number.");
+    }
 
     //The results output file:
     fileName << "R" << N << "S" << masterSeed << experiment->getName() << ".csv";
@@ -443,7 +475,7 @@ int main(int argc, char **argv)
             {
                 if (refreshPlanner != PLANNER_NOPLANNER)
                 {
-                    plnr = allocatePlanner(refreshPlanner, experiment, steerEta, 0u);
+                    plnr = allocatePlanner(refreshPlanner, experiment, 0.0, 0u);
                     plnr->setProblemDefinition(experiment->newProblemDefinition());
                     plnr->setup();
                     boost::thread cleanse(callSolve, &startTime, &endTime, plnr, asrl::time::duration(0));
@@ -453,7 +485,7 @@ int main(int argc, char **argv)
             }
 
             //Allocate a planner
-            plnr = allocatePlanner(plannersToTest.at(p).first, experiment, steerEta, plannersToTest.at(p).second);
+            plnr = allocatePlanner(plannersToTest.at(p).first, experiment, 0.0, plannersToTest.at(p).second);
 
             //Get the problem definition
             pdef = experiment->newProblemDefinition();

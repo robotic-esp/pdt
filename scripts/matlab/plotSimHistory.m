@@ -1,7 +1,11 @@
-function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, plannerNames, plannerColours, plannerLines, ignorePlanners, useMedian, unsolvedNan, plotInfiniteCI, yLimMargin)
+function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, plannerNames, plannerColours, plannerLines, plotTime, ignorePlanners, useMedian, unsolvedNan, plotInfiniteCI, yLimMargin)
     %interpPlannerData is :  numPlanners x 2 (time, cost) x numExperiments x interpolatedTimeSteps
     %unsolvedNan = false treates unsolved as having infinite cost and
     %calculates the median appropriately.
+    
+    if (nargin ~= 10)
+        error ('ASRL:plotSimHistory', 'The function signature of plotSimHistory has changed.')
+    end
     
     %Bah
     vErrTick = 100;
@@ -28,7 +32,7 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
     
     %Ranges:
     minPlotTime = inf;
-    maxPlotTime = max(max(max(interpPlannerData(:,1,:,:))));
+    maxPlotTime = min(plotTime, max(max(max(interpPlannerData(:,1,:,:)))));
     minHistCost = inf;
     maxHistCost = 0;
     minHistCostCI = zeros(size(interpPlannerData,1),1);

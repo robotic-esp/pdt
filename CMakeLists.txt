@@ -191,6 +191,9 @@ add_executable(bitstar_journal_regular
 add_executable(bitstar_journal_double_enclosure
   src/bitstar_journal/bitstar_journal_double_enclosure.cpp
 )
+add_executable(bitstar_journal_batch_size
+  src/bitstar_journal/bitstar_journal_batch_size.cpp
+)
 add_executable(bitstar_journal_rrtsharp_response
   src/bitstar_journal/bitstar_journal_rrtsharp_response.cpp
 )
@@ -211,6 +214,14 @@ target_link_libraries(bitstar_journal_regular
   ${OMPL_LIBRARIES}
 )
 target_link_libraries(bitstar_journal_double_enclosure
+  obstacles
+  experiments
+  ompl_tools
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
+target_link_libraries(bitstar_journal_batch_size
   obstacles
   experiments
   ompl_tools
