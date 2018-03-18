@@ -31,7 +31,7 @@ function makeHistoryPlots(R)
 
 
     %Plot time:
-    if (R == 0)
+    if (R == 0.2)
         %Interp spacing (us):
         interpTime = 100*1e-6;
 
@@ -50,8 +50,78 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439039860290564768RRTsharpResponse1';
-                     'R2S18439039861066065777RRTsharpResponse2'};
+        filenames = {'R2S18439041935127984148DblEncl'};
+
+        figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'RRTConnect',        'RRT-Connect',         k, '-';
+                    'RRTsharp',          'RRT\#',               r, '-';
+                    'RRTsharp1',         'RRT\#1',              p, '-';
+                    'RRTsharp2',         'RRT\#2',              o, '-';
+                    'RRTsharp3',         'RRT\#3',              y, '-';
+                    'Informed_RRTstar',  'Informed RRT*',       c, '-';
+                    'SORRTstar100',      'SORRT*',              b, '-';
+                    'BITstar100',        'BIT*',                g, '-'};
+
+        ignorePlanners = {'DELETEME'};   
+    elseif (R == 0.4)
+        %Interp spacing (us):
+        interpTime = 100*1e-6;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+        
+        %Number of experiments in each file:
+        numExp = 100;
+    
+        plotTime = 10;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25;
+        
+        %Whether to plot CIs with an infinite range:
+        plotInfiniteCIs = false;
+
+        %The filesnames. Ommit the data/ and the .csv.
+        filenames = {'R4S18439041935868477269DblEncl'};
+
+        figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'RRTConnect',        'RRT-Connect',         k, '-';
+                    'RRTsharp',          'RRT\#',               r, '-';
+                    'RRTsharp1',         'RRT\#1',              p, '-';
+                    'RRTsharp2',         'RRT\#2',              o, '-';
+                    'RRTsharp3',         'RRT\#3',              y, '-';
+                    'Informed_RRTstar',  'Informed RRT*',       c, '-';
+                    'SORRTstar100',      'SORRT*',              b, '-';
+                    'BITstar100',        'BIT*',                g, '-'};
+
+        ignorePlanners = {'DELETEME'};
+        
+    elseif (R == 0.8)
+        %Interp spacing (us):
+        interpTime = 100*1e-6;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+        
+        %Number of experiments in each file:
+        numExp = 100;
+    
+        plotTime = 30;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25;
+        
+        %Whether to plot CIs with an infinite range:
+        plotInfiniteCIs = false;
+
+        %The filesnames. Ommit the data/ and the .csv.
+        filenames = {'R8S18439041942918603405DblEncl'};
 
         figures = {};
 
@@ -112,6 +182,7 @@ function makeHistoryPlots(R)
                     'BITstar100',           'BIT*',           g, '-';};
 
         ignorePlanners = {'DELETEME'};
+        
     elseif (R == 2.1)
         %Interp spacing (us):
         interpTime = 100*1e-6;
@@ -131,14 +202,13 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = false;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439041897355338338DblEncl';
-                     'R2S18439041898093619436RegularRects'};
+        filenames = {'R2S18439041981077254091DblEncl'};
 
         figures = {};
 
 
         %The planner names (log and plot) and colours:
-        planners = {'BITstar1',           'BIT* (1)'      r, '-';
+        planners = {'BITstar5',           'BIT* (5)'      r, '-';
                     'BITstar10',          'BIT* (10)'     o, '-';
                     'BITstar50',          'BIT* (50)'     y, '-';
                     'BITstar100',         'BIT* (100)'    g, '-';
@@ -192,6 +262,42 @@ function makeHistoryPlots(R)
 
         ignorePlanners = {'DELETEME'};
         
+    elseif (R == 4.1)
+        %Interp spacing (us):
+        interpTime = 100*1e-6;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+        
+        %Number of experiments in each file:
+        numExp = 100;
+    
+        plotTime = 10;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25;
+        
+        %Whether to plot CIs with an infinite range:
+        plotInfiniteCIs = false;
+
+        %The filesnames. Ommit the data/ and the .csv.
+        filenames = {'R4S18439041981805099620DblEncl'};
+
+        figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'BITstar5',           'BIT* (5)'      r, '-';
+                    'BITstar10',          'BIT* (10)'     o, '-';
+                    'BITstar50',          'BIT* (50)'     y, '-';
+                    'BITstar100',         'BIT* (100)'    g, '-';
+                    'BITstar500',         'BIT* (500)'    b, '-';
+                    'BITstar1000',        'BIT* (1000)'   c, '-';
+                    'BITstar5000',        'BIT* (5000)'   p, '-';};
+
+
+        ignorePlanners = {'DELETEME'};
+        
     elseif (R == 8)
         %Interp spacing (us):
         interpTime = 100*1e-6;
@@ -227,6 +333,41 @@ function makeHistoryPlots(R)
                     'FMTstar10000',         'FMT*',           p, '-';
                     'SORRTstar100',         'SORRT*',         b, '-';
                     'BITstar100',           'BIT*',           g, '-';};
+
+        ignorePlanners = {'DELETEME'};
+        
+    elseif (R == 8.1)
+        %Interp spacing (us):
+        interpTime = 100*1e-6;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+        
+        %Number of experiments in each file:
+        numExp = 100;
+    
+        plotTime = 30;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25;
+        
+        %Whether to plot CIs with an infinite range:
+        plotInfiniteCIs = false;
+
+        %The filesnames. Ommit the data/ and the .csv.
+        filenames = {'R8S18439041988907160763DblEncl'};
+
+        figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'BITstar5',           'BIT* (5)'      r, '-';
+                    'BITstar10',          'BIT* (10)'     o, '-';
+                    'BITstar50',          'BIT* (50)'     y, '-';
+                    'BITstar100',         'BIT* (100)'    g, '-';
+                    'BITstar500',         'BIT* (500)'    b, '-';
+                    'BITstar1000',        'BIT* (1000)'   c, '-';
+                    'BITstar5000',        'BIT* (5000)'   p, '-';};
 
         ignorePlanners = {'DELETEME'};
         
@@ -268,9 +409,9 @@ function makeHistoryPlots(R)
                     'SORRTstar100',         'SORRT*',         b, '-';
                     'BITstar100',           'BIT*',           g, '-';};
 
-        ignorePlanners = {'DELETEME'};     
+        ignorePlanners = {'DELETEME'};   
         
-    elseif (R == 16.300)
+    elseif (R == 16)
         %Interp spacing (us):
         interpTime = 1000*1e-6;
 
@@ -280,7 +421,42 @@ function makeHistoryPlots(R)
         %Number of experiments in each file:
         numExp = 100;
     
-        plotTime = 300;
+        plotTime = 100;
+        
+        %The relative margin above the medians that we're willing to plot...
+        yLimMargin = 0.25;
+        
+        %Whether to plot CIs with an infinite range:
+        plotInfiniteCIs = false;
+
+        %The filesnames. Ommit the data/ and the .csv.
+        filenames = {''};
+
+        figures = {};
+
+
+        %The planner names (log and plot) and colours:
+        planners = {'BITstar5',           'BIT* (5)'      r, '-';
+                    'BITstar10',          'BIT* (10)'     o, '-';
+                    'BITstar50',          'BIT* (50)'     y, '-';
+                    'BITstar100',         'BIT* (100)'    g, '-';
+                    'BITstar500',         'BIT* (500)'    b, '-';
+                    'BITstar1000',        'BIT* (1000)'   c, '-';
+                    'BITstar5000',        'BIT* (5000)'   p, '-';};
+
+        ignorePlanners = {'DELETEME'};   
+        
+    elseif (R == 16.600)
+        %Interp spacing (us):
+        interpTime = 2000*1e-6;
+
+        useMedian = true;
+        unsolvedAsNan = false;
+        
+        %Number of experiments in each file:
+        numExp = 100;
+    
+        plotTime = 600;
         
         %The relative margin above the medians that we're willing to plot...
         yLimMargin = 0.25;
@@ -289,7 +465,7 @@ function makeHistoryPlots(R)
         plotInfiniteCIs = true;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R16S18439040499652745418DblEncl'};
+        filenames = {'R16S18439041381914166517DblEncl'};
 
         figures = {};
 

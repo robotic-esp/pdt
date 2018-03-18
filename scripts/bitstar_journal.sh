@@ -36,12 +36,14 @@ R16_LOG_INTERVAL=1000
 # $BIN_PATH/bitstar_journal_rrtsharp_response -r 8 -p 3 -s $R8_STEER -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
 
 ###Batch size problems###
-$BIN_PATH/bitstar_journal_batch_size -r 2 -b 5 10 50 100 500 1000 5000 -p 1 -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-$BIN_PATH/bitstar_journal_batch_size -r 4 -b 5 10 50 100 500 1000 5000 -p 1 -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-$BIN_PATH/bitstar_journal_batch_size -r 8 -b 5 10 50 100 500 1000 5000 -p 1 -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
-$BIN_PATH/bitstar_journal_batch_size -r 2 -b 5 10 50 100 500 1000 5000 -p 2 -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-$BIN_PATH/bitstar_journal_batch_size -r 4 -b 5 10 50 100 500 1000 5000 -p 2 -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-$BIN_PATH/bitstar_journal_batch_size -r 8 -b 5 10 50 100 500 1000 5000 -p 2 -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
+# $BIN_PATH/bitstar_journal_batch_size -r 2 -b 5 10 50 100 500 1000 5000 -p 1 -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+# $BIN_PATH/bitstar_journal_batch_size -r 4 -b 5 10 50 100 500 1000 5000 -p 1 -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+# $BIN_PATH/bitstar_journal_batch_size -r 8 -b 5 10 50 100 500 1000 5000 -p 1 -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_batch_size -r 16 -b 5 10 50 100 500 1000 5000 -p 1 -e $NUM_EXP -t $R16_TIME -i $R16_LOG_INTERVAL
+# $BIN_PATH/bitstar_journal_batch_size -r 2 -b 5 10 50 100 500 1000 5000 -p 2 -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+# $BIN_PATH/bitstar_journal_batch_size -r 4 -b 5 10 50 100 500 1000 5000 -p 2 -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+# $BIN_PATH/bitstar_journal_batch_size -r 8 -b 5 10 50 100 500 1000 5000 -p 2 -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_batch_size -r 16 -b 5 10 50 100 500 1000 5000 -p 2 -e $NUM_EXP -t $R16_TIME -i $R16_LOG_INTERVAL
 
 ###Regular worlds###
 # $BIN_PATH/bitstar_journal_regular -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
@@ -53,7 +55,7 @@ $BIN_PATH/bitstar_journal_batch_size -r 8 -b 5 10 50 100 500 1000 5000 -p 2 -e $
 # $BIN_PATH/bitstar_journal_double_enclosure -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
 # $BIN_PATH/bitstar_journal_double_enclosure -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
 # $BIN_PATH/bitstar_journal_double_enclosure -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
-# $BIN_PATH/bitstar_journal_double_enclosure -r 16 -s $R16_STEER -e $NUM_EXP -t 600 -i 2000
+# $BIN_PATH/bitstar_journal_double_enclosure -r 16 -s $R16_STEER -e $NUM_EXP -t 1000 -i 2500
 
 ###Random world###
 # $BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
