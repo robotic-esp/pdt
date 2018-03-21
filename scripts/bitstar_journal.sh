@@ -59,30 +59,30 @@ $BIN_PATH/bitstar_journal_double_enclosure -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_
 
 ###Random world###
 $BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 2 -s $R2_STEER -e $NUM_EXP -t $R2_TIME -i $R2_LOG_INTERVAL
 
 $BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 4 -s $R4_STEER -e $NUM_EXP -t $R4_TIME -i $R4_LOG_INTERVAL
 
 $BIN_PATH/bitstar_journal_random_single -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
-#$BIN_PATH/bitstar_journal_random_single -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
+$BIN_PATH/bitstar_journal_random_single -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
 #$BIN_PATH/bitstar_journal_random_single -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
 #$BIN_PATH/bitstar_journal_random_single -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
 #$BIN_PATH/bitstar_journal_random_single -r 8 -s $R8_STEER -e $NUM_EXP -t $R8_TIME -i $R8_LOG_INTERVAL
