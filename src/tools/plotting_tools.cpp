@@ -395,7 +395,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                     mfile << "    for  i = 1:size(xstarts,2)" << std::endl;
                     mfile << "        for  j = 1:size(xgoals,2)" << std::endl;
                     mfile << "            S = ellipseMatrix(xstarts(:,i), xgoals(:,j), queueValue, true);" << std::endl;
-                    mfile << "            plotEllipseMatrix(S, 0.5.*(xstarts(:,i) + xgoals(:,j)), 100);" << std::endl;
+                    mfile << "            plotEllipseMatrix(S, 0.5.*(xstarts(:,i) + xgoals(:,j)), 100, queueEllipseStyle, 3, queueEllipseColour);" << std::endl;
                     mfile << "        end" << std::endl;
                     mfile << "    end" << std::endl;
                     mfile << "end" << std::endl;
@@ -547,7 +547,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                     mfile << "    for  i = 1:size(xstarts,2)" << std::endl;
                     mfile << "        for  j = 1:size(xgoals,2)" << std::endl;
                     mfile << "            S = ellipseMatrix(xstarts(:,i), xgoals(:,j), solnCost, true);" << std::endl;
-                    mfile << "            plotEllipseMatrix(S, 0.5.*(xstarts(:,i) + xgoals(:,j)), 100, '-.', 3, k);" << std::endl;
+                    mfile << "            plotEllipseMatrix(S, 0.5.*(xstarts(:,i) + xgoals(:,j)), 100, worldEllipseStyle, 3, worldEllipseColour);" << std::endl;
                     mfile << "        end" << std::endl;
                     mfile << "    end" << std::endl;
                     mfile << "end" << std::endl;
