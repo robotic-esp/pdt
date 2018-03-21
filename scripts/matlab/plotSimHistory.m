@@ -1,9 +1,9 @@
-function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, plannerNames, plannerColours, plannerLines, plotTime, ignorePlanners, useMedian, unsolvedNan, plotInfiniteCI, yLimMargin)
+function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, plannerNames, plannerColours, plannerLines, plotTime, ignorePlanners, useMedian, unsolvedNan, plotFailures, plotInfiniteCI, yLimMargin)
     %interpPlannerData is :  numPlanners x 2 (time, cost) x numExperiments x interpolatedTimeSteps
     %unsolvedNan = false treates unsolved as having infinite cost and
     %calculates the median appropriately.
     
-    if (nargin ~= 10)
+    if (nargin ~= 11)
         error ('ASRL:plotSimHistory', 'The function signature of plotSimHistory has changed.')
     end
     
@@ -138,7 +138,7 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
             thisCost(isinf(thisCost)) = nan;
         end
         
-        if plotPlanners(i) == true && sum(sum(isfinite(thisCost))) > 0 && sum(sum(isfinite(thisTime))) > 0
+        if plotPlanners(i) == true && (plotFailures || (sum(sum(isfinite(thisCost))) > 0 && sum(sum(isfinite(thisTime))) > 0))
 
             %Calculate if this is scalar:
             isScalar = sum(sum(isfinite(thisTime))) == size(thisTime,1);

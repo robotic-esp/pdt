@@ -27,7 +27,7 @@ function interpPlannerData = processSimHistory(filename, numExperiments, maxTime
     numPlanners = numTotalRows/numExperiments;
     
     if (mod(numTotalRows,numExperiments) ~= 0)
-        error('Calculated a noninteger number of planner');
+        error('Calculated a noninteger number of planners. The specified number of experiments or planners may been incorrect.');
     end
 
     %Allocate the plannerdata as planner x {time,cost} x iteration

@@ -390,10 +390,11 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                     //Annotate
                     mfile << "%%%%%% Queue ellipses %%%%%%" << std::endl;
 
+                    mfile << "queueValue = " << planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value() << ";" << std::endl;
                     mfile << "if plotBitStarQueueEllipse" << std::endl;
                     mfile << "    for  i = 1:size(xstarts,2)" << std::endl;
                     mfile << "        for  j = 1:size(xgoals,2)" << std::endl;
-                    mfile << "            S = ellipseMatrix(xstarts(:,i), xgoals(:,j)," << planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value() << ", true);" << std::endl;
+                    mfile << "            S = ellipseMatrix(xstarts(:,i), xgoals(:,j), queueValue, true);" << std::endl;
                     mfile << "            plotEllipseMatrix(S, 0.5.*(xstarts(:,i) + xgoals(:,j)), 100);" << std::endl;
                     mfile << "        end" << std::endl;
                     mfile << "    end" << std::endl;
@@ -420,7 +421,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                 //Append the queue value to the xlabel if plotting ellipse or edge
                 if (std::isfinite(planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value()))
                 {
-                    mfile << "xLabelText = [xLabelText ' q=' num2str(" << planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value() << ", '%.6f')];" << std::endl;
+                    mfile << "xLabelText = [xLabelText ' q=' num2str(queueValue, '%.6f')];" << std::endl;
                 }
             }
 //            else if (plannerType == PLANNER_HYBRID_BITSTAR)
@@ -522,6 +523,19 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 //                }
 //            }
 
+            //Info about the solution
+            mfile << "%%%%%% Solution %%%%%%" << std::endl;
+            if (pdef->hasExactSolution() == true)
+            {
+                mfile << "solnCost = " << pdef->getSolutionPath()->cost(opt).value() << ";" << std::endl;
+            }
+            else
+            {
+                mfile << "solnCost = inf;" << std::endl;
+            }
+            mfile << "xLabelText = [xLabelText ' c=' num2str(solnCost, '%.6f')];" << std::endl;
+
+
             if (plannerType == PLANNER_RRTSTAR_INFORMED || plannerType == PLANNER_SORRTSTAR || plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_HYBRID_BITSTAR || plannerType == PLANNER_DUALTREE_BITSTAR)
             {
                 if (pdef->hasExactSolution() == true)
@@ -532,7 +546,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                     mfile << "if plotInformedEllipse" << std::endl;
                     mfile << "    for  i = 1:size(xstarts,2)" << std::endl;
                     mfile << "        for  j = 1:size(xgoals,2)" << std::endl;
-                    mfile << "            S = ellipseMatrix(xstarts(:,i), xgoals(:,j)," << pdef->getSolutionPath()->cost(opt).value() << ", true);" << std::endl;
+                    mfile << "            S = ellipseMatrix(xstarts(:,i), xgoals(:,j), solnCost, true);" << std::endl;
                     mfile << "            plotEllipseMatrix(S, 0.5.*(xstarts(:,i) + xgoals(:,j)), 100, '-.', 3, k);" << std::endl;
                     mfile << "        end" << std::endl;
                     mfile << "    end" << std::endl;
@@ -546,7 +560,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                 std::vector<ompl::base::State*> path;
 
                 //Annotate:
-                mfile << "%%%%%% The solution %%%%%%" << std::endl;
+                mfile << "%%%%%% The solution path %%%%%%" << std::endl;
 
                 path = pdef->getSolutionPath()->as<ompl::geometric::PathGeometric>()->getStates();
 
@@ -554,10 +568,10 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                 {
                     mfile << plotEdge(experiment, path.at(i - 1u), path.at(i), "solnColour", "solnStyle", "solnWeight");
                 }
-                mfile << "xLabelText = [xLabelText ' c=' num2str(" << pdef->getSolutionPath()->cost(opt).value() << ", '%.6f')];" << std::endl;
             }
         }
 
+        mfile << "%%%%%% Plot config %%%%%%" << std::endl;
         mfile << "xlabel(xLabelText);" << std::endl;
         mfile << "title(titleText);" << std::endl;
 
