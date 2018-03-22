@@ -172,9 +172,9 @@ std::string BaseExperiment::mfileHeader(bool monochrome) const
     rval << "o = [0.8500 0.3250 0.0980]; %2" << std::endl;
     rval << "w = [1 1 1];" << std::endl;
     rval << "k = [0 0 0];" << std::endl;
-    rval << "gray3 = [0.7 0.7 0.7];" << std::endl;
-    rval << "gray5 = [0.5 0.5 0.5];" << std::endl;
-    rval << "gray7 = [0.3 0.3 0.3];" << std::endl;
+    rval << "gray30 = [0.7 0.7 0.7];" << std::endl;
+    rval << "gray50 = [0.5 0.5 0.5];" << std::endl;
+    rval << "gray70 = [0.3 0.3 0.3];" << std::endl;
     if (monochrome == false)
     {
         rval << "startColour = g;" << std::endl;

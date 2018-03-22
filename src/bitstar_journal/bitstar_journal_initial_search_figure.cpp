@@ -396,6 +396,7 @@ int main(int argc, char **argv)
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
     plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 3u)); //Abuse number of samples as the variant number
     plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, BITSTAR_BATCH_SIZE));
+    plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, BITSTAR_BATCH_SIZE));
     plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
 
     //Create one experiment for all runs:
