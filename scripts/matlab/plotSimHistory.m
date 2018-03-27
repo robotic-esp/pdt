@@ -482,10 +482,10 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
         %Set the legends:
         if handles(i) == succHandl
             lHandle = legend(succHandles(plotPlanners), plannerNames(plotPlanners));
-%            lHandle = gridLegend(succHandles(plotPlanners), 3, plannerNames(plotPlanners), 'FontSize', legendFontSize, 'Interpreter', 'latex', 'Orientation', 'Horizontal', 'Location', 'SouthOutside');
+%            lHandle = gridLegend(succHandles(plotPlanners), 5, plannerNames(plotPlanners), 'FontSize', legendFontSize, 'Interpreter', 'latex', 'Orientation', 'Horizontal', 'Location', 'SouthOutside');
         elseif handles(i) == histHandl
             lHandle = legend(histHandles(plotPlanners), plannerNames(plotPlanners));
-%            lHandle = gridLegend(histHandles(plotPlanners), 3, plannerNames(plotPlanners), 'FontSize', legendFontSize, 'Interpreter', 'latex', 'Orientation', 'Horizontal', 'Location', 'SouthOutside');
+%            lHandle = gridLegend(histHandles(plotPlanners), 5, plannerNames(plotPlanners), 'FontSize', legendFontSize, 'Interpreter', 'latex', 'Orientation', 'Horizontal', 'Location', 'SouthOutside');
         else
             
             error('Unacceptable handle')

@@ -55,7 +55,9 @@ function makeHistoryPlots(R)
         plotTime = 1.0;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439041935127984148DblEncl'};
+        filenames = {'R2S18439042441715202437RRTsharpResponse1';
+                     'R2S18439042442492754539RRTsharpResponse2';
+                     'R2S18439042443237617086DblEncl'};
 
         figures = {};
 
@@ -81,7 +83,7 @@ function makeHistoryPlots(R)
         plotTime = 10;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R4S18439041935868477269DblEncl'};
+        filenames = {'R4S18439042443978464433DblEncl'};
 
         figures = {};
 
@@ -108,7 +110,7 @@ function makeHistoryPlots(R)
         plotTime = 30;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439041942918603405DblEncl'};
+        filenames = {'R8S18439042451026357679DblEncl'};
 
         figures = {};
 
@@ -135,14 +137,16 @@ function makeHistoryPlots(R)
         plotTime = 1.0;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439039985805592473RandRect';
-                     'R2S18439039986363589420RandRect';
-                     'R2S18439039986928702695RandRect';
-                     'R2S18439039987491435433RandRect';
-                     'R2S18439039988056253719RandRect';
-                     'R2S18439039988612206970RandRect';
-                     'R2S18439039989177777565RandRect';
-                     'R2S18439039989734726635RandRect'};
+        filenames = {'R2S18439042518466759363RandRect';
+                     'R2S18439042519024417213RandRect';
+                     'R2S18439042519586803738RandRect';
+                     'R2S18439042520145428827RandRect';
+                     'R2S18439042520709017768RandRect';
+                     'R2S18439042521273024586RandRect';
+                     'R2S18439042521839509649RandRect';
+                     'R2S18439042522404160047RandRect';
+                     'R2S18439042522968105186RandRect';
+                     'R2S18439042523531449764RandRect'};
 
         figures = {};
 
@@ -196,14 +200,16 @@ function makeHistoryPlots(R)
         plotTime = 10;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R4S18439040136519923873RandRect';
-                     'R4S18439040142447562849RandRect';
-                     'R4S18439040148381625485RandRect';
-                     'R4S18439040154299666715RandRect';
-                     'R4S18439040160265761812RandRect';
-                     'R4S18439040166048665873RandRect';
-                     'R4S18439040172100750621RandRect';
-                     'R4S18439040177923813149RandRect'};
+        filenames = {'R4S18439042524097082794RandRect';
+                     'R4S18439042529970181147RandRect';
+                     'R4S18439042535910568965RandRect';
+                     'R4S18439042541803537546RandRect';
+                     'R4S18439042547670616412RandRect';
+                     'R4S18439042553637184069RandRect';
+                     'R4S18439042559574700751RandRect';
+                     'R4S18439042565496571016RandRect';
+                     'R4S18439042571460205512RandRect';
+                     'R4S18439042577288193012RandRect'};
 
         figures = {};
 
@@ -259,7 +265,9 @@ function makeHistoryPlots(R)
         plotTime = 30;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439040357818370309RandRect'};
+        filenames = {'R8S18439042583183169937RandRect';
+                     'R8S18439042601745213635RandRect';
+                     'R8S18439042620607856931RandRect'};
 
         figures = {};
 
@@ -314,8 +322,7 @@ function makeHistoryPlots(R)
         plotTime = 100;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R16S18439040010558288241RegularRects';
-                     'R16S18439040071998264653RandRect'};
+        filenames = {'R16S18439042639068580734RandRect'};
 
         figures = {};
 
