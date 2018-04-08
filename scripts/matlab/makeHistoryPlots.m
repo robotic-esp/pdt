@@ -175,7 +175,8 @@ function makeHistoryPlots(R)
         plotTime = 1.0;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439041981077254091DblEncl'};
+        filenames = {'R2S18439041981077254091DblEncl';
+                     'R2S18439042010624099317RegularRects'};
 
         figures = {};
 
@@ -184,8 +185,8 @@ function makeHistoryPlots(R)
                     'BITstar10',          'BIT* (10)'     o, '-';
                     'BITstar50',          'BIT* (50)'     y, '-';
                     'BITstar100',         'BIT* (100)'    g, '-';
-                    'BITstar500',         'BIT* (500)'    b, '-';
-                    'BITstar1000',        'BIT* (1000)'   c, '-';
+                    'BITstar500',         'BIT* (500)'    c, '-';
+                    'BITstar1000',        'BIT* (1000)'   b, '-';
                     'BITstar5000',        'BIT* (5000)'   p, '-';};
 
         ignorePlanners = {'DELETEME'};   
@@ -238,7 +239,8 @@ function makeHistoryPlots(R)
         plotTime = 10;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R4S18439042011367949599RegularRects'};
+        filenames = {'R4S18439041981805099620DblEncl';
+                     'R4S18439042011367949599RegularRects'};
 
         figures = {};
 
@@ -247,8 +249,8 @@ function makeHistoryPlots(R)
                     'BITstar10',          'BIT* (10)'     o, '-';
                     'BITstar50',          'BIT* (50)'     y, '-';
                     'BITstar100',         'BIT* (100)'    g, '-';
-                    'BITstar500',         'BIT* (500)'    b, '-';
-                    'BITstar1000',        'BIT* (1000)'   c, '-';
+                    'BITstar500',         'BIT* (500)'    c, '-';
+                    'BITstar1000',        'BIT* (1000)'   b, '-';
                     'BITstar5000',        'BIT* (5000)'   p, '-';};
 
 
@@ -265,9 +267,9 @@ function makeHistoryPlots(R)
         plotTime = 30;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439042583183169937RandRect';
-                     'R8S18439042601745213635RandRect';
-                     'R8S18439042620607856931RandRect'};
+        filenames = {'R8S18439042822012678066RandRect';
+                     'R8S18439042840587660934RandRect';
+                     'R8S18439042859586030721RandRect'};
 
         figures = {};
 
@@ -296,7 +298,8 @@ function makeHistoryPlots(R)
         plotTime = 30;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439042018432131306RegularRects'};
+        filenames = {'R8S18439041988907160763DblEncl';
+                     'R8S18439042018432131306RegularRects'};
 
         figures = {};
 
@@ -305,10 +308,10 @@ function makeHistoryPlots(R)
                     'BITstar10',          'BIT* (10)'     o, '-';
                     'BITstar50',          'BIT* (50)'     y, '-';
                     'BITstar100',         'BIT* (100)'    g, '-';
-                    'BITstar500',         'BIT* (500)'    b, '-';
-                    'BITstar1000',        'BIT* (1000)'   c, '-';
+                    'BITstar500',         'BIT* (500)'    c, '-';
+                    'BITstar1000',        'BIT* (1000)'   b, '-';
                     'BITstar5000',        'BIT* (5000)'   p, '-';};
-
+                
         ignorePlanners = {'DELETEME'};
         
     elseif (R == 16)
@@ -322,7 +325,8 @@ function makeHistoryPlots(R)
         plotTime = 100;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R16S18439042639068580734RandRect'};
+        filenames = {'R16S18439042920907074439RandRect';
+                     'R16S18439042985727252476RandRect'};
 
         figures = {};
 
@@ -338,36 +342,7 @@ function makeHistoryPlots(R)
                     'SORRTstar100',         'SORRT*',         b, '-';
                     'BITstar100',           'BIT*',           g, '-';};
 
-        ignorePlanners = {'DELETEME'};   
-        
-    elseif (R == 16)
-        %Interp spacing (us):
-        interpTime = 1000*1e-6;
-        
-        %Number of experiments in each file:
-        numExp = 100;
-    
-        %The run time
-        plotTime = 100;
-
-        %Whether to plot CIs with an infinite range:
-        plotInfiniteCIs = true;
-
-        %The filesnames. Ommit the data/ and the .csv.
-        filenames = {''};
-
-        figures = {};
-
-        %The planner names (log and plot) and colours:
-        planners = {'BITstar5',           'BIT* (5)'      r, '-';
-                    'BITstar10',          'BIT* (10)'     o, '-';
-                    'BITstar50',          'BIT* (50)'     y, '-';
-                    'BITstar100',         'BIT* (100)'    g, '-';
-                    'BITstar500',         'BIT* (500)'    b, '-';
-                    'BITstar1000',        'BIT* (1000)'   c, '-';
-                    'BITstar5000',        'BIT* (5000)'   p, '-';};
-
-        ignorePlanners = {'DELETEME'};   
+        ignorePlanners = {'DELETEME'};
 
     elseif (R == 16.600)
         %Interp spacing (us):
