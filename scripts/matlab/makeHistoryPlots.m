@@ -325,8 +325,13 @@ function makeHistoryPlots(R)
         plotTime = 100;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R16S18439042920907074439RandRect';
-                     'R16S18439042985727252476RandRect'};
+        filenames = {'R16S18439043050149215929RandRect';
+                     'R16S18439043113440834383RandRect';
+                     'R16S18439043177570894870RandRect';
+                     'R16S18439043242343379133RandRect';
+                     'R16S18439043305624313035RandRect';
+                     'R16S18439043370829349683RandRect';
+                     'R16S18439043435870313265RandRect'};
 
         figures = {};
 
@@ -344,7 +349,7 @@ function makeHistoryPlots(R)
 
         ignorePlanners = {'DELETEME'};
 
-    elseif (R == 16.600)
+    elseif (R == 16.1000)
         %Interp spacing (us):
         interpTime = 2000*1e-6;
         
@@ -352,10 +357,13 @@ function makeHistoryPlots(R)
         numExp = 100;
 
         %The run time
-        plotTime = 600;
+        plotTime = 1000;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R16S18439041381914166517DblEncl'};
+        filenames = {'R16S18439043871333544029DblEncl'};
+        
+        %Force infinte CIs
+        plotInfiniteCIs = true;
 
         figures = {};
 
