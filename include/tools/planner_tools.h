@@ -10,6 +10,12 @@
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 
+#define BITSTAR_REGRESSION 1
+
+#ifdef BITSTAR_REGRESSION
+#include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
+#endif // BITSTAR_REGRESSION
+
 // Compile hooks for a planner called BITstarRegression:
 //#define BITSTAR_REGRESSION
 
@@ -27,10 +33,6 @@ sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regressi
 cd src
 sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regression|g' -e 's|BITstar|BITstarRegression|g' *.cpp
 */
-
-#ifdef BITSTAR_REGRESSION
-#include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
-#endif  // BITSTAR_REGRESSION
 
 
 enum PlannerType
@@ -54,7 +56,9 @@ enum PlannerType
     PLANNER_DUALTREE_BITSTAR,
     PLANNER_RRTSTAR_SEED,
     PLANNER_BITSTAR_SEED,
-    PLANNER_REGRESSION_BITSTAR,
+#ifdef BITSTAR_REGRESSION
+    PLANNER_BITSTAR_REGRESSION
+#endif
 };
 
 /** \brief Allocation function for RRT */
@@ -79,12 +83,12 @@ std::shared_ptr<ompl::geometric::SORRTstar> allocateSorrtStar(const ompl::base::
 std::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics);
 
 /** \brief Allocation function for BIT* */
-std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double weight = 1.0, const bool adapt = false);
+std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double initialInflationFactor, const double initialTruncationFactor, const double inflationFactorStep, const double truncationFactorStep);
 
 #ifdef BITSTAR_REGRESSION
 /** \brief Allocation function for a regression testing BIT* */
-std::shared_ptr<ompl::geometric::BITstarRegression> allocateBitStarRegression(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double weight = 1.0, const bool adapt = false);
-#endif  // BITSTAR_REGRESSION
+std::shared_ptr<ompl::geometric::BITstarRegression> allocateBitStarRegression(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches);
+#endif // BITSTAR_REGRESSION
 
 /** \brief Return true if the planner is any of the RRT types */
 bool isRrt(PlannerType plnrType);
