@@ -243,7 +243,7 @@ int main(int argc, char **argv)
                     passElements.push_back(std::make_shared<TestElement> (++id));
 
                     //Put data in the element
-                    rng.uniformNormalVector(N, &passElements.back()->data_[0]);
+                    rng.uniformNormalVector(passElements.back()->data_);
                 }
                 //No else, allocated earlier
 

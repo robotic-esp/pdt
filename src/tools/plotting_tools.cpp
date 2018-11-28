@@ -174,7 +174,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 
                 //Annotate:
                 mfile << "%%%%%% Queue edges %%%%%%" << std::endl;
-                #warning "ABIT* support disabled here"
+                // #warning "ABIT* support disabled here"
 //                mfile << "heuristicWeight = " << planner->as<ompl::geometric::BITstar>()->getSearchWeight() << ";" << std::endl;
 //                mfile << "if heuristicWeight > 1" << std::endl;
 //                mfile << "    titleText = [titleText ' (' num2str(heuristicWeight) ')'];" << std::endl;
