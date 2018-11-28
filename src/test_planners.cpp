@@ -66,7 +66,6 @@
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
-//#include <ompl/geometric/planners/bitstar/HybridBITstar.h>
 #include "ompl/base/objectives/PathLengthOptimizationObjective.h"
 //#include <ompl/tools/benchmark/Benchmark.h>
 #include "ompl/util/Console.h" //For OMPL_INFORM et al.
@@ -105,19 +104,10 @@ const bool BITSTAR_STRICT_QUEUE = true;
 const bool BITSTAR_DELAY_REWIRE = false;
 const bool BITSTAR_JIT = false;
 const bool BITSTAR_DROP_BATCH = false;
-const double ABITSTAR_WEIGHT = 100000.0;
-const bool ABITSTAR_ADAPT = true;
-
-//Hybrid BIT*
-const unsigned int numShortcuts = 25u;
-const unsigned int numShortcutFailures = 5u;
-const double shortcutWidth = 0.5;
-const double shortcutTol = 0.001;
-const double interpTol = 0.1;
-
-//ICRA16:
-const bool shareInfo = true;
-const bool parallelQueues = true;
+const double ABITSTAR_INITIAL_INFLATION_FACTOR = 3.0;
+const double ABITSTAR_INITIAL_TRUNCATION_FACTOR = 3.0;
+const double ABITSTAR_INFLATION_FACTOR_STEP = 0.1;
+const double ABITSTAR_TRUNCATION_FACTOR_STEP = 0.1;
 
 //Others:
 const double GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
@@ -282,37 +272,6 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
     return true;
 }
 
-//Allocate Hybrid BIT*
-//ompl::base::PlannerPtr allocateHybridBitStar(const ompl::base::SpaceInformationPtr& /*si*/, unsigned int /*numSamples*/)
-//{
-//    OMPL_ERROR("Hybrid BIT* is not implemented in this branch."); return ompl::base::PlannerPtr();
-//    std::stringstream plannerName;
-//
-//    plannerName << "HybridBITstar" << numSamples;
-//
-//    //Create a BIT* planner
-//    ompl::base::PlannerPtr base = std::make_shared<ompl::geometric::HybridBITstar>(si);
-//
-//    //Configure it
-//    //BIT* settings:
-//    base->as<ompl::geometric::HybridBITstar>()->setRewireFactor(BITSTAR_REWIRE_SCALE);
-//    base->as<ompl::geometric::HybridBITstar>()->setSamplesPerBatch(numSamples);
-//    base->as<ompl::geometric::HybridBITstar>()->setKNearest(BITSTAR_K_NEAREST);
-//    base->as<ompl::geometric::HybridBITstar>()->setStrictQueueOrdering(BITSTAR_STRICT_QUEUE);
-//    base->as<ompl::geometric::HybridBITstar>()->setPruning(BITSTAR_PRUNE);
-//    base->as<ompl::geometric::HybridBITstar>()->setPruneThresholdFraction(PRUNE_FRACTION);
-//    //Hybrid BIT* settings:
-//    base->as<ompl::geometric::HybridBITstar>()->setMaxNumberOfLocalIterations(numShortcuts);
-//    base->as<ompl::geometric::HybridBITstar>()->setMaxNumberofLocalFailures(numShortcutFailures);
-//    base->as<ompl::geometric::HybridBITstar>()->setShortcutWindowFraction(shortcutWidth);
-//    base->as<ompl::geometric::HybridBITstar>()->setShortcutTolerance(shortcutTol);
-//    base->as<ompl::geometric::HybridBITstar>()->setInterpolationTolerance(interpTol);
-//    base->setName(plannerName.str());
-//
-//    //Return
-//    return base;
-//}
-
 ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExperimentPtr& expDefn, const double steerEta, const unsigned int numSamples)
 {
     //Variables
@@ -365,18 +324,18 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
         }
         case PLANNER_BITSTAR:
         {
-            plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH, 1.0, false);
+          plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH, 1.0, 1.0, 0.1, 0.1);
             break;
         }
         case PLANNER_ABITSTAR:
         {
-            plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH, ABITSTAR_WEIGHT, ABITSTAR_ADAPT);
+          plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH, ABITSTAR_INITIAL_INFLATION_FACTOR, ABITSTAR_INITIAL_TRUNCATION_FACTOR, ABITSTAR_INFLATION_FACTOR_STEP, ABITSTAR_TRUNCATION_FACTOR_STEP);
             break;
         }
 #ifdef BITSTAR_REGRESSION
-        case PLANNER_REGRESSION_BITSTAR:
+        case PLANNER_BITSTAR_REGRESSION:
         {
-            plnr = allocateBitStarRegression(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH, 1.0, false);
+            plnr = allocateBitStarRegression(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH);
             break;
         }
 #endif  // BITSTAR_REGRESSION
@@ -492,37 +451,33 @@ int main(int argc, char **argv)
         std::vector<std::pair<PlannerType, unsigned int> > plannersToTest;
 
         //Add the planners to test. Be careful, too large of FMT batch size (i.e., ~100000u) fucks up wall time of other planners
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-//        plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
         plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
         plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
         plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 0u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
         plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP_INFORMED, 0u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 1u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
         plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP_INFORMED, 1u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 2u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP_INFORMED, 2u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 3u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP_INFORMED, 3u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
-//        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
-//        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
-//        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
-//        plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
-//        plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, BITSTAR_BATCH_SIZE));
-//        plannersToTest.push_back(std::make_pair(PLANNER_REGRESSION_BITSTAR, BITSTAR_BATCH_SIZE));
-//        plannersToTest.push_back(std::make_pair(PLANNER_REGRESSION_BITSTAR, BITSTAR_BATCH_SIZE));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 2u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP_INFORMED, 2u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 3u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP_INFORMED, 3u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, BITSTAR_BATCH_SIZE));
+        // plannersToTest.push_back(std::make_pair(PLANNER_REGRESSION_BITSTAR, BITSTAR_BATCH_SIZE));
+        // plannersToTest.push_back(std::make_pair(PLANNER_REGRESSION_BITSTAR, BITSTAR_BATCH_SIZE));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
         plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
-//        plannersToTest.push_back(std::make_pair(PLANNER_ABITSTAR, BITSTAR_BATCH_SIZE));
+        // plannersToTest.push_back(std::make_pair(PLANNER_ABITSTAR, BITSTAR_BATCH_SIZE));
 
         if (q == 0u)
         {
@@ -655,7 +610,7 @@ int main(int argc, char **argv)
                         }
                     }
 #ifdef BITSTAR_REGRESSION
-                    else if (plannersToTest.at(i).first == PLANNER_REGRESSION_BITSTAR)
+                    else if (plannersToTest.at(i).first == PLANNER_BITSTAR_REGRESSION)
                     {
                         if (LOG_ITERATIONS_AND_COST == true)
                         {

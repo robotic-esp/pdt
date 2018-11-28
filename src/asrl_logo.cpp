@@ -229,7 +229,7 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
         }
         case PLANNER_BITSTAR:
         {
-            return allocateBitStar(expDefn->getSpaceInformation(), K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCHES);
+          return allocateBitStar(expDefn->getSpaceInformation(), K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCHES, 1.0, 1.0, 0.1, 0.1);
             break;
         }
         default:
