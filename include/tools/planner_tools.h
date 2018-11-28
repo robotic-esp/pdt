@@ -1,3 +1,6 @@
+#ifndef ESP_OMPL_TOOLS_PLANNER_TOOLS_
+#define ESP_OMPL_TOOLS_PLANNER_TOOLS_
+
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
@@ -97,3 +100,5 @@ bool isBitStar(PlannerType plnrType);
 
 /** \brief Convert a planner enum into a planner name */
 std::string plannerName(PlannerType plnrType);
+
+#endif // ESP_OMPL_TOOLS_PLANNER_TOOLS_
