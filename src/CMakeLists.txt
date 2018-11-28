@@ -5,7 +5,6 @@ add_subdirectory( tools )
 add_subdirectory( bitstar_journal )
 add_subdirectory( informed_journal )
 
-
 # Executables
 add_executable(learn_binary_heap
   learn_binary_heap.cpp
@@ -16,7 +15,6 @@ target_link_libraries(learn_binary_heap
   ${OMPL_LIBRARIES}
 )
 
-
 add_executable(test_nn
   test_nn.cpp
 )
@@ -25,7 +23,6 @@ target_link_libraries(test_nn
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
 )
-
 
 add_executable(test_sampling
   test_sampling.cpp
@@ -36,7 +33,6 @@ target_link_libraries(test_sampling
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
 )
-
 
 add_executable(test_planners
   test_planners.cpp
@@ -50,6 +46,17 @@ target_link_libraries(test_planners
   ${OMPL_LIBRARIES}
 )
 
+add_executable(test_abitstar
+  test_abitstar.cpp
+)
+target_link_libraries(test_abitstar
+  obstacles
+  experiments
+  ompl_tools
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
 
 add_executable(test_multigoal
   test_multigoal.cpp
@@ -63,7 +70,6 @@ target_link_libraries(test_multigoal
   ${OMPL_LIBRARIES}
 )
 
-
 add_executable(time_prune
   time_prune.cpp
 )
@@ -75,7 +81,6 @@ target_link_libraries(time_prune
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
 )
-
 
 add_executable(asrl_logo
   asrl_logo.cpp
