@@ -44,6 +44,9 @@
 #include <utility>
 #include <memory>
 
+// Boost
+#include <boost/noncopyable.hpp>
+
 //OMPL:
 #include "ompl/base/SpaceInformation.h"
 #include "ompl/base/ProblemDefinition.h"
