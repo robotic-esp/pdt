@@ -348,7 +348,7 @@ int main(int argc, char **argv)
         std::vector<std::pair<PlannerType, ompl::base::PlannerPtr> > plannersToTest;
 
         //Add the planners to test:
-        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), kNearestBIT, rewireFactorBIT, bitStarSamples, pruneFraction, strictQueue, delayRewire, jit, dropBatches) ) );
+        plannersToTest.push_back( std::make_pair(PLANNER_BITSTAR, allocateBitStar(expDefn->getSpaceInformation(), kNearestBIT, rewireFactorBIT, bitStarSamples, pruneFraction, strictQueue, delayRewire, jit, dropBatches, 1.0, 1.0, 0.1, 0.1) ) );
 
         if (q == 0u)
         {
