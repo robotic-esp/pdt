@@ -4,6 +4,8 @@
 //For std::make_shared
 #include <memory>
 
+// #define BITSTAR_REGRESSION 1
+
 std::shared_ptr<ompl::geometric::RRT> allocateRrt(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias)
 {
     //Create a RRT planner
@@ -172,7 +174,7 @@ std::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInf
     return plnr;
 }
 
-std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double weight /*= 1.0*/, const bool adapt /*= false*/)
+std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double initialInflationFactor, const double initialTruncationFactor, const double inflationFactorStep, const double truncationFactorStep)
 {
     //Create a BIT* planner
     std::shared_ptr<ompl::geometric::BITstar> plnr = std::make_shared<ompl::geometric::BITstar>(si);
@@ -189,14 +191,10 @@ std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::Spac
     plnr->setDropSamplesOnPrune(refreshBatches);
     plnr->setStopOnSolnImprovement(false);
     plnr->setConsiderApproximateSolutions(false);
-    #warning "ABIT* support disabled here"
-    //plnr->setSearchWeight(weight);
-    //plnr->setAdaptWeight(adapt);
-
-    if (weight != 1 || adapt == true)
-    {
-        throw ompl::Exception("ABIT* has been disabled in this code.");
-    }
+    plnr->setInitialInflationFactor(initialInflationFactor);
+    plnr->setInitialTruncationFactor(initialTruncationFactor);
+    plnr->setInflationFactorStep(inflationFactorStep);
+    plnr->setTruncationFactorStep(truncationFactorStep);
 
     std::stringstream plannerName;
     if (delayRewire == true)
@@ -219,7 +217,7 @@ std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::Spac
     {
         plannerName << "l";
     }
-    if (weight > 1.0)
+    if (initialInflationFactor > 1.0 || initialTruncationFactor > 1.0)
     {
         plannerName << "A";
     }
@@ -231,7 +229,7 @@ std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::Spac
 }
 
 #ifdef BITSTAR_REGRESSION
-std::shared_ptr<ompl::geometric::BITstarRegression> allocateBitStarRegression(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double weight /*= 1.0*/, const bool adapt /*= false*/)
+std::shared_ptr<ompl::geometric::BITstarRegression> allocateBitStarRegression(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches)
 {
     //Create a BIT* planner
     std::shared_ptr<ompl::geometric::BITstarRegression> plnr = std::make_shared<ompl::geometric::BITstarRegression>(si);
@@ -248,14 +246,6 @@ std::shared_ptr<ompl::geometric::BITstarRegression> allocateBitStarRegression(co
     plnr->setDropSamplesOnPrune(refreshBatches);
     plnr->setStopOnSolnImprovement(false);
     plnr->setConsiderApproximateSolutions(false);
-    #warning "ABIT* support disabled here"
-    //plnr->setSearchWeight(weight);
-    //plnr->setAdaptWeight(adapt);
-
-    if (weight != 1 || adapt == true)
-    {
-        throw ompl::Exception("ABIT* has been disabled in this code.");
-    }
 
     std::stringstream plannerName;
     if (delayRewire == true)
@@ -277,10 +267,6 @@ std::shared_ptr<ompl::geometric::BITstarRegression> allocateBitStarRegression(co
     if (strictQueue == false)
     {
         plannerName << "l";
-    }
-    if (weight > 1.0)
-    {
-        plannerName << "A";
     }
     plannerName << "BITstarRegression" << numSamples;
     plnr->setName(plannerName.str());
@@ -392,11 +378,13 @@ std::string plannerName(PlannerType plnrType)
             return "BITstar";
             break;
         }
-        case PLANNER_REGRESSION_BITSTAR:
+#ifdef BITSTAR_REGRESSION
+        case PLANNER_BITSTAR_REGRESSION:
         {
-            return "BITstarRegress";
+            return "BITstarRegression";
             break;
         }
+#endif // BITSTAR_REGRESSION
         case PLANNER_ABITSTAR:
         {
             return "ABITstar";
