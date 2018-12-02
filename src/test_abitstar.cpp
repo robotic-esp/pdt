@@ -106,9 +106,9 @@ const bool BITSTAR_JIT = false;
 const bool BITSTAR_DROP_BATCH = false;
 
 // ABIT*
-const double ABITSTAR_INITIAL_INFLATION_FACTOR = 1.2;
+const double ABITSTAR_INITIAL_INFLATION_FACTOR = 10;
 const double ABITSTAR_INITIAL_TRUNCATION_FACTOR = 1.0;
-const double ABITSTAR_INFLATION_FACTOR_STEP = 0.1;
+const double ABITSTAR_INFLATION_FACTOR_STEP = 10;
 const double ABITSTAR_TRUNCATION_FACTOR_STEP = 0.1;
 
 //Plotting:
@@ -354,10 +354,10 @@ int main(int argc, char **argv)
     // BaseExperimentPtr expDefn = std::make_shared<DeadEndExperiment>(0.4, targetTime, CHECK_RESOLUTION);
     // BaseExperimentPtr expDefn = std::make_shared<SpiralExperiment>(0.4, targetTime, CHECK_RESOLUTION);
     // BaseExperimentPtr expDefn = std::make_shared<WallGapExperiment>(N, false, 0.05, targetTime, CHECK_RESOLUTION);
-    BaseExperimentPtr expDefn = std::make_shared<FlankingGapExperiment>(false, 0.05, targetTime, CHECK_RESOLUTION);
+    // BaseExperimentPtr expDefn = std::make_shared<FlankingGapExperiment>(false, 0.05, targetTime, CHECK_RESOLUTION);
     // BaseExperimentPtr expDefn = std::make_shared<RandomRectanglesExperiment>(N, numObs, obsRatio, targetTime, CHECK_RESOLUTION);
     // BaseExperimentPtr expDefn = std::make_shared<RegularRectanglesExperiment>(N, 4.0, 5, targetTime, CHECK_RESOLUTION);
-    // BaseExperimentPtr expDefn = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.8, targetTime, CHECK_RESOLUTION); //worldHalfWidth, insideWidth, wallThickness, gapWidth. Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
+    BaseExperimentPtr expDefn = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.8, targetTime, CHECK_RESOLUTION); //worldHalfWidth, insideWidth, wallThickness, gapWidth. Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
 
     if (INITIAL_SOLN_ONLY == true)
     {
@@ -380,7 +380,7 @@ int main(int argc, char **argv)
         std::vector<std::pair<PlannerType, unsigned int> > plannersToTest;
 
         //Add the planners to test. Be careful, too large of FMT batch size (i.e., ~100000u) fucks up wall time of other planners
-        plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
+        // plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
         // plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR_REGRESSION, BITSTAR_BATCH_SIZE));
         plannersToTest.push_back(std::make_pair(PLANNER_ABITSTAR, BITSTAR_BATCH_SIZE));
 
@@ -589,7 +589,6 @@ int main(int argc, char **argv)
             else
             {
                 startTime = asrl::time::now();
-                //plnr->solve( expDefn->getTargetTime() - initTime );
                 plnr->solve( asrl::time::seconds(expDefn->getTargetTime() - initTime) );
                 runTime = initTime + (asrl::time::now() - startTime);
             }
