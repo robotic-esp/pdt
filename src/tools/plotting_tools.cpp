@@ -162,7 +162,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
             mfile << "%%%%%%PLANNER%%%%%%" << '\n';
             mfile << '\n';
             //If the planner is a BIT*, do some special stuff
-            if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED)
+            if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_ABITSTAR)
             {
                 //Full queue
                 //Variables
@@ -377,7 +377,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 //            }
 
             //If the planner is a BIT*, do some more special stuff
-            if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED)
+            if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_ABITSTAR)
             {
                 //Value of best edge as an ellipse:
                 if (std::isfinite(planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value()))
