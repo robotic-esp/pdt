@@ -20,9 +20,6 @@
 #include "ompl/base/OptimizationObjective.h"
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include "ompl/geometric/planners/bitstar/datastructures/Vertex.h"
-//#include <ompl/geometric/planners/bitstar/HybridBITstar.h>
-//#include <ompl/geometric/planners/bitstar/BITstarOld.h>
-//#include <ompl/geometric/planners/bitstar/ICRA16.h>
 #include <ompl/util/Exception.h>
 
 std::string plotVertex(BaseExperimentPtr experiment, const ompl::base::State* vertex, std::string vertexColour, std::string vertexSize)
@@ -131,26 +128,8 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
         //Create the helpers
         createMatlabHelpers(path);
 
-        //Announce:
-//        std::cout << "Creating m-file plot: " << fileName.str() << '\n';
-
         //Open the file with the name of the planner
         mfile.open(fileName.str().c_str());
-
-        //Create the matlab header:
-//        if (plannerType == PLANNER_HYBRID_BITSTAR)
-//        {
-//            if (bool(planner->as<ompl::geometric::HybridBITstar>()->getNextShortcut().get<0u>()) && bitStarNextEdge == true)
-//            {
-//                mfile << matlabGlobalHeader(planner->getName(), 0.80);
-//            }
-//            else
-//            {
-//                mfile << matlabGlobalHeader(planner->getName());
-//            }
-//        }
-//        else
-//        {
 
         //Write the experiment header as well as the extra information
         mfile << experiment->mfileHeader(monochrome);
@@ -183,198 +162,56 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                 }
                 mfile << "end" << '\n';
             }
-//            else if (plannerType == PLANNER_HYBRID_BITSTAR)
-//            {
-//                //Full queue
-//                //Variables
-//                //The vector of edges in the queue
-//                std::vector<std::pair<ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr> > queueEdges;
-//                //The vector of shortcuts in the queue:
-//                std::vector<std::tuple<ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr, ompl::geometric::HybridBITstar::VertexConstPtr> > queueShortcuts;
-//
-//                //Get the queue edges
-//                planner->as<ompl::geometric::HybridBITstar>()->getEdgeQueue(&queueEdges);
-//
-//                //Annotate:
-//                mfile << "%%%%%% Queue edges %%%%%%" << '\n';
-//                mfile << "if plotBitStarFullQueue" << '\n';
-//
-//                //Iterate over the list of edges, calling the edge-plot function:
-//                for (unsigned int i = 0u; i < queueEdges.size(); ++i)
-//                {
-//                    mfile << "    " << plotEdge(experiment, queueEdges.at(i).first->stateConst(), queueEdges.at(i).second->stateConst(), "queueColour", "queueStyle", "queueWeight");
-//                }
-//                mfile << "end" << '\n';
-//
-//                //Get the shortcut edges
-//                planner->as<ompl::geometric::HybridBITstar>()->getShortcutQueue(&queueShortcuts);
-//
-//                //Annotate:
-//                mfile << "%%%%%% Shortcut edges %%%%%%" << '\n';
-//                mfile << "if plotBitStarFullQueue" << '\n';
-//
-//                //Iterate over the list of shortcuts, calling the edge-plot function 3 times:
-//                for (unsigned int i = 0u; i < queueShortcuts.size(); ++i)
-//                {
-//                    mfile << "    "  << plotEdge(experiment, queueShortcuts.at(i).get<0u>()->stateConst(), queueShortcuts.at(i).get<1u>()->stateConst(), "queueColour", "queueStyle", "queueWeight");
-//                    mfile << "    "  << plotEdge(experiment, queueShortcuts.at(i).get<1u>()->stateConst(), queueShortcuts.at(i).get<2u>()->stateConst(), "queueColour", "queueStyle", "queueWeight");
-//                    mfile << "    "  << plotEdge(experiment, queueShortcuts.at(i).get<2u>()->stateConst(), queueShortcuts.at(i).get<3u>()->stateConst(), "queueColour", "queueStyle", "queueWeight");
-//                }
-//                mfile << "end" << '\n';
-//            }
-//            else if (plannerType == PLANNER_DUALTREE_BITSTAR)
-//            {
-//                //Full queue
-//                //Variables
-//                //The vector of edges in the queue
-//                std::vector<std::pair<ompl::geometric::ICRA16::MultigraphVertexConstPtr, ompl::geometric::ICRA16::MultigraphVertexConstPtr> > queueEdges;
-//
-//                //Get the queue edges
-//                for (unsigned int i = 0u; i < 2u; ++i)
-//                {
-//                    queueEdges.clear();
-//
-//                    planner->as<ompl::geometric::ICRA16>()->getSubEdgeQueue(i, &queueEdges);
-//
-//                    //Annotate:
-//                    mfile << "%%%%%% Queue " << i << " edges %%%%%%" << '\n';
-//                    mfile << "if plotBitStarFullQueue" << '\n';
-//
-//                    //Iterate over the list of edges, calling the edge-plot function:
-//                    for (unsigned int i = 0u; i < queueEdges.size(); ++i)
-//                    {
-//                        mfile << "    " << plotEdge(experiment, queueEdges.at(i).first->stateConst(), queueEdges.at(i).second->stateConst(), "queueColour", "queueStyle", "queueWeight");
-//                    }
-//                    mfile << "end" << '\n';
-//                }
-//            }
 
             //Annotate the mfile:
             mfile << "%%%%%% The graph %%%%%%" << '\n';
 
-//            if (plannerType == PLANNER_DUALTREE_BITSTAR)
-//            {
-//                //Get the start tree and then the goal tree
-//
-//                //Variables:
-//                //The planner data
-//                ompl::base::PlannerData startData(si);
-//                ompl::base::PlannerData goalData(si);
-//
-//
-//                //The goal tree:
-//                //Get the data to output the results:
-//                planner->as<ompl::geometric::ICRA16>()->getSubPlannerData(1u, goalData);
-//
-//                mfile << "%%%%%% Reverse tree %%%%%%" << '\n';
-//
-//                //Write the planner data to file:
-//                for (unsigned int i = 0u; i < goalData.numVertices(); ++i)
-//                {
-//                    //The vertex being processed:
-//                    ompl::base::PlannerDataVertex vertex = goalData.getVertex(i);
-//                    //The vector of parent ids
-//                    std::vector<unsigned int> parentIds;
-//
-//                    //Not all indexes exist I think?
-//                    if (vertex != ompl::base::PlannerData::NO_VERTEX)
-//                    {
-//                        //Print it's coordinates to file:
-//                        mfile << plotVertex(experiment, vertex.getState(), "vertexColour", "vertexSize");
-//
-//                        //Get it's incoming edge, if it has one:
-//                        if (goalData.getIncomingEdges(i, parentIds) > 0u)
-//                        {
-//                            //The parent of the vertex:
-//                            ompl::base::PlannerDataVertex parent = goalData.getVertex(parentIds.front());
-//
-//                             //Plot the edge:
-//                             mfile << plotEdge(experiment, parent.getState(), vertex.getState(), "goalEdgeColour", "edgeStyle", "edgeWeight");
-//                        }
-//                    }
-//                }
-//
-//                //The start tree:
-//                //Get the data to output the results:
-//                planner->as<ompl::geometric::ICRA16>()->getSubPlannerData(0u, startData);
-//
-//                mfile << "%%%%%% Forward tree %%%%%%" << '\n';
-//
-//                //Write the planner data to file:
-//                for (unsigned int i = 0u; i < startData.numVertices(); ++i)
-//                {
-//                    //The vertex being processed:
-//                    ompl::base::PlannerDataVertex vertex = startData.getVertex(i);
-//                    //The vector of parent ids
-//                    std::vector<unsigned int> parentIds;
-//
-//                    //Not all indexes exist I think?
-//                    if (vertex != ompl::base::PlannerData::NO_VERTEX)
-//                    {
-//                        //Print it's coordinates to file:
-//                        mfile << plotVertex(experiment, vertex.getState(), "vertexColour", "vertexSize");
-//
-//                        //Get it's incoming edge, if it has one:
-//                        if (startData.getIncomingEdges(i, parentIds) > 0u)
-//                        {
-//                            //The parent of the vertex:
-//                            ompl::base::PlannerDataVertex parent = startData.getVertex(parentIds.front());
-//
-//                             //Plot the edge:
-//                             mfile << plotEdge(experiment, parent.getState(), vertex.getState(), "startEdgeColour", "edgeStyle", "edgeWeight");
-//                        }
-//                    }
-//                }
-//            }
-//            else
-//            {
-                //The planner data
-                ompl::base::PlannerData pdata(si);
-                //Get the data to output the results:
-                planner->getPlannerData(pdata);
+            //The planner data
+            ompl::base::PlannerData pdata(si);
+            //Get the data to output the results:
+            planner->getPlannerData(pdata);
 
-                //Write the planner data to file. Vertices and edges separately:
-                //Vertices only
-                mfile << "%%%%%% Vertices %%%%%%" << '\n';
-                mfile << "if plotVertices" << '\n';
-                for (unsigned int i = 0u; i < pdata.numVertices(); ++i)
+            //Write the planner data to file. Vertices and edges separately:
+            //Vertices only
+            mfile << "%%%%%% Vertices %%%%%%" << '\n';
+            mfile << "if plotVertices" << '\n';
+            for (unsigned int i = 0u; i < pdata.numVertices(); ++i)
+            {
+                //The vertex being processed:
+                ompl::base::PlannerDataVertex vertex = pdata.getVertex(i);
+
+                //Not all indexes exist I think?
+                if (vertex != ompl::base::PlannerData::NO_VERTEX)
                 {
-                    //The vertex being processed:
-                    ompl::base::PlannerDataVertex vertex = pdata.getVertex(i);
+                    //Print it's coordinates to file:
+                    mfile << "    " << plotVertex(experiment, vertex.getState(), "vertexColour", "vertexSize");
+                }
+            }
+            mfile << "end" << '\n';
 
-                    //Not all indexes exist I think?
-                    if (vertex != ompl::base::PlannerData::NO_VERTEX)
+            //Edges only
+            mfile << "%%%%%% Edges %%%%%%" << '\n';
+            for (unsigned int i = 0u; i < pdata.numVertices(); ++i)
+            {
+                //The vertex being processed:
+                ompl::base::PlannerDataVertex vertex = pdata.getVertex(i);
+                //The vector of parent ids
+                std::vector<unsigned int> parentIds;
+
+                //Not all indexes exist I think?
+                if (vertex != ompl::base::PlannerData::NO_VERTEX)
+                {
+                    //Get it's incoming edge, if it has one:
+                    if (pdata.getIncomingEdges(i, parentIds) > 0u)
                     {
-                        //Print it's coordinates to file:
-                        mfile << "    " << plotVertex(experiment, vertex.getState(), "vertexColour", "vertexSize");
+                        //The parent of the vertex:
+                        ompl::base::PlannerDataVertex parent = pdata.getVertex(parentIds.front());
+
+                         //Plot the edge:
+                         mfile << plotEdge(experiment, parent.getState(), vertex.getState(), "startEdgeColour", "edgeStyle", "edgeWeight");
                     }
                 }
-                mfile << "end" << '\n';
-
-                //Edges only
-                mfile << "%%%%%% Edges %%%%%%" << '\n';
-                for (unsigned int i = 0u; i < pdata.numVertices(); ++i)
-                {
-                    //The vertex being processed:
-                    ompl::base::PlannerDataVertex vertex = pdata.getVertex(i);
-                    //The vector of parent ids
-                    std::vector<unsigned int> parentIds;
-
-                    //Not all indexes exist I think?
-                    if (vertex != ompl::base::PlannerData::NO_VERTEX)
-                    {
-                        //Get it's incoming edge, if it has one:
-                        if (pdata.getIncomingEdges(i, parentIds) > 0u)
-                        {
-                            //The parent of the vertex:
-                            ompl::base::PlannerDataVertex parent = pdata.getVertex(parentIds.front());
-
-                             //Plot the edge:
-                             mfile << plotEdge(experiment, parent.getState(), vertex.getState(), "startEdgeColour", "edgeStyle", "edgeWeight");
-                        }
-                    }
-                }
-//            }
+            }
 
             //If the planner is a BIT*, do some more special stuff
             if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_ABITSTAR)
@@ -419,104 +256,6 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                     mfile << "xLabelText = [xLabelText ' q=' num2str(queueValue, '%.6f')];" << '\n';
                 }
             }
-//            else if (plannerType == PLANNER_HYBRID_BITSTAR)
-//            {
-//                //Value of best edge as an ellipse:
-//                if (std::isfinite(planner->as<ompl::geometric::HybridBITstar>()->getNextEdgeValueInQueue().value()))
-//                {
-//                    //Annotate
-//                    mfile << "%%%%%% Queue ellipses %%%%%%" << '\n';
-//
-//                    mfile << "if plotBitStarQueueEllipse" << '\n';
-//                    mfile << "    for  i = 1:size(xstarts,2)" << '\n';
-//                    mfile << "        for  j = 1:size(xgoals,2)" << '\n';
-//                    mfile << "            S = ellipseMatrix(xstarts(:,i), xgoals(:,j)," << planner->as<ompl::geometric::HybridBITstar>()->getNextEdgeValueInQueue().value() << ");" << '\n';
-//                    mfile << "            plotEllipseMatrix(S, 0.5.*(xstarts(:,i) + xgoals(:,j)), 100);" << '\n';
-//                    mfile << "        end" << '\n';
-//                    mfile << "    end" << '\n';
-//                    mfile << "end" << '\n';
-//                }
-//
-//
-//                //Best edge in queue
-//                std::pair<ompl::base::State const*, ompl::base::State const*> edge;
-//                std::tuple<ompl::base::State const*, ompl::base::State const*, ompl::base::State const*, ompl::base::State const*> shortcut;
-//
-//                edge = planner->as<ompl::geometric::HybridBITstar>()->getNextEdgeInQueue();
-//
-//                if (bool(edge.first) && bool(edge.second))
-//                {
-//                    //Annotate:
-//                    mfile << "%%%%%% Next edge in the queue %%%%%%" << '\n';
-//                    mfile << "if plotBitStarNextEdge" << '\n';
-//
-//                    mfile << "    " << plotEdge(experiment, edge.first, edge.second, "nextEdgeColour", "nextEdgeStyle", "nextEdgeWeight");
-//
-//                    mfile << "end" << '\n';
-//                }
-//
-//                shortcut = planner->as<ompl::geometric::HybridBITstar>()->getNextShortcut();
-//
-//                if (bool(shortcut.get<0u>()) && bool(shortcut.get<1u>()) && bool(shortcut.get<2u>()) && bool(shortcut.get<3u>()))
-//                {
-//                    //Annotate:
-//                    mfile << "%%%%%% Next shortcut in the queue %%%%%%" << '\n';
-//                    mfile << "if plotBitStarNextEdge" << '\n';
-//
-//                    mfile << "    " << plotEdge(experiment, shortcut.get<0u>(), shortcut.get<1u>(), "nextEdgeColour", "nextEdgeStyle", "nextEdgeWeight");
-//                    mfile << "    " << plotEdge(experiment, shortcut.get<1u>(), shortcut.get<2u>(), "nextEdgeColour", "nextEdgeStyle", "nextEdgeWeight");
-//                    mfile << "    " << plotEdge(experiment, shortcut.get<2u>(), shortcut.get<3u>(), "nextEdgeColour", "nextEdgeStyle", "nextEdgeWeight");
-//
-//                    mfile << "end" << '\n';
-//                }
-//
-//                //Append the queue value to the xlabel if plotting ellipse or edge
-//                if (std::isfinite(planner->as<ompl::geometric::HybridBITstar>()->getNextEdgeValueInQueue().value()))
-//                {
-//                    mfile << "xLabelText = [xLabelText ' q=' num2str(" << planner->as<ompl::geometric::HybridBITstar>()->getNextEdgeValueInQueue().value() << ", '%.6f')];" << '\n';
-//                }
-//            }
-//            else if (plannerType == PLANNER_DUALTREE_BITSTAR)
-//            {
-//                //Value of best edge as an ellipse:
-//                if (std::isfinite(planner->as<ompl::geometric::ICRA16>()->getNextEdgeValueInQueue().value()))
-//                {
-//                    //Annotate
-//                    mfile << "%%%%%% Queue ellipses %%%%%%" << '\n';
-//
-//                    mfile << "if plotBitStarQueueEllipse" << '\n';
-//                    mfile << "    for  i = 1:size(xstarts,2)" << '\n';
-//                    mfile << "        for  j = 1:size(xgoals,2)" << '\n';
-//                    mfile << "            S = ellipseMatrix(xstarts(:,i), xgoals(:,j)," << planner->as<ompl::geometric::ICRA16>()->getNextEdgeValueInQueue().value() << ");" << '\n';
-//                    mfile << "            plotEllipseMatrix(S, 0.5.*(xstarts(:,i) + xgoals(:,j)), 100);" << '\n';
-//                    mfile << "        end" << '\n';
-//                    mfile << "    end" << '\n';
-//                    mfile << "end" << '\n';
-//                }
-//
-//
-//                //Best edge in queue
-//                std::pair<ompl::base::State const*, ompl::base::State const*> edge;
-//
-//                edge = planner->as<ompl::geometric::ICRA16>()->getNextEdgeInQueue();
-//
-//                if (bool(edge.first) && bool(edge.second))
-//                {
-//                    //Annotate:
-//                    mfile << "%%%%%% Next edge in the queue %%%%%%" << '\n';
-//
-//                    mfile << "if plotBitStarNextEdge" << '\n';
-//                    mfile << "    " << plotEdge(experiment, edge.first, edge.second, "nextEdgeColour", "nextEdgeStyle", "nextEdgeWeight");
-//
-//                    mfile << "end" << '\n';
-//                }
-//
-//                //Append the queue value to the xlabel if plotting ellipse or edge
-//                if (std::isfinite(planner->as<ompl::geometric::ICRA16>()->getNextEdgeValueInQueue().value()))
-//                {
-//                    mfile << "xLabelText = [xLabelText ' q=' num2str(" << planner->as<ompl::geometric::ICRA16>()->getNextEdgeValueInQueue().value() << ", '%.6f')];" << '\n';
-//                }
-//            }
 
             //Info about the solution
             mfile << "%%%%%% Solution %%%%%%" << '\n';
