@@ -412,7 +412,7 @@ asrl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
     mfile << "warning('on', 'ASRL:Ellipses')" << '\n';
     mfile << '\n';
 
-    mfile << "system('/opt/ffmpeg -r 30 -i %06d.png -pix_fmt yuv420p -vcodec libx264 -qp 0 -r 30 " << planner->getName() << "S" << worldSeed <<".mp4');" << '\n';
+    mfile << "system('ffmpeg -r 30 -i %06d.png -pix_fmt yuv420p -vcodec libx264 -qp 0 -r 30 " << planner->getName() << "S" << worldSeed <<".mp4');" << '\n';
     mfile << "system('mkdir -p src');" << '\n';
     mfile << "system('mv *.m ./src/');" << '\n';
     mfile << "system('mkdir -p png');" << '\n';
