@@ -278,7 +278,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                 mfile << "xLabelText = [xLabelText ' (epsilon_s = ' num2str(inflationFactor) ', epsilon_t = ' num2str(truncationFactor) ')'];" << '\n';
             }
 
-            if (plannerType == PLANNER_RRTSTAR_INFORMED || plannerType == PLANNER_SORRTSTAR || plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_HYBRID_BITSTAR || plannerType == PLANNER_DUALTREE_BITSTAR)
+            if (plannerType == PLANNER_RRTSTAR_INFORMED || plannerType == PLANNER_SORRTSTAR || plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_ABITSTAR)
             {
                 if (pdef->hasExactSolution() == true)
                 {
