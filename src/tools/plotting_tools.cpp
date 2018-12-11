@@ -364,7 +364,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
             {
                 mfile << "inflationFactor = " << planner->as<ompl::geometric::BITstar>()->getCurrentInflationFactor() << ";" << '\n';
                 mfile << "truncationFactor = " << planner->as<ompl::geometric::BITstar>()->getCurrentTruncationFactor() << ";" << '\n';
-                mfile << "xLabelText = [xLabelText ' (epsilon_s = ' num2str(inflationFactor) ', epsilon_t = ' num2str(truncationFactor) ')'];" << '\n';
+                mfile << "xLabelText = [xLabelText ' (epsilon_s = ' num2str(inflationFactor) ', epsilon_t = ' num2str(truncationFactor) '), iter: ' iterString];" << '\n';
             }
 
             if (plannerType == PLANNER_RRTSTAR_INFORMED || plannerType == PLANNER_SORRTSTAR || plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_ABITSTAR)
