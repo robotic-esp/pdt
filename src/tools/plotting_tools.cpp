@@ -151,15 +151,52 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                 //Get the queue edges
                 planner->as<ompl::geometric::BITstar>()->getEdgeQueue(&queueEdges);
 
+                std::vector<double> queueXCoordsChildren { };
+                std::vector<double> queueYCoordsChildren { };
+                std::vector<double> queueXCoordsParents { };
+                std::vector<double> queueYCoordsParents { };
+
+                //Iterate over the list of edges, calling the edge-plot function:
+                for (auto& edge : queueEdges)
+                {
+                     ompl::base::ScopedState<> scopedChild(experiment->getSpaceInformation()->getStateSpace(), edge.first->stateConst());
+                     queueXCoordsChildren.emplace_back(scopedChild[0]);
+                     queueYCoordsChildren.emplace_back(scopedChild[1]);
+
+                     ompl::base::ScopedState<> scopedParent(experiment->getSpaceInformation()->getStateSpace(), edge.second->stateConst());
+                     queueXCoordsParents.emplace_back(scopedParent[0]);
+                     queueYCoordsParents.emplace_back(scopedParent[1]);
+                }
                 //Annotate:
                 mfile << "%%%%%% Queue edges %%%%%%" << '\n';
                 mfile << "if plotBitStarFullQueue" << '\n';
 
-                //Iterate over the list of edges, calling the edge-plot function:
-                for (unsigned int i = 0u; i < queueEdges.size(); ++i)
+                mfile << "    queueXCoordsChildren = [ ";
+                for (const auto x : queueXCoordsChildren)
                 {
-                    mfile << "    " << plotEdge(experiment, queueEdges.at(i).first->stateConst(), queueEdges.at(i).second->stateConst(), "queueColour", "queueStyle", "queueWeight");
+                    mfile << x << ' ';
                 }
+                mfile << "];\n";
+                mfile << "    queueYCoordsChildren = [ ";
+                for (const auto y : queueYCoordsChildren)
+                {
+                    mfile << y << ' ';
+                }
+                mfile << "];\n";
+                mfile << "    queueXCoordsParents = [ ";
+                for (const auto x : queueXCoordsParents)
+                {
+                    mfile << x << ' ';
+                }
+                mfile << "];\n";
+                mfile << "    queueYCoordsParents = [ ";
+                for (const auto y : queueYCoordsParents)
+                {
+                    mfile << y << ' ';
+                }
+                mfile << "];\n";
+
+                mfile << "    plot([ queueXCoordsChildren; queueXCoordsParents ], [ queueYCoordsChildren; queueYCoordsParents ], '-', 'Color', queueColour, 'LineStyle', queueStyle, 'LineWidth', queueWeight);" << '\n';
                 mfile << "end" << '\n';
             }
 
@@ -175,22 +212,43 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
             //Vertices only
             mfile << "%%%%%% Vertices %%%%%%" << '\n';
             mfile << "if plotVertices" << '\n';
+            mfile << "    xCoords = [ ";
             for (unsigned int i = 0u; i < pdata.numVertices(); ++i)
             {
                 //The vertex being processed:
                 ompl::base::PlannerDataVertex vertex = pdata.getVertex(i);
+                ompl::base::ScopedState<> scopedVertex(experiment->getSpaceInformation()->getStateSpace(), vertex.getState());
 
                 //Not all indexes exist I think?
                 if (vertex != ompl::base::PlannerData::NO_VERTEX)
                 {
-                    //Print it's coordinates to file:
-                    mfile << "    " << plotVertex(experiment, vertex.getState(), "vertexColour", "vertexSize");
+                    mfile << scopedVertex[0] << ' ';
                 }
             }
+            mfile << "];\n";
+            mfile << "    yCoords = [ ";
+            for (unsigned int i = 0u; i < pdata.numVertices(); ++i)
+            {
+                //The vertex being processed:
+                ompl::base::PlannerDataVertex vertex = pdata.getVertex(i);
+                ompl::base::ScopedState<> scopedVertex(experiment->getSpaceInformation()->getStateSpace(), vertex.getState());
+
+                //Not all indexes exist I think?
+                if (vertex != ompl::base::PlannerData::NO_VERTEX)
+                {
+                    mfile << scopedVertex[1] << ' ';
+                }
+            }
+            mfile << "];\n";
+            mfile << "    plot(xCoords, yCoords, 'o', 'Color', vertexColour, 'MarkerFaceColor', vertexColour, 'MarkerSize', vertexSize);" << '\n';
             mfile << "end" << '\n';
 
             //Edges only
             mfile << "%%%%%% Edges %%%%%%" << '\n';
+            std::vector<double> edgeXCoordsChildren { };
+            std::vector<double> edgeYCoordsChildren { };
+            std::vector<double> edgeXCoordsParents { };
+            std::vector<double> edgeYCoordsParents { };
             for (unsigned int i = 0u; i < pdata.numVertices(); ++i)
             {
                 //The vertex being processed:
@@ -204,14 +262,45 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                     //Get it's incoming edge, if it has one:
                     if (pdata.getIncomingEdges(i, parentIds) > 0u)
                     {
-                        //The parent of the vertex:
-                        ompl::base::PlannerDataVertex parent = pdata.getVertex(parentIds.front());
+                         //The parent of the vertex:
+                         ompl::base::PlannerDataVertex parent = pdata.getVertex(parentIds.front());
 
-                         //Plot the edge:
-                         mfile << plotEdge(experiment, parent.getState(), vertex.getState(), "startEdgeColour", "edgeStyle", "edgeWeight");
+                         ompl::base::ScopedState<> scopedChild(experiment->getSpaceInformation()->getStateSpace(), vertex.getState());
+                         edgeXCoordsChildren.emplace_back(scopedChild[0]);
+                         edgeYCoordsChildren.emplace_back(scopedChild[1]);
+
+                         ompl::base::ScopedState<> scopedParent(experiment->getSpaceInformation()->getStateSpace(), parent.getState());
+                         edgeXCoordsParents.emplace_back(scopedParent[0]);
+                         edgeYCoordsParents.emplace_back(scopedParent[1]);
                     }
                 }
             }
+            mfile << "edgeXCoordsChildren = [ ";
+            for (const auto x : edgeXCoordsChildren)
+            {
+                mfile << x << ' ';
+            }
+            mfile << "];\n";
+            mfile << "edgeYCoordsChildren = [ ";
+            for (const auto y : edgeYCoordsChildren)
+            {
+                mfile << y << ' ';
+            }
+            mfile << "];\n";
+            mfile << "edgeXCoordsParents = [ ";
+            for (const auto x : edgeXCoordsParents)
+            {
+                mfile << x << ' ';
+            }
+            mfile << "];\n";
+            mfile << "edgeYCoordsParents = [ ";
+            for (const auto y : edgeYCoordsParents)
+            {
+                mfile << y << ' ';
+            }
+            mfile << "];\n";
+
+            mfile << "plot([ edgeXCoordsChildren; edgeXCoordsParents ], [ edgeYCoordsChildren; edgeYCoordsParents ], '-', 'Color', startEdgeColour, 'LineStyle', edgeStyle, 'LineWidth', edgeWeight);" << '\n';
 
             //If the planner is a BIT*, do some more special stuff
             if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_ABITSTAR)
