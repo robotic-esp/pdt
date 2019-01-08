@@ -86,7 +86,7 @@ std::shared_ptr<ompl::geometric::SORRTstar> allocateSorrtStar(const ompl::base::
 std::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics);
 
 /** \brief Allocation function for BIT* */
-std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double initialInflationFactor, const double initialTruncationFactor, const double inflationFactorStep, const double truncationFactorStep);
+std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool enablePruning, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double initialInflationFactor);
 
 #ifdef BITSTAR_REGRESSION
 /** \brief Allocation function for a regression testing BIT* */
