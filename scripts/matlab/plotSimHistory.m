@@ -31,7 +31,7 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
     plotPlanners = true(size(interpPlannerData,1),1);
     
     %Ranges:
-    minPlotTime = inf;
+    minPlotTime = max(0, min(min(min(interpPlannerData(:,1,:,:)))));
     maxPlotTime = min(plotTime, max(max(max(interpPlannerData(:,1,:,:)))));
     minHistCost = inf;
     maxHistCost = 0;
@@ -473,7 +473,8 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
             %Iterate through the error bar handles and fix them.
             for j = 1:length(histErrBarHandles)
 %                 errorbar_tick(histErrBarHandles(j), vErrTick); %Set errorbar width
-                removeErrorBarCaps(histErrBarHandles(j));
+                h = histErrBarHandles(j);
+                h.CapSize = 0;
             end
         else
             error('Unacceptable handle')

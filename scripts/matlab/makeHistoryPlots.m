@@ -46,30 +46,23 @@ function makeHistoryPlots(R)
     %Plot time:
     if (R == 0.2)
         %Interp spacing (us):
-        interpTime = 100*1e-6;
+        interpTime = 1000000*1e-6;
         
         %Number of experiments in each file:
-        numExp = 100;
+        numExp = 2000;
     
         %The run time
-        plotTime = 1.0;
+        plotTime = 2;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439042441715202437RRTsharpResponse1';
-                     'R2S18439042442492754539RRTsharpResponse2';
-                     'R2S18439042443237617086DblEncl'};
+        filenames = {'R8S18439066192233788612DblEncl'};
 
         figures = {};
 
-        %The planner names (log and plot) and colours:
-        planners = {'RRTConnect',        'RRT-Connect',         k, '-';
-                    'RRTsharp',          'RRT\#',               r, '-';
-                    'RRTsharp1',         'RRT\#1',              p, '-';
-                    'RRTsharp2',         'RRT\#2',              o, '-';
-                    'RRTsharp3',         'RRT\#3',              y, '-';
-                    'Informed_RRTstar',  'Informed RRT*',       c, '-';
-                    'SORRTstar100',      'SORRT*',              b, '-';
-                    'BITstar100',        'BIT*',                g, '-'};
+        planners = {'BITstar100',           'BIT*',             b, '-';
+                    'BITstarRegression100', 'BIT* (reg)',       c, '-';
+                    'ABITstar100',          'ABIT*',            g, '-';
+                    'RRTConnect',           'RRTConnect',       k, '-'};
 
         ignorePlanners = {'DELETEME'};   
     elseif (R == 0.4)
@@ -77,52 +70,41 @@ function makeHistoryPlots(R)
         interpTime = 100*1e-6;
         
         %Number of experiments in each file:
-        numExp = 100;
+        numExp = 50;
     
         %The run time
-        plotTime = 10;
+        plotTime = 0.2;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R4S18439042443978464433DblEncl'};
+        filenames = {'R2S18439067668954477691DblEncl'};
 
         figures = {};
 
         %The planner names (log and plot) and colours:
-        planners = {'RRTConnect',        'RRT-Connect',         k, '-';
-                    'RRTsharp',          'RRT\#',               r, '-';
-                    'RRTsharp1',         'RRT\#1',              p, '-';
-                    'RRTsharp2',         'RRT\#2',              o, '-';
-                    'RRTsharp3',         'RRT\#3',              y, '-';
-                    'Informed_RRTstar',  'Informed RRT*',       c, '-';
-                    'SORRTstar100',      'SORRT*',              b, '-';
-                    'BITstar100',        'BIT*',                g, '-'};
+        planners = {'BITstar100',           'BIT*',             b, '-';
+                    'BITstarRegression100', 'BIT* (reg)',       c, '-';
+                    'ABITstar100',          'ABIT*',            g, '-';
+                    'RRTConnect',           'RRTConnect',       k, '-';
+                    'LBTRRT',               'LBTRRT',           p, '-'};
 
         ignorePlanners = {'DELETEME'};
-        
     elseif (R == 0.8)
         %Interp spacing (us):
         interpTime = 100*1e-6;
         
         %Number of experiments in each file:
-        numExp = 100;
+        numExp = 1000;
     
         %The run time
-        plotTime = 30;
+        plotTime = 5;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439042451026357679DblEncl'};
+        filenames = {'R4S18439067383613633415RegularRects_without_pruning'};
 
         figures = {};
 
         %The planner names (log and plot) and colours:
-        planners = {'RRTConnect',        'RRT-Connect',         k, '-';
-                    'RRTsharp',          'RRT\#',               r, '-';
-                    'RRTsharp1',         'RRT\#1',              p, '-';
-                    'RRTsharp2',         'RRT\#2',              o, '-';
-                    'RRTsharp3',         'RRT\#3',              y, '-';
-                    'Informed_RRTstar',  'Informed RRT*',       c, '-';
-                    'SORRTstar100',      'SORRT*',              b, '-';
-                    'BITstar100',        'BIT*',                g, '-'};
+        planners = {'ABITstar100',        'ABIT*',         b, '-'};
 
         ignorePlanners = {'DELETEME'};
 
@@ -137,17 +119,9 @@ function makeHistoryPlots(R)
         plotTime = 1.0;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439042518466759363RandRect';
-                     'R2S18439042519024417213RandRect';
-                     'R2S18439042519586803738RandRect';
-                     'R2S18439042520145428827RandRect';
-                     'R2S18439042520709017768RandRect';
-                     'R2S18439042521273024586RandRect';
-                     'R2S18439042521839509649RandRect';
-                     'R2S18439042522404160047RandRect';
-                     'R2S18439042522968105186RandRect';
-                     'R2S18439042523531449764RandRect'};
-
+        planners = {'BITstar100',           'BIT*',             b, '-';
+                    'BITstarRegression100', 'BIT* (reg)',       y, '-';
+                    'ABITstar100',          'ABIT*',            g, '-'};
         figures = {};
 
         %The planner names (log and plot) and colours:
@@ -391,12 +365,12 @@ function makeHistoryPlots(R)
         
         data = processSimHistory(['data/' filenames{i} '.csv'], numExp, plotTime, interpTime);
         [succHandl, histHandl, succRates(:,:,i)] = plotSimHistory(data, planners(:,2), planners(:,3), planners(:,4), plotTime, ignorePlanners, useMedian, unsolvedAsNan, plotFailures, plotInfiniteCIs, yLimMargin);
-
-        saveEpsToPdf(succHandl, ['data/' filenames{i} '_success.pdf'], true);
-        close(succHandl)
-
-        saveEpsToPdf(histHandl, ['data/' filenames{i} '_hist.pdf'], true);
-        close(histHandl)
+%
+%         saveEpsToPdf(succHandl, ['data/' filenames{i} '_success.pdf'], true);
+%         close(succHandl)
+%
+%         saveEpsToPdf(histHandl, ['data/' filenames{i} '_hist.pdf'], true);
+%         close(histHandl)
     end
 
     if ~isempty(figures)
