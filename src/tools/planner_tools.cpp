@@ -33,6 +33,21 @@ std::shared_ptr<ompl::geometric::RRTConnect> allocateRrtConnect(const ompl::base
     return plnr;
 }
 
+std::shared_ptr<ompl::geometric::LBTRRT> allocateLbtRrt(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const double epsilon)
+{
+    //Create an LBTRRT planner
+    std::shared_ptr<ompl::geometric::LBTRRT> plnr = std::make_shared<ompl::geometric::LBTRRT>(si);
+
+    //Configure it
+    plnr->setRange(steerEta);
+    plnr->setGoalBias(goalBias);
+    plnr->setApproximationFactor(epsilon);
+
+    plnr->setName("LBTRRT");
+
+    //Return
+    return plnr;
+}
 std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale)
 {
     //Create a RRT* planner
@@ -300,12 +315,15 @@ bool isRrtSharp(PlannerType plnrType)
             plnrType == PLANNER_RRTSHARP_INFORMED);
 }
 
+bool isLbtRrt(PlannerType plnrType)
+{
+  return plnrType == PLANNER_LBTRRT;
+}
+
 bool isBitStar(PlannerType plnrType)
 {
     return (plnrType == PLANNER_BITSTAR ||
             plnrType == PLANNER_ABITSTAR ||
-            plnrType == PLANNER_HYBRID_BITSTAR ||
-            plnrType == PLANNER_DUALTREE_BITSTAR ||
             plnrType == PLANNER_BITSTAR_SEED);
 }
 

@@ -64,6 +64,7 @@
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
+#include <ompl/geometric/planners/rrt/LBTRRT.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include "ompl/base/objectives/PathLengthOptimizationObjective.h"
@@ -85,7 +86,6 @@
 const double CHECK_RESOLUTION = 0.001;
 
 // Common
-const double PRUNE_FRACTION = 0.01;
 const double REWIRE_SCALE = 1.1; //The factor scaling the RGG term
 const bool K_NEAREST = false;
 
@@ -112,6 +112,8 @@ const double ABITSTAR_INFLATION_FACTOR_STEP = 10;
 const double ABITSTAR_TRUNCATION_FACTOR_STEP = 0.1;
 
 //Plotting:
+// LBTRRT
+const double LBTRRT_EPSILON = 0.4;
 const bool PLOT_VERTICES = true;
 const bool PLOT_WORLD_ELLIPSE = true;
 const bool PLOT_BITSTAR_ELLIPSE = true;
@@ -268,7 +270,7 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
     return true;
 }
 
-ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExperimentPtr& expDefn, const unsigned int numSamples)
+ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExperimentPtr& expDefn, const unsigned int numSamples, double steerEta)
 {
     //Variables
     //The allocated planner
@@ -284,6 +286,15 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
         case PLANNER_ABITSTAR:
         {
           plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH, ABITSTAR_INITIAL_INFLATION_FACTOR, ABITSTAR_INITIAL_TRUNCATION_FACTOR, ABITSTAR_INFLATION_FACTOR_STEP, ABITSTAR_TRUNCATION_FACTOR_STEP);
+        }
+        case PLANNER_RRTCONNECT:
+        {
+            plnr = allocateRrtConnect(expDefn->getSpaceInformation(), steerEta);
+            break;
+        }
+        case PLANNER_LBTRRT:
+        {
+            plnr = allocateLbtRrt(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, LBTRRT_EPSILON);
             break;
         }
 #ifdef BITSTAR_REGRESSION
@@ -383,13 +394,14 @@ int main(int argc, char **argv)
         // plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
         // plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR_REGRESSION, BITSTAR_BATCH_SIZE));
         plannersToTest.push_back(std::make_pair(PLANNER_ABITSTAR, BITSTAR_BATCH_SIZE));
+        plannersToTest.push_back(std::make_pair(PLANNER_LBTRRT, 0u));
 
         if (q == 0u)
         {
             std::cout << "   ";
             for (unsigned int i = 0u; i < plannersToTest.size(); ++i)
             {
-                std::cout << std::setw(26) << std::setfill(' ') << allocatePlanner(plannersToTest.at(i).first, expDefn, plannersToTest.at(i).second)->getName();
+                std::cout << std::setw(26) << std::setfill(' ') << allocatePlanner(plannersToTest.at(i).first, expDefn, plannersToTest.at(i).second, steerEta)->getName();
                 if (i != plannersToTest.size() - 1u)
                 {
                     std::cout << "    ";
@@ -413,7 +425,7 @@ int main(int argc, char **argv)
             ompl::base::ProblemDefinitionPtr pdef;
 
             //Allocate a planner
-            plnr = allocatePlanner(plannersToTest.at(i).first, expDefn, plannersToTest.at(i).second);
+            plnr = allocatePlanner(plannersToTest.at(i).first, expDefn, plannersToTest.at(i).second, steerEta);
 
             //Get the problem definition
             pdef = plnr->getProblemDefinition();
@@ -497,6 +509,18 @@ int main(int argc, char **argv)
                             progressPair.push_back( std::make_pair(initTime + (asrl::time::now() - startTime), plnr->as<ompl::geometric::RRTsharp>()->bestCost().value()) );
                         }
                     }
+                    else if (isLbtRrt(plannersToTest.at(i).first))
+                    {
+                        //Store the runtime and the current cost
+                        if (LOG_ITERATIONS_AND_COST == true)
+                        {
+                            progressTuple.push_back( std::make_tuple(initTime + (asrl::time::now() - startTime), std::stoi(plnr->as<ompl::geometric::LBTRRT>()->getIterationCount()), std::stod(plnr->as<ompl::geometric::LBTRRT>()->getBestCost())));
+                        }
+                        else
+                        {
+                            progressPair.push_back( std::make_pair(initTime + (asrl::time::now() - startTime), std::stod(plnr->as<ompl::geometric::LBTRRT>()->getBestCost())) );
+                        }
+                    }
                     else if (isBitStar(plannersToTest.at(i).first))
                     {
                         if (LOG_ITERATIONS_AND_COST == true)
@@ -561,6 +585,10 @@ int main(int argc, char **argv)
                     else if (isBitStar(plannersToTest.at(i).first))
                     {
                         progressTuple.push_back( std::make_tuple(runTime, plnr->as<ompl::geometric::BITstar>()->numIterations(), finalCost) );
+                    }
+                    else if (isLbtRrt(plannersToTest.at(i).first))
+                    {
+                        progressTuple.push_back( std::make_tuple(runTime, std::stoi(plnr->as<ompl::geometric::LBTRRT>()->getIterationCount()), std::stod(plnr->as<ompl::geometric::LBTRRT>()->getBestCost())));
                     }
                     else
                     {

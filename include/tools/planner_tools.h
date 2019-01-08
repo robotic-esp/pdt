@@ -7,6 +7,7 @@
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
+#include <ompl/geometric/planners/rrt/LBTRRT.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 
@@ -44,6 +45,7 @@ enum PlannerType
     PLANNER_RRTSTAR_INFORMED,
     PLANNER_RRTSHARP,
     PLANNER_RRTSHARP_INFORMED,
+    PLANNER_LBTRRT,
     PLANNER_SORRTSTAR,
     PLANNER_RRTSTAR_PRUNE,
     PLANNER_RRTSTAR_NEW_REJECT,
@@ -52,8 +54,6 @@ enum PlannerType
     PLANNER_FMTSTAR,
     PLANNER_BITSTAR,
     PLANNER_ABITSTAR,
-    PLANNER_HYBRID_BITSTAR,
-    PLANNER_DUALTREE_BITSTAR,
     PLANNER_RRTSTAR_SEED,
     PLANNER_BITSTAR_SEED,
 #ifdef BITSTAR_REGRESSION
@@ -72,6 +72,9 @@ std::shared_ptr<ompl::geometric::RRTstar> allocateRrtStar(const ompl::base::Spac
 
 /** \brief Allocation function for RRT# */
 std::shared_ptr<ompl::geometric::RRTsharp> allocateRrtSharp(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const bool reject, const bool informed, const unsigned int variant);
+
+/** \brief Allocation function for LBTRRT */
+std::shared_ptr<ompl::geometric::LBTRRT> allocateLbtRrt(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const double epsilon);
 
 /** \brief Allocation function for Informed RRT* */
 std::shared_ptr<ompl::geometric::InformedRRTstar> allocateInformedRrtStar(const ompl::base::SpaceInformationPtr &si, const double steerEta, const double goalBias, const bool kNearest, const double rewireScale, const double pruneFraction);
@@ -98,6 +101,9 @@ bool isRrtStar(PlannerType plnrType);
 
 /** \brief Return true if the planner is any of the RRTsharp types */
 bool isRrtSharp(PlannerType plnrType);
+
+/** \brief Return true if the planner is any of the LBTRRT types */
+bool isLbtRrt(PlannerType plnrType);
 
 /** \brief Return true if the planner is any of the BITstar types */
 bool isBitStar(PlannerType plnrType);
