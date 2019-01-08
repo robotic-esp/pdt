@@ -126,6 +126,7 @@ const bool FMT_USE_HEURISTICS = false;
 
 //Plotting:
 const bool PLOT_VERTICES = true;
+const bool PLOT_INDICES = false;
 const bool PLOT_WORLD_ELLIPSE = true;
 const bool PLOT_BITSTAR_ELLIPSE = true;
 const bool PLOT_BITSTAR_EDGE = true;
@@ -707,7 +708,7 @@ int main(int argc, char **argv)
             }
 
             //Save the map?
-            writeMatlabMap(expDefn, plannersToTest.at(i).first, plnr, masterSeed, PLOT_VERTICES, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
+            writeMatlabMap(expDefn, plannersToTest.at(i).first, plnr, masterSeed, PLOT_VERTICES, PLOT_INDICES, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
 
             std::cout << myResult.first << ", " << std::setw(8) << myResult.second;
             if (i != plannersToTest.size() - 1u)
