@@ -2,6 +2,8 @@
 #include "experiments/AsrlExperiment.h"
 #include "experiments/CentreSquareExperiment.h"
 #include "experiments/DeadEndExperiment.h"
+#include "experiments/GoalEnclosureExperiment.h"
+#include "experiments/StartEnclosureExperiment.h"
 #include "experiments/DividingWallExperiment.h"
 #include "experiments/DoubleEnclosureExperiment.h"
 #include "experiments/FlankingGapExperiment.h"

@@ -5,6 +5,8 @@ add_library(experiments
   ObstacleFreeExperiment.cpp
   CentreSquareExperiment.cpp
   DeadEndExperiment.cpp
+  GoalEnclosureExperiment.cpp
+  StartEnclosureExperiment.cpp
   DividingWallExperiment.cpp
   DoubleEnclosureExperiment.cpp
   FlankingGapExperiment.cpp
