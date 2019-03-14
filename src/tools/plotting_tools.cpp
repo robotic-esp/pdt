@@ -119,7 +119,7 @@ void createMatlabHelpers(std::string path)
 }
 
 
-void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, bool plotVertices, bool plotIndices, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue, std::string path /*= "plots/"*/, std::string postFix /*= std::string()*/, bool monochrome /*= false*/)
+void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl::base::PlannerPtr planner, unsigned int worldSeed, double runtime, bool plotVertices, bool plotIndices, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue, std::string path /*= "plots/"*/, std::string postFix /*= std::string()*/, bool monochrome /*= false*/)
 {
     //If we're 2D, plot:
     if (planner->getSpaceInformation()->getStateDimension() == 2u)
@@ -159,7 +159,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
 
         //Write the experiment header as well as the extra information
         mfile << experiment->mfileHeader(monochrome);
-        mfile << matlabExtraHeader(planner->getName(), plotVertices, plotIndices, informedWorldEllipse, bitStarQueueEllipse, bitStarNextEdge, bitStarFullQueue);
+        mfile << matlabExtraHeader(planner->getName(), plannerType, plotVertices, plotIndices, informedWorldEllipse, bitStarQueueEllipse, bitStarNextEdge, bitStarFullQueue);
 
         if (postFix != "I000000")
         {
@@ -167,7 +167,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
             mfile << "%%%%%%PLANNER%%%%%%" << '\n';
             mfile << '\n';
             //If the planner is a BIT*, do some special stuff
-            if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_ABITSTAR)
+            if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_SBITSTAR)
             {
                 //Get the queue edges
                 std::vector<std::pair<ompl::geometric::BITstar::VertexConstPtr, ompl::geometric::BITstar::VertexConstPtr> > queueEdges;
@@ -393,7 +393,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
             mfile << "plot([ edgeXCoordsChildren; edgeXCoordsParents ], [ edgeYCoordsChildren; edgeYCoordsParents ], '-', 'Color', startEdgeColour, 'LineStyle', edgeStyle, 'LineWidth', edgeWeight);" << '\n';
 
             //If the planner is a BIT*, do some more special stuff
-            if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_ABITSTAR)
+            if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_SBITSTAR)
             {
                 //Value of best edge as an ellipse:
                 if (std::isfinite(planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value()))
@@ -429,11 +429,11 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                     mfile << "end" << '\n';
                 }
 
-                //Append the queue value to the xlabel if plotting ellipse or edge
-                if (std::isfinite(planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value()))
-                {
-                    mfile << "xLabelText = [xLabelText ' q=' num2str(queueValue, '%.6f')];" << '\n';
-                }
+                // //Append the queue value to the xlabel if plotting ellipse or edge
+                // if (std::isfinite(planner->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue().value()))
+                // {
+                //     mfile << "xLabelText = [xLabelText ' q=' num2str(queueValue, '%.6f')];" << '\n';
+                // }
             }
 
             if (plannerType == PLANNER_BITSTAR_REGRESSION)
@@ -472,31 +472,39 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
                     mfile << "end" << '\n';
                 }
 
-                //Append the queue value to the xlabel if plotting ellipse or edge
-                if (std::isfinite(planner->as<ompl::geometric::BITstarRegression>()->getNextEdgeValueInQueue().value()))
-                {
-                    mfile << "xLabelText = [xLabelText ' q=' num2str(queueValue, '%.6f')];" << '\n';
-                }
+                // //Append the queue value to the xlabel if plotting ellipse or edge
+                // if (std::isfinite(planner->as<ompl::geometric::BITstarRegression>()->getNextEdgeValueInQueue().value()))
+                // {
+                //     mfile << "xLabelText = [xLabelText ' q=' num2str(queueValue, '%.6f')];" << '\n';
+                // }
             }
 
             //Info about the solution
             mfile << "%%%%%% Solution %%%%%%" << '\n';
             if (pdef->hasExactSolution() == true)
             {
-                mfile << "solnCost = " << pdef->getSolutionPath()->cost(opt).value() << ";" << '\n';
+                mfile << "solnCost = " << std::setprecision(6) << std::fixed << pdef->getSolutionPath()->cost(opt).value() << ";" << '\n';
+                mfile << "solnText = ['Cost: ' num2str(solnCost)];" << '\n';
             }
             else
             {
-                mfile << "solnCost = inf;" << '\n';
+                mfile << "solnCost = inf;\n";
+                mfile << "solnText = ['Cost: $\\infty$'];" << '\n';
             }
-            mfile << "xLabelText = [xLabelText ' c=' num2str(solnCost, '%.6f')];" << '\n';
 
-            // Info about the inflation and truncation factor
-            mfile << "%%%%%% Inflation %%%%%%" << '\n';
-            mfile << "inflationFactor = " << planner->as<ompl::geometric::BITstar>()->getCurrentInflationFactor() << ";" << '\n';
-            mfile << "xLabelText = [ xLabelText ' inflation = ' num2str(inflationFactor) ', iter: ' iterString ];" << '\n';
+            if (plannerType == PLANNER_BITSTAR || plannerType == PLANNER_SBITSTAR)
+            {
+                // Info about the inflation and truncation factor
+                mfile << "%%%%%% Inflation %%%%%%" << '\n';
+                // mfile << "inflationFactor = " << planner->as<ompl::geometric::BITstar>()->getCurrentInflationFactor() << ";" << '\n';
+                // mfile << "truncationFactor = " << planner->as<ompl::geometric::BITstar>()->getCurrentTruncationFactor() << ";" << '\n';
+                // mfile << "xLabelText = [ xLabelText ' inflation = ' num2str(inflationFactor) ', truncation = ' num2str(truncationFactor) ', iter: ' iterString ];" << '\n';
+            }
 
-            if (plannerType == PLANNER_RRTSTAR_INFORMED || plannerType == PLANNER_SORRTSTAR || plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_ABITSTAR || plannerType == PLANNER_BITSTAR_REGRESSION)
+            mfile << "runtime = " << runtime << ";\n";
+            mfile << "runtimeText = ['Time: ' num2str(runtime, '%.6f') 's'];\n";
+
+            if (plannerType == PLANNER_RRTSTAR_INFORMED || plannerType == PLANNER_SORRTSTAR || plannerType == PLANNER_BITSTAR || plannerType == PLANNER_BITSTAR_SEED || plannerType == PLANNER_SBITSTAR || plannerType == PLANNER_BITSTAR_REGRESSION)
             {
                 if (pdef->hasExactSolution() == true)
                 {
@@ -532,8 +540,8 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType, ompl:
         }
 
         mfile << "%%%%%% Plot config %%%%%%" << '\n';
-        mfile << "xlabel(xLabelText);" << '\n';
-        mfile << "title(titleText);" << '\n';
+        mfile << "xlabel([solnText, ' ', runtimeText], 'fontsize', 12, 'interpreter', 'latex', 'Position', [-0.6, 1.11, 0], 'horizontalAlignment', 'left');" << '\n';
+        mfile << "title(titleText, 'fontsize', 16, 'interpreter', 'latex', 'Position', [-1, 1, 0], 'horizontalAlignment', 'left');" << '\n';
 
         mfile << experiment->mfileFooter();
 
