@@ -48,19 +48,39 @@ std::string plotEdge(BaseExperimentPtr experiment, const ompl::base::State* pare
     return rval.str();
 }
 
-std::string matlabExtraHeader(std::string plannerName, bool plotVertices, bool plotIndices, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue)
+std::string matlabExtraHeader(std::string plannerName, PlannerType plannerType, bool plotVertices, bool plotIndices, bool informedWorldEllipse, bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue)
 {
     std::stringstream rval;
 
     rval << "%%%%%% Extra Config %%%%%%" << '\n';
-    rval << "titleText = '" << plannerName << "';" << '\n';
-    rval << "xLabelText = [];" << '\n';
+    if (plannerType == PLANNER_BITSTAR)
+    {
+        rval << "titleText = 'BIT*';\n";
+    }
+    else if (plannerType == PLANNER_SBITSTAR)
+    {
+        rval << "titleText = 'SBIT*';\n";
+    }
+    else if (plannerType == PLANNER_RRTSTAR)
+    {
+        rval << "titleText = 'RRT*';\n";
+    }
+    else if (plannerType == PLANNER_RRTSHARP)
+    {
+        rval << "titleText = 'RRT$^{\\#}$';\n";
+    }
+    else
+    {
+        rval << "titleText = '" << plannerName << "';" << '\n';
+    }
     rval << "plotVertices = " << (plotVertices ? "true" : "false") << ";" << '\n'; //<condition> ? <true-case-code> : <false-case-code>;
     rval << "plotIndices = " << (plotIndices ? "true" : "false") << ";" << '\n'; //<condition> ? <true-case-code> : <false-case-code>;
     rval << "plotInformedEllipse = " << (informedWorldEllipse ? "true" : "false") << ";" << '\n'; //<condition> ? <true-case-code> : <false-case-code>;
     rval << "plotBitStarQueueEllipse = " << (bitStarQueueEllipse ? "true" : "false") << ";" << '\n'; //<condition> ? <true-case-code> : <false-case-code>;
     rval << "plotBitStarNextEdge = " << (bitStarNextEdge ? "true" : "false") << ";" << '\n'; //<condition> ? <true-case-code> : <false-case-code>;
     rval << "plotBitStarFullQueue = " << (bitStarFullQueue ? "true" : "false") << ";" << '\n'; //<condition> ? <true-case-code> : <false-case-code>;
+    rval << "solnText = '';\n";
+    rval << "runtimeText = '';\n";
 
     return rval.str();
 }
