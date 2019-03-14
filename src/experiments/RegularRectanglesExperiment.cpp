@@ -52,8 +52,8 @@
 #include "ompl/base/goals/GoalState.h"
 #include "ompl/base/goals/GoalStates.h"
 
-RegularRectanglesExperiment::RegularRectanglesExperiment(const unsigned int dim, const double worldWidth, unsigned int numObsBetween, const double runSeconds, const double checkResolution)
-    :   BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-0.5*worldWidth, 0.5*worldWidth)), runSeconds, "RegularRects"),
+RegularRectanglesExperiment::RegularRectanglesExperiment(const unsigned int dim, const double worldHalfWidth, unsigned int numObsBetween, const double runSeconds, const double checkResolution)
+    :   BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-1.0 * worldHalfWidth, worldHalfWidth)), runSeconds, "RegularRects"),
         startPos_(-0.5),
         goalPos_(0.5)
 {

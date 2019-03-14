@@ -48,7 +48,7 @@ class RegularRectanglesExperiment : public BaseExperiment
 {
 public:
     /** \brief Constructor */
-    RegularRectanglesExperiment(const unsigned int dim, const double worldWidth, unsigned int numObsBetween, const double runSeconds, const double checkResolution);
+    RegularRectanglesExperiment(const unsigned int dim, const double worldHalfWidth, unsigned int numObsBetween, const double runSeconds, const double checkResolution);
 
     /** \brief Whether the problem has an exact expression for the optimum */
     virtual bool knowsOptimum() const;
