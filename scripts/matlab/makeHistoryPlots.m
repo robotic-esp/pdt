@@ -46,46 +46,63 @@ function makeHistoryPlots(R)
     %Plot time:
     if (R == 0.2)
         %Interp spacing (us):
-        interpTime = 1000000*1e-6;
+        interpTime = 100*1e-6;
         
         %Number of experiments in each file:
-        numExp = 2000;
+        numExp = 100;
     
         %The run time
-        plotTime = 2;
+        plotTime = 1.0;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R8S18439066192233788612DblEncl'};
+        filenames = {
+            'R8S18439072146874402233WallGap'
+%             'R8S18439071351109370200RegularRects'
+%             'R8S18439071143733709969RandRect'
+%             'R4S18439071184667532744RandRect'
+%             'R4S18439071184930502469RandRect'
+%             'R4S18439071185187944460RandRect'
+%             'R4S18439071185450992270RandRect'
+%             'R4S18439071185709980611RandRect'
+%             'R4S18439071185974167306RandRect'
+%             'R4S18439071186242979955RandRect'
+        };
 
         figures = {};
 
-        planners = {'BITstar100',           'BIT*',             b, '-';
-                    'BITstarRegression100', 'BIT* (reg)',       c, '-';
-                    'ABITstar100',          'ABIT*',            g, '-';
-                    'RRTConnect',           'RRTConnect',       k, '-'};
+        planners = {
+                    'BITstar100',            'BIT*',             b, '-';
+%                     'BITstarRegression100', 'BIT* (reg)',       c, '-';
+                    'ABITstar100',           'SBIT*',            g, '-';
+                    'RRTConnect',            'RRTConnect',       k, '-';
+                    'LBTRRT',                'LBTRRT',           p, '-';
+                    'RRTstar',               'RRT*',             r, '-';
+                    'RRTsharp',              'RRT$^{\#}$',       o, '-';
+                    };
 
         ignorePlanners = {'DELETEME'};   
     elseif (R == 0.4)
         %Interp spacing (us):
-        interpTime = 100*1e-6;
+        interpTime = 1000*1e-6;
         
         %Number of experiments in each file:
-        numExp = 50;
+        numExp = 100;
     
         %The run time
-        plotTime = 0.2;
+        plotTime = 10;
 
         %The filesnames. Ommit the data/ and the .csv.
-        filenames = {'R2S18439067668954477691DblEncl'};
+        filenames = {'R8S18439070324758262881RandRect'};
 
         figures = {};
 
         %The planner names (log and plot) and colours:
-        planners = {'BITstar100',           'BIT*',             b, '-';
-                    'BITstarRegression100', 'BIT* (reg)',       c, '-';
-                    'ABITstar100',          'ABIT*',            g, '-';
-                    'RRTConnect',           'RRTConnect',       k, '-';
-                    'LBTRRT',               'LBTRRT',           p, '-'};
+        planners = {
+                    'BITstar1000',           'BIT*',             b, '-';
+%                     'BITstarRegression300', 'BIT* (reg)',       c, '-';
+                    'ABITstar1000',          'ABIT*',            g, '-';
+                    'RRTConnect',           'RRTConnect',       k, '-'
+                    };
 
         ignorePlanners = {'DELETEME'};
     elseif (R == 0.8)
@@ -385,289 +402,3 @@ function makeHistoryPlots(R)
     end
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-%Old run-configs
-% %%%%%
-%     if (R == 0.2)
-%         %Interp spacing:
-%         interpTime = 0.001;
-% 
-%         useMedian = true;
-%         unsolvedAsNan = false;
-%         
-%         %Number of experiments in each file:
-%         numExp = 100;
-%     
-%         plotTime = 1;
-%         
-%         %The relative margin above the medians that we're willing to plot...
-%         yLimMargin = 0.25; 
-% 
-%         %The filesnames ommit the data/ and the .csv.
-%         filenames = {'R2S1916971778SpiralExperiment'
-%                      };
-% 
-%         figures = {};
-% 
-%         %The planner names (log and plot) and colours:
-%         planners = {'RRTConnect',              'RRTConnect',               k;
-%                     'RRT',                     'RRT',                      y;
-%                     'RRTstar',                 'RRT*',                     m;
-%                     'Informed_RRTstar',        'Informed RRT*',            c;
-%                     'SORRTstar100',            'SORRT*',                   b;
-%                     'FMTstar100',              'FMT*',                     r;
-%                     'FMTstar1000',             'FMT*',                     r;
-%                     'FMTstar10000',            'FMT*',                     r;
-%                     'BITstar100',              'BIT*',                     g};
-% 
-%        
-%        ignorePlanners = {};
-%     elseif (R == 0.8)
-%         %Interp spacing:
-%         interpTime = 0.001;
-% 
-%         useMedian = true;
-%         unsolvedAsNan = false;
-%         
-%         %Number of experiments in each file:
-%         numExp = 50;
-%     
-%         plotTime = 1.0*60;
-%         
-%         %The relative margin above the medians that we're willing to plot...
-%         yLimMargin = 0.25; 
-% 
-%         %The filesnames ommit the data/ and the .csv.
-%         filenames = {'R8S2926895744RandRect'
-%                      };
-% 
-%         figures = {};
-% 
-%         %The planner names (log and plot) and colours:
-%         planners = {'RRTConnect',              'RRTConnect',               k;
-%                     'Informed_RRTstar',        'Informed RRT*',            c;
-%                     'SORRTstar100',            'SORRT*',                   b;
-%                     'BITstar100',              'BIT*',                     g};
-%        
-%        ignorePlanners = {};
-%     elseif (R == 2)
-%         %Interp spacing:
-%         interpTime = 0.001;
-% 
-%         useMedian = true;
-%         unsolvedAsNan = false;
-%         
-%         %Number of experiments in each file:
-%         numExp = 100;
-%     
-%         plotTime = 3;
-%         
-%         %The relative margin above the medians that we're willing to plot...
-%         yLimMargin = 0.25; 
-% 
-%         %The filesnames ommit the data/ and the .csv.
-%         filenames = {'R2S1768893106RegularRects';
-%                      'R2S69304096RandRect';
-%                      'R2S1318982274RandRect';
-%                      'R2S1392623785RandRect';
-%                      'R2S1474871623RandRect';
-%                      'R2S1559415480RandRect';
-%                      'R2S2793489766RandRect';
-%                      'R2S2879561549RandRect';
-%                      'R2S2959607242RandRect';
-%                      'R2S4210929957RandRect';
-%                      'R2S4275578477RandRect'
-%                      };
-% 
-%         figures = {};
-% 
-%         %The planner names (log and plot) and colours:
-%         planners = {'RRTConnect',              'RRTConnect',               c;
-%                     'RRT',                     'RRT',                      k;
-%                     'RRTstar',                 'RRT*',                     m;
-%                     'Informed_RRTstar',        'Informed RRT*',            b;
-%                     'FMTstar100',              'FMT*',                     r;
-%                     'FMTstar1000',             'FMT*',                     r;
-%                     'FMTstar10000',            'FMT*',                     r;
-%                     'BITstar100',              'BIT*',                     g};
-%        
-%        ignorePlanners = {};
-%     elseif (R == 8)
-%         %Interp spacing:
-%         interpTime = 0.001;
-%     
-%         useMedian = true;
-%         unsolvedAsNan = false;
-%         
-%         %Number of experiments in each file:
-%         numExp = 100;
-%     
-%         plotTime = 150;
-%         
-%         %The relative margin above the medians that we're willing to plot...
-%         yLimMargin = 0.25; 
-% 
-%         %The filesnames ommit the data/ and the .csv.
-%         filenames = {'R8S2931786282RegularRects';
-%                      'R8S611884414RandRect';
-%                      'R8S666381624RandRect';
-%                      'R8S1005043852RandRect';
-%                      'R8S16758865RandRect';
-%                      'R8S2090761801RandRect';
-%                      'R8S2563592664RandRect';
-%                      'R8S2733150352RandRect';
-%                      'R8S3119022076RandRect';
-%                      'R8S3999221943RandRect';
-%                      'R8S4243632470RandRect'
-%                     };
-% 
-%         figures = {};
-% 
-%         %The planner names (log and plot) and colours:
-%         planners = {'RRTConnect',              'RRTConnect',               c;
-%                     'RRT',                     'RRT',                      k;
-%                     'RRTstar',                 'RRT*',                     m;
-%                     'Informed_RRTstar',        'Informed RRT*',            b;
-%                     'FMTstar100',              'FMT*',                     r;
-%                     'FMTstar1000',             'FMT*',                     r;
-%                     'FMTstar10000',            'FMT*',                     r;
-%                     'BITstar100',              'BIT*',                     g};
-%        
-%        ignorePlanners = {};
-%     elseif (R == 16)
-%         %Interp spacing:
-%         interpTime = 0.001;
-%     
-%         useMedian = true;
-%         unsolvedAsNan = false;
-%         
-%         %Number of experiments in each file:
-%         numExp = 100;
-%     
-%         plotTime = 300;
-%         
-%         %The relative margin above the medians that we're willing to plot...
-%         yLimMargin = 0.25; 
-% 
-%         %The filesnames ommit the data/ and the .csv.
-%         filenames = {'R16S704792960RegularRects';
-% %                      'R16S530875199RandRect';
-% %                      'R16S3720434557RandRect';
-% %                      'R16S4153856203RandRect';
-%                     };
-% 
-%         figures = {};
-% 
-%         %The planner names (log and plot) and colours:
-%         planners = {'RRTConnect',              'RRTConnect',               c;
-%                     'RRT',                     'RRT',                      k;
-%                     'RRTstar',                 'RRT*',                     m;
-%                     'Informed_RRTstar',        'Informed RRT*',            b;
-%                     'FMTstar100',              'FMT*',                     r;
-%                     'FMTstar1000',             'FMT*',                     r;
-%                     'FMTstar10000',            'FMT*',                     r;
-%                     'BITstar100',              'BIT*',                     g};
-%        
-%        ignorePlanners = {};
-%     elseif (R == 2i)
-%         %Interp spacing:
-%         interpTime = 0.001;
-% 
-%         useMedian = true;
-%         unsolvedAsNan = false;
-%         
-%         %Number of experiments in each file:
-%         numExp = 100;
-%     
-%         plotTime = 3;
-%         
-%         %The relative margin above the medians that we're willing to plot...
-%         yLimMargin = 0.25; 
-% 
-%         %The filesnames ommit the data/ and the .csv.
-%         filenames = {'R2S4008035615RegularRects'
-%                     };
-% 
-%         figures = {};
-% 
-%         %The planner names (log and plot) and colours:
-%         planners = { 'RRTstar',                     'RRT*',                     k;
-%                      'RRTstar_Prune',               'RRT* w/ pruning',          r;
-%                      'RRTstar_NewStateRejection',   'RRT* w/ new reject',       m;
-%                      'RRTstar_SampleRejection',     'RRT* w/ sample reject',    c;
-%                      'RRTstar_Trio',                'RRT* trio',                b;
-%                      'Informed_RRTstar',            'Informed RRT*',            g};
-%        
-%        ignorePlanners = {};
-%     elseif (R == 4i)
-%         %Interp spacing:
-%         interpTime = 0.001;
-% 
-%         useMedian = true;
-%         unsolvedAsNan = false;
-%         
-%         %Number of experiments in each file:
-%         numExp = 100;
-%     
-%         plotTime = 30;
-%         
-%         %The relative margin above the medians that we're willing to plot...
-%         yLimMargin = 0.25; 
-% 
-%         %The filesnames ommit the data/ and the .csv.
-%         filenames = {'R4S1810018230RegularRects'
-%                     };
-% 
-%         figures = {};
-% 
-%         %The planner names (log and plot) and colours:
-%         planners = { 'RRTstar',                     'RRT*',                     k;
-%                      'RRTstar_Prune',               'RRT* w/ pruning',          r;
-%                      'RRTstar_NewStateRejection',   'RRT* w/ new reject',       m;
-%                      'RRTstar_SampleRejection',     'RRT* w/ sample reject',    c;
-%                      'RRTstar_Trio',                'RRT* trio',                b;
-%                      'Informed_RRTstar',            'Informed RRT*',            g};
-%        
-%        ignorePlanners = {};
-%     elseif (R == 8i)
-%         %Interp spacing:
-%         interpTime = 0.001;
-% 
-%         useMedian = true;
-%         unsolvedAsNan = false;
-%         
-%         %Number of experiments in each file:
-%         numExp = 100;
-%     
-%         plotTime = 150;
-%         
-%         %The relative margin above the medians that we're willing to plot...
-%         yLimMargin = 0.25; 
-% 
-%         %The filesnames ommit the data/ and the .csv.
-%         filenames = {'R8S633746805RegularRects'
-%                     };
-% 
-%         figures = {};
-% 
-%         %The planner names (log and plot) and colours:
-%         planners = { 'RRTstar',                     'RRT*',                     k;
-%                      'RRTstar_Prune',               'RRT* w/ pruning',          r;
-%                      'RRTstar_NewStateRejection',   'RRT* w/ new reject',       m;
-%                      'RRTstar_SampleRejection',     'RRT* w/ sample reject',    c;
-%                      'RRTstar_Trio',                'RRT* trio',                b;
-%                      'Informed_RRTstar',            'Informed RRT*',            g};
-%        
-%        ignorePlanners = {};
-% %%%%%
