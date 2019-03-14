@@ -40,7 +40,7 @@
 #include "experiments/BaseExperiment.h"
 
 // An Obstacle-World
-#include "obstacles/HyperrectangleObstacles.h"
+#include "obstacles/CutoutObstacles.h"
 
 
 /** \brief An two-homotopy-class experiment that scales to N dimensions. I.e., an obstacle with a gap that is anchored to the map limit on one side. */
@@ -48,7 +48,7 @@ class WallGapExperiment : public BaseExperiment
 {
 public:
     /** \brief Constructor */
-    WallGapExperiment(const unsigned int dim, const bool onlyFindGap, const double gapWidth, const double runSeconds, const double checkResolution);
+    WallGapExperiment(const unsigned int dim, const bool onlyFindGap, const double gapWidth, const double gapOffset, const double flankWidth, const double runSeconds, const double checkResolution);
 
     /** \brief This problem knows its optimum */
     virtual bool knowsOptimum() const;
@@ -76,19 +76,23 @@ protected:
     /** \brief Whether to stop on class switch */
     bool stopClassSwitch_;
     /** \brief The obstacle world */
-    std::shared_ptr<HyperrectangleObstacles> rectObs_;
+    std::shared_ptr<CutoutObstacles> rectObs_;
     /** \brief The lower-left corners of the obstacles*/
-    std::shared_ptr<ompl::base::ScopedState<> > upperObs_;
-    std::shared_ptr<ompl::base::ScopedState<> > lowerObs_;
+    std::shared_ptr<ompl::base::ScopedState<> > gapLowerLeftCorner_;
+    std::shared_ptr<ompl::base::ScopedState<> > obstacleLowerLeftCorner_;
     /** The widths of the obstacles */
-    std::vector<double> upperWidths_;
-    std::vector<double> lowerWidths_;
+    std::vector<double> gapWidths_;
+    std::vector<double> obstacleWidths_;
 
     // Constant Parameters
     /** \brief The basic thickness of the obstacle. */
     double obsThickness_;
     /** \brief The gap width. */
     double gapWidth_;
+    /** \brief The gap offset. */
+    double gapOffset_;
+    /** \brief The flank width. */
+    double flankWidth_;
     /** \brief The start and goal positions */
     double startPos_;
     double goalPos_;

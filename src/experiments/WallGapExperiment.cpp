@@ -52,11 +52,15 @@
 #include "ompl/base/goals/GoalState.h"
 #include "ompl/base/goals/GoalStates.h"
 
-WallGapExperiment::WallGapExperiment(const unsigned int dim, const bool onlyFindGap, const double gapWidth, const double runSeconds, const double checkResolution)
+#include "obstacles/HyperrectangleObstacles.h"
+
+WallGapExperiment::WallGapExperiment(const unsigned int dim, const bool onlyFindGap, const double gapWidth, const double gapOffset, const double flankWidth, const double runSeconds, const double checkResolution)
     :   BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-1.0, 1.0)), runSeconds, "WallGap"),
         stopClassSwitch_(onlyFindGap),
         obsThickness_(0.25),
         gapWidth_(gapWidth),
+        gapOffset_(gapOffset),
+        flankWidth_(flankWidth),
         startPos_(-0.5),
         goalPos_(0.5)
 {
@@ -73,7 +77,10 @@ WallGapExperiment::WallGapExperiment(const unsigned int dim, const bool onlyFind
     BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
     // Allocate the obstacle world
-    rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
+    std::shared_ptr<HyperrectangleObstacles> obs;
+    std::shared_ptr<HyperrectangleObstacles> anti;
+
+    rectObs_ = std::make_shared<CutoutObstacles>(BaseExperiment::si_);
     BaseExperiment::obs_ = rectObs_;
 
     //Set the problem bounds:
@@ -136,67 +143,81 @@ WallGapExperiment::WallGapExperiment(const unsigned int dim, const bool onlyFind
     // Add
     BaseExperiment::goalPtr_->as<ompl::base::GoalState>()->setState(BaseExperiment::goalStates_.back());
 
+    // Allocate the temporary variable for the obstacles, antiobstacles, and the lower-left corners
+    obs = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
+    anti = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
+
     // Allocate the obstacles lower-left corners:
-    lowerObs_ = std::make_shared<ompl::base::ScopedState<> >(ss);
-    upperObs_ = std::make_shared<ompl::base::ScopedState<> >(ss);
+    obstacleLowerLeftCorner_ = std::make_shared<ompl::base::ScopedState<> >(ss);
 
-    // Specify the lower obstacle
+    // Specify the obstacle
     // Position
-    (*lowerObs_)[0u] = (goalPos_ + startPos_)/2.0 - 0.5*obsThickness_; // x
-    (*lowerObs_)[1u] = BaseExperiment::limits_.at(1u).first; // y
+    (*obstacleLowerLeftCorner_)[0u] = (goalPos_ + startPos_)/2.0 - 0.5*obsThickness_; // x
+    (*obstacleLowerLeftCorner_)[1u] = BaseExperiment::limits_.at(1u).first; // y
     for (unsigned int i = 2u; i < BaseExperiment::dim_; ++i)
     {
-        (*lowerObs_)[i] = BaseExperiment::limits_.at(i).first; //z
+        (*obstacleLowerLeftCorner_)[i] = BaseExperiment::limits_.at(i).first; //z
     }
 
-    // Widths
-    lowerWidths_ = std::vector<double> (BaseExperiment::dim_, 0.0);
-    lowerWidths_.at(0u) = obsThickness_; // x width
-    lowerWidths_.at(1u) = (0.0 - 0.25*obsThickness_ - 0.5*gapWidth_) - BaseExperiment::limits_.at(1u).first; //y width
+    // Obstacle widths
+    obstacleWidths_ = std::vector<double> (BaseExperiment::dim_, 0.0);
+    obstacleWidths_.at(0u) = obsThickness_; // x width
+    obstacleWidths_.at(1u) = (BaseExperiment::limits_.at(1u).second - BaseExperiment::limits_.at(1u).first) - flankWidth_; //y width
     for (unsigned int i = 2u; i < BaseExperiment::dim_; ++i)
     {
-        lowerWidths_.at(i) = BaseExperiment::limits_.at(i).second - BaseExperiment::limits_.at(i).first;
+        obstacleWidths_.at(i) = BaseExperiment::limits_.at(i).second - BaseExperiment::limits_.at(i).first;
     }
 
-    // Specify the upper obstacle
-    (*upperObs_)[0u] = (*lowerObs_)[0]; // x
-    (*upperObs_)[1u] = (*lowerObs_)[1] + lowerWidths_.at(1) + gapWidth_;
+    obs->addObstacle(std::make_pair(obstacleLowerLeftCorner_->get(), obstacleWidths_));
+
+    // Gap lower left corner.
+    gapLowerLeftCorner_ = std::make_shared<ompl::base::ScopedState<> >(ss);
+
+    // Specify the gap (as anti obstacle)
+    (*gapLowerLeftCorner_)[0u] = (goalPos_ + startPos_)/2.0 - 0.5*obsThickness_; // x
+    (*gapLowerLeftCorner_)[1u] = gapOffset_ + gapWidth_;
     for (unsigned int i = 2u; i < BaseExperiment::dim_; ++i)
     {
-        (*upperObs_)[i] = BaseExperiment::limits_.at(i).first; //z
+        (*gapLowerLeftCorner_)[i] = BaseExperiment::limits_.at(i).first; //z
     }
 
-    // Widths, which are only different from the lower widths in the second dimension
-    upperWidths_ = lowerWidths_;
-    upperWidths_.at(1u) = 0.75*obsThickness_- 0.5*gapWidth_;
-
-    // Add the obstacles
-    rectObs_->addObstacle(std::make_pair(lowerObs_->get(), lowerWidths_));
-    rectObs_->addObstacle(std::make_pair(upperObs_->get(), upperWidths_));
-
-    //Finally specify the optimization target:
-    if (stopClassSwitch_ == true)
+    // Gap widths
+    gapWidths_ = std::vector<double> (BaseExperiment::dim_, 0.0);
+    gapWidths_.at(0u) = obsThickness_; // x width
+    gapWidths_.at(1u) = gapWidth_; //y width
+    for (unsigned int i = 2u; i < BaseExperiment::dim_; ++i)
     {
-        //Stop if we find a cost better than the max non flanking cost
-        BaseExperiment::opt_->setCostThreshold(this->minFlankingCost());
-    }
-    else
-    {
-        //The optimum:
-        BaseExperiment::opt_->setCostThreshold(this->getOptimum());
+        gapWidths_.at(i) = BaseExperiment::limits_.at(i).second - BaseExperiment::limits_.at(i).first;
     }
 
-    //Make sure this is a sane problem:
-    if (this->minFlankingCost().value() < this->maxGapCost().value())
-    {
-        throw ompl::Exception("For the given gap width, a path through the gap can be worse than a flanking path.");
-    }
-    //No else
+    anti->addObstacle(std::make_pair(gapLowerLeftCorner_->get(), gapWidths_));
+
+    rectObs_->addObstacle(obs);
+    rectObs_->addAntiObstacle(anti);
+
+//     //Finally specify the optimization target:
+//     if (stopClassSwitch_ == true)
+//     {
+//         //Stop if we find a cost better than the max non flanking cost
+//         BaseExperiment::opt_->setCostThreshold(this->minFlankingCost());
+//     }
+//     else
+//     {
+//         //The optimum:
+//         BaseExperiment::opt_->setCostThreshold(this->getOptimum());
+//     }
+
+//     //Make sure this is a sane problem:
+//     if (this->minFlankingCost().value() < this->maxGapCost().value())
+//     {
+//         throw ompl::Exception("For the given gap width, a path through the gap can be worse than a flanking path.");
+//     }
+//     //No else
 }
 
 bool WallGapExperiment::knowsOptimum() const
 {
-    return true;
+    return false;
 }
 
 ompl::base::Cost WallGapExperiment::getOptimum() const
@@ -207,9 +228,9 @@ ompl::base::Cost WallGapExperiment::getOptimum() const
     ompl::base::Cost otherCornerToGoal;
 
     //The optimum goes exactly under *upperObs_:
-    startToCorner = ompl::base::Cost (std::sqrt(std::pow((*upperObs_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) + std::pow((*upperObs_)[1u] - BaseExperiment::startStates_.front()[1u], 2.0)));
-    obsEdge = ompl::base::Cost (upperWidths_.at(0u));
-    otherCornerToGoal = ompl::base::Cost (std::sqrt(std::pow(BaseExperiment::goalStates_.front()[0u] - ((*upperObs_)[0u] + upperWidths_.at(0u)), 2.0) + std::pow(BaseExperiment::goalStates_.front()[1u] - (*upperObs_)[1u], 2.0)));
+    startToCorner = ompl::base::Cost (std::sqrt(std::pow((*gapLowerLeftCorner_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) + std::pow((*gapLowerLeftCorner_)[1u] - BaseExperiment::startStates_.front()[1u], 2.0)));
+    obsEdge = ompl::base::Cost (gapWidths_.at(0u));
+    otherCornerToGoal = ompl::base::Cost (std::sqrt(std::pow(BaseExperiment::goalStates_.front()[0u] - ((*gapLowerLeftCorner_)[0u] + gapWidths_.at(0u)), 2.0) + std::pow(BaseExperiment::goalStates_.front()[1u] - (*gapLowerLeftCorner_)[1u], 2.0)));
 
     // Combine and return:
     return BaseExperiment::opt_->combineCosts(BaseExperiment::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
@@ -223,9 +244,9 @@ ompl::base::Cost WallGapExperiment::minFlankingCost() const
     ompl::base::Cost otherCornerToGoal;
 
     //The minimum cost not through the gap goes exactly over *upperObs_:
-    startToCorner = ompl::base::Cost(std::sqrt(std::pow((*upperObs_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) + std::pow(((*upperObs_)[1u] + upperWidths_.at(1u)) - BaseExperiment::startStates_.front()[1u], 2.0)));
-    obsEdge = ompl::base::Cost(upperWidths_.at(0u));
-    otherCornerToGoal = ompl::base::Cost(std::sqrt(std::pow(BaseExperiment::goalStates_.front()[0u] - ((*upperObs_)[0u] + upperWidths_.at(0u)), 2.0) + std::pow(BaseExperiment::goalStates_.front()[1u] - ((*upperObs_)[1u] + upperWidths_.at(1u)), 2.0)));
+    startToCorner = ompl::base::Cost(std::sqrt(std::pow((*gapLowerLeftCorner_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) + std::pow(((*gapLowerLeftCorner_)[1u] + gapWidths_.at(1u)) - BaseExperiment::startStates_.front()[1u], 2.0)));
+    obsEdge = ompl::base::Cost(gapWidths_.at(0u));
+    otherCornerToGoal = ompl::base::Cost(std::sqrt(std::pow(BaseExperiment::goalStates_.front()[0u] - ((*gapLowerLeftCorner_)[0u] + gapWidths_.at(0u)), 2.0) + std::pow(BaseExperiment::goalStates_.front()[1u] - ((*gapLowerLeftCorner_)[1u] + gapWidths_.at(1u)), 2.0)));
 
     // Combine and return:
     return BaseExperiment::opt_->combineCosts(BaseExperiment::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
@@ -240,9 +261,9 @@ ompl::base::Cost WallGapExperiment::maxGapCost() const
     ompl::base::Cost otherCornerToGoal;
 
     //The worst-case straight-line-path through the gap goes exactly over *lowerObs_:
-    startToCorner = ompl::base::Cost(std::sqrt(std::pow((*lowerObs_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) + std::pow(((*lowerObs_)[1u] + lowerWidths_.at(1u)) - BaseExperiment::startStates_.front()[1u], 2.0)));
-    obsEdge = ompl::base::Cost(lowerWidths_.at(0u));
-    otherCornerToGoal = ompl::base::Cost(std::sqrt(std::pow(BaseExperiment::goalStates_.front()[0u] - ((*lowerObs_)[0u] + lowerWidths_.at(0u)), 2.0) + std::pow(BaseExperiment::goalStates_.front()[1u] - ((*lowerObs_)[1u] + lowerWidths_.at(1u)), 2.0)));
+    startToCorner = ompl::base::Cost(std::sqrt(std::pow((*obstacleLowerLeftCorner_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) + std::pow(((*obstacleLowerLeftCorner_)[1u] + obstacleWidths_.at(1u)) - BaseExperiment::startStates_.front()[1u], 2.0)));
+    obsEdge = ompl::base::Cost(obstacleWidths_.at(0u));
+    otherCornerToGoal = ompl::base::Cost(std::sqrt(std::pow(BaseExperiment::goalStates_.front()[0u] - ((*obstacleLowerLeftCorner_)[0u] + obstacleWidths_.at(0u)), 2.0) + std::pow(BaseExperiment::goalStates_.front()[1u] - ((*obstacleLowerLeftCorner_)[1u] + obstacleWidths_.at(1u)), 2.0)));
 
     // Combine and return:
     return BaseExperiment::opt_->combineCosts(BaseExperiment::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
@@ -275,7 +296,7 @@ std::string WallGapExperiment::paraInfo() const
     rval << "bottom obstacle: [";
     for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i)
     {
-        rval << (*lowerObs_)[i];
+        rval << (*obstacleLowerLeftCorner_)[i];
         if (i != BaseExperiment::dim_-1u)
         {
             rval << ", ";
@@ -284,7 +305,7 @@ std::string WallGapExperiment::paraInfo() const
     rval << "], [";
     for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i)
     {
-        rval << (*lowerObs_)[i] + lowerWidths_.at(i);
+        rval << (*obstacleLowerLeftCorner_)[i] + obstacleWidths_.at(i);
         if (i != BaseExperiment::dim_-1u)
         {
             rval << ", ";
@@ -294,7 +315,7 @@ std::string WallGapExperiment::paraInfo() const
     rval << "upper obstacle: [";
     for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i)
     {
-        rval << (*upperObs_)[i];
+        rval << (*gapLowerLeftCorner_)[i];
         if (i != BaseExperiment::dim_-1u)
         {
             rval << ", ";
@@ -303,7 +324,7 @@ std::string WallGapExperiment::paraInfo() const
     rval << "], [";
     for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i)
     {
-        rval << (*upperObs_)[i] + upperWidths_.at(i);
+        rval << (*gapLowerLeftCorner_)[i] + gapWidths_.at(i);
         if (i != BaseExperiment::dim_-1u)
         {
             rval << ", ";
