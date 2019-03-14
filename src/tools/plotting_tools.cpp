@@ -559,6 +559,8 @@ asrl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
     bool optimized;
     //The start time
     asrl::time::point startTime;
+    // The iteration time
+    asrl::time::duration iterTime;
     //The total run time of the algorithm:
     asrl::time::duration runTime(0);
     //The path
@@ -572,7 +574,16 @@ asrl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
     //The planner status
     ompl::base::PlannerStatus plannerStatus = ompl::base::PlannerStatus::UNKNOWN;
 
+    // The path to write the files to.
     pathStream << "frames/" << planner->getName() << "S" << worldSeed << "/";
+
+    createDirectories(pathStream.str());
+
+    // The file that holds the timestamps of the frames.
+    std::ofstream timeFile;
+    timeFile.open(pathStream.str() + "frame_times.txt");
+    timeFile << "ffconcat version 1.0\n";
+    timeFile << std::setw(6) << std::setprecision(9) << std::fixed;
 
     //Run until the real PTC is met
     optimized = false;
@@ -580,15 +591,14 @@ asrl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
     //Write initial map:
     if (iter == 0u)
     {
-        writeMatlabMap(experiment, plannerType, planner, worldSeed, plotVertices, plotIndices, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), "I000000", monochrome);
-        writeMatlabMap(experiment, plannerType, planner, worldSeed, plotVertices, plotIndices, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), "I000001", monochrome);
+        writeMatlabMap(experiment, plannerType, planner, worldSeed, 0.0, plotVertices, plotIndices, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), "I000000", monochrome);
+        writeMatlabMap(experiment, plannerType, planner, worldSeed, 0.0, plotVertices, plotIndices, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), "I000001", monochrome);
+        timeFile << "file 000001.png\n";
         ++iter;
     }
 
     while (runTime < timeToRun && optimized == false && (plannerType != PLANNER_FMTSTAR || (plannerStatus != ompl::base::PlannerStatus::EXACT_SOLUTION && plannerStatus != ompl::base::PlannerStatus::CRASH)))
     {
-        //The iteration as a string
-        std::stringstream iterStream;
 
         ++iter;
 
@@ -596,12 +606,22 @@ asrl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
 
         startTime = asrl::time::now();
         plannerStatus = planner->solve(iterationPtc);
-        runTime = runTime + (asrl::time::now() - startTime);
+        iterTime = asrl::time::now() - startTime;
+        runTime = runTime + iterTime;
 
-        //Make frame:
-        iterStream << "I" << std::setfill('0') << std::setw(6) << iter;
+        // The identification postfix as a string
+        std::stringstream identificationStream;
+        identificationStream << "I" << std::setfill('0') << std::setw(6) << iter;
 
-        writeMatlabMap(experiment, plannerType, planner, worldSeed, plotVertices, plotIndices, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), iterStream.str(), monochrome);
+        // The iteration as a zero-padded string
+        std::stringstream iterationStream;
+        iterationStream << std::setfill('0') << std::setw(6) << iter;
+
+        // Write to the file with the frame times.
+        timeFile << "duration " << asrl::time::seconds(iterTime) * 1000.0 << '\n';
+        timeFile << "file " << iterationStream.str() << ".png\n";
+
+        writeMatlabMap(experiment, plannerType, planner, worldSeed, asrl::time::seconds(runTime), plotVertices, plotIndices, informedWorldEllipse, bitStarEllipse, bitStarEdge, bitStarQueue, pathStream.str(), identificationStream.str(), monochrome);
 
         if (planner->getProblemDefinition()->hasExactSolution() == true)
         {
@@ -612,6 +632,9 @@ asrl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType p
             }
         }
     }
+
+    timeFile.flush();
+    timeFile.close();
 
     //Now make the master animation file:
 
