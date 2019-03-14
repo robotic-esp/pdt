@@ -34,6 +34,10 @@
 
 /* Authors: Jonathan Gammell */
 
+// For SIGINT handling
+#include <unistd.h>
+#include <signal.h>
+
 //For std::cout
 #include <iostream>
 //For std::ifstream and std::ofstream
@@ -88,6 +92,7 @@ const double CHECK_RESOLUTION = 0.001;
 // Common
 const double REWIRE_SCALE = 1.1; //The factor scaling the RGG term
 const bool K_NEAREST = false;
+const double PRUNE_FRACTION = 0.1;
 
 // Experiment:
 const bool INITIAL_SOLN_ONLY = false;
@@ -96,35 +101,44 @@ const bool LOG_ITERATIONS_AND_COST = false;
 const unsigned int MICROSEC_SLEEP = 100u; // Period for logging data, 1000us = 1ms
 
 // BIT*
-const unsigned int BITSTAR_BATCH_SIZE = 100u;
+const unsigned int BITSTAR_BATCH_SIZE = 500;
 const bool BITSTAR_K_NEAREST = K_NEAREST;
 const double BITSTAR_REWIRE_SCALE = REWIRE_SCALE;
 const bool BITSTAR_ENABLE_PRUNING = false;
-const double BITSTAR_PRUNE_FRACTION = 0.99;
+const double BITSTAR_PRUNE_FRACTION = PRUNE_FRACTION;
 const bool BITSTAR_STRICT_QUEUE = true;
 const bool BITSTAR_DELAY_REWIRE = false;
 const bool BITSTAR_JIT = false;
 const bool BITSTAR_DROP_BATCH = false;
 
 // ABIT*
-const double ABITSTAR_INITIAL_INFLATION_FACTOR = 1000;
+const double ABITSTAR_INITIAL_INFLATION_FACTOR = 1000000.0;
+const double ABITSTAR_INFLATION_FACTOR_PARAMETER = 50;
+const double ABITSTAR_TRUNCATION_FACTOR_PARAMETER = 50;
 
 // RRT
+const bool RRT_K_NEAREST = K_NEAREST;
+const double RRT_REWIRE_SCALE = REWIRE_SCALE;
+const double RRT_PRUNE_FRACTION = PRUNE_FRACTION;
 const double RRT_STEER_ETA_2D = 0.3;
 const double RRT_STEER_ETA_4D = 0.5;
+const double RRT_STEER_ETA_6D = 0.9;
 const double RRT_STEER_ETA_8D = 1.25; //0.9;
 const double RRT_STEER_ETA_16D = 3.0;
 
 // LBTRRT
 const double LBTRRT_EPSILON = 0.4;
 
+// RRT SHARP
+const bool RRTSHARP_REJECT = false;
+
 // Others
-const double GOAL_BIAS = 0.05; //8D: 0.05; //2D: 0.05
+const double GOAL_BIAS = 0.05;
 
 //Plotting
 const bool PLOT_VERTICES = true;
 const bool PLOT_INDICES = false;
-const bool PLOT_WORLD_ELLIPSE = false;
+const bool PLOT_WORLD_ELLIPSE = true;
 const bool PLOT_BITSTAR_ELLIPSE = false;
 const bool PLOT_BITSTAR_EDGE = true;
 const bool PLOT_BITSTAR_QUEUE = false;
@@ -195,7 +209,7 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
     if (vm.count("state"))
     {
         *dimensionPtr = vm["state"].as<unsigned int>();
-        if ( (*dimensionPtr  != 2) && (*dimensionPtr  != 4) && (*dimensionPtr  != 8) && (*dimensionPtr  != 16) )
+        if ( (*dimensionPtr  != 2) && (*dimensionPtr  != 4) && (*dimensionPtr  != 6) && (*dimensionPtr  != 8) && (*dimensionPtr  != 16) )
         {
             std::cout << "Due to hard-coded RRT* paramenters, state dimension must be 2, 4, 8, or 16 for now " << std::endl << std::endl << desc << std::endl;
             return false;
@@ -289,17 +303,33 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
     {
         case PLANNER_BITSTAR:
         {
-            plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_ENABLE_PRUNING, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH, 1.0);
+            plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_ENABLE_PRUNING, BITSTAR_PRUNE_FRACTION, BITSTAR_JIT, BITSTAR_DROP_BATCH, 1.0, 0.0, 0.0);
             break;
         }
-        case PLANNER_ABITSTAR:
+        case PLANNER_SBITSTAR:
         {
-            plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_ENABLE_PRUNING, BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT, BITSTAR_DROP_BATCH, ABITSTAR_INITIAL_INFLATION_FACTOR);
+            plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_ENABLE_PRUNING, BITSTAR_PRUNE_FRACTION, BITSTAR_JIT, BITSTAR_DROP_BATCH, ABITSTAR_INITIAL_INFLATION_FACTOR, ABITSTAR_INFLATION_FACTOR_PARAMETER, ABITSTAR_TRUNCATION_FACTOR_PARAMETER);
             break;
         }
         case PLANNER_RRTCONNECT:
         {
             plnr = allocateRrtConnect(expDefn->getSpaceInformation(), steerEta);
+            break;
+        }
+        case PLANNER_RRTSTAR:
+        {
+            plnr = allocateRrtStar(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST, REWIRE_SCALE);
+            break;
+        }
+        case PLANNER_RRTSTAR_INFORMED:
+        {
+            plnr = allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST, RRT_REWIRE_SCALE, RRT_PRUNE_FRACTION);
+            break;
+        }
+        case PLANNER_RRTSHARP:
+        {
+            // Abuse numSamples as the variant number.
+            plnr = allocateRrtSharp(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST, REWIRE_SCALE, RRTSHARP_REJECT, false, numSamples);
             break;
         }
         case PLANNER_LBTRRT:
@@ -327,6 +357,16 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
      return plnr;
 };
 
+// Defining the experiment counter globally allows to gracefully finish an experiment and close the output file on SIGINT.
+unsigned int experimentCounter = 0u;
+
+// Handle SIGINT by setting the counter to maximum value, terminating the experiment loop.
+void signalHandler(int signum)
+{
+    std::cout << "\n=== Caught signal " << signum << ". Will clean up as soon as all planners have completed the same number of runs. ===\n" << std::endl;
+    experimentCounter = std::numeric_limits<unsigned int>::max() - 1u;
+}
+
 void callSolve(asrl::time::point* startTime, const ompl::base::PlannerPtr& planner, const asrl::time::duration& solveDuration)
 {
     *startTime = asrl::time::now();
@@ -337,6 +377,8 @@ void callSolve(asrl::time::point* startTime, const ompl::base::PlannerPtr& plann
 
 int main(int argc, char **argv)
 {
+    signal(SIGINT, signalHandler);
+
     //Argument Variables
     //The dimension size:
     unsigned int N;
@@ -374,13 +416,15 @@ int main(int argc, char **argv)
     // BaseExperimentPtr expDefn = std::make_shared<CentreSquareExperiment>(N, 0.25, 2.8, targetTime, CHECK_RESOLUTION);
     // BaseExperimentPtr expDefn = std::make_shared<DeadEndExperiment>(0.4, targetTime, CHECK_RESOLUTION);
     // BaseExperimentPtr expDefn = std::make_shared<SpiralExperiment>(0.4, targetTime, CHECK_RESOLUTION);
-    // BaseExperimentPtr expDefn = std::make_shared<WallGapExperiment>(N, false, 0.05, targetTime, CHECK_RESOLUTION);
-    // BaseExperimentPtr expDefn = std::make_shared<FlankingGapExperiment>(false, 0.05, targetTime, CHECK_RESOLUTION);
+    // BaseExperimentPtr expDefn = std::make_shared<WallGapExperiment>(N, false, 0.03, 0.3, 0.3, targetTime, CHECK_RESOLUTION);
+    BaseExperimentPtr expDefn = std::make_shared<FlankingGapExperiment>(false, 0.01, targetTime, CHECK_RESOLUTION);
     // BaseExperimentPtr expDefn = std::make_shared<RandomRectanglesExperiment>(N, numObs, obsRatio, targetTime, CHECK_RESOLUTION);
-    // BaseExperimentPtr expDefn = std::make_shared<RegularRectanglesExperiment>(N, 4.0, 5, targetTime, CHECK_RESOLUTION);
-    BaseExperimentPtr expDefn = std::make_shared<DoubleEnclosureExperiment>(N, 1.4, 0.6, 0.1, 0.4, targetTime, CHECK_RESOLUTION); //worldHalfWidth, insideWidth, wallThickness, gapWidth. Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
+    // BaseExperimentPtr expDefn = std::make_shared<RegularRectanglesExperiment>(N, 1.0, 3, targetTime, CHECK_RESOLUTION);
+    // BaseExperimentPtr expDefn = std::make_shared<DoubleEnclosureExperiment>(N, 1.0, 0.3, 0.05, 0.1, targetTime, CHECK_RESOLUTION); //worldHalfWidth, insideWidth, wallThickness, gapWidth. Symmetry when: worldHalfWidth = (3*insideWidth + 1)/2
+    // BaseExperimentPtr expDefn = std::make_shared<GoalEnclosureExperiment>(N, 1.0, 0.3, 0.1, 0.1, targetTime, CHECK_RESOLUTION); // worldHalfWidth, insideWidth, wallThickness, gapWidth.
+    // BaseExperimentPtr expDefn = std::make_shared<StartEnclosureExperiment>(N, 9.0, 3.0, 0.5, 3.0, targetTime, CHECK_RESOLUTION); // worldHalfWidth, insideWidth, wallThickness, gapWidth.
     // BaseExperimentPtr expDefn = std::make_shared<DoubleFloorplanExperiment>(N, 3, 1.5, 0.2, 0.6, targetTime, CHECK_RESOLUTION);
-    // BaseExperimentPtr expDefn = std::make_shared<FloorplanExperiment>(N, 5, 2.5, 0.4, 0.6, targetTime, CHECK_RESOLUTION);
+    // BaseExperimentPtr expDefn = std::make_shared<FloorplanExperiment>(N, 10, 3.0, 0.4, 1.5, targetTime, CHECK_RESOLUTION);
 
     if (INITIAL_SOLN_ONLY == true)
 
@@ -396,6 +440,10 @@ int main(int argc, char **argv)
     else if (N == 4)
     {
         steerEta = RRT_STEER_ETA_4D;
+    }
+    else if (N == 6u)
+    {
+        steerEta = RRT_STEER_ETA_6D;
     }
     else if (N == 8u)
     {
@@ -419,7 +467,7 @@ int main(int argc, char **argv)
     ResultsFile<TimeIterationCostHistory> plannerProgressIters(fileName.str());
 
 
-    for (unsigned int q = 0u; q < numExperiments; ++q)
+    for (; experimentCounter < numExperiments; ++experimentCounter)
     {
         //Variables:
         //The vector of planners:
@@ -427,12 +475,14 @@ int main(int argc, char **argv)
 
         // Add the planners to test. Be careful, too large of FMT batch size (i.e., ~100000u) fucks up wall time of other planners
         plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
-        plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR_REGRESSION, BITSTAR_BATCH_SIZE));
-        plannersToTest.push_back(std::make_pair(PLANNER_ABITSTAR, BITSTAR_BATCH_SIZE));
-        plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-        plannersToTest.push_back(std::make_pair(PLANNER_LBTRRT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR_REGRESSION, BITSTAR_BATCH_SIZE));
+        // plannersToTest.push_back(std::make_pair(PLANNER_SBITSTAR, BITSTAR_BATCH_SIZE));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_LBTRRT, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
+        // plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 0u));
 
-        if (q == 0u)
+        if (experimentCounter == 0u)
         {
             std::cout << "   ";
             for (unsigned int i = 0u; i < plannersToTest.size(); ++i)
@@ -445,7 +495,7 @@ int main(int argc, char **argv)
             }
             std::cout << std::endl;
         }
-        std::cout << std::setw(2) << q << ": " << std::flush;
+        std::cout << std::setw(2) << experimentCounter << ": " << std::flush;
 
         //Iterate over the planners, using the seed and solution from the first planner:
         for (unsigned int i = 0u; i < plannersToTest.size(); ++i)
@@ -471,8 +521,8 @@ int main(int argc, char **argv)
             plnr->setup();
             initTime = asrl::time::now() - startTime;
 
-            // Set the seed.
-            // if (plannersToTest.at(i).first == PLANNER_BITSTAR || plannersToTest.at(i).first == PLANNER_ABITSTAR)
+            // // Set the seed.
+            // if (plannersToTest.at(i).first == PLANNER_BITSTAR || plannersToTest.at(i).first == PLANNER_SBITSTAR)
             // {
             //     plnr->as<ompl::geometric::BITstar>()->setLocalSeed(masterSeed);
             // }
@@ -680,7 +730,7 @@ int main(int argc, char **argv)
             }
 
             //Save the map?
-            writeMatlabMap(expDefn, plannersToTest.at(i).first, plnr, masterSeed, PLOT_VERTICES, PLOT_INDICES, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
+            writeMatlabMap(expDefn, plannersToTest.at(i).first, plnr, masterSeed, asrl::time::seconds(runTime), PLOT_VERTICES, PLOT_INDICES, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
 
             std::cout << myResult.first << ", " << std::setw(8) << myResult.second;
             if (i != plannersToTest.size() - 1u)
