@@ -53,7 +53,7 @@ enum PlannerType
     PLANNER_RRTSTAR_TRIO,
     PLANNER_FMTSTAR,
     PLANNER_BITSTAR,
-    PLANNER_ABITSTAR,
+    PLANNER_SBITSTAR,
     PLANNER_RRTSTAR_SEED,
     PLANNER_BITSTAR_SEED,
 #ifdef BITSTAR_REGRESSION
@@ -86,7 +86,7 @@ std::shared_ptr<ompl::geometric::SORRTstar> allocateSorrtStar(const ompl::base::
 std::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool cacheCC,  const bool useHeuristics);
 
 /** \brief Allocation function for BIT* */
-std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool enablePruning, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double initialInflationFactor);
+std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool enablePruning, const double pruneFraction, const bool jit, const bool refreshBatches, const double initialInflationFactor, const double inflationFactorParameter, const double truncationFactorParameter);
 
 #ifdef BITSTAR_REGRESSION
 /** \brief Allocation function for a regression testing BIT* */

@@ -189,7 +189,7 @@ std::shared_ptr<ompl::geometric::FMT> allocateFmtStar(const ompl::base::SpaceInf
     return plnr;
 }
 
-std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const double pruneFraction, const bool strictQueue, const bool delayRewire, const bool jit, const bool refreshBatches, const double initialInflationFactor, const double initialTruncationFactor, const double inflationFactorStep, const double truncationFactorStep)
+std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::SpaceInformationPtr &si, const bool kNearest, const double rewireScale, const unsigned int numSamples, const bool enablePruning, const double pruneFraction, const bool jit, const bool refreshBatches, const double initialInflationFactor, const double inflationFactorParameter, const double truncationFactorParameter)
 {
     //Create a BIT* planner
     std::shared_ptr<ompl::geometric::BITstar> plnr = std::make_shared<ompl::geometric::BITstar>(si);
@@ -198,24 +198,17 @@ std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::Spac
     plnr->setUseKNearest(kNearest);
     plnr->setRewireFactor(rewireScale);
     plnr->setSamplesPerBatch(numSamples);
-    plnr->setPruning(true);
+    plnr->setPruning(enablePruning);
     plnr->setPruneThresholdFraction(pruneFraction);
-    plnr->setStrictQueueOrdering(strictQueue);
-    plnr->setDelayRewiringUntilInitialSolution(delayRewire);
     plnr->setJustInTimeSampling(jit);
     plnr->setDropSamplesOnPrune(refreshBatches);
     plnr->setStopOnSolnImprovement(false);
     plnr->setConsiderApproximateSolutions(false);
     plnr->setInitialInflationFactor(initialInflationFactor);
-    plnr->setInitialTruncationFactor(initialTruncationFactor);
-    plnr->setInflationFactorStep(inflationFactorStep);
-    plnr->setTruncationFactorStep(truncationFactorStep);
+    plnr->setInflationFactorParameter(inflationFactorParameter);
+    plnr->setTruncationFactorParameter(truncationFactorParameter);
 
     std::stringstream plannerName;
-    if (delayRewire == true)
-    {
-        plannerName << "d";
-    }
     if (jit == true)
     {
         plannerName << "j";
@@ -228,13 +221,9 @@ std::shared_ptr<ompl::geometric::BITstar> allocateBitStar(const ompl::base::Spac
     {
         plannerName << "k";
     }
-    if (strictQueue == false)
+    if (initialInflationFactor > 1.0 || inflactionFactorParameter > 0.0 || truncationFactorParameter > 0.0)
     {
-        plannerName << "l";
-    }
-    if (initialInflationFactor > 1.0 || initialTruncationFactor > 1.0)
-    {
-        plannerName << "A";
+        plannerName << "S";
     }
     plannerName << "BITstar" << numSamples;
     plnr->setName(plannerName.str());
@@ -323,7 +312,7 @@ bool isLbtRrt(PlannerType plnrType)
 bool isBitStar(PlannerType plnrType)
 {
     return (plnrType == PLANNER_BITSTAR ||
-            plnrType == PLANNER_ABITSTAR ||
+            plnrType == PLANNER_SBITSTAR ||
             plnrType == PLANNER_BITSTAR_SEED);
 }
 
@@ -403,7 +392,7 @@ std::string plannerName(PlannerType plnrType)
             break;
         }
 #endif // BITSTAR_REGRESSION
-        case PLANNER_ABITSTAR:
+        case PLANNER_SBITSTAR:
         {
             return "ABITstar";
             break;
