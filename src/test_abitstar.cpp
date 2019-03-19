@@ -328,7 +328,7 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
 
   // Return
   return plnr;
-};
+}
 
 // Defining the experiment counter globally allows to gracefully finish an experiment and close the
 // output file on SIGINT.

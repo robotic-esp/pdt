@@ -42,18 +42,13 @@ BaseObstacle::BaseObstacle(ompl::base::SpaceInformation* si)
 BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& si)
     : ompl::base::StateValidityChecker(si) {}
 
-BaseObstacle::~BaseObstacle() {}
-
 bool BaseObstacle::isValid(const std::vector<const ompl::base::State*>& states) const {
-  // Variable
-  // The return value
-  bool validStates;
-
-  // Iterate over the states
-  validStates = true;
-  for (unsigned int i = 0u; i < states.size() && validStates == true; ++i) {
-    validStates = this->isValid(states.at(i));
+  // Check all states.
+  for (const auto &state : states) {
+    if (!isValid(state)) {
+      return false;
+    }
   }
-
-  return validStates;
+  // All states are valid.
+  return true;
 }

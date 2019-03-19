@@ -108,10 +108,10 @@ class TimeCostHistory {
 
  private:
   /** \brief Raw data */
-  std::vector<data_t> data_;
+  std::vector<data_t> data_{};
 
   /** \brief Preallocated size */
-  unsigned int allocSize_;
+  unsigned int allocSize_{0u};
 };
 
 /** \brief A vector of time & iteration & cost */
@@ -135,10 +135,10 @@ class TimeIterationCostHistory {
 
  private:
   /** \brief Raw data */
-  std::vector<data_t> data_;
+  std::vector<data_t> data_{};
 
   /** \brief Preallocated size */
-  unsigned int allocSize_;
+  unsigned int allocSize_{0u};
 };
 
 /** \brief A vector of iteration & cost */
@@ -163,10 +163,10 @@ class IterationCostHistory {
 
  private:
   /** \brief Raw data */
-  std::vector<data_t> data_;
+  std::vector<data_t> data_{};
 
   /** \brief Preallocated size */
-  unsigned int allocSize_;
+  unsigned int allocSize_{0u};
 };
 
 /** \brief A vector of "target" & time */
@@ -188,10 +188,10 @@ class TargetTimeResults {
 
  private:
   /** \brief Raw data */
-  std::vector<data_t> data_;
+  std::vector<data_t> data_{};
 
   /** \brief Preallocated size */
-  unsigned int allocSize_;
+  unsigned int allocSize_{0u};
 };
 
 //******* The file that writes the data to disk*******//

@@ -77,28 +77,28 @@ class WallGapExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief Whether to stop on class switch */
-  bool stopClassSwitch_;
+  bool stopClassSwitch_{false};
   /** \brief The obstacle world */
-  std::shared_ptr<CutoutObstacles> rectObs_;
+  std::shared_ptr<CutoutObstacles> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
-  std::shared_ptr<ompl::base::ScopedState<> > gapLowerLeftCorner_;
-  std::shared_ptr<ompl::base::ScopedState<> > obstacleLowerLeftCorner_;
+  std::shared_ptr<ompl::base::ScopedState<>> gapLowerLeftCorner_{};
+  std::shared_ptr<ompl::base::ScopedState<>> obstacleLowerLeftCorner_{};
   /** The widths of the obstacles */
-  std::vector<double> gapWidths_;
-  std::vector<double> obstacleWidths_;
+  std::vector<double> gapWidths_{};
+  std::vector<double> obstacleWidths_{};
 
   // Constant Parameters
   /** \brief The basic thickness of the obstacle. */
-  double obsThickness_;
+  double obsThickness_{0.25};
   /** \brief The gap width. */
-  double gapWidth_;
+  double gapWidth_{0.0};
   /** \brief The gap offset. */
-  double gapOffset_;
+  double gapOffset_{0.0};
   /** \brief The flank width. */
-  double flankWidth_;
+  double flankWidth_{0.0};
   /** \brief The start and goal positions */
-  double startPos_;
-  double goalPos_;
+  double startPos_{-0.5};
+  double goalPos_{0.5};
 };
 
 typedef std::shared_ptr<WallGapExperiment> WallGapExperimentPtr;

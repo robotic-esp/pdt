@@ -46,15 +46,9 @@
  * collision if it is in an obstacle and not in an anti-obstacle. */
 class CutoutObstacles : public BaseObstacle {
  public:
-  /** \brief A shared pointer to the base obstacle type. (Pointer as we're being polymorphic). */
-  typedef std::shared_ptr<BaseObstacle> base_obstacle_ptr_t;
-
-  /** \brief Constructor. */
   CutoutObstacles(ompl::base::SpaceInformation* si);
-  /** \brief Constructor. */
   CutoutObstacles(const ompl::base::SpaceInformationPtr& si);
-  /** \brief Destructor */
-  ~CutoutObstacles() override;
+  ~CutoutObstacles() = default;
 
   /** \brief Clear the obstacle space */
   void clear() override;
@@ -63,21 +57,20 @@ class CutoutObstacles : public BaseObstacle {
   bool isValid(const ompl::base::State* state) const override;
 
   /** \brief Add an obstacle to the obstacle space */
-  void addObstacle(const base_obstacle_ptr_t& newObstaclePtr);
+  void addObstacle(const std::shared_ptr<BaseObstacle>& newObstaclePtr);
 
   /** \brief Add an anti-obstacle to the obstacle space */
-  void addAntiObstacle(const base_obstacle_ptr_t& newAntiObstaclePtr);
+  void addAntiObstacle(const std::shared_ptr<BaseObstacle>& newAntiObstaclePtr);
 
   /** \brief The obstacle map as a series of Matlab plot functions */
   std::string mfile(const std::string& obsColour, const std::string& spaceColour) const override;
 
- protected:
  private:
   /** \brief A vector of obstacles */
-  std::vector<base_obstacle_ptr_t> obstaclePtrs_;
+  std::vector<std::shared_ptr<BaseObstacle>> obstaclePtrs_ { };
 
   /** \brief A vector of anti-obstacles */
-  std::vector<base_obstacle_ptr_t> antiObstaclePtrs_;
+  std::vector<std::shared_ptr<BaseObstacle>> antiObstaclePtrs_ { };
 };
 
 #endif  // OBSTACLES_CUTOUT_OBSTACLES

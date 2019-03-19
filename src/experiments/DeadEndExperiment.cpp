@@ -54,10 +54,12 @@
 
 DeadEndExperiment::DeadEndExperiment(const double distFraction, const double runSeconds,
                                      const double checkResolution)
-    : BaseExperiment(2u, limits_t(2u, std::pair<double, double>(-1.0, 1.0)), runSeconds, "DeadEnd"),
-      topHorizontalWidths_(2u, 0.0),     // Preallocated but empty
-      sideVerticalWidths_(2u, 0.0),      // Preallocated but empty
-      bottomHorizontalWidths_(2u, 0.0),  // Preallocated but empty
+    : BaseExperiment(
+          2u, std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds, "DeadEnd"),
+      topHorizontalWidths_(2u, 0.0),     
+      sideVerticalWidths_(2u, 0.0),      
+      bottomHorizontalWidths_(2u, 0.0),  
       obsThickness_(0.1) {
   // Variable
   // The state space
@@ -145,9 +147,9 @@ DeadEndExperiment::DeadEndExperiment(const double distFraction, const double run
       BaseExperiment::goalStates_.back());
 
   // Allocate the obstacles' lower-left corners:
-  topHorizontal_ = std::make_shared<ompl::base::ScopedState<> >(ss);
-  sideVertical_ = std::make_shared<ompl::base::ScopedState<> >(ss);
-  bottomHorizontal_ = std::make_shared<ompl::base::ScopedState<> >(ss);
+  topHorizontal_ = std::make_shared<ompl::base::ScopedState<>>(ss);
+  sideVertical_ = std::make_shared<ompl::base::ScopedState<>>(ss);
+  bottomHorizontal_ = std::make_shared<ompl::base::ScopedState<>>(ss);
 
   // Specify the obstacles' lower-left corners:
   (*topHorizontal_)[0] = -1.0 * goalDist;
@@ -178,7 +180,9 @@ DeadEndExperiment::DeadEndExperiment(const double distFraction, const double run
   BaseExperiment::opt_->setCostThreshold(this->getOptimum());
 }
 
-bool DeadEndExperiment::knowsOptimum() const { return true; }
+bool DeadEndExperiment::knowsOptimum() const {
+  return true;
+}
 
 ompl::base::Cost DeadEndExperiment::getOptimum() const {
   ompl::base::Cost startToCorner(std::sqrt(
@@ -201,6 +205,10 @@ void DeadEndExperiment::setTarget(double targetSpecifier) {
       ompl::base::Cost(targetSpecifier * this->getOptimum().value()));
 }
 
-std::string DeadEndExperiment::lineInfo() const { return std::string(); }
+std::string DeadEndExperiment::lineInfo() const {
+  return std::string();
+}
 
-std::string DeadEndExperiment::paraInfo() const { return std::string(); }
+std::string DeadEndExperiment::paraInfo() const {
+  return std::string();
+}

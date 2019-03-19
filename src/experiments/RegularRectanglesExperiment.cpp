@@ -57,11 +57,10 @@ RegularRectanglesExperiment::RegularRectanglesExperiment(const unsigned int dim,
                                                          unsigned int numObsBetween,
                                                          const double runSeconds,
                                                          const double checkResolution)
-    : BaseExperiment(
-          dim, limits_t(dim, std::pair<double, double>(-1.0 * worldHalfWidth, worldHalfWidth)),
-          runSeconds, "RegularRects"),
-      startPos_(-0.5),
-      goalPos_(0.5) {
+    : BaseExperiment(dim,
+                     std::vector<std::pair<double, double>>(
+                         dim, std::pair<double, double>(-1.0 * worldHalfWidth, worldHalfWidth)),
+                     runSeconds, "RegularRects") {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -148,7 +147,9 @@ RegularRectanglesExperiment::RegularRectanglesExperiment(const unsigned int dim,
   BaseExperiment::opt_->setCostThreshold(this->getMinimum());
 }
 
-bool RegularRectanglesExperiment::knowsOptimum() const { return false; }
+bool RegularRectanglesExperiment::knowsOptimum() const {
+  return false;
+}
 
 ompl::base::Cost RegularRectanglesExperiment::getOptimum() const {
   throw ompl::Exception("The global optimum is unknown", BaseExperiment::name_);
@@ -187,4 +188,6 @@ std::string RegularRectanglesExperiment::lineInfo() const {
   return rval.str();
 }
 
-std::string RegularRectanglesExperiment::paraInfo() const { return std::string(); }
+std::string RegularRectanglesExperiment::paraInfo() const {
+  return std::string();
+}

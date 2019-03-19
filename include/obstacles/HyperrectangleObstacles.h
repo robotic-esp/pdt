@@ -102,20 +102,20 @@ class HyperrectangleObstacles : public BaseObstacle {
  protected:
  private:
   /** \brief The individual obstacles in a nearest neighbours structure */
-  std::shared_ptr<ompl::NearestNeighbors<obstacle_corner_widths_t> > nnObstacles_;
+  std::shared_ptr<ompl::NearestNeighbors<obstacle_corner_widths_t> > nnObstacles_ { };
   /** \brief A vector of states that I allocated (and therefore must free) */
-  std::vector<ompl::base::State*> statesToFree_;
+  std::vector<ompl::base::State*> statesToFree_ { };
   /** \brief The largest obstacle, used to find a small set of obstacles to check */
-  double maxWidth_;
+  double maxWidth_ { 0.0 };
   /** \brief The measure of obstacles. This is really an "upper bound", as we don't check for
    * overlapping obstacle regions when calculating. */
-  double obsMeasure_;
+  double obsMeasure_ { 0.0 };
   /** \brief Whether to disallow obstacle-obstacle collision */
-  bool separateObstacles_;
+  bool separateObstacles_ { false };
   /** \brief The state sampler */
-  ompl::base::StateSamplerPtr stateSampler_;
+  ompl::base::StateSamplerPtr stateSampler_ { };
   /** \brief The random number generator */
-  ompl::RNG rng_;
+  ompl::RNG rng_ { };
 
   /** \brief A common construtor */
   void construct();

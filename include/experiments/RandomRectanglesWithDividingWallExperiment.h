@@ -71,26 +71,26 @@ class RandomRectanglesWithDividingWallExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_;
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
   /** \brief The basic thickness of the wall. */
-  double wallThickness_;
+  double wallThickness_{0.0};
   /** \brief The number of gaps. */
-  unsigned int numGaps_;
+  unsigned int numGaps_{0u};
   /** \brief The resulting number of obstacles. */
-  unsigned int numWallObs_;
+  unsigned int numWallObs_{0u};
   /** \brief The gap width. */
-  double gapWidth_;
+  double gapWidth_{0.0};
   /** \brief The resulting obstacle width. */
-  double wallWidth_;
+  double wallWidth_{0.0};
   /** \brief The lower-left corners of the obstacles*/
-  std::vector<std::shared_ptr<ompl::base::ScopedState<> > > wallCorners_;
+  std::vector<std::shared_ptr<ompl::base::ScopedState<>>> wallCorners_{};
   /** The widths of an obstacles */
-  std::vector<double> allWallWidths_;
+  std::vector<double> allWallWidths_{};
 
   // Constant Parameters
   /** \brief The start and goal positions */
-  double startPos_;
-  double goalPos_;
+  double startPos_{-0.5};
+  double goalPos_{0.5};
 };
 
 typedef std::shared_ptr<RandomRectanglesWithDividingWallExperiment>

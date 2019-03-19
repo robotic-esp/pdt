@@ -52,11 +52,11 @@ function makeHistoryPlots(R)
         numExp = 100;
     
         %The run time
-        plotTime = 1.0;
+        plotTime = 0.1;
 
         %The filesnames. Ommit the data/ and the .csv.
         filenames = {
-            'R8S18439072146874402233WallGap'
+            'R2S18439073711839788863FlankingGap'
 %             'R8S18439071351109370200RegularRects'
 %             'R8S18439071143733709969RandRect'
 %             'R4S18439071184667532744RandRect'
@@ -71,13 +71,13 @@ function makeHistoryPlots(R)
         figures = {};
 
         planners = {
-                    'BITstar100',            'BIT*',             b, '-';
+                    'BITstar500',            'BIT*',             b, '-';
 %                     'BITstarRegression100', 'BIT* (reg)',       c, '-';
-                    'ABITstar100',           'SBIT*',            g, '-';
-                    'RRTConnect',            'RRTConnect',       k, '-';
-                    'LBTRRT',                'LBTRRT',           p, '-';
-                    'RRTstar',               'RRT*',             r, '-';
-                    'RRTsharp',              'RRT$^{\#}$',       o, '-';
+%                     'ABITstar100',           'SBIT*',            g, '-';
+%                     'RRTConnect',            'RRTConnect',       k, '-';
+%                     'LBTRRT',                'LBTRRT',           p, '-';
+%                     'RRTstar',               'RRT*',             r, '-';
+%                     'RRTsharp',              'RRT$^{\#}$',       o, '-';
                     };
 
         ignorePlanners = {'DELETEME'};   

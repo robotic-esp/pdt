@@ -76,26 +76,26 @@ class FlankingGapExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief Whether to stop on class switch */
-  bool stopClassSwitch_;
+  bool stopClassSwitch_{false};
   /** \brief The gap width. */
-  double gapWidth_;
+  double gapWidth_{0.0};
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_;
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
-  std::shared_ptr<ompl::base::ScopedState<> > upperObs_;
-  std::shared_ptr<ompl::base::ScopedState<> > lowerObs_;
+  std::shared_ptr<ompl::base::ScopedState<>> upperObs_{};
+  std::shared_ptr<ompl::base::ScopedState<>> lowerObs_{};
   /** The widths of the obstacles */
-  std::vector<double> upperWidths_;
-  std::vector<double> lowerWidths_;
+  std::vector<double> upperWidths_{};
+  std::vector<double> lowerWidths_{};
 
   // Constant Parameters
   /** \brief The basic thickness of the obstacle. */
-  double obsThickness_;
+  double obsThickness_{0.2};
   /** \brief The total height of the two obstacles. */
-  double obsTotalHeight_;
+  double obsTotalHeight_{1.0};
   /** \brief The start and goal positions */
-  double startPos_;
-  double goalPos_;
+  double startPos_{-0.5};
+  double goalPos_{0.5};
 };
 
 typedef std::shared_ptr<FlankingGapExperiment> FlankingGapExperimentPtr;

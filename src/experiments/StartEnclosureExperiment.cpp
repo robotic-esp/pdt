@@ -60,7 +60,9 @@ StartEnclosureExperiment::StartEnclosureExperiment(const unsigned int dim,
                                                    const double wallThickness,
                                                    const double gapWidth, const double runSeconds,
                                                    const double checkResolution)
-    : BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-worldHalfWidth, worldHalfWidth)),
+    : BaseExperiment(dim,
+                     std::vector<std::pair<double, double>>(
+                         dim, std::pair<double, double>(-worldHalfWidth, worldHalfWidth)),
                      runSeconds, "StartEnc"),
       insideWidth_(insideWidth),
       wallThickness_(wallThickness),

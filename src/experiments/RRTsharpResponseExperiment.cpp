@@ -53,6 +53,7 @@
 #include "ompl/base/spaces/RealVectorStateSpace.h"
 
 namespace {
+
 std::string ResponseName(unsigned int num) {
   if (num == 1u) {
     return "RRTsharpResponse1";
@@ -61,18 +62,17 @@ std::string ResponseName(unsigned int num) {
   } else {
     throw ompl::Exception("Unknown experiment number.");
   }
-};
+}
+
 }  // namespace
 
 RRTsharpResponseExperiment::RRTsharpResponseExperiment(const unsigned int expNum,
                                                        const double runSeconds,
                                                        const double checkResolution)
-    : BaseExperiment(2, limits_t(2, std::pair<double, double>(0.0, 1.0)), runSeconds,
-                     ResponseName(expNum)),
-      expNum_(expNum),
-      posX_(0.5),
-      startPosY_(0.4),
-      goalPosY_(0.6) {
+    : BaseExperiment(2,
+                     std::vector<std::pair<double, double>>(2, std::pair<double, double>(0.0, 1.0)),
+                     runSeconds, ResponseName(expNum)),
+      expNum_(expNum) {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -137,7 +137,7 @@ RRTsharpResponseExperiment::RRTsharpResponseExperiment(const unsigned int expNum
 
   if (expNum_ == 1) {
     // Set the lower-left corner
-    obs_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+    obs_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
     (*obs_.back())[0] = 0.1;
     (*obs_.back())[1] = 0.47;
 
@@ -155,7 +155,7 @@ RRTsharpResponseExperiment::RRTsharpResponseExperiment(const unsigned int expNum
     std::vector<double> widths3;
 
     // Set the lower-left corner of the centre obstacle
-    obs_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+    obs_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
     (*obs_.back())[0] = 0.1;
     (*obs_.back())[1] = 0.47;
 
@@ -167,7 +167,7 @@ RRTsharpResponseExperiment::RRTsharpResponseExperiment(const unsigned int expNum
     rectObs_->addObstacle(std::make_pair(obs_.back()->get(), widths1));
 
     // Set the lower-left corner of the left obstacle: center: [0.18, 0.29], size: [0.16, 0.36]
-    obs_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+    obs_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
     (*obs_.back())[0] = 0.1;
     (*obs_.back())[1] = 0.11;
 
@@ -179,7 +179,7 @@ RRTsharpResponseExperiment::RRTsharpResponseExperiment(const unsigned int expNum
     rectObs_->addObstacle(std::make_pair(obs_.back()->get(), widths2));
 
     // Set the lower-left corner of the right obstacle: center: [0.82, 0.29], size: [0.16, 0.36]
-    obs_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+    obs_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
     (*obs_.back())[0] = 0.74;
     (*obs_.back())[1] = 0.11;
 
@@ -197,7 +197,9 @@ RRTsharpResponseExperiment::RRTsharpResponseExperiment(const unsigned int expNum
   BaseExperiment::opt_->setCostThreshold(this->getOptimum());
 }
 
-bool RRTsharpResponseExperiment::knowsOptimum() const { return true; }
+bool RRTsharpResponseExperiment::knowsOptimum() const {
+  return true;
+}
 
 ompl::base::Cost RRTsharpResponseExperiment::getOptimum() const {
   double length;
@@ -245,4 +247,6 @@ std::string RRTsharpResponseExperiment::lineInfo() const {
   return rval.str();
 }
 
-std::string RRTsharpResponseExperiment::paraInfo() const { return std::string(); }
+std::string RRTsharpResponseExperiment::paraInfo() const {
+  return std::string();
+}

@@ -60,13 +60,13 @@ GoalEnclosureExperiment::GoalEnclosureExperiment(const unsigned int dim,
                                                  const double wallThickness, const double gapWidth,
                                                  const double runSeconds,
                                                  const double checkResolution)
-    : BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-worldHalfWidth, worldHalfWidth)),
+    : BaseExperiment(dim,
+                     std::vector<std::pair<double, double>>(
+                         dim, std::pair<double, double>(-worldHalfWidth, worldHalfWidth)),
                      runSeconds, "GoalEnc"),
       insideWidth_(insideWidth),
       wallThickness_(wallThickness),
-      gapWidth_(gapWidth),
-      startPos_(-0.5),
-      goalPos_(0.5) {
+      gapWidth_(gapWidth) {
   // Variables
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -159,7 +159,7 @@ GoalEnclosureExperiment::GoalEnclosureExperiment(const unsigned int dim,
   anti = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
 
   //*****Obstacle*****//
-  goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
 
   // All widths are the same
   goalEnclWidths_.push_back(
@@ -177,7 +177,7 @@ GoalEnclosureExperiment::GoalEnclosureExperiment(const unsigned int dim,
   obs->addObstacle(std::make_pair(goalEnclCorners_.back()->get(), goalEnclWidths_.back()));
 
   //*****Internal Space*****//
-  goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
 
   // All widths are the same
   goalEnclWidths_.push_back(std::vector<double>(BaseExperiment::dim_, insideWidth_));
@@ -194,7 +194,7 @@ GoalEnclosureExperiment::GoalEnclosureExperiment(const unsigned int dim,
   anti->addObstacle(std::make_pair(goalEnclCorners_.back()->get(), goalEnclWidths_.back()));
 
   //*****Right opening*****//
-  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
   startEnclWidths_.push_back(std::vector<double>());
 
   // All the other dimensions are the same
@@ -220,7 +220,9 @@ GoalEnclosureExperiment::GoalEnclosureExperiment(const unsigned int dim,
   BaseExperiment::opt_->setCostThreshold(BaseExperiment::getMinimum());
 }
 
-bool GoalEnclosureExperiment::knowsOptimum() const { return true; }
+bool GoalEnclosureExperiment::knowsOptimum() const {
+  return true;
+}
 
 ompl::base::Cost GoalEnclosureExperiment::getOptimum() const {
   /*
@@ -276,7 +278,9 @@ void GoalEnclosureExperiment::setTarget(double targetSpecifier) {
   BaseExperiment::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
 }
 
-std::string GoalEnclosureExperiment::lineInfo() const { return std::string(); }
+std::string GoalEnclosureExperiment::lineInfo() const {
+  return std::string();
+}
 
 std::string GoalEnclosureExperiment::paraInfo() const {
   std::stringstream rval;
@@ -296,7 +300,7 @@ std::string GoalEnclosureExperiment::paraInfo() const {
 }
 
 std::string GoalEnclosureExperiment::printRectangle(
-    std::shared_ptr<ompl::base::ScopedState<> > llCorner, std::vector<double> widths) const {
+    std::shared_ptr<ompl::base::ScopedState<>> llCorner, std::vector<double> widths) const {
   std::stringstream rval;
 
   rval << "[";

@@ -67,17 +67,15 @@ class CentreSquareExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_;
+  std::shared_ptr<HyperrectangleObstacles> rectObs_ { };
   /** \brief The lower-left corner of an obstacle half-way between the start and goal */
-  std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_;
+  std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_ { };
   /** The widths of the sight-line obstacle */
-  double obsWidth_;
+  double obsWidth_ { 0.0 };
 
-  // Constant Parameters
-  /** \brief The start position */
-  double startPos_;
-  /** \brief The goal position */
-  double goalPos_;
+  // The start and goal positions.
+  double startPos_ { 0.0 };
+  double goalPos_  { 0.0 };
 };
 
 typedef std::shared_ptr<CentreSquareExperiment> CentreSquareExperimentPtr;

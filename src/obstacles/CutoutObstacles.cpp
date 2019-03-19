@@ -40,15 +40,11 @@
 #include "ompl/base/StateValidityChecker.h"
 #include "ompl/util/Exception.h"
 
-CutoutObstacles::CutoutObstacles(ompl::base::SpaceInformation* si) : BaseObstacle(si) {}
-CutoutObstacles::CutoutObstacles(const ompl::base::SpaceInformationPtr& si) : BaseObstacle(si) {}
-CutoutObstacles::~CutoutObstacles() { this->clear(); }
+CutoutObstacles::CutoutObstacles(ompl::base::SpaceInformation* si)
+  : BaseObstacle(si) {}
 
-void CutoutObstacles::clear() {
-  // Free the obstacles:
-  obstaclePtrs_.clear();
-  antiObstaclePtrs_.clear();
-}
+CutoutObstacles::CutoutObstacles(const ompl::base::SpaceInformationPtr& si)
+  : BaseObstacle(si) {}
 
 bool CutoutObstacles::isValid(const ompl::base::State* state) const {
   // Variable
@@ -87,11 +83,11 @@ bool CutoutObstacles::isValid(const ompl::base::State* state) const {
   return validState;
 }
 
-void CutoutObstacles::addObstacle(const base_obstacle_ptr_t& newObstaclePtr) {
+void CutoutObstacles::addObstacle(const std::shared_ptr<BaseObstacle>& newObstaclePtr) {
   obstaclePtrs_.push_back(newObstaclePtr);
 }
 
-void CutoutObstacles::addAntiObstacle(const base_obstacle_ptr_t& newAntiObstaclePtr) {
+void CutoutObstacles::addAntiObstacle(const std::shared_ptr<BaseObstacle>& newAntiObstaclePtr) {
   antiObstaclePtrs_.push_back(newAntiObstaclePtr);
 }
 

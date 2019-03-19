@@ -40,20 +40,17 @@
 #include <string>
 #include <vector>
 
-#include "ompl/base/StateValidityChecker.h"
+#include <ompl/base/StateValidityChecker.h>
 
 /** \brief The base class for a random world that derives from StateValidityChecker*/
 class BaseObstacle : public ompl::base::StateValidityChecker {
  public:
-  // Pass-through constructor to StateValidityChecker
   BaseObstacle(ompl::base::SpaceInformation* si);
-
   BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-
-  virtual ~BaseObstacle();
+  virtual ~BaseObstacle() = default;
 
   /** \brief Clear the obstacle space */
-  virtual void clear() = 0;
+  virtual void clear() {};
 
   /** \brief Check for state validity */
   virtual bool isValid(const ompl::base::State* state) const = 0;

@@ -39,7 +39,13 @@
 
 #include "obstacles/BaseObstacle.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
+#pragma GCC diagnostic ignored "-Wuninitialized"
 #include <Eigen/Core>
+#pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
+
 #include <vector>
 
 #include "ompl/base/SpaceInformation.h"
@@ -48,19 +54,13 @@
 /** \brief A world consisting of random hyperrectangular obstacles.*/
 class CsvObstacle : public BaseObstacle {
  public:
-  /** \brief Constructor. */
   CsvObstacle(ompl::base::SpaceInformation* si, const double obsThreshold,
               const std::string& fullCsvFileName, const bool plotCsv,
               const bool flipCsvRows = false, const std::string& fullPngFileName = "");
-  /** \brief Constructor. */
   CsvObstacle(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
               const std::string& fullFileName, const bool plotCsv, const bool flipCsvRows = false,
               const std::string& fullPngFileName = "");
-  /** \brief Destructor */
-  ~CsvObstacle();
-
-  /** \brief Clear the obstacle space */
-  virtual void clear();
+  ~CsvObstacle() = default;
 
   /** \brief Check for state validity */
   virtual bool isValid(const ompl::base::State* state) const;
@@ -79,15 +79,15 @@ class CsvObstacle : public BaseObstacle {
 
   // Variables
   /// \brief The cost threshold
-  double thresh_;
+  double threshold_ { 0.0 };
   /// \brief The csv file of costs
-  std::string csvFile_;
+  std::string csvFile_ { "" };
   /// \brief The (optional) image file to overlay in the plot
-  std::string pngFile_;
+  std::string pngFile_ { "" };
   /// \brief Whether to plot the csv
-  bool plotCsv_;
+  bool plotCsv_ { false };
   /// \brief The obs data
-  Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> obsData_;
+  Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> obsData_ { 0, 0 };
 };
 
 #endif  // OBSTACLES_CSV_OBSTACLE

@@ -68,15 +68,15 @@ class SpiralExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_;
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
-  std::vector<ompl::base::ScopedState<> > obsCorners_;
+  std::vector<ompl::base::ScopedState<> > obsCorners_{};
   /** The widths of the obstacles */
-  std::vector<std::vector<double> > obsWidths_;
+  std::vector<std::vector<double> > obsWidths_{};
 
   // Constant Parameters
   /** \brief The basic thickness of the obstacle. */
-  double obsThickness_;
+  double obsThickness_{0.05};
 };
 
 typedef std::shared_ptr<SpiralExperiment> SpiralExperimentPtr;

@@ -67,8 +67,8 @@ class ObstacleFreeExperiment : public BaseExperiment {
  protected:
   // Constant Parameters
   /** \brief The definition of the "centre" and "outside" positions */
-  double centrePos_;
-  double outsidePos_;
+  double centrePos_  { 0.0 };
+  double outsidePos_ { 0.0 };
 };
 
 typedef std::shared_ptr<ObstacleFreeExperiment> ObstacleFreeExperimentPtr;

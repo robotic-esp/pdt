@@ -68,19 +68,19 @@ class RegularRectanglesExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<RepeatingHyperrectangleObstacles> regObs_;
+  std::shared_ptr<RepeatingHyperrectangleObstacles> regObs_{};
 
   // Constant Parameters
   /** \brief The start position */
-  double startPos_;
+  double startPos_{-0.5};
   /** \brief The goal position */
-  double goalPos_;
+  double goalPos_{0.5};
   /** \brief The width of obstacles */
-  std::vector<double> obsWidths_;
+  std::vector<double> obsWidths_{};
   /** \brief The width of blanks */
-  std::vector<double> blankWidths_;
+  std::vector<double> blankWidths_{};
   /** \brief The grid origin */
-  std::vector<double> origin_;
+  std::vector<double> origin_{};
 };
 
 typedef std::shared_ptr<RegularRectanglesExperiment> RegularRectanglesExperimentPtr;

@@ -67,15 +67,15 @@ class DeadEndExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_;
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
-  std::shared_ptr<ompl::base::ScopedState<> > topHorizontal_;
-  std::shared_ptr<ompl::base::ScopedState<> > sideVertical_;
-  std::shared_ptr<ompl::base::ScopedState<> > bottomHorizontal_;
+  std::shared_ptr<ompl::base::ScopedState<>> topHorizontal_{};
+  std::shared_ptr<ompl::base::ScopedState<>> sideVertical_{};
+  std::shared_ptr<ompl::base::ScopedState<>> bottomHorizontal_{};
   /** The widths of the obstacles */
-  std::vector<double> topHorizontalWidths_;
-  std::vector<double> sideVerticalWidths_;
-  std::vector<double> bottomHorizontalWidths_;
+  std::vector<double> topHorizontalWidths_{};
+  std::vector<double> sideVerticalWidths_{};
+  std::vector<double> bottomHorizontalWidths_{};
 
   // Constant Parameters
   /** \brief The basic thickness of the obstacle. */

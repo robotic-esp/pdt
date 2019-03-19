@@ -68,17 +68,17 @@ class RandomRectanglesExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_;
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
   /** \brief The lower-left corner of an obstacle half-way between the start and goal */
-  std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_;
+  std::shared_ptr<ompl::base::ScopedState<>> sightLineObs_{};
 
   // Constant Parameters
   /** \brief The start position */
-  double startPos_;
+  double startPos_{-0.5};
   /** \brief The goal position */
-  double goalPos_;
+  double goalPos_{0.5};
   /** \brief The mean obstacle width*/
-  double meanObsWidth_;
+  double meanObsWidth_{0.0};
 };
 
 typedef std::shared_ptr<RandomRectanglesExperiment> RandomRectanglesExperimentPtr;

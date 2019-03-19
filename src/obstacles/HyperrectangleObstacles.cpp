@@ -48,9 +48,10 @@
 
 HyperrectangleObstacles::HyperrectangleObstacles(ompl::base::SpaceInformation* si,
                                                  bool separateObstacles)
-    : BaseObstacle(si), maxWidth_(0.0), obsMeasure_(0.0), separateObstacles_(separateObstacles) {
+    : BaseObstacle(si), separateObstacles_(separateObstacles) {
   this->construct();
 }
+
 HyperrectangleObstacles::HyperrectangleObstacles(const ompl::base::SpaceInformationPtr& si,
                                                  bool separateObstacles)
     : BaseObstacle(si), maxWidth_(0.0), obsMeasure_(0.0), separateObstacles_(separateObstacles) {

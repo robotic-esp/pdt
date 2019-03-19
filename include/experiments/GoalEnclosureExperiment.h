@@ -71,25 +71,25 @@ class GoalEnclosureExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The actual enclosures */
-  std::shared_ptr<CutoutObstacles> enclObs_;
+  std::shared_ptr<CutoutObstacles> enclObs_ { };
 
   /** \brief Construction variables: The lower-left corners (1 obs, 2 anti) */
-  std::vector<std::shared_ptr<ompl::base::ScopedState<> > > startEnclCorners_;
-  std::vector<std::shared_ptr<ompl::base::ScopedState<> > > goalEnclCorners_;
+  std::vector<std::shared_ptr<ompl::base::ScopedState<> > > startEnclCorners_ { };
+  std::vector<std::shared_ptr<ompl::base::ScopedState<> > > goalEnclCorners_  { };
   /** \brief Construction variables: The associated widths */
-  std::vector<std::vector<double> > startEnclWidths_;
-  std::vector<std::vector<double> > goalEnclWidths_;
+  std::vector<std::vector<double> > startEnclWidths_ { };
+  std::vector<std::vector<double> > goalEnclWidths_ { };
 
   // Constant Parameters
   /** \brief The inside-width of the enclosure. */
-  double insideWidth_;
+  double insideWidth_ { 0.0 };
   /** \brief The enclosure-wall thickness. */
-  double wallThickness_;
+  double wallThickness_ { 0.0 };
   /** \brief The width of the opening in directions perpendicular to the wall thickness. */
-  double gapWidth_;
+  double gapWidth_ { 0.0 };
   /** \brief The start and goal positions */
-  double startPos_;
-  double goalPos_;
+  double startPos_ { -0.5 };
+  double goalPos_  {  0.5 };
 
   // Helper function
   std::string printRectangle(std::shared_ptr<ompl::base::ScopedState<> > llCorner,

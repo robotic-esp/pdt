@@ -78,30 +78,30 @@ class DividingWallExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_;
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
   /** \brief The number of walls */
-  unsigned int numWalls_;
+  unsigned int numWalls_{0u};
   /** \brief The separation between walls */
-  std::vector<double> wallSpacings_;
+  std::vector<double> wallSpacings_{};
   /** \brief The basic thickness of the wall. */
-  std::vector<double> wallThicknesses_;
+  std::vector<double> wallThicknesses_{};
   /** \brief The number of gaps. */
-  std::vector<unsigned int> numGaps_;
+  std::vector<unsigned int> numGaps_{};
   /** \brief The resulting number of obstacles. */
-  std::vector<unsigned int> numObs_;
+  std::vector<unsigned int> numObs_{};
   /** \brief The gap width. */
-  std::vector<double> gapWidths_;
+  std::vector<double> gapWidths_{};
   /** \brief The resulting obstacle width. */
-  std::vector<double> wallWidths_;
+  std::vector<double> wallWidths_{};
   /** \brief The lower-left corners of the obstacles*/
-  std::vector<std::vector<std::shared_ptr<ompl::base::ScopedState<> > > > obsCorners_;
+  std::vector<std::vector<std::shared_ptr<ompl::base::ScopedState<>>>> obsCorners_{};
   /** The widths of an obstacles */
-  std::vector<std::vector<double> > allObsWidths_;
+  std::vector<std::vector<double>> allObsWidths_{};
 
   // Constant Parameters
   /** \brief The start and goal positions */
-  double startPos_;
-  double goalPos_;
+  double startPos_{-0.5};
+  double goalPos_{0.5};
 
   // The common constructor function:
   void common_constructor(const std::vector<double> wallThickness,

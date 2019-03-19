@@ -49,11 +49,11 @@ CsvObstacle::CsvObstacle(ompl::base::SpaceInformation* si, const double obsThres
                          const std::string& fullCsvFileName, const bool plotCsv,
                          const bool flipCsvRows /*= false*/,
                          const std::string& fullPngFileName /*= ""*/)
-    : BaseObstacle(si),
-      thresh_(obsThreshold),
-      csvFile_(fullCsvFileName),
-      pngFile_(fullPngFileName),
-      plotCsv_(plotCsv) {
+    : BaseObstacle(si)
+    , threshold_(obsThreshold)
+    , csvFile_(fullCsvFileName)
+    , pngFile_(fullPngFileName)
+    , plotCsv_(plotCsv) {
   this->construct(flipCsvRows);
 }
 CsvObstacle::CsvObstacle(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
@@ -61,13 +61,12 @@ CsvObstacle::CsvObstacle(const ompl::base::SpaceInformationPtr& si, const double
                          const bool flipCsvRows /*= false*/,
                          const std::string& fullPngFileName /*= ""*/)
     : BaseObstacle(si),
-      thresh_(obsThreshold),
+      threshold_(obsThreshold),
       csvFile_(fullCsvFileName),
       pngFile_(fullPngFileName),
       plotCsv_(plotCsv) {
   this->construct(flipCsvRows);
 }
-CsvObstacle::~CsvObstacle() { this->clear(); }
 
 void CsvObstacle::construct(const bool flipRows) {
   // Variable
@@ -89,7 +88,7 @@ void CsvObstacle::construct(const bool flipRows) {
     // and columns
     for (unsigned int c = 0u; c < obsData_.cols(); ++c) {
       // Storing data
-      obsData_(r, c) = (csvParsed.at(r).at(c) >= thresh_);
+      obsData_(r, c) = (csvParsed.at(r).at(c) >= threshold_);
     }
   }
 
@@ -148,8 +147,6 @@ void CsvObstacle::parseCsv(unsigned int* numRows, unsigned int* numCols,
   // Close the file
   csvStream.close();
 }
-
-void CsvObstacle::clear() {}
 
 bool CsvObstacle::isValid(const ompl::base::State* state) const {
   // Variable

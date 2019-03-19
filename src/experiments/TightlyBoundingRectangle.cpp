@@ -59,7 +59,8 @@ TightlyBoundingRectangle::TightlyBoundingRectangle(const unsigned int dim,
                                                    const double transverseDiameter,
                                                    const double runSeconds)
     : BaseExperiment(
-          dim, limits_t(dim, std::pair<double, double>(-1.0, 1.0)), runSeconds,
+          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds,
           "TightRect"),  // We will have to manually overwrite the limits in our constructor
       dFoci_(fociDistance),
       dTrans_(transverseDiameter) {
@@ -157,7 +158,9 @@ TightlyBoundingRectangle::TightlyBoundingRectangle(const unsigned int dim,
   BaseExperiment::opt_->setCostThreshold(this->getOptimum());
 }
 
-bool TightlyBoundingRectangle::knowsOptimum() const { return true; }
+bool TightlyBoundingRectangle::knowsOptimum() const {
+  return true;
+}
 
 ompl::base::Cost TightlyBoundingRectangle::getOptimum() const {
   return BaseExperiment::getMinimum();
@@ -179,4 +182,6 @@ std::string TightlyBoundingRectangle::lineInfo() const {
   return rval.str();
 }
 
-std::string TightlyBoundingRectangle::paraInfo() const { return std::string(); }
+std::string TightlyBoundingRectangle::paraInfo() const {
+  return std::string();
+}

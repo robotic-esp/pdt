@@ -37,11 +37,15 @@
 // Me!
 #include "experiments/BaseExperiment.h"
 
-BaseExperiment::BaseExperiment(const unsigned int dim, const limits_t limits,
+BaseExperiment::BaseExperiment(const unsigned int dim,
+                               const std::vector<std::pair<double, double>> limits,
                                const double runSeconds, std::string name)
-    : name_(name), dim_(dim), limits_(limits), targetTime_(asrl::time::seconds(runSeconds)) {}
+    : name_(name), dim_(dim), limits_(limits), targetTime_(asrl::time::seconds(runSeconds)) {
+}
 
-ompl::base::SpaceInformationPtr BaseExperiment::getSpaceInformation() const { return si_; }
+ompl::base::SpaceInformationPtr BaseExperiment::getSpaceInformation() const {
+  return si_;
+}
 
 ompl::base::ProblemDefinitionPtr BaseExperiment::newProblemDefinition() const {
   // Variables
@@ -69,21 +73,29 @@ ompl::base::OptimizationObjectivePtr BaseExperiment::getOptimizationObjective() 
   return opt_;
 }
 
-asrl::time::duration BaseExperiment::getTargetTime() const { return targetTime_; }
+asrl::time::duration BaseExperiment::getTargetTime() const {
+  return targetTime_;
+}
 
-ompl::base::GoalPtr BaseExperiment::getGoalPtr() const { return goalPtr_; }
+ompl::base::GoalPtr BaseExperiment::getGoalPtr() const {
+  return goalPtr_;
+}
 
-std::vector<ompl::base::ScopedState<> > BaseExperiment::getStartStates() const {
+std::vector<ompl::base::ScopedState<>> BaseExperiment::getStartStates() const {
   return startStates_;
 }
 
-std::vector<ompl::base::ScopedState<> > BaseExperiment::getGoalStates() const {
+std::vector<ompl::base::ScopedState<>> BaseExperiment::getGoalStates() const {
   return goalStates_;
 }
 
-std::string BaseExperiment::getName() const { return name_; }
+std::string BaseExperiment::getName() const {
+  return name_;
+}
 
-BaseExperiment::limits_t BaseExperiment::getLimits() const { return limits_; }
+std::vector<std::pair<double, double>> BaseExperiment::getLimits() const {
+  return limits_;
+}
 
 ompl::base::Cost BaseExperiment::getMinimum() const {
   // Return the minimum of each start to the goal

@@ -54,9 +54,9 @@
 
 SpiralExperiment::SpiralExperiment(const double distFraction, const double runSeconds,
                                    const double checkResolution)
-    : BaseExperiment(2u, limits_t(2u, std::pair<double, double>(-1.0, 1.0)), runSeconds,
-                     "SpiralExperiment"),
-      obsThickness_(0.05) {
+    : BaseExperiment(
+          2u, std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds, "SpiralExperiment") {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -247,7 +247,9 @@ SpiralExperiment::SpiralExperiment(const double distFraction, const double runSe
   BaseExperiment::opt_->setCostThreshold(BaseExperiment::getMinimum());
 }
 
-bool SpiralExperiment::knowsOptimum() const { return false; }
+bool SpiralExperiment::knowsOptimum() const {
+  return false;
+}
 
 ompl::base::Cost SpiralExperiment::getOptimum() const {
   throw ompl::Exception("The global optimum is unknown", BaseExperiment::name_);
@@ -257,6 +259,10 @@ void SpiralExperiment::setTarget(double targetSpecifier) {
   BaseExperiment::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
 }
 
-std::string SpiralExperiment::lineInfo() const { return std::string(); }
+std::string SpiralExperiment::lineInfo() const {
+  return std::string();
+}
 
-std::string SpiralExperiment::paraInfo() const { return std::string(); }
+std::string SpiralExperiment::paraInfo() const {
+  return std::string();
+}

@@ -62,11 +62,10 @@
 /** \brief The base class for an experiment */
 class BaseExperiment : boost::noncopyable {
  public:
-  typedef std::vector<std::pair<double, double> > limits_t;
+  BaseExperiment(const unsigned int dim, const std::vector<std::pair<double, double>> limits,
+                 const double runSeconds, std::string name);
 
-  /** \brief Constructor */
-  BaseExperiment(const unsigned int dim, const limits_t limits, const double runSeconds,
-                 std::string name);
+  virtual ~BaseExperiment() = default;
 
   /** \brief Return the space information pointer */
   ompl::base::SpaceInformationPtr getSpaceInformation() const;
@@ -84,16 +83,16 @@ class BaseExperiment : boost::noncopyable {
   ompl::base::GoalPtr getGoalPtr() const;
 
   /** \brief Get the starts */
-  std::vector<ompl::base::ScopedState<> > getStartStates() const;
+  std::vector<ompl::base::ScopedState<>> getStartStates() const;
 
   /** \brief Get the goals */
-  std::vector<ompl::base::ScopedState<> > getGoalStates() const;
+  std::vector<ompl::base::ScopedState<>> getGoalStates() const;
 
   /** \brief Get the name */
   std::string getName() const;
 
   /** \brief Get the state-space limit */
-  limits_t getLimits() const;
+  std::vector<std::pair<double, double>> getLimits() const;
 
   /** \brief The global minimum that may or may not be attainable in a problem. */
   ompl::base::Cost getMinimum() const;
@@ -125,27 +124,27 @@ class BaseExperiment : boost::noncopyable {
  protected:
   // Variables
   /** \brief The name */
-  std::string name_;
+  std::string name_ { "unnamed experiment" };
   /** \brief The problem dimension */
-  unsigned int dim_;
+  unsigned int dim_ { 0u };
   /** \brief The problem limits */
-  limits_t limits_;
+  std::vector<std::pair<double, double>> limits_ { };
   /** \brief The space information for the experiment */
-  ompl::base::SpaceInformationPtr si_;
+  ompl::base::SpaceInformationPtr si_ { };
   /** \brief The optimization objective */
-  ompl::base::OptimizationObjectivePtr opt_;
+  ompl::base::OptimizationObjectivePtr opt_ { };
   /** \brief The obstacle world */
-  std::shared_ptr<BaseObstacle> obs_;
+  std::shared_ptr<BaseObstacle> obs_ { };
   /** \brief The runtime for the experiment */
-  asrl::time::duration targetTime_;
+  asrl::time::duration targetTime_ { };
   /** \brief The start states */
-  std::vector<ompl::base::ScopedState<> > startStates_;
+  std::vector<ompl::base::ScopedState<>> startStates_ { };
   /** \brief The goal states */
-  std::vector<ompl::base::ScopedState<> > goalStates_;
+  std::vector<ompl::base::ScopedState<>> goalStates_ { };
   /** \brief The goal as a pointer*/
-  ompl::base::GoalPtr goalPtr_;
+  ompl::base::GoalPtr goalPtr_ { };
 };
 
-typedef std::shared_ptr<BaseExperiment> BaseExperimentPtr;
+using BaseExperimentPtr = std::shared_ptr<BaseExperiment>;
 
 #endif  // BASE_EXPERIMENT_DEFINITION

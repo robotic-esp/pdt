@@ -67,19 +67,19 @@ class RRTsharpResponseExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_;
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
 
   // Constant Parameters
   /** \brief The lower-left corner of the obstacles */
-  std::vector<std::shared_ptr<ompl::base::ScopedState<> > > obs_;
+  std::vector<std::shared_ptr<ompl::base::ScopedState<>>> obs_{};
   /** \brief The experiment number */
   unsigned int expNum_;
   /** \brief The x position */
-  double posX_;
+  double posX_{0.5};
   /** \brief The start position */
-  double startPosY_;
+  double startPosY_{0.4};
   /** \brief The goal position */
-  double goalPosY_;
+  double goalPosY_{0.6};
 };
 
 typedef std::shared_ptr<RRTsharpResponseExperiment> RRTsharpResponseExperimentPtr;

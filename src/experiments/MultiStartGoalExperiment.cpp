@@ -56,8 +56,9 @@ MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim,
                                                    const unsigned int numObs, const double obsRatio,
                                                    const double runSeconds,
                                                    const double checkResolution)
-    : BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-1.0, 1.0)), runSeconds,
-                     "MultiStartGoal") {
+    : BaseExperiment(
+          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds, "MultiStartGoal") {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -178,7 +179,7 @@ MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim,
   // Create a random set of obstacles
   if (obsRatio > 0.0) {
     // A temporary vector
-    std::vector<ompl::base::ScopedState<> > tVec;
+    std::vector<ompl::base::ScopedState<>> tVec;
 
     // Copy into
     tVec.insert(tVec.end(), BaseExperiment::startStates_.begin(),
@@ -192,7 +193,9 @@ MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim,
   BaseExperiment::opt_->setCostThreshold(BaseExperiment::getMinimum());
 }
 
-bool MultiStartGoalExperiment::knowsOptimum() const { return false; }
+bool MultiStartGoalExperiment::knowsOptimum() const {
+  return false;
+}
 
 ompl::base::Cost MultiStartGoalExperiment::getOptimum() const {
   throw ompl::Exception("The global optimum is unknown", BaseExperiment::name_);
@@ -210,4 +213,6 @@ std::string MultiStartGoalExperiment::lineInfo() const {
   return rval.str();
 }
 
-std::string MultiStartGoalExperiment::paraInfo() const { return std::string(); }
+std::string MultiStartGoalExperiment::paraInfo() const {
+  return std::string();
+}

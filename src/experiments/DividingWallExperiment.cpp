@@ -56,8 +56,9 @@ DividingWallExperiment::DividingWallExperiment(const unsigned int dim, const dou
                                                const unsigned int numGaps, const double gapWidth,
                                                const double runSeconds,
                                                const double checkResolution)
-    : BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-1.0, 1.0)), runSeconds,
-                     "DividingWall") {
+    : BaseExperiment(
+          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds, "DividingWall") {
   common_constructor(std::vector<double>(1u, wallThickness), std::vector<unsigned int>(1u, numGaps),
                      std::vector<double>(1u, gapWidth), std::vector<double>(), checkResolution);
 }
@@ -66,8 +67,9 @@ DividingWallExperiment::DividingWallExperiment(
     const unsigned int dim, const std::vector<double> wallThicknesses,
     const std::vector<unsigned int> numGaps, const std::vector<double> gapWidths,
     const std::vector<double> wallSpacings, const double runSeconds, const double checkResolution)
-    : BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-1.0, 1.0)), runSeconds,
-                     "DividingWall") {
+    : BaseExperiment(
+          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds, "DividingWall") {
   common_constructor(wallThicknesses, numGaps, gapWidths, wallSpacings, checkResolution);
 }
 
@@ -178,9 +180,9 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
   numObs_ = std::vector<unsigned int>(numWalls_, 0u);
   wallWidths_ = std::vector<double>(numWalls_, 0.0);
   allObsWidths_ =
-      std::vector<std::vector<double> >(numWalls_, std::vector<double>(BaseExperiment::dim_, 0.0));
-  obsCorners_ = std::vector<std::vector<std::shared_ptr<ompl::base::ScopedState<> > > >(
-      numWalls_, std::vector<std::shared_ptr<ompl::base::ScopedState<> > >());
+      std::vector<std::vector<double>>(numWalls_, std::vector<double>(BaseExperiment::dim_, 0.0));
+  obsCorners_ = std::vector<std::vector<std::shared_ptr<ompl::base::ScopedState<>>>>(
+      numWalls_, std::vector<std::shared_ptr<ompl::base::ScopedState<>>>());
 
   // Now, iterate through each wall. We have to do this multiple times to be cleaner. First
   // calculate parameters:
@@ -246,7 +248,7 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
       double obsNum = static_cast<double>(i);
 
       // Allocate the obstacle
-      obsCorners_.at(w).push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+      obsCorners_.at(w).push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
 
       // Specify it's lower-left corner:
       (*(obsCorners_.at(w).back()))[0u] = leftXPos;  // x
@@ -273,7 +275,9 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
   BaseExperiment::opt_->setCostThreshold(BaseExperiment::getMinimum());
 }
 
-bool DividingWallExperiment::knowsOptimum() const { return false; }
+bool DividingWallExperiment::knowsOptimum() const {
+  return false;
+}
 
 ompl::base::Cost DividingWallExperiment::getOptimum() const {
   throw ompl::Exception("The global optimum is unknown, though it could be", BaseExperiment::name_);

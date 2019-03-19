@@ -1,4 +1,12 @@
 ---
-Language: Cpp
+AllowShortFunctionsOnASingleLine: InlineOnly
 BasedOnStyle: Google
+BreakConstructorInitializers: AfterColon
 ColumnLimit: 100
+FixNamespaceComments: true
+Language: Cpp
+# NamespaceIndentation: true
+# SpaceBeforeCpp11BracedList: true
+# SpaceBeforeRangeBasedForLoopColon: true
+SpacesInAngles: false
+SpacesInContainerLiterals: true

@@ -59,7 +59,9 @@ ObstacleFreeExperiment::ObstacleFreeExperiment(const unsigned int dim,
                                                const unsigned int maxNumStarts,
                                                const unsigned int maxNumGoals,
                                                const double runSeconds)
-    : BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-1.0, 1.0)), runSeconds, "Free") {
+    : BaseExperiment(
+          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds, "Free") {
   // Variables
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;

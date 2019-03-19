@@ -56,7 +56,8 @@ CentreSquareExperiment::CentreSquareExperiment(const unsigned int dim, const dou
                                                const double worldWidth, const double runSeconds,
                                                const double checkResolution)
     : BaseExperiment(dim,
-                     limits_t(dim, std::pair<double, double>(-0.5 * worldWidth, 0.5 * worldWidth)),
+                     std::vector<std::pair<double, double>>(
+                         dim, std::pair<double, double>(-0.5 * worldWidth, 0.5 * worldWidth)),
                      runSeconds, "CentreSquare"),
       obsWidth_(obsWidth),
       startPos_(-0.5),
@@ -134,7 +135,7 @@ CentreSquareExperiment::CentreSquareExperiment(const unsigned int dim, const dou
       BaseExperiment::goalStates_.back());
 
   // Set the obstacle's lower-left corner:
-  sightLineObs_ = std::make_shared<ompl::base::ScopedState<> >(ss);
+  sightLineObs_ = std::make_shared<ompl::base::ScopedState<>>(ss);
   for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
     (*sightLineObs_)[i] =
         (BaseExperiment::goalStates_.back()[i] + BaseExperiment::startStates_.back()[i]) / 2.0 -
@@ -149,7 +150,9 @@ CentreSquareExperiment::CentreSquareExperiment(const unsigned int dim, const dou
   BaseExperiment::opt_->setCostThreshold(this->getOptimum());
 }
 
-bool CentreSquareExperiment::knowsOptimum() const { return true; }
+bool CentreSquareExperiment::knowsOptimum() const {
+  return true;
+}
 
 ompl::base::Cost CentreSquareExperiment::getOptimum() const {
   ompl::base::Cost startToCorner(
@@ -178,4 +181,6 @@ std::string CentreSquareExperiment::lineInfo() const {
   return rval.str();
 }
 
-std::string CentreSquareExperiment::paraInfo() const { return std::string(); }
+std::string CentreSquareExperiment::paraInfo() const {
+  return std::string();
+}

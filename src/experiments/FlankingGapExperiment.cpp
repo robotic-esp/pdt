@@ -54,14 +54,11 @@
 
 FlankingGapExperiment::FlankingGapExperiment(const bool onlyFindGap, const double gapWidth,
                                              const double runSeconds, const double checkResolution)
-    : BaseExperiment(2u, limits_t(2u, std::pair<double, double>(-1.0, 1.0)), runSeconds,
-                     "FlankingGap"),
+    : BaseExperiment(
+          2u, std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds, "FlankingGap"),
       stopClassSwitch_(onlyFindGap),
-      gapWidth_(gapWidth),
-      obsThickness_(0.2),
-      obsTotalHeight_(1.0),
-      startPos_(-0.75),
-      goalPos_(0.75) {
+      gapWidth_(gapWidth) {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -135,8 +132,8 @@ FlankingGapExperiment::FlankingGapExperiment(const bool onlyFindGap, const doubl
       BaseExperiment::goalStates_.back());
 
   // Allocate the obstacles lower-left corners:
-  lowerObs_ = std::make_shared<ompl::base::ScopedState<> >(ss);
-  upperObs_ = std::make_shared<ompl::base::ScopedState<> >(ss);
+  lowerObs_ = std::make_shared<ompl::base::ScopedState<>>(ss);
+  upperObs_ = std::make_shared<ompl::base::ScopedState<>>(ss);
 
   // Specify the lower obstacle
   // Position
@@ -175,7 +172,9 @@ FlankingGapExperiment::FlankingGapExperiment(const bool onlyFindGap, const doubl
   // No else
 }
 
-bool FlankingGapExperiment::knowsOptimum() const { return true; }
+bool FlankingGapExperiment::knowsOptimum() const {
+  return true;
+}
 
 ompl::base::Cost FlankingGapExperiment::getOptimum() const {
   // Variables

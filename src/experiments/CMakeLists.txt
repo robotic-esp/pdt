@@ -1,7 +1,6 @@
 #Experiments library
 add_library(experiments
   BaseExperiment.cpp
-  AsrlExperiment.cpp
   ObstacleFreeExperiment.cpp
   CentreSquareExperiment.cpp
   DeadEndExperiment.cpp

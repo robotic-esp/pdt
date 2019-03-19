@@ -67,8 +67,8 @@ class TightlyBoundingRectangle : public BaseExperiment {
  protected:
   // Constant Parameters
   /** \brief The definition of the "centre" and "outside" positions */
-  double dFoci_;
-  double dTrans_;
+  double dFoci_{0.0};
+  double dTrans_{0.0};
 };
 
 typedef std::shared_ptr<TightlyBoundingRectangle> TightlyBoundingRectanglePtr;

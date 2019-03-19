@@ -85,15 +85,15 @@ class RepeatingHyperrectangleObstacles : public BaseObstacle {
 
   // Variables
   /** \brief The dimension of the planning problem*/
-  unsigned int dim_;
+  unsigned int dim_ { 0u };
   /** \brief The widths of the obstacle "columns"*/
-  std::vector<double> obsWidths_;
+  std::vector<double> obsWidths_ { };
   /** \brief The widths of the blank "columns" */
-  std::vector<double> blankWidths_;
-  /** \brief The period of "columns" (i.e., the width of obstacle plus the width of the blank) */
-  std::vector<double> periods_;
+  std::vector<double> blankWidths_ { };
   /** \brief The origin of the regularized grid */
-  std::vector<double> origin_;
+  std::vector<double> origin_ { };
+  /** \brief The period of "columns" (i.e., the width of obstacle plus the width of the blank) */
+  std::vector<double> periods_ { };
 };
 
 #endif  // OBSTACLES_REPEATING_HYPERRECTANGLE_OBSTACLES

@@ -58,15 +58,13 @@ WallGapExperiment::WallGapExperiment(const unsigned int dim, const bool onlyFind
                                      const double gapWidth, const double gapOffset,
                                      const double flankWidth, const double runSeconds,
                                      const double checkResolution)
-    : BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-1.0, 1.0)), runSeconds,
-                     "WallGap"),
+    : BaseExperiment(
+          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds, "WallGap"),
       stopClassSwitch_(onlyFindGap),
-      obsThickness_(0.25),
       gapWidth_(gapWidth),
       gapOffset_(gapOffset),
-      flankWidth_(flankWidth),
-      startPos_(-0.5),
-      goalPos_(0.5) {
+      flankWidth_(flankWidth) {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -147,7 +145,7 @@ WallGapExperiment::WallGapExperiment(const unsigned int dim, const bool onlyFind
   anti = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
 
   // Allocate the obstacles lower-left corners:
-  obstacleLowerLeftCorner_ = std::make_shared<ompl::base::ScopedState<> >(ss);
+  obstacleLowerLeftCorner_ = std::make_shared<ompl::base::ScopedState<>>(ss);
 
   // Specify the obstacle
   // Position
@@ -171,7 +169,7 @@ WallGapExperiment::WallGapExperiment(const unsigned int dim, const bool onlyFind
   obs->addObstacle(std::make_pair(obstacleLowerLeftCorner_->get(), obstacleWidths_));
 
   // Gap lower left corner.
-  gapLowerLeftCorner_ = std::make_shared<ompl::base::ScopedState<> >(ss);
+  gapLowerLeftCorner_ = std::make_shared<ompl::base::ScopedState<>>(ss);
 
   // Specify the gap (as anti obstacle)
   (*gapLowerLeftCorner_)[0u] = (goalPos_ + startPos_) / 2.0 - 0.5 * obsThickness_;  // x
@@ -214,7 +212,9 @@ WallGapExperiment::WallGapExperiment(const unsigned int dim, const bool onlyFind
   //     //No else
 }
 
-bool WallGapExperiment::knowsOptimum() const { return false; }
+bool WallGapExperiment::knowsOptimum() const {
+  return false;
+}
 
 ompl::base::Cost WallGapExperiment::getOptimum() const {
   // Variables

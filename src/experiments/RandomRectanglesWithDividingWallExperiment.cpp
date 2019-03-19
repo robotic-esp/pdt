@@ -56,12 +56,11 @@ RandomRectanglesWithDividingWallExperiment::RandomRectanglesWithDividingWallExpe
     const unsigned int dim, const unsigned int numObs, const double obsRatio,
     const unsigned int numGaps, const double gapWidth, const double runSeconds,
     const double checkResolution)
-    : BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-1.0, 1.0)), runSeconds,
-                     "RandomWithWall"),
+    : BaseExperiment(
+          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds, "RandomWithWall"),
       numGaps_(numGaps),
-      gapWidth_(gapWidth),
-      startPos_(-0.5),
-      goalPos_(0.5) {
+      gapWidth_(gapWidth) {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -182,7 +181,7 @@ RandomRectanglesWithDividingWallExperiment::RandomRectanglesWithDividingWallExpe
     double obsNum = static_cast<double>(i);
 
     // Allocate the obstacle
-    wallCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+    wallCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
 
     // Specify it's lower-left corner:
     (*(wallCorners_.back()))[0u] = (goalPos_ + startPos_) / 2.0 - 0.5 * allWallWidths_.at(0u);  // x
@@ -199,7 +198,7 @@ RandomRectanglesWithDividingWallExperiment::RandomRectanglesWithDividingWallExpe
   // Now create a random set of obstacles
   if (obsRatio > 0.0) {
     // A temporary vector
-    std::vector<ompl::base::ScopedState<> > tVec;
+    std::vector<ompl::base::ScopedState<>> tVec;
 
     // Copy into
     tVec.insert(tVec.end(), BaseExperiment::startStates_.begin(),
@@ -213,7 +212,9 @@ RandomRectanglesWithDividingWallExperiment::RandomRectanglesWithDividingWallExpe
   BaseExperiment::opt_->setCostThreshold(BaseExperiment::getMinimum());
 }
 
-bool RandomRectanglesWithDividingWallExperiment::knowsOptimum() const { return false; }
+bool RandomRectanglesWithDividingWallExperiment::knowsOptimum() const {
+  return false;
+}
 
 ompl::base::Cost RandomRectanglesWithDividingWallExperiment::getOptimum() const {
   throw ompl::Exception("The global optimum is unknown", BaseExperiment::name_);

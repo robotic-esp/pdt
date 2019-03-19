@@ -57,12 +57,9 @@ RandomRectanglesExperiment::RandomRectanglesExperiment(const unsigned int dim,
                                                        const double obsRatio,
                                                        const double runSeconds,
                                                        const double checkResolution)
-    : BaseExperiment(dim, limits_t(dim, std::pair<double, double>(-1.0, 1.0)), runSeconds,
-                     "RandRect"),
-      startPos_(-0.5),
-      goalPos_(0.5),
-      meanObsWidth_(0.0)  // Purposeful gibberish
-{
+    : BaseExperiment(
+          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+          runSeconds, "RandRect") {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -146,7 +143,7 @@ RandomRectanglesExperiment::RandomRectanglesExperiment(const unsigned int dim,
   sightLineWidth = std::min(BaseExperiment::getMinimum().value() / 7.5, meanObsWidth_);
 
   // Set the sight-line obstacle's lower-left corner:
-  sightLineObs_ = std::make_shared<ompl::base::ScopedState<> >(ss);
+  sightLineObs_ = std::make_shared<ompl::base::ScopedState<>>(ss);
   for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
     (*sightLineObs_)[i] =
         (BaseExperiment::goalStates_.back()[i] + BaseExperiment::startStates_.back()[i]) / 2.0 -
@@ -160,7 +157,7 @@ RandomRectanglesExperiment::RandomRectanglesExperiment(const unsigned int dim,
   // Create a random set of obstacles
   if (obsRatio > 0.0) {
     // A temporary vector
-    std::vector<ompl::base::ScopedState<> > tVec;
+    std::vector<ompl::base::ScopedState<>> tVec;
 
     // Copy into
     tVec.insert(tVec.end(), BaseExperiment::startStates_.begin(),
@@ -174,7 +171,9 @@ RandomRectanglesExperiment::RandomRectanglesExperiment(const unsigned int dim,
   BaseExperiment::opt_->setCostThreshold(BaseExperiment::getMinimum());
 }
 
-bool RandomRectanglesExperiment::knowsOptimum() const { return false; }
+bool RandomRectanglesExperiment::knowsOptimum() const {
+  return false;
+}
 
 ompl::base::Cost RandomRectanglesExperiment::getOptimum() const {
   throw ompl::Exception("The global optimum is unknown", BaseExperiment::name_);
@@ -193,4 +192,6 @@ std::string RandomRectanglesExperiment::lineInfo() const {
   return rval.str();
 }
 
-std::string RandomRectanglesExperiment::paraInfo() const { return std::string(); }
+std::string RandomRectanglesExperiment::paraInfo() const {
+  return std::string();
+}

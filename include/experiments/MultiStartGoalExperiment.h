@@ -67,7 +67,7 @@ class MultiStartGoalExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_;
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
 };
 
 typedef std::shared_ptr<MultiStartGoalExperiment> MultiStartGoalExperimentPtr;

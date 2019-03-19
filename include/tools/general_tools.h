@@ -123,7 +123,7 @@ std::ostream& operator<<(std::ostream& out, const std::chrono::duration<REP, PER
   out << out_stream.str();
 
   return out;
-};
+}
 
 // An output operator for std::chrono::point
 // Similar code exists in ompl/util/Time.h as as_string()
@@ -151,5 +151,6 @@ std::ostream& operator<<(std::ostream& out, const std::chrono::time_point<CLOCK,
   out << std::put_time(std::localtime(&cTime), "%F %T.") << epoch_us;
 
   return out;
-};
+}
+
 #endif  // GENERAL_TOOLS
