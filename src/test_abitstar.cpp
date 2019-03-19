@@ -74,8 +74,8 @@
 #include "ompl/base/objectives/PathLengthOptimizationObjective.h"
 //#include <ompl/tools/benchmark/Benchmark.h>
 #include <ompl/util/Exception.h>
-#include "ompl/tools/config/MagicConstants.h"  //For BETTER_PATH_COST_MARGIN
-#include "ompl/util/Console.h"                 //For OMPL_INFORM et al.
+#include <ompl/tools/config/MagicConstants.h>  //For BETTER_PATH_COST_MARGIN
+#include <ompl/util/Console.h>                 //For OMPL_INFORM et al.
 
 // Our Experiments
 #include "ExperimentDefinitions.h"
@@ -83,6 +83,7 @@
 // The helper functions for general and plotting:
 #include "tools/general_tools.h"
 #include "tools/plotting_tools.h"
+#include "tools/planner_tools.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
 
@@ -408,9 +409,7 @@ int main(int argc, char** argv) {
   // CHECK_RESOLUTION); BaseExperimentPtr expDefn = std::make_shared<FloorplanExperiment>(N,
   // 10, 3.0, 0.4, 1.5, targetTime, CHECK_RESOLUTION);
 
-  if (INITIAL_SOLN_ONLY == true)
-
-  {
+  if (INITIAL_SOLN_ONLY == true) {
     expDefn->setTarget(std::numeric_limits<double>::infinity());
   }
 

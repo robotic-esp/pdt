@@ -1,5 +1,6 @@
-# A random planning world in OMPL -- J. Gammell 2014
-cmake_minimum_required( VERSION 3.5 )
+# ESP OMPL TOOLS
+# Authors: Jonathan Gammell, Marlin Strub
+cmake_minimum_required(VERSION 3.5)
 project(esp_ompl_tools)
 
 # Enforce out-of-source builds.
@@ -25,21 +26,30 @@ message(STATUS "CMAKE_CXX_COMPILER_ID      = ${CMAKE_CXX_COMPILER_ID}"     )
 message(STATUS "CMAKE_CXX_COMPILER_VERSION = ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "Configuring for ${CMAKE_BUILD_TYPE} mode:")
 
-# Threads
+# TODO: Put this in the correct CMake project.
+# Find Threads.
 find_package (Threads)
 
-# Boost
+# TODO: Put this in the correct CMake project.
+# Find Boost.
 find_package( Boost 1.46.0 REQUIRED COMPONENTS program_options filesystem system thread)
 include_directories(${Boost_INCLUDE_DIR})
 
-# Eigen
+# TODO: Put this in the correct CMake project.
+# Find Eigen.
 find_package( Eigen3 REQUIRED )
 include_directories(${EIGEN3_INCLUDE_DIR})
 #message("Eigen: ${EIGEN3_INCLUDE_DIR}")
 
-# OMPL
+# TODO: Put this in the correct CMake project.
+# Find OMPL.
 find_package( ompl REQUIRED )
 include_directories(${OMPL_INCLUDE_DIRS})
 
+# TODO: This has to change. Split the libs according to functionality.
 include_directories( include )
 add_subdirectory( src )
+
+# Add the individual tools.
+add_subdirectory(esp_planner_factory)
+

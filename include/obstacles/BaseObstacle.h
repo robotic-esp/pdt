@@ -32,35 +32,32 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Jonathan Gammell, Marlin Strub
 
-#ifndef OBSTACLES_BASE_OBSTACLE
-#define OBSTACLES_BASE_OBSTACLE
+#pragma once
 
 #include <string>
 #include <vector>
 
 #include <ompl/base/StateValidityChecker.h>
 
-/** \brief The base class for a random world that derives from StateValidityChecker*/
+// The base class for obstacles.
 class BaseObstacle : public ompl::base::StateValidityChecker {
  public:
   BaseObstacle(ompl::base::SpaceInformation* si);
   BaseObstacle(const ompl::base::SpaceInformationPtr& si);
   virtual ~BaseObstacle() = default;
 
-  /** \brief Clear the obstacle space */
+  // Some obstacles might have to clean up allocated memory.
   virtual void clear() {};
 
-  /** \brief Check for state validity */
+  // Checks the valididy of a state.
   virtual bool isValid(const ompl::base::State* state) const = 0;
 
-  /** \brief Check a vector of states for validity */
+  // Checks the validity of multiple states by looping over all states.
   virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
 
-  /** \brief The obstacle map as a series of Matlab plot functions */
+  // TODO: Move this to the matlab plot exporter.
   virtual std::string mfile(const std::string& obsColour = "k",
                             const std::string& spaceColour = "w") const = 0;
 };
-
-#endif  // OBSTACLES_BASE_OBSTACLE
