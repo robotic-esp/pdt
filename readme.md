@@ -16,4 +16,5 @@ To create a map from a `.png` follow these steps:
    6. Convert to a binary image `Image -> Mode -> Indexed -> Black & White Palette`
    7. Save as `.bmp`
    8. Open `.bmp` in MATLAB
-   9. Export to a csv `csvwrite('filename.csv', bmpFileName)`
+   9. Export to a csv file `csvwrite('filename.csv', bmpFileName)`
+   10. Use the csvObstacle class
