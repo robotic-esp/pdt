@@ -48,6 +48,7 @@ add_executable(test_abitstar
   test_abitstar.cpp
 )
 target_link_libraries(test_abitstar
+  esp_planner_factory
   obstacles
   experiments
   ompl_tools

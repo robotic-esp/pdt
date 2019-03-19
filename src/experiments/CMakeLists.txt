@@ -24,9 +24,3 @@ target_link_libraries(experiments
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
 )
-
-#Symlink to the map directory
-add_custom_command(
-    TARGET experiments PRE_BUILD
-    COMMAND ln -sf ${CMAKE_SOURCE_DIR}/maps ${PROJECT_BINARY_DIR}/maps
-)

@@ -73,17 +73,19 @@
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include "ompl/base/objectives/PathLengthOptimizationObjective.h"
 //#include <ompl/tools/benchmark/Benchmark.h>
-#include <ompl/util/Exception.h>
 #include <ompl/tools/config/MagicConstants.h>  //For BETTER_PATH_COST_MARGIN
 #include <ompl/util/Console.h>                 //For OMPL_INFORM et al.
+#include <ompl/util/Exception.h>
 
 // Our Experiments
 #include "ExperimentDefinitions.h"
 
 // The helper functions for general and plotting:
 #include "tools/general_tools.h"
-#include "tools/plotting_tools.h"
 #include "tools/planner_tools.h"
+#include "tools/plotting_tools.h"
+
+#include "esp_planner_factory/planner_factory.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
 
@@ -146,11 +148,12 @@ const bool PLOT_BITSTAR_QUEUE = false;
 
 bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPtr,
               unsigned int* dimensionPtr, unsigned int* numTrialsPtr, double* runTimePtr,
-              bool* animatePtr) {
+                bool* animatePtr, std::string* plannerConfigFilePtr) {
   // Declare the supported options.
   boost::program_options::options_description desc("Allowed options");
   desc.add_options()("help,h", "Display this help message.")(
       "state,r", boost::program_options::value<unsigned int>(), "The state dimension.")(
+      "planner-config,p", boost::program_options::value<std::string>(), "The planner config file.")(
       "experiments,e", boost::program_options::value<unsigned int>(),
       "The number of unique experiments to run on the random world.")(
       "number-obstacles,n", boost::program_options::value<unsigned int>(),
@@ -263,6 +266,12 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
     ompl::msg::setLogLevel(ompl::msg::LOG_WARN);
   }
 
+  if (vm.count("planner-config")) {
+    *plannerConfigFilePtr = vm["planner-config"].as<std::string>();
+  } else {
+    *plannerConfigFilePtr = "No config file supplied.";
+  }
+
   return true;
 }
 
@@ -367,11 +376,16 @@ int main(int argc, char** argv) {
   // Whether to make frame-by-frame animations
   bool createAnimationFrames;
 
+  std::string plannerConfigFile{};
+
   // Get the command line arguments
   if (argParse(argc, argv, &numObs, &obsRatio, &N, &numExperiments, &targetTime,
-               &createAnimationFrames) == false) {
+               &createAnimationFrames, &plannerConfigFile) == false) {
     return 1;
   }
+
+  esp_ompl_tools::PlannerFactory plannerFactory(plannerConfigFile);
+  plannerFactory.dumpParameters(std::cout);
 
   // Variables
   // ompl::RNG::setSeed(18439067297677225292u);    std::cout << std::endl << " ---------> Seed set!
@@ -479,8 +493,10 @@ int main(int argc, char** argv) {
       ompl::base::ProblemDefinitionPtr pdef;
 
       // Allocate a planner
-      plnr = allocatePlanner(plannersToTest.at(i).first, expDefn, plannersToTest.at(i).second,
-                             steerEta);
+      // plnr = allocatePlanner(plannersToTest.at(i).first, expDefn, plannersToTest.at(i).second,
+      //                        steerEta);
+
+      plnr = plannerFactory.create("BITstar", expDefn);
 
       // Get the problem definition
       pdef = plnr->getProblemDefinition();

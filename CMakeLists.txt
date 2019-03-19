@@ -50,6 +50,11 @@ include_directories(${OMPL_INCLUDE_DIRS})
 include_directories( include )
 add_subdirectory( src )
 
+# Add the thirdparty projects.
+set(JSON_BuildTests OFF CACHE INTERNAL "") # No need to build the tests.
+set(JSON_Install OFF CACHE INTERNAL "")    # No need to install it.
+add_subdirectory(thirdparty/json)
+
 # Add the individual tools.
 add_subdirectory(esp_planner_factory)
 
