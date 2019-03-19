@@ -2,8 +2,6 @@
 add_subdirectory( obstacles )
 add_subdirectory( experiments )
 add_subdirectory( tools )
-add_subdirectory( bitstar_journal )
-add_subdirectory( informed_journal )
 
 # Executables
 # add_executable(learn_binary_heap
