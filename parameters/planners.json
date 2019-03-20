@@ -46,6 +46,7 @@
         "pruningThreshold": 0.1,
         "useJustInTimeSampling": false,
         "dropSamplesOnPrune": false,
+        "stopOnSolutionImprovement": false,
         "initialInflation": 1000000,
         "inflationParameter": 10,
         "truncationParameter": 5

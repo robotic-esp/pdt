@@ -64,12 +64,12 @@ PlannerFactory::PlannerFactory(fs::path plannerConfigFile) {
 }
 
 std::shared_ptr<ompl::base::Planner> PlannerFactory::create(
-    const std::string& type, const BaseExperimentPtr &experiment) const {
+    const std::string& plannerType, const BaseExperimentPtr &experiment) const {
   // BIT*
-  if (type == std::string("BITstar")) {
-    // Create a BIT* planner.
+  if (plannerType == std::string("BITstar")) {
+    // Allocate and configure a BIT* planner.
     auto planner = std::make_shared<ompl::geometric::BITstar>(experiment->getSpaceInformation());
-    auto plannerParams = parameters_[type];
+    const auto &plannerParams = parameters_[plannerType];
     planner->setProblemDefinition(experiment->newProblemDefinition());
     planner->setName(plannerParams["name"]);
     planner->setUseKNearest(plannerParams["useKNearest"]);
@@ -83,6 +83,53 @@ std::shared_ptr<ompl::base::Planner> PlannerFactory::create(
     planner->setInitialInflationFactor(1.0);
     planner->setInflationFactorParameter(0.0);
     planner->setTruncationFactorParameter(0.0);
+    return planner;
+  } else if (plannerType == std::string("SBITstar")) {
+    // Allocate and configure an SBIT* planner.
+    auto planner = std::make_shared<ompl::geometric::BITstar>(experiment->getSpaceInformation());
+    const auto &plannerParams = parameters_[plannerType];
+    planner->setProblemDefinition(experiment->newProblemDefinition());
+    planner->setName(plannerParams["name"]);
+    planner->setUseKNearest(plannerParams["useKNearest"]);
+    planner->setRewireFactor(plannerParams["rewireFactor"]);
+    planner->setSamplesPerBatch(plannerParams["samplesPerBatch"]);
+    planner->setPruning(plannerParams["enablePruning"]);
+    planner->setPruneThresholdFraction(plannerParams["pruningThreshold"]);
+    planner->setDropSamplesOnPrune(plannerParams["dropSamplesOnPrune"]);
+    planner->setJustInTimeSampling(plannerParams["useJustInTimeSampling"]);
+    planner->setStopOnSolnImprovement(plannerParams["stopOnSolutionImprovement"]);
+    planner->setInitialInflationFactor(plannerParams["initialInflation"]);
+    planner->setInflationFactorParameter(plannerParams["inflationParameter"]);
+    planner->setTruncationFactorParameter(plannerParams["truncationParameter"]);
+    return planner;
+  } else if (plannerType == std::string("RRTConnect")) {
+    // Allocate and configure an RRT-Connect planner.
+    auto planner = std::make_shared<ompl::geometric::RRTConnect>(experiment->getSpaceInformation());
+    auto dimKey = std::to_string(experiment->getDimensions()) + "d";
+    const auto &plannerParams = parameters_[plannerType];
+    planner->setProblemDefinition(experiment->newProblemDefinition());
+    planner->setName(plannerParams["name"]);
+    planner->setRange(plannerParams["maxEdgeLength"][dimKey]);
+    planner->setIntermediateStates(plannerParams["addIntermediateStates"]);
+    return planner;
+  } else if (plannerType == std::string("RRTstar")) {
+    // Allocate and configure an RRT-Connect planner.
+    auto planner = std::make_shared<ompl::geometric::RRTstar>(experiment->getSpaceInformation());
+    auto dimKey = std::to_string(experiment->getDimensions()) + "d";
+    const auto &plannerParams = parameters_[plannerType];
+    planner->setProblemDefinition(experiment->newProblemDefinition());
+    planner->setName(plannerParams["name"]);
+    planner->setKNearest(plannerParams["useKNearest"]);
+    planner->setRange(plannerParams["maxEdgeLength"][dimKey]);
+    planner->setGoalBias(plannerParams["goalBias"]);
+    planner->setDelayCC(plannerParams["delayCollisionChecks"]);
+    planner->setTreePruning(false);
+    planner->setPruneThreshold(1.0);
+    planner->setPrunedMeasure(false);
+    planner->setSampleRejection(false);
+    planner->setNewStateRejection(false);
+    planner->setAdmissibleCostToCome(true);
+    planner->setInformedSampling(false);
     return planner;
   } else {
     throw std::runtime_error("Requested to create unknown planner at factory.");

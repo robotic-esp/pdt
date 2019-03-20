@@ -97,6 +97,10 @@ std::vector<std::pair<double, double>> BaseExperiment::getLimits() const {
   return limits_;
 }
 
+unsigned int BaseExperiment::getDimensions() const {
+  return dim_;
+}
+
 ompl::base::Cost BaseExperiment::getMinimum() const {
   // Return the minimum of each start to the goal
   ompl::base::Cost minCost = opt_->infiniteCost();

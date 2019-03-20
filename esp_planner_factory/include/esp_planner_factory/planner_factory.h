@@ -55,7 +55,7 @@ public:
   ~PlannerFactory() = default;
 
   // Create a planner.
-  std::shared_ptr<ompl::base::Planner> create(const std::string &type,
+  std::shared_ptr<ompl::base::Planner> create(const std::string &plannerType,
                                               const BaseExperimentPtr &experiment) const;
   
   // Dump the parameters to an ostream.

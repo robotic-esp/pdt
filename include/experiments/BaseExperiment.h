@@ -94,6 +94,9 @@ class BaseExperiment : boost::noncopyable {
   /** \brief Get the state-space limit */
   std::vector<std::pair<double, double>> getLimits() const;
 
+  /** \brief Get the dimensionality of the underlying search space */
+  unsigned int getDimensions() const;
+
   /** \brief The global minimum that may or may not be attainable in a problem. */
   ompl::base::Cost getMinimum() const;
 
