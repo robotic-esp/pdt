@@ -34,7 +34,7 @@
 
 // Author: Marlin Strub
 
-#include "esp_planner_factory/planner_factory.h"
+#include "esp_factories/planner_factory.h"
 
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/fmt/FMT.h>

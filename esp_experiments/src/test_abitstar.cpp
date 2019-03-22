@@ -81,7 +81,7 @@
 #include "esp_utilities/general_tools.h"
 #include "esp_utilities/planner_tools.h"
 #include "esp_utilities/plotting_tools.h"
-#include "esp_planner_factory/planner_factory.h"
+#include "esp_factories/planner_factory.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
 

@@ -43,15 +43,28 @@ add_executable(test_abitstar
   src/test_abitstar.cpp
 )
 target_link_libraries(test_abitstar
+  esp_factories
   esp_obstacles
   esp_planning_contexts
-  esp_planner_factory
   esp_utilities
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
 )
 
+
+add_executable(planner_performance
+  src/planner_performance.cpp
+)
+target_link_libraries(planner_performance
+  esp_factories
+  esp_obstacles
+  esp_planning_contexts
+  esp_utilities
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
+)
 # add_executable(test_multigoal
 #   test_multigoal.cpp
 # )

@@ -26,24 +26,20 @@ message(STATUS "CMAKE_CXX_COMPILER_ID      = ${CMAKE_CXX_COMPILER_ID}"     )
 message(STATUS "CMAKE_CXX_COMPILER_VERSION = ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "Configuring for ${CMAKE_BUILD_TYPE} mode:")
 
-# TODO: Put this in the correct CMake project.
 # Find Threads.
-find_package (Threads)
+find_package(Threads)
 
 # TODO: Put this in the correct CMake project.
 # Find Boost.
-find_package( Boost 1.46.0 REQUIRED COMPONENTS program_options filesystem system thread)
+find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options filesystem system thread)
 include_directories(${Boost_INCLUDE_DIR})
 
-# TODO: Put this in the correct CMake project.
 # Find Eigen.
-find_package( Eigen3 REQUIRED )
+find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
-#message("Eigen: ${EIGEN3_INCLUDE_DIR}")
 
-# TODO: Put this in the correct CMake project.
 # Find OMPL.
-find_package( ompl REQUIRED )
+find_package(ompl REQUIRED)
 include_directories(${OMPL_INCLUDE_DIRS})
 
 # Add the thirdparty projects.
@@ -52,7 +48,7 @@ set(JSON_Install OFF CACHE INTERNAL "")    # No need to install the json lib.
 add_subdirectory(thirdparty/json)
 
 # Add the subdirectories.
-add_subdirectory(esp_planner_factory)
+add_subdirectory(esp_factories)
 add_subdirectory(esp_planning_contexts)
 add_subdirectory(esp_experiments)
 add_subdirectory(esp_obstacles)
