@@ -34,31 +34,21 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#pragma once
+#include "obstacles/BaseObstacle.h"
 
-#include <string>
-#include <vector>
+BaseObstacle::BaseObstacle(ompl::base::SpaceInformation* si)
+    : ompl::base::StateValidityChecker(si) {}
 
-#include <ompl/base/StateValidityChecker.h>
-#include <ompl/base/SpaceInformation.h>
+BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& si)
+    : ompl::base::StateValidityChecker(si) {}
 
-// The base class for obstacles.
-class BaseObstacle : public ompl::base::StateValidityChecker {
- public:
-  BaseObstacle(ompl::base::SpaceInformation* si);
-  BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-  virtual ~BaseObstacle() = default;
-
-  // Some obstacles might have to clean up allocated memory.
-  virtual void clear() {};
-
-  // Checks the valididy of a state.
-  virtual bool isValid(const ompl::base::State* state) const = 0;
-
-  // Checks the validity of multiple states by looping over all states.
-  virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
-
-  // TODO: Move this to the matlab plot exporter.
-  virtual std::string mfile(const std::string& obsColour = "k",
-                            const std::string& spaceColour = "w") const = 0;
-};
+bool BaseObstacle::isValid(const std::vector<const ompl::base::State*>& states) const {
+  // Check all states.
+  for (const auto &state : states) {
+    if (!isValid(state)) {
+      return false;
+    }
+  }
+  // All states are valid.
+  return true;
+}

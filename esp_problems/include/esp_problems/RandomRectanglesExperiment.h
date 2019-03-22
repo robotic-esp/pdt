@@ -32,33 +32,55 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+/* Authors: Jonathan Gammell */
 
-#pragma once
+#ifndef EXPERIMENTS_RANDOM_RECTANGLES_EXPERIMENT
+#define EXPERIMENTS_RANDOM_RECTANGLES_EXPERIMENT
 
-#include <string>
-#include <vector>
+#include "experiments/BaseExperiment.h"
 
-#include <ompl/base/StateValidityChecker.h>
-#include <ompl/base/SpaceInformation.h>
+// An Obstacle-World
+#include "obstacles/HyperrectangleObstacles.h"
 
-// The base class for obstacles.
-class BaseObstacle : public ompl::base::StateValidityChecker {
+/** \brief An experiment with a singularly placed square obstacle*/
+class RandomRectanglesExperiment : public BaseExperiment {
  public:
-  BaseObstacle(ompl::base::SpaceInformation* si);
-  BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-  virtual ~BaseObstacle() = default;
+  /** \brief Constructor. */
+  RandomRectanglesExperiment(const unsigned int dim, const unsigned int numObs,
+                             const double obsRatio, const double runSeconds,
+                             const double checkResolution);
 
-  // Some obstacles might have to clean up allocated memory.
-  virtual void clear() {};
+  /** \brief This problem \e does \e not know its optimum */
+  virtual bool knowsOptimum() const;
 
-  // Checks the valididy of a state.
-  virtual bool isValid(const ompl::base::State* state) const = 0;
+  /** \brief As the optimum is unknown, throw. */
+  virtual ompl::base::Cost getOptimum() const;
 
-  // Checks the validity of multiple states by looping over all states.
-  virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
+  /** \brief Set the optimization target as the specified cost. */
+  virtual void setTarget(double targetSpecifier);
 
-  // TODO: Move this to the matlab plot exporter.
-  virtual std::string mfile(const std::string& obsColour = "k",
-                            const std::string& spaceColour = "w") const = 0;
+  /** \brief Derived class specific information to include in the title line. */
+  virtual std::string lineInfo() const;
+
+  /** \brief Derived class specific information to include at the end. */
+  virtual std::string paraInfo() const;
+
+ protected:
+  // Variables
+  /** \brief The obstacle world */
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
+  /** \brief The lower-left corner of an obstacle half-way between the start and goal */
+  std::shared_ptr<ompl::base::ScopedState<>> sightLineObs_{};
+
+  // Constant Parameters
+  /** \brief The start position */
+  double startPos_{-0.5};
+  /** \brief The goal position */
+  double goalPos_{0.5};
+  /** \brief The mean obstacle width*/
+  double meanObsWidth_{0.0};
 };
+
+typedef std::shared_ptr<RandomRectanglesExperiment> RandomRectanglesExperimentPtr;
+
+#endif  // EXPERIMENTS_RANDOM_RECTANGLES_EXPERIMENT

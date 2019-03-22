@@ -32,33 +32,45 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+/* Authors: Jonathan Gammell */
 
-#pragma once
+#ifndef EXPERIMENTS_OBSTACLE_FREE_EXPERIMENT
+#define EXPERIMENTS_OBSTACLE_FREE_EXPERIMENT
 
-#include <string>
-#include <vector>
+#include "experiments/BaseExperiment.h"
 
-#include <ompl/base/StateValidityChecker.h>
-#include <ompl/base/SpaceInformation.h>
+#include "ompl/base/Goal.h"
+#include "ompl/base/ScopedState.h"
 
-// The base class for obstacles.
-class BaseObstacle : public ompl::base::StateValidityChecker {
+/** \brief An obstacle-free multigoal/multistart experiment */
+class ObstacleFreeExperiment : public BaseExperiment {
  public:
-  BaseObstacle(ompl::base::SpaceInformation* si);
-  BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-  virtual ~BaseObstacle() = default;
+  /** \brief Constructor */
+  ObstacleFreeExperiment(const unsigned int dim, const unsigned int maxNumStarts,
+                         const unsigned int maxNumGoals, const double runSeconds);
 
-  // Some obstacles might have to clean up allocated memory.
-  virtual void clear() {};
+  /** \brief This problem knows the optimum */
+  virtual bool knowsOptimum() const;
 
-  // Checks the valididy of a state.
-  virtual bool isValid(const ompl::base::State* state) const = 0;
+  /** \brief Returns the optimum cost, the minimum distance from start to goal. */
+  virtual ompl::base::Cost getOptimum() const;
 
-  // Checks the validity of multiple states by looping over all states.
-  virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
+  /** \brief Set the target cost as the specified multiplier of the optimum. */
+  virtual void setTarget(double targetSpecifier);
 
-  // TODO: Move this to the matlab plot exporter.
-  virtual std::string mfile(const std::string& obsColour = "k",
-                            const std::string& spaceColour = "w") const = 0;
+  /** \brief Derived class specific information to include in the title line. */
+  virtual std::string lineInfo() const;
+
+  /** \brief Derived class specific information to include at the end. */
+  virtual std::string paraInfo() const;
+
+ protected:
+  // Constant Parameters
+  /** \brief The definition of the "centre" and "outside" positions */
+  double centrePos_  { 0.0 };
+  double outsidePos_ { 0.0 };
 };
+
+typedef std::shared_ptr<ObstacleFreeExperiment> ObstacleFreeExperimentPtr;
+
+#endif  // EXPERIMENTS_OBSTACLE_FREE_EXPERIMENT

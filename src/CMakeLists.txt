@@ -49,9 +49,9 @@ add_executable(test_abitstar
 )
 target_link_libraries(test_abitstar
   esp_planner_factory
-  obstacles
-  experiments
-  ompl_tools
+  esp_obstacles
+  esp_problems
+  esp_utilities
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}

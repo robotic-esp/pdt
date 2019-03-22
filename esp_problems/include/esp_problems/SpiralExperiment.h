@@ -1,3 +1,4 @@
+
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
@@ -32,33 +33,52 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+/* Authors: Jonathan Gammell */
 
-#pragma once
+#ifndef EXPERIMENTS_SPIRAL_EXPERIMENT
+#define EXPERIMENTS_SPIRAL_EXPERIMENT
 
-#include <string>
-#include <vector>
+#include "experiments/BaseExperiment.h"
 
-#include <ompl/base/StateValidityChecker.h>
-#include <ompl/base/SpaceInformation.h>
+// An Obstacle-World
+#include "obstacles/HyperrectangleObstacles.h"
 
-// The base class for obstacles.
-class BaseObstacle : public ompl::base::StateValidityChecker {
+/** \brief An experiment with a heuristic breaking spiral */
+class SpiralExperiment : public BaseExperiment {
  public:
-  BaseObstacle(ompl::base::SpaceInformation* si);
-  BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-  virtual ~BaseObstacle() = default;
+  /** \brief Constructor */
+  SpiralExperiment(const double distFraction, const double runSeconds,
+                   const double checkResolution);
 
-  // Some obstacles might have to clean up allocated memory.
-  virtual void clear() {};
+  /** \brief This problem \e does \e not know its optimum (though it could) */
+  virtual bool knowsOptimum() const;
 
-  // Checks the valididy of a state.
-  virtual bool isValid(const ompl::base::State* state) const = 0;
+  /** \brief As the optimum is unknown, throw. */
+  virtual ompl::base::Cost getOptimum() const;
 
-  // Checks the validity of multiple states by looping over all states.
-  virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
+  /** \brief Set the optimization target as the specified cost. */
+  virtual void setTarget(double targetSpecifier);
 
-  // TODO: Move this to the matlab plot exporter.
-  virtual std::string mfile(const std::string& obsColour = "k",
-                            const std::string& spaceColour = "w") const = 0;
+  /** \brief Derived class specific information to include in the title line. */
+  virtual std::string lineInfo() const;
+
+  /** \brief Derived class specific information to include at the end. */
+  virtual std::string paraInfo() const;
+
+ protected:
+  // Variables
+  /** \brief The obstacle world */
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
+  /** \brief The lower-left corners of the obstacles*/
+  std::vector<ompl::base::ScopedState<> > obsCorners_{};
+  /** The widths of the obstacles */
+  std::vector<std::vector<double> > obsWidths_{};
+
+  // Constant Parameters
+  /** \brief The basic thickness of the obstacle. */
+  double obsThickness_{0.05};
 };
+
+typedef std::shared_ptr<SpiralExperiment> SpiralExperimentPtr;
+
+#endif  // EXPERIMENTS_SPIRAL_EXPERIMENT

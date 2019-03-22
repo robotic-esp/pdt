@@ -72,18 +72,17 @@
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include "ompl/base/objectives/PathLengthOptimizationObjective.h"
-//#include <ompl/tools/benchmark/Benchmark.h>
 #include <ompl/tools/config/MagicConstants.h>  //For BETTER_PATH_COST_MARGIN
 #include <ompl/util/Console.h>                 //For OMPL_INFORM et al.
 #include <ompl/util/Exception.h>
 
 // Our Experiments
-#include "ExperimentDefinitions.h"
+#include "esp_problems/AllExperiments.h"
 
 // The helper functions for general and plotting:
-#include "tools/general_tools.h"
-#include "tools/planner_tools.h"
-#include "tools/plotting_tools.h"
+#include "esp_utilities/general_tools.h"
+#include "esp_utilities/planner_tools.h"
+#include "esp_utilities/plotting_tools.h"
 
 #include "esp_planner_factory/planner_factory.h"
 
@@ -493,10 +492,9 @@ int main(int argc, char** argv) {
       ompl::base::ProblemDefinitionPtr pdef;
 
       // Allocate a planner
-      // plnr = allocatePlanner(plannersToTest.at(i).first, expDefn, plannersToTest.at(i).second,
-      //                        steerEta);
-
-      plnr = plannerFactory.create("BITstar", expDefn);
+      plnr = allocatePlanner(plannersToTest.at(i).first, expDefn, plannersToTest.at(i).second,
+                             steerEta);
+      // plnr = plannerFactory.create("BITstar", expDefn);
 
       // Get the problem definition
       pdef = plnr->getProblemDefinition();

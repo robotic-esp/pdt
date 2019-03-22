@@ -32,33 +32,44 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+/* Authors: Jonathan Gammell */
 
-#pragma once
+#ifndef EXPERIMENTS_MULTI_START_GOAL_EXPERIMENT
+#define EXPERIMENTS_MULTI_START_GOAL_EXPERIMENT
 
-#include <string>
-#include <vector>
+#include "experiments/BaseExperiment.h"
 
-#include <ompl/base/StateValidityChecker.h>
-#include <ompl/base/SpaceInformation.h>
+// An Obstacle-World
+#include "obstacles/HyperrectangleObstacles.h"
 
-// The base class for obstacles.
-class BaseObstacle : public ompl::base::StateValidityChecker {
+/** \brief An with 2 starts, 3 goals and random obstacles. */
+class MultiStartGoalExperiment : public BaseExperiment {
  public:
-  BaseObstacle(ompl::base::SpaceInformation* si);
-  BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-  virtual ~BaseObstacle() = default;
+  /** \brief Constructor. */
+  MultiStartGoalExperiment(const unsigned int dim, const unsigned int numObs, const double obsRatio,
+                           const double runSeconds, const double checkResolution);
 
-  // Some obstacles might have to clean up allocated memory.
-  virtual void clear() {};
+  /** \brief This problem \e does \e not know its optimum */
+  virtual bool knowsOptimum() const;
 
-  // Checks the valididy of a state.
-  virtual bool isValid(const ompl::base::State* state) const = 0;
+  /** \brief As the optimum is unknown, throw. */
+  virtual ompl::base::Cost getOptimum() const;
 
-  // Checks the validity of multiple states by looping over all states.
-  virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
+  /** \brief Set the optimization target as the specified cost. */
+  virtual void setTarget(double targetSpecifier);
 
-  // TODO: Move this to the matlab plot exporter.
-  virtual std::string mfile(const std::string& obsColour = "k",
-                            const std::string& spaceColour = "w") const = 0;
+  /** \brief Derived class specific information to include in the title line. */
+  virtual std::string lineInfo() const;
+
+  /** \brief Derived class specific information to include at the end. */
+  virtual std::string paraInfo() const;
+
+ protected:
+  // Variables
+  /** \brief The obstacle world */
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
 };
+
+typedef std::shared_ptr<MultiStartGoalExperiment> MultiStartGoalExperimentPtr;
+
+#endif  // EXPERIMENTS_MULTI_START_GOAL_EXPERIMENT

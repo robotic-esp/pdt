@@ -56,5 +56,8 @@ set(JSON_Install OFF CACHE INTERNAL "")    # No need to install it.
 add_subdirectory(thirdparty/json)
 
 # Add the individual tools.
+add_subdirectory(esp_obstacles)
 add_subdirectory(esp_planner_factory)
+add_subdirectory(esp_problems)
+add_subdirectory(esp_utilities)
 

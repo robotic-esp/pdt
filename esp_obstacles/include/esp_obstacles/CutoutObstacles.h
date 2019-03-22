@@ -32,33 +32,45 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+/* Authors: Jonathan Gammell */
 
-#pragma once
+#ifndef OBSTACLES_CUTOUT_OBSTACLES
+#define OBSTACLES_CUTOUT_OBSTACLES
 
-#include <string>
+#include <memory>
 #include <vector>
 
-#include <ompl/base/StateValidityChecker.h>
-#include <ompl/base/SpaceInformation.h>
+#include "obstacles/BaseObstacle.h"
 
-// The base class for obstacles.
-class BaseObstacle : public ompl::base::StateValidityChecker {
+/** \brief A world consisting of obstacles defined by obstacles and "anti-obstacles". A state is in
+ * collision if it is in an obstacle and not in an anti-obstacle. */
+class CutoutObstacles : public BaseObstacle {
  public:
-  BaseObstacle(ompl::base::SpaceInformation* si);
-  BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-  virtual ~BaseObstacle() = default;
+  CutoutObstacles(ompl::base::SpaceInformation* si);
+  CutoutObstacles(const ompl::base::SpaceInformationPtr& si);
+  ~CutoutObstacles() = default;
 
-  // Some obstacles might have to clean up allocated memory.
-  virtual void clear() {};
+  /** \brief Clear the obstacle space */
+  void clear() override;
 
-  // Checks the valididy of a state.
-  virtual bool isValid(const ompl::base::State* state) const = 0;
+  /** \brief Check for state validity */
+  bool isValid(const ompl::base::State* state) const override;
 
-  // Checks the validity of multiple states by looping over all states.
-  virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
+  /** \brief Add an obstacle to the obstacle space */
+  void addObstacle(const std::shared_ptr<BaseObstacle>& newObstaclePtr);
 
-  // TODO: Move this to the matlab plot exporter.
-  virtual std::string mfile(const std::string& obsColour = "k",
-                            const std::string& spaceColour = "w") const = 0;
+  /** \brief Add an anti-obstacle to the obstacle space */
+  void addAntiObstacle(const std::shared_ptr<BaseObstacle>& newAntiObstaclePtr);
+
+  /** \brief The obstacle map as a series of Matlab plot functions */
+  std::string mfile(const std::string& obsColour, const std::string& spaceColour) const override;
+
+ private:
+  /** \brief A vector of obstacles */
+  std::vector<std::shared_ptr<BaseObstacle>> obstaclePtrs_ { };
+
+  /** \brief A vector of anti-obstacles */
+  std::vector<std::shared_ptr<BaseObstacle>> antiObstaclePtrs_ { };
 };
+
+#endif  // OBSTACLES_CUTOUT_OBSTACLES

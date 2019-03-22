@@ -32,33 +32,52 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+/* Authors: Jonathan Gammell */
 
-#pragma once
+#ifndef EXPERIMENTS_CENTRE_SQUARE_EXPERIMENT
+#define EXPERIMENTS_CENTRE_SQUARE_EXPERIMENT
 
-#include <string>
-#include <vector>
+#include "experiments/BaseExperiment.h"
 
-#include <ompl/base/StateValidityChecker.h>
-#include <ompl/base/SpaceInformation.h>
+// An Obstacle-World
+#include "obstacles/HyperrectangleObstacles.h"
 
-// The base class for obstacles.
-class BaseObstacle : public ompl::base::StateValidityChecker {
+/** \brief An experiment with a singularly placed square obstacle*/
+class CentreSquareExperiment : public BaseExperiment {
  public:
-  BaseObstacle(ompl::base::SpaceInformation* si);
-  BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-  virtual ~BaseObstacle() = default;
+  /** \brief Constructor */
+  CentreSquareExperiment(const unsigned int dim, const double obsWidth, const double worldWidth,
+                         const double runSeconds, const double checkResolution);
 
-  // Some obstacles might have to clean up allocated memory.
-  virtual void clear() {};
+  /** \brief Whether the problem has an exact expression for the optimum */
+  virtual bool knowsOptimum() const;
 
-  // Checks the valididy of a state.
-  virtual bool isValid(const ompl::base::State* state) const = 0;
+  /** \brief This problem knows its optimum */
+  virtual ompl::base::Cost getOptimum() const;
 
-  // Checks the validity of multiple states by looping over all states.
-  virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
+  /** \brief Set the target cost as the specified multiplier of the optimum. */
+  virtual void setTarget(double targetSpecifier);
 
-  // TODO: Move this to the matlab plot exporter.
-  virtual std::string mfile(const std::string& obsColour = "k",
-                            const std::string& spaceColour = "w") const = 0;
+  /** \brief Derived class specific information to include in the title line. */
+  virtual std::string lineInfo() const;
+
+  /** \brief Derived class specific information to include at the end. */
+  virtual std::string paraInfo() const;
+
+ protected:
+  // Variables
+  /** \brief The obstacle world */
+  std::shared_ptr<HyperrectangleObstacles> rectObs_ { };
+  /** \brief The lower-left corner of an obstacle half-way between the start and goal */
+  std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_ { };
+  /** The widths of the sight-line obstacle */
+  double obsWidth_ { 0.0 };
+
+  // The start and goal positions.
+  double startPos_ { 0.0 };
+  double goalPos_  { 0.0 };
 };
+
+typedef std::shared_ptr<CentreSquareExperiment> CentreSquareExperimentPtr;
+
+#endif  // EXPERIMENTS_CENTRE_SQUARE_EXPERIMENT
