@@ -40,10 +40,10 @@
 #include "esp_planning_contexts/base_context.h"
 
 /** \brief An experiment with heuristic breaking deadend "C" */
-class DeadEndExperiment : public BaseExperiment {
+class DeadEnd : public BaseContext {
  public:
   /** \brief Constructor */
-  DeadEndExperiment(const double distFraction, const double runSeconds,
+  DeadEnd(const double distFraction, const double runSeconds,
                     const double checkResolution);
 
   /** \brief Whether the problem has an exact expression for the optimum */
@@ -78,5 +78,3 @@ class DeadEndExperiment : public BaseExperiment {
   /** \brief The basic thickness of the obstacle. */
   double obsThickness_;
 };
-
-typedef std::shared_ptr<DeadEndExperiment> DeadEndExperimentPtr;

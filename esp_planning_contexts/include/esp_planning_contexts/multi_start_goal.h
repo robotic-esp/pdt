@@ -40,11 +40,11 @@
 #include "esp_planning_contexts/base_context.h"
 
 /** \brief An with 2 starts, 3 goals and random obstacles. */
-class MultiStartGoalExperiment : public BaseExperiment {
+class MultiStartGoal : public BaseContext {
  public:
   /** \brief Constructor. */
-  MultiStartGoalExperiment(const unsigned int dim, const unsigned int numObs, const double obsRatio,
-                           const double runSeconds, const double checkResolution);
+  MultiStartGoal(const unsigned int dim, const unsigned int numObs, const double obsRatio,
+                 const double runSeconds, const double checkResolution);
 
   /** \brief This problem \e does \e not know its optimum */
   virtual bool knowsOptimum() const;
@@ -66,5 +66,3 @@ class MultiStartGoalExperiment : public BaseExperiment {
   /** \brief The obstacle world */
   std::shared_ptr<HyperrectangleObstacles> rectObs_{};
 };
-
-typedef std::shared_ptr<MultiStartGoalExperiment> MultiStartGoalExperimentPtr;

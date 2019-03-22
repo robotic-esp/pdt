@@ -47,9 +47,9 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-FlankingGapExperiment::FlankingGapExperiment(const bool onlyFindGap, const double gapWidth,
+FlankingGap::FlankingGap(const bool onlyFindGap, const double gapWidth,
                                              const double runSeconds, const double checkResolution)
-    : BaseExperiment(
+    : BaseContext(
           2u, std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
           runSeconds, "FlankingGap"),
       stopClassSwitch_(onlyFindGap),
@@ -58,73 +58,73 @@ FlankingGapExperiment::FlankingGapExperiment(const bool onlyFindGap, const doubl
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
   // The problem bounds
-  ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
+  ompl::base::RealVectorBounds problemBounds(BaseContext::dim_);
 
   // Make the state space Rn:
-  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseContext::dim_);
 
   // Create the space information class:
-  BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
+  BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
-  BaseExperiment::obs_ = rectObs_;
+  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
+  BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:
-  problemBounds.setLow(BaseExperiment::limits_.at(0u).first);
-  problemBounds.setHigh(BaseExperiment::limits_.at(0u).second);
+  problemBounds.setLow(BaseContext::limits_.at(0u).first);
+  problemBounds.setHigh(BaseContext::limits_.at(0u).second);
 
   // Store the problem bounds:
   ss->setBounds(problemBounds);
 
   // Set the validity checker and checking resolution
-  BaseExperiment::si_->setStateValidityChecker(
+  BaseContext::si_->setStateValidityChecker(
       static_cast<ompl::base::StateValidityCheckerPtr>(rectObs_));
-  BaseExperiment::si_->setStateValidityCheckingResolution(checkResolution);
+  BaseContext::si_->setStateValidityCheckingResolution(checkResolution);
 
   // Call setup!
-  BaseExperiment::si_->setup();
+  BaseContext::si_->setup();
 
   // Allocate the optimization objective
-  BaseExperiment::opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+  BaseContext::opt_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseContext::si_);
 
   // Set the heuristic to the default:
-  BaseExperiment::opt_->setCostToGoHeuristic(
+  BaseContext::opt_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
   // Create my start:
   // Create a start state on the vector:
-  BaseExperiment::startStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::startStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
     if (j == 0u) {
-      BaseExperiment::startStates_.back()[j] = startPos_;
+      BaseContext::startStates_.back()[j] = startPos_;
     } else {
-      BaseExperiment::startStates_.back()[j] = 0.0;
+      BaseContext::startStates_.back()[j] = 0.0;
     }
   }
 
   // Create my goal:
   // Create a goal state on the vector:
-  BaseExperiment::goalStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::goalStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
     if (j == 0u) {
-      BaseExperiment::goalStates_.back()[j] = goalPos_;
+      BaseContext::goalStates_.back()[j] = goalPos_;
     } else {
-      BaseExperiment::goalStates_.back()[j] = 0.0;
+      BaseContext::goalStates_.back()[j] = 0.0;
     }
   }
 
   // Allocate the goal:
-  BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
+  BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseExperiment::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseExperiment::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
+      BaseContext::goalStates_.back());
 
   // Allocate the obstacles lower-left corners:
   lowerObs_ = std::make_shared<ompl::base::ScopedState<>>(ss);
@@ -136,7 +136,7 @@ FlankingGapExperiment::FlankingGapExperiment(const bool onlyFindGap, const doubl
   (*lowerObs_)[1u] = -0.5 * obsTotalHeight_;
 
   // Widths
-  lowerWidths_ = std::vector<double>(BaseExperiment::dim_, obsThickness_);
+  lowerWidths_ = std::vector<double>(BaseContext::dim_, obsThickness_);
 
   // Specify the upper obstacle
   (*upperObs_)[0u] = (*lowerObs_)[0];  // x
@@ -153,10 +153,10 @@ FlankingGapExperiment::FlankingGapExperiment(const bool onlyFindGap, const doubl
   // Finally specify the optimization target:
   if (stopClassSwitch_ == true) {
     // Stop if we find a cost better than the max non flanking cost
-    BaseExperiment::opt_->setCostThreshold(this->minFlankingCost());
+    BaseContext::opt_->setCostThreshold(this->minFlankingCost());
   } else {
     // The optimum:
-    BaseExperiment::opt_->setCostThreshold(this->getOptimum());
+    BaseContext::opt_->setCostThreshold(this->getOptimum());
   }
 
   // Make sure this is a sane problem:
@@ -167,11 +167,11 @@ FlankingGapExperiment::FlankingGapExperiment(const bool onlyFindGap, const doubl
   // No else
 }
 
-bool FlankingGapExperiment::knowsOptimum() const {
+bool FlankingGap::knowsOptimum() const {
   return true;
 }
 
-ompl::base::Cost FlankingGapExperiment::getOptimum() const {
+ompl::base::Cost FlankingGap::getOptimum() const {
   // Variables
   ompl::base::Cost startToCorner;
   ompl::base::Cost obsEdge;
@@ -179,20 +179,20 @@ ompl::base::Cost FlankingGapExperiment::getOptimum() const {
 
   // The optimum goes exactly under the (*upperObs_):
   startToCorner = ompl::base::Cost(
-      std::sqrt(std::pow((*upperObs_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) +
-                std::pow((*upperObs_)[1u] - BaseExperiment::startStates_.front()[1u], 2.0)));
+      std::sqrt(std::pow((*upperObs_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
+                std::pow((*upperObs_)[1u] - BaseContext::startStates_.front()[1u], 2.0)));
   obsEdge = ompl::base::Cost(lowerWidths_.at(0u));
   otherCornerToGoal = ompl::base::Cost(std::sqrt(
-      std::pow(BaseExperiment::goalStates_.front()[0u] - ((*upperObs_)[0u] + lowerWidths_.at(0u)),
+      std::pow(BaseContext::goalStates_.front()[0u] - ((*upperObs_)[0u] + lowerWidths_.at(0u)),
                2.0) +
-      std::pow(BaseExperiment::goalStates_.front()[1u] - (*upperObs_)[1u], 2.0)));
+      std::pow(BaseContext::goalStates_.front()[1u] - (*upperObs_)[1u], 2.0)));
 
   // Combine and return:
-  return BaseExperiment::opt_->combineCosts(
-      BaseExperiment::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(
+      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
 }
 
-ompl::base::Cost FlankingGapExperiment::minFlankingCost() const {
+ompl::base::Cost FlankingGap::minFlankingCost() const {
   // Variables
   ompl::base::Cost startToCorner;
   ompl::base::Cost obsEdge;
@@ -201,20 +201,20 @@ ompl::base::Cost FlankingGapExperiment::minFlankingCost() const {
   // The minimum cost not through the gap goes exactly under the *lowerObs_ (or over the
   // *upperObs_):
   startToCorner = ompl::base::Cost(
-      std::sqrt(std::pow((*lowerObs_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) +
-                std::pow((*lowerObs_)[1u] - BaseExperiment::startStates_.front()[1u], 2.0)));
+      std::sqrt(std::pow((*lowerObs_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
+                std::pow((*lowerObs_)[1u] - BaseContext::startStates_.front()[1u], 2.0)));
   obsEdge = ompl::base::Cost(lowerWidths_.at(0u));
   otherCornerToGoal = ompl::base::Cost(std::sqrt(
-      std::pow(BaseExperiment::goalStates_.front()[0u] - ((*lowerObs_)[0u] + lowerWidths_.at(0u)),
+      std::pow(BaseContext::goalStates_.front()[0u] - ((*lowerObs_)[0u] + lowerWidths_.at(0u)),
                2.0) +
-      std::pow(BaseExperiment::goalStates_.front()[1u] - (*lowerObs_)[1u], 2.0)));
+      std::pow(BaseContext::goalStates_.front()[1u] - (*lowerObs_)[1u], 2.0)));
 
   // Combine and return:
-  return BaseExperiment::opt_->combineCosts(
-      BaseExperiment::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(
+      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
 }
 
-ompl::base::Cost FlankingGapExperiment::maxGapCost() const {
+ompl::base::Cost FlankingGap::maxGapCost() const {
   // Variables
   ompl::base::Cost startToCorner;
   ompl::base::Cost obsEdge;
@@ -222,33 +222,33 @@ ompl::base::Cost FlankingGapExperiment::maxGapCost() const {
 
   // The worst-case straight-line-path through the gap goes exactly over *lowerObs_:
   startToCorner = ompl::base::Cost(std::sqrt(
-      std::pow((*lowerObs_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) +
-      std::pow(((*lowerObs_)[1u] + lowerWidths_.at(1u)) - BaseExperiment::startStates_.front()[1u],
+      std::pow((*lowerObs_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
+      std::pow(((*lowerObs_)[1u] + lowerWidths_.at(1u)) - BaseContext::startStates_.front()[1u],
                2.0)));
   obsEdge = ompl::base::Cost(lowerWidths_.at(0u));
   otherCornerToGoal = ompl::base::Cost(std::sqrt(
-      std::pow(BaseExperiment::goalStates_.front()[0u] - ((*lowerObs_)[0u] + lowerWidths_.at(0u)),
+      std::pow(BaseContext::goalStates_.front()[0u] - ((*lowerObs_)[0u] + lowerWidths_.at(0u)),
                2.0) +
-      std::pow(BaseExperiment::goalStates_.front()[1u] - ((*lowerObs_)[1u] + lowerWidths_.at(1u)),
+      std::pow(BaseContext::goalStates_.front()[1u] - ((*lowerObs_)[1u] + lowerWidths_.at(1u)),
                2.0)));
 
   // Combine and return:
-  return BaseExperiment::opt_->combineCosts(
-      BaseExperiment::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(
+      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
 }
 
-void FlankingGapExperiment::setTarget(double targetSpecifier) {
+void FlankingGap::setTarget(double targetSpecifier) {
   if (stopClassSwitch_ == true) {
     throw ompl::Exception("Cannot set target when searching for class switch");
   }
   // No else
 
-  BaseExperiment::opt_->setCostThreshold(
+  BaseContext::opt_->setCostThreshold(
       ompl::base::Cost(targetSpecifier * this->getOptimum().value()));
 }
 
 /** \brief Derived class specific information. */
-std::string FlankingGapExperiment::lineInfo() const {
+std::string FlankingGap::lineInfo() const {
   std::stringstream rval;
 
   rval << "(min flanking: " << this->minFlankingCost() << ", max gap: " << this->maxGapCost()
@@ -257,35 +257,35 @@ std::string FlankingGapExperiment::lineInfo() const {
   return rval.str();
 }
 
-std::string FlankingGapExperiment::paraInfo() const {
+std::string FlankingGap::paraInfo() const {
   std::stringstream rval;
 
   rval << "bottom obstacle: [";
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     rval << (*lowerObs_)[i];
-    if (i != BaseExperiment::dim_ - 1u) {
+    if (i != BaseContext::dim_ - 1u) {
       rval << ", ";
     }
   }
   rval << "], [";
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     rval << (*lowerObs_)[i] + lowerWidths_.at(i);
-    if (i != BaseExperiment::dim_ - 1u) {
+    if (i != BaseContext::dim_ - 1u) {
       rval << ", ";
     }
   }
   rval << "]" << std::endl;
   rval << "upper obstacle: [";
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     rval << (*upperObs_)[i];
-    if (i != BaseExperiment::dim_ - 1u) {
+    if (i != BaseContext::dim_ - 1u) {
       rval << ", ";
     }
   }
   rval << "], [";
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     rval << (*upperObs_)[i] + upperWidths_.at(i);
-    if (i != BaseExperiment::dim_ - 1u) {
+    if (i != BaseContext::dim_ - 1u) {
       rval << ", ";
     }
   }

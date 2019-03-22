@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+/* Authors: Jonathan Gammell, Marlin Strub */
 
 #pragma once
 
@@ -41,25 +41,25 @@
 
 #include <boost/noncopyable.hpp>
 
-#include <ompl/util/Console.h>
-#include <ompl/util/Exception.h>
 #include <ompl/base/Cost.h>
 #include <ompl/base/OptimizationObjective.h>
 #include <ompl/base/ProblemDefinition.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/SpaceInformation.h>
+#include <ompl/util/Console.h>
+#include <ompl/util/Exception.h>
 
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_utilities/general_tools.h"
 
 /** \brief The base class for an experiment */
-class BaseExperiment : boost::noncopyable {
+class BaseContext : boost::noncopyable {
  public:
-  BaseExperiment(const unsigned int dim, const std::vector<std::pair<double, double>> limits,
-                 const double runSeconds, std::string name);
+  BaseContext(const unsigned int dim, const std::vector<std::pair<double, double>> limits,
+              const double runSeconds, std::string name);
 
   // Use default virtual destructor.
-  virtual ~BaseExperiment() = default;
+  virtual ~BaseContext() = default;
 
   /** \brief Return the space information pointer */
   ompl::base::SpaceInformationPtr getSpaceInformation() const;
@@ -121,25 +121,25 @@ class BaseExperiment : boost::noncopyable {
  protected:
   // Variables
   /** \brief The name */
-  std::string name_ { "unnamed experiment" };
+  std::string name_{"unnamed experiment"};
   /** \brief The problem dimension */
-  unsigned int dim_ { 0u };
+  unsigned int dim_{0u};
   /** \brief The problem limits */
-  std::vector<std::pair<double, double>> limits_ { };
+  std::vector<std::pair<double, double>> limits_{};
   /** \brief The space information for the experiment */
-  ompl::base::SpaceInformationPtr si_ { };
+  ompl::base::SpaceInformationPtr si_{};
   /** \brief The optimization objective */
-  ompl::base::OptimizationObjectivePtr opt_ { };
+  ompl::base::OptimizationObjectivePtr opt_{};
   /** \brief The obstacle world */
-  std::shared_ptr<BaseObstacle> obs_ { };
+  std::shared_ptr<BaseObstacle> obs_{};
   /** \brief The runtime for the experiment */
-  asrl::time::duration targetTime_ { };
+  asrl::time::duration targetTime_{};
   /** \brief The start states */
-  std::vector<ompl::base::ScopedState<>> startStates_ { };
+  std::vector<ompl::base::ScopedState<>> startStates_{};
   /** \brief The goal states */
-  std::vector<ompl::base::ScopedState<>> goalStates_ { };
+  std::vector<ompl::base::ScopedState<>> goalStates_{};
   /** \brief The goal as a pointer*/
-  ompl::base::GoalPtr goalPtr_ { };
+  ompl::base::GoalPtr goalPtr_{};
 };
 
-using BaseExperimentPtr = std::shared_ptr<BaseExperiment>;
+using BaseContextPtr = std::shared_ptr<BaseContext>;

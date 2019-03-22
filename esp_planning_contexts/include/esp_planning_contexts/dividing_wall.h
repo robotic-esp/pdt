@@ -39,24 +39,21 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 
-
 /** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
  * a multiple homotopy-class experiment that scales to N dimensions. */
-class DividingWallExperiment : public BaseExperiment {
+class DividingWall : public BaseContext {
  public:
   /** \brief Constructor for a single wall. Must be an even number of gaps to assure there is no
    * straight-line solution */
-  DividingWallExperiment(const unsigned int dim, const double wallThickness,
-                         const unsigned int numGaps, const double gapWidth, const double runSeconds,
-                         const double checkResolution);
+  DividingWall(const unsigned int dim, const double wallThickness, const unsigned int numGaps,
+               const double gapWidth, const double runSeconds, const double checkResolution);
 
   /** \brief Constructor for multiple walls. All the vectors must be the same size, except for
    * wall-spacing which should be one element shorter than the others */
-  DividingWallExperiment(const unsigned int dim, const std::vector<double> wallThicknesses,
-                         const std::vector<unsigned int> numGaps,
-                         const std::vector<double> gapWidths,
-                         const std::vector<double> wallSpacings, const double runSeconds,
-                         const double checkResolution);
+  DividingWall(const unsigned int dim, const std::vector<double> wallThicknesses,
+               const std::vector<unsigned int> numGaps, const std::vector<double> gapWidths,
+               const std::vector<double> wallSpacings, const double runSeconds,
+               const double checkResolution);
 
   /** \brief This problem could knows its optimum, but doesn't at the moment */
   virtual bool knowsOptimum() const;
@@ -107,5 +104,3 @@ class DividingWallExperiment : public BaseExperiment {
                           const std::vector<double> gapWidth,
                           const std::vector<double> wallSpacings, const double checkResolution);
 };
-
-typedef std::shared_ptr<DividingWallExperiment> DividingWallExperimentPtr;

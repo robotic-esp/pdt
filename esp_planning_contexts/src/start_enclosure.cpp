@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/start_enclosure.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -49,21 +49,19 @@
 
 #include "esp_obstacles/hyperrectangle.h"
 
-StartEnclosureExperiment::StartEnclosureExperiment(const unsigned int dim,
-                                                   const double worldHalfWidth,
-                                                   const double insideWidth,
-                                                   const double wallThickness,
-                                                   const double gapWidth, const double runSeconds,
-                                                   const double checkResolution)
-    : BaseExperiment(dim,
-                     std::vector<std::pair<double, double>>(
-                         dim, std::pair<double, double>(-worldHalfWidth, worldHalfWidth)),
-                     runSeconds, "StartEnc"),
-      insideWidth_(insideWidth),
-      wallThickness_(wallThickness),
-      gapWidth_(gapWidth),
-      startPos_(-0.5 * worldHalfWidth),
-      goalPos_(0.5 * worldHalfWidth) {
+StartEnclosure::StartEnclosure(const unsigned int dim, const double worldHalfWidth,
+                               const double insideWidth, const double wallThickness,
+                               const double gapWidth, const double runSeconds,
+                               const double checkResolution) :
+    BaseContext(dim,
+                std::vector<std::pair<double, double>>(
+                    dim, std::pair<double, double>(-worldHalfWidth, worldHalfWidth)),
+                runSeconds, "StartEnc"),
+    insideWidth_(insideWidth),
+    wallThickness_(wallThickness),
+    gapWidth_(gapWidth),
+    startPos_(-0.5 * worldHalfWidth),
+    goalPos_(0.5 * worldHalfWidth) {
   // Variables
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -83,90 +81,89 @@ StartEnclosureExperiment::StartEnclosureExperiment(const unsigned int dim,
   }
 
   // The problem bounds
-  ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
+  ompl::base::RealVectorBounds problemBounds(BaseContext::dim_);
 
   // Make the state space Rn:
-  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseContext::dim_);
 
   // Create the space information class:
-  BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
+  BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  enclObs_ = std::make_shared<CutoutObstacles>(BaseExperiment::si_);
-  BaseExperiment::obs_ = enclObs_;
+  enclObs_ = std::make_shared<CutoutObstacles>(BaseContext::si_);
+  BaseContext::obs_ = enclObs_;
 
   // Set the problem bounds:
-  problemBounds.setLow(BaseExperiment::limits_.at(0u).first);
-  problemBounds.setHigh(BaseExperiment::limits_.at(0u).second);
+  problemBounds.setLow(BaseContext::limits_.at(0u).first);
+  problemBounds.setHigh(BaseContext::limits_.at(0u).second);
 
   // Store the problem bounds:
   ss->setBounds(problemBounds);
 
   // Set the validity checker and checking resolution
-  BaseExperiment::si_->setStateValidityChecker(
+  BaseContext::si_->setStateValidityChecker(
       static_cast<ompl::base::StateValidityCheckerPtr>(enclObs_));
-  BaseExperiment::si_->setStateValidityCheckingResolution(checkResolution);
+  BaseContext::si_->setStateValidityCheckingResolution(checkResolution);
 
   // Call setup!
-  BaseExperiment::si_->setup();
+  BaseContext::si_->setup();
 
   // Allocate the optimization objective
-  BaseExperiment::opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+  BaseContext::opt_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseContext::si_);
 
   // Set the heuristic to the default:
-  BaseExperiment::opt_->setCostToGoHeuristic(
+  BaseContext::opt_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
   // Create my start:
   // Create a start state on the vector:
-  BaseExperiment::startStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::startStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
     if (j == 0u) {
-      BaseExperiment::startStates_.back()[j] = startPos_;
+      BaseContext::startStates_.back()[j] = startPos_;
     } else {
-      BaseExperiment::startStates_.back()[j] = 0.0;
+      BaseContext::startStates_.back()[j] = 0.0;
     }
   }
 
   // Create my goal:
   // Create a goal state on the vector:
-  BaseExperiment::goalStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::goalStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
     if (j == 0u) {
-      BaseExperiment::goalStates_.back()[j] = goalPos_;
+      BaseContext::goalStates_.back()[j] = goalPos_;
     } else {
-      BaseExperiment::goalStates_.back()[j] = 0.0;
+      BaseContext::goalStates_.back()[j] = 0.0;
     }
   }
 
   // Allocate the goal:
-  BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
+  BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseExperiment::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseExperiment::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Allocate the temporary variable for the obstacles, antiobstacles, and the lower-left corners
-  obs = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
-  anti = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
+  obs = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
+  anti = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
 
   //*****Obstacle*****//
-  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
 
   // All widths are the same
   startEnclWidths_.push_back(
-      std::vector<double>(BaseExperiment::dim_, insideWidth_ + 2 * wallThickness_));
+      std::vector<double>(BaseContext::dim_, insideWidth_ + 2 * wallThickness_));
 
   // X-position is unique
   (*startEnclCorners_.back())[0u] = startPos_ - 0.5 * startEnclWidths_.back().at(0u);
 
   // All the other dimensions are the same
-  for (unsigned int i = 1u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 1u; i < BaseContext::dim_; ++i) {
     (*startEnclCorners_.back())[i] = 0.0 - 0.5 * startEnclWidths_.back().at(i);
   }
 
@@ -174,16 +171,16 @@ StartEnclosureExperiment::StartEnclosureExperiment(const unsigned int dim,
   obs->addObstacle(std::make_pair(startEnclCorners_.back()->get(), startEnclWidths_.back()));
 
   //*****Internal Space*****//
-  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
 
   // All widths are the same
-  startEnclWidths_.push_back(std::vector<double>(BaseExperiment::dim_, insideWidth_));
+  startEnclWidths_.push_back(std::vector<double>(BaseContext::dim_, insideWidth_));
 
   // X-position is unique
   (*startEnclCorners_.back())[0u] = startPos_ - 0.5 * startEnclWidths_.back().at(0u);
 
   // All the other dimensions are the same
-  for (unsigned int i = 1u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 1u; i < BaseContext::dim_; ++i) {
     (*startEnclCorners_.back())[i] = 0.0 - 0.5 * startEnclWidths_.back().at(i);
   }
 
@@ -191,7 +188,7 @@ StartEnclosureExperiment::StartEnclosureExperiment(const unsigned int dim,
   anti->addObstacle(std::make_pair(startEnclCorners_.back()->get(), startEnclWidths_.back()));
 
   //***** Left Opening *****//
-  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
   startEnclWidths_.push_back(std::vector<double>());
 
   // X is unique (it's the outside of the wall on the left)
@@ -199,7 +196,7 @@ StartEnclosureExperiment::StartEnclosureExperiment(const unsigned int dim,
   startEnclWidths_.back().push_back(wallThickness_);
 
   // All the other dimensions are the same
-  for (unsigned int i = 1u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 1u; i < BaseContext::dim_; ++i) {
     (*startEnclCorners_.back())[i] = 0.0 - 0.5 * gapWidth_;
     startEnclWidths_.back().push_back(gapWidth_);
   }
@@ -212,12 +209,14 @@ StartEnclosureExperiment::StartEnclosureExperiment(const unsigned int dim,
   enclObs_->addAntiObstacle(anti);
 
   // Finally specify the optimization target as the minimum:
-  BaseExperiment::opt_->setCostThreshold(BaseExperiment::getMinimum());
+  BaseContext::opt_->setCostThreshold(BaseContext::getMinimum());
 }
 
-bool StartEnclosureExperiment::knowsOptimum() const { return true; }
+bool StartEnclosure::knowsOptimum() const {
+  return true;
+}
 
-ompl::base::Cost StartEnclosureExperiment::getOptimum() const {
+ompl::base::Cost StartEnclosure::getOptimum() const {
   /*
   The optimal solution has 5 components and is constrained to the xy plane:
     - diagonally from the start to the corner of the opening
@@ -259,21 +258,23 @@ ompl::base::Cost StartEnclosureExperiment::getOptimum() const {
   }
 
   // Combine and return:
-  return BaseExperiment::opt_->combineCosts(
+  return BaseContext::opt_->combineCosts(
       startToOpening,
-      BaseExperiment::opt_->combineCosts(
-          openingToCorner, BaseExperiment::opt_->combineCosts(
-                               cornerToCorner, BaseExperiment::opt_->combineCosts(
-                                                   openingToCorner, startToOpening))));
+      BaseContext::opt_->combineCosts(
+          openingToCorner,
+          BaseContext::opt_->combineCosts(
+              cornerToCorner, BaseContext::opt_->combineCosts(openingToCorner, startToOpening))));
 }
 
-void StartEnclosureExperiment::setTarget(double targetSpecifier) {
-  BaseExperiment::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
+void StartEnclosure::setTarget(double targetSpecifier) {
+  BaseContext::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
 }
 
-std::string StartEnclosureExperiment::lineInfo() const { return std::string(); }
+std::string StartEnclosure::lineInfo() const {
+  return std::string();
+}
 
-std::string StartEnclosureExperiment::paraInfo() const {
+std::string StartEnclosure::paraInfo() const {
   std::stringstream rval;
 
   rval << "Start obstacle "
@@ -290,21 +291,21 @@ std::string StartEnclosureExperiment::paraInfo() const {
   return rval.str();
 }
 
-std::string StartEnclosureExperiment::printRectangle(
-    std::shared_ptr<ompl::base::ScopedState<> > llCorner, std::vector<double> widths) const {
+std::string StartEnclosure::printRectangle(std::shared_ptr<ompl::base::ScopedState<>> llCorner,
+                                           std::vector<double> widths) const {
   std::stringstream rval;
 
   rval << "[";
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     rval << (*llCorner)[i];
-    if (i != BaseExperiment::dim_ - 1u) {
+    if (i != BaseContext::dim_ - 1u) {
       rval << ", ";
     }
   }
   rval << "], [";
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     rval << (*llCorner)[i] + widths.at(i);
-    if (i != BaseExperiment::dim_ - 1u) {
+    if (i != BaseContext::dim_ - 1u) {
       rval << ", ";
     }
   }

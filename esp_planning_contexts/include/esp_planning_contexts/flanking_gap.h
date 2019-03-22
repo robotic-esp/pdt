@@ -36,16 +36,16 @@
 
 #pragma once
 
-#include "esp_planning_contexts/base_context.h"
 #include "esp_obstacles/hyperrectangle.h"
+#include "esp_planning_contexts/base_context.h"
 
 /** \brief An three-homotopy-class experiment. I.e., an obstacle with a central gap that can be
  * circumvented above or below.*/
-class FlankingGapExperiment : public BaseExperiment {
+class FlankingGap : public BaseContext {
  public:
   /** \brief Constructor */
-  FlankingGapExperiment(const bool onlyFindGap, const double gapWidth, const double runSeconds,
-                        const double checkResolution);
+  FlankingGap(const bool onlyFindGap, const double gapWidth, const double runSeconds,
+              const double checkResolution);
 
   /** \brief This problem knows its optimum */
   virtual bool knowsOptimum() const;
@@ -94,5 +94,3 @@ class FlankingGapExperiment : public BaseExperiment {
   double startPos_{-0.5};
   double goalPos_{0.5};
 };
-
-typedef std::shared_ptr<FlankingGapExperiment> FlankingGapExperimentPtr;

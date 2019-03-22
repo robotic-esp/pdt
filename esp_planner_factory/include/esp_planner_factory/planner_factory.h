@@ -56,7 +56,7 @@ public:
 
   // Create a planner.
   std::shared_ptr<ompl::base::Planner> create(const std::string &plannerType,
-                                              const BaseExperimentPtr &experiment) const;
+                                              const BaseContextPtr &experiment) const;
   
   // Dump the parameters to an ostream.
   void dumpParameters(std::ostream& out) const;

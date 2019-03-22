@@ -47,54 +47,54 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim,
+MultiStartGoal::MultiStartGoal(const unsigned int dim,
                                                    const unsigned int numObs, const double obsRatio,
                                                    const double runSeconds,
                                                    const double checkResolution)
-    : BaseExperiment(
+    : BaseContext(
           dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
           runSeconds, "MultiStartGoal") {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
   // The problem bounds
-  ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
+  ompl::base::RealVectorBounds problemBounds(BaseContext::dim_);
   // The mean width of the obstacles:
   double meanObsWidth;
   // The measure of obstacles
   double obsMeasure;
 
   // Make the state space Rn:
-  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseContext::dim_);
 
   // Create the space information class:
-  BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
+  BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
-  BaseExperiment::obs_ = rectObs_;
+  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
+  BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:
-  problemBounds.setLow(BaseExperiment::limits_.at(0u).first);
-  problemBounds.setHigh(BaseExperiment::limits_.at(0u).second);
+  problemBounds.setLow(BaseContext::limits_.at(0u).first);
+  problemBounds.setHigh(BaseContext::limits_.at(0u).second);
 
   // Store the problem bounds:
   ss->setBounds(problemBounds);
 
   // Set the validity checker and checking resolution
-  BaseExperiment::si_->setStateValidityChecker(
+  BaseContext::si_->setStateValidityChecker(
       static_cast<ompl::base::StateValidityCheckerPtr>(rectObs_));
-  BaseExperiment::si_->setStateValidityCheckingResolution(checkResolution);
+  BaseContext::si_->setStateValidityCheckingResolution(checkResolution);
 
   // Call setup!
-  BaseExperiment::si_->setup();
+  BaseContext::si_->setup();
 
   // Allocate the optimization objective
-  BaseExperiment::opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+  BaseContext::opt_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseContext::si_);
 
   // Set the heuristic to the default:
-  BaseExperiment::opt_->setCostToGoHeuristic(
+  BaseContext::opt_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
   // Set the starts and goals (http://www.mathopenref.com/coordpolycalc.html):
@@ -102,19 +102,19 @@ MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim,
   // Create each one
   for (unsigned int i = 0u; i < 2u; ++i) {
     // Create a start state on the vector:
-    BaseExperiment::startStates_.push_back(ompl::base::ScopedState<>(ss));
+    BaseContext::startStates_.push_back(ompl::base::ScopedState<>(ss));
 
     if (i == 0u) {
-      BaseExperiment::startStates_.back()[0u] = -0.29;
-      BaseExperiment::startStates_.back()[1u] = -0.40;
-      for (unsigned int j = 2u; j < BaseExperiment::dim_; ++j) {
-        BaseExperiment::startStates_.back()[j] = 0.0;
+      BaseContext::startStates_.back()[0u] = -0.29;
+      BaseContext::startStates_.back()[1u] = -0.40;
+      for (unsigned int j = 2u; j < BaseContext::dim_; ++j) {
+        BaseContext::startStates_.back()[j] = 0.0;
       }
     } else if (i == 1u) {
-      BaseExperiment::startStates_.back()[0u] = 0.29;
-      BaseExperiment::startStates_.back()[1u] = -0.40;
-      for (unsigned int j = 2u; j < BaseExperiment::dim_; ++j) {
-        BaseExperiment::startStates_.back()[j] = 0.0;
+      BaseContext::startStates_.back()[0u] = 0.29;
+      BaseContext::startStates_.back()[1u] = -0.40;
+      for (unsigned int j = 2u; j < BaseContext::dim_; ++j) {
+        BaseContext::startStates_.back()[j] = 0.0;
       }
     } else {
       throw ompl::Exception("Incorrect number of starts");
@@ -123,53 +123,53 @@ MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim,
 
   // Create my goals:
   // Allocate the goal pointer:
-  BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalStates>(BaseExperiment::si_);
+  BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalStates>(BaseContext::si_);
 
   // Create each one
   for (unsigned int i = 0u; i < 3u; ++i) {
     // Create a goal state on the vector:
-    BaseExperiment::goalStates_.push_back(ompl::base::ScopedState<>(ss));
+    BaseContext::goalStates_.push_back(ompl::base::ScopedState<>(ss));
 
     if (i == 0u) {
-      BaseExperiment::goalStates_.back()[0u] = 0.0;
-      BaseExperiment::goalStates_.back()[1u] = 0.5;
-      for (unsigned int j = 2u; j < BaseExperiment::dim_; ++j) {
-        BaseExperiment::goalStates_.back()[j] = 0.0;
+      BaseContext::goalStates_.back()[0u] = 0.0;
+      BaseContext::goalStates_.back()[1u] = 0.5;
+      for (unsigned int j = 2u; j < BaseContext::dim_; ++j) {
+        BaseContext::goalStates_.back()[j] = 0.0;
       }
     } else if (i == 1u) {
-      BaseExperiment::goalStates_.back()[0u] = -0.48;
-      BaseExperiment::goalStates_.back()[1u] = 0.15;
-      for (unsigned int j = 2u; j < BaseExperiment::dim_; ++j) {
-        BaseExperiment::goalStates_.back()[j] = 0.0;
+      BaseContext::goalStates_.back()[0u] = -0.48;
+      BaseContext::goalStates_.back()[1u] = 0.15;
+      for (unsigned int j = 2u; j < BaseContext::dim_; ++j) {
+        BaseContext::goalStates_.back()[j] = 0.0;
       }
     } else if (i == 2u) {
-      BaseExperiment::goalStates_.back()[0u] = 0.48;
-      BaseExperiment::goalStates_.back()[1u] = 0.15;
-      for (unsigned int j = 2u; j < BaseExperiment::dim_; ++j) {
-        BaseExperiment::goalStates_.back()[j] = 0.0;
+      BaseContext::goalStates_.back()[0u] = 0.48;
+      BaseContext::goalStates_.back()[1u] = 0.15;
+      for (unsigned int j = 2u; j < BaseContext::dim_; ++j) {
+        BaseContext::goalStates_.back()[j] = 0.0;
       }
     } else if (i == 3u) {
-      BaseExperiment::goalStates_.back()[0u] = 0.0;
-      BaseExperiment::goalStates_.back()[1u] = 0.0;
-      for (unsigned int j = 2u; j < BaseExperiment::dim_; ++j) {
-        BaseExperiment::goalStates_.back()[j] = 0.0;
+      BaseContext::goalStates_.back()[0u] = 0.0;
+      BaseContext::goalStates_.back()[1u] = 0.0;
+      for (unsigned int j = 2u; j < BaseContext::dim_; ++j) {
+        BaseContext::goalStates_.back()[j] = 0.0;
       }
     } else {
       throw ompl::Exception("Incorrect number of goals");
     }
 
     // Add
-    BaseExperiment::goalPtr_->as<ompl::base::GoalStates>()->addState(
-        BaseExperiment::goalStates_.back());
+    BaseContext::goalPtr_->as<ompl::base::GoalStates>()->addState(
+        BaseContext::goalStates_.back());
   }
 
   // Calculate the minimum and maximum radius of the obstacles:
   // First, calculate the desired obstacle volume of the problem:
-  obsMeasure = obsRatio * BaseExperiment::si_->getSpaceMeasure();
+  obsMeasure = obsRatio * BaseContext::si_->getSpaceMeasure();
 
   // Then, calculate the mean radius necessary to get the desired obstacle volume with the desired
   // number of obstacles:
-  meanObsWidth = std::pow(obsMeasure / static_cast<double>(numObs), 1.0 / BaseExperiment::dim_);
+  meanObsWidth = std::pow(obsMeasure / static_cast<double>(numObs), 1.0 / BaseContext::dim_);
 
   // Create a random set of obstacles
   if (obsRatio > 0.0) {
@@ -177,30 +177,30 @@ MultiStartGoalExperiment::MultiStartGoalExperiment(const unsigned int dim,
     std::vector<ompl::base::ScopedState<>> tVec;
 
     // Copy into
-    tVec.insert(tVec.end(), BaseExperiment::startStates_.begin(),
-                BaseExperiment::startStates_.end());
-    tVec.insert(tVec.end(), BaseExperiment::goalStates_.begin(), BaseExperiment::goalStates_.end());
+    tVec.insert(tVec.end(), BaseContext::startStates_.begin(),
+                BaseContext::startStates_.end());
+    tVec.insert(tVec.end(), BaseContext::goalStates_.begin(), BaseContext::goalStates_.end());
 
     rectObs_->randomize(0.50 * meanObsWidth, 1.5 * meanObsWidth, obsRatio, tVec);
   }
 
   // Finally specify the optimization target:
-  BaseExperiment::opt_->setCostThreshold(BaseExperiment::getMinimum());
+  BaseContext::opt_->setCostThreshold(BaseContext::getMinimum());
 }
 
-bool MultiStartGoalExperiment::knowsOptimum() const {
+bool MultiStartGoal::knowsOptimum() const {
   return false;
 }
 
-ompl::base::Cost MultiStartGoalExperiment::getOptimum() const {
-  throw ompl::Exception("The global optimum is unknown", BaseExperiment::name_);
+ompl::base::Cost MultiStartGoal::getOptimum() const {
+  throw ompl::Exception("The global optimum is unknown", BaseContext::name_);
 }
 
-void MultiStartGoalExperiment::setTarget(double targetSpecifier) {
-  BaseExperiment::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
+void MultiStartGoal::setTarget(double targetSpecifier) {
+  BaseContext::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
 }
 
-std::string MultiStartGoalExperiment::lineInfo() const {
+std::string MultiStartGoal::lineInfo() const {
   std::stringstream rval;
 
   rval << " #Obs: " << rectObs_->getObstacles().size() << ".";
@@ -208,6 +208,6 @@ std::string MultiStartGoalExperiment::lineInfo() const {
   return rval.str();
 }
 
-std::string MultiStartGoalExperiment::paraInfo() const {
+std::string MultiStartGoal::paraInfo() const {
   return std::string();
 }

@@ -47,12 +47,12 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-RegularRectanglesExperiment::RegularRectanglesExperiment(const unsigned int dim,
+RegularRectangles::RegularRectangles(const unsigned int dim,
                                                          const double worldHalfWidth,
                                                          unsigned int numObsBetween,
                                                          const double runSeconds,
                                                          const double checkResolution)
-    : BaseExperiment(dim,
+    : BaseContext(dim,
                      std::vector<std::pair<double, double>>(
                          dim, std::pair<double, double>(-1.0 * worldHalfWidth, worldHalfWidth)),
                      runSeconds, "RegularRects") {
@@ -60,20 +60,20 @@ RegularRectanglesExperiment::RegularRectanglesExperiment(const unsigned int dim,
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
   // The problem bounds
-  ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
+  ompl::base::RealVectorBounds problemBounds(BaseContext::dim_);
 
   // Make the state space Rn:
-  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseContext::dim_);
 
   // Create the space information class:
-  BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
+  BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  obsWidths_.reserve(BaseExperiment::dim_);
-  blankWidths_.reserve(BaseExperiment::dim_);
-  origin_.reserve(BaseExperiment::dim_);
+  obsWidths_.reserve(BaseContext::dim_);
+  blankWidths_.reserve(BaseContext::dim_);
+  origin_.reserve(BaseContext::dim_);
 
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     obsWidths_.push_back((goalPos_ - startPos_) / (3.0 * numObsBetween));
     blankWidths_.push_back(2.0 * obsWidths_.at(i));
 
@@ -84,97 +84,97 @@ RegularRectanglesExperiment::RegularRectanglesExperiment(const unsigned int dim,
     }
   }
 
-  regObs_ = std::make_shared<RepeatingHyperrectangleObstacles>(BaseExperiment::si_, obsWidths_,
+  regObs_ = std::make_shared<RepeatingHyperrectangleObstacles>(BaseContext::si_, obsWidths_,
                                                                blankWidths_, origin_);
-  BaseExperiment::obs_ = regObs_;
+  BaseContext::obs_ = regObs_;
 
   // Set the problem bounds:
-  problemBounds.setLow(BaseExperiment::limits_.at(0u).first);
-  problemBounds.setHigh(BaseExperiment::limits_.at(0u).second);
+  problemBounds.setLow(BaseContext::limits_.at(0u).first);
+  problemBounds.setHigh(BaseContext::limits_.at(0u).second);
 
   // Store the problem bounds:
   ss->setBounds(problemBounds);
 
   // Set the validity checker and checking resolution
-  BaseExperiment::si_->setStateValidityChecker(
+  BaseContext::si_->setStateValidityChecker(
       static_cast<ompl::base::StateValidityCheckerPtr>(regObs_));
-  BaseExperiment::si_->setStateValidityCheckingResolution(checkResolution);
+  BaseContext::si_->setStateValidityCheckingResolution(checkResolution);
 
   // Call setup!
-  BaseExperiment::si_->setup();
+  BaseContext::si_->setup();
 
   // Allocate the optimization objective
-  BaseExperiment::opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+  BaseContext::opt_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseContext::si_);
 
   // Set the heuristic to the default:
-  BaseExperiment::opt_->setCostToGoHeuristic(
+  BaseContext::opt_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
   // Create my start:
   // Create a start state on the vector:
-  BaseExperiment::startStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::startStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  BaseExperiment::startStates_.back()[0u] = startPos_;
-  for (unsigned int j = 1u; j < BaseExperiment::dim_; ++j) {
-    BaseExperiment::startStates_.back()[j] = 0.0;
+  BaseContext::startStates_.back()[0u] = startPos_;
+  for (unsigned int j = 1u; j < BaseContext::dim_; ++j) {
+    BaseContext::startStates_.back()[j] = 0.0;
   }
 
   // Create my goal:
   // Create a goal state on the vector:
-  BaseExperiment::goalStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::goalStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  BaseExperiment::goalStates_.back()[0u] = goalPos_;
-  for (unsigned int j = 1u; j < BaseExperiment::dim_; ++j) {
-    BaseExperiment::goalStates_.back()[j] = 0.0;
+  BaseContext::goalStates_.back()[0u] = goalPos_;
+  for (unsigned int j = 1u; j < BaseContext::dim_; ++j) {
+    BaseContext::goalStates_.back()[j] = 0.0;
   }
 
   // Allocate the goal:
-  BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
+  BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseExperiment::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseExperiment::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
+      BaseContext::goalStates_.back());
 
   // Finally specify the optimization target:
-  BaseExperiment::opt_->setCostThreshold(this->getMinimum());
+  BaseContext::opt_->setCostThreshold(this->getMinimum());
 }
 
-bool RegularRectanglesExperiment::knowsOptimum() const {
+bool RegularRectangles::knowsOptimum() const {
   return false;
 }
 
-ompl::base::Cost RegularRectanglesExperiment::getOptimum() const {
-  throw ompl::Exception("The global optimum is unknown", BaseExperiment::name_);
+ompl::base::Cost RegularRectangles::getOptimum() const {
+  throw ompl::Exception("The global optimum is unknown", BaseContext::name_);
 }
 
-void RegularRectanglesExperiment::setTarget(double targetSpecifier) {
-  BaseExperiment::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
+void RegularRectangles::setTarget(double targetSpecifier) {
+  BaseContext::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
 }
 
-std::string RegularRectanglesExperiment::lineInfo() const {
+std::string RegularRectangles::lineInfo() const {
   std::stringstream rval;
 
   rval << "Obstacles starting at [";
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     rval << origin_.at(i);
-    if (i != BaseExperiment::dim_ - 1u) {
+    if (i != BaseContext::dim_ - 1u) {
       rval << ", ";
     }
   }
   rval << "] with widths [";
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     rval << obsWidths_.at(i);
-    if (i != BaseExperiment::dim_ - 1u) {
+    if (i != BaseContext::dim_ - 1u) {
       rval << ", ";
     }
   }
   rval << "] and gaps [";
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     rval << blankWidths_.at(i);
-    if (i != BaseExperiment::dim_ - 1u) {
+    if (i != BaseContext::dim_ - 1u) {
       rval << ", ";
     }
   }
@@ -183,6 +183,6 @@ std::string RegularRectanglesExperiment::lineInfo() const {
   return rval.str();
 }
 
-std::string RegularRectanglesExperiment::paraInfo() const {
+std::string RegularRectangles::paraInfo() const {
   return std::string();
 }

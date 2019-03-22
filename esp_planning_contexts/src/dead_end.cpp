@@ -47,9 +47,9 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-DeadEndExperiment::DeadEndExperiment(const double distFraction, const double runSeconds,
+DeadEnd::DeadEnd(const double distFraction, const double runSeconds,
                                      const double checkResolution)
-    : BaseExperiment(
+    : BaseContext(
           2u, std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
           runSeconds, "DeadEnd"),
       topHorizontalWidths_(2u, 0.0),     
@@ -60,7 +60,7 @@ DeadEndExperiment::DeadEndExperiment(const double distFraction, const double run
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
   // The problem bounds
-  ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
+  ompl::base::RealVectorBounds problemBounds(BaseContext::dim_);
   // The "characteristic width" of the problem
   double goalDist;
   // The start and goal position
@@ -68,41 +68,41 @@ DeadEndExperiment::DeadEndExperiment(const double distFraction, const double run
   double goalPos;
 
   // Make the state space Rn:
-  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseContext::dim_);
 
   // Create the space information class:
-  BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
+  BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
-  BaseExperiment::obs_ = rectObs_;
+  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
+  BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:
-  problemBounds.setLow(BaseExperiment::limits_.at(0u).first);
-  problemBounds.setHigh(BaseExperiment::limits_.at(0u).second);
+  problemBounds.setLow(BaseContext::limits_.at(0u).first);
+  problemBounds.setHigh(BaseContext::limits_.at(0u).second);
 
   // Store the problem bounds:
   ss->setBounds(problemBounds);
 
   // Set the validity checker and checking resolution
-  BaseExperiment::si_->setStateValidityChecker(
+  BaseContext::si_->setStateValidityChecker(
       static_cast<ompl::base::StateValidityCheckerPtr>(rectObs_));
-  BaseExperiment::si_->setStateValidityCheckingResolution(checkResolution);
+  BaseContext::si_->setStateValidityCheckingResolution(checkResolution);
 
   // Call setup!
-  BaseExperiment::si_->setup();
+  BaseContext::si_->setup();
 
   // Allocate the optimization objective
-  BaseExperiment::opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+  BaseContext::opt_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseContext::si_);
 
   // Set the heuristic to the default:
-  BaseExperiment::opt_->setCostToGoHeuristic(
+  BaseContext::opt_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
   // Calculate the characteristic width for the problem
   goalDist =
-      distFraction * (BaseExperiment::limits_.at(0u).second - BaseExperiment::limits_.at(0u).first);
+      distFraction * (BaseContext::limits_.at(0u).second - BaseContext::limits_.at(0u).first);
 
   // Calculate the start and goal position:
   startPos = -0.5 * goalDist;
@@ -110,36 +110,36 @@ DeadEndExperiment::DeadEndExperiment(const double distFraction, const double run
 
   // Create my start:
   // Create a start state on the vector:
-  BaseExperiment::startStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::startStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
     if (j == 0u) {
-      BaseExperiment::startStates_.back()[j] = startPos;
+      BaseContext::startStates_.back()[j] = startPos;
     } else {
-      BaseExperiment::startStates_.back()[j] = 0.0;
+      BaseContext::startStates_.back()[j] = 0.0;
     }
   }
 
   // Create my goal:
   // Create a goal state on the vector:
-  BaseExperiment::goalStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::goalStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
     if (j == 0u) {
-      BaseExperiment::goalStates_.back()[j] = goalPos;
+      BaseContext::goalStates_.back()[j] = goalPos;
     } else {
-      BaseExperiment::goalStates_.back()[j] = 0.0;
+      BaseContext::goalStates_.back()[j] = 0.0;
     }
   }
 
   // Allocate the goal:
-  BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
+  BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseExperiment::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseExperiment::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
+      BaseContext::goalStates_.back());
 
   // Allocate the obstacles' lower-left corners:
   topHorizontal_ = std::make_shared<ompl::base::ScopedState<>>(ss);
@@ -172,38 +172,38 @@ DeadEndExperiment::DeadEndExperiment(const double distFraction, const double run
   rectObs_->addObstacle(std::make_pair(bottomHorizontal_->get(), bottomHorizontalWidths_));
 
   // Finally specify the optimization target:
-  BaseExperiment::opt_->setCostThreshold(this->getOptimum());
+  BaseContext::opt_->setCostThreshold(this->getOptimum());
 }
 
-bool DeadEndExperiment::knowsOptimum() const {
+bool DeadEnd::knowsOptimum() const {
   return true;
 }
 
-ompl::base::Cost DeadEndExperiment::getOptimum() const {
+ompl::base::Cost DeadEnd::getOptimum() const {
   ompl::base::Cost startToCorner(std::sqrt(
-      std::pow((*bottomHorizontal_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) +
-      std::pow((*bottomHorizontal_)[1u] - BaseExperiment::startStates_.front()[1u], 2.0)));
+      std::pow((*bottomHorizontal_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
+      std::pow((*bottomHorizontal_)[1u] - BaseContext::startStates_.front()[1u], 2.0)));
   ompl::base::Cost obsEdge(bottomHorizontalWidths_.at(0u) + sideVerticalWidths_.at(0u));
   ompl::base::Cost otherCornerToGoal(
-      std::sqrt(std::pow(BaseExperiment::goalStates_.front()[0u] -
+      std::sqrt(std::pow(BaseContext::goalStates_.front()[0u] -
                              ((*sideVertical_)[0u] + sideVerticalWidths_.at(0u)),
                          2.0) +
-                std::pow(BaseExperiment::goalStates_.front()[1u] - (*sideVertical_)[1u], 2.0)));
+                std::pow(BaseContext::goalStates_.front()[1u] - (*sideVertical_)[1u], 2.0)));
 
   // Combine and return:
-  return BaseExperiment::opt_->combineCosts(
-      BaseExperiment::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(
+      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
 }
 
-void DeadEndExperiment::setTarget(double targetSpecifier) {
-  BaseExperiment::opt_->setCostThreshold(
+void DeadEnd::setTarget(double targetSpecifier) {
+  BaseContext::opt_->setCostThreshold(
       ompl::base::Cost(targetSpecifier * this->getOptimum().value()));
 }
 
-std::string DeadEndExperiment::lineInfo() const {
+std::string DeadEnd::lineInfo() const {
   return std::string();
 }
 
-std::string DeadEndExperiment::paraInfo() const {
+std::string DeadEnd::paraInfo() const {
   return std::string();
 }

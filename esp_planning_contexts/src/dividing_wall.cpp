@@ -47,28 +47,28 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-DividingWallExperiment::DividingWallExperiment(const unsigned int dim, const double wallThickness,
+DividingWall::DividingWall(const unsigned int dim, const double wallThickness,
                                                const unsigned int numGaps, const double gapWidth,
                                                const double runSeconds,
                                                const double checkResolution)
-    : BaseExperiment(
+    : BaseContext(
           dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
           runSeconds, "DividingWall") {
   common_constructor(std::vector<double>(1u, wallThickness), std::vector<unsigned int>(1u, numGaps),
                      std::vector<double>(1u, gapWidth), std::vector<double>(), checkResolution);
 }
 
-DividingWallExperiment::DividingWallExperiment(
+DividingWall::DividingWall(
     const unsigned int dim, const std::vector<double> wallThicknesses,
     const std::vector<unsigned int> numGaps, const std::vector<double> gapWidths,
     const std::vector<double> wallSpacings, const double runSeconds, const double checkResolution)
-    : BaseExperiment(
+    : BaseContext(
           dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
           runSeconds, "DividingWall") {
   common_constructor(wallThicknesses, numGaps, gapWidths, wallSpacings, checkResolution);
 }
 
-void DividingWallExperiment::common_constructor(const std::vector<double> wallThickness,
+void DividingWall::common_constructor(const std::vector<double> wallThickness,
                                                 const std::vector<unsigned int> numGaps,
                                                 const std::vector<double> gapWidth,
                                                 const std::vector<double> wallSpacings,
@@ -77,7 +77,7 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
   // The problem bounds
-  ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
+  ompl::base::RealVectorBounds problemBounds(BaseContext::dim_);
   // Whether one wall has an odd number of wall segments.
   bool hasOddNumObs;
   // A token for the x-position of the wall's left corner
@@ -92,70 +92,70 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
   goalPos_ = 0.5;
 
   // Make the state space Rn:
-  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseContext::dim_);
 
   // Create the space information class:
-  BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
+  BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
-  BaseExperiment::obs_ = rectObs_;
+  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
+  BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:
-  problemBounds.setLow(BaseExperiment::limits_.at(0u).first);
-  problemBounds.setHigh(BaseExperiment::limits_.at(0u).second);
+  problemBounds.setLow(BaseContext::limits_.at(0u).first);
+  problemBounds.setHigh(BaseContext::limits_.at(0u).second);
 
   // Store the problem bounds:
   ss->setBounds(problemBounds);
 
   // Set the validity checker and checking resolution
-  BaseExperiment::si_->setStateValidityChecker(
+  BaseContext::si_->setStateValidityChecker(
       static_cast<ompl::base::StateValidityCheckerPtr>(rectObs_));
-  BaseExperiment::si_->setStateValidityCheckingResolution(checkResolution);
+  BaseContext::si_->setStateValidityCheckingResolution(checkResolution);
 
   // Call setup!
-  BaseExperiment::si_->setup();
+  BaseContext::si_->setup();
 
   // Allocate the optimization objective
-  BaseExperiment::opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+  BaseContext::opt_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseContext::si_);
 
   // Set the heuristic to the default:
-  BaseExperiment::opt_->setCostToGoHeuristic(
+  BaseContext::opt_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
   // Create my start:
   // Create a start state on the vector:
-  BaseExperiment::startStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::startStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
     if (j == 0u) {
-      BaseExperiment::startStates_.back()[j] = startPos_;
+      BaseContext::startStates_.back()[j] = startPos_;
     } else {
-      BaseExperiment::startStates_.back()[j] = 0.0;
+      BaseContext::startStates_.back()[j] = 0.0;
     }
   }
 
   // Create my goal:
   // Create a goal state on the vector:
-  BaseExperiment::goalStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::goalStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
     if (j == 0u) {
-      BaseExperiment::goalStates_.back()[j] = goalPos_;
+      BaseContext::goalStates_.back()[j] = goalPos_;
     } else {
-      BaseExperiment::goalStates_.back()[j] = 0.0;
+      BaseContext::goalStates_.back()[j] = 0.0;
     }
   }
 
   // Allocate the goal:
-  BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
+  BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseExperiment::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseExperiment::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
+      BaseContext::goalStates_.back());
 
   // Calculate the obstacle parameters:
 
@@ -175,7 +175,7 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
   numObs_ = std::vector<unsigned int>(numWalls_, 0u);
   wallWidths_ = std::vector<double>(numWalls_, 0.0);
   allObsWidths_ =
-      std::vector<std::vector<double>>(numWalls_, std::vector<double>(BaseExperiment::dim_, 0.0));
+      std::vector<std::vector<double>>(numWalls_, std::vector<double>(BaseContext::dim_, 0.0));
   obsCorners_ = std::vector<std::vector<std::shared_ptr<ompl::base::ScopedState<>>>>(
       numWalls_, std::vector<std::shared_ptr<ompl::base::ScopedState<>>>());
 
@@ -191,7 +191,7 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
 
     // And the width:
     wallWidths_.at(w) =
-        (BaseExperiment::limits_.at(1u).second - BaseExperiment::limits_.at(1u).first -
+        (BaseContext::limits_.at(1u).second - BaseContext::limits_.at(1u).first -
          static_cast<double>(numGaps_.at(w)) * gapWidths_.at(w)) /
         static_cast<double>(numObs_.at(w));
 
@@ -203,9 +203,9 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
     // Fill in the obstacle widths:
     allObsWidths_.at(w).at(0u) = wallThicknesses_.at(w);  // x width;
     allObsWidths_.at(w).at(1u) = wallWidths_.at(w);       // y width;
-    for (unsigned int i = 2u; i < BaseExperiment::dim_; ++i) {
+    for (unsigned int i = 2u; i < BaseContext::dim_; ++i) {
       allObsWidths_.at(w).at(i) =
-          BaseExperiment::limits_.at(i).second - BaseExperiment::limits_.at(i).first;  // z width
+          BaseContext::limits_.at(i).second - BaseContext::limits_.at(i).first;  // z width
     }
   }
 
@@ -247,10 +247,10 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
 
       // Specify it's lower-left corner:
       (*(obsCorners_.at(w).back()))[0u] = leftXPos;  // x
-      (*(obsCorners_.at(w).back()))[1u] = BaseExperiment::limits_.at(1u).first +
+      (*(obsCorners_.at(w).back()))[1u] = BaseContext::limits_.at(1u).first +
                                           obsNum * (wallWidths_.at(w) + gapWidths_.at(w));  // y
-      for (unsigned int i = 2u; i < BaseExperiment::dim_; ++i) {
-        (*(obsCorners_.at(w).back()))[i] = BaseExperiment::limits_.at(i).first;  // z
+      for (unsigned int i = 2u; i < BaseContext::dim_; ++i) {
+        (*(obsCorners_.at(w).back()))[i] = BaseContext::limits_.at(i).first;  // z
       }
 
       // Add the obstacle
@@ -267,22 +267,22 @@ void DividingWallExperiment::common_constructor(const std::vector<double> wallTh
   }
 
   // Finally specify the optimization target:
-  BaseExperiment::opt_->setCostThreshold(BaseExperiment::getMinimum());
+  BaseContext::opt_->setCostThreshold(BaseContext::getMinimum());
 }
 
-bool DividingWallExperiment::knowsOptimum() const {
+bool DividingWall::knowsOptimum() const {
   return false;
 }
 
-ompl::base::Cost DividingWallExperiment::getOptimum() const {
-  throw ompl::Exception("The global optimum is unknown, though it could be", BaseExperiment::name_);
+ompl::base::Cost DividingWall::getOptimum() const {
+  throw ompl::Exception("The global optimum is unknown, though it could be", BaseContext::name_);
 }
 
-void DividingWallExperiment::setTarget(double targetSpecifier) {
-  BaseExperiment::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
+void DividingWall::setTarget(double targetSpecifier) {
+  BaseContext::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
 }
 
-std::string DividingWallExperiment::lineInfo() const {
+std::string DividingWall::lineInfo() const {
   std::stringstream rval;
 
   for (unsigned w = 0u; w < numWalls_; ++w) {
@@ -297,7 +297,7 @@ std::string DividingWallExperiment::lineInfo() const {
   return rval.str();
 }
 
-std::string DividingWallExperiment::paraInfo() const {
+std::string DividingWall::paraInfo() const {
   std::stringstream rval;
 
   rval << "obstacles = " << std::endl;
@@ -305,16 +305,16 @@ std::string DividingWallExperiment::paraInfo() const {
     for (unsigned int i = 0u; i < numObs_.at(w); ++i) {
       rval << w << "." << i << ": [";
 
-      for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+      for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
         rval << (*(obsCorners_.at(w).at(i)))[j];
-        if (j != BaseExperiment::dim_ - 1u) {
+        if (j != BaseContext::dim_ - 1u) {
           rval << ", ";
         }
       }
       rval << "], [";
-      for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+      for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
         rval << (*(obsCorners_.at(w).at(i)))[j] + allObsWidths_.at(w).at(j);
-        if (j != BaseExperiment::dim_ - 1u) {
+        if (j != BaseContext::dim_ - 1u) {
           rval << ", ";
         }
       }

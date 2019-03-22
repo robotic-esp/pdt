@@ -47,10 +47,10 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-CentreSquareExperiment::CentreSquareExperiment(const unsigned int dim, const double obsWidth,
+CentreSquare::CentreSquare(const unsigned int dim, const double obsWidth,
                                                const double worldWidth, const double runSeconds,
                                                const double checkResolution)
-    : BaseExperiment(dim,
+    : BaseContext(dim,
                      std::vector<std::pair<double, double>>(
                          dim, std::pair<double, double>(-0.5 * worldWidth, 0.5 * worldWidth)),
                      runSeconds, "CentreSquare"),
@@ -61,114 +61,114 @@ CentreSquareExperiment::CentreSquareExperiment(const unsigned int dim, const dou
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
   // The problem bounds
-  ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
+  ompl::base::RealVectorBounds problemBounds(BaseContext::dim_);
 
   // Make the state space Rn:
-  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseContext::dim_);
 
   // Create the space information class:
-  BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
+  BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
-  BaseExperiment::obs_ = rectObs_;
+  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
+  BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:
-  problemBounds.setLow(BaseExperiment::limits_.at(0u).first);
-  problemBounds.setHigh(BaseExperiment::limits_.at(0u).second);
+  problemBounds.setLow(BaseContext::limits_.at(0u).first);
+  problemBounds.setHigh(BaseContext::limits_.at(0u).second);
 
   // Store the problem bounds:
   ss->setBounds(problemBounds);
 
   // Set the validity checker and checking resolution
-  BaseExperiment::si_->setStateValidityChecker(
+  BaseContext::si_->setStateValidityChecker(
       static_cast<ompl::base::StateValidityCheckerPtr>(rectObs_));
-  BaseExperiment::si_->setStateValidityCheckingResolution(checkResolution);
+  BaseContext::si_->setStateValidityCheckingResolution(checkResolution);
 
   // Call setup!
-  BaseExperiment::si_->setup();
+  BaseContext::si_->setup();
 
   // Allocate the optimization objective
-  BaseExperiment::opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+  BaseContext::opt_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseContext::si_);
 
   // Set the heuristic to the default:
-  BaseExperiment::opt_->setCostToGoHeuristic(
+  BaseContext::opt_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
   // Create my start:
   // Create a start state on the vector:
-  BaseExperiment::startStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::startStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
     if (j == 0u) {
-      BaseExperiment::startStates_.back()[j] = startPos_;
+      BaseContext::startStates_.back()[j] = startPos_;
     } else {
-      BaseExperiment::startStates_.back()[j] = 0.0;
+      BaseContext::startStates_.back()[j] = 0.0;
     }
   }
 
   // Create my goal:
   // Create a goal state on the vector:
-  BaseExperiment::goalStates_.push_back(ompl::base::ScopedState<>(ss));
+  BaseContext::goalStates_.push_back(ompl::base::ScopedState<>(ss));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
     if (j == 0u) {
-      BaseExperiment::goalStates_.back()[j] = goalPos_;
+      BaseContext::goalStates_.back()[j] = goalPos_;
     } else {
-      BaseExperiment::goalStates_.back()[j] = 0.0;
+      BaseContext::goalStates_.back()[j] = 0.0;
     }
   }
 
   // Allocate the goal:
-  BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
+  BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseExperiment::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseExperiment::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
+      BaseContext::goalStates_.back());
 
   // Set the obstacle's lower-left corner:
   sightLineObs_ = std::make_shared<ompl::base::ScopedState<>>(ss);
-  for (unsigned int i = 0u; i < BaseExperiment::dim_; ++i) {
+  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
     (*sightLineObs_)[i] =
-        (BaseExperiment::goalStates_.back()[i] + BaseExperiment::startStates_.back()[i]) / 2.0 -
+        (BaseContext::goalStates_.back()[i] + BaseContext::startStates_.back()[i]) / 2.0 -
         0.5 * obsWidth_;
   }
 
   // Add the obstacle:
   rectObs_->addObstacle(
-      std::make_pair(sightLineObs_->get(), std::vector<double>(BaseExperiment::dim_, obsWidth_)));
+      std::make_pair(sightLineObs_->get(), std::vector<double>(BaseContext::dim_, obsWidth_)));
 
   // Finally specify the optimization target:
-  BaseExperiment::opt_->setCostThreshold(this->getOptimum());
+  BaseContext::opt_->setCostThreshold(this->getOptimum());
 }
 
-bool CentreSquareExperiment::knowsOptimum() const {
+bool CentreSquare::knowsOptimum() const {
   return true;
 }
 
-ompl::base::Cost CentreSquareExperiment::getOptimum() const {
+ompl::base::Cost CentreSquare::getOptimum() const {
   ompl::base::Cost startToCorner(
-      std::sqrt(std::pow((*sightLineObs_)[0u] - BaseExperiment::startStates_.front()[0u], 2.0) +
-                std::pow((*sightLineObs_)[1u] - BaseExperiment::startStates_.front()[1u], 2.0)));
+      std::sqrt(std::pow((*sightLineObs_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
+                std::pow((*sightLineObs_)[1u] - BaseContext::startStates_.front()[1u], 2.0)));
   ompl::base::Cost obsEdge(obsWidth_);
   ompl::base::Cost otherCornerToGoal(std::sqrt(
-      std::pow(BaseExperiment::goalStates_.front()[0u] - ((*sightLineObs_)[0u] + obsWidth_), 2.0) +
-      std::pow(BaseExperiment::goalStates_.front()[1u] - (*sightLineObs_)[1u], 2.0)));
+      std::pow(BaseContext::goalStates_.front()[0u] - ((*sightLineObs_)[0u] + obsWidth_), 2.0) +
+      std::pow(BaseContext::goalStates_.front()[1u] - (*sightLineObs_)[1u], 2.0)));
 
   // Combine and return:
-  return BaseExperiment::opt_->combineCosts(
-      BaseExperiment::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(
+      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
 }
 
-void CentreSquareExperiment::setTarget(double targetSpecifier) {
-  BaseExperiment::opt_->setCostThreshold(
+void CentreSquare::setTarget(double targetSpecifier) {
+  BaseContext::opt_->setCostThreshold(
       ompl::base::Cost(targetSpecifier * this->getOptimum().value()));
 }
 
-std::string CentreSquareExperiment::lineInfo() const {
+std::string CentreSquare::lineInfo() const {
   std::stringstream rval;
 
   rval << "Obstacle width: " << obsWidth_ << ".";
@@ -176,6 +176,6 @@ std::string CentreSquareExperiment::lineInfo() const {
   return rval.str();
 }
 
-std::string CentreSquareExperiment::paraInfo() const {
+std::string CentreSquare::paraInfo() const {
   return std::string();
 }

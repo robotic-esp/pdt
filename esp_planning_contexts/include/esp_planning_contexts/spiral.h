@@ -1,4 +1,3 @@
-
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
@@ -41,11 +40,10 @@
 #include "esp_planning_contexts/base_context.h"
 
 /** \brief An experiment with a heuristic breaking spiral */
-class SpiralExperiment : public BaseExperiment {
+class Spiral : public BaseContext {
  public:
   /** \brief Constructor */
-  SpiralExperiment(const double distFraction, const double runSeconds,
-                   const double checkResolution);
+  Spiral(const double distFraction, const double runSeconds, const double checkResolution);
 
   /** \brief This problem \e does \e not know its optimum (though it could) */
   virtual bool knowsOptimum() const;
@@ -75,5 +73,3 @@ class SpiralExperiment : public BaseExperiment {
   /** \brief The basic thickness of the obstacle. */
   double obsThickness_{0.05};
 };
-
-typedef std::shared_ptr<SpiralExperiment> SpiralExperimentPtr;

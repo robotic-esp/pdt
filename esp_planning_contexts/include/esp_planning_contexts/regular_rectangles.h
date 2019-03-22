@@ -40,12 +40,11 @@
 #include "esp_planning_contexts/base_context.h"
 
 /** \brief An experiment with regularly repeating rectangular obstacles */
-class RegularRectanglesExperiment : public BaseExperiment {
+class RegularRectangles : public BaseContext {
  public:
   /** \brief Constructor */
-  RegularRectanglesExperiment(const unsigned int dim, const double worldHalfWidth,
-                              unsigned int numObsBetween, const double runSeconds,
-                              const double checkResolution);
+  RegularRectangles(const unsigned int dim, const double worldHalfWidth, unsigned int numObsBetween,
+                    const double runSeconds, const double checkResolution);
 
   /** \brief Whether the problem has an exact expression for the optimum */
   virtual bool knowsOptimum() const;
@@ -79,5 +78,3 @@ class RegularRectanglesExperiment : public BaseExperiment {
   /** \brief The grid origin */
   std::vector<double> origin_{};
 };
-
-typedef std::shared_ptr<RegularRectanglesExperiment> RegularRectanglesExperimentPtr;

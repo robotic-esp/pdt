@@ -42,11 +42,11 @@
 #include "esp_planning_contexts/base_context.h"
 
 /** \brief An obstacle-free multigoal/multistart experiment */
-class ObstacleFreeExperiment : public BaseExperiment {
+class ObstacleFree : public BaseContext {
  public:
   /** \brief Constructor */
-  ObstacleFreeExperiment(const unsigned int dim, const unsigned int maxNumStarts,
-                         const unsigned int maxNumGoals, const double runSeconds);
+  ObstacleFree(const unsigned int dim, const unsigned int maxNumStarts,
+               const unsigned int maxNumGoals, const double runSeconds);
 
   /** \brief This problem knows the optimum */
   virtual bool knowsOptimum() const;
@@ -66,8 +66,6 @@ class ObstacleFreeExperiment : public BaseExperiment {
  protected:
   // Constant Parameters
   /** \brief The definition of the "centre" and "outside" positions */
-  double centrePos_  { 0.0 };
-  double outsidePos_ { 0.0 };
+  double centrePos_{0.0};
+  double outsidePos_{0.0};
 };
-
-typedef std::shared_ptr<ObstacleFreeExperiment> ObstacleFreeExperimentPtr;

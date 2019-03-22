@@ -49,18 +49,18 @@
 
 #include "esp_obstacles/hyperrectangle.h"
 
-ObstacleFreeExperiment::ObstacleFreeExperiment(const unsigned int dim,
+ObstacleFree::ObstacleFree(const unsigned int dim,
                                                const unsigned int maxNumStarts,
                                                const unsigned int maxNumGoals,
                                                const double runSeconds)
-    : BaseExperiment(
+    : BaseContext(
           dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
           runSeconds, "Free") {
   // Variables
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
   // The problem bounds
-  ompl::base::RealVectorBounds problemBounds(BaseExperiment::dim_);
+  ompl::base::RealVectorBounds problemBounds(BaseContext::dim_);
   // The validity checker:
   ompl::base::StateValidityCheckerPtr vc;
   // The number of starts and goals we're actually creating
@@ -80,48 +80,48 @@ ObstacleFreeExperiment::ObstacleFreeExperiment(const unsigned int dim,
   }
 
   // Make the state space Rn:
-  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseExperiment::dim_);
+  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseContext::dim_);
 
   // Create the space information class:
-  BaseExperiment::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
+  BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Make an empty obstacle pointer:
-  BaseExperiment::obs_ = std::make_shared<HyperrectangleObstacles>(BaseExperiment::si_, false);
+  BaseContext::obs_ = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
 
   // Make the validity checker all-true
-  vc = std::make_shared<ompl::base::AllValidStateValidityChecker>(BaseExperiment::si_);
+  vc = std::make_shared<ompl::base::AllValidStateValidityChecker>(BaseContext::si_);
 
   // Set the problem bounds:
-  problemBounds.setLow(BaseExperiment::limits_.at(0u).first);
-  problemBounds.setHigh(BaseExperiment::limits_.at(0u).second);
+  problemBounds.setLow(BaseContext::limits_.at(0u).first);
+  problemBounds.setHigh(BaseContext::limits_.at(0u).second);
 
   // Store the problem bounds:
   ss->setBounds(problemBounds);
 
   // Set the validity checker and checking resolution
-  BaseExperiment::si_->setStateValidityChecker(vc);
-  BaseExperiment::si_->setStateValidityCheckingResolution(0.1);
+  BaseContext::si_->setStateValidityChecker(vc);
+  BaseContext::si_->setStateValidityCheckingResolution(0.1);
 
   // Call setup!
-  BaseExperiment::si_->setup();
+  BaseContext::si_->setup();
 
   // Allocate the optimization objective
-  BaseExperiment::opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseExperiment::si_);
+  BaseContext::opt_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseContext::si_);
 
   // Set the heuristic to the default:
-  BaseExperiment::opt_->setCostToGoHeuristic(
+  BaseContext::opt_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
   // Given the way we define goals, We can only have 2 per dimension (i.e., 4 in 2D, 6 in 3D, etc)
-  numStarts = std::min(maxNumStarts, 2u * BaseExperiment::dim_);
-  numGoals = std::min(maxNumGoals, 2u * BaseExperiment::dim_);
+  numStarts = std::min(maxNumStarts, 2u * BaseContext::dim_);
+  numGoals = std::min(maxNumGoals, 2u * BaseContext::dim_);
 
   // Allocate the goal:
   if (numGoals == 1u) {
-    BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseExperiment::si_);
+    BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
   } else {
-    BaseExperiment::goalPtr_ = std::make_shared<ompl::base::GoalStates>(BaseExperiment::si_);
+    BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalStates>(BaseContext::si_);
   }
 
   // Assign positions
@@ -136,19 +136,19 @@ ObstacleFreeExperiment::ObstacleFreeExperiment(const unsigned int dim,
   // Create my starts:
   for (unsigned int i = 0u; i < numStarts; ++i) {
     // Create a start state on the vector:
-    BaseExperiment::startStates_.push_back(ompl::base::ScopedState<>(ss));
+    BaseContext::startStates_.push_back(ompl::base::ScopedState<>(ss));
 
     // Assign to each component
-    for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+    for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
       // Start
       if (((i == 0u) || (i - 1u <= 2u * j)) && (2u * j <= i)) {
         if (i % 2u == 0u) {
-          BaseExperiment::startStates_.back()[j] = startPos;
+          BaseContext::startStates_.back()[j] = startPos;
         } else {
-          BaseExperiment::startStates_.back()[j] = -startPos;
+          BaseContext::startStates_.back()[j] = -startPos;
         }
       } else {
-        BaseExperiment::startStates_.back()[j] = 0.0;
+        BaseContext::startStates_.back()[j] = 0.0;
       }
     }
   }
@@ -156,45 +156,45 @@ ObstacleFreeExperiment::ObstacleFreeExperiment(const unsigned int dim,
   // and the goal(s)
   for (unsigned int i = 0u; i < numGoals; ++i) {
     // Create a start state on the vector:
-    BaseExperiment::goalStates_.push_back(ompl::base::ScopedState<>(ss));
+    BaseContext::goalStates_.push_back(ompl::base::ScopedState<>(ss));
 
     // Assign to each component
-    for (unsigned int j = 0u; j < BaseExperiment::dim_; ++j) {
+    for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
       // Goal
       if (((i == 0u) || (i - 1u <= 2u * j)) && (2u * j <= i)) {
         if (i % 2u == 0u) {
-          BaseExperiment::goalStates_.back()[j] = goalPos;
+          BaseContext::goalStates_.back()[j] = goalPos;
         } else {
-          BaseExperiment::goalStates_.back()[j] = -goalPos;
+          BaseContext::goalStates_.back()[j] = -goalPos;
         }
       } else {
-        BaseExperiment::goalStates_.back()[j] = 0.0;
+        BaseContext::goalStates_.back()[j] = 0.0;
       }
     }
 
     // Store
     if (numGoals == 1u) {
-      BaseExperiment::goalPtr_->as<ompl::base::GoalState>()->setState(
-          BaseExperiment::goalStates_.back());
+      BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
+          BaseContext::goalStates_.back());
     } else {
-      BaseExperiment::goalPtr_->as<ompl::base::GoalStates>()->addState(
-          BaseExperiment::goalStates_.back());
+      BaseContext::goalPtr_->as<ompl::base::GoalStates>()->addState(
+          BaseContext::goalStates_.back());
     }
   }
 
   // Now specify the optimization target:
-  BaseExperiment::opt_->setCostThreshold(this->getOptimum());
+  BaseContext::opt_->setCostThreshold(this->getOptimum());
 }
 
-bool ObstacleFreeExperiment::knowsOptimum() const { return true; }
+bool ObstacleFree::knowsOptimum() const { return true; }
 
-ompl::base::Cost ObstacleFreeExperiment::getOptimum() const { return BaseExperiment::getMinimum(); }
+ompl::base::Cost ObstacleFree::getOptimum() const { return BaseContext::getMinimum(); }
 
-void ObstacleFreeExperiment::setTarget(double targetSpecifier) {
-  BaseExperiment::opt_->setCostThreshold(
+void ObstacleFree::setTarget(double targetSpecifier) {
+  BaseContext::opt_->setCostThreshold(
       ompl::base::Cost(targetSpecifier * this->getOptimum().value()));
 }
 
-std::string ObstacleFreeExperiment::lineInfo() const { return std::string(); }
+std::string ObstacleFree::lineInfo() const { return std::string(); }
 
-std::string ObstacleFreeExperiment::paraInfo() const { return std::string(); }
+std::string ObstacleFree::paraInfo() const { return std::string(); }

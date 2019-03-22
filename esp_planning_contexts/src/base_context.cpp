@@ -37,17 +37,17 @@
 // Me!
 #include "esp_planning_contexts/base_context.h"
 
-BaseExperiment::BaseExperiment(const unsigned int dim,
+BaseContext::BaseContext(const unsigned int dim,
                                const std::vector<std::pair<double, double>> limits,
                                const double runSeconds, std::string name)
     : name_(name), dim_(dim), limits_(limits), targetTime_(asrl::time::seconds(runSeconds)) {
 }
 
-ompl::base::SpaceInformationPtr BaseExperiment::getSpaceInformation() const {
+ompl::base::SpaceInformationPtr BaseContext::getSpaceInformation() const {
   return si_;
 }
 
-ompl::base::ProblemDefinitionPtr BaseExperiment::newProblemDefinition() const {
+ompl::base::ProblemDefinitionPtr BaseContext::newProblemDefinition() const {
   // Variables
   // The problem definition
   ompl::base::ProblemDefinitionPtr pdef;
@@ -69,39 +69,39 @@ ompl::base::ProblemDefinitionPtr BaseExperiment::newProblemDefinition() const {
   return pdef;
 }
 
-ompl::base::OptimizationObjectivePtr BaseExperiment::getOptimizationObjective() const {
+ompl::base::OptimizationObjectivePtr BaseContext::getOptimizationObjective() const {
   return opt_;
 }
 
-asrl::time::duration BaseExperiment::getTargetTime() const {
+asrl::time::duration BaseContext::getTargetTime() const {
   return targetTime_;
 }
 
-ompl::base::GoalPtr BaseExperiment::getGoalPtr() const {
+ompl::base::GoalPtr BaseContext::getGoalPtr() const {
   return goalPtr_;
 }
 
-std::vector<ompl::base::ScopedState<>> BaseExperiment::getStartStates() const {
+std::vector<ompl::base::ScopedState<>> BaseContext::getStartStates() const {
   return startStates_;
 }
 
-std::vector<ompl::base::ScopedState<>> BaseExperiment::getGoalStates() const {
+std::vector<ompl::base::ScopedState<>> BaseContext::getGoalStates() const {
   return goalStates_;
 }
 
-std::string BaseExperiment::getName() const {
+std::string BaseContext::getName() const {
   return name_;
 }
 
-std::vector<std::pair<double, double>> BaseExperiment::getLimits() const {
+std::vector<std::pair<double, double>> BaseContext::getLimits() const {
   return limits_;
 }
 
-unsigned int BaseExperiment::getDimensions() const {
+unsigned int BaseContext::getDimensions() const {
   return dim_;
 }
 
-ompl::base::Cost BaseExperiment::getMinimum() const {
+ompl::base::Cost BaseContext::getMinimum() const {
   // Return the minimum of each start to the goal
   ompl::base::Cost minCost = opt_->infiniteCost();
 
@@ -115,7 +115,7 @@ ompl::base::Cost BaseExperiment::getMinimum() const {
   return minCost;
 }
 
-void BaseExperiment::print(const bool verbose /* == false */) const {
+void BaseContext::print(const bool verbose /* == false */) const {
   std::cout << name_ << " in R^" << dim_ << ". runtime: " << asrl::time::seconds(targetTime_)
             << ". target: " << opt_->getCostThreshold();
   if (this->knowsOptimum()) {
@@ -142,7 +142,7 @@ void BaseExperiment::print(const bool verbose /* == false */) const {
   }
 }
 
-std::string BaseExperiment::mfileHeader(bool monochrome) const {
+std::string BaseContext::mfileHeader(bool monochrome) const {
   std::stringstream rval;
 
   rval << "%%%%%% Pre config %%%%%%" << std::endl;
@@ -242,7 +242,7 @@ std::string BaseExperiment::mfileHeader(bool monochrome) const {
   return rval.str();
 }
 
-std::string BaseExperiment::mfileFooter() const {
+std::string BaseContext::mfileFooter() const {
   std::stringstream rval;
 
   // Plot the start and goal vertices:

@@ -41,14 +41,14 @@
 
 /** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
  * a multiple homotopy-class experiment that scales to N dimensions. */
-class RandomRectanglesWithDividingWallExperiment : public BaseExperiment {
+class RandomRectanglesWithDividingWall : public BaseContext {
  public:
   /** \brief Constructor. Must be an even number of gaps to assure there is no straight-line
    * solution. The obstacle ratio \e does include the obstacles. */
-  RandomRectanglesWithDividingWallExperiment(const unsigned int dim, const unsigned int numObs,
-                                             const double obsRatio, const unsigned int numGaps,
-                                             const double gapWidth, const double runSeconds,
-                                             const double checkResolution);
+  RandomRectanglesWithDividingWall(const unsigned int dim, const unsigned int numObs,
+                                   const double obsRatio, const unsigned int numGaps,
+                                   const double gapWidth, const double runSeconds,
+                                   const double checkResolution);
 
   /** \brief This does not knows its optimum. */
   virtual bool knowsOptimum() const;
@@ -89,6 +89,3 @@ class RandomRectanglesWithDividingWallExperiment : public BaseExperiment {
   double startPos_{-0.5};
   double goalPos_{0.5};
 };
-
-typedef std::shared_ptr<RandomRectanglesWithDividingWallExperiment>
-    RandomRectanglesWithDividingWallExperimentPtr;

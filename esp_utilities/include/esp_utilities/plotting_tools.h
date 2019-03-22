@@ -27,7 +27,7 @@ std::string matlabExtraHeader(std::string plannerName, PlannerType plannerType, 
                               bool bitStarNextEdge, bool bitStarFullQueue);
 
 /** \brief Create the matlab plot commands for a problem */
-void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType,
+void writeMatlabMap(BaseContextPtr experiment, PlannerType plannerType,
                     ompl::base::PlannerPtr planner, unsigned int worldSeed, double runtime,
                     bool plotVertices, bool plotIndices, bool informedWorldEllipse,
                     bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue,
@@ -35,7 +35,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType,
                     bool monochrome = false);
 
 /** \brief Create an iteration-by-iteration animation of the planner */
-asrl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType plannerType,
+asrl::time::duration createAnimation(BaseContextPtr experiment, PlannerType plannerType,
                                      ompl::base::PlannerPtr planner, unsigned int worldSeed,
                                      asrl::time::duration timeToRun, bool plotVertices,
                                      bool plotIndices, bool informedWorldEllipse,

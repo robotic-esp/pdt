@@ -42,13 +42,12 @@
 /** \brief A homotopy-breaking, "bug trap" style experiment that scales to N dimensions. I.e., The
  * start and goal are both enclosed in a box with a opening away from the other. 2D is a slice of
  * higher-D */
-class GoalEnclosureExperiment : public BaseExperiment {
+class GoalEnclosure : public BaseContext {
  public:
   /** \brief Constructor */
-  GoalEnclosureExperiment(const unsigned int dim, const double worldHalfWidth,
-                          const double insideWidth, const double wallThickness,
-                          const double gapWidth, const double runSeconds,
-                          const double checkResolution);
+  GoalEnclosure(const unsigned int dim, const double worldHalfWidth, const double insideWidth,
+                const double wallThickness, const double gapWidth, const double runSeconds,
+                const double checkResolution);
 
   /** \brief This problem could knows its optimum, but doesn't right now */
   virtual bool knowsOptimum() const;
@@ -68,29 +67,27 @@ class GoalEnclosureExperiment : public BaseExperiment {
  protected:
   // Variables
   /** \brief The actual enclosures */
-  std::shared_ptr<CutoutObstacles> enclObs_ { };
+  std::shared_ptr<CutoutObstacles> enclObs_{};
 
   /** \brief Construction variables: The lower-left corners (1 obs, 2 anti) */
-  std::vector<std::shared_ptr<ompl::base::ScopedState<> > > startEnclCorners_ { };
-  std::vector<std::shared_ptr<ompl::base::ScopedState<> > > goalEnclCorners_  { };
+  std::vector<std::shared_ptr<ompl::base::ScopedState<> > > startEnclCorners_{};
+  std::vector<std::shared_ptr<ompl::base::ScopedState<> > > goalEnclCorners_{};
   /** \brief Construction variables: The associated widths */
-  std::vector<std::vector<double> > startEnclWidths_ { };
-  std::vector<std::vector<double> > goalEnclWidths_ { };
+  std::vector<std::vector<double> > startEnclWidths_{};
+  std::vector<std::vector<double> > goalEnclWidths_{};
 
   // Constant Parameters
   /** \brief The inside-width of the enclosure. */
-  double insideWidth_ { 0.0 };
+  double insideWidth_{0.0};
   /** \brief The enclosure-wall thickness. */
-  double wallThickness_ { 0.0 };
+  double wallThickness_{0.0};
   /** \brief The width of the opening in directions perpendicular to the wall thickness. */
-  double gapWidth_ { 0.0 };
+  double gapWidth_{0.0};
   /** \brief The start and goal positions */
-  double startPos_ { -0.5 };
-  double goalPos_  {  0.5 };
+  double startPos_{-0.5};
+  double goalPos_{0.5};
 
   // Helper function
   std::string printRectangle(std::shared_ptr<ompl::base::ScopedState<> > llCorner,
                              std::vector<double> widths) const;
 };
-
-typedef std::shared_ptr<GoalEnclosureExperiment> GoalEnclosureExperimentPtr;

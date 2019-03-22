@@ -41,12 +41,12 @@
 
 /** \brief An two-homotopy-class experiment that scales to N dimensions. I.e., an obstacle with a
  * gap that is anchored to the map limit on one side. */
-class WallGapExperiment : public BaseExperiment {
+class WallGap : public BaseContext {
  public:
   /** \brief Constructor */
-  WallGapExperiment(const unsigned int dim, const bool onlyFindGap, const double gapWidth,
-                    const double gapOffset, const double flankWidth, const double runSeconds,
-                    const double checkResolution);
+  WallGap(const unsigned int dim, const bool onlyFindGap, const double gapWidth,
+          const double gapOffset, const double flankWidth, const double runSeconds,
+          const double checkResolution);
 
   /** \brief This problem knows its optimum */
   virtual bool knowsOptimum() const;
@@ -72,7 +72,6 @@ class WallGapExperiment : public BaseExperiment {
   ompl::base::Cost maxGapCost() const;
 
  protected:
-  // Variables
   /** \brief Whether to stop on class switch */
   bool stopClassSwitch_{false};
   /** \brief The obstacle world */
@@ -84,7 +83,6 @@ class WallGapExperiment : public BaseExperiment {
   std::vector<double> gapWidths_{};
   std::vector<double> obstacleWidths_{};
 
-  // Constant Parameters
   /** \brief The basic thickness of the obstacle. */
   double obsThickness_{0.25};
   /** \brief The gap width. */
@@ -97,5 +95,3 @@ class WallGapExperiment : public BaseExperiment {
   double startPos_{-0.5};
   double goalPos_{0.5};
 };
-
-typedef std::shared_ptr<WallGapExperiment> WallGapExperimentPtr;

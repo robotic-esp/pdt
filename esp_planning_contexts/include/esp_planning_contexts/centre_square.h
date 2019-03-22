@@ -40,10 +40,10 @@
 #include "esp_planning_contexts/base_context.h"
 
 /** \brief An experiment with a singularly placed square obstacle*/
-class CentreSquareExperiment : public BaseExperiment {
+class CentreSquare : public BaseContext {
  public:
   /** \brief Constructor */
-  CentreSquareExperiment(const unsigned int dim, const double obsWidth, const double worldWidth,
+  CentreSquare(const unsigned int dim, const double obsWidth, const double worldWidth,
                          const double runSeconds, const double checkResolution);
 
   /** \brief Whether the problem has an exact expression for the optimum */
@@ -74,5 +74,3 @@ class CentreSquareExperiment : public BaseExperiment {
   double startPos_ { 0.0 };
   double goalPos_  { 0.0 };
 };
-
-typedef std::shared_ptr<CentreSquareExperiment> CentreSquareExperimentPtr;

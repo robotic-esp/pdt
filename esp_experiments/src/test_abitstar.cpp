@@ -271,7 +271,7 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
   return true;
 }
 
-ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExperimentPtr& expDefn,
+ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseContextPtr& expDefn,
                                        const unsigned int numSamples, double steerEta) {
   // Variables
   // The allocated planner
@@ -403,8 +403,8 @@ int main(int argc, char** argv) {
   // std::make_shared<SpiralExperiment>(0.4, targetTime, CHECK_RESOLUTION); BaseExperimentPtr
   // expDefn = std::make_shared<WallGapExperiment>(N, false, 0.03, 0.3, 0.3, targetTime,
   // CHECK_RESOLUTION);
-  BaseExperimentPtr expDefn =
-      std::make_shared<FlankingGapExperiment>(false, 0.01, targetTime, CHECK_RESOLUTION);
+  BaseContextPtr expDefn =
+      std::make_shared<FlankingGap>(false, 0.01, targetTime, CHECK_RESOLUTION);
   // BaseExperimentPtr expDefn = std::make_shared<RandomRectanglesExperiment>(N, numObs, obsRatio,
   // targetTime, CHECK_RESOLUTION); BaseExperimentPtr expDefn =
   // std::make_shared<RegularRectanglesExperiment>(N, 1.0, 3, targetTime, CHECK_RESOLUTION);

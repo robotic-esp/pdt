@@ -64,7 +64,7 @@ PlannerFactory::PlannerFactory(fs::path plannerConfigFile) {
 }
 
 std::shared_ptr<ompl::base::Planner> PlannerFactory::create(
-    const std::string& plannerType, const BaseExperimentPtr &experiment) const {
+    const std::string& plannerType, const BaseContextPtr &experiment) const {
   // BIT*
   if (plannerType == std::string("BITstar")) {
     // Allocate and configure a BIT* planner.

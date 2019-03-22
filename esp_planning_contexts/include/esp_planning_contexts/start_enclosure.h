@@ -42,13 +42,12 @@
 /** \brief A homotopy-breaking, "bug trap" style experiment that scales to N dimensions. I.e., The
  * start and goal are both enclosed in a box with a opening away from the other. 2D is a slice of
  * higher-D */
-class StartEnclosureExperiment : public BaseExperiment {
+class StartEnclosure : public BaseContext {
  public:
   /** \brief Constructor */
-  StartEnclosureExperiment(const unsigned int dim, const double worldHalfWidth,
-                           const double insideWidth, const double wallThickness,
-                           const double gapWidth, const double runSeconds,
-                           const double checkResolution);
+  StartEnclosure(const unsigned int dim, const double worldHalfWidth, const double insideWidth,
+                 const double wallThickness, const double gapWidth, const double runSeconds,
+                 const double checkResolution);
 
   /** \brief This problem could knows its optimum, but doesn't right now */
   virtual bool knowsOptimum() const;
@@ -66,16 +65,12 @@ class StartEnclosureExperiment : public BaseExperiment {
   virtual std::string paraInfo() const;
 
  protected:
-  // Variables
   /** \brief The actual enclosures */
   std::shared_ptr<CutoutObstacles> enclObs_{};
-
-  /** \brief Construction variables: The lower-left corners (1 obs, 2 anti) */
   std::vector<std::shared_ptr<ompl::base::ScopedState<>>> startEnclCorners_{};
   std::vector<std::shared_ptr<ompl::base::ScopedState<>>> goalEnclCorners_{};
-  /** \brief Construction variables: The associated widths */
-  std::vector<std::vector<double> > startEnclWidths_{};
-  std::vector<std::vector<double> > goalEnclWidths_{};
+  std::vector<std::vector<double>> startEnclWidths_{};
+  std::vector<std::vector<double>> goalEnclWidths_{};
 
   // Constant Parameters
   /** \brief The inside-width of the enclosure. */
@@ -89,8 +84,6 @@ class StartEnclosureExperiment : public BaseExperiment {
   double goalPos_;
 
   // Helper function
-  std::string printRectangle(std::shared_ptr<ompl::base::ScopedState<> > llCorner,
+  std::string printRectangle(std::shared_ptr<ompl::base::ScopedState<>> llCorner,
                              std::vector<double> widths) const;
 };
-
-typedef std::shared_ptr<StartEnclosureExperiment> StartEnclosureExperimentPtr;

@@ -19,7 +19,7 @@
 #include <ompl/geometric/planners/bitstar_regression/datastructures/Vertex.h>
 #endif  // BITSTAR_REGRESSION
 
-std::string plotVertex(BaseExperimentPtr experiment, const ompl::base::State* vertex,
+std::string plotVertex(BaseContextPtr experiment, const ompl::base::State* vertex,
                        std::string vertexColour, std::string vertexSize) {
   // A scoped state
   ompl::base::ScopedState<> scopedVertex(experiment->getSpaceInformation()->getStateSpace(),
@@ -32,7 +32,7 @@ std::string plotVertex(BaseExperimentPtr experiment, const ompl::base::State* ve
   return rval.str();
 }
 
-std::string plotEdge(BaseExperimentPtr experiment, const ompl::base::State* parent,
+std::string plotEdge(BaseContextPtr experiment, const ompl::base::State* parent,
                      const ompl::base::State* child, std::string edgeColour, std::string lineStyle,
                      std::string edgeWeight) {
   // Scoped states
@@ -115,7 +115,7 @@ void createMatlabHelpers(std::string path) {
   // No else
 }
 
-void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType,
+void writeMatlabMap(BaseContextPtr experiment, PlannerType plannerType,
                     ompl::base::PlannerPtr planner, unsigned int worldSeed, double runtime,
                     bool plotVertices, bool plotIndices, bool informedWorldEllipse,
                     bool bitStarQueueEllipse, bool bitStarNextEdge, bool bitStarFullQueue,
@@ -571,7 +571,7 @@ void writeMatlabMap(BaseExperimentPtr experiment, PlannerType plannerType,
   }
 }
 
-asrl::time::duration createAnimation(BaseExperimentPtr experiment, PlannerType plannerType,
+asrl::time::duration createAnimation(BaseContextPtr experiment, PlannerType plannerType,
                                      ompl::base::PlannerPtr planner, unsigned int worldSeed,
                                      asrl::time::duration timeToRun, bool plotVertices,
                                      bool plotIndices, bool informedWorldEllipse,

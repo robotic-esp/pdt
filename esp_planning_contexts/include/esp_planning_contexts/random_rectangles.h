@@ -40,12 +40,11 @@
 #include "esp_planning_contexts/base_context.h"
 
 /** \brief An experiment with a singularly placed square obstacle*/
-class RandomRectanglesExperiment : public BaseExperiment {
+class RandomRectangles : public BaseContext {
  public:
   /** \brief Constructor. */
-  RandomRectanglesExperiment(const unsigned int dim, const unsigned int numObs,
-                             const double obsRatio, const double runSeconds,
-                             const double checkResolution);
+  RandomRectangles(const unsigned int dim, const unsigned int numObs, const double obsRatio,
+                   const double runSeconds, const double checkResolution);
 
   /** \brief This problem \e does \e not know its optimum */
   virtual bool knowsOptimum() const;
@@ -77,5 +76,3 @@ class RandomRectanglesExperiment : public BaseExperiment {
   /** \brief The mean obstacle width*/
   double meanObsWidth_{0.0};
 };
-
-typedef std::shared_ptr<RandomRectanglesExperiment> RandomRectanglesExperimentPtr;
