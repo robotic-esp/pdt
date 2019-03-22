@@ -19,10 +19,13 @@ include_directories(
 add_library(esp_planner_factory
   src/planner_factory.cpp)
 
-# Link the library.
+# Link the library with libraries not exposed in API.
 target_link_libraries(esp_planner_factory PRIVATE
+  nlohmann_json::nlohmann_json)
+
+# Link the library with libraries exposed in API.
+target_link_libraries(esp_planner_factory PUBLIC
   stdc++fs
-  nlohmann_json::nlohmann_json
   experiments)
 
 # Specify the include directories exported by this library.
