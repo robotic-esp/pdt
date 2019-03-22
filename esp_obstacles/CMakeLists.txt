@@ -10,17 +10,16 @@ find_package(ompl REQUIRED)
 
 # Include necessary header directories.
 include_directories(
-  ../include
   ${OMPL_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include)
 
 # Build the library.
 add_library(esp_obstacles
-  src/BaseObstacle.cpp
-  src/CsvObstacle.cpp
-  src/CutoutObstacles.cpp
-  src/HyperrectangleObstacles.cpp
-  src/RepeatingHyperrectangleObstacles.cpp)
+  src/base_obstacle.cpp
+  src/binary_map.cpp
+  src/cutout.cpp
+  src/hyperrectangle.cpp
+  src/repeating_hyperrectangles.cpp)
 
 # Link the library.
 target_link_libraries(esp_obstacles PUBLIC

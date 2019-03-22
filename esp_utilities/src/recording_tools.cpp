@@ -1,11 +1,9 @@
-#include "tools/recording_tools.h"
+#include "esp_utilities/recording_tools.h"
 
-// For std::setfill and std::setw and std::setprecision
 #include <iomanip>
-// For boost::filesystem
 #include <boost/filesystem.hpp>
 
-#define ALLOC_TIME_SAFETY_FACTOR 10.0
+constexpr float ALLOC_TIME_SAFETY_FACTOR = 10.0;
 
 void createDirectories(std::string fileName) {
   /// Variables

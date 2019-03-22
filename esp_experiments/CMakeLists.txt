@@ -1,8 +1,3 @@
-#src
-add_subdirectory( obstacles )
-add_subdirectory( experiments )
-add_subdirectory( tools )
-
 # Executables
 # add_executable(learn_binary_heap
 #   learn_binary_heap.cpp
@@ -45,11 +40,12 @@ add_subdirectory( tools )
 # )
 
 add_executable(test_abitstar
-  test_abitstar.cpp
+  src/test_abitstar.cpp
 )
 target_link_libraries(test_abitstar
   esp_obstacles
-  esp_contexts
+  esp_planning_contexts
+  esp_planner_factory
   esp_utilities
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_LIBRARIES}

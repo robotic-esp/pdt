@@ -1,30 +1,22 @@
-// Me
-#include "tools/plotting_tools.h"
+#include "esp_utilities/plotting_tools.h"
 
-// For std::ifstream and std::ofstream
 #include <fstream>
-// For std::setfill and std::setw and std::setprecision
 #include <iomanip>
-// C++11 Tuple
 #include <tuple>
-// For boost::filesystem
 #include <boost/filesystem.hpp>
 
-// R^n
 #include <ompl/base/spaces/RealVectorStateSpace.h>
-// For geometric::path
 #include <ompl/geometric/PathGeometric.h>
-// For ompl::base::GoalStates:
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/util/Exception.h>
-#include "ompl/base/OptimizationObjective.h"
-#include "ompl/base/goals/GoalState.h"
-#include "ompl/base/goals/GoalStates.h"
-#include "ompl/geometric/planners/bitstar/datastructures/Vertex.h"
+#include <ompl/base/OptimizationObjective.h>
+#include <ompl/base/goals/GoalState.h>
+#include <ompl/base/goals/GoalStates.h>
+#include <ompl/geometric/planners/bitstar/datastructures/Vertex.h>
 
 #ifdef BITSTAR_REGRESSION
 #include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
-#include "ompl/geometric/planners/bitstar_regression/datastructures/Vertex.h"
+#include <ompl/geometric/planners/bitstar_regression/datastructures/Vertex.h>
 #endif  // BITSTAR_REGRESSION
 
 std::string plotVertex(BaseExperimentPtr experiment, const ompl::base::State* vertex,

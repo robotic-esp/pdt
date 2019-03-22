@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2019, University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Oxford nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,37 +32,23 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Jonathan Gammell, Marlin Strub
 
-#pragma once
+#include "esp_obstacles/base_obstacle.h"
 
-#include <experimental/filesystem>
-#include <fstream>
-#include <iostream>
+BaseObstacle::BaseObstacle(ompl::base::SpaceInformation* si)
+    : ompl::base::StateValidityChecker(si) {}
 
-#include <ompl/base/Planner.h>
+BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& si)
+    : ompl::base::StateValidityChecker(si) {}
 
-#include "nlohmann/json.hpp"
-
-#include "esp_planning_contexts/base_context.h"
-
-namespace esp_ompl_tools {
-
-// A class to create planners from config files.
-class PlannerFactory {
-public:
-  PlannerFactory(std::experimental::filesystem::path plannerConfigFile);
-  ~PlannerFactory() = default;
-
-  // Create a planner.
-  std::shared_ptr<ompl::base::Planner> create(const std::string &plannerType,
-                                              const BaseExperimentPtr &experiment) const;
-  
-  // Dump the parameters to an ostream.
-  void dumpParameters(std::ostream& out) const;
-
-private:
-  nlohmann::json parameters_{};
-};
-
-} // End namespace esp_ompl_tools.
+bool BaseObstacle::isValid(const std::vector<const ompl::base::State*>& states) const {
+  // Check all states.
+  for (const auto &state : states) {
+    if (!isValid(state)) {
+      return false;
+    }
+  }
+  // All states are valid.
+  return true;
+}

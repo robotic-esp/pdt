@@ -1,21 +1,13 @@
-// The states
-#include "ompl/base/State.h"
-// The planners:
-#include "ompl/base/Planner.h"
-// The planner termination conditions
-#include "ompl/base/PlannerTerminationCondition.h"
+#pragma once
 
-// The experiments:
-#include "esp_problems/AllExperiments.h"
+#include <ompl/base/State.h>
+#include <ompl/base/Planner.h>
+#include <ompl/base/PlannerTerminationCondition.h>
 
-// The planner tools
-#include <tools/planner_tools.h>
-
-// The data recording
-#include "tools/recording_tools.h"
-
-// Some general time helpers
-#include "tools/general_tools.h"
+#include "esp_planning_contexts/all_contexts.h"
+#include "esp_utilities/planner_tools.h"
+#include "esp_utilities/recording_tools.h"
+#include "esp_utilities/general_tools.h"
 
 // asrl::time::duration == std::chrono::duration
 /** \brief Create the matlab plot command for a vertex */

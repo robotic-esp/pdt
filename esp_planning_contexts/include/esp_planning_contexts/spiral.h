@@ -1,7 +1,8 @@
+
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2019, University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +15,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Oxford nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,37 +33,47 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+/* Authors: Jonathan Gammell */
 
 #pragma once
 
-#include <experimental/filesystem>
-#include <fstream>
-#include <iostream>
-
-#include <ompl/base/Planner.h>
-
-#include "nlohmann/json.hpp"
-
+#include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 
-namespace esp_ompl_tools {
+/** \brief An experiment with a heuristic breaking spiral */
+class SpiralExperiment : public BaseExperiment {
+ public:
+  /** \brief Constructor */
+  SpiralExperiment(const double distFraction, const double runSeconds,
+                   const double checkResolution);
 
-// A class to create planners from config files.
-class PlannerFactory {
-public:
-  PlannerFactory(std::experimental::filesystem::path plannerConfigFile);
-  ~PlannerFactory() = default;
+  /** \brief This problem \e does \e not know its optimum (though it could) */
+  virtual bool knowsOptimum() const;
 
-  // Create a planner.
-  std::shared_ptr<ompl::base::Planner> create(const std::string &plannerType,
-                                              const BaseExperimentPtr &experiment) const;
-  
-  // Dump the parameters to an ostream.
-  void dumpParameters(std::ostream& out) const;
+  /** \brief As the optimum is unknown, throw. */
+  virtual ompl::base::Cost getOptimum() const;
 
-private:
-  nlohmann::json parameters_{};
+  /** \brief Set the optimization target as the specified cost. */
+  virtual void setTarget(double targetSpecifier);
+
+  /** \brief Derived class specific information to include in the title line. */
+  virtual std::string lineInfo() const;
+
+  /** \brief Derived class specific information to include at the end. */
+  virtual std::string paraInfo() const;
+
+ protected:
+  // Variables
+  /** \brief The obstacle world */
+  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
+  /** \brief The lower-left corners of the obstacles*/
+  std::vector<ompl::base::ScopedState<> > obsCorners_{};
+  /** The widths of the obstacles */
+  std::vector<std::vector<double> > obsWidths_{};
+
+  // Constant Parameters
+  /** \brief The basic thickness of the obstacle. */
+  double obsThickness_{0.05};
 };
 
-} // End namespace esp_ompl_tools.
+typedef std::shared_ptr<SpiralExperiment> SpiralExperimentPtr;

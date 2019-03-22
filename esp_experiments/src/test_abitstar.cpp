@@ -77,10 +77,11 @@
 #include <ompl/util/Exception.h>
 
 #include "esp_planning_contexts/all_contexts.h"
+
 #include "esp_utilities/general_tools.h"
 #include "esp_utilities/planner_tools.h"
 #include "esp_utilities/plotting_tools.h"
-#include "esp_utilities/planner_factory.h"
+#include "esp_planner_factory/planner_factory.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
 

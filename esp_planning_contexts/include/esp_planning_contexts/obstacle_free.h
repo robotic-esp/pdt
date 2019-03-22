@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2019, University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Oxford nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,37 +32,42 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+/* Authors: Jonathan Gammell */
 
 #pragma once
 
-#include <experimental/filesystem>
-#include <fstream>
-#include <iostream>
-
-#include <ompl/base/Planner.h>
-
-#include "nlohmann/json.hpp"
+#include <ompl/base/Goal.h>
+#include <ompl/base/ScopedState.h>
 
 #include "esp_planning_contexts/base_context.h"
 
-namespace esp_ompl_tools {
+/** \brief An obstacle-free multigoal/multistart experiment */
+class ObstacleFreeExperiment : public BaseExperiment {
+ public:
+  /** \brief Constructor */
+  ObstacleFreeExperiment(const unsigned int dim, const unsigned int maxNumStarts,
+                         const unsigned int maxNumGoals, const double runSeconds);
 
-// A class to create planners from config files.
-class PlannerFactory {
-public:
-  PlannerFactory(std::experimental::filesystem::path plannerConfigFile);
-  ~PlannerFactory() = default;
+  /** \brief This problem knows the optimum */
+  virtual bool knowsOptimum() const;
 
-  // Create a planner.
-  std::shared_ptr<ompl::base::Planner> create(const std::string &plannerType,
-                                              const BaseExperimentPtr &experiment) const;
-  
-  // Dump the parameters to an ostream.
-  void dumpParameters(std::ostream& out) const;
+  /** \brief Returns the optimum cost, the minimum distance from start to goal. */
+  virtual ompl::base::Cost getOptimum() const;
 
-private:
-  nlohmann::json parameters_{};
+  /** \brief Set the target cost as the specified multiplier of the optimum. */
+  virtual void setTarget(double targetSpecifier);
+
+  /** \brief Derived class specific information to include in the title line. */
+  virtual std::string lineInfo() const;
+
+  /** \brief Derived class specific information to include at the end. */
+  virtual std::string paraInfo() const;
+
+ protected:
+  // Constant Parameters
+  /** \brief The definition of the "centre" and "outside" positions */
+  double centrePos_  { 0.0 };
+  double outsidePos_ { 0.0 };
 };
 
-} // End namespace esp_ompl_tools.
+typedef std::shared_ptr<ObstacleFreeExperiment> ObstacleFreeExperimentPtr;

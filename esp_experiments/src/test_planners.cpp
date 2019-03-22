@@ -34,10 +34,6 @@
 
 /* Authors: Jonathan Gammell */
 
-// For SIGINT handling
-#include <signal.h>
-#include <unistd.h>
-
 // For std::cout
 #include <iostream>
 // For std::ifstream and std::ofstream
@@ -66,21 +62,22 @@
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
-#include <ompl/geometric/planners/rrt/LBTRRT.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include "ompl/base/objectives/PathLengthOptimizationObjective.h"
-#include <ompl/tools/config/MagicConstants.h>  //For BETTER_PATH_COST_MARGIN
-#include <ompl/util/Console.h>                 //For OMPL_INFORM et al.
+//#include <ompl/tools/benchmark/Benchmark.h>
 #include <ompl/util/Exception.h>
+#include "ompl/tools/config/MagicConstants.h"  //For BETTER_PATH_COST_MARGIN
+#include "ompl/util/Console.h"                 //For OMPL_INFORM et al.
 
-#include "esp_planning_contexts/all_contexts.h"
-#include "esp_utilities/general_tools.h"
-#include "esp_utilities/planner_tools.h"
-#include "esp_utilities/plotting_tools.h"
-#include "esp_utilities/planner_factory.h"
+// Our Experiments
+#include "ExperimentDefinitions.h"
+
+// The helper functions for general and plotting:
+#include "tools/general_tools.h"
+#include "tools/plotting_tools.h"
 
 #define ASRL_DBL_INFINITY std::numeric_limits<double>::infinity()
 
@@ -88,9 +85,9 @@
 const double CHECK_RESOLUTION = 0.001;
 
 // Common
+const double PRUNE_FRACTION = 0.01;
 const double REWIRE_SCALE = 1.1;  // The factor scaling the RGG term
 const bool K_NEAREST = false;
-const double PRUNE_FRACTION = 0.1;
 
 // Experiment:
 const bool INITIAL_SOLN_ONLY = false;
@@ -99,63 +96,55 @@ const bool LOG_ITERATIONS_AND_COST = false;
 const unsigned int MICROSEC_SLEEP = 100u;  // Period for logging data, 1000us = 1ms
 
 // BIT*
-const unsigned int BITSTAR_BATCH_SIZE = 500;
+const unsigned int BITSTAR_BATCH_SIZE = 100u;
 const bool BITSTAR_K_NEAREST = K_NEAREST;
 const double BITSTAR_REWIRE_SCALE = REWIRE_SCALE;
-const bool BITSTAR_ENABLE_PRUNING = false;
 const double BITSTAR_PRUNE_FRACTION = PRUNE_FRACTION;
 const bool BITSTAR_STRICT_QUEUE = true;
 const bool BITSTAR_DELAY_REWIRE = false;
 const bool BITSTAR_JIT = false;
 const bool BITSTAR_DROP_BATCH = false;
+const double ABITSTAR_INITIAL_INFLATION_FACTOR = 3.0;
+const double ABITSTAR_INITIAL_TRUNCATION_FACTOR = 3.0;
+const double ABITSTAR_INFLATION_FACTOR_STEP = 0.1;
+const double ABITSTAR_TRUNCATION_FACTOR_STEP = 0.1;
 
-// ABIT*
-const double ABITSTAR_INITIAL_INFLATION_FACTOR = 1000000.0;
-const double ABITSTAR_INFLATION_FACTOR_PARAMETER = 50;
-const double ABITSTAR_TRUNCATION_FACTOR_PARAMETER = 50;
-
-// RRT
+// Others:
+const double GOAL_BIAS = 0.05;  // 8D: 0.05; //2D: 0.05
+const double RRT_STEER_ETA_2D = 0.3;
+const double RRT_STEER_ETA_4D = 0.5;
+const double RRT_STEER_ETA_8D = 1.25;  // 0.9;
+const double RRT_STEER_ETA_16D = 3.0;
 const bool RRT_K_NEAREST = K_NEAREST;
 const double RRT_REWIRE_SCALE = REWIRE_SCALE;
 const double RRT_PRUNE_FRACTION = PRUNE_FRACTION;
-const double RRT_STEER_ETA_2D = 0.3;
-const double RRT_STEER_ETA_4D = 0.5;
-const double RRT_STEER_ETA_6D = 0.9;
-const double RRT_STEER_ETA_8D = 1.25;  // 0.9;
-const double RRT_STEER_ETA_16D = 3.0;
-
-// LBTRRT
-const double LBTRRT_EPSILON = 0.4;
-
-// RRT SHARP
 const bool RRTSHARP_REJECT = false;
+const double FMT_REWIRE_SCALE = REWIRE_SCALE;
+const bool FMT_K_NEAREST = K_NEAREST;
+const bool FMT_CACHE_CC = false;
+const bool FMT_USE_HEURISTICS = false;
 
-// Others
-const double GOAL_BIAS = 0.05;
-
-// Plotting
+// Plotting:
 const bool PLOT_VERTICES = true;
 const bool PLOT_INDICES = false;
 const bool PLOT_WORLD_ELLIPSE = true;
-const bool PLOT_BITSTAR_ELLIPSE = false;
+const bool PLOT_BITSTAR_ELLIPSE = true;
 const bool PLOT_BITSTAR_EDGE = true;
 const bool PLOT_BITSTAR_QUEUE = false;
 
 bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPtr,
               unsigned int* dimensionPtr, unsigned int* numTrialsPtr, double* runTimePtr,
-                bool* animatePtr, std::string* plannerConfigFilePtr) {
+              bool* animatePtr) {
   // Declare the supported options.
   boost::program_options::options_description desc("Allowed options");
-  desc.add_options()("help,h", "Display this help message.")(
+  desc.add_options()("help,h", "produce help message")(
       "state,r", boost::program_options::value<unsigned int>(), "The state dimension.")(
-      "planner-config,p", boost::program_options::value<std::string>(), "The planner config file.")(
       "experiments,e", boost::program_options::value<unsigned int>(),
       "The number of unique experiments to run on the random world.")(
       "number-obstacles,n", boost::program_options::value<unsigned int>(),
       "The number of obstacles used to calculate the max obstacle radius to give the desired "
-      "obstacle coverage,"
-      "[1, 2, ...). Note: radius is selected from 0.5x - 1x max radius, so the actual number of "
-      "obstacles will vary.")(
+      "obstacle coverage, [1, 2, ...). Note: radius is selected from 0.5x - 1x max radius, so the "
+      "actual number of obstacles will vary.")(
       "obstacle-coverage,o", boost::program_options::value<double>(),
       "The mean percentage of volume taken up by obstacles in the random world, [0,1).")(
       "runtime,t", boost::program_options::value<double>(),
@@ -199,8 +188,8 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
 
   if (vm.count("state")) {
     *dimensionPtr = vm["state"].as<unsigned int>();
-    if ((*dimensionPtr != 2) && (*dimensionPtr != 4) && (*dimensionPtr != 6) &&
-        (*dimensionPtr != 8) && (*dimensionPtr != 16)) {
+    if ((*dimensionPtr != 2) && (*dimensionPtr != 4) && (*dimensionPtr != 8) &&
+        (*dimensionPtr != 16)) {
       std::cout
           << "Due to hard-coded RRT* paramenters, state dimension must be 2, 4, 8, or 16 for now "
           << std::endl
@@ -261,35 +250,18 @@ bool argParse(int argc, char** argv, unsigned int* numObsPtr, double* obsRatioPt
     ompl::msg::setLogLevel(ompl::msg::LOG_WARN);
   }
 
-  if (vm.count("planner-config")) {
-    *plannerConfigFilePtr = vm["planner-config"].as<std::string>();
-  } else {
-    *plannerConfigFilePtr = "No config file supplied.";
-  }
-
   return true;
 }
 
 ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExperimentPtr& expDefn,
-                                       const unsigned int numSamples, double steerEta) {
+                                       const double steerEta, const unsigned int numSamples) {
   // Variables
   // The allocated planner
   ompl::base::PlannerPtr plnr;
 
   switch (plnrType) {
-    case PLANNER_BITSTAR: {
-      plnr =
-          allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE,
-                          numSamples, BITSTAR_ENABLE_PRUNING, BITSTAR_PRUNE_FRACTION, BITSTAR_JIT,
-                          BITSTAR_DROP_BATCH, 1.0, 0.0, 0.0);
-      break;
-    }
-    case PLANNER_SBITSTAR: {
-      plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST,
-                             BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_ENABLE_PRUNING,
-                             BITSTAR_PRUNE_FRACTION, BITSTAR_JIT, BITSTAR_DROP_BATCH,
-                             ABITSTAR_INITIAL_INFLATION_FACTOR, ABITSTAR_INFLATION_FACTOR_PARAMETER,
-                             ABITSTAR_TRUNCATION_FACTOR_PARAMETER);
+    case PLANNER_RRT: {
+      plnr = allocateRrt(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS);
       break;
     }
     case PLANNER_RRTCONNECT: {
@@ -301,19 +273,46 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
                              REWIRE_SCALE);
       break;
     }
-    case PLANNER_RRTSTAR_INFORMED: {
-      plnr = allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS,
-                                     RRT_K_NEAREST, RRT_REWIRE_SCALE, RRT_PRUNE_FRACTION);
-      break;
-    }
     case PLANNER_RRTSHARP: {
       // Abuse numSamples as the variant number.
       plnr = allocateRrtSharp(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST,
                               REWIRE_SCALE, RRTSHARP_REJECT, false, numSamples);
       break;
     }
-    case PLANNER_LBTRRT: {
-      plnr = allocateLbtRrt(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, LBTRRT_EPSILON);
+    case PLANNER_RRTSHARP_INFORMED: {
+      // Abuse numSamples as the variant number.
+      plnr = allocateRrtSharp(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST,
+                              REWIRE_SCALE, false, true, numSamples);
+      break;
+    }
+    case PLANNER_RRTSTAR_INFORMED: {
+      plnr = allocateInformedRrtStar(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS,
+                                     RRT_K_NEAREST, RRT_REWIRE_SCALE, RRT_PRUNE_FRACTION);
+      break;
+    }
+    case PLANNER_SORRTSTAR: {
+      plnr = allocateSorrtStar(expDefn->getSpaceInformation(), steerEta, GOAL_BIAS, RRT_K_NEAREST,
+                               RRT_REWIRE_SCALE, RRT_PRUNE_FRACTION, numSamples);
+      break;
+    }
+    case PLANNER_FMTSTAR: {
+      plnr = allocateFmtStar(expDefn->getSpaceInformation(), FMT_K_NEAREST, FMT_REWIRE_SCALE,
+                             numSamples, FMT_CACHE_CC, FMT_USE_HEURISTICS);
+      break;
+    }
+    case PLANNER_BITSTAR: {
+      plnr = allocateBitStar(expDefn->getSpaceInformation(), BITSTAR_K_NEAREST,
+                             BITSTAR_REWIRE_SCALE, numSamples, BITSTAR_PRUNE_FRACTION,
+                             BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT,
+                             BITSTAR_DROP_BATCH, 1.0, 1.0, 0.1, 0.1);
+      break;
+    }
+    case PLANNER_ABITSTAR: {
+      plnr = allocateBitStar(
+          expDefn->getSpaceInformation(), BITSTAR_K_NEAREST, BITSTAR_REWIRE_SCALE, numSamples,
+          BITSTAR_PRUNE_FRACTION, BITSTAR_STRICT_QUEUE, BITSTAR_DELAY_REWIRE, BITSTAR_JIT,
+          BITSTAR_DROP_BATCH, ABITSTAR_INITIAL_INFLATION_FACTOR, ABITSTAR_INITIAL_TRUNCATION_FACTOR,
+          ABITSTAR_INFLATION_FACTOR_STEP, ABITSTAR_TRUNCATION_FACTOR_STEP);
       break;
     }
 #ifdef BITSTAR_REGRESSION
@@ -333,20 +332,7 @@ ompl::base::PlannerPtr allocatePlanner(const PlannerType plnrType, const BaseExp
 
   // Return
   return plnr;
-}
-
-// Defining the experiment counter globally allows to gracefully finish an experiment and close the
-// output file on SIGINT.
-unsigned int experimentCounter = 0u;
-
-// Handle SIGINT by setting the counter to maximum value, terminating the experiment loop.
-void signalHandler(int signum) {
-  std::cout
-      << "\n=== Caught signal " << signum
-      << ". Will clean up as soon as all planners have completed the same number of runs. ===\n"
-      << std::endl;
-  experimentCounter = std::numeric_limits<unsigned int>::max() - 1u;
-}
+};
 
 void callSolve(asrl::time::point* startTime, const ompl::base::PlannerPtr& planner,
                const asrl::time::duration& solveDuration) {
@@ -355,8 +341,6 @@ void callSolve(asrl::time::point* startTime, const ompl::base::PlannerPtr& plann
 }
 
 int main(int argc, char** argv) {
-  signal(SIGINT, signalHandler);
-
   // Argument Variables
   // The dimension size:
   unsigned int N;
@@ -371,64 +355,52 @@ int main(int argc, char** argv) {
   // Whether to make frame-by-frame animations
   bool createAnimationFrames;
 
-  std::string plannerConfigFile{};
-
   // Get the command line arguments
   if (argParse(argc, argv, &numObs, &obsRatio, &N, &numExperiments, &targetTime,
-               &createAnimationFrames, &plannerConfigFile) == false) {
+               &createAnimationFrames) == false) {
     return 1;
   }
 
-  esp_ompl_tools::PlannerFactory plannerFactory(plannerConfigFile);
-  plannerFactory.dumpParameters(std::cout);
-
   // Variables
-  // ompl::RNG::setSeed(18439067297677225292u);    std::cout << std::endl << " ---------> Seed set!
-  // <---------                   " << std::endl << std::endl;
+  //    ompl::RNG::setSeed(18439039004593060841);    std::cout << std::endl << " ---------> Seed
+  //    set! <---------                   " << std::endl << std::endl;
 
   // Master seed:
   std::uint_fast32_t masterSeed = ompl::RNG::getSeed();
   // Convenience typedefs:
   typedef std::pair<asrl::time::duration, ompl::base::Cost> planner_result_t;
   //    typedef std::vector<planner_result_t> experiment_result_t;
+  // The steer eta used
+  double steerEta;
   // The filename for progress
   std::stringstream fileName;
   // The world name
   std::stringstream worldName;
   // The experiment
-  // BaseExperimentPtr expDefn = std::make_shared<CentreSquareExperiment>(N, 0.25, 2.8, targetTime,
+  // BaseExperimentPtr expDefn = std::make_shared<CentreSquareExperiment>(N, 0.25, targetTime,
   // CHECK_RESOLUTION); BaseExperimentPtr expDefn = std::make_shared<DeadEndExperiment>(0.4,
   // targetTime, CHECK_RESOLUTION); BaseExperimentPtr expDefn =
-  // std::make_shared<SpiralExperiment>(0.4, targetTime, CHECK_RESOLUTION); BaseExperimentPtr
-  // expDefn = std::make_shared<WallGapExperiment>(N, false, 0.03, 0.3, 0.3, targetTime,
+  // std::make_shared<SpiralExperiment>(0.4, targetTime, CHECK_RESOLUTION);
+  //    BaseExperimentPtr expDefn = std::make_shared<WallGapExperiment>(N, false, 0.05, targetTime,
+  //    CHECK_RESOLUTION);
+  // BaseExperimentPtr expDefn = std::make_shared<FlankingGapExperiment>(false, 0.05, targetTime,
   // CHECK_RESOLUTION);
-  BaseExperimentPtr expDefn =
-      std::make_shared<FlankingGapExperiment>(false, 0.01, targetTime, CHECK_RESOLUTION);
-  // BaseExperimentPtr expDefn = std::make_shared<RandomRectanglesExperiment>(N, numObs, obsRatio,
-  // targetTime, CHECK_RESOLUTION); BaseExperimentPtr expDefn =
-  // std::make_shared<RegularRectanglesExperiment>(N, 1.0, 3, targetTime, CHECK_RESOLUTION);
-  // BaseExperimentPtr expDefn = std::make_shared<DoubleEnclosureExperiment>(N, 1.0, 0.3, 0.05, 0.1,
-  // targetTime, CHECK_RESOLUTION); //worldHalfWidth, insideWidth, wallThickness, gapWidth. Symmetry
-  // when: worldHalfWidth = (3*insideWidth + 1)/2 BaseExperimentPtr expDefn =
-  // std::make_shared<GoalEnclosureExperiment>(N, 1.0, 0.3, 0.1, 0.1, targetTime, CHECK_RESOLUTION);
-  // // worldHalfWidth, insideWidth, wallThickness, gapWidth. BaseExperimentPtr expDefn =
-  // std::make_shared<StartEnclosureExperiment>(N, 9.0, 3.0, 0.5, 3.0, targetTime,
-  // CHECK_RESOLUTION); // worldHalfWidth, insideWidth, wallThickness, gapWidth. BaseExperimentPtr
-  // expDefn = std::make_shared<DoubleFloorplanExperiment>(N, 3, 1.5, 0.2, 0.6, targetTime,
-  // CHECK_RESOLUTION); BaseExperimentPtr expDefn = std::make_shared<FloorplanExperiment>(N,
-  // 10, 3.0, 0.4, 1.5, targetTime, CHECK_RESOLUTION);
+  //    BaseExperimentPtr expDefn = std::make_shared<RandomRectanglesExperiment>(N, numObs,
+  //    obsRatio, targetTime, CHECK_RESOLUTION); BaseExperimentPtr expDefn =
+  //    std::make_shared<RegularRectanglesExperiment>(N, 4.0, 5, targetTime, CHECK_RESOLUTION);
+  BaseExperimentPtr expDefn = std::make_shared<DoubleEnclosureExperiment>(
+      N, 1.4, 0.6, 0.1, 0.8, targetTime,
+      CHECK_RESOLUTION);  // worldHalfWidth, insideWidth, wallThickness, gapWidth. Symmetry when:
+                          // worldHalfWidth = (3*insideWidth + 1)/2
 
   if (INITIAL_SOLN_ONLY == true) {
     expDefn->setTarget(std::numeric_limits<double>::infinity());
   }
 
-  double steerEta{0.0};
   if (N == 2u) {
     steerEta = RRT_STEER_ETA_2D;
   } else if (N == 4) {
     steerEta = RRT_STEER_ETA_4D;
-  } else if (N == 6u) {
-    steerEta = RRT_STEER_ETA_6D;
   } else if (N == 8u) {
     steerEta = RRT_STEER_ETA_8D;
   } else if (N == 16u) {
@@ -437,6 +409,9 @@ int main(int argc, char** argv) {
     throw ompl::Exception("No recorded steer eta for this dimension.");
   }
 
+  // Let people know what's going on:
+  std::cout << expDefn->getName() << " in R^" << N << " with an RRT edge length of " << steerEta
+            << "." << std::endl;
   std::cout << "Seed: " << masterSeed << std::endl;
   expDefn->print();
 
@@ -445,27 +420,47 @@ int main(int argc, char** argv) {
   ResultsFile<TimeCostHistory> plannerProgress(fileName.str());
   ResultsFile<TimeIterationCostHistory> plannerProgressIters(fileName.str());
 
-  for (; experimentCounter < numExperiments; ++experimentCounter) {
+  for (unsigned int q = 0u; q < numExperiments; ++q) {
     // Variables:
     // The vector of planners:
     std::vector<std::pair<PlannerType, unsigned int> > plannersToTest;
 
     // Add the planners to test. Be careful, too large of FMT batch size (i.e., ~100000u) fucks up
     // wall time of other planners
-    plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
-    // plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR_REGRESSION, BITSTAR_BATCH_SIZE));
-    // plannersToTest.push_back(std::make_pair(PLANNER_SBITSTAR, BITSTAR_BATCH_SIZE));
     // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
-    // plannersToTest.push_back(std::make_pair(PLANNER_LBTRRT, 0u));
-    // plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
-    // plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 0u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRT, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP_INFORMED, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP_INFORMED, 1u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 2u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP_INFORMED, 2u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP, 3u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTSHARP_INFORMED, 3u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTSTAR_INFORMED, 0u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 1000u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 10000u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_FMTSTAR, 100000u));
+    // plannersToTest.push_back(std::make_pair(PLANNER_SORRTSTAR, BITSTAR_BATCH_SIZE));
+    // plannersToTest.push_back(std::make_pair(PLANNER_REGRESSION_BITSTAR, BITSTAR_BATCH_SIZE));
+    // plannersToTest.push_back(std::make_pair(PLANNER_REGRESSION_BITSTAR, BITSTAR_BATCH_SIZE));
+    // plannersToTest.push_back(std::make_pair(PLANNER_RRTCONNECT, 0u));
+    plannersToTest.push_back(std::make_pair(PLANNER_BITSTAR, BITSTAR_BATCH_SIZE));
+    // plannersToTest.push_back(std::make_pair(PLANNER_ABITSTAR, BITSTAR_BATCH_SIZE));
 
-    if (experimentCounter == 0u) {
+    if (q == 0u) {
       std::cout << "   ";
       for (unsigned int i = 0u; i < plannersToTest.size(); ++i) {
         std::cout << std::setw(26) << std::setfill(' ')
-                  << allocatePlanner(plannersToTest.at(i).first, expDefn,
-                                     plannersToTest.at(i).second, steerEta)
+                  << allocatePlanner(plannersToTest.at(i).first, expDefn, steerEta,
+                                     plannersToTest.at(i).second)
                          ->getName();
         if (i != plannersToTest.size() - 1u) {
           std::cout << "    ";
@@ -473,7 +468,7 @@ int main(int argc, char** argv) {
       }
       std::cout << std::endl;
     }
-    std::cout << std::setw(2) << experimentCounter << ": " << std::flush;
+    std::cout << std::setw(2) << q << ": " << std::flush;
 
     // Iterate over the planners, using the seed and solution from the first planner:
     for (unsigned int i = 0u; i < plannersToTest.size(); ++i) {
@@ -488,9 +483,8 @@ int main(int argc, char** argv) {
       ompl::base::ProblemDefinitionPtr pdef;
 
       // Allocate a planner
-      plnr = allocatePlanner(plannersToTest.at(i).first, expDefn, plannersToTest.at(i).second,
-                             steerEta);
-      // plnr = plannerFactory.create("BITstar", expDefn);
+      plnr = allocatePlanner(plannersToTest.at(i).first, expDefn, steerEta,
+                             plannersToTest.at(i).second);
 
       // Get the problem definition
       pdef = plnr->getProblemDefinition();
@@ -500,21 +494,17 @@ int main(int argc, char** argv) {
       plnr->setup();
       initTime = asrl::time::now() - startTime;
 
-      // // Set the seed.
-      // if (plannersToTest.at(i).first == PLANNER_BITSTAR || plannersToTest.at(i).first ==
-      // PLANNER_SBITSTAR)
-      // {
-      //     plnr->as<ompl::geometric::BITstar>()->setLocalSeed(masterSeed);
-      // }
-      // if (plannersToTest.at(i).first == PLANNER_BITSTAR_REGRESSION)
-      // {
-      //     plnr->as<ompl::geometric::BITstarRegression>()->setLocalSeed(masterSeed);
-      // }
+      //            if (i == 0u)
+      //            {
+      //                std::cout << std::setw(4) <<
+      //                plnr->as<ompl::geometric::RRTConnect>()->getRange() << ": " << std::flush;
+      //            }
 
       // Run the planner
       if (createAnimationFrames == true) {
         if (plannersToTest.at(i).first == PLANNER_RRT) {
           startTime = asrl::time::now();
+          // plnr->solve( expDefn->getTargetTime() - initTime );
           plnr->solve(asrl::time::seconds(expDefn->getTargetTime() - initTime));
           runTime = initTime + (asrl::time::now() - startTime);
           // runTime = initTime + createAnimation(expDefn plannersToTest.at(i), masterSeed,
@@ -523,7 +513,7 @@ int main(int argc, char** argv) {
           runTime =
               initTime + createAnimation(expDefn, plannersToTest.at(i).first, plnr, masterSeed,
                                          expDefn->getTargetTime() - initTime, PLOT_VERTICES,
-                                         PLOT_INDICES, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE,
+                                         PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE,
                                          PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
         }
       } else if (LOG_PROGRESS == true) {
@@ -549,9 +539,6 @@ int main(int argc, char** argv) {
               plannersToTest.at(i).first == PLANNER_RRTCONNECT) {
             // Do nothing, these do not have intermediate data
           } else if (plannersToTest.at(i).first == PLANNER_FMTSTAR) {
-            throw ompl::Exception(
-                "Whoops, FMT* planners arent supported for logging data. Feel free to implement "
-                "(haha who am I kidding.)");
             if (LOG_ITERATIONS_AND_COST == true) {
               // If FMT* is modified, 1 of 2:
               // progressTuple.push_back( std::make_tuple(initTime + (asrl::time::now() -
@@ -582,18 +569,6 @@ int main(int argc, char** argv) {
               progressPair.push_back(
                   std::make_pair(initTime + (asrl::time::now() - startTime),
                                  plnr->as<ompl::geometric::RRTsharp>()->bestCost().value()));
-            }
-          } else if (isLbtRrt(plannersToTest.at(i).first)) {
-            // Store the runtime and the current cost
-            if (LOG_ITERATIONS_AND_COST == true) {
-              progressTuple.push_back(std::make_tuple(
-                  initTime + (asrl::time::now() - startTime),
-                  std::stoi(plnr->as<ompl::geometric::LBTRRT>()->getIterationCount()),
-                  std::stod(plnr->as<ompl::geometric::LBTRRT>()->getBestCost())));
-            } else {
-              progressPair.push_back(
-                  std::make_pair(initTime + (asrl::time::now() - startTime),
-                                 std::stod(plnr->as<ompl::geometric::LBTRRT>()->getBestCost())));
             }
           } else if (isBitStar(plannersToTest.at(i).first)) {
             if (LOG_ITERATIONS_AND_COST == true) {
@@ -651,10 +626,6 @@ int main(int argc, char** argv) {
           } else if (isBitStar(plannersToTest.at(i).first)) {
             progressTuple.push_back(std::make_tuple(
                 runTime, plnr->as<ompl::geometric::BITstar>()->numIterations(), finalCost));
-          } else if (isLbtRrt(plannersToTest.at(i).first)) {
-            progressTuple.push_back(std::make_tuple(
-                runTime, std::stoi(plnr->as<ompl::geometric::LBTRRT>()->getIterationCount()),
-                std::stod(plnr->as<ompl::geometric::LBTRRT>()->getBestCost())));
           } else {
             throw ompl::Exception("Planner not recognized for progress logging.");
           }
@@ -676,6 +647,7 @@ int main(int argc, char** argv) {
         }
       } else {
         startTime = asrl::time::now();
+        // plnr->solve( expDefn->getTargetTime() - initTime );
         plnr->solve(asrl::time::seconds(expDefn->getTargetTime() - initTime));
         runTime = initTime + (asrl::time::now() - startTime);
       }
@@ -690,9 +662,9 @@ int main(int argc, char** argv) {
       }
 
       // Save the map?
-      writeMatlabMap(expDefn, plannersToTest.at(i).first, plnr, masterSeed,
-                     asrl::time::seconds(runTime), PLOT_VERTICES, PLOT_INDICES, PLOT_WORLD_ELLIPSE,
-                     PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE, PLOT_BITSTAR_QUEUE);
+      writeMatlabMap(expDefn, plannersToTest.at(i).first, plnr, masterSeed, PLOT_VERTICES,
+                     PLOT_INDICES, PLOT_WORLD_ELLIPSE, PLOT_BITSTAR_ELLIPSE, PLOT_BITSTAR_EDGE,
+                     PLOT_BITSTAR_QUEUE);
 
       std::cout << myResult.first << ", " << std::setw(8) << myResult.second;
       if (i != plannersToTest.size() - 1u) {

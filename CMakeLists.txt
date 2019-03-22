@@ -46,18 +46,14 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 find_package( ompl REQUIRED )
 include_directories(${OMPL_INCLUDE_DIRS})
 
-# TODO: This has to change. Split the libs according to functionality.
-include_directories( include )
-add_subdirectory( src )
-
 # Add the thirdparty projects.
 set(JSON_BuildTests OFF CACHE INTERNAL "") # No need to build the tests.
-set(JSON_Install OFF CACHE INTERNAL "")    # No need to install it.
+set(JSON_Install OFF CACHE INTERNAL "")    # No need to install the json lib.
 add_subdirectory(thirdparty/json)
 
-# Add the individual tools.
-add_subdirectory(esp_obstacles)
+# Add the subdirectories.
 add_subdirectory(esp_planner_factory)
-add_subdirectory(esp_problems)
+add_subdirectory(esp_planning_contexts)
+add_subdirectory(esp_experiments)
+add_subdirectory(esp_obstacles)
 add_subdirectory(esp_utilities)
-

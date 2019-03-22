@@ -17,13 +17,12 @@ include_directories(
 add_library(esp_utilities
   src/planner_tools.cpp
   src/plotting_tools.cpp
-  src/recording_tools.cpp
-  )
+  src/recording_tools.cpp)
 
-# Link the library.
+# Link the library with libraries exposed in API.
 target_link_libraries(esp_utilities PUBLIC
   ${OMPL_LIBRARIES}
-  esp_problems)
+  esp_planning_contexts)
 
 # Specify the include directories exported by this library.
 target_include_directories(esp_utilities PUBLIC

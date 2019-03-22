@@ -10,7 +10,6 @@ find_package(ompl REQUIRED)
 
 # Include necessary header directories.
 include_directories(
-  ../include
   ${OMPL_INCLUDE_DIRS}
   ${NLOHMANN_JSON_INCLUDE_BUILD_DIR}
   ${PROJECT_SOURCE_DIR}/include)
@@ -26,7 +25,8 @@ target_link_libraries(esp_planner_factory PRIVATE
 # Link the library with libraries exposed in API.
 target_link_libraries(esp_planner_factory PUBLIC
   stdc++fs
-  experiments)
+  ${OMPL_LIBRARIES}
+  esp_planning_contexts)
 
 # Specify the include directories exported by this library.
 target_include_directories(esp_planner_factory PUBLIC

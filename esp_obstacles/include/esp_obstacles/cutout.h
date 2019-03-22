@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2019, University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Oxford nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,37 +32,45 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+/* Authors: Jonathan Gammell */
 
-#pragma once
+#ifndef OBSTACLES_CUTOUT_OBSTACLES
+#define OBSTACLES_CUTOUT_OBSTACLES
 
-#include <experimental/filesystem>
-#include <fstream>
-#include <iostream>
+#include <memory>
+#include <vector>
 
-#include <ompl/base/Planner.h>
+#include "esp_obstacles/base_obstacle.h"
 
-#include "nlohmann/json.hpp"
+/** \brief A world consisting of obstacles defined by obstacles and "anti-obstacles". A state is in
+ * collision if it is in an obstacle and not in an anti-obstacle. */
+class CutoutObstacles : public BaseObstacle {
+ public:
+  CutoutObstacles(ompl::base::SpaceInformation* si);
+  CutoutObstacles(const ompl::base::SpaceInformationPtr& si);
+  ~CutoutObstacles() = default;
 
-#include "esp_planning_contexts/base_context.h"
+  /** \brief Clear the obstacle space */
+  void clear() override;
 
-namespace esp_ompl_tools {
+  /** \brief Check for state validity */
+  bool isValid(const ompl::base::State* state) const override;
 
-// A class to create planners from config files.
-class PlannerFactory {
-public:
-  PlannerFactory(std::experimental::filesystem::path plannerConfigFile);
-  ~PlannerFactory() = default;
+  /** \brief Add an obstacle to the obstacle space */
+  void addObstacle(const std::shared_ptr<BaseObstacle>& newObstaclePtr);
 
-  // Create a planner.
-  std::shared_ptr<ompl::base::Planner> create(const std::string &plannerType,
-                                              const BaseExperimentPtr &experiment) const;
-  
-  // Dump the parameters to an ostream.
-  void dumpParameters(std::ostream& out) const;
+  /** \brief Add an anti-obstacle to the obstacle space */
+  void addAntiObstacle(const std::shared_ptr<BaseObstacle>& newAntiObstaclePtr);
 
-private:
-  nlohmann::json parameters_{};
+  /** \brief The obstacle map as a series of Matlab plot functions */
+  std::string mfile(const std::string& obsColour, const std::string& spaceColour) const override;
+
+ private:
+  /** \brief A vector of obstacles */
+  std::vector<std::shared_ptr<BaseObstacle>> obstaclePtrs_ { };
+
+  /** \brief A vector of anti-obstacles */
+  std::vector<std::shared_ptr<BaseObstacle>> antiObstaclePtrs_ { };
 };
 
-} // End namespace esp_ompl_tools.
+#endif  // OBSTACLES_CUTOUT_OBSTACLES
