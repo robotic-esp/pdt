@@ -67,10 +67,10 @@ class CutoutHyperrectangles : public BaseObstacle {
 
  private:
   /** \brief A vector of obstacles */
-  std::vector<std::shared_ptr<BaseObstacle>> obstaclePtrs_ { };
+  std::vector<std::shared_ptr<BaseObstacle>> obstaclePtrs_{};
 
   /** \brief A vector of anti-obstacles */
-  std::vector<std::shared_ptr<BaseObstacle>> antiObstaclePtrs_ { };
+  std::vector<std::shared_ptr<BaseObstacle>> antiObstaclePtrs_{};
 };
 
 #endif  // OBSTACLES_CUTOUT_OBSTACLES

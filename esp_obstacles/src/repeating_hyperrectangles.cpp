@@ -43,44 +43,44 @@
 
 RepeatingHyperrectangles::RepeatingHyperrectangles(
     ompl::base::SpaceInformation* si, double obsWidth, double blankWidth,
-    const std::vector<double>& origin /*= std::vector<double>()*/)
-    : BaseObstacle(si),
-      dim_(StateValidityChecker::si_->getStateDimension()),
-      obsWidths_(std::vector<double>(dim_, obsWidth)),
-      blankWidths_(std::vector<double>(dim_, blankWidth)),
-      origin_(origin) {
+    const std::vector<double>& origin /*= std::vector<double>()*/) :
+    BaseObstacle(si),
+    dim_(StateValidityChecker::si_->getStateDimension()),
+    obsWidths_(std::vector<double>(dim_, obsWidth)),
+    blankWidths_(std::vector<double>(dim_, blankWidth)),
+    origin_(origin) {
   this->construct();
 }
 RepeatingHyperrectangles::RepeatingHyperrectangles(
     ompl::base::SpaceInformation* si, const std::vector<double>& obsWidths,
     const std::vector<double>& blankWidths,
-    const std::vector<double>& origin /*= std::vector<double>()*/)
-    : BaseObstacle(si),
-      dim_(StateValidityChecker::si_->getStateDimension()),
-      obsWidths_(obsWidths),
-      blankWidths_(blankWidths),
-      origin_(origin) {
+    const std::vector<double>& origin /*= std::vector<double>()*/) :
+    BaseObstacle(si),
+    dim_(StateValidityChecker::si_->getStateDimension()),
+    obsWidths_(obsWidths),
+    blankWidths_(blankWidths),
+    origin_(origin) {
   this->construct();
 }
 RepeatingHyperrectangles::RepeatingHyperrectangles(
     const ompl::base::SpaceInformationPtr& si, double obsWidth, double blankWidth,
-    const std::vector<double>& origin /*= std::vector<double>()*/)
-    : BaseObstacle(si),
-      dim_(StateValidityChecker::si_->getStateDimension()),
-      obsWidths_(std::vector<double>(dim_, obsWidth)),
-      blankWidths_(std::vector<double>(dim_, blankWidth)),
-      origin_(origin) {
+    const std::vector<double>& origin /*= std::vector<double>()*/) :
+    BaseObstacle(si),
+    dim_(StateValidityChecker::si_->getStateDimension()),
+    obsWidths_(std::vector<double>(dim_, obsWidth)),
+    blankWidths_(std::vector<double>(dim_, blankWidth)),
+    origin_(origin) {
   this->construct();
 }
 RepeatingHyperrectangles::RepeatingHyperrectangles(
     const ompl::base::SpaceInformationPtr& si, const std::vector<double>& obsWidths,
     const std::vector<double>& blankWidths,
-    const std::vector<double>& origin /*= std::vector<double>()*/)
-    : BaseObstacle(si),
-      dim_(StateValidityChecker::si_->getStateDimension()),
-      obsWidths_(obsWidths),
-      blankWidths_(blankWidths),
-      origin_(origin) {
+    const std::vector<double>& origin /*= std::vector<double>()*/) :
+    BaseObstacle(si),
+    dim_(StateValidityChecker::si_->getStateDimension()),
+    obsWidths_(obsWidths),
+    blankWidths_(blankWidths),
+    origin_(origin) {
   this->construct();
 }
 
@@ -96,9 +96,11 @@ void RepeatingHyperrectangles::construct() {
   }
 }
 
-RepeatingHyperrectangles::~RepeatingHyperrectangles() {}
+RepeatingHyperrectangles::~RepeatingHyperrectangles() {
+}
 
-void RepeatingHyperrectangles::clear() {}
+void RepeatingHyperrectangles::clear() {
+}
 
 bool RepeatingHyperrectangles::isValid(const ompl::base::State* state) const {
   // Variable
@@ -149,7 +151,7 @@ bool RepeatingHyperrectangles::isValid(const ompl::base::State* state) const {
 }
 
 std::string RepeatingHyperrectangles::mfile(const std::string& obsColour,
-                                                    const std::string& /*spaceColour*/) const {
+                                            const std::string& /*spaceColour*/) const {
   // Variables
   // The string stream:
   std::stringstream rval;

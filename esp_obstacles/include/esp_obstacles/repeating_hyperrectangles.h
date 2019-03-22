@@ -48,23 +48,21 @@
 class RepeatingHyperrectangles : public BaseObstacle {
  public:
   /** \brief Constructor. */
-  RepeatingHyperrectangles(ompl::base::SpaceInformation* si, double obsWidth,
-                                   double blankWidth,
-                                   const std::vector<double>& origin = std::vector<double>());
+  RepeatingHyperrectangles(ompl::base::SpaceInformation* si, double obsWidth, double blankWidth,
+                           const std::vector<double>& origin = std::vector<double>());
   /** \brief Constructor. */
-  RepeatingHyperrectangles(ompl::base::SpaceInformation* si,
-                                   const std::vector<double>& obsWidths,
-                                   const std::vector<double>& blankWidths,
-                                   const std::vector<double>& origin = std::vector<double>());
+  RepeatingHyperrectangles(ompl::base::SpaceInformation* si, const std::vector<double>& obsWidths,
+                           const std::vector<double>& blankWidths,
+                           const std::vector<double>& origin = std::vector<double>());
   /** \brief Constructor. */
   RepeatingHyperrectangles(const ompl::base::SpaceInformationPtr& si, double obsWidth,
-                                   double blankWidth,
-                                   const std::vector<double>& origin = std::vector<double>());
+                           double blankWidth,
+                           const std::vector<double>& origin = std::vector<double>());
   /** \brief Constructor. */
   RepeatingHyperrectangles(const ompl::base::SpaceInformationPtr& si,
-                                   const std::vector<double>& obsWidths,
-                                   const std::vector<double>& blankWidths,
-                                   const std::vector<double>& origin = std::vector<double>());
+                           const std::vector<double>& obsWidths,
+                           const std::vector<double>& blankWidths,
+                           const std::vector<double>& origin = std::vector<double>());
   /** \brief Destructor */
   ~RepeatingHyperrectangles();
 
@@ -85,13 +83,13 @@ class RepeatingHyperrectangles : public BaseObstacle {
 
   // Variables
   /** \brief The dimension of the planning problem*/
-  unsigned int dim_ { 0u };
+  unsigned int dim_{0u};
   /** \brief The widths of the obstacle "columns"*/
-  std::vector<double> obsWidths_ { };
+  std::vector<double> obsWidths_{};
   /** \brief The widths of the blank "columns" */
-  std::vector<double> blankWidths_ { };
+  std::vector<double> blankWidths_{};
   /** \brief The origin of the regularized grid */
-  std::vector<double> origin_ { };
+  std::vector<double> origin_{};
   /** \brief The period of "columns" (i.e., the width of obstacle plus the width of the blank) */
-  std::vector<double> periods_ { };
+  std::vector<double> periods_{};
 };

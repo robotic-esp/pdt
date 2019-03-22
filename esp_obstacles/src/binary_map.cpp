@@ -40,13 +40,13 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include <ompl/util/Exception.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
+#include <ompl/util/Exception.h>
 
 BinaryMap::BinaryMap(ompl::base::SpaceInformation* si, const double obsThreshold,
-                         const std::string& fullCsvFileName, const bool plotCsv,
-                         const bool flipCsvRows /*= false*/,
-                         const std::string& fullPngFileName /*= ""*/) :
+                     const std::string& fullCsvFileName, const bool plotCsv,
+                     const bool flipCsvRows /*= false*/,
+                     const std::string& fullPngFileName /*= ""*/) :
     BaseObstacle(si),
     threshold_(obsThreshold),
     csvFile_(fullCsvFileName),
@@ -55,9 +55,9 @@ BinaryMap::BinaryMap(ompl::base::SpaceInformation* si, const double obsThreshold
   this->construct(flipCsvRows);
 }
 BinaryMap::BinaryMap(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
-                         const std::string& fullCsvFileName, const bool plotCsv,
-                         const bool flipCsvRows /*= false*/,
-                         const std::string& fullPngFileName /*= ""*/) :
+                     const std::string& fullCsvFileName, const bool plotCsv,
+                     const bool flipCsvRows /*= false*/,
+                     const std::string& fullPngFileName /*= ""*/) :
     BaseObstacle(si),
     threshold_(obsThreshold),
     csvFile_(fullCsvFileName),
@@ -98,7 +98,7 @@ void BinaryMap::construct(const bool flipRows) {
 
 // Adapted from http://stackoverflow.com/a/1120224
 void BinaryMap::parseCsv(unsigned int* numRows, unsigned int* numCols,
-                           std::vector<std::vector<double> >* data) {
+                         std::vector<std::vector<double> >* data) {
   // Variables
   // The input csv file
   std::ifstream csvStream;
@@ -182,7 +182,7 @@ bool BinaryMap::isValid(const ompl::base::State* state) const {
 
 // Discard arguments
 std::string BinaryMap::mfile(const std::string& /*obsColour*/,
-                               const std::string& /*spaceColour*/) const {
+                             const std::string& /*spaceColour*/) const {
   // Variables
   // The string stream:
   std::stringstream rval;

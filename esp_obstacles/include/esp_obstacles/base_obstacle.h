@@ -39,8 +39,8 @@
 #include <string>
 #include <vector>
 
-#include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/SpaceInformation.h>
+#include <ompl/base/StateValidityChecker.h>
 
 // The base class for obstacles.
 class BaseObstacle : public ompl::base::StateValidityChecker {
@@ -50,7 +50,7 @@ class BaseObstacle : public ompl::base::StateValidityChecker {
   virtual ~BaseObstacle() = default;
 
   // Some obstacles might have to clean up allocated memory.
-  virtual void clear() {};
+  virtual void clear(){};
 
   // Checks the valididy of a state.
   virtual bool isValid(const ompl::base::State* state) const = 0;

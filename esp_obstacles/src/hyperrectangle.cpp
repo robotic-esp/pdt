@@ -42,15 +42,17 @@
 #include <ompl/datastructures/NearestNeighborsGNAT.h>
 #include <ompl/util/Exception.h>
 
-Hyperrectangle::Hyperrectangle(ompl::base::SpaceInformation* si,
-                                                 bool separateObstacles)
-    : BaseObstacle(si), separateObstacles_(separateObstacles) {
+Hyperrectangle::Hyperrectangle(ompl::base::SpaceInformation* si, bool separateObstacles) :
+    BaseObstacle(si),
+    separateObstacles_(separateObstacles) {
   this->construct();
 }
 
-Hyperrectangle::Hyperrectangle(const ompl::base::SpaceInformationPtr& si,
-                                                 bool separateObstacles)
-    : BaseObstacle(si), maxWidth_(0.0), obsMeasure_(0.0), separateObstacles_(separateObstacles) {
+Hyperrectangle::Hyperrectangle(const ompl::base::SpaceInformationPtr& si, bool separateObstacles) :
+    BaseObstacle(si),
+    maxWidth_(0.0),
+    obsMeasure_(0.0),
+    separateObstacles_(separateObstacles) {
   this->construct();
 }
 void Hyperrectangle::construct() {
@@ -62,7 +64,9 @@ void Hyperrectangle::construct() {
   // Allocate a sampler
   stateSampler_ = StateValidityChecker::si_->allocStateSampler();
 }
-Hyperrectangle::~Hyperrectangle() { this->clear(); }
+Hyperrectangle::~Hyperrectangle() {
+  this->clear();
+}
 
 void Hyperrectangle::clear() {
   // Free the memory:
@@ -79,7 +83,9 @@ void Hyperrectangle::clear() {
   obsMeasure_ = 0.0;
 }
 
-unsigned int Hyperrectangle::size() const { return nnObstacles_->size(); }
+unsigned int Hyperrectangle::size() const {
+  return nnObstacles_->size();
+}
 
 bool Hyperrectangle::isValid(const ompl::base::State* state) const {
   // Variable
@@ -149,15 +155,13 @@ void Hyperrectangle::addObstacle(const obstacle_corner_widths_t& newObstacle) {
   }
 }
 
-void Hyperrectangle::addObstacles(
-    const std::vector<obstacle_corner_widths_t>& newObstacles) {
+void Hyperrectangle::addObstacles(const std::vector<obstacle_corner_widths_t>& newObstacles) {
   for (unsigned int i = 0u; i < newObstacles.size(); ++i) {
     this->addObstacle(newObstacles.at(i));
   }
 }
 
-std::vector<Hyperrectangle::obstacle_corner_widths_t>
-Hyperrectangle::getObstacles() const {
+std::vector<Hyperrectangle::obstacle_corner_widths_t> Hyperrectangle::getObstacles() const {
   // Create a return value
   std::vector<obstacle_corner_widths_t> obsVector;
 
@@ -172,9 +176,8 @@ void Hyperrectangle::randomize(double minObsSize, double maxObsSize, double obsR
   this->randomize(minObsSize, maxObsSize, obsRatio, std::vector<const ompl::base::State*>());
 }
 
-void Hyperrectangle::randomize(
-    double minObsSize, double maxObsSize, double obsRatio,
-    const std::vector<ompl::base::ScopedState<> >& existingStates) {
+void Hyperrectangle::randomize(double minObsSize, double maxObsSize, double obsRatio,
+                               const std::vector<ompl::base::ScopedState<> >& existingStates) {
   // Make a vector
   std::vector<const ompl::base::State*> tVec(existingStates.size(), NULL);
 
@@ -187,9 +190,8 @@ void Hyperrectangle::randomize(
   this->randomize(minObsSize, maxObsSize, obsRatio, tVec);
 }
 
-void Hyperrectangle::randomize(
-    double minObsSize, double maxObsSize, double obsRatio,
-    const std::vector<const ompl::base::State*>& existingStates) {
+void Hyperrectangle::randomize(double minObsSize, double maxObsSize, double obsRatio,
+                               const std::vector<const ompl::base::State*>& existingStates) {
   while (obsMeasure_ / StateValidityChecker::si_->getSpaceMeasure() < obsRatio) {
     // Variables:
     // The newly created state
@@ -240,7 +242,7 @@ void Hyperrectangle::randomize(
 }
 
 std::string Hyperrectangle::mfile(const std::string& obsColour,
-                                           const std::string& /*spaceColour*/) const {
+                                  const std::string& /*spaceColour*/) const {
   // Variables
   // The string stream:
   std::stringstream rval;
@@ -278,8 +280,8 @@ std::string Hyperrectangle::mfile(const std::string& obsColour,
   return rval.str();
 }
 
-bool Hyperrectangle::verifyStateObstaclePair(
-    const ompl::base::State* state, const obstacle_corner_widths_t& obstacle) const {
+bool Hyperrectangle::verifyStateObstaclePair(const ompl::base::State* state,
+                                             const obstacle_corner_widths_t& obstacle) const {
   // Variables:
   // Whether the state is valid
   bool validState;
@@ -381,7 +383,7 @@ double Hyperrectangle::rectangleVolume(const std::vector<double>& widths) {
 }
 
 double Hyperrectangle::distanceFunction(const obstacle_corner_widths_t& a,
-                                                 const obstacle_corner_widths_t& b) const {
+                                        const obstacle_corner_widths_t& b) const {
   return StateValidityChecker::si_->distance(a.first, b.first);
 
   // I think this *should* be std::max, but that clearly misses obstacles for reasons I don't

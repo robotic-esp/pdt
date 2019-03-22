@@ -54,11 +54,11 @@
 class BinaryMap : public BaseObstacle {
  public:
   BinaryMap(ompl::base::SpaceInformation* si, const double obsThreshold,
-              const std::string& fullCsvFileName, const bool plotCsv,
-              const bool flipCsvRows = false, const std::string& fullPngFileName = "");
+            const std::string& fullCsvFileName, const bool plotCsv, const bool flipCsvRows = false,
+            const std::string& fullPngFileName = "");
   BinaryMap(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
-              const std::string& fullFileName, const bool plotCsv, const bool flipCsvRows = false,
-              const std::string& fullPngFileName = "");
+            const std::string& fullFileName, const bool plotCsv, const bool flipCsvRows = false,
+            const std::string& fullPngFileName = "");
   ~BinaryMap() = default;
 
   /** \brief Check for state validity */
@@ -78,13 +78,13 @@ class BinaryMap : public BaseObstacle {
 
   // Variables
   /// \brief The cost threshold
-  double threshold_ { 0.0 };
+  double threshold_{0.0};
   /// \brief The csv file of costs
-  std::string csvFile_ { "" };
+  std::string csvFile_{""};
   /// \brief The (optional) image file to overlay in the plot
-  std::string pngFile_ { "" };
+  std::string pngFile_{""};
   /// \brief Whether to plot the csv
-  bool plotCsv_ { false };
+  bool plotCsv_{false};
   /// \brief The obs data
-  Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> obsData_ { 0, 0 };
+  Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> obsData_{0, 0};
 };

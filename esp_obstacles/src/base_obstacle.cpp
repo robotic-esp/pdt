@@ -36,15 +36,17 @@
 
 #include "esp_obstacles/base_obstacle.h"
 
-BaseObstacle::BaseObstacle(ompl::base::SpaceInformation* si)
-    : ompl::base::StateValidityChecker(si) {}
+BaseObstacle::BaseObstacle(ompl::base::SpaceInformation* si) :
+    ompl::base::StateValidityChecker(si) {
+}
 
-BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& si)
-    : ompl::base::StateValidityChecker(si) {}
+BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& si) :
+    ompl::base::StateValidityChecker(si) {
+}
 
 bool BaseObstacle::isValid(const std::vector<const ompl::base::State*>& states) const {
   // Check all states.
-  for (const auto &state : states) {
+  for (const auto& state : states) {
     if (!isValid(state)) {
       return false;
     }

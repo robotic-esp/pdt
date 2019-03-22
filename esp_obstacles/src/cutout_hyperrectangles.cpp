@@ -40,11 +40,12 @@
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/util/Exception.h>
 
-CutoutHyperrectangles::CutoutHyperrectangles(ompl::base::SpaceInformation* si)
-  : BaseObstacle(si) {}
+CutoutHyperrectangles::CutoutHyperrectangles(ompl::base::SpaceInformation* si) : BaseObstacle(si) {
+}
 
-CutoutHyperrectangles::CutoutHyperrectangles(const ompl::base::SpaceInformationPtr& si)
-  : BaseObstacle(si) {}
+CutoutHyperrectangles::CutoutHyperrectangles(const ompl::base::SpaceInformationPtr& si) :
+    BaseObstacle(si) {
+}
 
 bool CutoutHyperrectangles::isValid(const ompl::base::State* state) const {
   // Variable
@@ -87,12 +88,13 @@ void CutoutHyperrectangles::addObstacle(const std::shared_ptr<BaseObstacle>& new
   obstaclePtrs_.push_back(newObstaclePtr);
 }
 
-void CutoutHyperrectangles::addAntiObstacle(const std::shared_ptr<BaseObstacle>& newAntiObstaclePtr) {
+void CutoutHyperrectangles::addAntiObstacle(
+    const std::shared_ptr<BaseObstacle>& newAntiObstaclePtr) {
   antiObstaclePtrs_.push_back(newAntiObstaclePtr);
 }
 
 std::string CutoutHyperrectangles::mfile(const std::string& obsColour,
-                                   const std::string& spaceColour) const {
+                                         const std::string& spaceColour) const {
   // Variables
   // The string stream:
   std::stringstream rval;
