@@ -66,8 +66,8 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
   // Temporary variables for the obstacle and antiobstacle
-  std::shared_ptr<HyperrectangleObstacles> obs;
-  std::shared_ptr<HyperrectangleObstacles> anti;
+  std::shared_ptr<Hyperrectangle> obs;
+  std::shared_ptr<Hyperrectangle> anti;
 
   if (gapWidth_ <= 0 || insideWidth_ <= 0 || wallThickness_ <= 0) {
     throw ompl::Exception("Widths must be > 0.");
@@ -90,7 +90,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
   BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  enclObs_ = std::make_shared<CutoutObstacles>(BaseContext::si_);
+  enclObs_ = std::make_shared<CutoutHyperrectangles>(BaseContext::si_);
   BaseContext::obs_ = enclObs_;
 
   // Set the problem bounds:
@@ -150,8 +150,8 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
       BaseContext::goalStates_.back());
 
   // Allocate the temporary variable for the obstacles, antiobstacles, and the lower-left corners
-  obs = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
-  anti = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
+  obs = std::make_shared<Hyperrectangle>(BaseContext::si_, false);
+  anti = std::make_shared<Hyperrectangle>(BaseContext::si_, false);
 
   //*****The start first*****//
   //*****Obstacle*****//

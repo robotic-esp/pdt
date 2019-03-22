@@ -77,7 +77,7 @@ class FlankingGap : public BaseContext {
   /** \brief The gap width. */
   double gapWidth_{0.0};
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
+  std::shared_ptr<Hyperrectangle> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
   std::shared_ptr<ompl::base::ScopedState<>> upperObs_{};
   std::shared_ptr<ompl::base::ScopedState<>> lowerObs_{};

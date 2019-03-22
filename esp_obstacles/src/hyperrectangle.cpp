@@ -42,29 +42,29 @@
 #include <ompl/datastructures/NearestNeighborsGNAT.h>
 #include <ompl/util/Exception.h>
 
-HyperrectangleObstacles::HyperrectangleObstacles(ompl::base::SpaceInformation* si,
+Hyperrectangle::Hyperrectangle(ompl::base::SpaceInformation* si,
                                                  bool separateObstacles)
     : BaseObstacle(si), separateObstacles_(separateObstacles) {
   this->construct();
 }
 
-HyperrectangleObstacles::HyperrectangleObstacles(const ompl::base::SpaceInformationPtr& si,
+Hyperrectangle::Hyperrectangle(const ompl::base::SpaceInformationPtr& si,
                                                  bool separateObstacles)
     : BaseObstacle(si), maxWidth_(0.0), obsMeasure_(0.0), separateObstacles_(separateObstacles) {
   this->construct();
 }
-void HyperrectangleObstacles::construct() {
+void Hyperrectangle::construct() {
   // Setup the NN structure
   nnObstacles_.reset(new ompl::NearestNeighborsGNAT<obstacle_corner_widths_t>());
-  nnObstacles_->setDistanceFunction(std::bind(&HyperrectangleObstacles::distanceFunction, this,
+  nnObstacles_->setDistanceFunction(std::bind(&Hyperrectangle::distanceFunction, this,
                                               std::placeholders::_1, std::placeholders::_2));
 
   // Allocate a sampler
   stateSampler_ = StateValidityChecker::si_->allocStateSampler();
 }
-HyperrectangleObstacles::~HyperrectangleObstacles() { this->clear(); }
+Hyperrectangle::~Hyperrectangle() { this->clear(); }
 
-void HyperrectangleObstacles::clear() {
+void Hyperrectangle::clear() {
   // Free the memory:
   StateValidityChecker::si_->freeStates(statesToFree_);
 
@@ -79,9 +79,9 @@ void HyperrectangleObstacles::clear() {
   obsMeasure_ = 0.0;
 }
 
-unsigned int HyperrectangleObstacles::size() const { return nnObstacles_->size(); }
+unsigned int Hyperrectangle::size() const { return nnObstacles_->size(); }
 
-bool HyperrectangleObstacles::isValid(const ompl::base::State* state) const {
+bool Hyperrectangle::isValid(const ompl::base::State* state) const {
   // Variable
   // The return value
   bool validState;
@@ -112,7 +112,7 @@ bool HyperrectangleObstacles::isValid(const ompl::base::State* state) const {
   return validState;
 }
 
-void HyperrectangleObstacles::addObstacle(const obstacle_corner_widths_t& newObstacle) {
+void Hyperrectangle::addObstacle(const obstacle_corner_widths_t& newObstacle) {
   //    //Print the obstacle out to the terminal:
   //    std::cout << "ll = [";
   //    for (unsigned int i = 0u; i < newObstacle.second.size(); ++i)
@@ -149,15 +149,15 @@ void HyperrectangleObstacles::addObstacle(const obstacle_corner_widths_t& newObs
   }
 }
 
-void HyperrectangleObstacles::addObstacles(
+void Hyperrectangle::addObstacles(
     const std::vector<obstacle_corner_widths_t>& newObstacles) {
   for (unsigned int i = 0u; i < newObstacles.size(); ++i) {
     this->addObstacle(newObstacles.at(i));
   }
 }
 
-std::vector<HyperrectangleObstacles::obstacle_corner_widths_t>
-HyperrectangleObstacles::getObstacles() const {
+std::vector<Hyperrectangle::obstacle_corner_widths_t>
+Hyperrectangle::getObstacles() const {
   // Create a return value
   std::vector<obstacle_corner_widths_t> obsVector;
 
@@ -168,11 +168,11 @@ HyperrectangleObstacles::getObstacles() const {
   return obsVector;
 }
 
-void HyperrectangleObstacles::randomize(double minObsSize, double maxObsSize, double obsRatio) {
+void Hyperrectangle::randomize(double minObsSize, double maxObsSize, double obsRatio) {
   this->randomize(minObsSize, maxObsSize, obsRatio, std::vector<const ompl::base::State*>());
 }
 
-void HyperrectangleObstacles::randomize(
+void Hyperrectangle::randomize(
     double minObsSize, double maxObsSize, double obsRatio,
     const std::vector<ompl::base::ScopedState<> >& existingStates) {
   // Make a vector
@@ -187,7 +187,7 @@ void HyperrectangleObstacles::randomize(
   this->randomize(minObsSize, maxObsSize, obsRatio, tVec);
 }
 
-void HyperrectangleObstacles::randomize(
+void Hyperrectangle::randomize(
     double minObsSize, double maxObsSize, double obsRatio,
     const std::vector<const ompl::base::State*>& existingStates) {
   while (obsMeasure_ / StateValidityChecker::si_->getSpaceMeasure() < obsRatio) {
@@ -239,7 +239,7 @@ void HyperrectangleObstacles::randomize(
   }
 }
 
-std::string HyperrectangleObstacles::mfile(const std::string& obsColour,
+std::string Hyperrectangle::mfile(const std::string& obsColour,
                                            const std::string& /*spaceColour*/) const {
   // Variables
   // The string stream:
@@ -278,7 +278,7 @@ std::string HyperrectangleObstacles::mfile(const std::string& obsColour,
   return rval.str();
 }
 
-bool HyperrectangleObstacles::verifyStateObstaclePair(
+bool Hyperrectangle::verifyStateObstaclePair(
     const ompl::base::State* state, const obstacle_corner_widths_t& obstacle) const {
   // Variables:
   // Whether the state is valid
@@ -309,7 +309,7 @@ bool HyperrectangleObstacles::verifyStateObstaclePair(
   return validState;
 }
 
-bool HyperrectangleObstacles::verifyObstacle(const obstacle_corner_widths_t& obstacle) const {
+bool Hyperrectangle::verifyObstacle(const obstacle_corner_widths_t& obstacle) const {
   throw ompl::Exception("This may not work properly. Try it in R2 and plot to be sure");
   // Variables:
   // Whether the obstacle is valid
@@ -367,7 +367,7 @@ bool HyperrectangleObstacles::verifyObstacle(const obstacle_corner_widths_t& obs
   return validObs;
 }
 
-double HyperrectangleObstacles::rectangleVolume(const std::vector<double>& widths) {
+double Hyperrectangle::rectangleVolume(const std::vector<double>& widths) {
   // Variable
   // The measure of this rectangle
   double measure;
@@ -380,7 +380,7 @@ double HyperrectangleObstacles::rectangleVolume(const std::vector<double>& width
   return measure;
 }
 
-double HyperrectangleObstacles::distanceFunction(const obstacle_corner_widths_t& a,
+double Hyperrectangle::distanceFunction(const obstacle_corner_widths_t& a,
                                                  const obstacle_corner_widths_t& b) const {
   return StateValidityChecker::si_->distance(a.first, b.first);
 

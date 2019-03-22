@@ -64,7 +64,7 @@ class RandomRectangles : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
+  std::shared_ptr<Hyperrectangle> rectObs_{};
   /** \brief The lower-left corner of an obstacle half-way between the start and goal */
   std::shared_ptr<ompl::base::ScopedState<>> sightLineObs_{};
 

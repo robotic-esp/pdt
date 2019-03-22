@@ -40,13 +40,13 @@
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/util/Exception.h>
 
-CutoutObstacles::CutoutObstacles(ompl::base::SpaceInformation* si)
+CutoutHyperrectangles::CutoutHyperrectangles(ompl::base::SpaceInformation* si)
   : BaseObstacle(si) {}
 
-CutoutObstacles::CutoutObstacles(const ompl::base::SpaceInformationPtr& si)
+CutoutHyperrectangles::CutoutHyperrectangles(const ompl::base::SpaceInformationPtr& si)
   : BaseObstacle(si) {}
 
-bool CutoutObstacles::isValid(const ompl::base::State* state) const {
+bool CutoutHyperrectangles::isValid(const ompl::base::State* state) const {
   // Variable
   // The return value
   bool validState;
@@ -83,15 +83,15 @@ bool CutoutObstacles::isValid(const ompl::base::State* state) const {
   return validState;
 }
 
-void CutoutObstacles::addObstacle(const std::shared_ptr<BaseObstacle>& newObstaclePtr) {
+void CutoutHyperrectangles::addObstacle(const std::shared_ptr<BaseObstacle>& newObstaclePtr) {
   obstaclePtrs_.push_back(newObstaclePtr);
 }
 
-void CutoutObstacles::addAntiObstacle(const std::shared_ptr<BaseObstacle>& newAntiObstaclePtr) {
+void CutoutHyperrectangles::addAntiObstacle(const std::shared_ptr<BaseObstacle>& newAntiObstaclePtr) {
   antiObstaclePtrs_.push_back(newAntiObstaclePtr);
 }
 
-std::string CutoutObstacles::mfile(const std::string& obsColour,
+std::string CutoutHyperrectangles::mfile(const std::string& obsColour,
                                    const std::string& spaceColour) const {
   // Variables
   // The string stream:

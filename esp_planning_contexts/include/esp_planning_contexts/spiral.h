@@ -63,7 +63,7 @@ class Spiral : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
+  std::shared_ptr<Hyperrectangle> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
   std::vector<ompl::base::ScopedState<> > obsCorners_{};
   /** The widths of the obstacles */

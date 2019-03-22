@@ -67,7 +67,7 @@ class DoubleEnclosure : public BaseContext {
  protected:
   // Variables
   /** \brief The actual enclosures */
-  std::shared_ptr<CutoutObstacles> enclObs_{};
+  std::shared_ptr<CutoutHyperrectangles> enclObs_{};
 
   /** \brief Construction variables: The lower-left corners (1 obs, 2 anti) */
   std::vector<std::shared_ptr<ompl::base::ScopedState<>>> startEnclCorners_{};

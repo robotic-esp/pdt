@@ -73,10 +73,10 @@ WallGap::WallGap(const unsigned int dim, const bool onlyFindGap,
   BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  std::shared_ptr<HyperrectangleObstacles> obs;
-  std::shared_ptr<HyperrectangleObstacles> anti;
+  std::shared_ptr<Hyperrectangle> obs;
+  std::shared_ptr<Hyperrectangle> anti;
 
-  rectObs_ = std::make_shared<CutoutObstacles>(BaseContext::si_);
+  rectObs_ = std::make_shared<CutoutHyperrectangles>(BaseContext::si_);
   BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:
@@ -136,8 +136,8 @@ WallGap::WallGap(const unsigned int dim, const bool onlyFindGap,
       BaseContext::goalStates_.back());
 
   // Allocate the temporary variable for the obstacles, antiobstacles, and the lower-left corners
-  obs = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
-  anti = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
+  obs = std::make_shared<Hyperrectangle>(BaseContext::si_, false);
+  anti = std::make_shared<Hyperrectangle>(BaseContext::si_, false);
 
   // Allocate the obstacles lower-left corners:
   obstacleLowerLeftCorner_ = std::make_shared<ompl::base::ScopedState<>>(ss);

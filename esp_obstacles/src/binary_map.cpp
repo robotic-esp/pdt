@@ -43,7 +43,7 @@
 #include <ompl/util/Exception.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-CsvObstacle::CsvObstacle(ompl::base::SpaceInformation* si, const double obsThreshold,
+BinaryMap::BinaryMap(ompl::base::SpaceInformation* si, const double obsThreshold,
                          const std::string& fullCsvFileName, const bool plotCsv,
                          const bool flipCsvRows /*= false*/,
                          const std::string& fullPngFileName /*= ""*/) :
@@ -54,7 +54,7 @@ CsvObstacle::CsvObstacle(ompl::base::SpaceInformation* si, const double obsThres
     plotCsv_(plotCsv) {
   this->construct(flipCsvRows);
 }
-CsvObstacle::CsvObstacle(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
+BinaryMap::BinaryMap(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
                          const std::string& fullCsvFileName, const bool plotCsv,
                          const bool flipCsvRows /*= false*/,
                          const std::string& fullPngFileName /*= ""*/) :
@@ -66,7 +66,7 @@ CsvObstacle::CsvObstacle(const ompl::base::SpaceInformationPtr& si, const double
   this->construct(flipCsvRows);
 }
 
-void CsvObstacle::construct(const bool flipRows) {
+void BinaryMap::construct(const bool flipRows) {
   // Variable
   // The number of rows
   unsigned int numRows;
@@ -97,7 +97,7 @@ void CsvObstacle::construct(const bool flipRows) {
 }
 
 // Adapted from http://stackoverflow.com/a/1120224
-void CsvObstacle::parseCsv(unsigned int* numRows, unsigned int* numCols,
+void BinaryMap::parseCsv(unsigned int* numRows, unsigned int* numCols,
                            std::vector<std::vector<double> >* data) {
   // Variables
   // The input csv file
@@ -146,7 +146,7 @@ void CsvObstacle::parseCsv(unsigned int* numRows, unsigned int* numCols,
   csvStream.close();
 }
 
-bool CsvObstacle::isValid(const ompl::base::State* state) const {
+bool BinaryMap::isValid(const ompl::base::State* state) const {
   // Variable
   // The return value
   bool validState;
@@ -181,7 +181,7 @@ bool CsvObstacle::isValid(const ompl::base::State* state) const {
 }
 
 // Discard arguments
-std::string CsvObstacle::mfile(const std::string& /*obsColour*/,
+std::string BinaryMap::mfile(const std::string& /*obsColour*/,
                                const std::string& /*spaceColour*/) const {
   // Variables
   // The string stream:

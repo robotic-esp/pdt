@@ -51,16 +51,15 @@
 
 #include "esp_obstacles/base_obstacle.h"
 
-/** \brief A world consisting of random hyperrectangular obstacles.*/
-class CsvObstacle : public BaseObstacle {
+class BinaryMap : public BaseObstacle {
  public:
-  CsvObstacle(ompl::base::SpaceInformation* si, const double obsThreshold,
+  BinaryMap(ompl::base::SpaceInformation* si, const double obsThreshold,
               const std::string& fullCsvFileName, const bool plotCsv,
               const bool flipCsvRows = false, const std::string& fullPngFileName = "");
-  CsvObstacle(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
+  BinaryMap(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
               const std::string& fullFileName, const bool plotCsv, const bool flipCsvRows = false,
               const std::string& fullPngFileName = "");
-  ~CsvObstacle() = default;
+  ~BinaryMap() = default;
 
   /** \brief Check for state validity */
   virtual bool isValid(const ompl::base::State* state) const;

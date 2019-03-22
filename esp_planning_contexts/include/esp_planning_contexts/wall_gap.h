@@ -75,7 +75,7 @@ class WallGap : public BaseContext {
   /** \brief Whether to stop on class switch */
   bool stopClassSwitch_{false};
   /** \brief The obstacle world */
-  std::shared_ptr<CutoutObstacles> rectObs_{};
+  std::shared_ptr<CutoutHyperrectangles> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
   std::shared_ptr<ompl::base::ScopedState<>> gapLowerLeftCorner_{};
   std::shared_ptr<ompl::base::ScopedState<>> obstacleLowerLeftCorner_{};

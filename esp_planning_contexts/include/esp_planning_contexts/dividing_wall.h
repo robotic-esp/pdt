@@ -73,7 +73,7 @@ class DividingWall : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
+  std::shared_ptr<Hyperrectangle> rectObs_{};
   /** \brief The number of walls */
   unsigned int numWalls_{0u};
   /** \brief The separation between walls */

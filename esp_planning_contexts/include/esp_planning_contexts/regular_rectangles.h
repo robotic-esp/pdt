@@ -64,7 +64,7 @@ class RegularRectangles : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<RepeatingHyperrectangleObstacles> regObs_{};
+  std::shared_ptr<RepeatingHyperrectangles> regObs_{};
 
   // Constant Parameters
   /** \brief The start position */

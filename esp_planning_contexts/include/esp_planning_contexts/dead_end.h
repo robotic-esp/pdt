@@ -64,7 +64,7 @@ class DeadEnd : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
+  std::shared_ptr<Hyperrectangle> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
   std::shared_ptr<ompl::base::ScopedState<>> topHorizontal_{};
   std::shared_ptr<ompl::base::ScopedState<>> sideVertical_{};

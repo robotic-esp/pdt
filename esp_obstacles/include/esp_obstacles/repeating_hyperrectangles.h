@@ -45,28 +45,28 @@
 #include "esp_obstacles/base_obstacle.h"
 
 /** \brief A world consisting of random hyperrectangular obstacles.*/
-class RepeatingHyperrectangleObstacles : public BaseObstacle {
+class RepeatingHyperrectangles : public BaseObstacle {
  public:
   /** \brief Constructor. */
-  RepeatingHyperrectangleObstacles(ompl::base::SpaceInformation* si, double obsWidth,
+  RepeatingHyperrectangles(ompl::base::SpaceInformation* si, double obsWidth,
                                    double blankWidth,
                                    const std::vector<double>& origin = std::vector<double>());
   /** \brief Constructor. */
-  RepeatingHyperrectangleObstacles(ompl::base::SpaceInformation* si,
+  RepeatingHyperrectangles(ompl::base::SpaceInformation* si,
                                    const std::vector<double>& obsWidths,
                                    const std::vector<double>& blankWidths,
                                    const std::vector<double>& origin = std::vector<double>());
   /** \brief Constructor. */
-  RepeatingHyperrectangleObstacles(const ompl::base::SpaceInformationPtr& si, double obsWidth,
+  RepeatingHyperrectangles(const ompl::base::SpaceInformationPtr& si, double obsWidth,
                                    double blankWidth,
                                    const std::vector<double>& origin = std::vector<double>());
   /** \brief Constructor. */
-  RepeatingHyperrectangleObstacles(const ompl::base::SpaceInformationPtr& si,
+  RepeatingHyperrectangles(const ompl::base::SpaceInformationPtr& si,
                                    const std::vector<double>& obsWidths,
                                    const std::vector<double>& blankWidths,
                                    const std::vector<double>& origin = std::vector<double>());
   /** \brief Destructor */
-  ~RepeatingHyperrectangleObstacles();
+  ~RepeatingHyperrectangles();
 
   /** \brief Clear the obstacle space */
   virtual void clear();

@@ -74,7 +74,7 @@ DeadEnd::DeadEnd(const double distFraction, const double runSeconds,
   BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  rectObs_ = std::make_shared<HyperrectangleObstacles>(BaseContext::si_, false);
+  rectObs_ = std::make_shared<Hyperrectangle>(BaseContext::si_, false);
   BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:

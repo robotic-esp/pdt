@@ -44,11 +44,11 @@
 
 /** \brief A world consisting of obstacles defined by obstacles and "anti-obstacles". A state is in
  * collision if it is in an obstacle and not in an anti-obstacle. */
-class CutoutObstacles : public BaseObstacle {
+class CutoutHyperrectangles : public BaseObstacle {
  public:
-  CutoutObstacles(ompl::base::SpaceInformation* si);
-  CutoutObstacles(const ompl::base::SpaceInformationPtr& si);
-  ~CutoutObstacles() = default;
+  CutoutHyperrectangles(ompl::base::SpaceInformation* si);
+  CutoutHyperrectangles(const ompl::base::SpaceInformationPtr& si);
+  ~CutoutHyperrectangles() = default;
 
   /** \brief Clear the obstacle space */
   void clear() override;

@@ -49,17 +49,17 @@
 #include "esp_obstacles/base_obstacle.h"
 
 /** \brief A world consisting of random hyperrectangular obstacles.*/
-class HyperrectangleObstacles : public BaseObstacle {
+class Hyperrectangle : public BaseObstacle {
  public:
   /** \brief a pair of lower-left corner and widths for a hyperrectangle obstacle*/
   typedef std::pair<const ompl::base::State*, std::vector<double> > obstacle_corner_widths_t;
 
   /** \brief Constructor. */
-  HyperrectangleObstacles(ompl::base::SpaceInformation* si, bool separateObstacles);
+  Hyperrectangle(ompl::base::SpaceInformation* si, bool separateObstacles);
   /** \brief Constructor. */
-  HyperrectangleObstacles(const ompl::base::SpaceInformationPtr& si, bool separateObstacles);
+  Hyperrectangle(const ompl::base::SpaceInformationPtr& si, bool separateObstacles);
   /** \brief Destructor */
-  ~HyperrectangleObstacles();
+  ~Hyperrectangle();
 
   /** \brief Clear the obstacle space */
   virtual void clear();

@@ -68,7 +68,7 @@ class RandomRectanglesWithDividingWall : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<HyperrectangleObstacles> rectObs_{};
+  std::shared_ptr<Hyperrectangle> rectObs_{};
   /** \brief The basic thickness of the wall. */
   double wallThickness_{0.0};
   /** \brief The number of gaps. */

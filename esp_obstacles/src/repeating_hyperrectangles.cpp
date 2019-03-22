@@ -41,7 +41,7 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/util/Exception.h>
 
-RepeatingHyperrectangleObstacles::RepeatingHyperrectangleObstacles(
+RepeatingHyperrectangles::RepeatingHyperrectangles(
     ompl::base::SpaceInformation* si, double obsWidth, double blankWidth,
     const std::vector<double>& origin /*= std::vector<double>()*/)
     : BaseObstacle(si),
@@ -51,7 +51,7 @@ RepeatingHyperrectangleObstacles::RepeatingHyperrectangleObstacles(
       origin_(origin) {
   this->construct();
 }
-RepeatingHyperrectangleObstacles::RepeatingHyperrectangleObstacles(
+RepeatingHyperrectangles::RepeatingHyperrectangles(
     ompl::base::SpaceInformation* si, const std::vector<double>& obsWidths,
     const std::vector<double>& blankWidths,
     const std::vector<double>& origin /*= std::vector<double>()*/)
@@ -62,7 +62,7 @@ RepeatingHyperrectangleObstacles::RepeatingHyperrectangleObstacles(
       origin_(origin) {
   this->construct();
 }
-RepeatingHyperrectangleObstacles::RepeatingHyperrectangleObstacles(
+RepeatingHyperrectangles::RepeatingHyperrectangles(
     const ompl::base::SpaceInformationPtr& si, double obsWidth, double blankWidth,
     const std::vector<double>& origin /*= std::vector<double>()*/)
     : BaseObstacle(si),
@@ -72,7 +72,7 @@ RepeatingHyperrectangleObstacles::RepeatingHyperrectangleObstacles(
       origin_(origin) {
   this->construct();
 }
-RepeatingHyperrectangleObstacles::RepeatingHyperrectangleObstacles(
+RepeatingHyperrectangles::RepeatingHyperrectangles(
     const ompl::base::SpaceInformationPtr& si, const std::vector<double>& obsWidths,
     const std::vector<double>& blankWidths,
     const std::vector<double>& origin /*= std::vector<double>()*/)
@@ -84,7 +84,7 @@ RepeatingHyperrectangleObstacles::RepeatingHyperrectangleObstacles(
   this->construct();
 }
 
-void RepeatingHyperrectangleObstacles::construct() {
+void RepeatingHyperrectangles::construct() {
   if (origin_.empty() == true) {
     origin_ = std::vector<double>(dim_, 0.0);
   } else if (origin_.size() != dim_) {
@@ -96,11 +96,11 @@ void RepeatingHyperrectangleObstacles::construct() {
   }
 }
 
-RepeatingHyperrectangleObstacles::~RepeatingHyperrectangleObstacles() {}
+RepeatingHyperrectangles::~RepeatingHyperrectangles() {}
 
-void RepeatingHyperrectangleObstacles::clear() {}
+void RepeatingHyperrectangles::clear() {}
 
-bool RepeatingHyperrectangleObstacles::isValid(const ompl::base::State* state) const {
+bool RepeatingHyperrectangles::isValid(const ompl::base::State* state) const {
   // Variable
   // The return value
   bool validState;
@@ -148,7 +148,7 @@ bool RepeatingHyperrectangleObstacles::isValid(const ompl::base::State* state) c
   return validState;
 }
 
-std::string RepeatingHyperrectangleObstacles::mfile(const std::string& obsColour,
+std::string RepeatingHyperrectangles::mfile(const std::string& obsColour,
                                                     const std::string& /*spaceColour*/) const {
   // Variables
   // The string stream:

@@ -84,7 +84,7 @@ RegularRectangles::RegularRectangles(const unsigned int dim,
     }
   }
 
-  regObs_ = std::make_shared<RepeatingHyperrectangleObstacles>(BaseContext::si_, obsWidths_,
+  regObs_ = std::make_shared<RepeatingHyperrectangles>(BaseContext::si_, obsWidths_,
                                                                blankWidths_, origin_);
   BaseContext::obs_ = regObs_;
 
