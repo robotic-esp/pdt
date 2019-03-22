@@ -49,6 +49,10 @@
 
 #include "esp_obstacles/hyperrectangle.h"
 
+namespace esp {
+
+namespace ompltools {
+
 GoalEnclosure::GoalEnclosure(const unsigned int dim, const double worldHalfWidth,
                              const double insideWidth, const double wallThickness,
                              const double gapWidth, const double runSeconds,
@@ -313,3 +317,7 @@ std::string GoalEnclosure::printRectangle(std::shared_ptr<ompl::base::ScopedStat
 
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

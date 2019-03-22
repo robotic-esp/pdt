@@ -40,6 +40,10 @@
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/util/Exception.h>
 
+namespace esp {
+
+namespace ompltools {
+
 CutoutHyperrectangles::CutoutHyperrectangles(ompl::base::SpaceInformation* si) : BaseObstacle(si) {
 }
 
@@ -109,3 +113,7 @@ std::string CutoutHyperrectangles::mfile(const std::string& obsColour,
 
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

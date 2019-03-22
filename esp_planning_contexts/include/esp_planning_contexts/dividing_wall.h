@@ -39,6 +39,10 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
  * a multiple homotopy-class experiment that scales to N dimensions. */
 class DividingWall : public BaseContext {
@@ -104,3 +108,7 @@ class DividingWall : public BaseContext {
                           const std::vector<double> gapWidth,
                           const std::vector<double> wallSpacings, const double checkResolution);
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

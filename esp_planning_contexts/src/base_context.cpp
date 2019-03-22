@@ -34,13 +34,19 @@
 
 /* Authors: Jonathan Gammell */
 
-// Me!
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 BaseContext::BaseContext(const unsigned int dim,
-                               const std::vector<std::pair<double, double>> limits,
-                               const double runSeconds, std::string name)
-    : name_(name), dim_(dim), limits_(limits), targetTime_(asrl::time::seconds(runSeconds)) {
+                         const std::vector<std::pair<double, double>> limits,
+                         const double runSeconds, std::string name) :
+    name_(name),
+    dim_(dim),
+    limits_(limits),
+    targetTime_(asrl::time::seconds(runSeconds)) {
 }
 
 ompl::base::SpaceInformationPtr BaseContext::getSpaceInformation() const {
@@ -271,3 +277,7 @@ std::string BaseContext::mfileFooter() const {
 
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

@@ -39,6 +39,10 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief An experiment with a heuristic breaking spiral */
 class Spiral : public BaseContext {
  public:
@@ -73,3 +77,7 @@ class Spiral : public BaseContext {
   /** \brief The basic thickness of the obstacle. */
   double obsThickness_{0.05};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

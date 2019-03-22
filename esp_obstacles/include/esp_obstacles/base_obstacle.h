@@ -42,6 +42,10 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/StateValidityChecker.h>
 
+namespace esp {
+
+namespace ompltools {
+
 // The base class for obstacles.
 class BaseObstacle : public ompl::base::StateValidityChecker {
  public:
@@ -62,3 +66,7 @@ class BaseObstacle : public ompl::base::StateValidityChecker {
   virtual std::string mfile(const std::string& obsColour = "k",
                             const std::string& spaceColour = "w") const = 0;
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

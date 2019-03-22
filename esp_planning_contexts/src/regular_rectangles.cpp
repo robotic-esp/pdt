@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/regular_rectangles.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -47,15 +47,17 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-RegularRectangles::RegularRectangles(const unsigned int dim,
-                                                         const double worldHalfWidth,
-                                                         unsigned int numObsBetween,
-                                                         const double runSeconds,
-                                                         const double checkResolution)
-    : BaseContext(dim,
-                     std::vector<std::pair<double, double>>(
-                         dim, std::pair<double, double>(-1.0 * worldHalfWidth, worldHalfWidth)),
-                     runSeconds, "RegularRects") {
+namespace esp {
+
+namespace ompltools {
+
+RegularRectangles::RegularRectangles(const unsigned int dim, const double worldHalfWidth,
+                                     unsigned int numObsBetween, const double runSeconds,
+                                     const double checkResolution) :
+    BaseContext(dim,
+                std::vector<std::pair<double, double>>(
+                    dim, std::pair<double, double>(-1.0 * worldHalfWidth, worldHalfWidth)),
+                runSeconds, "RegularRects") {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -84,8 +86,8 @@ RegularRectangles::RegularRectangles(const unsigned int dim,
     }
   }
 
-  regObs_ = std::make_shared<RepeatingHyperrectangles>(BaseContext::si_, obsWidths_,
-                                                               blankWidths_, origin_);
+  regObs_ = std::make_shared<RepeatingHyperrectangles>(BaseContext::si_, obsWidths_, blankWidths_,
+                                                       origin_);
   BaseContext::obs_ = regObs_;
 
   // Set the problem bounds:
@@ -135,8 +137,7 @@ RegularRectangles::RegularRectangles(const unsigned int dim,
   BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseContext::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Finally specify the optimization target:
   BaseContext::opt_->setCostThreshold(this->getMinimum());
@@ -186,3 +187,7 @@ std::string RegularRectangles::lineInfo() const {
 std::string RegularRectangles::paraInfo() const {
   return std::string();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

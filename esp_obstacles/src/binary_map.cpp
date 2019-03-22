@@ -43,6 +43,10 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/util/Exception.h>
 
+namespace esp {
+
+namespace ompltools {
+
 BinaryMap::BinaryMap(ompl::base::SpaceInformation* si, const double obsThreshold,
                      const std::string& fullCsvFileName, const bool plotCsv,
                      const bool flipCsvRows /*= false*/,
@@ -208,3 +212,7 @@ std::string BinaryMap::mfile(const std::string& /*obsColour*/,
 
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

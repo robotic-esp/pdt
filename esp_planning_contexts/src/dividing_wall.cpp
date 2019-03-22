@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/dividing_wall.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -47,32 +47,36 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
+namespace esp {
+
+namespace ompltools {
+
 DividingWall::DividingWall(const unsigned int dim, const double wallThickness,
-                                               const unsigned int numGaps, const double gapWidth,
-                                               const double runSeconds,
-                                               const double checkResolution)
-    : BaseContext(
-          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
-          runSeconds, "DividingWall") {
+                           const unsigned int numGaps, const double gapWidth,
+                           const double runSeconds, const double checkResolution) :
+    BaseContext(dim,
+                std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+                runSeconds, "DividingWall") {
   common_constructor(std::vector<double>(1u, wallThickness), std::vector<unsigned int>(1u, numGaps),
                      std::vector<double>(1u, gapWidth), std::vector<double>(), checkResolution);
 }
 
-DividingWall::DividingWall(
-    const unsigned int dim, const std::vector<double> wallThicknesses,
-    const std::vector<unsigned int> numGaps, const std::vector<double> gapWidths,
-    const std::vector<double> wallSpacings, const double runSeconds, const double checkResolution)
-    : BaseContext(
-          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
-          runSeconds, "DividingWall") {
+DividingWall::DividingWall(const unsigned int dim, const std::vector<double> wallThicknesses,
+                           const std::vector<unsigned int> numGaps,
+                           const std::vector<double> gapWidths,
+                           const std::vector<double> wallSpacings, const double runSeconds,
+                           const double checkResolution) :
+    BaseContext(dim,
+                std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+                runSeconds, "DividingWall") {
   common_constructor(wallThicknesses, numGaps, gapWidths, wallSpacings, checkResolution);
 }
 
 void DividingWall::common_constructor(const std::vector<double> wallThickness,
-                                                const std::vector<unsigned int> numGaps,
-                                                const std::vector<double> gapWidth,
-                                                const std::vector<double> wallSpacings,
-                                                const double checkResolution) {
+                                      const std::vector<unsigned int> numGaps,
+                                      const std::vector<double> gapWidth,
+                                      const std::vector<double> wallSpacings,
+                                      const double checkResolution) {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -154,8 +158,7 @@ void DividingWall::common_constructor(const std::vector<double> wallThickness,
   BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseContext::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Calculate the obstacle parameters:
 
@@ -190,10 +193,9 @@ void DividingWall::common_constructor(const std::vector<double> wallThickness,
     hasOddNumObs = hasOddNumObs || (numObs_.at(w) % 2u == 1u);
 
     // And the width:
-    wallWidths_.at(w) =
-        (BaseContext::limits_.at(1u).second - BaseContext::limits_.at(1u).first -
-         static_cast<double>(numGaps_.at(w)) * gapWidths_.at(w)) /
-        static_cast<double>(numObs_.at(w));
+    wallWidths_.at(w) = (BaseContext::limits_.at(1u).second - BaseContext::limits_.at(1u).first -
+                         static_cast<double>(numGaps_.at(w)) * gapWidths_.at(w)) /
+                        static_cast<double>(numObs_.at(w));
 
     // Sanity check
     if (wallWidths_.at(w) <= 0.0) {
@@ -247,8 +249,8 @@ void DividingWall::common_constructor(const std::vector<double> wallThickness,
 
       // Specify it's lower-left corner:
       (*(obsCorners_.at(w).back()))[0u] = leftXPos;  // x
-      (*(obsCorners_.at(w).back()))[1u] = BaseContext::limits_.at(1u).first +
-                                          obsNum * (wallWidths_.at(w) + gapWidths_.at(w));  // y
+      (*(obsCorners_.at(w).back()))[1u] =
+          BaseContext::limits_.at(1u).first + obsNum * (wallWidths_.at(w) + gapWidths_.at(w));  // y
       for (unsigned int i = 2u; i < BaseContext::dim_; ++i) {
         (*(obsCorners_.at(w).back()))[i] = BaseContext::limits_.at(i).first;  // z
       }
@@ -324,3 +326,7 @@ std::string DividingWall::paraInfo() const {
 
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

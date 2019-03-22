@@ -39,12 +39,15 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief An experiment with heuristic breaking deadend "C" */
 class DeadEnd : public BaseContext {
  public:
   /** \brief Constructor */
-  DeadEnd(const double distFraction, const double runSeconds,
-                    const double checkResolution);
+  DeadEnd(const double distFraction, const double runSeconds, const double checkResolution);
 
   /** \brief Whether the problem has an exact expression for the optimum */
   virtual bool knowsOptimum() const;
@@ -78,3 +81,7 @@ class DeadEnd : public BaseContext {
   /** \brief The basic thickness of the obstacle. */
   double obsThickness_;
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

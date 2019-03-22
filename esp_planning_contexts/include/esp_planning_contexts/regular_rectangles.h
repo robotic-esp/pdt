@@ -39,6 +39,10 @@
 #include "esp_obstacles/repeating_hyperrectangles.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief An experiment with regularly repeating rectangular obstacles */
 class RegularRectangles : public BaseContext {
  public:
@@ -78,3 +82,7 @@ class RegularRectangles : public BaseContext {
   /** \brief The grid origin */
   std::vector<double> origin_{};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

@@ -36,9 +36,8 @@
 
 #include "esp_planning_contexts/obstacle_free.h"
 
-#include <memory>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -49,13 +48,15 @@
 
 #include "esp_obstacles/hyperrectangle.h"
 
-ObstacleFree::ObstacleFree(const unsigned int dim,
-                                               const unsigned int maxNumStarts,
-                                               const unsigned int maxNumGoals,
-                                               const double runSeconds)
-    : BaseContext(
-          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
-          runSeconds, "Free") {
+namespace esp {
+
+namespace ompltools {
+
+ObstacleFree::ObstacleFree(const unsigned int dim, const unsigned int maxNumStarts,
+                           const unsigned int maxNumGoals, const double runSeconds) :
+    BaseContext(dim,
+                std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+                runSeconds, "Free") {
   // Variables
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -174,8 +175,7 @@ ObstacleFree::ObstacleFree(const unsigned int dim,
 
     // Store
     if (numGoals == 1u) {
-      BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-          BaseContext::goalStates_.back());
+      BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
     } else {
       BaseContext::goalPtr_->as<ompl::base::GoalStates>()->addState(
           BaseContext::goalStates_.back());
@@ -186,15 +186,27 @@ ObstacleFree::ObstacleFree(const unsigned int dim,
   BaseContext::opt_->setCostThreshold(this->getOptimum());
 }
 
-bool ObstacleFree::knowsOptimum() const { return true; }
+bool ObstacleFree::knowsOptimum() const {
+  return true;
+}
 
-ompl::base::Cost ObstacleFree::getOptimum() const { return BaseContext::getMinimum(); }
+ompl::base::Cost ObstacleFree::getOptimum() const {
+  return BaseContext::getMinimum();
+}
 
 void ObstacleFree::setTarget(double targetSpecifier) {
   BaseContext::opt_->setCostThreshold(
       ompl::base::Cost(targetSpecifier * this->getOptimum().value()));
 }
 
-std::string ObstacleFree::lineInfo() const { return std::string(); }
+std::string ObstacleFree::lineInfo() const {
+  return std::string();
+}
 
-std::string ObstacleFree::paraInfo() const { return std::string(); }
+std::string ObstacleFree::paraInfo() const {
+  return std::string();
+}
+
+}  // namespace ompltools
+
+}  // namespace esp

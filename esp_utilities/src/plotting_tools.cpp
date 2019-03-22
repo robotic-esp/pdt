@@ -1,23 +1,27 @@
 #include "esp_utilities/plotting_tools.h"
 
+#include <boost/filesystem.hpp>
 #include <fstream>
 #include <iomanip>
 #include <tuple>
-#include <boost/filesystem.hpp>
 
-#include <ompl/base/spaces/RealVectorStateSpace.h>
-#include <ompl/geometric/PathGeometric.h>
-#include <ompl/geometric/planners/bitstar/BITstar.h>
-#include <ompl/util/Exception.h>
 #include <ompl/base/OptimizationObjective.h>
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/base/goals/GoalStates.h>
+#include <ompl/base/spaces/RealVectorStateSpace.h>
+#include <ompl/geometric/PathGeometric.h>
+#include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/bitstar/datastructures/Vertex.h>
+#include <ompl/util/Exception.h>
 
 #ifdef BITSTAR_REGRESSION
 #include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
 #include <ompl/geometric/planners/bitstar_regression/datastructures/Vertex.h>
 #endif  // BITSTAR_REGRESSION
+
+namespace esp {
+
+namespace ompltools {
 
 std::string plotVertex(BaseContextPtr experiment, const ompl::base::State* vertex,
                        std::string vertexColour, std::string vertexSize) {
@@ -709,3 +713,7 @@ asrl::time::duration createAnimation(BaseContextPtr experiment, PlannerType plan
 
   return runTime;
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

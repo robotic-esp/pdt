@@ -39,6 +39,10 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief An experiment with a singularly placed square obstacle*/
 class RandomRectangles : public BaseContext {
  public:
@@ -76,3 +80,7 @@ class RandomRectangles : public BaseContext {
   /** \brief The mean obstacle width*/
   double meanObsWidth_{0.0};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, University of Toronto
+ *  Copyright (c) 2018, University of Oxford
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Toronto nor the names of its
+ *   * Neither the name of the University of Oxford nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,21 +32,21 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#ifndef RECORDING_TOOLS
-#define RECORDING_TOOLS
+// Authors: Jonathan Gammell
 
-// For std::ifstream and std::ofstream
+#pragma once
+
 #include <fstream>
-
-// For vector and tuple
 #include <tuple>
 #include <vector>
 
-// For ompl exceptions
-#include "ompl/util/Exception.h"
+#include <ompl/util/Exception.h>
 
-// For some general time helpers
 #include "esp_utilities/general_tools.h"
+
+namespace esp {
+
+namespace ompltools {
 
 /** \brief A helper function to create directories using boost filesystem */
 void createDirectories(std::string fileName);
@@ -230,4 +230,6 @@ class ResultsFile {
   std::string filename_;
 };
 
-#endif  // RECORDING_TOOLS
+}  // namespace ompltools
+
+}  // namespace esp

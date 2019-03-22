@@ -34,8 +34,7 @@
 
 /* Authors: Jonathan Gammell */
 
-#ifndef OBSTACLES_HYPERRECTANGLE_OBSTACLES
-#define OBSTACLES_HYPERRECTANGLE_OBSTACLES
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -47,6 +46,10 @@
 #include <ompl/util/RandomNumbers.h>
 
 #include "esp_obstacles/base_obstacle.h"
+
+namespace esp {
+
+namespace ompltools {
 
 /** \brief A world consisting of random hyperrectangular obstacles.*/
 class Hyperrectangle : public BaseObstacle {
@@ -134,4 +137,6 @@ class Hyperrectangle : public BaseObstacle {
                           const obstacle_corner_widths_t& b) const;
 };
 
-#endif  // OBSTACLES_HYPERRECTANGLE_OBSTACLES
+}  // namespace ompltools
+
+}  // namespace esp

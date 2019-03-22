@@ -39,6 +39,10 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief An three-homotopy-class experiment. I.e., an obstacle with a central gap that can be
  * circumvented above or below.*/
 class FlankingGap : public BaseContext {
@@ -94,3 +98,7 @@ class FlankingGap : public BaseContext {
   double startPos_{-0.5};
   double goalPos_{0.5};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

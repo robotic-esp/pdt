@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/spiral.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -47,11 +47,14 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-Spiral::Spiral(const double distFraction, const double runSeconds,
-                                   const double checkResolution)
-    : BaseContext(
-          2u, std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
-          runSeconds, "SpiralExperiment") {
+namespace esp {
+
+namespace ompltools {
+
+Spiral::Spiral(const double distFraction, const double runSeconds, const double checkResolution) :
+    BaseContext(2u,
+                std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
+                runSeconds, "SpiralExperiment") {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -137,8 +140,7 @@ Spiral::Spiral(const double distFraction, const double runSeconds,
   BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseContext::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Define the obstacles
   // The parameters for the spiral walls:
@@ -261,3 +263,7 @@ std::string Spiral::lineInfo() const {
 std::string Spiral::paraInfo() const {
   return std::string();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

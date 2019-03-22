@@ -44,6 +44,10 @@
 
 #include "esp_obstacles/base_obstacle.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief A world consisting of random hyperrectangular obstacles.*/
 class RepeatingHyperrectangles : public BaseObstacle {
  public:
@@ -93,3 +97,7 @@ class RepeatingHyperrectangles : public BaseObstacle {
   /** \brief The period of "columns" (i.e., the width of obstacle plus the width of the blank) */
   std::vector<double> periods_{};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

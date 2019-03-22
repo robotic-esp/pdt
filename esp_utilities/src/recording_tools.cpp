@@ -1,7 +1,11 @@
 #include "esp_utilities/recording_tools.h"
 
-#include <iomanip>
 #include <boost/filesystem.hpp>
+#include <iomanip>
+
+namespace esp {
+
+namespace ompltools {
 
 constexpr float ALLOC_TIME_SAFETY_FACTOR = 10.0;
 
@@ -226,3 +230,7 @@ std::string TargetTimeResults::output(const std::string& labelPrefix) {
   // Return
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

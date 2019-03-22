@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/multi_start_goal.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -47,13 +47,16 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-MultiStartGoal::MultiStartGoal(const unsigned int dim,
-                                                   const unsigned int numObs, const double obsRatio,
-                                                   const double runSeconds,
-                                                   const double checkResolution)
-    : BaseContext(
-          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
-          runSeconds, "MultiStartGoal") {
+namespace esp {
+
+namespace ompltools {
+
+MultiStartGoal::MultiStartGoal(const unsigned int dim, const unsigned int numObs,
+                               const double obsRatio, const double runSeconds,
+                               const double checkResolution) :
+    BaseContext(dim,
+                std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+                runSeconds, "MultiStartGoal") {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -159,8 +162,7 @@ MultiStartGoal::MultiStartGoal(const unsigned int dim,
     }
 
     // Add
-    BaseContext::goalPtr_->as<ompl::base::GoalStates>()->addState(
-        BaseContext::goalStates_.back());
+    BaseContext::goalPtr_->as<ompl::base::GoalStates>()->addState(BaseContext::goalStates_.back());
   }
 
   // Calculate the minimum and maximum radius of the obstacles:
@@ -177,8 +179,7 @@ MultiStartGoal::MultiStartGoal(const unsigned int dim,
     std::vector<ompl::base::ScopedState<>> tVec;
 
     // Copy into
-    tVec.insert(tVec.end(), BaseContext::startStates_.begin(),
-                BaseContext::startStates_.end());
+    tVec.insert(tVec.end(), BaseContext::startStates_.begin(), BaseContext::startStates_.end());
     tVec.insert(tVec.end(), BaseContext::goalStates_.begin(), BaseContext::goalStates_.end());
 
     rectObs_->randomize(0.50 * meanObsWidth, 1.5 * meanObsWidth, obsRatio, tVec);
@@ -211,3 +212,7 @@ std::string MultiStartGoal::lineInfo() const {
 std::string MultiStartGoal::paraInfo() const {
   return std::string();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

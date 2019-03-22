@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/random_rectangles_with_dividing_wall.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -47,15 +47,19 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
+namespace esp {
+
+namespace ompltools {
+
 RandomRectanglesWithDividingWall::RandomRectanglesWithDividingWall(
     const unsigned int dim, const unsigned int numObs, const double obsRatio,
     const unsigned int numGaps, const double gapWidth, const double runSeconds,
-    const double checkResolution)
-    : BaseContext(
-          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
-          runSeconds, "RandomWithWall"),
-      numGaps_(numGaps),
-      gapWidth_(gapWidth) {
+    const double checkResolution) :
+    BaseContext(dim,
+                std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+                runSeconds, "RandomWithWall"),
+    numGaps_(numGaps),
+    gapWidth_(gapWidth) {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -129,8 +133,7 @@ RandomRectanglesWithDividingWall::RandomRectanglesWithDividingWall(
   BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseContext::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Calculate the minimum and maximum radius of the obstacles:
   // First, calculate the desired obstacle volume of the problem:
@@ -196,8 +199,7 @@ RandomRectanglesWithDividingWall::RandomRectanglesWithDividingWall(
     std::vector<ompl::base::ScopedState<>> tVec;
 
     // Copy into
-    tVec.insert(tVec.end(), BaseContext::startStates_.begin(),
-                BaseContext::startStates_.end());
+    tVec.insert(tVec.end(), BaseContext::startStates_.begin(), BaseContext::startStates_.end());
     tVec.insert(tVec.end(), BaseContext::goalStates_.begin(), BaseContext::goalStates_.end());
 
     rectObs_->randomize(0.50 * meanObsWidth, 1.5 * meanObsWidth, obsRatio, tVec);
@@ -252,3 +254,7 @@ std::string RandomRectanglesWithDividingWall::paraInfo() const {
 
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

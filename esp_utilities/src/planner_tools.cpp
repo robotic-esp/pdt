@@ -4,6 +4,10 @@
 
 // #define BITSTAR_REGRESSION 1
 
+namespace esp {
+
+namespace ompltools {
+
 std::shared_ptr<ompl::geometric::RRT> allocateRrt(const ompl::base::SpaceInformationPtr &si,
                                                   const double steerEta, const double goalBias) {
   // Create a RRT planner
@@ -303,7 +307,9 @@ bool isRrtSharp(PlannerType plnrType) {
   return (plnrType == PLANNER_RRTSHARP || plnrType == PLANNER_RRTSHARP_INFORMED);
 }
 
-bool isLbtRrt(PlannerType plnrType) { return plnrType == PLANNER_LBTRRT; }
+bool isLbtRrt(PlannerType plnrType) {
+  return plnrType == PLANNER_LBTRRT;
+}
 
 bool isBitStar(PlannerType plnrType) {
   return (plnrType == PLANNER_BITSTAR || plnrType == PLANNER_SBITSTAR ||
@@ -379,3 +385,7 @@ std::string plannerName(PlannerType plnrType) {
 
   return std::string();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

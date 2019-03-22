@@ -41,6 +41,10 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/util/Exception.h>
 
+namespace esp {
+
+namespace ompltools {
+
 RepeatingHyperrectangles::RepeatingHyperrectangles(
     ompl::base::SpaceInformation* si, double obsWidth, double blankWidth,
     const std::vector<double>& origin /*= std::vector<double>()*/) :
@@ -183,3 +187,7 @@ std::string RepeatingHyperrectangles::mfile(const std::string& obsColour,
 
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

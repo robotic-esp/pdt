@@ -39,6 +39,10 @@
 #include "esp_obstacles/cutout_hyperrectangles.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief A homotopy-breaking, "bug trap" style experiment that scales to N dimensions. I.e., The
  * start and goal are both enclosed in a box with a opening away from the other. 2D is a slice of
  * higher-D */
@@ -91,3 +95,7 @@ class DoubleEnclosure : public BaseContext {
   std::string printRectangle(std::shared_ptr<ompl::base::ScopedState<>> llCorner,
                              std::vector<double> widths) const;
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

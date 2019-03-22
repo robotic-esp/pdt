@@ -39,6 +39,10 @@
 #include "esp_obstacles/cutout_hyperrectangles.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief An two-homotopy-class experiment that scales to N dimensions. I.e., an obstacle with a
  * gap that is anchored to the map limit on one side. */
 class WallGap : public BaseContext {
@@ -95,3 +99,7 @@ class WallGap : public BaseContext {
   double startPos_{-0.5};
   double goalPos_{0.5};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

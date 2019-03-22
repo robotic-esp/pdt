@@ -44,19 +44,18 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
 #   ${OMPL_LIBRARIES}
 # )
 
-add_executable(test_abitstar
-  src/test_abitstar.cpp
-)
-target_link_libraries(test_abitstar
-  esp_factories
-  esp_obstacles
-  esp_planning_contexts
-  esp_utilities
-  ${CMAKE_THREAD_LIBS_INIT}
-  ${Boost_LIBRARIES}
-  ${OMPL_LIBRARIES}
-)
-
+# add_executable(test_abitstar
+#   src/test_abitstar.cpp
+# )
+# target_link_libraries(test_abitstar
+#   esp_factories
+#   esp_obstacles
+#   esp_planning_contexts
+#   esp_utilities
+#   ${CMAKE_THREAD_LIBS_INIT}
+#   ${Boost_LIBRARIES}
+#   ${OMPL_LIBRARIES}
+# )
 
 add_executable(planner_performance
   src/planner_performance.cpp

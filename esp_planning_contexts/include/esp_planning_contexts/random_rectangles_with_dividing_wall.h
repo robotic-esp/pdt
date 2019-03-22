@@ -39,6 +39,10 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
  * a multiple homotopy-class experiment that scales to N dimensions. */
 class RandomRectanglesWithDividingWall : public BaseContext {
@@ -89,3 +93,7 @@ class RandomRectanglesWithDividingWall : public BaseContext {
   double startPos_{-0.5};
   double goalPos_{0.5};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

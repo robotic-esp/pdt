@@ -51,6 +51,10 @@
 
 #include "esp_obstacles/base_obstacle.h"
 
+namespace esp {
+
+namespace ompltools {
+
 class BinaryMap : public BaseObstacle {
  public:
   BinaryMap(ompl::base::SpaceInformation* si, const double obsThreshold,
@@ -88,3 +92,7 @@ class BinaryMap : public BaseObstacle {
   /// \brief The obs data
   Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> obsData_{0, 0};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

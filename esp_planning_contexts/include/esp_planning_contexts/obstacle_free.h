@@ -41,6 +41,10 @@
 
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief An obstacle-free multigoal/multistart experiment */
 class ObstacleFree : public BaseContext {
  public:
@@ -69,3 +73,7 @@ class ObstacleFree : public BaseContext {
   double centrePos_{0.0};
   double outsidePos_{0.0};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

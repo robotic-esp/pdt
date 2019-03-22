@@ -34,13 +34,16 @@
 
 /* Authors: Jonathan Gammell */
 
-#ifndef OBSTACLES_CUTOUT_OBSTACLES
-#define OBSTACLES_CUTOUT_OBSTACLES
+#pragma once
 
 #include <memory>
 #include <vector>
 
 #include "esp_obstacles/base_obstacle.h"
+
+namespace esp {
+
+namespace ompltools {
 
 /** \brief A world consisting of obstacles defined by obstacles and "anti-obstacles". A state is in
  * collision if it is in an obstacle and not in an anti-obstacle. */
@@ -73,4 +76,6 @@ class CutoutHyperrectangles : public BaseObstacle {
   std::vector<std::shared_ptr<BaseObstacle>> antiObstaclePtrs_{};
 };
 
-#endif  // OBSTACLES_CUTOUT_OBSTACLES
+}  // namespace ompltools
+
+}  // namespace esp

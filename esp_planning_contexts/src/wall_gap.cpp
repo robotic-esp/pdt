@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/wall_gap.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -49,17 +49,20 @@
 
 #include "esp_obstacles/hyperrectangle.h"
 
-WallGap::WallGap(const unsigned int dim, const bool onlyFindGap,
-                                     const double gapWidth, const double gapOffset,
-                                     const double flankWidth, const double runSeconds,
-                                     const double checkResolution)
-    : BaseContext(
-          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
-          runSeconds, "WallGap"),
-      stopClassSwitch_(onlyFindGap),
-      gapWidth_(gapWidth),
-      gapOffset_(gapOffset),
-      flankWidth_(flankWidth) {
+namespace esp {
+
+namespace ompltools {
+
+WallGap::WallGap(const unsigned int dim, const bool onlyFindGap, const double gapWidth,
+                 const double gapOffset, const double flankWidth, const double runSeconds,
+                 const double checkResolution) :
+    BaseContext(dim,
+                std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+                runSeconds, "WallGap"),
+    stopClassSwitch_(onlyFindGap),
+    gapWidth_(gapWidth),
+    gapOffset_(gapOffset),
+    flankWidth_(flankWidth) {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -132,8 +135,7 @@ WallGap::WallGap(const unsigned int dim, const bool onlyFindGap,
   BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseContext::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Allocate the temporary variable for the obstacles, antiobstacles, and the lower-left corners
   obs = std::make_shared<Hyperrectangle>(BaseContext::si_, false);
@@ -145,7 +147,7 @@ WallGap::WallGap(const unsigned int dim, const bool onlyFindGap,
   // Specify the obstacle
   // Position
   (*obstacleLowerLeftCorner_)[0u] = (goalPos_ + startPos_) / 2.0 - 0.5 * obsThickness_;  // x
-  (*obstacleLowerLeftCorner_)[1u] = BaseContext::limits_.at(1u).first;                // y
+  (*obstacleLowerLeftCorner_)[1u] = BaseContext::limits_.at(1u).first;                   // y
   for (unsigned int i = 2u; i < BaseContext::dim_; ++i) {
     (*obstacleLowerLeftCorner_)[i] = BaseContext::limits_.at(i).first;  // z
   }
@@ -157,8 +159,7 @@ WallGap::WallGap(const unsigned int dim, const bool onlyFindGap,
       (BaseContext::limits_.at(1u).second - BaseContext::limits_.at(1u).first) -
       flankWidth_;  // y width
   for (unsigned int i = 2u; i < BaseContext::dim_; ++i) {
-    obstacleWidths_.at(i) =
-        BaseContext::limits_.at(i).second - BaseContext::limits_.at(i).first;
+    obstacleWidths_.at(i) = BaseContext::limits_.at(i).second - BaseContext::limits_.at(i).first;
   }
 
   obs->addObstacle(std::make_pair(obstacleLowerLeftCorner_->get(), obstacleWidths_));
@@ -218,19 +219,19 @@ ompl::base::Cost WallGap::getOptimum() const {
   ompl::base::Cost otherCornerToGoal;
 
   // The optimum goes exactly under *upperObs_:
-  startToCorner = ompl::base::Cost(std::sqrt(
-      std::pow((*gapLowerLeftCorner_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
-      std::pow((*gapLowerLeftCorner_)[1u] - BaseContext::startStates_.front()[1u], 2.0)));
+  startToCorner = ompl::base::Cost(
+      std::sqrt(std::pow((*gapLowerLeftCorner_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
+                std::pow((*gapLowerLeftCorner_)[1u] - BaseContext::startStates_.front()[1u], 2.0)));
   obsEdge = ompl::base::Cost(gapWidths_.at(0u));
-  otherCornerToGoal = ompl::base::Cost(std::sqrt(
-      std::pow(BaseContext::goalStates_.front()[0u] -
-                   ((*gapLowerLeftCorner_)[0u] + gapWidths_.at(0u)),
-               2.0) +
-      std::pow(BaseContext::goalStates_.front()[1u] - (*gapLowerLeftCorner_)[1u], 2.0)));
+  otherCornerToGoal = ompl::base::Cost(
+      std::sqrt(std::pow(BaseContext::goalStates_.front()[0u] -
+                             ((*gapLowerLeftCorner_)[0u] + gapWidths_.at(0u)),
+                         2.0) +
+                std::pow(BaseContext::goalStates_.front()[1u] - (*gapLowerLeftCorner_)[1u], 2.0)));
 
   // Combine and return:
-  return BaseContext::opt_->combineCosts(
-      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(BaseContext::opt_->combineCosts(startToCorner, obsEdge),
+                                         otherCornerToGoal);
 }
 
 ompl::base::Cost WallGap::minFlankingCost() const {
@@ -240,11 +241,11 @@ ompl::base::Cost WallGap::minFlankingCost() const {
   ompl::base::Cost otherCornerToGoal;
 
   // The minimum cost not through the gap goes exactly over *upperObs_:
-  startToCorner = ompl::base::Cost(std::sqrt(
-      std::pow((*gapLowerLeftCorner_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
-      std::pow(((*gapLowerLeftCorner_)[1u] + gapWidths_.at(1u)) -
-                   BaseContext::startStates_.front()[1u],
-               2.0)));
+  startToCorner = ompl::base::Cost(
+      std::sqrt(std::pow((*gapLowerLeftCorner_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
+                std::pow(((*gapLowerLeftCorner_)[1u] + gapWidths_.at(1u)) -
+                             BaseContext::startStates_.front()[1u],
+                         2.0)));
   obsEdge = ompl::base::Cost(gapWidths_.at(0u));
   otherCornerToGoal =
       ompl::base::Cost(std::sqrt(std::pow(BaseContext::goalStates_.front()[0u] -
@@ -255,8 +256,8 @@ ompl::base::Cost WallGap::minFlankingCost() const {
                                           2.0)));
 
   // Combine and return:
-  return BaseContext::opt_->combineCosts(
-      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(BaseContext::opt_->combineCosts(startToCorner, obsEdge),
+                                         otherCornerToGoal);
 }
 
 ompl::base::Cost WallGap::maxGapCost() const {
@@ -281,8 +282,8 @@ ompl::base::Cost WallGap::maxGapCost() const {
                          2.0)));
 
   // Combine and return:
-  return BaseContext::opt_->combineCosts(
-      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(BaseContext::opt_->combineCosts(startToCorner, obsEdge),
+                                         otherCornerToGoal);
 }
 
 void WallGap::setTarget(double targetSpecifier) {
@@ -340,3 +341,7 @@ std::string WallGap::paraInfo() const {
 
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

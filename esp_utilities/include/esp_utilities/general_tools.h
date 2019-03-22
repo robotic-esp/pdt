@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2018, University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Oxford nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,21 +32,21 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#ifndef GENERAL_TOOLS
-#define GENERAL_TOOLS
+// Authors: Jonathan Gammell
 
-// For io streams
-#include <iostream>
-// For stringstream
-#include <sstream>
-// For setw and setprecision, etc.
-#include <iomanip>
-// For infinities
-#include <cmath>
-// For time
+#pragma once
+
 #include <chrono>
+#include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 #define ASRL_DURATION_INFINITY asrl::time::clock::duration::max()
+
+namespace esp {
+
+namespace ompltools {
 
 // Stream operator defined after the namespace
 template <class CLOCK, class DUR>
@@ -73,7 +73,9 @@ inline bool isfinite(const asrl::time::duration& dur) {
 }
 
 /// This was copied from ompl/util/Time.h and modified to use the specified clock
-inline asrl::time::point now() { return asrl::time::clock::now(); }
+inline asrl::time::point now() {
+  return asrl::time::clock::now();
+}
 
 /** \brief Return string representation of point in time */
 inline std::string as_string(const asrl::time::point& p) {
@@ -153,4 +155,6 @@ std::ostream& operator<<(std::ostream& out, const std::chrono::time_point<CLOCK,
   return out;
 }
 
-#endif  // GENERAL_TOOLS
+}  // namespace ompltools
+
+}  // namespace esp

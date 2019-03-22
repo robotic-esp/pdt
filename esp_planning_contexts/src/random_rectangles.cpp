@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/random_rectangles.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -47,14 +47,16 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-RandomRectangles::RandomRectangles(const unsigned int dim,
-                                                       const unsigned int numObs,
-                                                       const double obsRatio,
-                                                       const double runSeconds,
-                                                       const double checkResolution)
-    : BaseContext(
-          dim, std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
-          runSeconds, "RandRect") {
+namespace esp {
+
+namespace ompltools {
+
+RandomRectangles::RandomRectangles(const unsigned int dim, const unsigned int numObs,
+                                   const double obsRatio, const double runSeconds,
+                                   const double checkResolution) :
+    BaseContext(dim,
+                std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
+                runSeconds, "RandRect") {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -122,8 +124,7 @@ RandomRectangles::RandomRectangles(const unsigned int dim,
   BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseContext::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Calculate the minimum and maximum radius of the obstacles:
   // First, calculate the desired obstacle volume of the problem:
@@ -146,8 +147,8 @@ RandomRectangles::RandomRectangles(const unsigned int dim,
   }
 
   // Add the obstacle.:
-  rectObs_->addObstacle(std::make_pair(sightLineObs_->get(),
-                                       std::vector<double>(BaseContext::dim_, sightLineWidth)));
+  rectObs_->addObstacle(
+      std::make_pair(sightLineObs_->get(), std::vector<double>(BaseContext::dim_, sightLineWidth)));
 
   // Create a random set of obstacles
   if (obsRatio > 0.0) {
@@ -155,8 +156,7 @@ RandomRectangles::RandomRectangles(const unsigned int dim,
     std::vector<ompl::base::ScopedState<>> tVec;
 
     // Copy into
-    tVec.insert(tVec.end(), BaseContext::startStates_.begin(),
-                BaseContext::startStates_.end());
+    tVec.insert(tVec.end(), BaseContext::startStates_.begin(), BaseContext::startStates_.end());
     tVec.insert(tVec.end(), BaseContext::goalStates_.begin(), BaseContext::goalStates_.end());
 
     rectObs_->randomize(0.50 * meanObsWidth_, 1.5 * meanObsWidth_, obsRatio, tVec);
@@ -190,3 +190,7 @@ std::string RandomRectangles::lineInfo() const {
 std::string RandomRectangles::paraInfo() const {
   return std::string();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

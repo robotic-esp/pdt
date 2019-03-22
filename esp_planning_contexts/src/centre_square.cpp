@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/centre_square.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -47,16 +47,19 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-CentreSquare::CentreSquare(const unsigned int dim, const double obsWidth,
-                                               const double worldWidth, const double runSeconds,
-                                               const double checkResolution)
-    : BaseContext(dim,
-                     std::vector<std::pair<double, double>>(
-                         dim, std::pair<double, double>(-0.5 * worldWidth, 0.5 * worldWidth)),
-                     runSeconds, "CentreSquare"),
-      obsWidth_(obsWidth),
-      startPos_(-0.5),
-      goalPos_(0.5) {
+namespace esp {
+
+namespace ompltools {
+
+CentreSquare::CentreSquare(const unsigned int dim, const double obsWidth, const double worldWidth,
+                           const double runSeconds, const double checkResolution) :
+    BaseContext(dim,
+                std::vector<std::pair<double, double>>(
+                    dim, std::pair<double, double>(-0.5 * worldWidth, 0.5 * worldWidth)),
+                runSeconds, "CentreSquare"),
+    obsWidth_(obsWidth),
+    startPos_(-0.5),
+    goalPos_(0.5) {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -126,8 +129,7 @@ CentreSquare::CentreSquare(const unsigned int dim, const double obsWidth,
   BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseContext::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Set the obstacle's lower-left corner:
   sightLineObs_ = std::make_shared<ompl::base::ScopedState<>>(ss);
@@ -159,8 +161,8 @@ ompl::base::Cost CentreSquare::getOptimum() const {
       std::pow(BaseContext::goalStates_.front()[1u] - (*sightLineObs_)[1u], 2.0)));
 
   // Combine and return:
-  return BaseContext::opt_->combineCosts(
-      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(BaseContext::opt_->combineCosts(startToCorner, obsEdge),
+                                         otherCornerToGoal);
 }
 
 void CentreSquare::setTarget(double targetSpecifier) {
@@ -179,3 +181,7 @@ std::string CentreSquare::lineInfo() const {
 std::string CentreSquare::paraInfo() const {
   return std::string();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

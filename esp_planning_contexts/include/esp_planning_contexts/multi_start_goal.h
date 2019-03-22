@@ -39,6 +39,10 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief An with 2 starts, 3 goals and random obstacles. */
 class MultiStartGoal : public BaseContext {
  public:
@@ -66,3 +70,7 @@ class MultiStartGoal : public BaseContext {
   /** \brief The obstacle world */
   std::shared_ptr<Hyperrectangle> rectObs_{};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

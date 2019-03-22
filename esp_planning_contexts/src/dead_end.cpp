@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/dead_end.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -47,15 +47,18 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-DeadEnd::DeadEnd(const double distFraction, const double runSeconds,
-                                     const double checkResolution)
-    : BaseContext(
-          2u, std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
-          runSeconds, "DeadEnd"),
-      topHorizontalWidths_(2u, 0.0),     
-      sideVerticalWidths_(2u, 0.0),      
-      bottomHorizontalWidths_(2u, 0.0),  
-      obsThickness_(0.1) {
+namespace esp {
+
+namespace ompltools {
+
+DeadEnd::DeadEnd(const double distFraction, const double runSeconds, const double checkResolution) :
+    BaseContext(2u,
+                std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
+                runSeconds, "DeadEnd"),
+    topHorizontalWidths_(2u, 0.0),
+    sideVerticalWidths_(2u, 0.0),
+    bottomHorizontalWidths_(2u, 0.0),
+    obsThickness_(0.1) {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -138,8 +141,7 @@ DeadEnd::DeadEnd(const double distFraction, const double runSeconds,
   BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseContext::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Allocate the obstacles' lower-left corners:
   topHorizontal_ = std::make_shared<ompl::base::ScopedState<>>(ss);
@@ -180,9 +182,9 @@ bool DeadEnd::knowsOptimum() const {
 }
 
 ompl::base::Cost DeadEnd::getOptimum() const {
-  ompl::base::Cost startToCorner(std::sqrt(
-      std::pow((*bottomHorizontal_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
-      std::pow((*bottomHorizontal_)[1u] - BaseContext::startStates_.front()[1u], 2.0)));
+  ompl::base::Cost startToCorner(
+      std::sqrt(std::pow((*bottomHorizontal_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
+                std::pow((*bottomHorizontal_)[1u] - BaseContext::startStates_.front()[1u], 2.0)));
   ompl::base::Cost obsEdge(bottomHorizontalWidths_.at(0u) + sideVerticalWidths_.at(0u));
   ompl::base::Cost otherCornerToGoal(
       std::sqrt(std::pow(BaseContext::goalStates_.front()[0u] -
@@ -191,8 +193,8 @@ ompl::base::Cost DeadEnd::getOptimum() const {
                 std::pow(BaseContext::goalStates_.front()[1u] - (*sideVertical_)[1u], 2.0)));
 
   // Combine and return:
-  return BaseContext::opt_->combineCosts(
-      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(BaseContext::opt_->combineCosts(startToCorner, obsEdge),
+                                         otherCornerToGoal);
 }
 
 void DeadEnd::setTarget(double targetSpecifier) {
@@ -207,3 +209,7 @@ std::string DeadEnd::lineInfo() const {
 std::string DeadEnd::paraInfo() const {
   return std::string();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

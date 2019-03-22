@@ -36,6 +36,10 @@
 
 #include "esp_obstacles/base_obstacle.h"
 
+namespace esp {
+
+namespace ompltools {
+
 BaseObstacle::BaseObstacle(ompl::base::SpaceInformation* si) :
     ompl::base::StateValidityChecker(si) {
 }
@@ -54,3 +58,7 @@ bool BaseObstacle::isValid(const std::vector<const ompl::base::State*>& states) 
   // All states are valid.
   return true;
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

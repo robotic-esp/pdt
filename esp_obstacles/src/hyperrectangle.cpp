@@ -42,6 +42,10 @@
 #include <ompl/datastructures/NearestNeighborsGNAT.h>
 #include <ompl/util/Exception.h>
 
+namespace esp {
+
+namespace ompltools {
+
 Hyperrectangle::Hyperrectangle(ompl::base::SpaceInformation* si, bool separateObstacles) :
     BaseObstacle(si),
     separateObstacles_(separateObstacles) {
@@ -385,24 +389,8 @@ double Hyperrectangle::rectangleVolume(const std::vector<double>& widths) {
 double Hyperrectangle::distanceFunction(const obstacle_corner_widths_t& a,
                                         const obstacle_corner_widths_t& b) const {
   return StateValidityChecker::si_->distance(a.first, b.first);
-
-  // I think this *should* be std::max, but that clearly misses obstacles for reasons I don't
-  // understand, so I don't trust it and instead call nearest neighbours with the radius of the
-  // bounding circle...
-  /*
-  //Variable
-  //The distance
-  double dist;
-
-  //The distance is the largest component of the absolute dist between the states
-  dist = 0.0;
-  for (unsigned int i = 0u; i < a.second.size(); ++i)
-  {
-      dist = std::min(dist,
-  std::abs(a.first->as<ompl::base::RealVectorStateSpace::StateType>()->values[i] -
-  b.first->as<ompl::base::RealVectorStateSpace::StateType>()->values[i]) );
-  }
-
-  return dist;
-  */
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

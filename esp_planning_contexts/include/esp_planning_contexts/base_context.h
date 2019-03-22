@@ -52,6 +52,10 @@
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_utilities/general_tools.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief The base class for an experiment */
 class BaseContext : boost::noncopyable {
  public:
@@ -143,3 +147,7 @@ class BaseContext : boost::noncopyable {
 };
 
 using BaseContextPtr = std::shared_ptr<BaseContext>;
+
+}  // namespace ompltools
+
+}  // namespace esp

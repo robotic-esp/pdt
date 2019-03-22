@@ -39,12 +39,16 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 
+namespace esp {
+
+namespace ompltools {
+
 /** \brief An experiment with a singularly placed square obstacle*/
 class CentreSquare : public BaseContext {
  public:
   /** \brief Constructor */
   CentreSquare(const unsigned int dim, const double obsWidth, const double worldWidth,
-                         const double runSeconds, const double checkResolution);
+               const double runSeconds, const double checkResolution);
 
   /** \brief Whether the problem has an exact expression for the optimum */
   virtual bool knowsOptimum() const;
@@ -64,13 +68,17 @@ class CentreSquare : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<Hyperrectangle> rectObs_ { };
+  std::shared_ptr<Hyperrectangle> rectObs_{};
   /** \brief The lower-left corner of an obstacle half-way between the start and goal */
-  std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_ { };
+  std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_{};
   /** The widths of the sight-line obstacle */
-  double obsWidth_ { 0.0 };
+  double obsWidth_{0.0};
 
   // The start and goal positions.
-  double startPos_ { 0.0 };
-  double goalPos_  { 0.0 };
+  double startPos_{0.0};
+  double goalPos_{0.0};
 };
+
+}  // namespace ompltools
+
+}  // namespace esp

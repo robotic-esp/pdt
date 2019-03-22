@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/double_enclosure.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -49,16 +49,18 @@
 
 #include "esp_obstacles/hyperrectangle.h"
 
-DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
-                                                     const double worldHalfWidth,
-                                                     const double insideWidth,
-                                                     const double wallThickness,
-                                                     const double gapWidth, const double runSeconds,
-                                                     const double checkResolution) :
+namespace esp {
+
+namespace ompltools {
+
+DoubleEnclosure::DoubleEnclosure(const unsigned int dim, const double worldHalfWidth,
+                                 const double insideWidth, const double wallThickness,
+                                 const double gapWidth, const double runSeconds,
+                                 const double checkResolution) :
     BaseContext(dim,
-                   std::vector<std::pair<double, double>>(
-                       dim, std::pair<double, double>(-worldHalfWidth, worldHalfWidth)),
-                   runSeconds, "DblEncl"),
+                std::vector<std::pair<double, double>>(
+                    dim, std::pair<double, double>(-worldHalfWidth, worldHalfWidth)),
+                runSeconds, "DblEncl"),
     insideWidth_(insideWidth),
     wallThickness_(wallThickness),
     gapWidth_(gapWidth) {
@@ -146,8 +148,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
   BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseContext::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Allocate the temporary variable for the obstacles, antiobstacles, and the lower-left corners
   obs = std::make_shared<Hyperrectangle>(BaseContext::si_, false);
@@ -155,7 +156,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
 
   //*****The start first*****//
   //*****Obstacle*****//
-  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
 
   // All widths are the same
   startEnclWidths_.push_back(
@@ -173,7 +174,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
   obs->addObstacle(std::make_pair(startEnclCorners_.back()->get(), startEnclWidths_.back()));
 
   //*****Internal Space*****//
-  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
 
   // All widths are the same
   startEnclWidths_.push_back(std::vector<double>(BaseContext::dim_, insideWidth_));
@@ -190,7 +191,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
   anti->addObstacle(std::make_pair(startEnclCorners_.back()->get(), startEnclWidths_.back()));
 
   //*****Passage*****//
-  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  startEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
   startEnclWidths_.push_back(std::vector<double>());
 
   // X is unique (it's the outside of the wall on the left)
@@ -208,7 +209,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
 
   //*****Then the goal*****//
   //*****Obstacle*****//
-  goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
 
   // All widths are the same
   goalEnclWidths_.push_back(
@@ -226,7 +227,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
   obs->addObstacle(std::make_pair(goalEnclCorners_.back()->get(), goalEnclWidths_.back()));
 
   //*****Internal Space*****//
-  goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
 
   // All widths are the same
   goalEnclWidths_.push_back(std::vector<double>(BaseContext::dim_, insideWidth_));
@@ -243,7 +244,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
   anti->addObstacle(std::make_pair(goalEnclCorners_.back()->get(), goalEnclWidths_.back()));
 
   //*****Passage*****//
-  goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<> >(ss));
+  goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));
   goalEnclWidths_.push_back(std::vector<double>());
 
   // X is unique (it's the inside of the wall on the right)
@@ -267,7 +268,9 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim,
   BaseContext::opt_->setCostThreshold(BaseContext::getMinimum());
 }
 
-bool DoubleEnclosure::knowsOptimum() const { return true; }
+bool DoubleEnclosure::knowsOptimum() const {
+  return true;
+}
 
 ompl::base::Cost DoubleEnclosure::getOptimum() const {
   /*
@@ -314,16 +317,18 @@ ompl::base::Cost DoubleEnclosure::getOptimum() const {
   return BaseContext::opt_->combineCosts(
       startToOpening,
       BaseContext::opt_->combineCosts(
-          openingToCorner, BaseContext::opt_->combineCosts(
-                               cornerToCorner, BaseContext::opt_->combineCosts(
-                                                   openingToCorner, startToOpening))));
+          openingToCorner,
+          BaseContext::opt_->combineCosts(
+              cornerToCorner, BaseContext::opt_->combineCosts(openingToCorner, startToOpening))));
 }
 
 void DoubleEnclosure::setTarget(double targetSpecifier) {
   BaseContext::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
 }
 
-std::string DoubleEnclosure::lineInfo() const { return std::string(); }
+std::string DoubleEnclosure::lineInfo() const {
+  return std::string();
+}
 
 std::string DoubleEnclosure::paraInfo() const {
   std::stringstream rval;
@@ -342,8 +347,8 @@ std::string DoubleEnclosure::paraInfo() const {
   return rval.str();
 }
 
-std::string DoubleEnclosure::printRectangle(
-    std::shared_ptr<ompl::base::ScopedState<> > llCorner, std::vector<double> widths) const {
+std::string DoubleEnclosure::printRectangle(std::shared_ptr<ompl::base::ScopedState<>> llCorner,
+                                            std::vector<double> widths) const {
   std::stringstream rval;
 
   rval << "[";
@@ -364,3 +369,7 @@ std::string DoubleEnclosure::printRectangle(
 
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

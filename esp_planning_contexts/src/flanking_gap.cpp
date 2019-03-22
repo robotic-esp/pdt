@@ -37,8 +37,8 @@
 #include "esp_planning_contexts/flanking_gap.h"
 
 #include <cmath>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
@@ -47,13 +47,17 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-FlankingGap::FlankingGap(const bool onlyFindGap, const double gapWidth,
-                                             const double runSeconds, const double checkResolution)
-    : BaseContext(
-          2u, std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
-          runSeconds, "FlankingGap"),
-      stopClassSwitch_(onlyFindGap),
-      gapWidth_(gapWidth) {
+namespace esp {
+
+namespace ompltools {
+
+FlankingGap::FlankingGap(const bool onlyFindGap, const double gapWidth, const double runSeconds,
+                         const double checkResolution) :
+    BaseContext(2u,
+                std::vector<std::pair<double, double>>(2u, std::pair<double, double>(-1.0, 1.0)),
+                runSeconds, "FlankingGap"),
+    stopClassSwitch_(onlyFindGap),
+    gapWidth_(gapWidth) {
   // Variable
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -123,8 +127,7 @@ FlankingGap::FlankingGap(const bool onlyFindGap, const double gapWidth,
   BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(
-      BaseContext::goalStates_.back());
+  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Allocate the obstacles lower-left corners:
   lowerObs_ = std::make_shared<ompl::base::ScopedState<>>(ss);
@@ -188,8 +191,8 @@ ompl::base::Cost FlankingGap::getOptimum() const {
       std::pow(BaseContext::goalStates_.front()[1u] - (*upperObs_)[1u], 2.0)));
 
   // Combine and return:
-  return BaseContext::opt_->combineCosts(
-      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(BaseContext::opt_->combineCosts(startToCorner, obsEdge),
+                                         otherCornerToGoal);
 }
 
 ompl::base::Cost FlankingGap::minFlankingCost() const {
@@ -210,8 +213,8 @@ ompl::base::Cost FlankingGap::minFlankingCost() const {
       std::pow(BaseContext::goalStates_.front()[1u] - (*lowerObs_)[1u], 2.0)));
 
   // Combine and return:
-  return BaseContext::opt_->combineCosts(
-      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(BaseContext::opt_->combineCosts(startToCorner, obsEdge),
+                                         otherCornerToGoal);
 }
 
 ompl::base::Cost FlankingGap::maxGapCost() const {
@@ -233,8 +236,8 @@ ompl::base::Cost FlankingGap::maxGapCost() const {
                2.0)));
 
   // Combine and return:
-  return BaseContext::opt_->combineCosts(
-      BaseContext::opt_->combineCosts(startToCorner, obsEdge), otherCornerToGoal);
+  return BaseContext::opt_->combineCosts(BaseContext::opt_->combineCosts(startToCorner, obsEdge),
+                                         otherCornerToGoal);
 }
 
 void FlankingGap::setTarget(double targetSpecifier) {
@@ -293,3 +296,7 @@ std::string FlankingGap::paraInfo() const {
 
   return rval.str();
 }
+
+}  // namespace ompltools
+
+}  // namespace esp
