@@ -380,7 +380,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  esp_ompl_tools::PlannerFactory plannerFactory(plannerConfigFile);
+  esp::ompltools::PlannerFactory plannerFactory(plannerConfigFile);
   plannerFactory.dumpParameters(std::cout);
 
   // Variables

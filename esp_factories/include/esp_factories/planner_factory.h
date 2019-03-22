@@ -46,23 +46,27 @@
 
 #include "esp_planning_contexts/base_context.h"
 
-namespace esp_ompl_tools {
+namespace esp {
+
+namespace ompltools {
 
 // A class to create planners from config files.
 class PlannerFactory {
-public:
+ public:
   PlannerFactory(std::experimental::filesystem::path plannerConfigFile);
   ~PlannerFactory() = default;
 
   // Create a planner.
   std::shared_ptr<ompl::base::Planner> create(const std::string &plannerType,
                                               const BaseContextPtr &experiment) const;
-  
-  // Dump the parameters to an ostream.
-  void dumpParameters(std::ostream& out) const;
 
-private:
+  // Dump the parameters to an ostream.
+  void dumpParameters(std::ostream &out) const;
+
+ private:
   nlohmann::json parameters_{};
 };
 
-} // End namespace esp_ompl_tools.
+}  // namespace ompltools
+
+}  // namespace esp

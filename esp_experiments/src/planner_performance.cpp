@@ -40,5 +40,9 @@
 #include "esp_factories/planner_factory.h"
 
 int main(int /* argc */, char** /* argv */) {
-  std::cout << "Hello World\n";
+  // Create a planner factory, using the default parameters.
+  esp::ompltools::PlannerFactory plannerFactory("./parameters/default_planner_parameters.json");
+
+
+  return 0;
 }

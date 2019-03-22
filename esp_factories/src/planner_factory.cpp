@@ -46,25 +46,29 @@
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
 
-namespace esp_ompl_tools {
+namespace esp {
+
+namespace ompltools {
 
 // Convenience namespace.
 namespace fs = std::experimental::filesystem;
 
 PlannerFactory::PlannerFactory(fs::path plannerConfigFile) {
-  // Check the config file exists.
   if (fs::exists(plannerConfigFile)) {
-    // It does, load it into the parameters.
+    // If its a symlink, read the actual file.
+    if (fs::is_symlink(plannerConfigFile)) {
+      plannerConfigFile = fs::read_symlink(plannerConfigFile);
+    }
     std::ifstream file(plannerConfigFile.string());
     file >> parameters_;
   } else {
-    // It does not, the factory is useless, throw.
+    // The provided config file does not exist, the factory is useless, throw.
     throw fs::filesystem_error("File does not exist.", plannerConfigFile, std::error_code());
   }
 }
 
 std::shared_ptr<ompl::base::Planner> PlannerFactory::create(
-    const std::string& plannerType, const BaseContextPtr &experiment) const {
+    const std::string &plannerType, const BaseContextPtr &experiment) const {
   // BIT*
   if (plannerType == std::string("BITstar")) {
     // Allocate and configure a BIT* planner.
@@ -137,8 +141,10 @@ std::shared_ptr<ompl::base::Planner> PlannerFactory::create(
   }
 }
 
-void PlannerFactory::dumpParameters(std::ostream& out) const {
+void PlannerFactory::dumpParameters(std::ostream &out) const {
   out << "Planner Parameters:\n" << parameters_.dump(2) << '\n';
 }
 
-}  // namespace esp_ompl_tools
+}  // namespace ompltools
+
+}  // namespace esp
