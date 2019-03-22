@@ -17,7 +17,7 @@ include_directories(
 add_library(esp_obstacles
   src/base_obstacle.cpp
   src/binary_map.cpp
-  src/cutout.cpp
+  src/cutout_hyperrectangles.cpp
   src/hyperrectangle.cpp
   src/repeating_hyperrectangles.cpp)
 

@@ -34,7 +34,7 @@
 
 /* Authors: Jonathan Gammell */
 
-#include "esp_obstacles/cutout.h"
+#include "esp_obstacles/cutout_hyperrectangles.h"
 
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/StateValidityChecker.h>

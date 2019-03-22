@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "esp_obstacles/cutout.h"
+#include "esp_obstacles/cutout_hyperrectangles.h"
 #include "esp_planning_contexts/base_context.h"
 
 /** \brief An two-homotopy-class experiment that scales to N dimensions. I.e., an obstacle with a
