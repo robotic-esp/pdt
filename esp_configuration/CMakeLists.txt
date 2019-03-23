@@ -6,6 +6,7 @@ add_definitions(-std=c++17 -Wall -Wextra -Weffc++ -Werror
   -Wdisabled-optimization -fdiagnostics-color=auto)
 
 # Get the git branch, commit hash, and status.
+# See answers to https://stackoverflow.com/q/1435953/6333988
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
