@@ -1,0 +1,169 @@
+{
+    "Contexts": {
+        "CentreSquare": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "obstacleWidth": 0.5
+        },
+        "DividingWall": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "collisionCheckResolution": 0.001,
+            "wallThickness": 0.1,
+            "numGaps": 2,
+            "gapWidths": 0.05
+        },
+        "DoubleEnclosure": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "insideWidth": 0.3,
+            "wallThickness": 0.05,
+            "openingWidth": 0.1
+        },
+        "FlankingGap": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "startPositionX": -0.5,
+            "goalPositionX": 0.5,
+            "collisionCheckResolution": 0.001,
+            "wallThickness": 0.05,
+            "gapWidths": 0.01
+        },
+        "GoalEnclosure": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "startPositionX": -0.5,
+            "goalPositionX": 0.5,
+            "collisionCheckResolution": 0.001,
+            "insideWidth": 0.3,
+            "wallThickness": 0.05,
+            "openingWidth": 0.1
+        },
+        "MultiStartGoal": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "numStarts": 2,
+            "numGoals": 3,
+            "collisionCheckResolution": 0.001,
+            "numObstacles": 30,
+            "obstacleRatio": 0.8
+        },
+        "ObstacleFree": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "numStarts": 3,
+            "numGoals": 3,
+            "collisionCheckResolution": 0.001
+        },
+        "RandomRectangles": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "startPositionX": -0.5,
+            "goalPositionX": 0.5,
+            "collisionCheckResolution": 0.001,
+            "numObstacles": 30,
+            "obstacleRatio": 0.8
+        },
+        "RegularRectangles": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "startPositionX": -0.5,
+            "goalPositionX": 0.5,
+            "collisionCheckResolution": 0.001,
+            "numObstaclesBetween": 5
+        },
+        "Spiral": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "wallThickness": 0.05
+        },
+        "StartEnclosure": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "startPositionX": -0.5,
+            "goalPositionX": 0.5,
+            "collisionCheckResolution": 0.001,
+            "insideWidth": 0.3,
+            "wallThickness": 0.05,
+            "openingWidth": 0.1
+        },
+        "WallGap": {
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "startPositionX": -0.5,
+            "goalPositionX": 0.5,
+            "collisionCheckResolution": 0.001,
+            "gapWidth": 0.05,
+            "gapOffset": 0.05,
+            "flankWidth": 1.5
+        }
+    },
+    "Planners": {
+        "RRTstar": {
+            "name": "RRTstar",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "goalBias": 0.05,
+            "maxEdgeLength": {
+                "2d": 0.3,
+                "4d": 0.5,
+                "6d": 0.9,
+                "8d": 1.25,
+                "16d": 3.0
+            },
+            "delayCollisionChecks": true,
+            "useAdmissibleCostToCome": true
+        },
+        "RRTConnect": {
+            "name": "RRTConnect",
+            "useKNearest": false,
+            "maxEdgeLength": {
+                "2d": 0.3,
+                "4d": 0.5,
+                "6d": 0.9,
+                "8d": 1.25,
+                "16d": 3.0
+            },
+            "addIntermediateStates": false
+        },
+        "BITstar": {
+            "name": "BITstar",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "samplesPerBatch": 1000,
+            "enablePruning": false,
+            "pruningThreshold": 0.1,
+            "useJustInTimeSampling": false,
+            "dropSamplesOnPrune": false,
+            "stopOnSolutionImprovement": false
+        },
+        "SBITstar": {
+            "name": "SBITstar",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "samplesPerBatch": 100,
+            "enablePruning": false,
+            "pruningThreshold": 0.1,
+            "useJustInTimeSampling": false,
+            "dropSamplesOnPrune": false,
+            "stopOnSolutionImprovement": false,
+            "initialInflation": 1000000,
+            "inflationParameter": 10,
+            "truncationParameter": 5
+        }
+    }
+}

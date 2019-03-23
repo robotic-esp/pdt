@@ -1,0 +1,16 @@
+{
+    "context": "CentreSquare",
+    "planners": {
+        "BITstar",
+        "RRTstar",
+        "RRTConnect"
+    },
+    "numRuns": 100,
+    "patches": {
+        "Contexts": {
+            "CentreSquare": {
+                "maxTime": 3
+            }
+        }
+    }
+}
