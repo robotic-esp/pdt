@@ -17,7 +17,6 @@ include_directories(
 add_library(esp_planning_contexts
   src/base_context.cpp
   src/centre_square.cpp
-  src/dead_end.cpp
   src/dividing_wall.cpp
   src/double_enclosure.cpp
   src/flanking_gap.cpp
@@ -25,14 +24,14 @@ add_library(esp_planning_contexts
   src/multi_start_goal.cpp
   src/obstacle_free.cpp
   src/random_rectangles.cpp
-  src/random_rectangles_with_dividing_wall.cpp
   src/regular_rectangles.cpp
   src/spiral.cpp
   src/start_enclosure.cpp
   src/wall_gap.cpp)
 
 # Link the library.
-target_link_libraries(esp_planning_contexts PUBLIC
+target_link_libraries(esp_planning_contexts
+  PUBLIC # Libraries exposed in API.
   ${OMPL_LIBRARIES}
   esp_obstacles
   esp_utilities)

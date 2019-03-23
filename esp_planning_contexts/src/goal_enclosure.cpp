@@ -92,7 +92,7 @@ GoalEnclosure::GoalEnclosure(const unsigned int dim, const double worldHalfWidth
   BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  enclObs_ = std::make_shared<CutoutHyperrectangles>(BaseContext::si_);
+  enclObs_ = std::make_shared<CutoutObstacles>(BaseContext::si_);
   BaseContext::obs_ = enclObs_;
 
   // Set the problem bounds:

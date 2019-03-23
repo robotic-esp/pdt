@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "esp_obstacles/cutout_hyperrectangles.h"
+#include "esp_obstacles/cutout_obstacles.h"
 #include "esp_planning_contexts/base_context.h"
 
 namespace esp {
@@ -49,9 +49,12 @@ namespace ompltools {
 class DoubleEnclosure : public BaseContext {
  public:
   /** \brief Constructor */
-  DoubleEnclosure(const unsigned int dim, const double worldHalfWidth, const double insideWidth,
-                  const double wallThickness, const double gapWidth, const double runSeconds,
+  DoubleEnclosure(const unsigned int dim, const double worldWidth, const double insideWidth,
+                  const double wallThickness, const double openingWidth, const double runSeconds,
                   const double checkResolution);
+
+  // Destructor
+  ~DoubleEnclosure() = default;
 
   /** \brief This problem could knows its optimum, but doesn't right now */
   virtual bool knowsOptimum() const;
@@ -71,7 +74,7 @@ class DoubleEnclosure : public BaseContext {
  protected:
   // Variables
   /** \brief The actual enclosures */
-  std::shared_ptr<CutoutHyperrectangles> enclObs_{};
+  std::shared_ptr<CutoutObstacles> enclObs_{};
 
   /** \brief Construction variables: The lower-left corners (1 obs, 2 anti) */
   std::vector<std::shared_ptr<ompl::base::ScopedState<>>> startEnclCorners_{};
@@ -86,7 +89,7 @@ class DoubleEnclosure : public BaseContext {
   /** \brief The enclosure-wall thickness. */
   double wallThickness_{0.0};
   /** \brief The width of the opening in directions perpendicular to the wall thickness. */
-  double gapWidth_{0.0};
+  double openingWidth_{0.0};
   /** \brief The start and goal positions */
   double startPos_{-0.5};
   double goalPos_{0.5};

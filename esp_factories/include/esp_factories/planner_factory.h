@@ -36,14 +36,13 @@
 
 #pragma once
 
-#include <experimental/filesystem>
 #include <fstream>
 #include <iostream>
 
 #include <ompl/base/Planner.h>
 
-#include "nlohmann/json.hpp"
 
+#include "esp_configuration/configuration.h"
 #include "esp_planning_contexts/base_context.h"
 
 namespace esp {
@@ -53,18 +52,16 @@ namespace ompltools {
 // A class to create planners from config files.
 class PlannerFactory {
  public:
-  PlannerFactory(std::experimental::filesystem::path plannerConfigFile);
+  PlannerFactory(const std::shared_ptr<Configuration> &config,
+                 const std::shared_ptr<BaseContext> &context);
   ~PlannerFactory() = default;
 
   // Create a planner.
-  std::shared_ptr<ompl::base::Planner> create(const std::string &plannerType,
-                                              const BaseContextPtr &experiment) const;
-
-  // Dump the parameters to an ostream.
-  void dumpParameters(std::ostream &out) const;
+  std::shared_ptr<ompl::base::Planner> create(const std::string &plannerType) const;
 
  private:
-  nlohmann::json parameters_{};
+  const std::shared_ptr<const Configuration> config_;
+  const std::shared_ptr<const BaseContext> context_;
 };
 
 }  // namespace ompltools

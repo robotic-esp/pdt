@@ -39,8 +39,6 @@
 #include <memory>
 #include <utility>
 
-#include <boost/noncopyable.hpp>
-
 #include <ompl/base/Cost.h>
 #include <ompl/base/OptimizationObjective.h>
 #include <ompl/base/ProblemDefinition.h>
@@ -57,7 +55,7 @@ namespace esp {
 namespace ompltools {
 
 /** \brief The base class for an experiment */
-class BaseContext : boost::noncopyable {
+class BaseContext {
  public:
   BaseContext(const unsigned int dim, const std::vector<std::pair<double, double>> limits,
               const double runSeconds, std::string name);

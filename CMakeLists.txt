@@ -20,6 +20,11 @@ endif()
 # Put executables in bin directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 
+# Create a symlink of the parameters folder to the bin directory.
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
+  ${CMAKE_CURRENT_SOURCE_DIR}/parameters
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/parameters)
+
 # Display system info.
 message(STATUS "CMAKE_SYSTEM_NAME          = ${CMAKE_SYSTEM_NAME}"         )
 message(STATUS "CMAKE_CXX_COMPILER_ID      = ${CMAKE_CXX_COMPILER_ID}"     )
@@ -48,6 +53,7 @@ set(JSON_Install OFF CACHE INTERNAL "")    # No need to install the json lib.
 add_subdirectory(thirdparty/json)
 
 # Add the subdirectories.
+add_subdirectory(esp_configuration)
 add_subdirectory(esp_factories)
 add_subdirectory(esp_planning_contexts)
 add_subdirectory(esp_experiments)

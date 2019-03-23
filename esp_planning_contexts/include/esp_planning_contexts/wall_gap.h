@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "esp_obstacles/cutout_hyperrectangles.h"
+#include "esp_obstacles/cutout_obstacles.h"
 #include "esp_planning_contexts/base_context.h"
 
 namespace esp {
@@ -79,7 +79,7 @@ class WallGap : public BaseContext {
   /** \brief Whether to stop on class switch */
   bool stopClassSwitch_{false};
   /** \brief The obstacle world */
-  std::shared_ptr<CutoutHyperrectangles> rectObs_{};
+  std::shared_ptr<CutoutObstacles> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
   std::shared_ptr<ompl::base::ScopedState<>> gapLowerLeftCorner_{};
   std::shared_ptr<ompl::base::ScopedState<>> obstacleLowerLeftCorner_{};

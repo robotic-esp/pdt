@@ -37,12 +37,22 @@
 
 #include <iostream>
 
+#include "esp_configuration/configuration.h"
+#include "esp_factories/context_factory.h"
 #include "esp_factories/planner_factory.h"
+#include "esp_planning_contexts/all_contexts.h"
 
 int main(int /* argc */, char** /* argv */) {
-  // Create a planner factory, using the default parameters.
-  esp::ompltools::PlannerFactory plannerFactory("./parameters/default_planner_parameters.json");
+  auto config = std::make_shared<esp::ompltools::Configuration>("./parameters/default.json");
+  config->loadExperiment("PlannerPerformance");
+  esp::ompltools::ContextFactory contextFactory(config);
+  auto context = contextFactory.create("CentreSquare");
+  esp::ompltools::PlannerFactory plannerFactory(config, context);
+  auto planner1 = plannerFactory.create("BITstar");
+  auto planner2 = plannerFactory.create("RRTstar");
+  auto planner3 = plannerFactory.create("RRTConnect");
 
+  config->dumpAccessed();
 
   return 0;
 }

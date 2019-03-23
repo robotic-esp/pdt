@@ -17,12 +17,13 @@ include_directories(
 add_library(esp_obstacles
   src/base_obstacle.cpp
   src/binary_map.cpp
-  src/cutout_hyperrectangles.cpp
+  src/cutout_obstacles.cpp
   src/hyperrectangle.cpp
   src/repeating_hyperrectangles.cpp)
 
 # Link the library.
-target_link_libraries(esp_obstacles PUBLIC
+target_link_libraries(esp_obstacles
+  PUBLIC # Libraries exposed in API.
   ${OMPL_LIBRARIES})
 
 # Specify the include directories exported by this library.

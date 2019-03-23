@@ -62,7 +62,7 @@ class Hyperrectangle : public BaseObstacle {
   /** \brief Constructor. */
   Hyperrectangle(const ompl::base::SpaceInformationPtr& si, bool separateObstacles);
   /** \brief Destructor */
-  ~Hyperrectangle();
+  virtual ~Hyperrectangle();
 
   /** \brief Clear the obstacle space */
   virtual void clear();

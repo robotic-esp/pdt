@@ -16,16 +16,16 @@ include_directories(
 
 # Build the library.
 add_library(esp_factories
+  src/context_factory.cpp
   src/planner_factory.cpp)
 
-# Link the library with libraries not exposed in API.
-target_link_libraries(esp_factories PRIVATE
-  nlohmann_json::nlohmann_json)
-
-# Link the library with libraries exposed in API.
-target_link_libraries(esp_factories PUBLIC
-  stdc++fs
+# Link the library.
+target_link_libraries(esp_factories
+  PRIVATE # Libraries not exposed in API.
+  nlohmann_json::nlohmann_json
+  PUBLIC # Libraries exposed in API.
   ${OMPL_LIBRARIES}
+  esp_configuration
   esp_planning_contexts)
 
 # Specify the include directories exported by this library.

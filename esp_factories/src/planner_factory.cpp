@@ -46,87 +46,80 @@
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
 
+#include "nlohmann/json.hpp"
+
 namespace esp {
 
 namespace ompltools {
 
-// Convenience namespace.
-namespace fs = std::experimental::filesystem;
-
-PlannerFactory::PlannerFactory(fs::path plannerConfigFile) {
-  if (fs::exists(plannerConfigFile)) {
-    // If its a symlink, read the actual file.
-    if (fs::is_symlink(plannerConfigFile)) {
-      plannerConfigFile = fs::read_symlink(plannerConfigFile);
-    }
-    std::ifstream file(plannerConfigFile.string());
-    file >> parameters_;
-  } else {
-    // The provided config file does not exist, the factory is useless, throw.
-    throw fs::filesystem_error("File does not exist.", plannerConfigFile, std::error_code());
+  PlannerFactory::PlannerFactory(const std::shared_ptr<Configuration> &config,
+                                 const std::shared_ptr<BaseContext> &context) :
+  config_(config),
+  context_(context) {
+  if (config_->contains("Planners") == 0) {
+    throw std::runtime_error("Configuration does not contain planner data.");
   }
 }
 
-std::shared_ptr<ompl::base::Planner> PlannerFactory::create(
-    const std::string &plannerType, const BaseContextPtr &experiment) const {
+std::shared_ptr<ompl::base::Planner> PlannerFactory::create(const std::string &plannerType) const {
   // BIT*
   if (plannerType == std::string("BITstar")) {
     // Allocate and configure a BIT* planner.
-    auto planner = std::make_shared<ompl::geometric::BITstar>(experiment->getSpaceInformation());
-    const auto &plannerParams = parameters_[plannerType];
-    planner->setProblemDefinition(experiment->newProblemDefinition());
-    planner->setName(plannerParams["name"]);
-    planner->setUseKNearest(plannerParams["useKNearest"]);
-    planner->setRewireFactor(plannerParams["rewireFactor"]);
-    planner->setSamplesPerBatch(plannerParams["samplesPerBatch"]);
-    planner->setPruning(plannerParams["enablePruning"]);
-    planner->setPruneThresholdFraction(plannerParams["pruningThreshold"]);
-    planner->setDropSamplesOnPrune(plannerParams["dropSamplesOnPrune"]);
-    planner->setJustInTimeSampling(plannerParams["useJustInTimeSampling"]);
-    planner->setStopOnSolnImprovement(plannerParams["stopOnSolutionImprovement"]);
+    auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
+    const auto &plannerConfig = config_->getPlannerConfig(plannerType);
+    planner->setProblemDefinition(context_->newProblemDefinition());
+    planner->setName(plannerConfig["name"]);
+    planner->setUseKNearest(plannerConfig["useKNearest"]);
+    planner->setRewireFactor(plannerConfig["rewireFactor"]);
+    planner->setSamplesPerBatch(plannerConfig["samplesPerBatch"]);
+    planner->setPruning(plannerConfig["enablePruning"]);
+    planner->setPruneThresholdFraction(plannerConfig["pruningThreshold"]);
+    planner->setDropSamplesOnPrune(plannerConfig["dropSamplesOnPrune"]);
+    planner->setJustInTimeSampling(plannerConfig["useJustInTimeSampling"]);
+    planner->setStopOnSolnImprovement(plannerConfig["stopOnSolutionImprovement"]);
     planner->setInitialInflationFactor(1.0);
     planner->setInflationFactorParameter(0.0);
     planner->setTruncationFactorParameter(0.0);
     return planner;
   } else if (plannerType == std::string("SBITstar")) {
     // Allocate and configure an SBIT* planner.
-    auto planner = std::make_shared<ompl::geometric::BITstar>(experiment->getSpaceInformation());
-    const auto &plannerParams = parameters_[plannerType];
-    planner->setProblemDefinition(experiment->newProblemDefinition());
-    planner->setName(plannerParams["name"]);
-    planner->setUseKNearest(plannerParams["useKNearest"]);
-    planner->setRewireFactor(plannerParams["rewireFactor"]);
-    planner->setSamplesPerBatch(plannerParams["samplesPerBatch"]);
-    planner->setPruning(plannerParams["enablePruning"]);
-    planner->setPruneThresholdFraction(plannerParams["pruningThreshold"]);
-    planner->setDropSamplesOnPrune(plannerParams["dropSamplesOnPrune"]);
-    planner->setJustInTimeSampling(plannerParams["useJustInTimeSampling"]);
-    planner->setStopOnSolnImprovement(plannerParams["stopOnSolutionImprovement"]);
-    planner->setInitialInflationFactor(plannerParams["initialInflation"]);
-    planner->setInflationFactorParameter(plannerParams["inflationParameter"]);
-    planner->setTruncationFactorParameter(plannerParams["truncationParameter"]);
+    auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
+    const auto &plannerConfig = config_->getPlannerConfig(plannerType);
+    planner->setProblemDefinition(context_->newProblemDefinition());
+    planner->setName(plannerConfig["name"]);
+    planner->setUseKNearest(plannerConfig["useKNearest"]);
+    planner->setRewireFactor(plannerConfig["rewireFactor"]);
+    planner->setSamplesPerBatch(plannerConfig["samplesPerBatch"]);
+    planner->setPruning(plannerConfig["enablePruning"]);
+    planner->setPruneThresholdFraction(plannerConfig["pruningThreshold"]);
+    planner->setDropSamplesOnPrune(plannerConfig["dropSamplesOnPrune"]);
+    planner->setJustInTimeSampling(plannerConfig["useJustInTimeSampling"]);
+    planner->setStopOnSolnImprovement(plannerConfig["stopOnSolutionImprovement"]);
+    planner->setInitialInflationFactor(plannerConfig["initialInflation"]);
+    planner->setInflationFactorParameter(plannerConfig["inflationParameter"]);
+    planner->setTruncationFactorParameter(plannerConfig["truncationParameter"]);
     return planner;
   } else if (plannerType == std::string("RRTConnect")) {
     // Allocate and configure an RRT-Connect planner.
-    auto planner = std::make_shared<ompl::geometric::RRTConnect>(experiment->getSpaceInformation());
-    auto dimKey = std::to_string(experiment->getDimensions()) + "d";
-    const auto &plannerParams = parameters_[plannerType];
-    planner->setProblemDefinition(experiment->newProblemDefinition());
-    planner->setName(plannerParams["name"]);
-    planner->setRange(plannerParams["maxEdgeLength"][dimKey]);
-    planner->setIntermediateStates(plannerParams["addIntermediateStates"]);
+    auto planner = std::make_shared<ompl::geometric::RRTConnect>(context_->getSpaceInformation());
+    auto dimKey = std::to_string(context_->getDimensions()) + "d";
+    const auto &plannerConfig = config_->getPlannerConfig(plannerType);
+    planner->setProblemDefinition(context_->newProblemDefinition());
+    planner->setName(plannerConfig["name"]);
+    planner->setRange(plannerConfig["maxEdgeLength"][dimKey]);
+    planner->setIntermediateStates(plannerConfig["addIntermediateStates"]);
     return planner;
   } else if (plannerType == std::string("RRTstar")) {
     // Allocate and configure an RRT-Connect planner.
-    auto planner = std::make_shared<ompl::geometric::RRTstar>(experiment->getSpaceInformation());
-    auto dimKey = std::to_string(experiment->getDimensions()) + "d";
-    const auto &plannerParams = parameters_[plannerType];
-    planner->setProblemDefinition(experiment->newProblemDefinition());
-    planner->setName(plannerParams["name"]);
-    planner->setKNearest(plannerParams["useKNearest"]);
-    planner->setRange(plannerParams["maxEdgeLength"][dimKey]);
-    planner->setGoalBias(plannerParams["goalBias"]);
-    planner->setDelayCC(plannerParams["delayCollisionChecks"]);
+    auto planner = std::make_shared<ompl::geometric::RRTstar>(context_->getSpaceInformation());
+    auto dimKey = std::to_string(context_->getDimensions()) + "d";
+    const auto &plannerConfig = config_->getPlannerConfig(plannerType);
+    planner->setProblemDefinition(context_->newProblemDefinition());
+    planner->setName(plannerConfig["name"]);
+    planner->setKNearest(plannerConfig["useKNearest"]);
+    planner->setRange(plannerConfig["maxEdgeLength"][dimKey]);
+    planner->setGoalBias(plannerConfig["goalBias"]);
+    planner->setDelayCC(plannerConfig["delayCollisionChecks"]);
     planner->setTreePruning(false);
     planner->setPruneThreshold(1.0);
     planner->setPrunedMeasure(false);
@@ -137,12 +130,8 @@ std::shared_ptr<ompl::base::Planner> PlannerFactory::create(
     return planner;
   } else {
     throw std::runtime_error("Requested to create unknown planner at factory.");
-    return std::make_shared<ompl::geometric::BITstar>(experiment->getSpaceInformation());
+    return std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
   }
-}
-
-void PlannerFactory::dumpParameters(std::ostream &out) const {
-  out << "Planner Parameters:\n" << parameters_.dump(2) << '\n';
 }
 
 }  // namespace ompltools

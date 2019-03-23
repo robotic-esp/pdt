@@ -53,17 +53,18 @@ namespace esp {
 
 namespace ompltools {
 
-DoubleEnclosure::DoubleEnclosure(const unsigned int dim, const double worldHalfWidth,
+DoubleEnclosure::DoubleEnclosure(const unsigned int dim, const double worldWidth,
                                  const double insideWidth, const double wallThickness,
-                                 const double gapWidth, const double runSeconds,
+                                 const double openingWidth, const double runSeconds,
                                  const double checkResolution) :
     BaseContext(dim,
                 std::vector<std::pair<double, double>>(
-                    dim, std::pair<double, double>(-worldHalfWidth, worldHalfWidth)),
+                    dim, std::pair<double, double>(-0.5 * worldWidth, 0.5 * worldWidth)),
                 runSeconds, "DblEncl"),
+    enclObs_(std::make_shared<CutoutObstacles>(BaseContext::si_)),
     insideWidth_(insideWidth),
     wallThickness_(wallThickness),
-    gapWidth_(gapWidth) {
+    openingWidth_(openingWidth) {
   // Variables
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -71,14 +72,14 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim, const double worldHalfW
   std::shared_ptr<Hyperrectangle> obs;
   std::shared_ptr<Hyperrectangle> anti;
 
-  if (gapWidth_ <= 0 || insideWidth_ <= 0 || wallThickness_ <= 0) {
+  if (openingWidth_ <= 0 || insideWidth_ <= 0 || wallThickness_ <= 0) {
     throw ompl::Exception("Widths must be > 0.");
   }
-  if (gapWidth_ > insideWidth_ && gapWidth_ != (insideWidth_ + 2.0 * wallThickness_)) {
+  if (openingWidth_ > insideWidth_ && openingWidth_ != (insideWidth_ + 2.0 * wallThickness_)) {
     throw ompl::Exception(
         "Gap can only be wider than the interior width if it is as wide as the entire obstacle.");
   }
-  if (gapWidth_ > (insideWidth_ + 2.0 * wallThickness_)) {
+  if (openingWidth_ > (insideWidth_ + 2.0 * wallThickness_)) {
     throw ompl::Exception("Gap is wider than the enclosure.");
   }
 
@@ -91,8 +92,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim, const double worldHalfW
   // Create the space information class:
   BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
-  // Allocate the obstacle world
-  enclObs_ = std::make_shared<CutoutHyperrectangles>(BaseContext::si_);
+  // Register the obstacle with the context
   BaseContext::obs_ = enclObs_;
 
   // Set the problem bounds:
@@ -200,8 +200,8 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim, const double worldHalfW
 
   // All the other dimensions are the same
   for (unsigned int i = 1u; i < BaseContext::dim_; ++i) {
-    (*startEnclCorners_.back())[i] = 0.0 - 0.5 * gapWidth_;
-    startEnclWidths_.back().push_back(gapWidth_);
+    (*startEnclCorners_.back())[i] = 0.0 - 0.5 * openingWidth_;
+    startEnclWidths_.back().push_back(openingWidth_);
   }
 
   // Add to the anti obstacle.
@@ -253,8 +253,8 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim, const double worldHalfW
 
   // All the other dimensions are the same
   for (unsigned int i = 1u; i < BaseContext::dim_; ++i) {
-    (*goalEnclCorners_.back())[i] = 0.0 - 0.5 * gapWidth_;
-    goalEnclWidths_.back().push_back(gapWidth_);
+    (*goalEnclCorners_.back())[i] = 0.0 - 0.5 * openingWidth_;
+    goalEnclWidths_.back().push_back(openingWidth_);
   }
 
   // Add to the anti obstacle.
@@ -289,13 +289,13 @@ ompl::base::Cost DoubleEnclosure::getOptimum() const {
   ompl::base::Cost cornerToCorner;
 
   // Calculate the distances They depend on whether the gap is wider than the interior or not
-  if (gapWidth_ <= insideWidth_) {
+  if (openingWidth_ <= insideWidth_) {
     // It is not, we must go to the top-left corner of the passage
     startToOpening = ompl::base::Cost(std::sqrt(std::pow(0.5 * insideWidth_ + wallThickness_, 2.0) +
-                                                std::pow(0.5 * gapWidth_, 2.0)));
+                                                std::pow(0.5 * openingWidth_, 2.0)));
 
     // and then to the top-left corner of the obstacle
-    openingToCorner = ompl::base::Cost(0.5 * (insideWidth_ + 2 * wallThickness_ - gapWidth_));
+    openingToCorner = ompl::base::Cost(0.5 * (insideWidth_ + 2 * wallThickness_ - openingWidth_));
 
     // and then across to the other
     cornerToCorner =

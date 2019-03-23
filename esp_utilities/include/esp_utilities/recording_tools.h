@@ -40,8 +40,6 @@
 #include <tuple>
 #include <vector>
 
-#include <ompl/util/Exception.h>
-
 #include "esp_utilities/general_tools.h"
 
 namespace esp {
@@ -213,7 +211,7 @@ class ResultsFile {
 
     // Check on the failbit:
     if (mfile.fail() == true) {
-      throw ompl::Exception("Could not open file.");
+      throw std::ios_base::failure("Could not open file.");
     }
 
     // Write the data

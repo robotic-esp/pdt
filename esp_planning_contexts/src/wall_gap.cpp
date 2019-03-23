@@ -79,7 +79,7 @@ WallGap::WallGap(const unsigned int dim, const bool onlyFindGap, const double ga
   std::shared_ptr<Hyperrectangle> obs;
   std::shared_ptr<Hyperrectangle> anti;
 
-  rectObs_ = std::make_shared<CutoutHyperrectangles>(BaseContext::si_);
+  rectObs_ = std::make_shared<CutoutObstacles>(BaseContext::si_);
   BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:

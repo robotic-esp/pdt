@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "esp_obstacles/cutout_hyperrectangles.h"
+#include "esp_obstacles/cutout_obstacles.h"
 #include "esp_planning_contexts/base_context.h"
 
 namespace esp {
@@ -70,7 +70,7 @@ class StartEnclosure : public BaseContext {
 
  protected:
   /** \brief The actual enclosures */
-  std::shared_ptr<CutoutHyperrectangles> enclObs_{};
+  std::shared_ptr<CutoutObstacles> enclObs_{};
   std::vector<std::shared_ptr<ompl::base::ScopedState<>>> startEnclCorners_{};
   std::vector<std::shared_ptr<ompl::base::ScopedState<>>> goalEnclCorners_{};
   std::vector<std::vector<double>> startEnclWidths_{};
