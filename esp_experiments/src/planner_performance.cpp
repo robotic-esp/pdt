@@ -42,15 +42,16 @@
 #include "esp_factories/planner_factory.h"
 #include "esp_planning_contexts/all_contexts.h"
 
-int main(int /* argc */, char** /* argv */) {
-  auto config = std::make_shared<esp::ompltools::Configuration>("./parameters/default.json");
-  config->loadExperiment("PlannerPerformance");
+int main(int argc, char** argv) {
+  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
   esp::ompltools::ContextFactory contextFactory(config);
   auto context = contextFactory.create("CentreSquare");
   esp::ompltools::PlannerFactory plannerFactory(config, context);
   auto planner1 = plannerFactory.create("BITstar");
   auto planner2 = plannerFactory.create("RRTstar");
   auto planner3 = plannerFactory.create("RRTConnect");
+
+  auto experimentConfig = config->getExperimentConfig();
 
   config->dumpAccessed();
 

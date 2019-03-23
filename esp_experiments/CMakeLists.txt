@@ -56,6 +56,7 @@ add_executable(planner_performance
   src/planner_performance.cpp
 )
 target_link_libraries(planner_performance PUBLIC
+  ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
   esp_configuration
   esp_factories

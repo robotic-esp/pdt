@@ -1,16 +1,21 @@
 {
-    "context": "CentreSquare",
-    "planners": {
-        "BITstar",
-        "RRTstar",
-        "RRTConnect"
+    "Experiment": {
+        "version": {
+            "commit": "any",
+            "branch": "any",
+            "status": "any"
+        },
+        "planners": [
+            "BITstar",
+            "RRTstar"
+        ],
+        "context": "CentreSquare",
+        "numRuns": 100
     },
-    "numRuns": 100,
-    "patches": {
-        "Contexts": {
-            "CentreSquare": {
-                "maxTime": 3
-            }
+    "Contexts": {
+        "CentreSquare": {
+            "maxTime": 30,
+            "dimensions": 16
         }
     }
 }

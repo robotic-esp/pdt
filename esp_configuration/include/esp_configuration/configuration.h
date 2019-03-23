@@ -36,7 +36,6 @@
 
 #pragma once
 
-#include <experimental/filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -52,11 +51,12 @@ namespace json = nlohmann;
 // A class to manage configuration for repeatable experiments.
 class Configuration {
  public:
-  Configuration(std::experimental::filesystem::path defaultConfig);
+  Configuration(int argc, char** argv);
   ~Configuration() = default;
 
-  const json::json &getPlannerConfig(const std::string &planner) const;
-  const json::json &getContextConfig(const std::string &context) const;
+  const json::json& getExperimentConfig() const;
+  const json::json& getPlannerConfig(const std::string &planner) const;
+  const json::json& getContextConfig(const std::string &context) const;
 
   bool contains(const std::string &key) const;
 
