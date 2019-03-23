@@ -57,10 +57,9 @@ namespace po = boost::program_options;
 Configuration::Configuration(int argc, char **argv) {
   // Declare the available options.
   po::options_description availableOptions("Configuration options");
-  availableOptions.add_options()
-    ("help,h", "Display available options.")
-    ("default-config,c", po::value<std::string>(), "Location of the default configuration file.")
-    ("patch-config,p", po::value<std::string>(), "Location of the patch configuration file.");
+  availableOptions.add_options()("help,h", "Display available options.")(
+      "default-config,c", po::value<std::string>(), "Location of the default configuration file.")(
+      "patch-config,p", po::value<std::string>(), "Location of the patch configuration file.");
 
   // Parse the command line arguments to see which options were invoked.
   po::variables_map invokedOptions;
@@ -89,10 +88,11 @@ Configuration::Configuration(int argc, char **argv) {
     }
     std::ifstream file(defaultConfig.string());
     file >> allParameters_;
-  } else { // The provided default config file does not exist.
+  } else {  // The provided default config file does not exist.
     throw fs::filesystem_error(
         "The file supposedly containing the default configuration does not exist on the provided "
-        "path.", defaultConfig, std::error_code());
+        "path.",
+        defaultConfig, std::error_code());
   }
 
   // Load the config patch if one is provided.
@@ -106,30 +106,53 @@ Configuration::Configuration(int argc, char **argv) {
       json::json patch;
       std::ifstream file(patchConfig.string());
       file >> patch;
+      // If the patch specifies a commit, check that it is currently checked out and clean.
+      if (patch.count("Version") != 0) {
+        std::string experimentCommit = patch["Version"]["commit"];
+        if (experimentCommit != std::string("any")) {
+          if (experimentCommit != Version::GIT_SHA1) {
+            throw std::runtime_error(
+                "Experiment specifies commit that is different from the one that's checked out");
+          } else if (Version::GIT_STATUS == std::string("DIRTY")) {
+            throw std::runtime_error(
+                "Experiment specifies commit that matches the one that's checked out, but there are "
+                "uncommited changes.");
+          }
+        }
+      }
       allParameters_.merge_patch(patch);
-    } else { // The provided patch config file does not exist.
+    } else {  // The provided patch config file does not exist.
       throw fs::filesystem_error(
           "The file supposedly containing the patch configuration does not exist on the provided "
-          "path.", patchConfig, std::error_code());
+          "path.",
+          patchConfig, std::error_code());
     }
+  }
+
+  // Capture the current version.
+  accessedParameters_["Version"]["commit"] = Version::GIT_SHA1;
+  accessedParameters_["Version"]["branch"] = Version::GIT_REFSPEC;
+  accessedParameters_["Version"]["status"] = Version::GIT_STATUS;
+  if (Version::GIT_STATUS == std::string("DIRTY")) {
+    std::cout << "Warning: There are uncommited changes, results might not be reproducible.\n";
   }
 }
 
-  const json::json& Configuration::getExperimentConfig() const {
-    if (allParameters_.count("Experiment") == 0) {
-      throw std::runtime_error("Requested configuration for experiment, but none exists.");
-    }
-    if (accessedParameters_.count("Experiment") != 0) {
-      if (accessedParameters_["Experiment"] != allParameters_["Experiment"]) {
-        throw std::runtime_error("Accessing changed parameters, results might not be reproducable.");
-      }
-    } else {
-      accessedParameters_["Experiment"] = allParameters_["Experiment"];
-    }
-    return allParameters_["Experiment"];
+const json::json &Configuration::getExperimentConfig() const {
+  if (allParameters_.count("Experiment") == 0) {
+    throw std::runtime_error("Requested configuration for experiment, but none exists.");
   }
+  if (accessedParameters_.count("Experiment") != 0) {
+    if (accessedParameters_["Experiment"] != allParameters_["Experiment"]) {
+      throw std::runtime_error("Accessing changed parameters, results might not be reproducable.");
+    }
+  } else {
+    accessedParameters_["Experiment"] = allParameters_["Experiment"];
+  }
+  return allParameters_["Experiment"];
+}
 
-const json::json& Configuration::getPlannerConfig(const std::string &planner) const {
+const json::json &Configuration::getPlannerConfig(const std::string &planner) const {
   if (allParameters_["Planners"].count(planner) == 0) {
     throw std::runtime_error("Requested configuration for unknown planner.");
   }
@@ -143,7 +166,7 @@ const json::json& Configuration::getPlannerConfig(const std::string &planner) co
   return allParameters_["Planners"][planner];
 }
 
-const json::json& Configuration::getContextConfig(const std::string &context) const {
+const json::json &Configuration::getContextConfig(const std::string &context) const {
   if (allParameters_["Contexts"].count(context) == 0) {
     throw std::runtime_error("Requested configuration for unknown context.");
   }

@@ -1,10 +1,5 @@
 {
     "Experiment": {
-        "version": {
-            "commit": "any",
-            "branch": "any",
-            "status": "any"
-        },
         "planners": [
             "BITstar",
             "RRTstar"
@@ -17,5 +12,10 @@
             "maxTime": 30,
             "dimensions": 16
         }
+    },
+    "Version": {
+        "commit": "any",
+        "branch": "any",
+        "status": "any"
     }
 }
