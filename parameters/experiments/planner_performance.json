@@ -1,14 +1,17 @@
 {
     "Experiment": {
+        "executable": "planner_performance",
         "planners": [
             "BITstar",
-            "RRTstar"
+            "RRTstar",
+            "RRTConnect"
         ],
-        "context": "CentreSquare",
-        "numRuns": 100
+        "context": "DoubleEnclosure",
+        "numRuns": 100,
+        "seed": "time"
     },
     "Contexts": {
-        "CentreSquare": {
+        "DoubleEnclosure": {
             "maxTime": 30,
             "dimensions": 16
         }

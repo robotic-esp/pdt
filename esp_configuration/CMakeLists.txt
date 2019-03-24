@@ -13,13 +13,17 @@ get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 git_local_changes(GIT_STATUS)
 configure_file(src/version.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/version.cpp @ONLY)
 
+find_package(ompl)
+
 # Include necessary header directories.
 include_directories(
+  ${OMPL_INCLUDE_DIRS}
   ${NLOHMANN_JSON_INCLUDE_BUILD_DIR}
   ${PROJECT_SOURCE_DIR}/include)
 
 # Build the library.
 add_library(esp_configuration
+  ${OMPL_LIBRARIES}
   src/configuration.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
 

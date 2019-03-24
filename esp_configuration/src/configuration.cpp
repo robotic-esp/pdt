@@ -43,6 +43,7 @@
 #include <experimental/filesystem>
 
 #include <boost/program_options.hpp>
+#include <ompl/util/RandomNumbers.h>
 
 #include "esp_configuration/version.h"
 
@@ -120,6 +121,32 @@ Configuration::Configuration(int argc, char **argv) {
           }
         }
       }
+
+      // If the patch specifies an experiment, there are some special precautions to be taken.
+      if (patch.count("Experiment") != 0) {
+        // Check it specifies which executable is associated with this experiment and make sure it's
+        // the one that is being executed.
+        if (patch["Experiment"].count("executable") == 0) {
+          throw std::runtime_error("Please specify the executable name for the experiment.");
+        } else if (patch["Experiment"]["executable"] != std::string(argv[0]).substr(2)) {
+          throw std::runtime_error(
+              "Experiment config specifies executable name that does not match the name of the "
+              "current executable.");
+        }
+
+        // Handle any seed specification.
+        if (patch["Experiment"].count("seed") != 0) {
+          if (patch["Experiment"]["seed"] == std::string("time")) {
+            patch["Experiment"]["seed"] = ompl::RNG::getSeed();
+          } else {
+            ompl::RNG::setSeed(patch["Experiment"]["seed"]);
+          }
+        } else {
+          patch["Experiment"]["seed"] = ompl::RNG::getSeed();
+        }
+      }
+
+      // The patch seems valid, merge it into the default config.
       allParameters_.merge_patch(patch);
     } else {  // The provided patch config file does not exist.
       throw fs::filesystem_error(
