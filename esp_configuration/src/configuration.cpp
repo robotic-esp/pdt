@@ -42,8 +42,9 @@
 
 #include <experimental/filesystem>
 
-#include <boost/program_options.hpp>
+#include <ompl/util/Console.h>
 #include <ompl/util/RandomNumbers.h>
+#include <boost/program_options.hpp>
 
 #include "esp_configuration/version.h"
 
@@ -164,7 +165,32 @@ Configuration::Configuration(int argc, char **argv) {
   accessedParameters_["Version"]["branch"] = Version::GIT_REFSPEC;
   accessedParameters_["Version"]["status"] = Version::GIT_STATUS;
   if (Version::GIT_STATUS == std::string("DIRTY")) {
-    std::cout << "Warning: There are uncommited changes, results might not be reproducible.\n";
+    OMPL_WARN("The working directory is dirty, results might not be reproducible.");
+  }
+
+  // Set the appropriate log level.
+  if (allParameters_.count("Log") != 0) {
+    auto level = allParameters_["Log"]["level"];
+    if (level == std::string("dev2")) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV2);
+    } else if (level == std::string("dev1")) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV1);
+    } else if (level == std::string("debug")) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEBUG);
+    } else if (level == std::string("info")) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
+    } else if (level == std::string("warn")) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+    } else if (level == std::string("error")) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_ERROR);
+    } else if (level == std::string("none")) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_NONE);
+    } else {
+      OMPL_WARN("Config specifies invalid log level. Setting the log level to LOG_WARN");
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+    }
+  } else {
+    ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
   }
 }
 

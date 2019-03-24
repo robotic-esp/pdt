@@ -6,14 +6,15 @@
             "RRTstar",
             "RRTConnect"
         ],
-        "context": "DoubleEnclosure",
+        "context": "CentreSquare",
         "numRuns": 100,
-        "seed": "time"
+        "seed": "time",
+        "log": "warn"
     },
     "Contexts": {
-        "DoubleEnclosure": {
-            "maxTime": 30,
-            "dimensions": 16
+        "CentreSquare": {
+            "maxTime": 0.2,
+            "dimensions": 2
         }
     },
     "Version": {

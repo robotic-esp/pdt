@@ -40,6 +40,8 @@
 #include <iostream>
 #include <string>
 
+#include <ompl/util/Console.h>
+
 #include "nlohmann/json.hpp"
 
 namespace esp {

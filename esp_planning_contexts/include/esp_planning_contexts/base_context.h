@@ -73,7 +73,7 @@ class BaseContext {
   ompl::base::OptimizationObjectivePtr getOptimizationObjective() const;
 
   /** \brief Return the maximum experiment runtime */
-  asrl::time::duration getTargetTime() const;
+  asrl::time::duration getTargetDuration() const;
 
   /** \brief Get the goal */
   ompl::base::GoalPtr getGoalPtr() const;
@@ -135,7 +135,7 @@ class BaseContext {
   /** \brief The obstacle world */
   std::shared_ptr<BaseObstacle> obs_{};
   /** \brief The runtime for the experiment */
-  asrl::time::duration targetTime_{};
+  asrl::time::duration targetDuration_{};
   /** \brief The start states */
   std::vector<ompl::base::ScopedState<>> startStates_{};
   /** \brief The goal states */

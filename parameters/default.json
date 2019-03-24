@@ -165,5 +165,8 @@
             "inflationParameter": 10,
             "truncationParameter": 5
         }
+    },
+    "Log": {
+        "level": "warn"
     }
 }

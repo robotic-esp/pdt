@@ -64,7 +64,7 @@ inline Duration seconds(double sec) {
 
 // Convert a duration to a double.
 inline double seconds(Duration sec) {
-  return std::chrono::duration_cast<std::chrono::seconds>(sec).count();
+  return sec.count();
 }
 
 }  // namespace time
