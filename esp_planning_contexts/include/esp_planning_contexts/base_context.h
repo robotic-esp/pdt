@@ -123,7 +123,7 @@ class BaseContext {
  protected:
   // Variables
   /** \brief The name */
-  std::string name_{"unnamed experiment"};
+  std::string name_{"UnnamedContext"};
   /** \brief The problem dimension */
   unsigned int dim_{0u};
   /** \brief The problem limits */

@@ -60,8 +60,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim, const double worldWidth
     BaseContext(dim,
                 std::vector<std::pair<double, double>>(
                     dim, std::pair<double, double>(-0.5 * worldWidth, 0.5 * worldWidth)),
-                runSeconds, "DblEncl"),
-    enclObs_(std::make_shared<CutoutObstacles>(BaseContext::si_)),
+                runSeconds, "DoubleEnclosure"),
     insideWidth_(insideWidth),
     wallThickness_(wallThickness),
     openingWidth_(openingWidth) {
@@ -93,6 +92,7 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim, const double worldWidth
   BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Register the obstacle with the context
+  enclObs_ = std::make_shared<CutoutObstacles>(BaseContext::si_);
   BaseContext::obs_ = enclObs_;
 
   // Set the problem bounds:
