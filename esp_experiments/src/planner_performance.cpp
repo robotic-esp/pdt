@@ -35,6 +35,7 @@
 
 /* Authors: Marlin Strub */
 
+#include <iomanip>
 #include <iostream>
 #include <vector>
 
@@ -42,8 +43,9 @@
 #include "esp_factories/context_factory.h"
 #include "esp_factories/planner_factory.h"
 #include "esp_planning_contexts/all_contexts.h"
+#include "esp_utilities/time.h"
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
 
@@ -54,14 +56,29 @@ int main(int argc, char** argv) {
   esp::ompltools::ContextFactory contextFactory(config);
   auto context = contextFactory.create(experimentConfig["context"]);
 
-  // Instantiate the planners to be tested.
-  std::vector<ompl::base::PlannerPtr> planners { };
+  // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
-  for (const auto &planner : experimentConfig["planners"]) {
-    planners.emplace_back(plannerFactory.create(planner));
+
+  // Let's keep the console output for now, I can create a nicer pango visualization later.
+  for (const auto &plannerType : experimentConfig["planners"]) {
+    std::cout << std::setw(16) << std::setfill(' ') << plannerType;
+  }
+  std::cout << std::setw(2) << '\n';
+
+  // Let's dance.
+  for (std::size_t i = 0; i < experimentConfig["numRuns"]; ++i) {
+    for (const auto &plannerType : experimentConfig["planners"]) {
+      auto planner = plannerFactory.create(plannerType);
+
+      auto setupStartTime = esp::ompltools::time::Clock::now();
+      planner->setup();
+      auto setupDuration = setupStartTime - esp::ompltools::time::Clock::now();
+      std::cout << setupDuration << '\n';
+    }
+    std::cout << std::setw(2) << '\n';
   }
 
-  config->dumpAccessed();
+  // config->dumpAccessed();
 
   return 0;
 }
