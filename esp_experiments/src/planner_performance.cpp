@@ -36,6 +36,7 @@
 /* Authors: Marlin Strub */
 
 #include <iostream>
+#include <vector>
 
 #include "esp_configuration/configuration.h"
 #include "esp_factories/context_factory.h"
@@ -43,15 +44,22 @@
 #include "esp_planning_contexts/all_contexts.h"
 
 int main(int argc, char** argv) {
+  // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
-  esp::ompltools::ContextFactory contextFactory(config);
-  auto context = contextFactory.create("CentreSquare");
-  esp::ompltools::PlannerFactory plannerFactory(config, context);
-  auto planner1 = plannerFactory.create("BITstar");
-  auto planner2 = plannerFactory.create("RRTstar");
-  auto planner3 = plannerFactory.create("RRTConnect");
 
+  // Get the config for this experiment.
   auto experimentConfig = config->getExperimentConfig();
+
+  // Create the context for this experiment.
+  esp::ompltools::ContextFactory contextFactory(config);
+  auto context = contextFactory.create(experimentConfig["context"]);
+
+  // Instantiate the planners to be tested.
+  std::vector<ompl::base::PlannerPtr> planners { };
+  esp::ompltools::PlannerFactory plannerFactory(config, context);
+  for (const auto &planner : experimentConfig["planners"]) {
+    planners.emplace_back(plannerFactory.create(planner));
+  }
 
   config->dumpAccessed();
 

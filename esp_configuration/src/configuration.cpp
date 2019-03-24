@@ -104,19 +104,22 @@ Configuration::Configuration(int argc, char **argv) {
       if (fs::is_symlink(patchConfig)) {
         patchConfig = fs::read_symlink(patchConfig);
       }
+
+      // Convert the config into a json datastructure.
       json::json patch;
       std::ifstream file(patchConfig.string());
       file >> patch;
+
       // If the patch specifies a commit, check that it is currently checked out and clean.
       if (patch.count("Version") != 0) {
         std::string experimentCommit = patch["Version"]["commit"];
         if (experimentCommit != std::string("any")) {
           if (experimentCommit != Version::GIT_SHA1) {
             throw std::runtime_error(
-                "Experiment specifies commit that is different from the one that's checked out");
+                "Config specifies commit that is different from the one that's checked out");
           } else if (Version::GIT_STATUS == std::string("DIRTY")) {
             throw std::runtime_error(
-                "Experiment specifies commit that matches the one that's checked out, but there are "
+                "Config specifies commit that matches the one that's checked out, but there are "
                 "uncommited changes.");
           }
         }
