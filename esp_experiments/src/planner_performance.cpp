@@ -35,13 +35,18 @@
 
 /* Authors: Marlin Strub */
 
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 
+#include <ompl/util/Console.h>
+#include <boost/thread/thread.hpp>
+
 #include "esp_configuration/configuration.h"
 #include "esp_factories/context_factory.h"
 #include "esp_factories/planner_factory.h"
+#include "esp_performance_loggers/performance_loggers.h"
 #include "esp_planning_contexts/all_contexts.h"
 #include "esp_utilities/time.h"
 
@@ -61,21 +66,48 @@ int main(int argc, char **argv) {
 
   // Let's keep the console output for now, I can create a nicer pango visualization later.
   for (const auto &plannerType : experimentConfig["planners"]) {
-    std::cout << std::setw(16) << std::setfill(' ') << plannerType;
+    std::cout << "      " << std::setw(22) << std::setfill(' ') << std::left
+              << std::string(plannerType);
   }
-  std::cout << std::setw(2) << '\n';
+  std::cout << '\n';
 
   // Let's dance.
   for (std::size_t i = 0; i < experimentConfig["numRuns"]; ++i) {
+    std::cout << '\n' << std::setw(4) << std::right << std::setfill('0') << i << ": ";
     for (const auto &plannerType : experimentConfig["planners"]) {
+      // Allocate the planner.
       auto planner = plannerFactory.create(plannerType);
 
+      // Set it up.
       auto setupStartTime = esp::ompltools::time::Clock::now();
       planner->setup();
-      auto setupDuration = setupStartTime - esp::ompltools::time::Clock::now();
-      std::cout << setupDuration << '\n';
+      auto setupDuration = esp::ompltools::time::Clock::now() - setupStartTime;
+
+      // Compute the duration we have left for solving.
+      auto maxSolveDuration =
+          esp::ompltools::time::seconds(context->getTargetDuration() - setupDuration);
+
+      // Make sure the clock is steady.
+      if (!esp::ompltools::time::Clock::is_steady) {
+        boost::this_thread::sleep_for(boost::chrono::microseconds(1));
+      }
+
+      // Solve the problem on a separate thread.
+      auto solveStartTime = esp::ompltools::time::Clock::now();
+      boost::thread solveThread(
+          [&planner, &maxSolveDuration]() { planner->solve(maxSolveDuration); });
+      do {
+        // Log progress here.
+      } while (!solveThread.try_join_for(boost::chrono::microseconds(1000)));
+      auto solveDuration = esp::ompltools::time::Clock::now() - solveStartTime;
+
+      auto result = std::make_pair(setupDuration + solveDuration,
+                                   planner->getProblemDefinition()->getSolutionPath()->cost(
+                                       context->getOptimizationObjective()));
+
+      std::cout << std::setw(17) << std::left << result.first << ' ' << std::setw(8) << std::fixed
+                << result.second << "  ";
     }
-    std::cout << std::setw(2) << '\n';
   }
 
   // config->dumpAccessed();

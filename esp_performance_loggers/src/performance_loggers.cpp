@@ -1,4 +1,4 @@
-#include "esp_utilities/recording_tools.h"
+#include "esp_performance_loggers/performance_loggers.h"
 
 #include <boost/filesystem.hpp>
 #include <iomanip>
@@ -30,18 +30,18 @@ void createDirectories(std::string fileName) {
 }
 
 //******* The different pieces of data to be recorded*******//
-TimeCostHistory::TimeCostHistory(double runTimeSeconds, unsigned int recordPeriodMicrosecond) {
+TimeCostLogger::TimeCostLogger(double runTimeSeconds, unsigned int recordPeriodMicrosecond) {
   allocSize_ = ALLOC_TIME_SAFETY_FACTOR * runTimeSeconds /
                (static_cast<double>(recordPeriodMicrosecond) / 1e6);
   data_.reserve(allocSize_);
 }
-TimeCostHistory::TimeCostHistory(const asrl::time::duration& runTime,
+TimeCostLogger::TimeCostLogger(const asrl::time::duration& runTime,
                                  unsigned int recordPeriodMicrosecond) {
   allocSize_ = ALLOC_TIME_SAFETY_FACTOR * asrl::time::seconds(runTime) /
                (static_cast<double>(recordPeriodMicrosecond) / 1e6);
   data_.reserve(allocSize_);
 }
-std::string TimeCostHistory::output(const std::string& labelPrefix) {
+std::string TimeCostLogger::output(const std::string& labelPrefix) {
   // Variable
   // The return value
   std::stringstream rval;
@@ -78,19 +78,19 @@ std::string TimeCostHistory::output(const std::string& labelPrefix) {
   return rval.str();
 }
 
-TimeIterationCostHistory::TimeIterationCostHistory(double runTimeSeconds,
+TimeIterationCostLogger::TimeIterationCostLogger(double runTimeSeconds,
                                                    unsigned int recordPeriodMicrosecond) {
   allocSize_ = ALLOC_TIME_SAFETY_FACTOR * runTimeSeconds /
                (static_cast<double>(recordPeriodMicrosecond) / 1e6);
   data_.reserve(allocSize_);
 }
-TimeIterationCostHistory::TimeIterationCostHistory(const asrl::time::duration& runTime,
+TimeIterationCostLogger::TimeIterationCostLogger(const asrl::time::duration& runTime,
                                                    unsigned int recordPeriodMicrosecond) {
   allocSize_ = ALLOC_TIME_SAFETY_FACTOR * asrl::time::seconds(runTime) /
                (static_cast<double>(recordPeriodMicrosecond) / 1e6);
   data_.reserve(allocSize_);
 }
-std::string TimeIterationCostHistory::output(const std::string& labelPrefix) {
+std::string TimeIterationCostLogger::output(const std::string& labelPrefix) {
   // Variable
   // The return value
   std::stringstream rval;
@@ -137,23 +137,23 @@ std::string TimeIterationCostHistory::output(const std::string& labelPrefix) {
   return rval.str();
 }
 
-IterationCostHistory::IterationCostHistory(unsigned int numIterations) {
+IterationCostLogger::IterationCostLogger(unsigned int numIterations) {
   allocSize_ = numIterations + 5u;
   data_.reserve(allocSize_);
 }
-IterationCostHistory::IterationCostHistory(double runTimeSeconds,
+IterationCostLogger::IterationCostLogger(double runTimeSeconds,
                                            unsigned int recordPeriodMicrosecond) {
   allocSize_ = ALLOC_TIME_SAFETY_FACTOR * runTimeSeconds /
                (static_cast<double>(recordPeriodMicrosecond) / 1e6);
   data_.reserve(allocSize_);
 }
-IterationCostHistory::IterationCostHistory(const asrl::time::duration& runTime,
+IterationCostLogger::IterationCostLogger(const asrl::time::duration& runTime,
                                            unsigned int recordPeriodMicrosecond) {
   allocSize_ = ALLOC_TIME_SAFETY_FACTOR * asrl::time::seconds(runTime) /
                (static_cast<double>(recordPeriodMicrosecond) / 1e6);
   data_.reserve(allocSize_);
 }
-std::string IterationCostHistory::output(const std::string& labelPrefix) {
+std::string IterationCostLogger::output(const std::string& labelPrefix) {
   // Variable
   // The return value
   std::stringstream rval;
