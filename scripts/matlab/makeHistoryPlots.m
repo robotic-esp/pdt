@@ -49,14 +49,14 @@ function makeHistoryPlots(R)
         interpTime = 100*1e-6;
         
         %Number of experiments in each file:
-        numExp = 100;
+        numExp = 10;
     
         %The run time
-        plotTime = 0.1;
+        plotTime = 0.2;
 
         %The filesnames. Ommit the data/ and the .csv.
         filenames = {
-            'R2S18439073711839788863FlankingGap'
+            '2019-03-25_16:18:45'
 %             'R8S18439071351109370200RegularRects'
 %             'R8S18439071143733709969RandRect'
 %             'R4S18439071184667532744RandRect'
@@ -71,12 +71,12 @@ function makeHistoryPlots(R)
         figures = {};
 
         planners = {
-                    'BITstar500',            'BIT*',             b, '-';
+                    'BITstar',            'BIT*',             b, '-';
 %                     'BITstarRegression100', 'BIT* (reg)',       c, '-';
 %                     'ABITstar100',           'SBIT*',            g, '-';
-%                     'RRTConnect',            'RRTConnect',       k, '-';
+                    'RRTConnect',            'RRTConnect',       k, '-';
 %                     'LBTRRT',                'LBTRRT',           p, '-';
-%                     'RRTstar',               'RRT*',             r, '-';
+                    'RRTstar',               'RRT*',             r, '-';
 %                     'RRTsharp',              'RRT$^{\#}$',       o, '-';
                     };
 

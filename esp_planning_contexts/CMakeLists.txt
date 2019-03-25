@@ -34,7 +34,7 @@ target_link_libraries(esp_planning_contexts
   PUBLIC # Libraries exposed in API.
   ${OMPL_LIBRARIES}
   esp_obstacles
-  esp_utilities)
+  esp_time)
 
 # Specify the include directories exported by this library.
 target_include_directories(esp_planning_contexts PUBLIC

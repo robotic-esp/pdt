@@ -46,7 +46,7 @@ BaseContext::BaseContext(const unsigned int dim,
     name_(name),
     dim_(dim),
     limits_(limits),
-    targetDuration_(asrl::time::seconds(runSeconds)) {
+    targetDuration_(time::seconds(runSeconds)) {
 }
 
 ompl::base::SpaceInformationPtr BaseContext::getSpaceInformation() const {
@@ -79,7 +79,7 @@ ompl::base::OptimizationObjectivePtr BaseContext::getOptimizationObjective() con
   return opt_;
 }
 
-asrl::time::duration BaseContext::getTargetDuration() const {
+time::Duration BaseContext::getTargetDuration() const {
   return targetDuration_;
 }
 
@@ -122,7 +122,8 @@ ompl::base::Cost BaseContext::getMinimum() const {
 }
 
 void BaseContext::print(const bool verbose /* == false */) const {
-  std::cout << name_ << " in R^" << dim_ << ". runtime: " << asrl::time::seconds(targetDuration_)
+  std::cout << name_ << " in R^" << dim_
+            << ". runtime: " << time::seconds(targetDuration_)
             << ". target: " << opt_->getCostThreshold();
   if (this->knowsOptimum()) {
     std::cout << " (opt: " << this->getOptimum() << ")";

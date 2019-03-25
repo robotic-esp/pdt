@@ -1,28 +1,17 @@
 cmake_minimum_required(VERSION 2.8)
-project(esp_utilities)
+project(esp_common)
 
 # Enable more warnings and treat warnings as errors.
 add_definitions(-std=c++17 -Wall -Wextra -Weffc++ -Werror
   -Wdisabled-optimization -fdiagnostics-color=auto)
 
-# Find OMPL.
-find_package(ompl REQUIRED)
-
 # Include necessary header directories.
 include_directories(
-  ${OMPL_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include)
 
 # Add the library as an interface.
-add_library(esp_utilities
-  src/get_best_cost.cpp)
-
-target_link_libraries(esp_utilities
-  ${OMPL_LIBRARIES}
-  esp_common)
+add_library(esp_common INTERFACE)
 
 # Specify the include directories exported by this library.
-target_include_directories(esp_utilities
-  PUBLIC
-  ${OMPL_INCLUDE_DIRS}
+target_include_directories(esp_common INTERFACE
   ${PROJECT_SOURCE_DIR}/include)

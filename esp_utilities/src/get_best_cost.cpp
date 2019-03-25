@@ -32,66 +32,61 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+// Authors: Marlin Strub
 
-#pragma once
+#include "esp_utilities/get_best_cost.h"
 
-#include <chrono>
-#include <sstream>
+#include <limits>
 #include <string>
+
+#include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/rrt/InformedRRTstar.h>
+#include <ompl/geometric/planners/rrt/LBTRRT.h>
+#include <ompl/geometric/planners/rrt/RRTConnect.h>
+#include <ompl/geometric/planners/rrt/RRTsharp.h>
+#include <ompl/geometric/planners/rrt/RRTstar.h>
+
+#include "esp_common/planner_enum.h"
 
 namespace esp {
 
 namespace ompltools {
 
-namespace time {
+namespace utilities {
 
-using Clock = std::chrono::high_resolution_clock;
-using TimePoint = std::chrono::high_resolution_clock::time_point;
-using Duration = std::chrono::duration<double>;
+namespace {
 
-// Convert a TimePoint to a string.
-inline std::string toString(const TimePoint& timePoint) {
-  std::stringstream stream;
-  stream << timePoint;
-  return stream.str();
+static const std::map<std::string, PLANNER> nameToEnum = {{"BITstar", PLANNER::BITSTAR},
+                                                          {"LBTRRT", PLANNER::LBTRRT},
+                                                          {"RRTConnect", PLANNER::RRTCONNECT},
+                                                          {"RRTstar", PLANNER::RRTSTAR}};
+
+}  // namespace
+
+ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner) {
+  auto type = nameToEnum.at(planner->getName());
+  switch (type) {
+    case PLANNER::BITSTAR: {
+      return planner->as<ompl::geometric::BITstar>()->bestCost();
+    }
+    case PLANNER::RRTSTAR: {
+      return planner->as<ompl::geometric::RRTstar>()->bestCost();
+    }
+    case PLANNER::RRTCONNECT: {
+      return ompl::base::Cost(std::numeric_limits<double>::infinity());
+    }
+    case PLANNER::LBTRRT: {
+      return ompl::base::Cost(std::stod(planner->as<ompl::geometric::LBTRRT>()->getBestCost()));
+    }
+    default: {
+      throw std::runtime_error("Cannot get best cost of planner.");
+      return ompl::base::Cost(std::numeric_limits<double>::infinity());
+    }
+  }
 }
 
-// Convert a double to a duration.
-inline Duration seconds(double sec) {
-  return Duration(sec);
-}
-
-// Convert a duration to a double.
-inline double seconds(Duration sec) {
-  return sec.count();
-}
-
-}  // namespace time
+}  // namespace utilities
 
 }  // namespace ompltools
 
 }  // namespace esp
-
-std::ostream& operator<<(std::ostream& out, const esp::ompltools::time::Duration& duration) {
-  std::stringstream stream;
-  // Handle the case of time with infinite value.
-  if (duration.count() == std::numeric_limits<double>::infinity()) {
-    stream << "inf";
-  } else {
-    // Convert to HH:MM:SS:XXXXXX format (15 chars wide).
-    long hr = std::chrono::duration_cast<std::chrono::hours>(duration).count();
-    long min = std::chrono::duration_cast<std::chrono::minutes>(duration).count() - 60 * hr;
-    long s =
-        std::chrono::duration_cast<std::chrono::seconds>(duration).count() - 60 * (min + 60 * hr);
-    long us = std::chrono::duration_cast<std::chrono::microseconds>(duration).count() -
-              1e6 * (s + 60 * (min + 60 * hr));
-
-    stream << std::setw(2) << std::setfill('0') << hr << ":" << std::setw(2) << std::setfill('0')
-           << min << ":" << std::setw(2) << std::setfill('0') << s << "." << std::setw(6)
-           << std::setfill('0') << us;
-  }
-
-  out << stream.str();
-  return out;
-}

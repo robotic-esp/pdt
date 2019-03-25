@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2019, University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Oxford nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -34,43 +34,30 @@
 
 // Authors: Marlin Strub
 
+// I really don't like having to do this, but I don't see any way around it. The main issue is that
+// the planner base class does not provide access to the current best cost. It does for some
+// planners (through the progressProperties) but the planner implementations are free to choose the
+// corresponding property name themselves and of course its not the same for all planners (e.g.,
+// "best cost REAL" vs "best cost DOUBLE"). Similarly, most anytime planners provide direct access
+// to their current best cost, but the corresponding function is not named (e.g., getBestCost() in
+// LBTRRT and bestCost() in RRT). On top of that the planner base class does not have a type
+// property (only a name). But I don't feel comfortable comparing strings all the time, especially
+// when logging the best costs.
+
 #pragma once
 
-#include <fstream>
-#include <iostream>
+#include <map>
 #include <string>
-
-#include <ompl/util/Console.h>
-
-#include "nlohmann/json.hpp"
 
 namespace esp {
 
 namespace ompltools {
 
-namespace json = nlohmann;
-
-// A class to manage configuration for repeatable experiments.
-class Configuration {
- public:
-  Configuration(int argc, char** argv);
-  ~Configuration() = default;
-
-  const json::json& getExperimentConfig();
-  const json::json& getPlannerConfig(const std::string &planner) const;
-  const json::json& getContextConfig(const std::string &context) const;
-
-  bool contains(const std::string &key) const;
-
-  // Dump the parameters.
-  void dumpAll(std::ostream &out = std::cout) const;
-  void dumpAll(const std::string& filename) const;
-  void dumpAccessed(std::ostream &out = std::cout) const;
-  void dumpAccessed(const std::string& filename) const;
-
- private:
-  json::json allParameters_{};
-  mutable json::json accessedParameters_{};
+enum class PLANNER {
+  BITSTAR,
+  LBTRRT,
+  RRTCONNECT,
+  RRTSTAR,
 };
 
 }  // namespace ompltools

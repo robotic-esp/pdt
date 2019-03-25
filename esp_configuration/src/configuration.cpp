@@ -47,6 +47,7 @@
 #include <boost/program_options.hpp>
 
 #include "esp_configuration/version.h"
+#include "esp_time/time.h"
 
 namespace esp {
 
@@ -119,7 +120,7 @@ Configuration::Configuration(int argc, char **argv) {
             throw std::runtime_error(
                 "Config specifies commit that is different from the one that's checked out");
           } else if (Version::GIT_STATUS == std::string("DIRTY")) {
-            throw std::runtime_error(
+            OMPL_WARN(
                 "Config specifies commit that matches the one that's checked out, but there are "
                 "uncommited changes.");
           }
@@ -159,7 +160,6 @@ Configuration::Configuration(int argc, char **argv) {
           patchConfig, std::error_code());
     }
   }
-
   // Capture the current version.
   accessedParameters_["Version"]["commit"] = Version::GIT_SHA1;
   accessedParameters_["Version"]["branch"] = Version::GIT_REFSPEC;
@@ -194,7 +194,7 @@ Configuration::Configuration(int argc, char **argv) {
   }
 }
 
-const json::json &Configuration::getExperimentConfig() const {
+const json::json &Configuration::getExperimentConfig() {
   if (allParameters_.count("Experiment") == 0) {
     throw std::runtime_error("Requested configuration for experiment, but none exists.");
   }
@@ -203,6 +203,8 @@ const json::json &Configuration::getExperimentConfig() const {
       throw std::runtime_error("Accessing changed parameters, results might not be reproducable.");
     }
   } else {
+    static const auto systemTime = std::chrono::system_clock::now();
+    allParameters_["Experiment"]["date"] = time::toDateString(systemTime);
     accessedParameters_["Experiment"] = allParameters_["Experiment"];
   }
   return allParameters_["Experiment"];
@@ -244,8 +246,45 @@ void Configuration::dumpAll(std::ostream &out) const {
   out << allParameters_.dump(2) << '\n';
 }
 
+void Configuration::dumpAll(const std::string &filename) const {
+  // Open the file.
+  std::ofstream configFile;
+  configFile.open(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+
+  // Check if it was successfully opened.
+  if (configFile.fail()) {
+    throw std::ios_base::failure("Could not open config file.");
+  }
+
+  // Write the config to this file.
+  dumpAll(configFile);
+
+  // Close the file.
+  configFile.close();
+}
+
 void Configuration::dumpAccessed(std::ostream &out) const {
   out << accessedParameters_.dump(2) << '\n';
+}
+
+void Configuration::dumpAccessed(const std::string &filename) const {
+  // Make sure the path exists.
+  fs::create_directories(fs::path(filename).parent_path());
+
+  // Open the file.
+  std::ofstream configFile;
+  configFile.open(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
+
+  // Check if it was successfully opened.
+  if (configFile.fail()) {
+    throw std::ios_base::failure("Could not open config file.");
+  }
+
+  // Write the config to this file.
+  dumpAccessed(configFile);
+
+  // Close the file.
+  configFile.close();
 }
 
 }  // namespace ompltools

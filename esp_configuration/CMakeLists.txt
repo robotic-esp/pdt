@@ -32,7 +32,8 @@ target_link_libraries(esp_configuration
   PUBLIC # Libraries exposed in API.
   stdc++fs
   nlohmann_json::nlohmann_json
-  esp_planning_contexts)
+  esp_planning_contexts
+  esp_time)
 
 # Specify the include directories exported by this library.
 target_include_directories(esp_configuration PUBLIC

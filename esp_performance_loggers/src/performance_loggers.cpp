@@ -1,92 +1,120 @@
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2014, University of Toronto
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the University of Toronto nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *********************************************************************/
+
+// Authors: Jonathan Gammell, Marlin Strub
+
 #include "esp_performance_loggers/performance_loggers.h"
 
-#include <boost/filesystem.hpp>
+#include <cmath>
 #include <iomanip>
+
+#include <experimental/filesystem>
+
+#include <ompl/util/Console.h>
 
 namespace esp {
 
 namespace ompltools {
 
-constexpr float ALLOC_TIME_SAFETY_FACTOR = 10.0;
+namespace {
 
-void createDirectories(std::string fileName) {
-  /// Variables
-  // The boost::path representation of the string
-  boost::filesystem::path fullPath;
+// Constants
+constexpr double ALLOC_SAFETY_FACTOR = 10.0;
 
-  // Create a boost::path from the provided string
-  fullPath = fileName.c_str();
+}  // namespace
 
-  // Decompose the path into the parent directories and check if they exist
-  if (fullPath.parent_path().empty() == false) {
-    if (boost::filesystem::exists(fullPath.parent_path()) == false) {
-      // If they don't exist, make them
-      boost::filesystem::create_directories(fullPath.parent_path());
+// Convenience namespace.
+namespace fs = std::experimental::filesystem;
 
-      //    std::cout << "Created: " << boost::filesystem::absolute(fullPath.parent_path()) << "\n";
-    }
+TimeCostLogger::TimeCostLogger(const esp::ompltools::time::Duration& maxDuration,
+                               double logFrequency) :
+    allocSize_(std::ceil(ALLOC_SAFETY_FACTOR *
+                         std::chrono::duration<double, std::ratio<1>>(maxDuration).count() *
+                         logFrequency)) {
+  measurements_.reserve(allocSize_);
+}
+
+void TimeCostLogger::addMeasurement(const esp::ompltools::time::Duration& duration,
+                                    const ompl::base::Cost& cost) {
+  measurements_.emplace_back(duration, cost);
+}
+
+std::string TimeCostLogger::createLogString(const std::string& prefix) const {
+  if (measurements_.capacity() > allocSize_) {
+    OMPL_WARN(
+        "The result file was under-allocated (reserved: %d, used: %d). This will affect the "
+        "accuracy of timings.",
+        allocSize_, measurements_.size());
   }
-  // Else, do nothing
-}
 
-//******* The different pieces of data to be recorded*******//
-TimeCostLogger::TimeCostLogger(double runTimeSeconds, unsigned int recordPeriodMicrosecond) {
-  allocSize_ = ALLOC_TIME_SAFETY_FACTOR * runTimeSeconds /
-               (static_cast<double>(recordPeriodMicrosecond) / 1e6);
-  data_.reserve(allocSize_);
-}
-TimeCostLogger::TimeCostLogger(const asrl::time::duration& runTime,
-                                 unsigned int recordPeriodMicrosecond) {
-  allocSize_ = ALLOC_TIME_SAFETY_FACTOR * asrl::time::seconds(runTime) /
-               (static_cast<double>(recordPeriodMicrosecond) / 1e6);
-  data_.reserve(allocSize_);
-}
-std::string TimeCostLogger::output(const std::string& labelPrefix) {
-  // Variable
-  // The return value
+  // Start with the prefix.
   std::stringstream rval;
+  rval << prefix << ", ";
 
-  if (data_.capacity() > allocSize_) {
-    std::cout << std::endl;
-    std::cout << "WARNING. The result file was under allocated (reserved: " << allocSize_
-              << ", used: " << data_.size() << ", capacity: " << data_.capacity()
-              << "). This will affect the accuracy of timings." << std::endl;
-    std::cout << std::endl;
-  }
-
-  // Write the time first:
-  rval << labelPrefix << ", ";
-  for (unsigned int i = 0u; i < data_.size(); ++i) {
-    rval << std::setprecision(21) << asrl::time::seconds(data_.at(i).first);
-    if (i != data_.size() - 1u) {
+  // Dump the time measurements.
+  for (std::size_t i = 0u; i < measurements_.size(); ++i) {
+    rval << std::setprecision(21)
+         << std::chrono::duration<double, std::ratio<1>>(measurements_.at(i).first).count();
+    if (i != measurements_.size() - 1u) {
       rval << ", ";
     }
   }
-  rval << std::endl;
+  rval << '\n';
 
-  // then costs:
-  rval << labelPrefix << ", ";
-  for (unsigned int i = 0u; i < data_.size(); ++i) {
-    rval << std::setprecision(21) << data_.at(i).second;
-    if (i != data_.size() - 1u) {
+  // Dump the cost measurements.
+  rval << prefix << ", ";
+  for (unsigned int i = 0u; i < measurements_.size(); ++i) {
+    rval << std::setprecision(21) << measurements_.at(i).second.value();
+    if (i != measurements_.size() - 1u) {
       rval << ", ";
     }
   }
-  rval << std::endl;
+  rval << '\n';
 
-  // Return
+  // Return as string.
   return rval.str();
 }
 
 TimeIterationCostLogger::TimeIterationCostLogger(double runTimeSeconds,
-                                                   unsigned int recordPeriodMicrosecond) {
-  allocSize_ = ALLOC_TIME_SAFETY_FACTOR * runTimeSeconds /
-               (static_cast<double>(recordPeriodMicrosecond) / 1e6);
+                                                 unsigned int recordPeriodMicrosecond) {
+  allocSize_ =
+      ALLOC_SAFETY_FACTOR * runTimeSeconds / (static_cast<double>(recordPeriodMicrosecond) / 1e6);
   data_.reserve(allocSize_);
 }
-TimeIterationCostLogger::TimeIterationCostLogger(const asrl::time::duration& runTime,
-                                                   unsigned int recordPeriodMicrosecond) {
-  allocSize_ = ALLOC_TIME_SAFETY_FACTOR * asrl::time::seconds(runTime) /
+TimeIterationCostLogger::TimeIterationCostLogger(const esp::ompltools::time::Duration& runTime,
+                                                 unsigned int recordPeriodMicrosecond) {
+  allocSize_ = ALLOC_SAFETY_FACTOR * esp::ompltools::time::seconds(runTime) /
                (static_cast<double>(recordPeriodMicrosecond) / 1e6);
   data_.reserve(allocSize_);
 }
@@ -106,7 +134,7 @@ std::string TimeIterationCostLogger::output(const std::string& labelPrefix) {
   // Write the time first:
   rval << labelPrefix << ", ";
   for (unsigned int i = 0u; i < data_.size(); ++i) {
-    rval << std::setprecision(21) << asrl::time::seconds(std::get<0u>(data_.at(i)));
+    rval << std::setprecision(21) << esp::ompltools::time::seconds(std::get<0u>(data_.at(i)));
     if (i != data_.size() - 1u) {
       rval << ", ";
     }
@@ -142,14 +170,14 @@ IterationCostLogger::IterationCostLogger(unsigned int numIterations) {
   data_.reserve(allocSize_);
 }
 IterationCostLogger::IterationCostLogger(double runTimeSeconds,
-                                           unsigned int recordPeriodMicrosecond) {
-  allocSize_ = ALLOC_TIME_SAFETY_FACTOR * runTimeSeconds /
-               (static_cast<double>(recordPeriodMicrosecond) / 1e6);
+                                         unsigned int recordPeriodMicrosecond) {
+  allocSize_ =
+      ALLOC_SAFETY_FACTOR * runTimeSeconds / (static_cast<double>(recordPeriodMicrosecond) / 1e6);
   data_.reserve(allocSize_);
 }
-IterationCostLogger::IterationCostLogger(const asrl::time::duration& runTime,
-                                           unsigned int recordPeriodMicrosecond) {
-  allocSize_ = ALLOC_TIME_SAFETY_FACTOR * asrl::time::seconds(runTime) /
+IterationCostLogger::IterationCostLogger(const esp::ompltools::time::Duration& runTime,
+                                         unsigned int recordPeriodMicrosecond) {
+  allocSize_ = ALLOC_SAFETY_FACTOR * esp::ompltools::time::seconds(runTime) /
                (static_cast<double>(recordPeriodMicrosecond) / 1e6);
   data_.reserve(allocSize_);
 }
@@ -220,7 +248,7 @@ std::string TargetTimeResults::output(const std::string& labelPrefix) {
   // the time
   rval << labelPrefix << ", ";
   for (unsigned int i = 0u; i < data_.size(); ++i) {
-    rval << std::setprecision(21) << asrl::time::seconds(data_.at(i).second);
+    rval << std::setprecision(21) << esp::ompltools::time::seconds(data_.at(i).second);
     if (i != data_.size() - 1u) {
       rval << ", ";
     }

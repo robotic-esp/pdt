@@ -144,7 +144,7 @@
             "name": "BITstar",
             "useKNearest": false,
             "rewireFactor": 1.1,
-            "samplesPerBatch": 1000,
+            "samplesPerBatch": 100,
             "enablePruning": false,
             "pruningThreshold": 0.1,
             "useJustInTimeSampling": false,

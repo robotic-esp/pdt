@@ -48,7 +48,8 @@
 #include "esp_factories/planner_factory.h"
 #include "esp_performance_loggers/performance_loggers.h"
 #include "esp_planning_contexts/all_contexts.h"
-#include "esp_utilities/time.h"
+#include "esp_time/time.h"
+#include "esp_utilities/get_best_cost.h"
 
 int main(int argc, char **argv) {
   // Read the config files.
@@ -71,10 +72,18 @@ int main(int argc, char **argv) {
   }
   std::cout << '\n';
 
+  // Prepare the performance logger.
+  esp::ompltools::PerformanceLog<esp::ompltools::TimeCostLogger> log(
+      experimentConfig["executable"].get<std::string>() + std::string("_logs/") +
+      experimentConfig["date"].get<std::string>() + std::string(".csv"));
+
   // Let's dance.
   for (std::size_t i = 0; i < experimentConfig["numRuns"]; ++i) {
-    std::cout << '\n' << std::setw(4) << std::right << std::setfill('0') << i << ": ";
+    std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << ": ";
     for (const auto &plannerType : experimentConfig["planners"]) {
+      // Create the logger for this run.
+      esp::ompltools::TimeCostLogger logger(context->getTargetDuration(),
+                                            experimentConfig["logFrequency"]);
       // Allocate the planner.
       auto planner = plannerFactory.create(plannerType);
 
@@ -87,28 +96,44 @@ int main(int argc, char **argv) {
       auto maxSolveDuration =
           esp::ompltools::time::seconds(context->getTargetDuration() - setupDuration);
 
-      // Make sure the clock is steady.
-      if (!esp::ompltools::time::Clock::is_steady) {
-        boost::this_thread::sleep_for(boost::chrono::microseconds(1));
-      }
-
       // Solve the problem on a separate thread.
       auto solveStartTime = esp::ompltools::time::Clock::now();
       boost::thread solveThread(
           [&planner, &maxSolveDuration]() { planner->solve(maxSolveDuration); });
+      // Log the intermediate best costs.
       do {
-        // Log progress here.
-      } while (!solveThread.try_join_for(boost::chrono::microseconds(1000)));
-      auto solveDuration = esp::ompltools::time::Clock::now() - solveStartTime;
+        logger.addMeasurement(setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime),
+                              esp::ompltools::utilities::getBestCost(planner));
+      } while (!solveThread.try_join_for(
+          boost::chrono::duration<double>(1.0 / experimentConfig["logFrequency"].get<double>())));
+      // Get the final runtime.
+      auto totalDuration = setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
 
-      auto result = std::make_pair(setupDuration + solveDuration,
-                                   planner->getProblemDefinition()->getSolutionPath()->cost(
-                                       context->getOptimizationObjective()));
+      // Store the final best cost.
+      auto problem = planner->getProblemDefinition();
+      if (problem->hasExactSolution()) {
+        logger.addMeasurement(
+            totalDuration, problem->getSolutionPath()->cost(context->getOptimizationObjective()));
+      } else {
+        logger.addMeasurement(totalDuration,
+                              ompl::base::Cost(std::numeric_limits<double>::infinity()));
+      }
 
+      // Add this run to the log.
+      log.addResult(planner->getName(), logger);
+
+      auto result = logger.lastMeasurement();
       std::cout << std::setw(17) << std::left << result.first << ' ' << std::setw(8) << std::fixed
                 << result.second << "  ";
     }
   }
+
+  // Report success and dump config.
+
+  config->dumpAccessed(experimentConfig["executable"].get<std::string>() + std::string("_logs/") +
+                       experimentConfig["date"].get<std::string>() + std::string(".json"));
+  std::cout << "\nExperiment ended cleanly."
+               "The log and config are in ./planner_performance_logs/\n";
 
   // config->dumpAccessed();
 

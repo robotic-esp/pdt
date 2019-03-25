@@ -3,13 +3,13 @@
         "executable": "planner_performance",
         "planners": [
             "BITstar",
-            "RRTstar",
-            "RRTConnect"
+            "RRTConnect",
+            "RRTstar"
         ],
         "context": "CentreSquare",
-        "numRuns": 100,
+        "numRuns": 10,
         "seed": "time",
-        "log": "warn"
+        "logFrequency": 10000
     },
     "Contexts": {
         "CentreSquare": {

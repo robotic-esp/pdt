@@ -53,10 +53,12 @@ set(JSON_Install OFF CACHE INTERNAL "")    # No need to install the json lib.
 add_subdirectory(thirdparty/json)
 
 # Add the subdirectories.
+add_subdirectory(esp_common)
 add_subdirectory(esp_configuration)
 add_subdirectory(esp_experiments)
 add_subdirectory(esp_factories)
 add_subdirectory(esp_obstacles)
 add_subdirectory(esp_performance_loggers)
 add_subdirectory(esp_planning_contexts)
+add_subdirectory(esp_time)
 add_subdirectory(esp_utilities)

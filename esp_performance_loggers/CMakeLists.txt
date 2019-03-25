@@ -5,8 +5,12 @@ project(esp_performance_loggers)
 add_definitions(-std=c++17 -Wall -Wextra -Weffc++ -Werror
   -Wdisabled-optimization -fdiagnostics-color=auto)
 
+# Find OMPL.
+find_package(ompl REQUIRED)
+
 # Include necessary header directories.
 include_directories(
+  ${OMPL_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include)
 
 # Build the library.
@@ -16,7 +20,11 @@ add_library(esp_performance_loggers
 # Link the library.
 target_link_libraries(esp_performance_loggers
   PRIVATE # Libraries not exposed in API.
-  esp_utilities)
+  stdc++fs
+  PUBLIC # Libraries exposed in API.
+  ${OMPL_LIBRARIES}
+  ${Boost_LIBRARIES}
+  esp_time)
 
 # Specify the include directories exported by this library.
 target_include_directories(esp_performance_loggers PUBLIC

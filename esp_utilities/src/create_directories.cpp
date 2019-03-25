@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2019, University of Oxford
+ *  Copyright (c) 2018, University of Oxford
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,46 +32,41 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Jonathan Gammell, Marlin Strub
 
 #pragma once
 
+#include <chrono>
 #include <fstream>
-#include <iostream>
-#include <string>
+#include <tuple>
+#include <vector>
 
-#include <ompl/util/Console.h>
+#include <ompl/base/Cost.h>
 
-#include "nlohmann/json.hpp"
+#include "esp_time/time.h"
 
 namespace esp {
 
 namespace ompltools {
 
-namespace json = nlohmann;
+void createDirectories(const std::string& fileName) {
+  boost::filesystem::path fullPath;
 
-// A class to manage configuration for repeatable experiments.
-class Configuration {
- public:
-  Configuration(int argc, char** argv);
-  ~Configuration() = default;
+  // Create a boost::path from the provided string
+  fullPath = fileName.c_str();
 
-  const json::json& getExperimentConfig();
-  const json::json& getPlannerConfig(const std::string &planner) const;
-  const json::json& getContextConfig(const std::string &context) const;
+  // Decompose the path into the parent directories and check if they exist
+  if (fullPath.parent_path().empty() == false) {
+    if (boost::filesystem::exists(fullPath.parent_path()) == false) {
+      // If they don't exist, make them
+      boost::filesystem::create_directories(fullPath.parent_path());
 
-  bool contains(const std::string &key) const;
+      //    std::cout << "Created: " << boost::filesystem::absolute(fullPath.parent_path()) << "\n";
+    }
+  }
+  // Else, do nothing
+}
 
-  // Dump the parameters.
-  void dumpAll(std::ostream &out = std::cout) const;
-  void dumpAll(const std::string& filename) const;
-  void dumpAccessed(std::ostream &out = std::cout) const;
-  void dumpAccessed(const std::string& filename) const;
-
- private:
-  json::json allParameters_{};
-  mutable json::json accessedParameters_{};
-};
 
 }  // namespace ompltools
 

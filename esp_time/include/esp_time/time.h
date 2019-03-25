@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2019, University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Oxford nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,47 +32,42 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Jonathan Gammell, Marlin Strub
 
 #pragma once
 
-#include <fstream>
-#include <iostream>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 #include <string>
-
-#include <ompl/util/Console.h>
-
-#include "nlohmann/json.hpp"
 
 namespace esp {
 
 namespace ompltools {
 
-namespace json = nlohmann;
+namespace time {
 
-// A class to manage configuration for repeatable experiments.
-class Configuration {
- public:
-  Configuration(int argc, char** argv);
-  ~Configuration() = default;
+// We need a steady clock because we use it as a stopwatch.
+using Clock = std::chrono::steady_clock;
+using TimePoint = Clock::time_point;
+using Duration = std::chrono::duration<double, std::ratio<1>>;
 
-  const json::json& getExperimentConfig();
-  const json::json& getPlannerConfig(const std::string &planner) const;
-  const json::json& getContextConfig(const std::string &context) const;
+// Convert a TimePoint to a string.
+// See https://rextester.com/HADNXK16356
+std::string toDateString(const std::chrono::system_clock::time_point& timePoint,
+                         const std::string& format = "%F_%T");
 
-  bool contains(const std::string &key) const;
+// Convert a double to a duration.
+Duration seconds(double sec);
 
-  // Dump the parameters.
-  void dumpAll(std::ostream &out = std::cout) const;
-  void dumpAll(const std::string& filename) const;
-  void dumpAccessed(std::ostream &out = std::cout) const;
-  void dumpAccessed(const std::string& filename) const;
+// Convert a duration to a double.
+double seconds(Duration sec);
 
- private:
-  json::json allParameters_{};
-  mutable json::json accessedParameters_{};
-};
+}  // namespace time
 
 }  // namespace ompltools
 
 }  // namespace esp
+
+// A pretty output operator for durations.
+std::ostream& operator<<(std::ostream& out, const esp::ompltools::time::Duration& duration);

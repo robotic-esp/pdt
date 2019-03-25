@@ -48,7 +48,7 @@
 #include <ompl/util/Exception.h>
 
 #include "esp_obstacles/base_obstacle.h"
-#include "esp_utilities/general_tools.h"
+#include "esp_time/time.h"
 
 namespace esp {
 
@@ -73,7 +73,7 @@ class BaseContext {
   ompl::base::OptimizationObjectivePtr getOptimizationObjective() const;
 
   /** \brief Return the maximum experiment runtime */
-  asrl::time::duration getTargetDuration() const;
+  time::Duration getTargetDuration() const;
 
   /** \brief Get the goal */
   ompl::base::GoalPtr getGoalPtr() const;
@@ -135,7 +135,7 @@ class BaseContext {
   /** \brief The obstacle world */
   std::shared_ptr<BaseObstacle> obs_{};
   /** \brief The runtime for the experiment */
-  asrl::time::duration targetDuration_{};
+  time::Duration targetDuration_{};
   /** \brief The start states */
   std::vector<ompl::base::ScopedState<>> startStates_{};
   /** \brief The goal states */

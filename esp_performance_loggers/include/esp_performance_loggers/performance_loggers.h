@@ -32,22 +32,26 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell
+// Authors: Jonathan Gammell, Marlin Strub
 
 #pragma once
 
+#include <chrono>
 #include <fstream>
 #include <tuple>
 #include <vector>
 
-#include "esp_utilities/general_tools.h"
+#include <experimental/filesystem>
+
+#include <ompl/base/Cost.h>
+
+#include "esp_time/time.h"
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief A helper function to create directories using boost filesystem */
-void createDirectories(std::string fileName);
+namespace fs = std::experimental::filesystem;
 
 //******* The different pieces of data to be recorded*******//
 /** \brief A null-logging class */
@@ -61,7 +65,8 @@ class NullLogger {
   NullLogger(double /*runTimeSeconds*/, unsigned int /*recordPeriodMicrosecond*/) {
     empty_ = false;
   };
-  NullLogger(const asrl::time::duration& /*runTime*/, unsigned int /*recordPeriodMicrosecond*/) {
+  NullLogger(const esp::ompltools::time::Duration& /*runTime*/,
+             unsigned int /*recordPeriodMicrosecond*/) {
     empty_ = false;
   };
 
@@ -89,39 +94,37 @@ class NullLogger {
 /** \brief A vector of time & cost */
 class TimeCostLogger {
  public:
-  /** \brief Data type */
-  typedef std::pair<asrl::time::duration, double> data_t;
+  using logData = std::pair<const esp::ompltools::time::Duration, const ompl::base::Cost>;
 
   /** \brief Constructors */
-  TimeCostLogger(double runTimeSeconds, unsigned int recordPeriodMicrosecond);
-  TimeCostLogger(const asrl::time::duration& runTime, unsigned int recordPeriodMicrosecond);
+  TimeCostLogger(const esp::ompltools::time::Duration& maxDuration, double logFrequency);
 
   /** \brief Output the data with the appropriate label*/
-  std::string output(const std::string& labelPrefix);
+  std::string createLogString(const std::string& labelPrefix) const;
 
   /** \brief std::vector pass-throughs */
-  bool empty() const { return data_.empty(); }
-  void push_back(const data_t& newData) { data_.push_back(newData); };
-  data_t back() { return data_.back(); };
+  bool empty() const { return measurements_.empty(); }
+  void addMeasurement(const esp::ompltools::time::Duration& duration, const ompl::base::Cost& cost);
+  logData lastMeasurement() { return measurements_.back(); };
 
  private:
-  /** \brief Raw data */
-  std::vector<data_t> data_{};
+  // The measurements
+  std::vector<logData> measurements_{};
 
   /** \brief Preallocated size */
-  unsigned int allocSize_{0u};
+  std::size_t allocSize_{0u};
 };
 
 /** \brief A vector of time & iteration & cost */
 class TimeIterationCostLogger {
  public:
   /** \brief Data type */
-  typedef std::tuple<asrl::time::duration, unsigned int, double> data_t;
+  typedef std::tuple<esp::ompltools::time::Duration, unsigned int, double> data_t;
 
   /** \brief Constructors */
   TimeIterationCostLogger(double runTimeSeconds, unsigned int recordPeriodMicrosecond);
-  TimeIterationCostLogger(const asrl::time::duration& runTime,
-                           unsigned int recordPeriodMicrosecond);
+  TimeIterationCostLogger(const esp::ompltools::time::Duration& runTime,
+                          unsigned int recordPeriodMicrosecond);
 
   /** \brief Output the data with the appropriate label*/
   std::string output(const std::string& labelPrefix);
@@ -148,7 +151,8 @@ class IterationCostLogger {
   /** \brief Constructors */
   IterationCostLogger(unsigned int numIterations);
   IterationCostLogger(double runTimeSeconds, unsigned int recordPeriodMicrosecond);
-  IterationCostLogger(const asrl::time::duration& runTime, unsigned int recordPeriodMicrosecond);
+  IterationCostLogger(const esp::ompltools::time::Duration& runTime,
+                      unsigned int recordPeriodMicrosecond);
 
   /** \brief Output the data with the appropriate label*/
   std::string output(const std::string& labelPrefix);
@@ -171,7 +175,7 @@ class IterationCostLogger {
 class TargetTimeResults {
  public:
   /** \brief Data type */
-  typedef std::pair<double, asrl::time::duration> data_t;
+  typedef std::pair<double, esp::ompltools::time::Duration> data_t;
 
   /** \brief Constructors */
   TargetTimeResults(unsigned int numTargets);
@@ -194,34 +198,28 @@ class TargetTimeResults {
 
 //******* The file that writes the data to disk*******//
 /** \brief A class to write results to disk. */
-template <class Data>
-class ResultsFile {
+template <class Logger>
+class PerformanceLog {
  public:
-  ResultsFile(const std::string& fullFileName) : filename_(fullFileName) {
-    createDirectories(filename_);
+  PerformanceLog(const std::string& fullFileName) : filename_(fullFileName) {
+    fs::create_directories(fs::path(filename_).parent_path());
   };
 
-  void addResult(const std::string& plannerName, Data& data) {
-    // Variable:
-    // The output file stream
-    std::ofstream mfile;
+  void addResult(const std::string& plannerName, const Logger& logger) {
+    // Open the file.
+    std::ofstream csvFile;
+    csvFile.open(filename_.c_str(), std::ofstream::out | std::ofstream::app);
 
-    // Open the file:
-    mfile.open(filename_.c_str(), std::ofstream::out | std::ofstream::app);
-
-    // Check on the failbit:
-    if (mfile.fail() == true) {
-      throw std::ios_base::failure("Could not open file.");
+    // Check on the failbit.
+    if (csvFile.fail() == true) {
+      throw std::ios_base::failure("Could not open log file.");
     }
 
-    // Write the data
-    mfile << data.output(plannerName);
-
-    // Flush the file:
-    mfile.flush();
+    // Write the data.
+    csvFile << logger.createLogString(plannerName);
 
     // Close the file:
-    mfile.close();
+    csvFile.close();
   };
 
  private:

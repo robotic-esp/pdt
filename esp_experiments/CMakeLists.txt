@@ -62,6 +62,7 @@ target_link_libraries(planner_performance PUBLIC
   esp_factories
   esp_planning_contexts
   esp_performance_loggers
+  esp_time
   esp_utilities
 )
 # add_executable(test_multigoal
