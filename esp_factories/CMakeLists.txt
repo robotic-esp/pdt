@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(esp_factories)
 
-# Enable more warnings and treat warnings as errors.
-add_definitions(-std=c++17 -Wall -Wextra -Weffc++ -Werror
-  -Wdisabled-optimization -fdiagnostics-color=auto)
-
 # Find OMPL.
 find_package(ompl REQUIRED)
 
@@ -25,6 +21,7 @@ target_link_libraries(esp_factories
   nlohmann_json::nlohmann_json
   PUBLIC # Libraries exposed in API.
   ${OMPL_LIBRARIES}
+  esp_common
   esp_configuration
   esp_planning_contexts)
 

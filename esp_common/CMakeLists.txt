@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 2.8)
 project(esp_common)
 
-# Enable more warnings and treat warnings as errors.
-add_definitions(-std=c++17 -Wall -Wextra -Weffc++ -Werror
-  -Wdisabled-optimization -fdiagnostics-color=auto)
-
 # Include necessary header directories.
 include_directories(
+  ${NLOHMANN_JSON_INCLUDE_BUILD_DIR}
   ${PROJECT_SOURCE_DIR}/include)
 
 # Add the library as an interface.
 add_library(esp_common INTERFACE)
+
+target_link_libraries(esp_common INTERFACE
+  nlohmann_json::nlohmann_json)
 
 # Specify the include directories exported by this library.
 target_include_directories(esp_common INTERFACE

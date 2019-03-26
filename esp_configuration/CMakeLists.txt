@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(esp_configuration)
 
-# Enable more warnings and treat warnings as errors.
-add_definitions(-std=c++17 -Wall -Wextra -Weffc++ -Werror
-  -Wdisabled-optimization -fdiagnostics-color=auto)
-
 # Get the git branch, commit hash, and status.
 # See answers to https://stackoverflow.com/q/1435953/6333988
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)

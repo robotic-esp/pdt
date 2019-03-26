@@ -8,9 +8,13 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
    message(SEND_ERROR "Please build this porject out-of-source.")
 endif()
 
-# Set standard, enable warnings and treat warnings as errors.
-add_definitions(-std=c++17 -Wall -Wextra -Weffc++ -Werror
-  -Wdisabled-optimization -pedantic-errors -fdiagnostics-color=auto)
+# Set the standard.
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Enable additional warnings and treat warnings as errors.
+set(ESP_CXX_COMPILE_FLAGS "-Wall -Wextra -Weffc++ -Werror -Wdisabled-optimization -pedantic-errors -fdiagnostics-color=auto")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ESP_CXX_COMPILE_FLAGS}")
 
 # Build in release if no build type is specified.
 if (NOT CMAKE_BUILD_TYPE)
