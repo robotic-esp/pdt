@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "esp_obstacles/hyperrectangle.h"
+#include "esp_obstacles/random_hyperrectangles.h"
 #include "esp_planning_contexts/base_context.h"
 
 namespace esp {
@@ -68,7 +68,7 @@ class MultiStartGoal : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<Hyperrectangle> rectObs_{};
+  std::shared_ptr<RandomHyperrectangles> rectObs_{};
 };
 
 }  // namespace ompltools

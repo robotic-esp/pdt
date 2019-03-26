@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "esp_obstacles/hyperrectangle.h"
+#include "esp_obstacles/random_hyperrectangles.h"
 #include "esp_planning_contexts/base_context.h"
 
 namespace esp {
@@ -77,7 +77,7 @@ class DividingWall : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<Hyperrectangle> rectObs_{};
+  std::shared_ptr<RandomHyperrectangles> rectObs_{};
   /** \brief The number of walls */
   unsigned int numWalls_{0u};
   /** \brief The separation between walls */

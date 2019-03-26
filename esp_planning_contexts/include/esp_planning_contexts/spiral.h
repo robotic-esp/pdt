@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "esp_obstacles/hyperrectangle.h"
+#include "esp_obstacles/random_hyperrectangles.h"
 #include "esp_planning_contexts/base_context.h"
 
 namespace esp {
@@ -67,7 +67,7 @@ class Spiral : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<Hyperrectangle> rectObs_{};
+  std::shared_ptr<RandomHyperrectangles> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
   std::vector<ompl::base::ScopedState<> > obsCorners_{};
   /** The widths of the obstacles */
