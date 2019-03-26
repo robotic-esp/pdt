@@ -46,7 +46,7 @@
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 
-#include "esp_common/planner_enum.h"
+#include "esp_common/planner_type.h"
 
 namespace esp {
 
@@ -54,32 +54,22 @@ namespace ompltools {
 
 namespace utilities {
 
-namespace {
-
-static const std::map<std::string, PLANNER> nameToEnum = {{"BITstar", PLANNER::BITSTAR},
-                                                          {"LBTRRT", PLANNER::LBTRRT},
-                                                          {"RRTConnect", PLANNER::RRTCONNECT},
-                                                          {"RRTstar", PLANNER::RRTSTAR}};
-
-}  // namespace
-
-ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner) {
-  auto type = nameToEnum.at(planner->getName());
-  switch (type) {
-    case PLANNER::BITSTAR: {
+ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE plannerType) {
+  switch (plannerType) {
+    case PLANNER_TYPE::BITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
     }
-    case PLANNER::RRTSTAR: {
+    case PLANNER_TYPE::RRTSTAR: {
       return planner->as<ompl::geometric::RRTstar>()->bestCost();
     }
-    case PLANNER::RRTCONNECT: {
+    case PLANNER_TYPE::RRTCONNECT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
-    case PLANNER::LBTRRT: {
+    case PLANNER_TYPE::LBTRRT: {
       return ompl::base::Cost(std::stod(planner->as<ompl::geometric::LBTRRT>()->getBestCost()));
     }
     default: {
-      throw std::runtime_error("Cannot get best cost of planner.");
+      throw std::runtime_error("Received request to get best cost of unknown planner type.");
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
   }

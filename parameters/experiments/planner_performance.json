@@ -3,7 +3,6 @@
         "executable": "planner_performance",
         "planners": [
             "BITstar",
-            "RRTConnect",
             "LBTRRT",
             "RRTstar"
         ],

@@ -39,13 +39,15 @@
 #include <ompl/base/Cost.h>
 #include <ompl/base/Planner.h>
 
+#include "esp_common/planner_type.h"
+
 namespace esp {
 
 namespace ompltools {
 
 namespace utilities {
 
-ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner);
+ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE plannerType);
 
 }  // namespace utilities
 

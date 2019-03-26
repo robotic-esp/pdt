@@ -41,9 +41,10 @@
 
 #include <ompl/base/Planner.h>
 
-
 #include "esp_configuration/configuration.h"
 #include "esp_planning_contexts/base_context.h"
+
+#include "esp_common/planner_type.h"
 
 namespace esp {
 
@@ -57,7 +58,8 @@ class PlannerFactory {
   ~PlannerFactory() = default;
 
   // Create a planner.
-  std::shared_ptr<ompl::base::Planner> create(const std::string &plannerType) const;
+  std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> create(
+      const std::string &plannerName) const;
 
  private:
   const std::shared_ptr<const Configuration> config_;

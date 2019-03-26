@@ -114,7 +114,7 @@
     },
     "Planners": {
         "BITstar": {
-            "name": "BITstar",
+            "type": "BITstar",
             "useKNearest": false,
             "rewireFactor": 1.1,
             "samplesPerBatch": 100,
@@ -125,7 +125,7 @@
             "stopOnSolutionImprovement": false
         },
         "LBTRRT" : {
-            "name": "LBTRRT",
+            "type": "LBTRRT",
             "approximationFactor": 0.4,
             "goalBias": 0.05,
             "maxEdgeLength": {
@@ -137,7 +137,7 @@
             }
         },
         "RRTConnect": {
-            "name": "RRTConnect",
+            "type": "RRTConnect",
             "useKNearest": false,
             "maxEdgeLength": {
                 "2d": 0.3,
@@ -149,7 +149,7 @@
             "addIntermediateStates": false
         },
         "RRTstar": {
-            "name": "RRTstar",
+            "type": "RRTstar",
             "useKNearest": false,
             "rewireFactor": 1.1,
             "goalBias": 0.05,
@@ -164,7 +164,7 @@
             "useAdmissibleCostToCome": true
         },
         "SBITstar": {
-            "name": "SBITstar",
+            "type": "SBITstar",
             "useKNearest": false,
             "rewireFactor": 1.1,
             "samplesPerBatch": 100,

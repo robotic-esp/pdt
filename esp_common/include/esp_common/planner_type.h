@@ -46,16 +46,27 @@
 
 #pragma once
 
+#include "nlohmann/json.hpp"
+
 namespace esp {
 
 namespace ompltools {
 
-enum class PLANNER {
+enum class PLANNER_TYPE {
   BITSTAR,
   LBTRRT,
   RRTCONNECT,
   RRTSTAR,
+  SBITSTAR,
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
+                                               {PLANNER_TYPE::BITSTAR, "BITstar"},
+                                               {PLANNER_TYPE::LBTRRT, "LBTRRT"},
+                                               {PLANNER_TYPE::RRTCONNECT, "RRTConnect"},
+                                               {PLANNER_TYPE::RRTSTAR, "RRTstar"},
+                                               {PLANNER_TYPE::SBITSTAR, "SBITstar"},
+                                           })
 
 }  // namespace ompltools
 

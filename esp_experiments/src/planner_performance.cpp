@@ -82,12 +82,12 @@ int main(int argc, char **argv) {
   // Let's dance.
   for (std::size_t i = 0; i < experimentConfig["numRuns"]; ++i) {
     std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << " | ";
-    for (const auto &plannerType : experimentConfig["planners"]) {
+    for (const auto &plannerName : experimentConfig["planners"]) {
       // Create the logger for this run.
       esp::ompltools::TimeCostLogger logger(context->getTargetDuration(),
                                             experimentConfig["logFrequency"]);
       // Allocate the planner.
-      auto planner = plannerFactory.create(plannerType);
+      auto [ planner, plannerType ] = plannerFactory.create(plannerName);
 
       // Set it up.
       auto setupStartTime = esp::ompltools::time::Clock::now();
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
       // Log the intermediate best costs.
       do {
         logger.addMeasurement(setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime),
-                              esp::ompltools::utilities::getBestCost(planner));
+                              esp::ompltools::utilities::getBestCost(planner, plannerType));
       } while (!solveThread.try_join_for(
           boost::chrono::duration<double>(1.0 / experimentConfig["logFrequency"].get<double>())));
       // Get the final runtime.
