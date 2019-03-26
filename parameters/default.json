@@ -113,6 +113,41 @@
         }
     },
     "Planners": {
+        "BITstar": {
+            "name": "BITstar",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "samplesPerBatch": 100,
+            "enablePruning": false,
+            "pruningThreshold": 0.1,
+            "useJustInTimeSampling": false,
+            "dropSamplesOnPrune": false,
+            "stopOnSolutionImprovement": false
+        },
+        "LBTRRT" : {
+            "name": "LBTRRT",
+            "approximationFactor": 0.4,
+            "goalBias": 0.05,
+            "maxEdgeLength": {
+                "2d": 0.3,
+                "4d": 0.5,
+                "6d": 0.9,
+                "8d": 1.25,
+                "16d": 3.0
+            }
+        },
+        "RRTConnect": {
+            "name": "RRTConnect",
+            "useKNearest": false,
+            "maxEdgeLength": {
+                "2d": 0.3,
+                "4d": 0.5,
+                "6d": 0.9,
+                "8d": 1.25,
+                "16d": 3.0
+            },
+            "addIntermediateStates": false
+        },
         "RRTstar": {
             "name": "RRTstar",
             "useKNearest": false,
@@ -127,29 +162,6 @@
             },
             "delayCollisionChecks": true,
             "useAdmissibleCostToCome": true
-        },
-        "RRTConnect": {
-            "name": "RRTConnect",
-            "useKNearest": false,
-            "maxEdgeLength": {
-                "2d": 0.3,
-                "4d": 0.5,
-                "6d": 0.9,
-                "8d": 1.25,
-                "16d": 3.0
-            },
-            "addIntermediateStates": false
-        },
-        "BITstar": {
-            "name": "BITstar",
-            "useKNearest": false,
-            "rewireFactor": 1.1,
-            "samplesPerBatch": 100,
-            "enablePruning": false,
-            "pruningThreshold": 0.1,
-            "useJustInTimeSampling": false,
-            "dropSamplesOnPrune": false,
-            "stopOnSolutionImprovement": false
         },
         "SBITstar": {
             "name": "SBITstar",

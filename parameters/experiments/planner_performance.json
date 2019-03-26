@@ -4,12 +4,13 @@
         "planners": [
             "BITstar",
             "RRTConnect",
+            "LBTRRT",
             "RRTstar"
         ],
         "context": "CentreSquare",
         "numRuns": 10,
         "seed": "time",
-        "logFrequency": 10000
+        "logFrequency": 1000
     },
     "Contexts": {
         "CentreSquare": {

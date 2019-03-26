@@ -128,6 +128,17 @@ std::shared_ptr<ompl::base::Planner> PlannerFactory::create(const std::string &p
     planner->setAdmissibleCostToCome(true);
     planner->setInformedSampling(false);
     return planner;
+  } else if (plannerType == std::string("LBTRRT")) {
+    // Allocate and configure an LBTRRT planner.
+    auto planner = std::make_shared<ompl::geometric::LBTRRT>(context_->getSpaceInformation());
+    auto dimKey = std::to_string(context_->getDimensions()) + "d";
+    const auto &plannerConfig = config_->getPlannerConfig(plannerType);
+    planner->setProblemDefinition(context_->newProblemDefinition());
+    planner->setName(plannerConfig["name"]);
+    planner->setRange(plannerConfig["maxEdgeLength"][dimKey]);
+    planner->setGoalBias(plannerConfig["goalBias"]);
+    planner->setApproximationFactor(plannerConfig["approximationFactor"]);
+    return planner;
   } else {
     throw std::runtime_error("Requested to create unknown planner at factory.");
     return std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
