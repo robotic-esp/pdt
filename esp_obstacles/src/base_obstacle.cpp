@@ -41,7 +41,9 @@ namespace esp {
 namespace ompltools {
 
 BaseObstacle::BaseObstacle(ompl::base::SpaceInformation* si) :
-    ompl::base::StateValidityChecker(si) {
+    ompl::base::StateValidityChecker(si),
+    stateSpace_(si->getStateSpace()),
+    dimension_(si->getStateDimension()) {
 }
 
 BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& si) :
@@ -60,7 +62,7 @@ bool BaseObstacle::isValid(const std::vector<const ompl::base::State*>& states) 
 }
 
 unsigned int BaseObstacle::getDimension() const {
-  return ompl::base::StateValidityChecker::si_->getStateDimension();
+  return stateSpace_->getDimension();
 }
 
 }  // namespace ompltools

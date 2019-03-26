@@ -73,6 +73,10 @@ class BaseObstacle : public ompl::base::StateValidityChecker {
   // TODO: Move this to the matlab plot exporter.
   virtual std::string mfile(const std::string& obsColour = "k",
                             const std::string& spaceColour = "w") const = 0;
+
+ protected:
+  ompl::base::StateSpacePtr stateSpace_{};
+  unsigned int dimension_{0u};
 };
 
 }  // namespace ompltools

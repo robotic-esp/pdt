@@ -87,10 +87,6 @@ void RandomHyperrectangles::clear() {
   obsMeasure_ = 0.0;
 }
 
-unsigned int RandomHyperrectangles::size() const {
-  return nnObstacles_->size();
-}
-
 bool RandomHyperrectangles::isValid(const ompl::base::State* state) const {
   // Variable
   // The return value
@@ -123,29 +119,6 @@ bool RandomHyperrectangles::isValid(const ompl::base::State* state) const {
 }
 
 void RandomHyperrectangles::addObstacle(const obstacle_corner_widths_t& newObstacle) {
-  //    //Print the obstacle out to the terminal:
-  //    std::cout << "ll = [";
-  //    for (unsigned int i = 0u; i < newObstacle.second.size(); ++i)
-  //    {
-  //        std::cout <<
-  //        newObstacle.first->as<ompl::base::RealVectorStateSpace::StateType>()->values[i]; if (i
-  //        != (newObstacle.second.size() - 1u))
-  //        {
-  //            std::cout << ", ";
-  //        }
-  //    }
-  //    std::cout << "], ur = [";
-  //    for (unsigned int i = 0u; i < newObstacle.second.size(); ++i)
-  //    {
-  //        std::cout <<
-  //        newObstacle.first->as<ompl::base::RealVectorStateSpace::StateType>()->values[i] +
-  //        newObstacle.second.at(i); if (i != (newObstacle.second.size() - 1u))
-  //        {
-  //            std::cout << ", ";
-  //        }
-  //    }
-  //    std::cout << "]" << std::endl;
-
   // Add the obstacle
   nnObstacles_->add(newObstacle);
 
@@ -156,12 +129,6 @@ void RandomHyperrectangles::addObstacle(const obstacle_corner_widths_t& newObsta
   for (unsigned int i = 0u; i < newObstacle.second.size(); ++i) {
     // Update the largest obstacle size:
     maxWidth_ = std::max(maxWidth_, newObstacle.second.at(i));
-  }
-}
-
-void RandomHyperrectangles::addObstacles(const std::vector<obstacle_corner_widths_t>& newObstacles) {
-  for (unsigned int i = 0u; i < newObstacles.size(); ++i) {
-    this->addObstacle(newObstacles.at(i));
   }
 }
 

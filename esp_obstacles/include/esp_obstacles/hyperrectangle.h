@@ -37,6 +37,9 @@
 #pragma once
 
 #include <memory>
+#include <vector>
+
+#include <ompl/base/ScopedState.h>
 
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/obstacle_visitor.h"
@@ -48,22 +51,41 @@ namespace ompltools {
 /** \brief A world consisting of random hyperrectangular obstacles.*/
 class Hyperrectangle : public BaseObstacle {
  public:
+  // To create a hyperrectangle, we need to have some information about the underlying space.
   Hyperrectangle(ompl::base::SpaceInformation* si);
   Hyperrectangle(const ompl::base::SpaceInformationPtr& si);
+
+  // Disable copy for now.
   Hyperrectangle(const Hyperrectangle&) = delete;
   Hyperrectangle& operator=(const Hyperrectangle&) = delete;
+
+  // We need to free the corner state (OMPL does not believe in RAII).
   virtual ~Hyperrectangle();
 
-  /** \brief Clear the obstacle space */
-  virtual void clear();
+  // Set the side lengths.
+  void setSideLengths(const std::vector<double>& sideLength);
+
+  // Get the side lengths.
+  std::vector<double> getSideLengths() const;
+
+  // Set the corner coordinates.
+  void setCornerCoordinates(const std::vector<double>& coordinates);
+
+  // Get the corner coordinates.
+  std::vector<double> getCornerCoordinates() const;
 
   /** \brief Check for state validity */
   virtual bool isValid(const ompl::base::State* state) const;
 
+  // Accept a visitor.
   virtual void accept(const ObstacleVisitor& visitor) const override;
 
  private:
-  ompl::base::State* corner { nullptr };
+  // This is the corner with the smallest value in each dimension. If we're in [0, X]^2 it's the lower-left corner.
+  ompl::base::ScopedState<> corner;
+
+  // These are the sidelengths of this hypercube.
+  std::vector<double> sideLengths_{};
 };
 
 }  // namespace ompltools

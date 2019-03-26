@@ -46,14 +46,61 @@ namespace esp {
 
 namespace ompltools {
 
-Hyperrectangle::Hyperrectangle(ompl::base::SpaceInformation* si) : BaseObstacle(si) {
+Hyperrectangle::Hyperrectangle(ompl::base::SpaceInformation* si) :
+    BaseObstacle(si),
+    corner(BaseObstacle::stateSpace_),
+    sideLengths_(BaseObstacle::stateSpace_->getDimension(), 0.0) {
+  if (BaseObstacle::stateSpace_->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
+    throw std::runtime_error(
+        "Not sure what a hyperrectangle looks like in any other space than a real vector state "
+        "space.");
+  }
 }
 
-Hyperrectangle::Hyperrectangle(const ompl::base::SpaceInformationPtr& si) : BaseObstacle(si) {
+Hyperrectangle::Hyperrectangle(const ompl::base::SpaceInformationPtr& si) :
+    BaseObstacle(si),
+    corner(BaseObstacle::stateSpace_),
+    sideLengths_(BaseObstacle::stateSpace_->getDimension(), 0.0) {
 }
 
-bool Hyperrectangle::isValid(const ompl::base::State* /*state*/) const {
-  return true;
+void Hyperrectangle::setSideLengths(const std::vector<double>& sideLengths) {
+  sideLengths_ = sideLengths;
+}
+
+std::vector<double> Hyperrectangle::getSideLengths() const {
+  return sideLengths_;
+}
+
+void Hyperrectangle::setCornerCoordinates(const std::vector<double>& coordinates) {
+  if (coordinates.size() != BaseObstacle::dimension_) {
+    throw std::runtime_error("Coordinate dimensions do not match hyperrectangle dimensions.");
+  } else {
+    for (std::size_t i = 0; i < coordinates.size(); ++i) {
+      corner[i] = coordinates[i];
+    }
+  }
+}
+
+std::vector<double> Hyperrectangle::getCornerCoordinates() const {
+  std::vector<double> coordinates(BaseObstacle::dimension_, 0.0);
+  for (std::size_t i = 0; i < coordinates.size(); ++i) {
+    coordinates[i] = corner[i];
+  }
+  return coordinates;
+}
+
+bool Hyperrectangle::isValid(const ompl::base::State* state) const {
+  if (!StateValidityChecker::si_->satisfiesBounds(state)) {
+    return false;
+  }
+  const auto* rs = static_cast<const ompl::base::RealVectorStateSpace::StateType*>(state);
+  for (std::size_t i = 0; i < BaseObstacle::dimension_; ++i) {
+    if ((*rs)[i] - std::numeric_limits<double>::epsilon() > corner[i] + sideLengths_[i] &&
+        (*rs)[i] + std::numeric_limits<double>::epsilon() < corner[i]) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void Hyperrectangle::accept(const ObstacleVisitor& visitor) const {

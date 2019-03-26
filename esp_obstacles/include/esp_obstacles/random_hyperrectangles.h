@@ -46,6 +46,7 @@
 #include <ompl/util/RandomNumbers.h>
 
 #include "esp_obstacles/base_obstacle.h"
+#include "esp_obstacles/hyperrectangle.h"
 
 namespace esp {
 
@@ -67,9 +68,6 @@ class RandomHyperrectangles : public BaseObstacle {
   /** \brief Clear the obstacle space */
   virtual void clear();
 
-  /** \brief The number of obstacles in the random world */
-  unsigned int size() const;
-
   /** \brief Check for state validity */
   virtual bool isValid(const ompl::base::State* state) const;
 
@@ -78,9 +76,6 @@ class RandomHyperrectangles : public BaseObstacle {
 
   /** \brief Add an obstacle to the obstacle space */
   void addObstacle(const obstacle_corner_widths_t& newObstacle);
-
-  /** \brief Add multiple obstacles to the obstacle space */
-  void addObstacles(const std::vector<obstacle_corner_widths_t>& newObstacles);
 
   /** \brief Create random obstacles such that the ratio of the space bounds covered by obstacles is
    * no more than the given parameter */
