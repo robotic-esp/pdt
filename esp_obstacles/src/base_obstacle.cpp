@@ -59,6 +59,10 @@ bool BaseObstacle::isValid(const std::vector<const ompl::base::State*>& states) 
   return true;
 }
 
+unsigned int BaseObstacle::getDimension() const {
+  return ompl::base::StateValidityChecker::si_->getStateDimension();
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

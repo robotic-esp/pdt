@@ -32,33 +32,22 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Marlin Strub
 
-#include "esp_obstacles/hyperrectangle.h"
-
-#include <functional>
-
-#include <ompl/base/spaces/RealVectorStateSpace.h>
-#include <ompl/datastructures/NearestNeighborsGNAT.h>
-#include <ompl/util/Exception.h>
+#pragma once
 
 namespace esp {
 
 namespace ompltools {
 
-Hyperrectangle::Hyperrectangle(ompl::base::SpaceInformation* si) : BaseObstacle(si) {
-}
+class ObstacleVisitor {
+ public:
+  ObstacleVisitor() = default;
+  virtual ~ObstacleVisitor() = default;
 
-Hyperrectangle::Hyperrectangle(const ompl::base::SpaceInformationPtr& si) : BaseObstacle(si) {
-}
-
-bool Hyperrectangle::isValid(const ompl::base::State* /*state*/) const {
-  return true;
-}
-
-void Hyperrectangle::accept(const ObstacleVisitor& visitor) const {
-  visitor.visit(*this);
-}
+  template <typename T>
+  void visit(const T& /* obstacle */) const {}
+};
 
 }  // namespace ompltools
 

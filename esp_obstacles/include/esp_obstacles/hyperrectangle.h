@@ -37,15 +37,9 @@
 #pragma once
 
 #include <memory>
-#include <vector>
-
-#include <ompl/base/ScopedState.h>
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/StateValidityChecker.h>
-#include <ompl/datastructures/NearestNeighbors.h>
-#include <ompl/util/RandomNumbers.h>
 
 #include "esp_obstacles/base_obstacle.h"
+#include "esp_obstacles/obstacle_visitor.h"
 
 namespace esp {
 
@@ -54,87 +48,22 @@ namespace ompltools {
 /** \brief A world consisting of random hyperrectangular obstacles.*/
 class Hyperrectangle : public BaseObstacle {
  public:
-  /** \brief a pair of lower-left corner and widths for a hyperrectangle obstacle*/
-  typedef std::pair<const ompl::base::State*, std::vector<double> > obstacle_corner_widths_t;
-
-  /** \brief Constructor. */
-  Hyperrectangle(ompl::base::SpaceInformation* si, bool separateObstacles);
-  /** \brief Constructor. */
-  Hyperrectangle(const ompl::base::SpaceInformationPtr& si, bool separateObstacles);
-  /** \brief Destructor */
+  Hyperrectangle(ompl::base::SpaceInformation* si);
+  Hyperrectangle(const ompl::base::SpaceInformationPtr& si);
+  Hyperrectangle(const Hyperrectangle&) = delete;
+  Hyperrectangle& operator=(const Hyperrectangle&) = delete;
   virtual ~Hyperrectangle();
 
   /** \brief Clear the obstacle space */
   virtual void clear();
 
-  /** \brief The number of obstacles in the random world */
-  unsigned int size() const;
-
   /** \brief Check for state validity */
   virtual bool isValid(const ompl::base::State* state) const;
 
-  /** \brief Get the vector of obstacles in the obstacle space */
-  std::vector<obstacle_corner_widths_t> getObstacles() const;
+  virtual void accept(const ObstacleVisitor& visitor) const override;
 
-  /** \brief Add an obstacle to the obstacle space */
-  void addObstacle(const obstacle_corner_widths_t& newObstacle);
-
-  /** \brief Add multiple obstacles to the obstacle space */
-  void addObstacles(const std::vector<obstacle_corner_widths_t>& newObstacles);
-
-  /** \brief Create random obstacles such that the ratio of the space bounds covered by obstacles is
-   * no more than the given parameter */
-  void randomize(double minObsSize, double maxObsSize, double obsRatio);
-
-  /** \brief Create random obstacles such that the ratio of the space bounds covered by obstacles is
-   * no more than the given parameter and that the states given are not inside*/
-  void randomize(double minObsSize, double maxObsSize, double obsRatio,
-                 const std::vector<ompl::base::ScopedState<> >& existingStates);
-
-  /** \brief Create random obstacles such that the ratio of the space bounds covered by obstacles is
-   * no more than the given parameter and that the states given are not inside*/
-  void randomize(double minObsSize, double maxObsSize, double obsRatio,
-                 const std::vector<const ompl::base::State*>& existingStates);
-
-  /** \brief The volume an n-dimensional sphere */
-  static double rectangleVolume(const std::vector<double>& widths);
-
-  /** \brief The obstacle map as a series of Matlab plot functions. Discard the space-colour
-   * argument. */
-  virtual std::string mfile(const std::string& obsColour, const std::string& /*spaceColour*/) const;
-
- protected:
  private:
-  /** \brief The individual obstacles in a nearest neighbours structure */
-  std::shared_ptr<ompl::NearestNeighbors<obstacle_corner_widths_t> > nnObstacles_{};
-  /** \brief A vector of states that I allocated (and therefore must free) */
-  std::vector<ompl::base::State*> statesToFree_{};
-  /** \brief The largest obstacle, used to find a small set of obstacles to check */
-  double maxWidth_{0.0};
-  /** \brief The measure of obstacles. This is really an "upper bound", as we don't check for
-   * overlapping obstacle regions when calculating. */
-  double obsMeasure_{0.0};
-  /** \brief Whether to disallow obstacle-obstacle collision */
-  bool separateObstacles_{false};
-  /** \brief The state sampler */
-  ompl::base::StateSamplerPtr stateSampler_{};
-  /** \brief The random number generator */
-  ompl::RNG rng_{};
-
-  /** \brief A common construtor */
-  void construct();
-
-  /** \brief Check whether a state is valid w.r.t to a specific obstacle. I.e., isValid is
-   * calculated by and'ing the following function over all obstacles:*/
-  bool verifyStateObstaclePair(const ompl::base::State* state,
-                               const obstacle_corner_widths_t& obstacle) const;
-
-  /** \brief Check whether two obstacles are in collision */
-  bool verifyObstacle(const obstacle_corner_widths_t& obstacle) const;
-
-  /** \brief The distance function for finding the nearest neighbour obstacles */
-  double distanceFunction(const obstacle_corner_widths_t& a,
-                          const obstacle_corner_widths_t& b) const;
+  ompl::base::State* corner { nullptr };
 };
 
 }  // namespace ompltools

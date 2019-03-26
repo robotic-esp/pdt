@@ -65,6 +65,9 @@ class CutoutObstacles : public BaseObstacle {
   /** \brief The obstacle map as a series of Matlab plot functions */
   std::string mfile(const std::string& obsColour, const std::string& spaceColour) const override;
 
+  // Accept a visitor.
+  virtual void accept(const ObstacleVisitor& visitor) const override;
+
  private:
   /** \brief A vector of obstacles */
   std::vector<std::shared_ptr<BaseObstacle>> obstaclePtrs_{};
