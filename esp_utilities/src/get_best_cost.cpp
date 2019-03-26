@@ -59,14 +59,20 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     case PLANNER_TYPE::BITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
     }
-    case PLANNER_TYPE::RRTSTAR: {
-      return planner->as<ompl::geometric::RRTstar>()->bestCost();
+    case PLANNER_TYPE::LBTRRT: {
+      return ompl::base::Cost(std::stod(planner->as<ompl::geometric::LBTRRT>()->getBestCost()));
     }
     case PLANNER_TYPE::RRTCONNECT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
-    case PLANNER_TYPE::LBTRRT: {
-      return ompl::base::Cost(std::stod(planner->as<ompl::geometric::LBTRRT>()->getBestCost()));
+    case PLANNER_TYPE::RRTSHARP: {
+      return planner->as<ompl::geometric::RRTsharp>()->bestCost();
+    }
+    case PLANNER_TYPE::RRTSTAR: {
+      return planner->as<ompl::geometric::RRTstar>()->bestCost();
+    }
+    case PLANNER_TYPE::SBITSTAR: {
+      return planner->as<ompl::geometric::BITstar>()->bestCost();
     }
     default: {
       throw std::runtime_error("Received request to get best cost of unknown planner type.");

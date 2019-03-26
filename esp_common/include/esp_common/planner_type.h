@@ -56,6 +56,7 @@ enum class PLANNER_TYPE {
   BITSTAR,
   LBTRRT,
   RRTCONNECT,
+  RRTSHARP,
   RRTSTAR,
   SBITSTAR,
 };
@@ -64,6 +65,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
                                                {PLANNER_TYPE::BITSTAR, "BITstar"},
                                                {PLANNER_TYPE::LBTRRT, "LBTRRT"},
                                                {PLANNER_TYPE::RRTCONNECT, "RRTConnect"},
+                                               {PLANNER_TYPE::RRTSHARP, "RRTsharp"},
                                                {PLANNER_TYPE::RRTSTAR, "RRTstar"},
                                                {PLANNER_TYPE::SBITSTAR, "SBITstar"},
                                            })

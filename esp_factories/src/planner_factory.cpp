@@ -106,8 +106,21 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setIntermediateStates(plannerConfig["addIntermediateStates"]);
       return {planner, PLANNER_TYPE::RRTCONNECT};
     }
+    case PLANNER_TYPE::RRTSHARP: {
+      // Allocate and configure an RRTSharp planner.
+      auto planner = std::make_shared<ompl::geometric::RRTsharp>(context_->getSpaceInformation());
+      auto dimKey = std::to_string(context_->getDimensions()) + "d";
+      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setName(plannerName);
+      planner->setKNearest(plannerConfig["useKNearest"]);
+      planner->setRange(plannerConfig["maxEdgeLength"][dimKey]);
+      planner->setGoalBias(plannerConfig["goalBias"]);
+      planner->setSampleRejection(plannerConfig["enableSampleRejection"]);
+      planner->setInformedSampling(false);
+      return {planner, PLANNER_TYPE::RRTSHARP};
+    }
     case PLANNER_TYPE::RRTSTAR: {
-      // Allocate and configure an RRT-Connect planner.
+      // Allocate and configure an RRTstar planner.
       auto planner = std::make_shared<ompl::geometric::RRTstar>(context_->getSpaceInformation());
       auto dimKey = std::to_string(context_->getDimensions()) + "d";
       planner->setProblemDefinition(context_->newProblemDefinition());
@@ -121,7 +134,6 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setPrunedMeasure(false);
       planner->setSampleRejection(false);
       planner->setNewStateRejection(false);
-      planner->setAdmissibleCostToCome(true);
       planner->setInformedSampling(false);
       return {planner, PLANNER_TYPE::RRTSTAR};
     }

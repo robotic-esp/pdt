@@ -68,9 +68,10 @@ int main(int argc, char **argv) {
   esp::ompltools::PlannerFactory plannerFactory(config, context);
 
   // Let's keep the console output for now, I can create a nicer pango visualization later.
+  std::cout << '\n';
   for (const auto &plannerType : experimentConfig["planners"]) {
-    std::cout << "       " << std::setw(21) << std::setfill(' ') << std::left
-              << std::string(plannerType);
+    std::cout << std::setw(7) << std::setfill(' ') << ' ' << std::setw(21)
+              << std::setfill(' ') << std::left << std::string(plannerType);
   }
   std::cout << '\n';
 
@@ -87,7 +88,7 @@ int main(int argc, char **argv) {
       esp::ompltools::TimeCostLogger logger(context->getTargetDuration(),
                                             experimentConfig["logFrequency"]);
       // Allocate the planner.
-      auto [ planner, plannerType ] = plannerFactory.create(plannerName);
+      auto [planner, plannerType] = plannerFactory.create(plannerName);
 
       // Set it up.
       auto setupStartTime = esp::ompltools::time::Clock::now();
