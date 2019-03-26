@@ -40,6 +40,8 @@
 #include <iostream>
 #include <vector>
 
+#include <experimental/filesystem>
+
 #include <ompl/util/Console.h>
 #include <boost/thread/thread.hpp>
 
@@ -67,7 +69,7 @@ int main(int argc, char **argv) {
 
   // Let's keep the console output for now, I can create a nicer pango visualization later.
   for (const auto &plannerType : experimentConfig["planners"]) {
-    std::cout << "      " << std::setw(22) << std::setfill(' ') << std::left
+    std::cout << "       " << std::setw(21) << std::setfill(' ') << std::left
               << std::string(plannerType);
   }
   std::cout << '\n';
@@ -79,7 +81,7 @@ int main(int argc, char **argv) {
 
   // Let's dance.
   for (std::size_t i = 0; i < experimentConfig["numRuns"]; ++i) {
-    std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << ": ";
+    std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << " | ";
     for (const auto &plannerType : experimentConfig["planners"]) {
       // Create the logger for this run.
       esp::ompltools::TimeCostLogger logger(context->getTargetDuration(),
@@ -123,19 +125,19 @@ int main(int argc, char **argv) {
       log.addResult(planner->getName(), logger);
 
       auto result = logger.lastMeasurement();
-      std::cout << std::setw(17) << std::left << result.first << ' ' << std::setw(8) << std::fixed
-                << result.second << "  ";
+      std::cout << std::setw(17) << std::left << result.first << std::setw(8) << std::fixed
+                << result.second << " | ";
     }
   }
 
-  // Report success and dump config.
-
+  // Dump all accessed parameters.
   config->dumpAccessed(experimentConfig["executable"].get<std::string>() + std::string("_logs/") +
                        experimentConfig["date"].get<std::string>() + std::string(".json"));
-  std::cout << "\nExperiment ended cleanly."
-               "The log and config are in ./planner_performance_logs/\n";
 
-  // config->dumpAccessed();
+  // Report success.
+  std::cout << "\n\nExperiment date: " << experimentConfig["date"].get<std::string>()
+            << "\nOutput folder: " << std::experimental::filesystem::current_path().string() << '/'
+            << experimentConfig["executable"].get<std::string>() << "_logs\n\n";
 
   return 0;
 }
