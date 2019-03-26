@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
 
       auto result = logger.lastMeasurement();
       std::cout << std::setw(17) << std::left << result.first << std::setw(8) << std::fixed
-                << result.second << " | ";
+                << result.second << " | " << std::flush;
     }
   }
 
