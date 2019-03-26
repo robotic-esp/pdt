@@ -318,6 +318,10 @@ std::string GoalEnclosure::printRectangle(std::shared_ptr<ompl::base::ScopedStat
   return rval.str();
 }
 
+void GoalEnclosure::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

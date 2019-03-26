@@ -64,6 +64,8 @@ class Spiral : public BaseContext {
   /** \brief Derived class specific information to include at the end. */
   virtual std::string paraInfo() const;
 
+  virtual void accept(const ContextVisitor& visitor) const;
+
  protected:
   // Variables
   /** \brief The obstacle world */

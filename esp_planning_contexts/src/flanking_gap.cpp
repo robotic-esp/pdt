@@ -297,6 +297,10 @@ std::string FlankingGap::paraInfo() const {
   return rval.str();
 }
 
+void FlankingGap::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

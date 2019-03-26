@@ -182,6 +182,10 @@ std::string CentreSquare::paraInfo() const {
   return std::string();
 }
 
+void CentreSquare::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

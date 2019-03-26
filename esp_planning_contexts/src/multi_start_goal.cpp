@@ -213,6 +213,10 @@ std::string MultiStartGoal::paraInfo() const {
   return std::string();
 }
 
+void MultiStartGoal::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

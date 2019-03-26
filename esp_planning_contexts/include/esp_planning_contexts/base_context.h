@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell, Marlin Strub */
+// Authors: Jonathan Gammell, Marlin Strub
 
 #pragma once
 
@@ -48,6 +48,7 @@
 #include <ompl/util/Exception.h>
 
 #include "esp_obstacles/base_obstacle.h"
+#include "esp_planning_contexts/context_visitor.h"
 #include "esp_time/time.h"
 
 namespace esp {
@@ -104,6 +105,8 @@ class BaseContext {
 
   /** \brief The MATLAB plot file footer*/
   std::string mfileFooter() const;
+
+  virtual void accept(const ContextVisitor& visitor) const = 0;
 
   /** \brief Whether the problem has an exact expression for the optimum */
   virtual bool knowsOptimum() const = 0;

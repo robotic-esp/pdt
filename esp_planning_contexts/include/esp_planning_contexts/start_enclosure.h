@@ -68,6 +68,8 @@ class StartEnclosure : public BaseContext {
   /** \brief Derived class specific information to include at the end. */
   virtual std::string paraInfo() const;
 
+  virtual void accept(const ContextVisitor& visitor) const;
+
  protected:
   /** \brief The actual enclosures */
   std::shared_ptr<CutoutObstacles> enclObs_{};

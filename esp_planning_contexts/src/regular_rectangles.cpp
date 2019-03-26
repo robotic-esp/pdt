@@ -188,6 +188,10 @@ std::string RegularRectangles::paraInfo() const {
   return std::string();
 }
 
+void RegularRectangles::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

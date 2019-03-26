@@ -342,6 +342,10 @@ std::string WallGap::paraInfo() const {
   return rval.str();
 }
 
+void WallGap::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

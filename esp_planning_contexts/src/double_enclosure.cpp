@@ -370,6 +370,10 @@ std::string DoubleEnclosure::printRectangle(std::shared_ptr<ompl::base::ScopedSt
   return rval.str();
 }
 
+void DoubleEnclosure::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

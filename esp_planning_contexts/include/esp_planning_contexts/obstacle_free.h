@@ -67,6 +67,8 @@ class ObstacleFree : public BaseContext {
   /** \brief Derived class specific information to include at the end. */
   virtual std::string paraInfo() const;
 
+  virtual void accept(const ContextVisitor& visitor) const;
+
  protected:
   // Constant Parameters
   /** \brief The definition of the "centre" and "outside" positions */

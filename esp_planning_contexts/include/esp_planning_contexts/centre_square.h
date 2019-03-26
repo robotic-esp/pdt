@@ -38,6 +38,7 @@
 
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/context_visitor.h"
 
 namespace esp {
 
@@ -64,6 +65,8 @@ class CentreSquare : public BaseContext {
 
   /** \brief Derived class specific information to include at the end. */
   virtual std::string paraInfo() const;
+
+  virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
   // Variables

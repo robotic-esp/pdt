@@ -74,6 +74,8 @@ class FlankingGap : public BaseContext {
   /** \brief Get the maximum (straight line path) cost that is through the gap. */
   ompl::base::Cost maxGapCost() const;
 
+  virtual void accept(const ContextVisitor& visitor) const;
+
  protected:
   // Variables
   /** \brief Whether to stop on class switch */

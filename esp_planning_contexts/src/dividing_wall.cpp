@@ -327,6 +327,10 @@ std::string DividingWall::paraInfo() const {
   return rval.str();
 }
 
+void DividingWall::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

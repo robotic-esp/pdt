@@ -264,6 +264,10 @@ std::string Spiral::paraInfo() const {
   return std::string();
 }
 
+void Spiral::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

@@ -207,6 +207,10 @@ std::string ObstacleFree::paraInfo() const {
   return std::string();
 }
 
+void ObstacleFree::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp
