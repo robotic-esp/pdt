@@ -68,6 +68,12 @@ class Hyperrectangle : public BaseObstacle {
   // Get the side lengths.
   std::vector<double> getSideLengths() const;
 
+  // Set the corner with a state.
+  void setCorner(const ompl::base::ScopedState<> &state);
+
+  // Get a copy of the current corner.
+  ompl::base::ScopedState<> getCorner() const;
+
   // Set the corner coordinates.
   void setCornerCoordinates(const std::vector<double>& coordinates);
 
@@ -82,7 +88,7 @@ class Hyperrectangle : public BaseObstacle {
 
  private:
   // This is the corner with the smallest value in each dimension. If we're in [0, X]^2 it's the lower-left corner.
-  ompl::base::ScopedState<> corner;
+  ompl::base::ScopedState<> corner_;
 
   // These are the sidelengths of this hypercube.
   std::vector<double> sideLengths_{};

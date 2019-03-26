@@ -32,15 +32,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Marlin Strub
 
 #include "esp_obstacles/hyperrectangle.h"
 
-#include <functional>
-
 #include <ompl/base/spaces/RealVectorStateSpace.h>
-#include <ompl/datastructures/NearestNeighborsGNAT.h>
-#include <ompl/util/Exception.h>
 
 namespace esp {
 
@@ -48,7 +44,7 @@ namespace ompltools {
 
 Hyperrectangle::Hyperrectangle(ompl::base::SpaceInformation* si) :
     BaseObstacle(si),
-    corner(BaseObstacle::stateSpace_),
+    corner_(BaseObstacle::stateSpace_),
     sideLengths_(BaseObstacle::stateSpace_->getDimension(), 0.0) {
   if (BaseObstacle::stateSpace_->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
     throw std::runtime_error(
@@ -59,7 +55,7 @@ Hyperrectangle::Hyperrectangle(ompl::base::SpaceInformation* si) :
 
 Hyperrectangle::Hyperrectangle(const ompl::base::SpaceInformationPtr& si) :
     BaseObstacle(si),
-    corner(BaseObstacle::stateSpace_),
+    corner_(BaseObstacle::stateSpace_),
     sideLengths_(BaseObstacle::stateSpace_->getDimension(), 0.0) {
 }
 
@@ -71,12 +67,20 @@ std::vector<double> Hyperrectangle::getSideLengths() const {
   return sideLengths_;
 }
 
+void Hyperrectangle::setCorner(const ompl::base::ScopedState<>& state) {
+  corner_ = state;
+}
+
+ompl::base::ScopedState<> Hyperrectangle::getCorner() const {
+  return corner_;
+}
+
 void Hyperrectangle::setCornerCoordinates(const std::vector<double>& coordinates) {
   if (coordinates.size() != BaseObstacle::dimension_) {
     throw std::runtime_error("Coordinate dimensions do not match hyperrectangle dimensions.");
   } else {
     for (std::size_t i = 0; i < coordinates.size(); ++i) {
-      corner[i] = coordinates[i];
+      corner_[i] = coordinates[i];
     }
   }
 }
@@ -84,7 +88,7 @@ void Hyperrectangle::setCornerCoordinates(const std::vector<double>& coordinates
 std::vector<double> Hyperrectangle::getCornerCoordinates() const {
   std::vector<double> coordinates(BaseObstacle::dimension_, 0.0);
   for (std::size_t i = 0; i < coordinates.size(); ++i) {
-    coordinates[i] = corner[i];
+    coordinates[i] = corner_[i];
   }
   return coordinates;
 }
@@ -95,8 +99,8 @@ bool Hyperrectangle::isValid(const ompl::base::State* state) const {
   }
   const auto* rs = static_cast<const ompl::base::RealVectorStateSpace::StateType*>(state);
   for (std::size_t i = 0; i < BaseObstacle::dimension_; ++i) {
-    if ((*rs)[i] - std::numeric_limits<double>::epsilon() > corner[i] + sideLengths_[i] &&
-        (*rs)[i] + std::numeric_limits<double>::epsilon() < corner[i]) {
+    if ((*rs)[i] - std::numeric_limits<double>::epsilon() > corner_[i] + sideLengths_[i] &&
+        (*rs)[i] + std::numeric_limits<double>::epsilon() < corner_[i]) {
       return true;
     }
   }
