@@ -56,22 +56,39 @@ class Configuration {
   Configuration(int argc, char** argv);
   ~Configuration() = default;
 
-  const json::json& getExperimentConfig();
-  const json::json& getPlannerConfig(const std::string &planner) const;
-  const json::json& getContextConfig(const std::string &context) const;
+  // Get the experiment config.
+  const json::json& getExperimentConfig() const;
 
-  bool contains(const std::string &key) const;
+  // Get the planner config.
+  const json::json& getPlannerConfig(const std::string& planner) const;
+
+  // Get the context config.
+  const json::json& getContextConfig(const std::string& context) const;
+
+  // Add a key-value-pair to the experiment config.
+  template <typename T>
+  void addToTimeField(const std::string& key, const T& value);
+
+
+  // Query the config whether it contains a key.
+  bool contains(const std::string& key) const;
 
   // Dump the parameters.
-  void dumpAll(std::ostream &out = std::cout) const;
+  void dumpAll(std::ostream& out = std::cout) const;
   void dumpAll(const std::string& filename) const;
-  void dumpAccessed(std::ostream &out = std::cout) const;
+  void dumpAccessed(std::ostream& out = std::cout) const;
   void dumpAccessed(const std::string& filename) const;
 
  private:
   json::json allParameters_{};
   mutable json::json accessedParameters_{};
 };
+
+template <typename T>
+void Configuration::addToTimeField(const std::string& key, const T& value) {
+  allParameters_["Time"][key] = value;
+  accessedParameters_["Time"][key] = value;
+}
 
 }  // namespace ompltools
 

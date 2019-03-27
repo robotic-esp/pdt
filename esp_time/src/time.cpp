@@ -42,23 +42,22 @@ namespace ompltools {
 
 namespace time {
 
-// Convert a TimePoint to a string.
-// See https://rextester.com/HADNXK16356
-std::string toDateString(const std::chrono::system_clock::time_point& timePoint,
-                         const std::string& format) {
-  const std::time_t t = std::chrono::system_clock::to_time_t(timePoint);
-  const std::tm tm = *std::localtime(std::addressof(t));
+std::string toDateString(const std::chrono::system_clock::time_point& timePoint) {
   std::ostringstream stream;
-  stream << std::put_time(std::addressof(tm), format.c_str());
+  stream << timePoint;
   return stream.str();
 }
 
-// Convert a double to a duration.
+std::string toDurationString(const Duration& duration) {
+  std::stringstream stream;
+  stream << duration;
+  return stream.str();
+}
+
 Duration seconds(double sec) {
   return Duration(sec);
 }
 
-// Convert a duration to a double.
 double seconds(Duration sec) {
   return std::chrono::duration<double, std::ratio<1>>(sec).count();
 }
@@ -89,5 +88,13 @@ std::ostream& operator<<(std::ostream& out, const esp::ompltools::time::Duration
   }
 
   out << stream.str();
+  return out;
+}
+
+// See https://rextester.com/HADNXK16356
+std::ostream& operator<<(std::ostream& out, const std::chrono::system_clock::time_point timePoint) {
+  const std::time_t t = std::chrono::system_clock::to_time_t(timePoint);
+  const std::tm tm = *std::localtime(std::addressof(t));
+  out << std::put_time(std::addressof(tm), "%F_%H-%M-%S");
   return out;
 }

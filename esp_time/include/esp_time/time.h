@@ -49,13 +49,13 @@ namespace time {
 
 // We need a steady clock because we use it as a stopwatch.
 using Clock = std::chrono::steady_clock;
-using TimePoint = Clock::time_point;
 using Duration = std::chrono::duration<double, std::ratio<1>>;
 
 // Convert a TimePoint to a string.
-// See https://rextester.com/HADNXK16356
-std::string toDateString(const std::chrono::system_clock::time_point& timePoint,
-                         const std::string& format = "%F_%T");
+std::string toDateString(const std::chrono::system_clock::time_point& timePoint);
+
+// Convert a duration to a string.
+std::string toDurationString(const Duration& duration);
 
 // Convert a double to a duration.
 Duration seconds(double sec);
@@ -71,3 +71,6 @@ double seconds(Duration sec);
 
 // A pretty output operator for durations.
 std::ostream& operator<<(std::ostream& out, const esp::ompltools::time::Duration& duration);
+
+// A pretty output operator for times (dates).
+std::ostream& operator<<(std::ostream& out, const std::chrono::system_clock::time_point timePoint);

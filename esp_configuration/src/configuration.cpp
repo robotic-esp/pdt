@@ -194,7 +194,7 @@ Configuration::Configuration(int argc, char **argv) {
   }
 }
 
-const json::json &Configuration::getExperimentConfig() {
+const json::json &Configuration::getExperimentConfig() const {
   if (allParameters_.count("Experiment") == 0) {
     throw std::runtime_error("Requested configuration for experiment, but none exists.");
   }
@@ -203,8 +203,6 @@ const json::json &Configuration::getExperimentConfig() {
       throw std::runtime_error("Accessing changed parameters, results might not be reproducable.");
     }
   } else {
-    static const auto systemTime = std::chrono::system_clock::now();
-    allParameters_["Experiment"]["date"] = time::toDateString(systemTime);
     accessedParameters_["Experiment"] = allParameters_["Experiment"];
   }
   return allParameters_["Experiment"];

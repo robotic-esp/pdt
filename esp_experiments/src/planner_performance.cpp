@@ -57,6 +57,11 @@ int main(int argc, char **argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
 
+  // Record the experiment start time.
+  auto experimentStartTime = std::chrono::system_clock::now();
+  auto experimentStartTimeString = esp::ompltools::time::toDateString(experimentStartTime);
+  config->addToTimeField("start", experimentStartTimeString);
+
   // Get the config for this experiment.
   auto experimentConfig = config->getExperimentConfig();
 
@@ -70,17 +75,17 @@ int main(int argc, char **argv) {
   // Let's keep the console output for now, I can create a nicer pango visualization later.
   std::cout << '\n';
   for (const auto &plannerType : experimentConfig["planners"]) {
-    std::cout << std::setw(7) << std::setfill(' ') << ' ' << std::setw(21)
-              << std::setfill(' ') << std::left << std::string(plannerType);
+    std::cout << std::setw(7) << std::setfill(' ') << ' ' << std::setw(21) << std::setfill(' ')
+              << std::left << std::string(plannerType);
   }
   std::cout << '\n';
 
   // Prepare the performance logger.
   esp::ompltools::PerformanceLog<esp::ompltools::TimeCostLogger> log(
       experimentConfig["executable"].get<std::string>() + std::string("_logs/") +
-      experimentConfig["date"].get<std::string>() + std::string(".csv"));
+      experimentStartTimeString + std::string(".csv"));
 
-  // Let's dance.
+  // May the best planner win.
   for (std::size_t i = 0; i < experimentConfig["numRuns"]; ++i) {
     std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << " | ";
     for (const auto &plannerName : experimentConfig["planners"]) {
@@ -109,10 +114,11 @@ int main(int argc, char **argv) {
                               esp::ompltools::utilities::getBestCost(planner, plannerType));
       } while (!solveThread.try_join_for(
           boost::chrono::duration<double>(1.0 / experimentConfig["logFrequency"].get<double>())));
+
       // Get the final runtime.
       auto totalDuration = setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
 
-      // Store the final best cost.
+      // Store the final cost.
       auto problem = planner->getProblemDefinition();
       if (problem->hasExactSolution()) {
         logger.addMeasurement(
@@ -122,21 +128,31 @@ int main(int argc, char **argv) {
                               ompl::base::Cost(std::numeric_limits<double>::infinity()));
       }
 
-      // Add this run to the log.
+      // Add this run to the log and report it to the console.
       log.addResult(planner->getName(), logger);
-
       auto result = logger.lastMeasurement();
       std::cout << std::setw(17) << std::left << result.first << std::setw(8) << std::fixed
                 << result.second << " | " << std::flush;
     }
   }
 
+  // Register the end time of the experiment.
+  auto experimentEndTime = std::chrono::system_clock::now();
+  auto experimentEndTimeString = esp::ompltools::time::toDateString(experimentEndTime);
+  config->addToTimeField("end", experimentEndTimeString);
+
+  // Get the duration of the experiment.
+  esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
+  config->addToTimeField("duration", esp::ompltools::time::toDurationString(experimentDuration));
+
   // Dump all accessed parameters.
   config->dumpAccessed(experimentConfig["executable"].get<std::string>() + std::string("_logs/") +
-                       experimentConfig["date"].get<std::string>() + std::string(".json"));
+                       experimentStartTimeString + std::string(".json"));
 
   // Report success.
-  std::cout << "\n\nExperiment date: " << experimentConfig["date"].get<std::string>()
+  std::cout << "\n\nExperiment ran for: " << (experimentEndTime - experimentStartTime)
+            << " (Start: " << experimentStartTimeString << ", End: " << experimentEndTimeString
+            << ")\n"
             << "\nOutput folder: " << std::experimental::filesystem::current_path().string() << '/'
             << experimentConfig["executable"].get<std::string>() << "_logs\n\n";
 
