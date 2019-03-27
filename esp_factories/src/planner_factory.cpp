@@ -63,7 +63,7 @@ PlannerFactory::PlannerFactory(const std::shared_ptr<Configuration> &config,
 
 std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::create(
     const std::string &plannerName) const {
-  const auto &plannerConfig = config_->getPlannerConfig(plannerName);
+  const auto plannerConfig = config_->getPlannerConfig(plannerName);
   const auto type = plannerConfig["type"].get<PLANNER_TYPE>();
   // BIT*
   switch (type) {

@@ -38,6 +38,7 @@
 
 #include "nlohmann/json.hpp"
 
+#include "esp_common/context_type.h"
 #include "esp_planning_contexts/all_contexts.h"
 
 namespace esp {
@@ -50,52 +51,56 @@ ContextFactory::ContextFactory(const std::shared_ptr<Configuration> &config) : c
   }
 }
 
-std::shared_ptr<BaseContext> ContextFactory::create(const std::string &contextType) const {
-  if (contextType == std::string("CentreSquare")) {
-    auto contextConfig = config_->getContextConfig(contextType);
-    try {
-      return std::make_shared<CentreSquare>(contextConfig["dimensions"],
-                                            contextConfig["obstacleWidth"],
-                                            contextConfig["boundarySideLengths"],
-                                            contextConfig["maxTime"],
-                                            contextConfig["collisionCheckResolution"]);
-    } catch (const json::detail::type_error& e) {
-      throw std::runtime_error(
-          "Error allocating a CentreSquare context. Check the spelling of the parameters in the "
-          "context factory and the json file.");
+std::shared_ptr<BaseContext> ContextFactory::create(const std::string &contextName) const {
+  auto contextConfig = config_->getContextConfig(contextName);
+  auto type = contextConfig["type"].get<CONTEXT_TYPE>();
+  switch (type) {
+    case CONTEXT_TYPE::CENTRE_SQUARE: {
+      try {
+        return std::make_shared<CentreSquare>(contextConfig["dimensions"],
+                                              contextConfig["obstacleWidth"],
+                                              contextConfig["boundarySideLengths"],
+                                              contextConfig["maxTime"],
+                                              contextConfig["collisionCheckResolution"]);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error(
+            "Error allocating a CentreSquare context. Check the spelling of the parameters in the "
+            "context factory and the json file.");
+      }
     }
-  } else if (contextType == std::string("DividingWall")) {
-    auto contextConfig = config_->getContextConfig(contextType);
-    try {
-    return std::make_shared<DividingWall>(contextConfig["dimensions"],
-                                          contextConfig["wallThickness"],
-                                          contextConfig["numGaps"],
-                                          contextConfig["gapWidths"],
-                                          contextConfig["maxTime"],
-                                          contextConfig["collisionCheckResolution"]);
-    } catch (const json::detail::type_error& e) {
-      throw std::runtime_error(
-          "Error allocating a DividingWall context. Check the spelling of the parameters in the "
-          "context factory and the json file.");
+    case CONTEXT_TYPE::DIVIDING_WALL: {
+      try {
+        return std::make_shared<DividingWall>(contextConfig["dimensions"],
+                                              contextConfig["wallThickness"],
+                                              contextConfig["numGaps"],
+                                              contextConfig["gapWidths"],
+                                              contextConfig["maxTime"],
+                                              contextConfig["collisionCheckResolution"]);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error(
+            "Error allocating a DividingWall context. Check the spelling of the parameters in the "
+            "context factory and the json file.");
+      }
     }
-  } else if (contextType == std::string("DoubleEnclosure")) {
-    auto contextConfig = config_->getContextConfig(contextType);
-    try {
-    return std::make_shared<DoubleEnclosure>(contextConfig["dimensions"],
-                                             contextConfig["boundarySideLengths"],
-                                             contextConfig["insideWidth"],
-                                             contextConfig["wallThickness"],
-                                             contextConfig["openingWidth"],
-                                             contextConfig["maxTime"],
-                                             contextConfig["collisionCheckResolution"]);
-    } catch (const json::detail::type_error& e) {
-      throw std::runtime_error(
-          "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in the "
-          "context factory and the json file.");
+    case CONTEXT_TYPE::DOUBLE_ENCLOSURE: {
+      try {
+        return std::make_shared<DoubleEnclosure>(contextConfig["dimensions"],
+                                                 contextConfig["boundarySideLengths"],
+                                                 contextConfig["insideWidth"],
+                                                 contextConfig["wallThickness"],
+                                                 contextConfig["openingWidth"],
+                                                 contextConfig["maxTime"],
+                                                 contextConfig["collisionCheckResolution"]);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error(
+            "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in the "
+            "context factory and the json file.");
+      }
     }
-  } else {
-    throw std::runtime_error("Requested to create unknown context at factory.");
-    return std::make_shared<CentreSquare>(0u, 0.0, 0.0, 0.0, 0.0);
+    default: {
+      throw std::runtime_error("Requested to create context of unknown type at factory.");
+      return std::make_shared<CentreSquare>(0u, 0.0, 0.0, 0.0, 0.0);
+    }
   }
 }
 
