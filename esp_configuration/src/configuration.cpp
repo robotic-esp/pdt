@@ -144,7 +144,8 @@ Configuration::Configuration(int argc, char **argv) {
           if (patch["Experiment"]["seed"] == std::string("time")) {
             patch["Experiment"]["seed"] = ompl::RNG::getSeed();
           } else {
-            ompl::RNG::setSeed(patch["Experiment"]["seed"]);
+            ompl::RNG::setSeed(patch["Experiment"]["seed"].get<unsigned long>());
+            OMPL_WARN("Seed set to %lu", patch["Experiment"]["seed"].get<unsigned long>());
           }
         } else {
           patch["Experiment"]["seed"] = ompl::RNG::getSeed();
