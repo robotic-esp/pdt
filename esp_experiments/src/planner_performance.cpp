@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
   // Record the experiment start time.
   auto experimentStartTime = std::chrono::system_clock::now();
   auto experimentStartTimeString = esp::ompltools::time::toDateString(experimentStartTime);
-  config->addToTimeField("start", experimentStartTimeString);
+  config->addToMiscField("start", experimentStartTimeString);
 
   // Get the config for this experiment.
   auto experimentConfig = config->getExperimentConfig();
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
   // Prepare the performance logger.
   esp::ompltools::PerformanceLog<esp::ompltools::TimeCostLogger> log(
       experimentConfig["executable"].get<std::string>() + std::string("_logs/") +
-      experimentStartTimeString + std::string(".csv"));
+      experimentStartTimeString + '_' + context->getName() + std::string(".csv"));
 
   // May the best planner win.
   for (std::size_t i = 0; i < experimentConfig["numRuns"]; ++i) {
@@ -139,22 +139,25 @@ int main(int argc, char **argv) {
   // Register the end time of the experiment.
   auto experimentEndTime = std::chrono::system_clock::now();
   auto experimentEndTimeString = esp::ompltools::time::toDateString(experimentEndTime);
-  config->addToTimeField("end", experimentEndTimeString);
+  config->addToMiscField("end", experimentEndTimeString);
 
   // Get the duration of the experiment.
   esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
-  config->addToTimeField("duration", esp::ompltools::time::toDurationString(experimentDuration));
+  config->addToMiscField("duration", esp::ompltools::time::toDurationString(experimentDuration));
 
-  // Dump all accessed parameters.
-  config->dumpAccessed(experimentConfig["executable"].get<std::string>() + std::string("_logs/") +
-                       experimentStartTimeString + std::string(".json"));
+  // Dump all accessed parameters right next to the log file.
+  auto logPath = std::experimental::filesystem::path(log.getFilename());
+  auto configPath = logPath.parent_path() /= logPath.stem() += ".json";
+  config->addToMiscField("resultFile", logPath.string());
+  config->addToMiscField("configFile", configPath.string());
+  config->dumpAccessed(configPath.string());
 
   // Report success.
   std::cout << "\n\nExperiment ran for: " << (experimentEndTime - experimentStartTime)
             << " (Start: " << experimentStartTimeString << ", End: " << experimentEndTimeString
             << ")\n"
-            << "\nOutput folder: " << std::experimental::filesystem::current_path().string() << '/'
-            << experimentConfig["executable"].get<std::string>() << "_logs\n\n";
+            << "\nWrote results to: " << logPath.string()
+            << "\nWrote config to: " << configPath.string() << "\n\n";
 
   return 0;
 }

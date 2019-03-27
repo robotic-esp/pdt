@@ -205,6 +205,10 @@ class PerformanceLog {
     fs::create_directories(fs::path(filename_).parent_path());
   };
 
+  std::string getFilename() const {
+    return fs::current_path().string() + '/' + filename_;
+  }
+
   void addResult(const std::string& plannerName, const Logger& logger) {
     // Open the file.
     std::ofstream csvFile;

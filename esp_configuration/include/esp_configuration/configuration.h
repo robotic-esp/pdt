@@ -67,7 +67,7 @@ class Configuration {
 
   // Add a key-value-pair to the experiment config.
   template <typename T>
-  void addToTimeField(const std::string& key, const T& value);
+  void addToMiscField(const std::string& key, const T& value);
 
 
   // Query the config whether it contains a key.
@@ -85,9 +85,9 @@ class Configuration {
 };
 
 template <typename T>
-void Configuration::addToTimeField(const std::string& key, const T& value) {
-  allParameters_["Time"][key] = value;
-  accessedParameters_["Time"][key] = value;
+void Configuration::addToMiscField(const std::string& key, const T& value) {
+  allParameters_["Miscellaneous"][key] = value;
+  accessedParameters_["Miscellaneous"][key] = value;
 }
 
 }  // namespace ompltools
