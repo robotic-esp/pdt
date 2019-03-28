@@ -283,6 +283,10 @@ void Configuration::dumpAccessed(const std::string &filename) const {
 
   // Close the file.
   configFile.close();
+
+  // This file should not accidentally be written to.
+  fs::permissions(filename,
+                  fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
 }
 
 }  // namespace ompltools

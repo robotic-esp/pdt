@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
   config->addToMiscField("duration", esp::ompltools::time::toDurationString(experimentDuration));
 
   // Dump all accessed parameters right next to the log file.
-  auto logPath = std::experimental::filesystem::path(log.getFilename());
+  auto logPath = log.getFilePath();
   auto configPath = logPath.parent_path() /= logPath.stem() += ".json";
   config->addToMiscField("resultFile", logPath.string());
   config->addToMiscField("configFile", configPath.string());

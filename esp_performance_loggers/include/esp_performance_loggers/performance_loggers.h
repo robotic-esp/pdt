@@ -202,17 +202,29 @@ template <class Logger>
 class PerformanceLog {
  public:
   PerformanceLog(const std::string& fullFileName) : filename_(fullFileName) {
+    // Create parent directories, if needed.
     fs::create_directories(fs::path(filename_).parent_path());
+
+    // Create the file.
+    std::ofstream file(filename_);
+
+    // Set the permissions to read only.
+    fs::permissions(filename_,
+                    fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
   };
 
-  std::string getFilename() const {
-    return fs::current_path().string() + '/' + filename_;
+  fs::path getFilePath() const {
+    return fs::current_path() /= fs::path(filename_);
   }
 
   void addResult(const std::string& plannerName, const Logger& logger) {
+    // Make sure we can write to this file.
+    fs::permissions(filename_, fs::perms::owner_read | fs::perms::owner_write |
+                                   fs::perms::group_read | fs::perms::others_read);
+
     // Open the file.
     std::ofstream csvFile;
-    csvFile.open(filename_.c_str(), std::ofstream::out | std::ofstream::app);
+    csvFile.open(filename_, std::ofstream::out | std::ofstream::app);
 
     // Check on the failbit.
     if (csvFile.fail() == true) {
@@ -224,6 +236,10 @@ class PerformanceLog {
 
     // Close the file:
     csvFile.close();
+
+    // This file should not accidentally be written to.
+    fs::permissions(filename_,
+                    fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
   };
 
  private:
