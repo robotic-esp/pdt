@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "esp_obstacles/random_hyperrectangles.h"
+#include "esp_obstacles/hyperrectangles.h"
 #include "esp_planning_contexts/base_context.h"
 
 namespace esp {
@@ -83,7 +83,7 @@ class FlankingGap : public BaseContext {
   /** \brief The gap width. */
   double gapWidth_{0.0};
   /** \brief The obstacle world */
-  std::shared_ptr<RandomHyperrectangles> rectObs_{};
+  std::shared_ptr<Hyperrectangles> rectObs_{};
   /** \brief The lower-left corners of the obstacles*/
   std::shared_ptr<ompl::base::ScopedState<>> upperObs_{};
   std::shared_ptr<ompl::base::ScopedState<>> lowerObs_{};

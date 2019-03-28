@@ -74,7 +74,7 @@ MultiStartGoal::MultiStartGoal(const unsigned int dim, const unsigned int numObs
   BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  rectObs_ = std::make_shared<RandomHyperrectangles>(BaseContext::si_, false);
+  rectObs_ = std::make_shared<Hyperrectangles>(BaseContext::si_, false);
   BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:

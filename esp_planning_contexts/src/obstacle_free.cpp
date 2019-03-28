@@ -46,7 +46,7 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-#include "esp_obstacles/random_hyperrectangles.h"
+#include "esp_obstacles/hyperrectangles.h"
 
 namespace esp {
 
@@ -56,7 +56,7 @@ ObstacleFree::ObstacleFree(const unsigned int dim, const unsigned int maxNumStar
                            const unsigned int maxNumGoals, const double runSeconds) :
     BaseContext(dim,
                 std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
-                runSeconds, "Free") {
+                runSeconds, "ObstacleFree") {
   // Variables
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
@@ -87,7 +87,7 @@ ObstacleFree::ObstacleFree(const unsigned int dim, const unsigned int maxNumStar
   BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Make an empty obstacle pointer:
-  BaseContext::obs_ = std::make_shared<RandomHyperrectangles>(BaseContext::si_, false);
+  BaseContext::obs_ = std::make_shared<Hyperrectangles>(BaseContext::si_, false);
 
   // Make the validity checker all-true
   vc = std::make_shared<ompl::base::AllValidStateValidityChecker>(BaseContext::si_);

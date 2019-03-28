@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "esp_obstacles/random_hyperrectangles.h"
+#include "esp_obstacles/hyperrectangles.h"
 #include "esp_planning_contexts/base_context.h"
 #include "esp_planning_contexts/context_visitor.h"
 
@@ -71,7 +71,7 @@ class CentreSquare : public BaseContext {
  protected:
   // Variables
   /** \brief The obstacle world */
-  std::shared_ptr<RandomHyperrectangles> rectObs_{};
+  std::shared_ptr<Hyperrectangles> rectObs_{};
   /** \brief The lower-left corner of an obstacle half-way between the start and goal */
   std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_{};
   /** The widths of the sight-line obstacle */

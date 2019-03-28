@@ -46,24 +46,23 @@
 #include <ompl/util/RandomNumbers.h>
 
 #include "esp_obstacles/base_obstacle.h"
-#include "esp_obstacles/hyperrectangle.h"
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief A world consisting of random hyperrectangular obstacles.*/
-class RandomHyperrectangles : public BaseObstacle {
+/** \brief A collection of hyperrectangular obstacles.*/
+class Hyperrectangles : public BaseObstacle {
  public:
   /** \brief a pair of lower-left corner and widths for a hyperrectangle obstacle*/
   typedef std::pair<const ompl::base::State*, std::vector<double> > obstacle_corner_widths_t;
 
   /** \brief Constructor. */
-  RandomHyperrectangles(ompl::base::SpaceInformation* si, bool separateObstacles);
+  Hyperrectangles(ompl::base::SpaceInformation* si, bool separateObstacles);
   /** \brief Constructor. */
-  RandomHyperrectangles(const ompl::base::SpaceInformationPtr& si, bool separateObstacles);
+  Hyperrectangles(const ompl::base::SpaceInformationPtr& si, bool separateObstacles);
   /** \brief Destructor */
-  virtual ~RandomHyperrectangles();
+  virtual ~Hyperrectangles();
 
   /** \brief Clear the obstacle space */
   virtual void clear();
@@ -101,7 +100,6 @@ class RandomHyperrectangles : public BaseObstacle {
   // Accept a visitor.
   virtual void accept(const ObstacleVisitor& visitor) const override;
 
- protected:
  private:
   /** \brief The individual obstacles in a nearest neighbours structure */
   std::shared_ptr<ompl::NearestNeighbors<obstacle_corner_widths_t> > nnObstacles_{};

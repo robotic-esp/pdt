@@ -64,11 +64,11 @@ class BaseObstacle : public ompl::base::StateValidityChecker {
   // Checks the validity of multiple states by looping over all states.
   virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
 
-  // Accept a visitor.
-  virtual void accept(const ObstacleVisitor& visitor) const = 0;
-
   // Make dimension of obstacle public.
   virtual unsigned int getDimension() const;
+
+  // Accept a visitor.
+  virtual void accept(const ObstacleVisitor& visitor) const = 0;
 
   // TODO: Move this to the matlab plot exporter.
   virtual std::string mfile(const std::string& obsColour = "k",

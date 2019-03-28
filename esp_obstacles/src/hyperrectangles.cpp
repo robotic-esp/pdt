@@ -34,7 +34,7 @@
 
 /* Authors: Jonathan Gammell */
 
-#include "esp_obstacles/random_hyperrectangles.h"
+#include "esp_obstacles/hyperrectangles.h"
 
 #include <functional>
 
@@ -46,33 +46,33 @@ namespace esp {
 
 namespace ompltools {
 
-RandomHyperrectangles::RandomHyperrectangles(ompl::base::SpaceInformation* si, bool separateObstacles) :
+Hyperrectangles::Hyperrectangles(ompl::base::SpaceInformation* si, bool separateObstacles) :
     BaseObstacle(si),
     separateObstacles_(separateObstacles) {
   this->construct();
 }
 
-RandomHyperrectangles::RandomHyperrectangles(const ompl::base::SpaceInformationPtr& si, bool separateObstacles) :
+Hyperrectangles::Hyperrectangles(const ompl::base::SpaceInformationPtr& si, bool separateObstacles) :
     BaseObstacle(si),
     maxWidth_(0.0),
     obsMeasure_(0.0),
     separateObstacles_(separateObstacles) {
   this->construct();
 }
-void RandomHyperrectangles::construct() {
+void Hyperrectangles::construct() {
   // Setup the NN structure
   nnObstacles_.reset(new ompl::NearestNeighborsGNAT<obstacle_corner_widths_t>());
-  nnObstacles_->setDistanceFunction(std::bind(&RandomHyperrectangles::distanceFunction, this,
+  nnObstacles_->setDistanceFunction(std::bind(&Hyperrectangles::distanceFunction, this,
                                               std::placeholders::_1, std::placeholders::_2));
 
   // Allocate a sampler
   stateSampler_ = StateValidityChecker::si_->allocStateSampler();
 }
-RandomHyperrectangles::~RandomHyperrectangles() {
+Hyperrectangles::~Hyperrectangles() {
   this->clear();
 }
 
-void RandomHyperrectangles::clear() {
+void Hyperrectangles::clear() {
   // Free the memory:
   StateValidityChecker::si_->freeStates(statesToFree_);
 
@@ -87,7 +87,7 @@ void RandomHyperrectangles::clear() {
   obsMeasure_ = 0.0;
 }
 
-bool RandomHyperrectangles::isValid(const ompl::base::State* state) const {
+bool Hyperrectangles::isValid(const ompl::base::State* state) const {
   // Variable
   // The return value
   bool validState;
@@ -118,7 +118,7 @@ bool RandomHyperrectangles::isValid(const ompl::base::State* state) const {
   return validState;
 }
 
-void RandomHyperrectangles::addObstacle(const obstacle_corner_widths_t& newObstacle) {
+void Hyperrectangles::addObstacle(const obstacle_corner_widths_t& newObstacle) {
   // Add the obstacle
   nnObstacles_->add(newObstacle);
 
@@ -132,7 +132,7 @@ void RandomHyperrectangles::addObstacle(const obstacle_corner_widths_t& newObsta
   }
 }
 
-std::vector<RandomHyperrectangles::obstacle_corner_widths_t> RandomHyperrectangles::getObstacles() const {
+std::vector<Hyperrectangles::obstacle_corner_widths_t> Hyperrectangles::getObstacles() const {
   // Create a return value
   std::vector<obstacle_corner_widths_t> obsVector;
 
@@ -143,11 +143,11 @@ std::vector<RandomHyperrectangles::obstacle_corner_widths_t> RandomHyperrectangl
   return obsVector;
 }
 
-void RandomHyperrectangles::randomize(double minObsSize, double maxObsSize, double obsRatio) {
+void Hyperrectangles::randomize(double minObsSize, double maxObsSize, double obsRatio) {
   this->randomize(minObsSize, maxObsSize, obsRatio, std::vector<const ompl::base::State*>());
 }
 
-void RandomHyperrectangles::randomize(double minObsSize, double maxObsSize, double obsRatio,
+void Hyperrectangles::randomize(double minObsSize, double maxObsSize, double obsRatio,
                                const std::vector<ompl::base::ScopedState<> >& existingStates) {
   // Make a vector
   std::vector<const ompl::base::State*> tVec(existingStates.size(), NULL);
@@ -161,7 +161,7 @@ void RandomHyperrectangles::randomize(double minObsSize, double maxObsSize, doub
   this->randomize(minObsSize, maxObsSize, obsRatio, tVec);
 }
 
-void RandomHyperrectangles::randomize(double minObsSize, double maxObsSize, double obsRatio,
+void Hyperrectangles::randomize(double minObsSize, double maxObsSize, double obsRatio,
                                const std::vector<const ompl::base::State*>& existingStates) {
   while (obsMeasure_ / StateValidityChecker::si_->getSpaceMeasure() < obsRatio) {
     // Variables:
@@ -212,7 +212,7 @@ void RandomHyperrectangles::randomize(double minObsSize, double maxObsSize, doub
   }
 }
 
-std::string RandomHyperrectangles::mfile(const std::string& obsColour,
+std::string Hyperrectangles::mfile(const std::string& obsColour,
                                   const std::string& /*spaceColour*/) const {
   // Variables
   // The string stream:
@@ -251,7 +251,7 @@ std::string RandomHyperrectangles::mfile(const std::string& obsColour,
   return rval.str();
 }
 
-bool RandomHyperrectangles::verifyStateObstaclePair(const ompl::base::State* state,
+bool Hyperrectangles::verifyStateObstaclePair(const ompl::base::State* state,
                                              const obstacle_corner_widths_t& obstacle) const {
   // Variables:
   // Whether the state is valid
@@ -282,7 +282,7 @@ bool RandomHyperrectangles::verifyStateObstaclePair(const ompl::base::State* sta
   return validState;
 }
 
-bool RandomHyperrectangles::verifyObstacle(const obstacle_corner_widths_t& obstacle) const {
+bool Hyperrectangles::verifyObstacle(const obstacle_corner_widths_t& obstacle) const {
   throw ompl::Exception("This may not work properly. Try it in R2 and plot to be sure");
   // Variables:
   // Whether the obstacle is valid
@@ -340,7 +340,7 @@ bool RandomHyperrectangles::verifyObstacle(const obstacle_corner_widths_t& obsta
   return validObs;
 }
 
-double RandomHyperrectangles::rectangleVolume(const std::vector<double>& widths) {
+double Hyperrectangles::rectangleVolume(const std::vector<double>& widths) {
   // Variable
   // The measure of this rectangle
   double measure;
@@ -353,12 +353,12 @@ double RandomHyperrectangles::rectangleVolume(const std::vector<double>& widths)
   return measure;
 }
 
-double RandomHyperrectangles::distanceFunction(const obstacle_corner_widths_t& a,
+double Hyperrectangles::distanceFunction(const obstacle_corner_widths_t& a,
                                         const obstacle_corner_widths_t& b) const {
   return StateValidityChecker::si_->distance(a.first, b.first);
 }
 
-void RandomHyperrectangles::accept(const ObstacleVisitor& visitor) const {
+void Hyperrectangles::accept(const ObstacleVisitor& visitor) const {
   visitor.visit(*this);
 }
 
