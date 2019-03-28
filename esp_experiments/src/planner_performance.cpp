@@ -65,6 +65,13 @@ int main(int argc, char **argv) {
   // Get the config for this experiment.
   auto experimentConfig = config->getExperimentConfig();
 
+  // Check it has planners and contexts specified.
+  if (!experimentConfig.contains("context")) {
+    OMPL_ERROR("The planner_performance experiment config requires a context.");
+  } else if (!experimentConfig.contains("planners")) {
+    OMPL_ERROR("The planner_performance experiment config requires at least one planner.");
+  }
+
   // Create the context for this experiment.
   esp::ompltools::ContextFactory contextFactory(config);
   auto context = contextFactory.create(experimentConfig["context"]);
@@ -147,7 +154,7 @@ int main(int argc, char **argv) {
 
   // Dump all accessed parameters right next to the log file.
   auto logPath = log.getFilePath();
-  auto configPath = logPath.parent_path() /= logPath.stem() += ".json";
+  auto configPath = std::experimental::filesystem::path(logPath).replace_extension(".json");
   config->addToMiscField("resultFile", logPath.string());
   config->addToMiscField("configFile", configPath.string());
   config->dumpAccessed(configPath.string());

@@ -40,12 +40,11 @@
 #include <iostream>
 #include <string>
 
-#include <experimental/filesystem>
-
 #include <ompl/util/Console.h>
 #include <ompl/util/RandomNumbers.h>
 #include <boost/program_options.hpp>
 
+#include "esp_configuration/directory.h"
 #include "esp_configuration/version.h"
 #include "esp_time/time.h"
 
@@ -75,98 +74,84 @@ Configuration::Configuration(int argc, char **argv) {
     std::terminate();
   }
 
-  // This configuration class requires a default configuration by design.
-  if (!invokedOptions.count("default-config")) {
-    throw std::runtime_error(
-        "Please provide the location of the default configuration file with the command line "
-        "option \"--default-config /path/to/default/config\".");
-  }
+  // There are the following supported scenarios:
+  //   - No options are invoked -> Look for a default config at default location.
+  //   - A default config is provided without a patch config -> Load the provided default.
+  //   - Only a patch config is provided -> Check the config whether to load a default.
+  //   - A default and a patch config is provided -> Check the patch config whether to load the
+  //     default.
 
-  // Check that the default config file exists.
-  fs::path defaultConfig(invokedOptions["default-config"].as<std::string>());
-  if (fs::exists(defaultConfig)) {
-    // If it the file is a symlink, read the actual file.
-    if (fs::is_symlink(defaultConfig)) {
-      defaultConfig = fs::read_symlink(defaultConfig);
-    }
-    std::ifstream file(defaultConfig.string());
-    file >> allParameters_;
-  } else {  // The provided default config file does not exist.
-    throw fs::filesystem_error(
-        "The file supposedly containing the default configuration does not exist on the provided "
-        "path.",
-        defaultConfig, std::error_code());
-  }
-
-  // Load the config patch if one is provided.
-  if (invokedOptions.count("patch-config")) {
+  if (!invokedOptions.count("default-config") && !invokedOptions.count("patch-config")) {
+    loadDefaultConfigFromDefaultPath();
+  } else if (invokedOptions.count("default-config") && !invokedOptions.count("patch-config")) {
+    fs::path defaultConfig(invokedOptions["default-config"].as<std::string>());
+    loadConfigFromSpecifiedPath(defaultConfig);
+  } else if (!invokedOptions.count("default-config") && invokedOptions.count("patch-config")) {
     fs::path patchConfig(invokedOptions["patch-config"].as<std::string>());
     if (fs::exists(patchConfig)) {
       // If it the file is a symlink, read the actual file.
       if (fs::is_symlink(patchConfig)) {
         patchConfig = fs::read_symlink(patchConfig);
       }
-
-      // Convert the config into a json datastructure.
-      json::json patch;
+      // Load the patch config.
       std::ifstream file(patchConfig.string());
+      json::json patch;
       file >> patch;
-
-      // If the patch specifies a commit, check that it is currently checked out and clean.
-      if (patch.count("Version") != 0) {
-        std::string experimentCommit = patch["Version"]["commit"];
-        if (experimentCommit != std::string("any")) {
-          if (experimentCommit != Version::GIT_SHA1) {
-            OMPL_ERROR("Config specifies commit that is different from the one that's checked out");
-          } else if (Version::GIT_STATUS == std::string("DIRTY")) {
-            OMPL_WARN(
-                "Config specifies commit that matches the one that's checked out, but there are "
-                "uncommited changes.");
+      if (patch.contains("Experiment")) {
+        if (patch["Experiment"].contains("useOnlyThisConfig")) {
+          // Check if the patch claims to be complete.
+          if (!patch["Experiment"]["useOnlyThisConfig"]) {
+            // Load the default config.
+            loadDefaultConfigFromDefaultPath();
           }
         }
       }
-
-      // If the patch specifies an experiment, there are some special precautions to be taken.
-      if (patch.count("Experiment") != 0) {
-        // Check it specifies which executable is associated with this experiment and make sure it's
-        // the one that is being executed.
-        if (patch["Experiment"].count("executable") == 0) {
-          throw std::runtime_error("Please specify the executable name for the experiment.");
-        } else if (patch["Experiment"]["executable"] != std::string(argv[0]).substr(2)) {
-          throw std::runtime_error(
-              "Experiment config specifies executable name that does not match the name of the "
-              "current executable.");
-        }
-
-        // Handle any seed specification.
-        if (patch["Experiment"].count("seed") != 0) {
-          if (patch["Experiment"]["seed"] == std::string("time")) {
-            patch["Experiment"]["seed"] = ompl::RNG::getSeed();
-          } else {
-            ompl::RNG::setSeed(patch["Experiment"]["seed"].get<unsigned long>());
-            OMPL_WARN("Seed set to %lu", patch["Experiment"]["seed"].get<unsigned long>());
-          }
-        } else {
-          patch["Experiment"]["seed"] = ompl::RNG::getSeed();
-        }
-      }
-
-      // The patch seems valid, merge it into the default config.
+      // Load the patch, possibly overriding default values.
       allParameters_.merge_patch(patch);
-    } else {  // The provided patch config file does not exist.
-      throw fs::filesystem_error(
-          "The file supposedly containing the patch configuration does not exist on the provided "
-          "path.",
-          patchConfig, std::error_code());
+      OMPL_INFORM("Loaded patch configuration from %s", patchConfig.c_str());
+    } else {
+      // The provided patch config file does not exist.
+      OMPL_ERROR("Cannot find provided configuration file at %s", patchConfig.c_str());
+      throw std::ios_base::failure("Cannot find patch config file.");
     }
+  } else if (invokedOptions.count("default-config") && invokedOptions.count("patch-config")) {
+    fs::path patchConfig(invokedOptions["patch-config"].as<std::string>());
+    if (fs::exists(patchConfig)) {
+      // If it the file is a symlink, read the actual file.
+      if (fs::is_symlink(patchConfig)) {
+        patchConfig = fs::read_symlink(patchConfig);
+      }
+      // Load the patch config.
+      std::ifstream file(patchConfig.string());
+      json::json patch;
+      file >> patch;
+      if (patch.contains("Experiment")) {
+        if (patch["Experiment"].contains("useOnlyThisConfig") &&
+            patch["Experiment"]["useOnlyThisConfig"].get<bool>()) {
+          OMPL_WARN(
+              "Provided a default config but patch says 'useOnlyThisConfig'. Not loading the "
+              "provided default config.");
+        } else {
+          fs::path defaultConfig(invokedOptions["default-config"].as<std::string>());
+          loadConfigFromSpecifiedPath(defaultConfig);
+        }
+      }
+
+      // Merge the patch, possibly overriding default values.
+      allParameters_.merge_patch(patch);
+      OMPL_INFORM("Loaded patch configuration from %s", patchConfig.c_str());
+    } else {
+      // The provided patch config file does not exist.
+      OMPL_ERROR("Cannot find provided configuration file at %s", patchConfig.c_str());
+      throw std::ios_base::failure("Cannot find patch config file.");
+    }
+  } else {
+    // How did we get here?
+    assert(false);
   }
-  // Capture the current version.
-  accessedParameters_["Version"]["commit"] = Version::GIT_SHA1;
-  accessedParameters_["Version"]["branch"] = Version::GIT_REFSPEC;
-  accessedParameters_["Version"]["status"] = Version::GIT_STATUS;
-  if (Version::GIT_STATUS == std::string("DIRTY")) {
-    OMPL_WARN("The working directory is dirty, results might not be reproducible.");
-  }
+
+  // Handle seed specifications.
+  handleSeedSpecification();
 
   // Set the appropriate log level.
   if (allParameters_.count("Log") != 0) {
@@ -192,6 +177,9 @@ Configuration::Configuration(int argc, char **argv) {
   } else {
     ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
   }
+
+  // Assert that this is a reproducible experiment.
+  assertReproducability(argv);
 }
 
 const json::json &Configuration::getExperimentConfig() const {
@@ -200,7 +188,10 @@ const json::json &Configuration::getExperimentConfig() const {
   }
   if (accessedParameters_.count("Experiment") != 0) {
     if (accessedParameters_["Experiment"] != allParameters_["Experiment"]) {
-      throw std::runtime_error("Accessing changed parameters, results might not be reproducable.");
+      OMPL_ERROR(
+          "Experiment parameters have changed during execution. Results might not be "
+          "reproducable.");
+      throw std::runtime_error("Reproducibility error.");
     }
   } else {
     accessedParameters_["Experiment"] = allParameters_["Experiment"];
@@ -214,7 +205,9 @@ const json::json &Configuration::getPlannerConfig(const std::string &planner) co
   }
   if (accessedParameters_["Planners"].count(planner) != 0) {
     if (accessedParameters_["Planners"][planner] != allParameters_["Planners"][planner]) {
-      throw std::runtime_error("Accessing changed parameters, results might not be reproducable.");
+      OMPL_ERROR(
+          "Planner parameters have changed during execution. Results might not be reproducable.");
+      throw std::runtime_error("Reproducibility error.");
     }
   } else {
     accessedParameters_["Planners"][planner] = allParameters_["Planners"][planner];
@@ -228,7 +221,9 @@ const json::json &Configuration::getContextConfig(const std::string &context) co
   }
   if (accessedParameters_["Contexts"].count(context) != 0) {
     if (accessedParameters_["Contexts"][context] != allParameters_["Contexts"][context]) {
-      throw std::runtime_error("Accessing changed parameters, results might not be reproducable.");
+      OMPL_ERROR(
+          "Context parameters have changed during execution. Results might not be reproducable.");
+      throw std::runtime_error("Reproducibility error.");
     }
   } else {
     accessedParameters_["Contexts"][context] = allParameters_["Contexts"][context];
@@ -285,8 +280,100 @@ void Configuration::dumpAccessed(const std::string &filename) const {
   configFile.close();
 
   // This file should not accidentally be written to.
-  fs::permissions(filename,
-                  fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
+  fs::permissions(filename, fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
+}
+
+void Configuration::loadDefaultConfigFromDefaultPath() {
+  fs::path defaultConfig(Directory::SOURCE / "parameters/esp_ompltools_default_config.json");
+  if (fs::exists(defaultConfig)) {
+    // Load the default config.
+    std::ifstream file(defaultConfig.string());
+    file >> allParameters_;
+    OMPL_INFORM("Loaded default configuration from %s", defaultConfig.c_str());
+  } else {
+    // Cannot find default config at default location.
+    OMPL_ERROR("No configuration file is provided and cannot find default at %s",
+               defaultConfig.c_str());
+    throw std::ios_base::failure("Cannot find default config file.");
+  }
+}
+
+void Configuration::loadConfigFromSpecifiedPath(fs::path path) {
+  if (fs::exists(path)) {
+    // If it the file is a symlink, read the actual file.
+    if (fs::is_symlink(path)) {
+      path = fs::read_symlink(path);
+    }
+    // Load the provided default config.
+    std::ifstream file(path.string());
+    file >> allParameters_;
+    OMPL_INFORM("Loaded configuration from %s", path.c_str());
+  } else {
+    // The provided default config file does not exist.
+    OMPL_ERROR("Cannot find provided configuration file at %s", path.c_str());
+    throw std::ios_base::failure("Cannot find default config file.");
+  }
+}
+
+void Configuration::assertReproducability(char **argv) {
+  // Check the status of the working directory.
+  if (Version::GIT_STATUS == std::string("DIRTY")) {
+    OMPL_WARN("Working directory is dirty.");
+  }
+
+  // Make sure we're executing the right executable.
+  if (allParameters_.contains("Experiment")) {
+    // Check we're on the same commit.
+    if (allParameters_["Experiment"].contains("version")) {
+      if (allParameters_["Experiment"]["version"].contains("commit")) {
+        auto commitHash = allParameters_["Experiment"]["version"]["commit"].get<std::string>();
+        if (commitHash != std::string("any")) {
+          if (commitHash != Version::GIT_SHA1) {
+            OMPL_ERROR("Config specifies commit %s. You are currently on %s.", commitHash.c_str(),
+                       Version::GIT_SHA1.c_str());
+          }
+        }
+      }
+    }
+
+    // Check this is the correct executable.
+    if (allParameters_["Experiment"].contains("executable")) {
+      auto executable = allParameters_["Experiment"]["executable"].get<std::string>();
+      if (executable != std::string("any")) {
+        if (executable != std::string(argv[0]).substr(2)) {
+          OMPL_ERROR("Config specifies executable %s. You are executing %s.", executable.c_str(),
+                     std::string(argv[0]).substr(2));
+        }
+      }
+    }
+  }
+
+  // Store the executable name.
+  allParameters_["Experiment"]["executable"] = std::string(argv[0]).substr(2);
+
+  // Store the current version.
+  allParameters_["Experiment"]["version"]["commit"] = Version::GIT_SHA1;
+  allParameters_["Experiment"]["version"]["branch"] = Version::GIT_REFSPEC;
+  allParameters_["Experiment"]["version"]["status"] = Version::GIT_STATUS;
+
+  // We don't want to be loading default configs when rerunning this experiment.
+  allParameters_["Experiment"]["useOnlyThisConfig"] = true;
+
+  // If in debug, ensure we've set the seed.
+  assert(allParameters_["Experiment"]["seed"].get<unsigned int>() == ompl::RNG::getSeed());
+}
+
+void Configuration::handleSeedSpecification() {
+  if (allParameters_["Experiment"].contains("seed")) {
+    auto seed = allParameters_["Experiment"]["seed"].get<unsigned long>();
+    ompl::RNG::setSeed(seed);
+    OMPL_WARN("Configuration set seed to be %lu", seed);
+    allParameters_["Experiment"]["seed"] = seed;
+  } else {
+    auto seed = ompl::RNG::getSeed();
+    OMPL_INFORM("Seed is %lu", seed);
+    allParameters_["Experiment"]["seed"] = seed;
+  }
 }
 
 }  // namespace ompltools

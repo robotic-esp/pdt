@@ -9,7 +9,11 @@ get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 git_local_changes(GIT_STATUS)
 configure_file(src/version.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/version.cpp @ONLY)
 
-find_package(ompl)
+# Make the path to the project binary .
+configure_file(src/directory.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/directory.cpp @ONLY)
+
+# Find OMPL.
+find_package(ompl REQUIRED)
 
 # Include necessary header directories.
 include_directories(
@@ -21,7 +25,8 @@ include_directories(
 add_library(esp_configuration
   ${OMPL_LIBRARIES}
   src/configuration.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
+  ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/directory.cpp)
 
 # Link the library.
 target_link_libraries(esp_configuration

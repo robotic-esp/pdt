@@ -40,6 +40,8 @@
 #include <iostream>
 #include <string>
 
+#include <experimental/filesystem>
+
 #include <ompl/util/Console.h>
 
 #include "nlohmann/json.hpp"
@@ -80,6 +82,10 @@ class Configuration {
   void dumpAccessed(const std::string& filename) const;
 
  private:
+  void loadDefaultConfigFromDefaultPath();
+  void loadConfigFromSpecifiedPath(std::experimental::filesystem::path path);
+  void assertReproducability(char** argv);
+  void handleSeedSpecification();
   json::json allParameters_{};
   mutable json::json accessedParameters_{};
 };
