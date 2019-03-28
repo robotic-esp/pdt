@@ -33,7 +33,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Marlin Strub */
+// Authors: Marlin Strub
 
 #include <functional>
 #include <iomanip>
@@ -57,8 +57,20 @@ int main(int argc, char **argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
 
+  // Record the experiment start time.
+  auto experimentStartTime = std::chrono::system_clock::now();
+  auto experimentStartTimeString = esp::ompltools::time::toDateString(experimentStartTime);
+  config->addToMiscField("start", experimentStartTimeString);
+
   // Get the config for this experiment.
   auto experimentConfig = config->getExperimentConfig();
+
+  // Check it has planners and contexts specified.
+  if (!experimentConfig.contains("context")) {
+    OMPL_ERROR("The planner_performance experiment config requires a context.");
+  } else if (!experimentConfig.contains("planners")) {
+    OMPL_ERROR("The planner_performance experiment config requires at least one planner.");
+  }
 
   // Create the context for this experiment.
   esp::ompltools::ContextFactory contextFactory(config);
@@ -67,20 +79,20 @@ int main(int argc, char **argv) {
   // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
 
-  // Let's keep the console output for now, I can create a nicer pango visualization later.
+  // Report the planner names to the console.
   std::cout << '\n';
   for (const auto &plannerType : experimentConfig["planners"]) {
-    std::cout << std::setw(7) << std::setfill(' ') << ' ' << std::setw(21)
-              << std::setfill(' ') << std::left << std::string(plannerType);
+    std::cout << std::setw(7) << std::setfill(' ') << ' ' << std::setw(21) << std::setfill(' ')
+              << std::left << std::string(plannerType);
   }
   std::cout << '\n';
 
-  // Prepare the performance logger.
+  // Create the log.
   esp::ompltools::PerformanceLog<esp::ompltools::TimeCostLogger> log(
       experimentConfig["executable"].get<std::string>() + std::string("_logs/") +
-      experimentConfig["date"].get<std::string>() + std::string(".csv"));
+      experimentStartTimeString + '_' + context->getName() + std::string(".csv"));
 
-  // Let's dance.
+  // May the best planner win.
   for (std::size_t i = 0; i < experimentConfig["numRuns"]; ++i) {
     std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << " | ";
     for (const auto &plannerName : experimentConfig["planners"]) {
@@ -109,10 +121,11 @@ int main(int argc, char **argv) {
                               esp::ompltools::utilities::getBestCost(planner, plannerType));
       } while (!solveThread.try_join_for(
           boost::chrono::duration<double>(1.0 / experimentConfig["logFrequency"].get<double>())));
+
       // Get the final runtime.
       auto totalDuration = setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
 
-      // Store the final best cost.
+      // Store the final cost.
       auto problem = planner->getProblemDefinition();
       if (problem->hasExactSolution()) {
         logger.addMeasurement(
@@ -122,23 +135,36 @@ int main(int argc, char **argv) {
                               ompl::base::Cost(std::numeric_limits<double>::infinity()));
       }
 
-      // Add this run to the log.
+      // Add this run to the log and report it to the console.
       log.addResult(planner->getName(), logger);
-
       auto result = logger.lastMeasurement();
       std::cout << std::setw(17) << std::left << result.first << std::setw(8) << std::fixed
                 << result.second << " | " << std::flush;
     }
   }
 
-  // Dump all accessed parameters.
-  config->dumpAccessed(experimentConfig["executable"].get<std::string>() + std::string("_logs/") +
-                       experimentConfig["date"].get<std::string>() + std::string(".json"));
+  // Register the end time of the experiment.
+  auto experimentEndTime = std::chrono::system_clock::now();
+  auto experimentEndTimeString = esp::ompltools::time::toDateString(experimentEndTime);
+  config->addToMiscField("end", experimentEndTimeString);
+
+  // Compute and registar the duration of the experiment.
+  esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
+  config->addToMiscField("duration", esp::ompltools::time::toDurationString(experimentDuration));
+
+  // Dump all accessed parameters right next to the log file.
+  auto logPath = log.getFilePath();
+  auto configPath = std::experimental::filesystem::path(logPath).replace_extension(".json");
+  config->addToMiscField("resultFile", logPath.string());
+  config->addToMiscField("configFile", configPath.string());
+  config->dumpAccessed(configPath.string());
 
   // Report success.
-  std::cout << "\n\nExperiment date: " << experimentConfig["date"].get<std::string>()
-            << "\nOutput folder: " << std::experimental::filesystem::current_path().string() << '/'
-            << experimentConfig["executable"].get<std::string>() << "_logs\n\n";
+  std::cout << "\n\nExperiment ran for:\t" << (experimentEndTime - experimentStartTime)
+            << "\t\t(" << experimentStartTimeString << " -- " << experimentEndTimeString
+            << ")\n"
+            << "\nWrote results to:\t" << logPath.string() << "\nWrote config to:\t"
+            << configPath.string() << "\n\n";
 
   return 0;
 }

@@ -42,6 +42,8 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/StateValidityChecker.h>
 
+#include "esp_obstacles/obstacle_visitor.h"
+
 namespace esp {
 
 namespace ompltools {
@@ -62,9 +64,19 @@ class BaseObstacle : public ompl::base::StateValidityChecker {
   // Checks the validity of multiple states by looping over all states.
   virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
 
+  // Accept a visitor.
+  virtual void accept(const ObstacleVisitor& visitor) const = 0;
+
+  // Make dimension of obstacle public.
+  virtual unsigned int getDimension() const;
+
   // TODO: Move this to the matlab plot exporter.
   virtual std::string mfile(const std::string& obsColour = "k",
                             const std::string& spaceColour = "w") const = 0;
+
+ protected:
+  ompl::base::StateSpacePtr stateSpace_{};
+  unsigned int dimension_{0u};
 };
 
 }  // namespace ompltools

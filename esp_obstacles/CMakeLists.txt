@@ -15,6 +15,7 @@ add_library(esp_obstacles
   src/binary_map.cpp
   src/cutout_obstacles.cpp
   src/hyperrectangle.cpp
+  src/random_hyperrectangles.cpp
   src/repeating_hyperrectangles.cpp)
 
 # Link the library.

@@ -188,6 +188,10 @@ std::string RepeatingHyperrectangles::mfile(const std::string& obsColour,
   return rval.str();
 }
 
+void RepeatingHyperrectangles::accept(const ObstacleVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

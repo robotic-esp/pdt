@@ -80,6 +80,9 @@ class RepeatingHyperrectangles : public BaseObstacle {
    * argument) */
   virtual std::string mfile(const std::string& obsColour, const std::string& /*spaceColour*/) const;
 
+  // Accept a visitor.
+  virtual void accept(const ObstacleVisitor& visitor) const override;
+
  protected:
  private:
   /** \brief Common constructor */

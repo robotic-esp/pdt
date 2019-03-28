@@ -1,6 +1,7 @@
 {
     "Contexts": {
         "CentreSquare": {
+            "type": "CentreSquare",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -8,6 +9,7 @@
             "obstacleWidth": 0.5
         },
         "DividingWall": {
+            "type": "DividingWall",
             "maxTime": 1,
             "dimensions": 2,
             "collisionCheckResolution": 0.001,
@@ -16,6 +18,7 @@
             "gapWidths": 0.05
         },
         "DoubleEnclosure": {
+            "type": "DoubleEnclosure",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -25,6 +28,7 @@
             "openingWidth": 0.1
         },
         "FlankingGap": {
+            "type": "FlankingGap",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -35,6 +39,7 @@
             "gapWidths": 0.01
         },
         "GoalEnclosure": {
+            "type": "GoalEnclosure",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -46,6 +51,7 @@
             "openingWidth": 0.1
         },
         "MultiStartGoal": {
+            "type": "MultiStartGoal",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -56,6 +62,7 @@
             "obstacleRatio": 0.8
         },
         "ObstacleFree": {
+            "type": "ObstacleFree",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -64,6 +71,7 @@
             "collisionCheckResolution": 0.001
         },
         "RandomRectangles": {
+            "type": "RandomRectangles",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -74,6 +82,7 @@
             "obstacleRatio": 0.8
         },
         "RegularRectangles": {
+            "type": "RegularRectangles",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -83,6 +92,7 @@
             "numObstaclesBetween": 5
         },
         "Spiral": {
+            "type": "Spiral",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -90,6 +100,7 @@
             "wallThickness": 0.05
         },
         "StartEnclosure": {
+            "type": "StartEnclosure",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -101,6 +112,7 @@
             "openingWidth": 0.1
         },
         "WallGap": {
+            "type": "WallGap",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,

@@ -47,7 +47,7 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-#include "esp_obstacles/hyperrectangle.h"
+#include "esp_obstacles/random_hyperrectangles.h"
 
 namespace esp {
 
@@ -68,8 +68,8 @@ GoalEnclosure::GoalEnclosure(const unsigned int dim, const double worldHalfWidth
   // The state space
   std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
   // Temporary variables for the obstacle and antiobstacle
-  std::shared_ptr<Hyperrectangle> obs;
-  std::shared_ptr<Hyperrectangle> anti;
+  std::shared_ptr<RandomHyperrectangles> obs;
+  std::shared_ptr<RandomHyperrectangles> anti;
 
   if (gapWidth_ <= 0 || insideWidth_ <= 0 || wallThickness_ <= 0) {
     throw ompl::Exception("Widths must be > 0.");
@@ -151,8 +151,8 @@ GoalEnclosure::GoalEnclosure(const unsigned int dim, const double worldHalfWidth
   BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
   // Allocate the temporary variable for the obstacles, antiobstacles, and the lower-left corners
-  obs = std::make_shared<Hyperrectangle>(BaseContext::si_, false);
-  anti = std::make_shared<Hyperrectangle>(BaseContext::si_, false);
+  obs = std::make_shared<RandomHyperrectangles>(BaseContext::si_, false);
+  anti = std::make_shared<RandomHyperrectangles>(BaseContext::si_, false);
 
   //*****Obstacle*****//
   goalEnclCorners_.push_back(std::make_shared<ompl::base::ScopedState<>>(ss));

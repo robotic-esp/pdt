@@ -99,6 +99,10 @@ std::string CutoutObstacles::mfile(const std::string& obsColour,
   return rval.str();
 }
 
+void CutoutObstacles::accept(const ObstacleVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

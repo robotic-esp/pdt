@@ -1,0 +1,13 @@
+#include "esp_configuration/directory.h"
+
+#define ESP_OMPL_TOOLS_SOURCE_DIRECTORY "@CMAKE_SOURCE_DIR@"
+
+namespace esp {
+
+namespace ompltools {
+
+const std::experimental::filesystem::path Directory::SOURCE = ESP_OMPL_TOOLS_SOURCE_DIRECTORY;
+
+}  // namespace ompltools
+
+}  // namespace esp
