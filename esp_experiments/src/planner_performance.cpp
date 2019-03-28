@@ -33,7 +33,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Marlin Strub */
+// Authors: Marlin Strub
 
 #include <functional>
 #include <iomanip>
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
   // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
 
-  // Let's keep the console output for now, I can create a nicer pango visualization later.
+  // Report the planner names to the console.
   std::cout << '\n';
   for (const auto &plannerType : experimentConfig["planners"]) {
     std::cout << std::setw(7) << std::setfill(' ') << ' ' << std::setw(21) << std::setfill(' ')
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
   }
   std::cout << '\n';
 
-  // Prepare the performance logger.
+  // Create the log.
   esp::ompltools::PerformanceLog<esp::ompltools::TimeCostLogger> log(
       experimentConfig["executable"].get<std::string>() + std::string("_logs/") +
       experimentStartTimeString + '_' + context->getName() + std::string(".csv"));
@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
   auto experimentEndTimeString = esp::ompltools::time::toDateString(experimentEndTime);
   config->addToMiscField("end", experimentEndTimeString);
 
-  // Get the duration of the experiment.
+  // Compute and registar the duration of the experiment.
   esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
   config->addToMiscField("duration", esp::ompltools::time::toDurationString(experimentDuration));
 
@@ -153,11 +153,11 @@ int main(int argc, char **argv) {
   config->dumpAccessed(configPath.string());
 
   // Report success.
-  std::cout << "\n\nExperiment ran for: " << (experimentEndTime - experimentStartTime)
-            << " (Start: " << experimentStartTimeString << ", End: " << experimentEndTimeString
+  std::cout << "\n\nExperiment ran for:\t" << (experimentEndTime - experimentStartTime)
+            << "\t\t(" << experimentStartTimeString << " -- " << experimentEndTimeString
             << ")\n"
-            << "\nWrote results to: " << logPath.string()
-            << "\nWrote config to: " << configPath.string() << "\n\n";
+            << "\nWrote results to:\t" << logPath.string() << "\nWrote config to:\t"
+            << configPath.string() << "\n\n";
 
   return 0;
 }

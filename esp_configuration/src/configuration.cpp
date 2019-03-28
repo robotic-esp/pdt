@@ -117,8 +117,7 @@ Configuration::Configuration(int argc, char **argv) {
         std::string experimentCommit = patch["Version"]["commit"];
         if (experimentCommit != std::string("any")) {
           if (experimentCommit != Version::GIT_SHA1) {
-            throw std::runtime_error(
-                "Config specifies commit that is different from the one that's checked out");
+            OMPL_ERROR("Config specifies commit that is different from the one that's checked out");
           } else if (Version::GIT_STATUS == std::string("DIRTY")) {
             OMPL_WARN(
                 "Config specifies commit that matches the one that's checked out, but there are "
