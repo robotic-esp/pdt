@@ -67,6 +67,7 @@ BaseVisualizer::~BaseVisualizer() {
 void BaseVisualizer::setContext(
     const std::pair<std::shared_ptr<BaseContext>, CONTEXT_TYPE> &contextPair) {
   // Setting a new context means all the data is invalid.
+  viewedIteration_ = 0u;
 
   // Stop iterating.
   dataThreadPromise_.set_value();
@@ -83,6 +84,7 @@ void BaseVisualizer::setContext(
   // Reset all data.
   plannerData_.clear();
   durations_.clear();
+  largestIteration_ = 0u;
   setupDuration_ = time::Duration(0.0);
 
   // Create data.
@@ -92,6 +94,7 @@ void BaseVisualizer::setContext(
 void BaseVisualizer::setPlanner(
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> &plannerPair) {
   // Setting a new context means all the data is invalid.
+  viewedIteration_ = 0u;
 
   // Stop iterating.
   dataThreadPromise_.set_value();
@@ -108,7 +111,6 @@ void BaseVisualizer::setPlanner(
   // Reset all data.
   plannerData_.clear();
   durations_.clear();
-  viewedIteration_ = 0u;
   largestIteration_ = 0u;
   setupDuration_ = time::Duration(0.0);
 
