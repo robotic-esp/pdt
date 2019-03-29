@@ -1,27 +1,29 @@
 cmake_minimum_required(VERSION 2.8)
-project(esp_obstacles)
+project(esp_visualization)
 
-# Find OMPL.
-find_package(ompl REQUIRED)
+# Find Pangolin.
+find_package(Pangolin REQUIRED)
 
 # Include necessary header directories.
 include_directories(
+  ${Pangolin_INCLUDE_DIRS} 
   ${OMPL_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include)
 
 # Build the library.
-add_library(esp_obstacles
-  src/base_obstacle.cpp
-  src/binary_map.cpp
-  src/cutout_obstacles.cpp
-  src/hyperrectangle.cpp
-  src/repeating_hyperrectangles.cpp)
+add_library(esp_visualization
+  src/base_visualizer.cpp
+  src/interactive_visualizer.cpp)
 
 # Link the library.
-target_link_libraries(esp_obstacles
+target_link_libraries(esp_visualization
   PUBLIC # Libraries exposed in API.
-  ${OMPL_LIBRARIES})
+  ${OMPL_LIBRARIES}
+  ${Pangolin_LIBRARIES}
+  esp_common
+  esp_factories
+  esp_planning_contexts)
 
 # Specify the include directories exported by this library.
-target_include_directories(esp_obstacles PUBLIC
+target_include_directories(esp_visualization PUBLIC
   ${PROJECT_SOURCE_DIR}/include)

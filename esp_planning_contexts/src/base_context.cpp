@@ -53,6 +53,10 @@ ompl::base::SpaceInformationPtr BaseContext::getSpaceInformation() const {
   return si_;
 }
 
+ompl::base::StateSpacePtr BaseContext::getStateSpace() const {
+  return si_->getStateSpace();
+}
+
 ompl::base::ProblemDefinitionPtr BaseContext::newProblemDefinition() const {
   // Variables
   // The problem definition

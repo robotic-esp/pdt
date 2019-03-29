@@ -36,35 +36,30 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+// GCC complains about variadic macros with no arguments in pangolin. This should be allowed in
+// c++20 (see http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2034.htm). I haven't found a way to
+// ignore just this specific warning with a #pragma, so I include this as a system header. Not sure
+// of all the implications of this though.
+#pragma GCC system_header
+#include <pangolin/pangolin.h>
 
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/StateValidityChecker.h>
+#include "esp_common/context_type.h"
+#include "esp_common/planner_type.h"
+#include "esp_planning_contexts/base_context.h"
+#include "esp_visualization/base_visualizer.h"
 
 namespace esp {
 
 namespace ompltools {
 
-// The base class for obstacles.
-class BaseObstacle : public ompl::base::StateValidityChecker {
+class InteractiveVisualizer : public BaseVisualizer {
  public:
-  BaseObstacle(ompl::base::SpaceInformation* si);
-  BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-  virtual ~BaseObstacle() = default;
+  InteractiveVisualizer(
+      const std::pair<std::shared_ptr<BaseContext>, CONTEXT_TYPE>& contextPair,
+      const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
+  ~InteractiveVisualizer() = default;
 
-  // Some obstacles might have to clean up allocated memory.
-  virtual void clear(){};
-
-  // Checks the valididy of a state.
-  virtual bool isValid(const ompl::base::State* state) const = 0;
-
-  // Checks the validity of multiple states by looping over all states.
-  virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
-
-  // TODO: Move this to the matlab plot exporter.
-  virtual std::string mfile(const std::string& obsColour = "k",
-                            const std::string& spaceColour = "w") const = 0;
+  void run();
 };
 
 }  // namespace ompltools

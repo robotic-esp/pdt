@@ -66,6 +66,21 @@ target_link_libraries(planner_performance PUBLIC
   esp_utilities
 )
 
+add_executable(planner_visualization
+  src/planner_visualization.cpp
+  )
+target_link_libraries(planner_visualization PUBLIC
+  ${Boost_LIBRARIES}
+  ${Pangolin_LIBRARIES}
+  ${OMPL_LIBRARIES}
+  esp_configuration
+  esp_factories
+  esp_planning_contexts
+  esp_time
+  esp_utilities
+  esp_visualization
+)
+
 # add_executable(test_multigoal
 #   test_multigoal.cpp
 # )

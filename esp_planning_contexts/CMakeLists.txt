@@ -5,9 +5,6 @@ project(esp_planning_contexts)
 add_definitions(-std=c++17 -Wall -Wextra -Weffc++ -Werror
   -Wdisabled-optimization -fdiagnostics-color=auto)
 
-# Find OMPL.
-find_package(ompl REQUIRED)
-
 # Include necessary header directories.
 include_directories(
   ${OMPL_INCLUDE_DIRS}

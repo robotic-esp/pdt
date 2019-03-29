@@ -1,7 +1,8 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, University of Toronto
+ *  Copyright (c) 2014-2017     University of Toronto
+ *  Copyright (c) 2018-present  University of Oxford
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +15,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Toronto nor the names of its
+ *   * Neither the names of the copyright holders nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,41 +33,37 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+// Authors: Marlin Strub
 
-#pragma once
+#include <pangolin/pangolin.h>
 
-#include <string>
-#include <vector>
+#include "esp_common/context_type.h"
+#include "esp_common/planner_type.h"
+#include "esp_configuration/configuration.h"
+#include "esp_factories/context_factory.h"
+#include "esp_factories/planner_factory.h"
+#include "esp_planning_contexts/all_contexts.h"
+#include "esp_visualization/interactive_visualizer.h"
 
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/StateValidityChecker.h>
+int main(int argc, char** argv) {
+  // Load the config.
+  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
 
-namespace esp {
+  // Get the experiment config.
+  auto experimentConfig = config->getExperimentConfig();
 
-namespace ompltools {
+  // Create the context for this experiment.
+  esp::ompltools::ContextFactory contextFactory(config);
+  auto context = contextFactory.create(experimentConfig["context"]);
 
-// The base class for obstacles.
-class BaseObstacle : public ompl::base::StateValidityChecker {
- public:
-  BaseObstacle(ompl::base::SpaceInformation* si);
-  BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-  virtual ~BaseObstacle() = default;
+  // Create a planner factory for planners in this context.
+  esp::ompltools::PlannerFactory plannerFactory(config, context);
+  auto [planner, plannerType] = plannerFactory.create(experimentConfig["planner"]);
 
-  // Some obstacles might have to clean up allocated memory.
-  virtual void clear(){};
+  esp::ompltools::InteractiveVisualizer visualizer(
+      {context, esp::ompltools::CONTEXT_TYPE::CENTRE_SQUARE}, {planner, plannerType});
 
-  // Checks the valididy of a state.
-  virtual bool isValid(const ompl::base::State* state) const = 0;
-
-  // Checks the validity of multiple states by looping over all states.
-  virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
-
-  // TODO: Move this to the matlab plot exporter.
-  virtual std::string mfile(const std::string& obsColour = "k",
-                            const std::string& spaceColour = "w") const = 0;
-};
-
-}  // namespace ompltools
-
-}  // namespace esp
+  visualizer.run();
+  
+  return 0;
+}

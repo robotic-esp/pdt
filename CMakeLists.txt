@@ -12,10 +12,6 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Enable additional warnings and treat warnings as errors.
-set(ESP_CXX_COMPILE_FLAGS "-Wall -Wextra -Weffc++ -Werror -Wdisabled-optimization -pedantic-errors -fdiagnostics-color=auto")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ESP_CXX_COMPILE_FLAGS}")
-
 # Build in release if no build type is specified.
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -38,23 +34,27 @@ message(STATUS "Configuring for ${CMAKE_BUILD_TYPE} mode:")
 # Find Threads.
 find_package(Threads)
 
+# Find Eigen.
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
 # TODO: Put this in the correct CMake project.
 # Find Boost.
 find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options filesystem system thread)
 include_directories(${Boost_INCLUDE_DIR})
-
-# Find Eigen.
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
 
 # Find OMPL.
 find_package(ompl REQUIRED)
 include_directories(${OMPL_INCLUDE_DIRS})
 
 # Add the thirdparty projects.
-set(JSON_BuildTests OFF CACHE INTERNAL "") # No need to build the tests.
-set(JSON_Install OFF CACHE INTERNAL "")    # No need to install the json lib.
+set(JSON_BuildTests OFF CACHE INTERNAL "") # Don't build the tests for json.
+set(JSON_Install OFF CACHE INTERNAL "")    # Don't install the json lib.
 add_subdirectory(thirdparty/json)
+
+# Enable additional warnings and treat warnings as errors for our own code.
+set(ESP_CXX_COMPILE_FLAGS "-Wall -Wextra -Weffc++ -Werror -Wdisabled-optimization -pedantic-errors -fdiagnostics-color=auto")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ESP_CXX_COMPILE_FLAGS}")
 
 # Add the subdirectories.
 add_subdirectory(esp_common)
@@ -66,3 +66,4 @@ add_subdirectory(esp_performance_loggers)
 add_subdirectory(esp_planning_contexts)
 add_subdirectory(esp_time)
 add_subdirectory(esp_utilities)
+add_subdirectory(esp_visualization)

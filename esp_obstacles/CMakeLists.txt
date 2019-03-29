@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 project(esp_obstacles)
 
-# Find OMPL.
-find_package(ompl REQUIRED)
-
 # Include necessary header directories.
 include_directories(
+  ${EIGEN3_INCLUDE_DIR}
   ${OMPL_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include)
 
@@ -20,6 +18,7 @@ add_library(esp_obstacles
 # Link the library.
 target_link_libraries(esp_obstacles
   PUBLIC # Libraries exposed in API.
+  ${EIGEN3_LIBRARIES}
   ${OMPL_LIBRARIES})
 
 # Specify the include directories exported by this library.

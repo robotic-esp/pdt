@@ -44,6 +44,7 @@
 #include <ompl/base/ProblemDefinition.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/SpaceInformation.h>
+#include <ompl/base/StateSpace.h>
 #include <ompl/util/Console.h>
 #include <ompl/util/Exception.h>
 
@@ -66,6 +67,9 @@ class BaseContext {
 
   /** \brief Return the space information pointer */
   ompl::base::SpaceInformationPtr getSpaceInformation() const;
+
+  /** \brief Return the space information pointer */
+  ompl::base::StateSpacePtr getStateSpace() const;
 
   /** \brief Return a newly generated problem definition */
   ompl::base::ProblemDefinitionPtr newProblemDefinition() const;

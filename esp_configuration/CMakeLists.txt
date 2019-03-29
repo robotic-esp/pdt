@@ -9,11 +9,8 @@ get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 git_local_changes(GIT_STATUS)
 configure_file(src/version.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/version.cpp @ONLY)
 
-# Make the path to the project binary .
+# Make the path to the source directory available in code.
 configure_file(src/directory.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/directory.cpp @ONLY)
-
-# Find OMPL.
-find_package(ompl REQUIRED)
 
 # Include necessary header directories.
 include_directories(
@@ -23,7 +20,6 @@ include_directories(
 
 # Build the library.
 add_library(esp_configuration
-  ${OMPL_LIBRARIES}
   src/configuration.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/directory.cpp)
@@ -31,6 +27,8 @@ add_library(esp_configuration
 # Link the library.
 target_link_libraries(esp_configuration
   PUBLIC # Libraries exposed in API.
+  ${Boost_LIBRARIES}
+  ${OMPL_LIBRARIES}
   stdc++fs
   nlohmann_json::nlohmann_json
   esp_planning_contexts
