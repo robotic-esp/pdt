@@ -48,35 +48,16 @@ namespace esp {
 
 namespace ompltools {
 
-// The base class for obstacles.
+// The base class for obstacles. This is a wrapper arround OMPL's state validity checker that
+// accepts visitors.
 class BaseObstacle : public ompl::base::StateValidityChecker {
  public:
   BaseObstacle(ompl::base::SpaceInformation* si);
   BaseObstacle(const ompl::base::SpaceInformationPtr& si);
   virtual ~BaseObstacle() = default;
 
-  // Some obstacles might have to clean up allocated memory.
-  virtual void clear(){};
-
-  // Checks the valididy of a state.
-  virtual bool isValid(const ompl::base::State* state) const = 0;
-
-  // Checks the validity of multiple states by looping over all states.
-  virtual bool isValid(const std::vector<const ompl::base::State*>& states) const;
-
-  // Make dimension of obstacle public.
-  virtual unsigned int getDimension() const;
-
   // Accept a visitor.
   virtual void accept(const ObstacleVisitor& visitor) const = 0;
-
-  // TODO: Move this to the matlab plot exporter.
-  virtual std::string mfile(const std::string& obsColour = "k",
-                            const std::string& spaceColour = "w") const = 0;
-
- protected:
-  ompl::base::StateSpacePtr stateSpace_{};
-  unsigned int dimension_{0u};
 };
 
 }  // namespace ompltools
