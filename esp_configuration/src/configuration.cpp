@@ -340,9 +340,9 @@ void Configuration::assertReproducability(char **argv) {
     if (allParameters_["Experiment"].contains("executable")) {
       auto executable = allParameters_["Experiment"]["executable"].get<std::string>();
       if (executable != std::string("any")) {
-        if (executable != std::string(argv[0]).substr(2)) {
-          OMPL_ERROR("Config specifies executable %s. You are executing %s.", executable.c_str(),
-                     std::string(argv[0]).substr(2));
+        if (executable != fs::path(std::string(argv[0]).substr(2)).filename().string()) {
+          OMPL_ERROR("Config specifies executable '%s'. You are executing '%s'.", executable.c_str(),
+                     fs::path(std::string(argv[0]).substr(2)).filename().c_str());
         }
       }
     }
