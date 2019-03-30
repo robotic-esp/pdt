@@ -62,10 +62,7 @@ class CutoutObstacles : public BaseObstacle {
   /** \brief Add an anti-obstacle to the obstacle space */
   void addAntiObstacle(const std::shared_ptr<BaseObstacle>& newAntiObstaclePtr);
 
-  /** \brief The obstacle map as a series of Matlab plot functions */
-  std::string mfile(const std::string& obsColour, const std::string& spaceColour) const override;
-
-  // Accept a visitor.
+  // Implement accepting a visitor.
   virtual void accept(const ObstacleVisitor& visitor) const override;
 
  private:

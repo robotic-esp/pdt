@@ -70,7 +70,6 @@ class CentreSquare : public BaseContext {
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
-  // Variables
   /** \brief The obstacle world */
   std::shared_ptr<Hyperrectangles> rectObs_{};
   /** \brief The lower-left corner of an obstacle half-way between the start and goal */

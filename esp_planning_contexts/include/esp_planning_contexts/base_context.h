@@ -104,12 +104,7 @@ class BaseContext {
   /** \brief Print out summary of the experiment */
   void print(const bool verbose = false) const;
 
-  /** \brief The MATLAB plot file header*/
-  std::string mfileHeader(bool monochrome) const;
-
-  /** \brief The MATLAB plot file footer*/
-  std::string mfileFooter() const;
-
+  // Accept a visitor.
   virtual void accept(const ContextVisitor& visitor) const = 0;
 
   /** \brief Whether the problem has an exact expression for the optimum */

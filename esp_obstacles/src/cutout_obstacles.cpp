@@ -82,23 +82,6 @@ void CutoutObstacles::addAntiObstacle(const std::shared_ptr<BaseObstacle>& newAn
   antiObstaclePtrs_.push_back(newAntiObstaclePtr);
 }
 
-std::string CutoutObstacles::mfile(const std::string& obsColour,
-                                   const std::string& spaceColour) const {
-  // Variables
-  // The string stream:
-  std::stringstream rval;
-
-  for (const auto& obs : obstaclePtrs_) {
-    rval << obs->mfile(obsColour);
-  }
-
-  for (const auto& anti : antiObstaclePtrs_) {
-    rval << anti->mfile(spaceColour);
-  }
-
-  return rval.str();
-}
-
 void CutoutObstacles::accept(const ObstacleVisitor& visitor) const {
   visitor.visit(*this);
 }
