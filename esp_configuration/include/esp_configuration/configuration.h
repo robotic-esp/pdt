@@ -74,9 +74,6 @@ class Configuration {
   // Get the experiment config.
   const json::json& getExperimentConfig() const;
 
-  // Get the context config.
-  const json::json& getContextConfig(const std::string& context) const;
-
   // Add a key-value-pair to the experiment config.
   template <typename T>
   void addToMiscField(const std::string& key, const T& value);

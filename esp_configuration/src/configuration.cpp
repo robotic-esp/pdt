@@ -198,22 +198,6 @@ const json::json &Configuration::getExperimentConfig() const {
   return parameters_["Experiment"];
 }
 
-const json::json &Configuration::getContextConfig(const std::string &context) const {
-  if (parameters_["Contexts"].count(context) == 0) {
-    throw std::runtime_error("Requested configuration for unknown context.");
-  }
-  if (accessedParameters_["Contexts"].count(context) != 0) {
-    if (accessedParameters_["Contexts"][context] != parameters_["Contexts"][context]) {
-      OMPL_ERROR(
-          "Context parameters have changed during execution. Results might not be reproducable.");
-      throw std::runtime_error("Reproducibility error.");
-    }
-  } else {
-    accessedParameters_["Contexts"][context] = parameters_["Contexts"][context];
-  }
-  return parameters_["Contexts"][context];
-}
-
 bool Configuration::contains(const std::string &key) const {
   return contains(key, parameters_);
 }

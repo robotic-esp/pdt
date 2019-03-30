@@ -45,23 +45,28 @@ namespace esp {
 
 namespace ompltools {
 
-ContextFactory::ContextFactory(const std::shared_ptr<Configuration> &config) : config_(config) {
+ContextFactory::ContextFactory(const std::shared_ptr<Configuration>& config) : config_(config) {
   if (config_->contains("Contexts") == 0) {
-    throw std::runtime_error("Configuration does not contain context data.");
+    OMPL_ERROR("Configuration does not contain context data.");
+    throw std::runtime_error("Context factory error.");
   }
 }
 
-std::shared_ptr<BaseContext> ContextFactory::create(const std::string &contextName) const {
-  auto contextConfig = config_->getContextConfig(contextName);
-  auto type = contextConfig["type"].get<CONTEXT_TYPE>();
+std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextName) const {
+  const std::string parentKey{"Contexts/" + contextName};
+  if (!config_->contains(parentKey)) {
+    OMPL_ERROR("Configuration has no entry for requested context '%s'.", parentKey.c_str());
+  }
+  auto type = config_->get<CONTEXT_TYPE>(parentKey + "/type");
   switch (type) {
     case CONTEXT_TYPE::CENTRE_SQUARE: {
       try {
-        return std::make_shared<CentreSquare>(contextConfig["dimensions"],
-                                              contextConfig["obstacleWidth"],
-                                              contextConfig["boundarySideLengths"],
-                                              contextConfig["maxTime"],
-                                              contextConfig["collisionCheckResolution"]);
+        return std::make_shared<CentreSquare>(
+            config_->get<std::size_t>(parentKey + "/dimensions"),
+            config_->get<double>(parentKey + "/obstacleWidth"),
+            config_->get<double>(parentKey + "/boundarySideLengths"),
+            config_->get<double>(parentKey + "/maxTime"),
+            config_->get<double>(parentKey + "/collisionCheckResolution"));
       } catch (const json::detail::type_error& e) {
         throw std::runtime_error(
             "Error allocating a CentreSquare context. Check the spelling of the parameters in the "
@@ -70,12 +75,13 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string &contextNa
     }
     case CONTEXT_TYPE::DIVIDING_WALL: {
       try {
-        return std::make_shared<DividingWall>(contextConfig["dimensions"],
-                                              contextConfig["wallThickness"],
-                                              contextConfig["numGaps"],
-                                              contextConfig["gapWidths"],
-                                              contextConfig["maxTime"],
-                                              contextConfig["collisionCheckResolution"]);
+        return std::make_shared<DividingWall>(
+            config_->get<std::size_t>(parentKey + "/dimensions"),
+            config_->get<double>(parentKey + "/wallThickness"),
+            config_->get<double>(parentKey + "/numGaps"),
+            config_->get<double>(parentKey + "/gapWidths"),
+            config_->get<double>(parentKey + "/maxTime"),
+            config_->get<double>(parentKey + "/collisionCheckResolution"));
       } catch (const json::detail::type_error& e) {
         throw std::runtime_error(
             "Error allocating a DividingWall context. Check the spelling of the parameters in the "
@@ -84,13 +90,14 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string &contextNa
     }
     case CONTEXT_TYPE::DOUBLE_ENCLOSURE: {
       try {
-        return std::make_shared<DoubleEnclosure>(contextConfig["dimensions"],
-                                                 contextConfig["boundarySideLengths"],
-                                                 contextConfig["insideWidth"],
-                                                 contextConfig["wallThickness"],
-                                                 contextConfig["openingWidth"],
-                                                 contextConfig["maxTime"],
-                                                 contextConfig["collisionCheckResolution"]);
+        return std::make_shared<DoubleEnclosure>(
+            config_->get<std::size_t>(parentKey + "/dimensions"),
+            config_->get<double>(parentKey + "/boundarySideLengths"),
+            config_->get<double>(parentKey + "/insideWidth"),
+            config_->get<double>(parentKey + "/wallThickness"),
+            config_->get<double>(parentKey + "/openingWidth"),
+            config_->get<double>(parentKey + "/maxTime"),
+            config_->get<double>(parentKey + "/collisionCheckResolution"));
       } catch (const json::detail::type_error& e) {
         throw std::runtime_error(
             "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in "

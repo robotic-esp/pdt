@@ -65,7 +65,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     const std::string &plannerName) const {
   const std::string parentKey{"Planners/" + plannerName};
   if (!config_->contains(parentKey)) {
-    OMPL_ERROR("Configuration has no entry for requested planner planner '%s'.", parentKey.c_str());
+    OMPL_ERROR("Configuration has no entry for requested planner '%s'.", parentKey.c_str());
   }
   const auto type = config_->get<PLANNER_TYPE>(parentKey + "/type");
   // BIT*
