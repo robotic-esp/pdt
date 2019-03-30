@@ -68,7 +68,8 @@ class Configuration {
   template <typename T>
   T get(const std::string& key) const;
 
-  // This adds to or creates an "Experiment" entry in the accessed parameters.
+  // This adds to or creates an "Experiment" entry in the accessed parameters with various
+  // information about the state of the working directory and the OMPL seed.
   void registerAsExperiment() const;
 
   // Get the experiment config.

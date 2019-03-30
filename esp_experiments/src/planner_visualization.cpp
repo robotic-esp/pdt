@@ -48,17 +48,17 @@
 int main(int argc, char** argv) {
   // Load the config.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+  config->registerAsExperiment();
+
+  auto contextFactory = std::make_shared<esp::ompltools::ContextFactory>(config);
+  auto context = contextFactory->create(config->get<std::string>("Experiment/context"));
+
+  auto plannerFactory = std::make_shared<esp::ompltools::PlannerFactory>(config, context);
+  auto [planner, plannerType] =
+      plannerFactory->create(config->get<std::string>("Experiment/planner"));
 
   // Get the experiment config.
-  auto experimentConfig = config->getExperimentConfig();
-
-  // Create the context for this experiment.
-  esp::ompltools::ContextFactory contextFactory(config);
-  auto context = contextFactory.create(experimentConfig["context"]);
-
-  // Create a planner factory for planners in this context.
-  esp::ompltools::PlannerFactory plannerFactory(config, context);
-  auto [planner, plannerType] = plannerFactory.create(experimentConfig["planner"]);
+  config->dumpAccessed();
 
   esp::ompltools::InteractiveVisualizer visualizer(context, {planner, plannerType});
 
