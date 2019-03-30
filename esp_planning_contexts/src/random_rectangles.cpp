@@ -75,7 +75,6 @@ RandomRectangles::RandomRectangles(const unsigned int dim, const unsigned int nu
 
   // Allocate the obstacle world
   rectObs_ = std::make_shared<Hyperrectangles>(BaseContext::si_, false);
-  BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:
   problemBounds.setLow(BaseContext::limits_.at(0u).first);

@@ -86,9 +86,6 @@ ObstacleFree::ObstacleFree(const unsigned int dim, const unsigned int maxNumStar
   // Create the space information class:
   BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
-  // Make an empty obstacle pointer:
-  BaseContext::obs_ = std::make_shared<Hyperrectangles>(BaseContext::si_, false);
-
   // Make the validity checker all-true
   vc = std::make_shared<ompl::base::AllValidStateValidityChecker>(BaseContext::si_);
 

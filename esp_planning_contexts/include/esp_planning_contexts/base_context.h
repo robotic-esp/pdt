@@ -134,8 +134,6 @@ class BaseContext {
   ompl::base::SpaceInformationPtr si_{};
   /** \brief The optimization objective */
   ompl::base::OptimizationObjectivePtr opt_{};
-  /** \brief The obstacle world */
-  std::shared_ptr<BaseObstacle> obs_{};
   /** \brief The runtime for the experiment */
   time::Duration targetDuration_{};
   /** \brief The start states */

@@ -76,11 +76,7 @@ WallGap::WallGap(const unsigned int dim, const bool onlyFindGap, const double ga
   BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
 
   // Allocate the obstacle world
-  std::shared_ptr<Hyperrectangles> obs;
-  std::shared_ptr<Hyperrectangles> anti;
-
   rectObs_ = std::make_shared<CutoutObstacles>(BaseContext::si_);
-  BaseContext::obs_ = rectObs_;
 
   // Set the problem bounds:
   problemBounds.setLow(BaseContext::limits_.at(0u).first);
@@ -137,10 +133,6 @@ WallGap::WallGap(const unsigned int dim, const bool onlyFindGap, const double ga
   // Add
   BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
 
-  // Allocate the temporary variable for the obstacles, antiobstacles, and the lower-left corners
-  obs = std::make_shared<Hyperrectangles>(BaseContext::si_, false);
-  anti = std::make_shared<Hyperrectangles>(BaseContext::si_, false);
-
   // Allocate the obstacles lower-left corners:
   obstacleLowerLeftCorner_ = std::make_shared<ompl::base::ScopedState<>>(ss);
 
@@ -162,6 +154,7 @@ WallGap::WallGap(const unsigned int dim, const bool onlyFindGap, const double ga
     obstacleWidths_.at(i) = BaseContext::limits_.at(i).second - BaseContext::limits_.at(i).first;
   }
 
+  auto obs = std::make_shared<Hyperrectangles>(BaseContext::si_, false);
   obs->addObstacle(std::make_pair(obstacleLowerLeftCorner_->get(), obstacleWidths_));
 
   // Gap lower left corner.
@@ -182,30 +175,11 @@ WallGap::WallGap(const unsigned int dim, const bool onlyFindGap, const double ga
     gapWidths_.at(i) = BaseContext::limits_.at(i).second - BaseContext::limits_.at(i).first;
   }
 
+  auto anti = std::make_shared<Hyperrectangles>(BaseContext::si_, false);
   anti->addObstacle(std::make_pair(gapLowerLeftCorner_->get(), gapWidths_));
 
   rectObs_->addObstacle(obs);
   rectObs_->addAntiObstacle(anti);
-
-  //     //Finally specify the optimization target:
-  //     if (stopClassSwitch_ == true)
-  //     {
-  //         //Stop if we find a cost better than the max non flanking cost
-  //         BaseExperiment::opt_->setCostThreshold(this->minFlankingCost());
-  //     }
-  //     else
-  //     {
-  //         //The optimum:
-  //         BaseExperiment::opt_->setCostThreshold(this->getOptimum());
-  //     }
-
-  //     //Make sure this is a sane problem:
-  //     if (this->minFlankingCost().value() < this->maxGapCost().value())
-  //     {
-  //         throw ompl::Exception("For the given gap width, a path through the gap can be worse
-  //         than a flanking path.");
-  //     }
-  //     //No else
 }
 
 bool WallGap::knowsOptimum() const {

@@ -88,7 +88,6 @@ RegularRectangles::RegularRectangles(const unsigned int dim, const double worldH
 
   regObs_ = std::make_shared<RepeatingHyperrectangles>(BaseContext::si_, obsWidths_, blankWidths_,
                                                        origin_);
-  BaseContext::obs_ = regObs_;
 
   // Set the problem bounds:
   problemBounds.setLow(BaseContext::limits_.at(0u).first);

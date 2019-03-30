@@ -93,7 +93,6 @@ DoubleEnclosure::DoubleEnclosure(const unsigned int dim, const double worldWidth
 
   // Register the obstacle with the context
   enclObs_ = std::make_shared<CutoutObstacles>(BaseContext::si_);
-  BaseContext::obs_ = enclObs_;
 
   // Set the problem bounds:
   problemBounds.setLow(BaseContext::limits_.at(0u).first);
