@@ -52,20 +52,21 @@ class CentreSquare : public BaseContext {
                const double runSeconds, const double checkResolution);
 
   /** \brief Whether the problem has an exact expression for the optimum */
-  virtual bool knowsOptimum() const;
+  virtual bool knowsOptimum() const override;
 
   /** \brief This problem knows its optimum */
-  virtual ompl::base::Cost getOptimum() const;
+  virtual ompl::base::Cost getOptimum() const override;
 
   /** \brief Set the target cost as the specified multiplier of the optimum. */
-  virtual void setTarget(double targetSpecifier);
+  virtual void setTarget(double targetSpecifier) override;
 
   /** \brief Derived class specific information to include in the title line. */
-  virtual std::string lineInfo() const;
+  virtual std::string lineInfo() const override;
 
   /** \brief Derived class specific information to include at the end. */
-  virtual std::string paraInfo() const;
+  virtual std::string paraInfo() const override;
 
+  // Accept a context visitor.
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:

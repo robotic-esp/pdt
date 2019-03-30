@@ -48,10 +48,9 @@ namespace esp {
 namespace ompltools {
 
 BaseVisualizer::BaseVisualizer(
-    const std::pair<std::shared_ptr<BaseContext>, CONTEXT_TYPE> &contextPair,
+    const std::shared_ptr<BaseContext> &context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
-    context_(contextPair.first),
-    contextType_(contextPair.second),
+    context_(context),
     planner_(plannerPair.first),
     plannerType_(plannerPair.second),
     dataThreadPromise_(),
@@ -65,7 +64,7 @@ BaseVisualizer::~BaseVisualizer() {
 }
 
 void BaseVisualizer::setContext(
-    const std::pair<std::shared_ptr<BaseContext>, CONTEXT_TYPE> &contextPair) {
+    const std::shared_ptr<BaseContext>& context) {
   // Setting a new context means all the data is invalid.
   viewedIteration_ = 0u;
 
@@ -74,8 +73,7 @@ void BaseVisualizer::setContext(
   dataThread_.join();
 
   // Set the new context.
-  context_ = contextPair.first;
-  contextType_ = contextPair.second;
+  context_ = context;
 
   // Reset the promise and stop signal.
   dataThreadPromise_ = std::promise<void>();

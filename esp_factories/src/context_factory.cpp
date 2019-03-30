@@ -93,8 +93,8 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string &contextNa
                                                  contextConfig["collisionCheckResolution"]);
       } catch (const json::detail::type_error& e) {
         throw std::runtime_error(
-            "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in the "
-            "context factory and the json file.");
+            "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in "
+            "the context factory and the json file.");
       }
     }
     default: {

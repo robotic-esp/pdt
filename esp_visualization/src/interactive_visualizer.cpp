@@ -41,9 +41,9 @@ namespace esp {
 namespace ompltools {
 
 InteractiveVisualizer::InteractiveVisualizer(
-    const std::pair<std::shared_ptr<BaseContext>, CONTEXT_TYPE>& contextPair,
+    const std::shared_ptr<BaseContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
-    BaseVisualizer(contextPair, plannerPair) {
+    BaseVisualizer(context, plannerPair) {
 }
 
 void InteractiveVisualizer::run() {
@@ -100,7 +100,7 @@ void InteractiveVisualizer::run() {
   // Set up a viewport. A viewport is where OpenGL draws to. We can
   // have multiple viewports for different parts of a window. Any draw
   // command will draw to the active viewport.
-  pangolin::View& view = pangolin::CreateDisplay();
+  pangolin::View& canvas = pangolin::CreateDisplay();
 
   auto bounds = context_->getLimits();
 
@@ -108,7 +108,7 @@ void InteractiveVisualizer::run() {
   // respect to the window boundaries (0 is left/bottom, 1 is right/top).
   // We can also set an aspect ratio such that even if the window gets
   // rescaled the drawings in the viewport do not get distorted.
-  view.SetBounds(
+  canvas.SetBounds(
       0.0, 1.0, pangolin::Attach::Pix(200), 1.0,
       (bounds.at(0).second - bounds.at(0).first) / (bounds.at(1).second - bounds.at(1).first));
 
@@ -172,10 +172,14 @@ void InteractiveVisualizer::run() {
       }
     }
 
-    // Get the edges in a format we can draw them with Pangolin.
+    // Activate this render state for the canvas.
+    canvas.Activate(renderState);
 
+    // Clear the viewport.
     glClear(GL_COLOR_BUFFER_BIT);
-    view.Activate(renderState);
+
+    // Draw the context.
+    context_->accept(*this);
 
     // Draw the vertices.
     glColor3fv(blue);
@@ -186,6 +190,10 @@ void InteractiveVisualizer::run() {
     }
     pangolin::FinishFrame();
   }
+}
+
+void InteractiveVisualizer::visit(const CentreSquare& context) const {
+  std::cout << "Visiting a " << context.getName() << " context.\n";
 }
 
 }  // namespace ompltools

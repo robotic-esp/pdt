@@ -46,7 +46,6 @@
 
 #include <ompl/base/Planner.h>
 
-#include "esp_common/context_type.h"
 #include "esp_common/planner_type.h"
 #include "esp_planning_contexts/base_context.h"
 #include "esp_time/time.h"
@@ -58,7 +57,7 @@ namespace ompltools {
 // The base class for a visualizer.
 class BaseVisualizer {
  public:
-  BaseVisualizer(const std::pair<std::shared_ptr<BaseContext>, CONTEXT_TYPE> &contextPair,
+  BaseVisualizer(const std::shared_ptr<BaseContext> &context,
                  const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
   virtual ~BaseVisualizer();
 
@@ -66,7 +65,7 @@ class BaseVisualizer {
   // Setters for context and planner. These are final because they need to be threadsafe, so
   // care has to be taken when implementing them.
   virtual void setContext(
-      const std::pair<std::shared_ptr<BaseContext>, CONTEXT_TYPE> &contextPair) final;
+      const std::shared_ptr<BaseContext> &context) final;
   virtual void setPlanner(
       const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> &plannerPair) final;
 
@@ -78,7 +77,6 @@ class BaseVisualizer {
 
   // The current context.
   std::shared_ptr<BaseContext> context_{};
-  CONTEXT_TYPE contextType_{};
 
   // The current planner.
   std::shared_ptr<ompl::base::Planner> planner_{};
@@ -105,7 +103,7 @@ class BaseVisualizer {
   void createData();
 
   // This is how many iterations we'll create ahead of the viewed iteration.
-  static constexpr std::size_t iterationBuffer_{100000u};
+  static constexpr std::size_t iterationBuffer_{2000u};
 
   // The planner data, indexed by the iteration.
   std::vector<std::shared_ptr<ompl::base::PlannerData>> plannerData_{};

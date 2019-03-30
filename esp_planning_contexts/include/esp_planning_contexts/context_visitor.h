@@ -40,14 +40,43 @@ namespace esp {
 
 namespace ompltools {
 
+// Forward declarations.
+class CentreSquare;
+class DividingWall;
+class DoubleEnclosure;
+class FlankingGap;
+class GoalEnclosure;
+class MultiStartGoal;
+class ObstacleFree;
+class RandomRectangles;
+class RegularRectangles;
+class Spiral;
+class StartEnclosure;
+class WallGap;
+
 class ContextVisitor {
  public:
   ContextVisitor() = default;
-  ~ContextVisitor() = default;
+  virtual ~ContextVisitor() = default;
 
-  // The base visit for any context is to do nothing.
-  template <typename T>
-  void visit(const T& /* context */) const {}
+  // Any context visitor must implement its actions on all contexts.
+  virtual void visit(const CentreSquare &context) const = 0;
+  // virtual void visit(const DividingWall &context) const = 0;
+  // virtual void visit(const DoubleEnclosure &context) const = 0;
+  // virtual void visit(const FlankingGap &context) const = 0;
+  // virtual void visit(const GoalEnclosure &context) const = 0;
+  // virtual void visit(const MultiStartGoal &context) const = 0;
+  // virtual void visit(const ObstacleFree &context) const = 0;
+  // virtual void visit(const RandomRectangles &context) const = 0;
+  // virtual void visit(const RegularRectangles &context) const = 0;
+  // virtual void visit(const Spiral &context) const = 0;
+  // virtual void visit(const StartEnclosure &context) const = 0;
+  // virtual void visit(const WallGap &context) const = 0;
+
+  // This is only needed until all other contexts are implemented.
+  // ADL should resolve to the above methods.
+  template <typename C>
+  void visit(const C& /* context */) const {}
 };
 
 }  // namespace ompltools

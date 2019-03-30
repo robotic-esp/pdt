@@ -60,10 +60,9 @@ int main(int argc, char** argv) {
   esp::ompltools::PlannerFactory plannerFactory(config, context);
   auto [planner, plannerType] = plannerFactory.create(experimentConfig["planner"]);
 
-  esp::ompltools::InteractiveVisualizer visualizer(
-      {context, esp::ompltools::CONTEXT_TYPE::CENTRE_SQUARE}, {planner, plannerType});
+  esp::ompltools::InteractiveVisualizer visualizer(context, {planner, plannerType});
 
   visualizer.run();
-  
+
   return 0;
 }

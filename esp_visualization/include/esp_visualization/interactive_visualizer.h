@@ -45,21 +45,24 @@
 
 #include "esp_common/context_type.h"
 #include "esp_common/planner_type.h"
-#include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/all_contexts.h"
 #include "esp_visualization/base_visualizer.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class InteractiveVisualizer : public BaseVisualizer {
+class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor {
  public:
   InteractiveVisualizer(
-      const std::pair<std::shared_ptr<BaseContext>, CONTEXT_TYPE>& contextPair,
+      const std::shared_ptr<BaseContext>& context,
       const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
   ~InteractiveVisualizer() = default;
 
   void run();
+
+ private:
+  void visit(const CentreSquare& context) const override;
 };
 
 }  // namespace ompltools
