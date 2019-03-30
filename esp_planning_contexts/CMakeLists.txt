@@ -30,6 +30,7 @@ add_library(esp_planning_contexts
 target_link_libraries(esp_planning_contexts
   PUBLIC # Libraries exposed in API.
   ${OMPL_LIBRARIES}
+  esp_configuration
   esp_obstacles
   esp_time)
 

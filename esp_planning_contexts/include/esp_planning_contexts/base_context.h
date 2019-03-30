@@ -123,8 +123,7 @@ class BaseContext {
   virtual std::string paraInfo() const = 0;
 
  protected:
-  // Variables
-  /** \brief The name */
+  /** \brief The context name */
   std::string name_{"UnnamedContext"};
   /** \brief The problem dimension */
   unsigned int dim_{0u};

@@ -31,7 +31,6 @@ target_link_libraries(esp_configuration
   ${OMPL_LIBRARIES}
   stdc++fs
   nlohmann_json::nlohmann_json
-  esp_planning_contexts
   esp_time)
 
 # Specify the include directories exported by this library.

@@ -54,7 +54,7 @@ namespace ompltools {
 /** \brief A collection of hyperrectangular obstacles.*/
 class Hyperrectangles : public BaseObstacle {
  public:
-  /** \brief a pair of lower-left corner and widths for a hyperrectangle obstacle*/
+  /** \brief a pair of lower-left corner and widths for a hyperrectangles obstacle*/
   typedef std::pair<const ompl::base::State*, std::vector<double> > obstacle_corner_widths_t;
 
   /** \brief Constructor. */
@@ -68,7 +68,7 @@ class Hyperrectangles : public BaseObstacle {
   virtual void clear();
 
   /** \brief Check for state validity */
-  virtual bool isValid(const ompl::base::State* state) const;
+  virtual bool isValid(const ompl::base::State* state) const override;
 
   /** \brief Get the vector of obstacles in the obstacle space */
   std::vector<obstacle_corner_widths_t> getObstacles() const;
