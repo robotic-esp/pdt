@@ -56,7 +56,12 @@ namespace ompltools {
 namespace fs = std::experimental::filesystem;
 namespace po = boost::program_options;
 
-Configuration::Configuration(int argc, char **argv) {
+Configuration::Configuration(int argc, char **argv) :
+    executable_(fs::path(std::string(argv[0]).substr(2)).filename().string()) {
+  load(argc, argv);
+}
+
+void Configuration::load(int argc, char **argv) {
   // Declare the available options.
   po::options_description availableOptions("Configuration options");
   availableOptions.add_options()("help,h", "Display available options.")(
@@ -107,7 +112,7 @@ Configuration::Configuration(int argc, char **argv) {
         }
       }
       // Load the patch, possibly overriding default values.
-      allParameters_.merge_patch(patch);
+      parameters_.merge_patch(patch);
       OMPL_INFORM("Loaded patch configuration from %s", patchConfig.c_str());
     } else {
       // The provided patch config file does not exist.
@@ -138,7 +143,7 @@ Configuration::Configuration(int argc, char **argv) {
       }
 
       // Merge the patch, possibly overriding default values.
-      allParameters_.merge_patch(patch);
+      parameters_.merge_patch(patch);
       OMPL_INFORM("Loaded patch configuration from %s", patchConfig.c_str());
     } else {
       // The provided patch config file does not exist.
@@ -150,12 +155,9 @@ Configuration::Configuration(int argc, char **argv) {
     assert(false);
   }
 
-  // Handle seed specifications.
-  handleSeedSpecification();
-
   // Set the appropriate log level.
-  if (allParameters_.count("Log") != 0) {
-    auto level = allParameters_["Log"]["level"];
+  if (parameters_.count("Log") != 0) {
+    auto level = parameters_["Log"]["level"];
     if (level == std::string("dev2")) {
       ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV2);
     } else if (level == std::string("dev1")) {
@@ -177,66 +179,65 @@ Configuration::Configuration(int argc, char **argv) {
   } else {
     ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
   }
-
-  // Assert that this is a reproducible experiment.
-  assertReproducability(argv);
 }
 
 const json::json &Configuration::getExperimentConfig() const {
-  if (allParameters_.count("Experiment") == 0) {
+  if (parameters_.count("Experiment") == 0) {
     throw std::runtime_error("Requested configuration for experiment, but none exists.");
   }
   if (accessedParameters_.count("Experiment") != 0) {
-    if (accessedParameters_["Experiment"] != allParameters_["Experiment"]) {
+    if (accessedParameters_["Experiment"] != parameters_["Experiment"]) {
       OMPL_ERROR(
           "Experiment parameters have changed during execution. Results might not be "
           "reproducable.");
       throw std::runtime_error("Reproducibility error.");
     }
   } else {
-    accessedParameters_["Experiment"] = allParameters_["Experiment"];
+    accessedParameters_["Experiment"] = parameters_["Experiment"];
   }
-  return allParameters_["Experiment"];
-}
-
-const json::json &Configuration::getPlannerConfig(const std::string &planner) const {
-  if (allParameters_["Planners"].count(planner) == 0) {
-    throw std::runtime_error("Requested configuration for unknown planner.");
-  }
-  if (accessedParameters_["Planners"].count(planner) != 0) {
-    if (accessedParameters_["Planners"][planner] != allParameters_["Planners"][planner]) {
-      OMPL_ERROR(
-          "Planner parameters have changed during execution. Results might not be reproducable.");
-      throw std::runtime_error("Reproducibility error.");
-    }
-  } else {
-    accessedParameters_["Planners"][planner] = allParameters_["Planners"][planner];
-  }
-  return allParameters_["Planners"][planner];
+  return parameters_["Experiment"];
 }
 
 const json::json &Configuration::getContextConfig(const std::string &context) const {
-  if (allParameters_["Contexts"].count(context) == 0) {
+  if (parameters_["Contexts"].count(context) == 0) {
     throw std::runtime_error("Requested configuration for unknown context.");
   }
   if (accessedParameters_["Contexts"].count(context) != 0) {
-    if (accessedParameters_["Contexts"][context] != allParameters_["Contexts"][context]) {
+    if (accessedParameters_["Contexts"][context] != parameters_["Contexts"][context]) {
       OMPL_ERROR(
           "Context parameters have changed during execution. Results might not be reproducable.");
       throw std::runtime_error("Reproducibility error.");
     }
   } else {
-    accessedParameters_["Contexts"][context] = allParameters_["Contexts"][context];
+    accessedParameters_["Contexts"][context] = parameters_["Contexts"][context];
   }
-  return allParameters_["Contexts"][context];
+  return parameters_["Contexts"][context];
 }
 
 bool Configuration::contains(const std::string &key) const {
-  return allParameters_.find(key) != allParameters_.end();
+  return contains(key, parameters_);
+}
+
+bool Configuration::contains(const std::string &key, const json::json &parameters) const {
+  if (parameters.contains(key)) {
+    return true;
+  } else {
+    if (isNestedKey(key)) {
+      auto [ns, rest] = split(key);
+      if (parameters.contains(ns)) {
+        auto nestedParameters = parameters[ns];
+        return contains(rest, nestedParameters);
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 }
 
 void Configuration::dumpAll(std::ostream &out) const {
-  out << allParameters_.dump(2) << '\n';
+  out << parameters_.dump(2) << '\n';
 }
 
 void Configuration::dumpAll(const std::string &filename) const {
@@ -288,7 +289,7 @@ void Configuration::loadDefaultConfigFromDefaultPath() {
   if (fs::exists(defaultConfig)) {
     // Load the default config.
     std::ifstream file(defaultConfig.string());
-    file >> allParameters_;
+    file >> parameters_;
     OMPL_INFORM("Loaded default configuration from %s", defaultConfig.c_str());
   } else {
     // Cannot find default config at default location.
@@ -306,7 +307,7 @@ void Configuration::loadConfigFromSpecifiedPath(fs::path path) {
     }
     // Load the provided default config.
     std::ifstream file(path.string());
-    file >> allParameters_;
+    file >> parameters_;
     OMPL_INFORM("Loaded configuration from %s", path.c_str());
   } else {
     // The provided default config file does not exist.
@@ -315,18 +316,37 @@ void Configuration::loadConfigFromSpecifiedPath(fs::path path) {
   }
 }
 
-void Configuration::assertReproducability(char **argv) {
+bool Configuration::isNestedKey(const std::string &name) const {
+  std::size_t pos = name.find('/');
+  if (pos == std::string::npos) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+std::pair<const std::string, const std::string> Configuration::split(
+    const std::string &name) const {
+  std::size_t pos = name.find('/');
+  if (pos == std::string::npos) {
+    OMPL_ERROR("String '%s' does not contain '/' character.", name.c_str());
+    throw std::runtime_error("Cannot split string without '/' character.");
+  }
+  return std::make_pair(name.substr(0, pos), name.substr(pos + 1));
+}
+
+void Configuration::registerAsExperiment() const {
   // Check the status of the working directory.
   if (Version::GIT_STATUS == std::string("DIRTY")) {
     OMPL_WARN("Working directory is dirty.");
   }
 
   // Make sure we're executing the right executable.
-  if (allParameters_.contains("Experiment")) {
+  if (parameters_.contains("Experiment")) {
     // Check we're on the same commit.
-    if (allParameters_["Experiment"].contains("version")) {
-      if (allParameters_["Experiment"]["version"].contains("commit")) {
-        auto commitHash = allParameters_["Experiment"]["version"]["commit"].get<std::string>();
+    if (parameters_["Experiment"].contains("version")) {
+      if (parameters_["Experiment"]["version"].contains("commit")) {
+        auto commitHash = parameters_["Experiment"]["version"]["commit"].get<std::string>();
         if (commitHash != std::string("any")) {
           if (commitHash != Version::GIT_SHA1) {
             OMPL_ERROR("Config specifies commit %s. You are currently on %s.", commitHash.c_str(),
@@ -337,42 +357,45 @@ void Configuration::assertReproducability(char **argv) {
     }
 
     // Check this is the correct executable.
-    if (allParameters_["Experiment"].contains("executable")) {
-      auto executable = allParameters_["Experiment"]["executable"].get<std::string>();
+    if (parameters_["Experiment"].contains("executable")) {
+      auto executable = parameters_["Experiment"]["executable"].get<std::string>();
       if (executable != std::string("any")) {
-        if (executable != fs::path(std::string(argv[0]).substr(2)).filename().string()) {
-          OMPL_ERROR("Config specifies executable '%s'. You are executing '%s'.", executable.c_str(),
-                     fs::path(std::string(argv[0]).substr(2)).filename().c_str());
+        if (executable != executable_) {
+          OMPL_ERROR("Config specifies executable '%s'. You are executing '%s'.",
+                     executable.c_str(), executable_.c_str());
         }
       }
     }
   }
 
   // Store the executable name.
-  allParameters_["Experiment"]["executable"] = std::string(argv[0]).substr(2);
+  accessedParameters_["Experiment"]["executable"] = executable_;
 
   // Store the current version.
-  allParameters_["Experiment"]["version"]["commit"] = Version::GIT_SHA1;
-  allParameters_["Experiment"]["version"]["branch"] = Version::GIT_REFSPEC;
-  allParameters_["Experiment"]["version"]["status"] = Version::GIT_STATUS;
+  accessedParameters_["Experiment"]["version"]["commit"] = Version::GIT_SHA1;
+  accessedParameters_["Experiment"]["version"]["branch"] = Version::GIT_REFSPEC;
+  accessedParameters_["Experiment"]["version"]["status"] = Version::GIT_STATUS;
 
-  // We don't want to be loading default configs when rerunning this experiment.
-  allParameters_["Experiment"]["useOnlyThisConfig"] = true;
+  // This ensures we don't load any additional config when rerunning this experiment.
+  accessedParameters_["Experiment"]["useOnlyThisConfig"] = true;
 
   // If in debug, ensure we've set the seed.
   assert(allParameters_["Experiment"]["seed"].get<unsigned int>() == ompl::RNG::getSeed());
+
+  // Handle seed specifications.
+  handleSeedSpecification();
 }
 
-void Configuration::handleSeedSpecification() {
-  if (allParameters_["Experiment"].contains("seed")) {
-    auto seed = allParameters_["Experiment"]["seed"].get<unsigned long>();
+void Configuration::handleSeedSpecification() const {
+  if (parameters_["Experiment"].contains("seed")) {
+    auto seed = parameters_["Experiment"]["seed"].get<unsigned long>();
     ompl::RNG::setSeed(seed);
     OMPL_WARN("Configuration set seed to be %lu", seed);
-    allParameters_["Experiment"]["seed"] = seed;
+    accessedParameters_["Experiment"]["seed"] = seed;
   } else {
     auto seed = ompl::RNG::getSeed();
     OMPL_INFORM("Seed is %lu", seed);
-    allParameters_["Experiment"]["seed"] = seed;
+    accessedParameters_["Experiment"]["seed"] = seed;
   }
 }
 

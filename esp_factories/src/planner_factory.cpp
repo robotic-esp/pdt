@@ -63,8 +63,11 @@ PlannerFactory::PlannerFactory(const std::shared_ptr<Configuration> &config,
 
 std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::create(
     const std::string &plannerName) const {
-  const auto plannerConfig = config_->getPlannerConfig(plannerName);
-  const auto type = plannerConfig["type"].get<PLANNER_TYPE>();
+  const std::string parentKey{"Planners/" + plannerName};
+  if (!config_->contains(parentKey)) {
+    OMPL_ERROR("Configuration has no entry for requested planner planner '%s'.", parentKey.c_str());
+  }
+  const auto type = config_->get<PLANNER_TYPE>(parentKey + "/type");
   // BIT*
   switch (type) {
     case PLANNER_TYPE::BITSTAR: {
@@ -72,14 +75,15 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->newProblemDefinition());
       planner->setName(plannerName);
-      planner->setUseKNearest(plannerConfig["useKNearest"]);
-      planner->setRewireFactor(plannerConfig["rewireFactor"]);
-      planner->setSamplesPerBatch(plannerConfig["samplesPerBatch"]);
-      planner->setPruning(plannerConfig["enablePruning"]);
-      planner->setPruneThresholdFraction(plannerConfig["pruningThreshold"]);
-      planner->setDropSamplesOnPrune(plannerConfig["dropSamplesOnPrune"]);
-      planner->setJustInTimeSampling(plannerConfig["useJustInTimeSampling"]);
-      planner->setStopOnSolnImprovement(plannerConfig["stopOnSolutionImprovement"]);
+      planner->setUseKNearest(config_->get<bool>(parentKey + "/useKNearest"));
+      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
+      planner->setSamplesPerBatch(config_->get<std::size_t>(parentKey + "/samplesPerBatch"));
+      planner->setPruning(config_->get<bool>(parentKey + "/enablePruning"));
+      planner->setPruneThresholdFraction(config_->get<double>(parentKey + "/pruningThreshold"));
+      planner->setDropSamplesOnPrune(config_->get<bool>(parentKey + "/dropSamplesOnPrune"));
+      planner->setJustInTimeSampling(config_->get<bool>(parentKey + "/useJustInTimeSampling"));
+      planner->setStopOnSolnImprovement(
+          config_->get<bool>(parentKey + "/stopOnSolutionImprovement"));
       planner->setInitialInflationFactor(1.0);
       planner->setInflationFactorParameter(0.0);
       planner->setTruncationFactorParameter(0.0);
@@ -91,9 +95,9 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto dimKey = std::to_string(context_->getDimensions()) + "d";
       planner->setProblemDefinition(context_->newProblemDefinition());
       planner->setName(plannerName);
-      planner->setRange(plannerConfig["maxEdgeLength"][dimKey]);
-      planner->setGoalBias(plannerConfig["goalBias"]);
-      planner->setApproximationFactor(plannerConfig["approximationFactor"]);
+      planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
+      planner->setGoalBias(config_->get<double>(parentKey + "/goalBias"));
+      planner->setApproximationFactor(config_->get<double>(parentKey + "/approximationFactor"));
       return {planner, PLANNER_TYPE::LBTRRT};
     }
     case PLANNER_TYPE::RRTCONNECT: {
@@ -102,8 +106,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto dimKey = std::to_string(context_->getDimensions()) + "d";
       planner->setProblemDefinition(context_->newProblemDefinition());
       planner->setName(plannerName);
-      planner->setRange(plannerConfig["maxEdgeLength"][dimKey]);
-      planner->setIntermediateStates(plannerConfig["addIntermediateStates"]);
+      planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
+      planner->setIntermediateStates(config_->get<bool>(parentKey + "/addIntermediateStates"));
       return {planner, PLANNER_TYPE::RRTCONNECT};
     }
     case PLANNER_TYPE::RRTSHARP: {
@@ -112,10 +116,10 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto dimKey = std::to_string(context_->getDimensions()) + "d";
       planner->setProblemDefinition(context_->newProblemDefinition());
       planner->setName(plannerName);
-      planner->setKNearest(plannerConfig["useKNearest"]);
-      planner->setRange(plannerConfig["maxEdgeLength"][dimKey]);
-      planner->setGoalBias(plannerConfig["goalBias"]);
-      planner->setSampleRejection(plannerConfig["enableSampleRejection"]);
+      planner->setKNearest(config_->get<bool>(parentKey + "/useKNearest"));
+      planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
+      planner->setGoalBias(config_->get<double>(parentKey + "/goalBias"));
+      planner->setSampleRejection(config_->get<bool>(parentKey + "/enableSampleRejection"));
       planner->setInformedSampling(false);
       return {planner, PLANNER_TYPE::RRTSHARP};
     }
@@ -125,10 +129,10 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto dimKey = std::to_string(context_->getDimensions()) + "d";
       planner->setProblemDefinition(context_->newProblemDefinition());
       planner->setName(plannerName);
-      planner->setKNearest(plannerConfig["useKNearest"]);
-      planner->setRange(plannerConfig["maxEdgeLength"][dimKey]);
-      planner->setGoalBias(plannerConfig["goalBias"]);
-      planner->setDelayCC(plannerConfig["delayCollisionChecks"]);
+      planner->setKNearest(config_->get<bool>(parentKey + "/useKNearest"));
+      planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
+      planner->setGoalBias(config_->get<double>(parentKey + "/goalBias"));
+      planner->setDelayCC(config_->get<bool>(parentKey + "/delayCollisionChecks"));
       planner->setTreePruning(false);
       planner->setPruneThreshold(1.0);
       planner->setPrunedMeasure(false);
@@ -142,22 +146,25 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->newProblemDefinition());
       planner->setName(plannerName);
-      planner->setUseKNearest(plannerConfig["useKNearest"]);
-      planner->setRewireFactor(plannerConfig["rewireFactor"]);
-      planner->setSamplesPerBatch(plannerConfig["samplesPerBatch"]);
-      planner->setPruning(plannerConfig["enablePruning"]);
-      planner->setPruneThresholdFraction(plannerConfig["pruningThreshold"]);
-      planner->setDropSamplesOnPrune(plannerConfig["dropSamplesOnPrune"]);
-      planner->setJustInTimeSampling(plannerConfig["useJustInTimeSampling"]);
-      planner->setStopOnSolnImprovement(plannerConfig["stopOnSolutionImprovement"]);
-      planner->setInitialInflationFactor(plannerConfig["initialInflation"]);
-      planner->setInflationFactorParameter(plannerConfig["inflationParameter"]);
-      planner->setTruncationFactorParameter(plannerConfig["truncationParameter"]);
+      planner->setUseKNearest(config_->get<bool>(parentKey + "/useKNearest"));
+      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
+      planner->setSamplesPerBatch(config_->get<std::size_t>(parentKey + "/samplesPerBatch"));
+      planner->setPruning(config_->get<bool>(parentKey + "/enablePruning"));
+      planner->setPruneThresholdFraction(config_->get<double>(parentKey + "/pruningThreshold"));
+      planner->setDropSamplesOnPrune(config_->get<bool>(parentKey + "/dropSamplesOnPrune"));
+      planner->setJustInTimeSampling(config_->get<bool>(parentKey + "/useJustInTimeSampling"));
+      planner->setStopOnSolnImprovement(
+          config_->get<bool>(parentKey + "/stopOnSolutionImprovement"));
+      planner->setInitialInflationFactor(config_->get<double>(parentKey + "/initialInflation"));
+      planner->setInflationFactorParameter(config_->get<double>(parentKey + "/inflationParameter"));
+      planner->setTruncationFactorParameter(
+          config_->get<double>(parentKey + "/truncationParameter"));
       return {planner, PLANNER_TYPE::SBITSTAR};
     }
     default: {
-      throw std::runtime_error(
-          "Planner factory recieved request to create planner of unknown type.");
+      OMPL_ERROR("Planner factory recieved request to create planner of unknown type '%s'.",
+                 config_->get<std::string>("Planner/" + plannerName + "/type"));
+      throw std::runtime_error("Planner factory error.");
       return {std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation()),
               PLANNER_TYPE::BITSTAR};
     }

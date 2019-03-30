@@ -58,11 +58,21 @@ class Configuration {
   Configuration(int argc, char** argv);
   ~Configuration() = default;
 
+  // Load from command line options.
+  void load(int argc, char** argv);
+
+  // Check if a key exists.
+  bool contains(const std::string& key) const;
+
+  // Get a parameter by its key.
+  template <typename T>
+  T get(const std::string& key) const;
+
+  // This adds to or creates an "Experiment" entry in the accessed parameters.
+  void registerAsExperiment() const;
+
   // Get the experiment config.
   const json::json& getExperimentConfig() const;
-
-  // Get the planner config.
-  const json::json& getPlannerConfig(const std::string& planner) const;
 
   // Get the context config.
   const json::json& getContextConfig(const std::string& context) const;
@@ -71,10 +81,6 @@ class Configuration {
   template <typename T>
   void addToMiscField(const std::string& key, const T& value);
 
-
-  // Query the config whether it contains a key.
-  bool contains(const std::string& key) const;
-
   // Dump the parameters.
   void dumpAll(std::ostream& out = std::cout) const;
   void dumpAll(const std::string& filename) const;
@@ -82,18 +88,92 @@ class Configuration {
   void dumpAccessed(const std::string& filename) const;
 
  private:
+  // Recursive implementation of public contain method.
+  bool contains(const std::string& key, const json::json& parameters) const;
+
+  // Recursive implementation of public get method.
+  template <typename T>
+  T get(const std::string& key, const json::json& parameters, const std::string& prevNs) const;
+
+  // Recursively register an accessed parameter.
+  template <typename T>
+  void registerAccess(const std::string& key, const T& value, json::json* accessedParameters) const;
+
+  // Helper to load the default config from the default path.
   void loadDefaultConfigFromDefaultPath();
+
+  // Helper to load any config from a specified path.
   void loadConfigFromSpecifiedPath(std::experimental::filesystem::path path);
-  void assertReproducability(char** argv);
-  void handleSeedSpecification();
-  json::json allParameters_{};
+
+  // Check if the name is nested, i.e., contains a '/'.
+  bool isNestedKey(const std::string& name) const;
+
+  // Split a nested name, throws if it isn't nested.
+  std::pair<const std::string, const std::string> split(const std::string& name) const;
+
+  // If any config file specifies the seed, we need to set it in OMPL, otherwise we store OMPL's
+  // seed.
+  void handleSeedSpecification() const;
+
+  std::string executable_{};
+
+  // All parameters as a big json structure.
+  json::json parameters_{};
+
+  // The parameters that were actually accessed.
   mutable json::json accessedParameters_{};
 };
 
 template <typename T>
 void Configuration::addToMiscField(const std::string& key, const T& value) {
-  allParameters_["Miscellaneous"][key] = value;
+  parameters_["Miscellaneous"][key] = value;
   accessedParameters_["Miscellaneous"][key] = value;
+}
+
+template <typename T>
+T Configuration::get(const std::string& key) const {
+  return get<T>(key, parameters_, "");
+}
+
+template <typename T>
+T Configuration::get(const std::string& key, const json::json& parameters,
+                     const std::string& path) const {
+  if (!isNestedKey(key)) {
+    if (parameters.contains(key)) {
+      registerAccess<T>(path + key, parameters[key].get<T>(), &accessedParameters_);
+      return parameters[key].get<T>();
+    } else {
+      OMPL_ERROR("Requested nonexisting parameter '%s'.", key.c_str());
+      throw std::runtime_error("Configuration error.");
+    }
+  } else {
+    auto [ns, rest] = split(key);
+    if (parameters.contains(ns)) {
+      auto nestedParameters = parameters[ns];
+      return get<T>(rest, nestedParameters, path + ns + "/");
+    } else {
+      OMPL_ERROR("Requested nonexisting parameter '%s'.", key.c_str());
+      throw std::runtime_error("Configuration error.");
+    }
+  }
+}
+
+template <typename T>
+void Configuration::registerAccess(const std::string& key, const T& value,
+                                   json::json* accessedParameters) const {
+  if (!isNestedKey(key)) {
+    if (accessedParameters->contains(key) && (*accessedParameters)[key] != value) {
+      OMPL_ERROR("Value of parameter being accessed has changed.");
+      throw std::runtime_error("Reproducibility error.");
+    }
+    (*accessedParameters)[key] = value;
+  } else {
+    auto [ns, rest] = split(key);
+    if (!accessedParameters->contains(ns)) {
+      (*accessedParameters)[ns] = json::json();
+    }
+    registerAccess(rest, value, &((*accessedParameters)[ns]));
+  }
 }
 
 }  // namespace ompltools
