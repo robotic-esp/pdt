@@ -36,6 +36,7 @@
 
 #pragma once
 
+#include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 #include "esp_planning_contexts/context_validity_checker.h"
@@ -67,18 +68,14 @@ class CentreSquare : public BaseContext {
   /** \brief Derived class specific information to include at the end. */
   virtual std::string paraInfo() const override;
 
-  // Make the width of the centre square available.
-  double getWidth() const;
-
-  // Make midpoint available.
-  std::vector<double> getMidpoint() const;
+  // Make the obstacle public.
+  std::shared_ptr<const Hyperrectangle<BaseObstacle>> getCentreSquare();
 
   // Accept a context visitor.
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
   std::shared_ptr<ContextValidityChecker> validityChecker_{};
-  std::shared_ptr<Hyperrectangle<BaseObstacle>> centreSquare_{};
   std::unique_ptr<ompl::base::ScopedState<>> midpoint_{};
   std::vector<double> widths_{};
 

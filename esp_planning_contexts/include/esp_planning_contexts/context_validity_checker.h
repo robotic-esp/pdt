@@ -44,6 +44,8 @@
 #include <ompl/datastructures/NearestNeighborsGNAT.h>
 
 #include "esp_obstacles/base_obstacle.h"
+#include "esp_obstacles/hyperrectangle.h"
+#include "esp_obstacles/obstacle_visitor.h"
 
 namespace esp {
 
@@ -58,20 +60,20 @@ class ContextValidityChecker : public ompl::base::StateValidityChecker {
   virtual bool isValid(const ompl::base::State* state) const override;
 
   // Add obstacles.
-  virtual void addObstacle(const std::shared_ptr<const BaseObstacle>& obstacle);
-  virtual void addObstacles(const std::vector<std::shared_ptr<const BaseObstacle>>& obstacles);
+  virtual void addObstacle(const std::shared_ptr<BaseObstacle>& obstacle);
+  virtual void addObstacles(const std::vector<std::shared_ptr<BaseObstacle>>& obstacles);
 
   // Add antiobstacles.
-  virtual void addAntiObstacle(const std::shared_ptr<const BaseAntiObstacle>& anti);
-  virtual void addAntiObstacles(const std::vector<std::shared_ptr<const BaseAntiObstacle>>& antis);
+  virtual void addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti);
+  virtual void addAntiObstacles(const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis);
 
   // Make obstacles accessible.
-  virtual std::vector<std::shared_ptr<const BaseObstacle>> getObstacles() const;
-  virtual std::vector<std::shared_ptr<const BaseAntiObstacle>> getAntiObstacles() const;
+  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const;
+  virtual std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const;
 
  protected:
-  std::vector<std::shared_ptr<const BaseObstacle>> obstacles_{};
-  std::vector<std::shared_ptr<const BaseAntiObstacle>> antiObstacles_{};
+  std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
+  std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
 };
 
 }  // namespace ompltools

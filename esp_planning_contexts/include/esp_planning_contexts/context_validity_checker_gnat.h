@@ -58,14 +58,14 @@ class ContextValidityCheckerGNAT : public ContextValidityChecker {
   virtual bool isValid(const ompl::base::State* state) const override;
 
   // Add obstacles.
-  virtual void addObstacle(const std::shared_ptr<const BaseObstacle>& obstacle) override;
+  virtual void addObstacle(const std::shared_ptr<BaseObstacle>& obstacle) override;
   virtual void addObstacles(
-      const std::vector<std::shared_ptr<const BaseObstacle>>& obstacles) override;
+      const std::vector<std::shared_ptr<BaseObstacle>>& obstacles) override;
 
   // Add antiobstacles.
-  virtual void addAntiObstacle(const std::shared_ptr<const BaseAntiObstacle>& anti) override;
+  virtual void addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti) override;
   virtual void addAntiObstacles(
-      const std::vector<std::shared_ptr<const BaseAntiObstacle>>& antis) override;
+      const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis) override;
 
  private:
   double maxObstacleRadius_{0.0};

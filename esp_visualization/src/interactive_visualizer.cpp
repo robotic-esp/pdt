@@ -57,7 +57,9 @@ void InteractiveVisualizer::run() {
   // Create the options panel.
   const std::string optionsName{"options"};
   pangolin::CreatePanel(optionsName).SetBounds(0.0f, 1.0f, 0.0f, pangolin::Attach::Pix(200));
-  pangolin::Var<bool> optionShowEdges(optionsName + ".Show Edges", true, true);
+  pangolin::Var<bool> optionDrawEdges(optionsName + ".Draw Edges", true, true);
+  pangolin::Var<bool> optionDrawObstacles(optionsName + ".Draw Obstacles", true, true);
+  pangolin::Var<bool> optionDrawContext(optionsName + ".Draw Context", true, true);
 
   // Register some keypresses.
   pangolin::RegisterKeyPressCallback('f', [this]() {
@@ -179,12 +181,24 @@ void InteractiveVisualizer::run() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Draw the context.
-    context_->accept(*this);
+    if (optionDrawContext) {
+      context_->accept(*this);
+    }
+
+    // Draw the obstacles.
+    if (optionDrawObstacles) {
+      for (auto obstacle : context_->getObstacles()) {
+        obstacle->accept(*this);
+      }
+      for (auto antiObstacle : context_->getAntiObstacles()) {
+        antiObstacle->accept(*this);
+      }
+    }
 
     // Draw the vertices.
     glColor3fv(blue);
     pangolin::glDrawPoints(vertices);
-    if (optionShowEdges) {
+    if (optionDrawEdges) {
       glColor3fv(green);
       pangolin::glDrawLines(edges);
     }
@@ -192,13 +206,27 @@ void InteractiveVisualizer::run() {
   }
 }
 
-void InteractiveVisualizer::visit(const CentreSquare& centreSquare) const {
-  auto midpoint = centreSquare.getMidpoint();
-  auto halfWidth = centreSquare.getWidth() / 2.0;
-  glColor3fv(black);
-  pangolin::glDrawRect(midpoint.at(0) - halfWidth, midpoint.at(1) - halfWidth,
-                       midpoint.at(0) + halfWidth, midpoint.at(1) + halfWidth);
+void InteractiveVisualizer::visit(const CentreSquare& /* centreSquare */) const {
+}
 
+void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
+  glColor3fv(black);
+  std::vector<double> widths = obstacle.getWidths();
+  std::vector<double> midpoint = obstacle.getAnchorCoordinates();
+  if (widths.size() == 2 && midpoint.size() == 2) {
+    pangolin::glDrawRect(midpoint.at(0) - widths.at(0) / 2.0, midpoint.at(1) - widths.at(1) / 2.0,
+                         midpoint.at(0) + widths.at(0) / 2.0, midpoint.at(1) + widths.at(1) / 2.0);
+  }
+}
+
+void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
+  glColor3fv(white);
+  std::vector<double> widths = antiObstacle.getWidths();
+  std::vector<double> midpoint = antiObstacle.getAnchorCoordinates();
+  if (widths.size() == 2 && midpoint.size() == 2) {
+    pangolin::glDrawRect(midpoint.at(0) - widths.at(0) / 2.0, midpoint.at(1) - widths.at(1) / 2.0,
+                         midpoint.at(0) + widths.at(0) / 2.0, midpoint.at(1) + widths.at(1) / 2.0);
+  }
 }
 
 }  // namespace ompltools

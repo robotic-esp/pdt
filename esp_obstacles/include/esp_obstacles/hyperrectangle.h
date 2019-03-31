@@ -46,6 +46,7 @@
 #include <ompl/util/Exception.h>
 
 #include "esp_obstacles/base_obstacle.h"
+#include "esp_obstacles/obstacle_visitor.h"
 
 namespace esp {
 

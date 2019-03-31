@@ -60,6 +60,9 @@ class GeometricShape {
   // Get the anchor point of this shape.
   virtual ompl::base::ScopedState<> getAnchor() const;
 
+  // Make anchor coordinates more easily accessible.
+  std::vector<double> getAnchorCoordinates() const;
+
   // Get the measure of this obstacle.
   virtual double computeMeasure() const = 0;
 

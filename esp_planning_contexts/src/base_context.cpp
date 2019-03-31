@@ -129,8 +129,17 @@ ompl::base::Cost BaseContext::getMinimum() const {
   return minCost;
 }
 
+std::vector<std::shared_ptr<BaseObstacle>> BaseContext::getObstacles() const {
+  return obstacles_;
+}
+
+std::vector<std::shared_ptr<BaseAntiObstacle>> BaseContext::getAntiObstacles() const {
+  return antiObstacles_;
+}
+
 void BaseContext::print(const bool verbose /* == false */) const {
-  std::cout << name_ << " in R^" << dimensionality_ << ". runtime: " << time::seconds(targetDuration_)
+  std::cout << name_ << " in R^" << dimensionality_
+            << ". runtime: " << time::seconds(targetDuration_)
             << ". target: " << optimizationObjective_->getCostThreshold();
   if (this->knowsOptimum()) {
     std::cout << " (opt: " << this->computeOptimum() << ")";

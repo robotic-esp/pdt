@@ -102,6 +102,12 @@ class BaseContext {
   /** \brief The global minimum that may or may not be attainable in a problem. */
   ompl::base::Cost getMinimum() const;
 
+  // Get the obstacles.
+  std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const;
+
+  // Get the antiobstacles.
+  std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const;
+
   /** \brief Print out summary of the experiment */
   void print(const bool verbose = false) const;
 
@@ -140,6 +146,10 @@ class BaseContext {
   std::vector<ompl::base::ScopedState<>> startStates_{};
   /** \brief The goal states */
   std::vector<ompl::base::ScopedState<>> goalStates_{};
+  // The obstacles.
+  std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
+  // The antiobstacles.
+  std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
   /** \brief The goal as a pointer*/
   ompl::base::GoalPtr goalPtr_{};
 };

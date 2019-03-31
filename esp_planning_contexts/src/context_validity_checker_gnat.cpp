@@ -95,7 +95,7 @@ bool ContextValidityCheckerGNAT::isValid(const ompl::base::State* state) const {
   return true;
 }
 
-void ContextValidityCheckerGNAT::addObstacle(const std::shared_ptr<const BaseObstacle>& obstacle) {
+void ContextValidityCheckerGNAT::addObstacle(const std::shared_ptr<BaseObstacle>& obstacle) {
   double circumscribingRadius = obstacle->computeMinCircumscribingRadius();
   if (maxObstacleRadius_ < circumscribingRadius) {
     maxObstacleRadius_ = circumscribingRadius;
@@ -105,7 +105,7 @@ void ContextValidityCheckerGNAT::addObstacle(const std::shared_ptr<const BaseObs
 }
 
 void ContextValidityCheckerGNAT::addObstacles(
-    const std::vector<std::shared_ptr<const BaseObstacle>>& obstacles) {
+    const std::vector<std::shared_ptr<BaseObstacle>>& obstacles) {
   // We could insert multiple elements at once, but have to be careful about indices and this is not
   // going to happen frequently, so better safe than fast.
   obstacles_.reserve(obstacles_.size() + obstacles.size());
@@ -119,8 +119,7 @@ void ContextValidityCheckerGNAT::addObstacles(
   }
 }
 
-void ContextValidityCheckerGNAT::addAntiObstacle(
-    const std::shared_ptr<const BaseAntiObstacle>& anti) {
+void ContextValidityCheckerGNAT::addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti) {
   double circumscribingRadius = anti->computeMinCircumscribingRadius();
   if (maxAntiObstacleRadius_ < circumscribingRadius) {
     maxAntiObstacleRadius_ = circumscribingRadius;
@@ -130,7 +129,7 @@ void ContextValidityCheckerGNAT::addAntiObstacle(
 }
 
 void ContextValidityCheckerGNAT::addAntiObstacles(
-    const std::vector<std::shared_ptr<const BaseAntiObstacle>>& antis) {
+    const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis) {
   antiObstacles_.reserve(antiObstacles_.size() + antis.size());
   for (const auto& anti : antis) {
     double circumscribingRadius = anti->computeMinCircumscribingRadius();

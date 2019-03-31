@@ -40,13 +40,22 @@ namespace esp {
 
 namespace ompltools {
 
+class BaseObstacle;
+class BaseAntiObstacle;
+template <typename T>
+class Hyperrectangle;
+
 class ObstacleVisitor {
  public:
   ObstacleVisitor() = default;
   virtual ~ObstacleVisitor() = default;
 
+  // Any obstacle visitor must implement its actions on all obstacles.
+  virtual void visit(const Hyperrectangle<BaseObstacle>& obstacle) const = 0;
+  virtual void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const = 0;
+
   template <typename T>
-  void visit(const T& /* obstacle */) const {}
+  void visit(const T&) const {}
 };
 
 }  // namespace ompltools

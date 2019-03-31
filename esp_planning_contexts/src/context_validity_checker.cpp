@@ -69,29 +69,29 @@ bool ContextValidityChecker::isValid(const ompl::base::State* state) const {
   return true;
 }
 
-void ContextValidityChecker::addObstacle(const std::shared_ptr<const BaseObstacle>& obstacle) {
+void ContextValidityChecker::addObstacle(const std::shared_ptr<BaseObstacle>& obstacle) {
   obstacles_.emplace_back(obstacle);
 }
 
 void ContextValidityChecker::addObstacles(
-    const std::vector<std::shared_ptr<const BaseObstacle>>& obstacles) {
+    const std::vector<std::shared_ptr<BaseObstacle>>& obstacles) {
   obstacles_.insert(obstacles_.end(), obstacles.begin(), obstacles.end());
 }
 
-void ContextValidityChecker::addAntiObstacle(const std::shared_ptr<const BaseAntiObstacle>& anti) {
+void ContextValidityChecker::addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti) {
   antiObstacles_.emplace_back(anti);
 }
 
 void ContextValidityChecker::addAntiObstacles(
-    const std::vector<std::shared_ptr<const BaseAntiObstacle>>& antis) {
+    const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis) {
   antiObstacles_.insert(antiObstacles_.end(), antis.begin(), antis.end());
 }
 
-std::vector<std::shared_ptr<const BaseObstacle>> ContextValidityChecker::getObstacles() const {
+std::vector<std::shared_ptr<BaseObstacle>> ContextValidityChecker::getObstacles() const {
   return obstacles_;
 }
 
-std::vector<std::shared_ptr<const BaseAntiObstacle>> ContextValidityChecker::getAntiObstacles()
+std::vector<std::shared_ptr<BaseAntiObstacle>> ContextValidityChecker::getAntiObstacles()
     const {
   return antiObstacles_;
 }

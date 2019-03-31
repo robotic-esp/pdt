@@ -75,11 +75,12 @@ CentreSquare::CentreSquare(const unsigned int dim, const double obsWidth, const 
   for (std::size_t i = 1u; i < dimensionality_; ++i) {
     (*midpoint_)[i] = 0.0;
   }
-  centreSquare_ = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, *midpoint_, widths_);
+  obstacles_.emplace_back(
+      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, *midpoint_, widths_));
 
   // Create the validity checker and add the obstacle.
   validityChecker_ = std::make_shared<ContextValidityChecker>(spaceInfo_);
-  validityChecker_->addObstacle(centreSquare_);
+  validityChecker_->addObstacles(obstacles_);
 
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(
@@ -133,11 +134,11 @@ bool CentreSquare::knowsOptimum() const {
 ompl::base::Cost CentreSquare::computeOptimum() const {
   ompl::base::Cost startToCorner(
       std::sqrt(std::pow(std::abs(startStates_.front()[0u] - (*midpoint_)[0u]), 2.0) -
-                std::pow(centreSquare_->computeMinCircumscribingRadius(), 2.0)));
-  ompl::base::Cost centreSquareEdge(centreSquare_->getWidths().at(0));
+                std::pow(obstacles_.back()->computeMinCircumscribingRadius(), 2.0)));
+  ompl::base::Cost centreSquareEdge(widths_.at(0));
   ompl::base::Cost goalToCorner(
       std::sqrt(std::pow(std::abs(goalStates_.front()[0u] - (*midpoint_)[0u]), 2.0) -
-                std::pow(centreSquare_->computeMinCircumscribingRadius(), 2.0)));
+                std::pow(obstacles_.back()->computeMinCircumscribingRadius(), 2.0)));
 
   // Combine and return.
   return optimizationObjective_->combineCosts(
@@ -152,26 +153,13 @@ void CentreSquare::setTarget(double targetSpecifier) {
 std::string CentreSquare::lineInfo() const {
   std::stringstream rval;
 
-  rval << "Obstacle width: " << centreSquare_->getWidths().at(0) << ".";
+  rval << "Obstacle width: " << widths_.at(0) << ".";
 
   return rval.str();
 }
 
 std::string CentreSquare::paraInfo() const {
   return std::string();
-}
-
-double CentreSquare::getWidth() const {
-  return centreSquare_->getWidths().at(0);
-}
-
-std::vector<double> CentreSquare::getMidpoint() const {
-  std::vector<double> coordinates{};
-  for (std::size_t i = 0; i < dimensionality_; ++i) {
-    std::cout << (*midpoint_)[i] << '\n';
-    coordinates.emplace_back((*midpoint_)[i]);
-  }
-  return coordinates;
 }
 
 void CentreSquare::accept(const ContextVisitor& visitor) const {
