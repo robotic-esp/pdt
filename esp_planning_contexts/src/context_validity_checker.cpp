@@ -34,51 +34,67 @@
 
 /* Authors: Jonathan Gammell */
 
-#pragma once
-
-#include "esp_obstacles/hyperrectangles.h"
-#include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/context_validity_checker.h"
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief An experiment with a heuristic breaking spiral */
-class Spiral : public BaseContext {
- public:
-  /** \brief Constructor */
-  Spiral(const double distFraction, const double runSeconds, const double checkResolution);
+ContextValidityChecker::ContextValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo) :
+    ompl::base::StateValidityChecker(spaceInfo) {
+}
 
-  /** \brief This problem \e does \e not know its optimum (though it could) */
-  virtual bool knowsOptimum() const;
+bool ContextValidityChecker::isValid(const ompl::base::State* state) const {
+  // If the state does not satisfy the space bounds, it is not valid.
+  if (!si_->satisfiesBounds(state)) {
+    return false;
+  }
 
-  /** \brief As the optimum is unknown, throw. */
-  virtual ompl::base::Cost getOptimum() const;
+  // A state is valid if it collides with an anti obstacle. This overrides collisions with
+  // obstacles.
+  for (const auto& anti : antiObstacles_) {
+    if (anti->validates(state)) {
+      return true;
+    }
+  }
 
-  /** \brief Set the optimization target as the specified cost. */
-  virtual void setTarget(double targetSpecifier);
+  // A state is not valid if it collides with an obstacle.
+  for (const auto& obs : obstacles_) {
+    if (obs->invalidates(state)) {
+      return false;
+    }
+  }
 
-  /** \brief Derived class specific information to include in the title line. */
-  virtual std::string lineInfo() const;
+  // The state satisfies the bounds and is not invalidated by any obstacles.
+  return true;
+}
 
-  /** \brief Derived class specific information to include at the end. */
-  virtual std::string paraInfo() const;
+void ContextValidityChecker::addObstacle(const std::shared_ptr<const BaseObstacle>& obstacle) {
+  obstacles_.emplace_back(obstacle);
+}
 
-  virtual void accept(const ContextVisitor& visitor) const;
+void ContextValidityChecker::addObstacles(
+    const std::vector<std::shared_ptr<const BaseObstacle>>& obstacles) {
+  obstacles_.insert(obstacles_.end(), obstacles.begin(), obstacles.end());
+}
 
- protected:
-  // Variables
-  /** \brief The obstacle world */
-  std::shared_ptr<Hyperrectangles> rectObs_{};
-  /** \brief The lower-left corners of the obstacles*/
-  std::vector<ompl::base::ScopedState<> > obsCorners_{};
-  /** The widths of the obstacles */
-  std::vector<std::vector<double> > obsWidths_{};
+void ContextValidityChecker::addAntiObstacle(const std::shared_ptr<const BaseAntiObstacle>& anti) {
+  antiObstacles_.emplace_back(anti);
+}
 
-  // Constant Parameters
-  /** \brief The basic thickness of the obstacle. */
-  double obsThickness_{0.05};
-};
+void ContextValidityChecker::addAntiObstacles(
+    const std::vector<std::shared_ptr<const BaseAntiObstacle>>& antis) {
+  antiObstacles_.insert(antiObstacles_.end(), antis.begin(), antis.end());
+}
+
+std::vector<std::shared_ptr<const BaseObstacle>> ContextValidityChecker::getObstacles() const {
+  return obstacles_;
+}
+
+std::vector<std::shared_ptr<const BaseAntiObstacle>> ContextValidityChecker::getAntiObstacles()
+    const {
+  return antiObstacles_;
+}
 
 }  // namespace ompltools
 

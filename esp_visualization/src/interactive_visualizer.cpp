@@ -192,8 +192,13 @@ void InteractiveVisualizer::run() {
   }
 }
 
-void InteractiveVisualizer::visit(const CentreSquare& context) const {
-  std::cout << "Visiting a " << context.getName() << " context.\n";
+void InteractiveVisualizer::visit(const CentreSquare& centreSquare) const {
+  auto midpoint = centreSquare.getMidpoint();
+  auto halfWidth = centreSquare.getWidth() / 2.0;
+  glColor3fv(black);
+  pangolin::glDrawRect(midpoint.at(0) - halfWidth, midpoint.at(1) - halfWidth,
+                       midpoint.at(0) + halfWidth, midpoint.at(1) + halfWidth);
+
 }
 
 }  // namespace ompltools

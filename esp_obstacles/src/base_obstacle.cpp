@@ -40,12 +40,33 @@ namespace esp {
 
 namespace ompltools {
 
-BaseObstacle::BaseObstacle(ompl::base::SpaceInformation* si) :
-    ompl::base::StateValidityChecker(si) {
+GeometricShape::GeometricShape(const ompl::base::SpaceInformationPtr& spaceInfo) :
+    spaceInfo_(spaceInfo),
+    anchor_(spaceInfo) {
 }
 
-BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& si) :
-    ompl::base::StateValidityChecker(si) {
+void GeometricShape::setAnchor(const ompl::base::ScopedState<>& state) {
+  anchor_ = state;
+}
+
+ompl::base::ScopedState<> GeometricShape::getAnchor() const {
+  return anchor_;
+}
+
+BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& spaceInfo) :
+    GeometricShape(spaceInfo) {
+}
+
+BaseAntiObstacle::BaseAntiObstacle(const ompl::base::SpaceInformationPtr& spaceInfo) :
+    GeometricShape(spaceInfo) {
+}
+
+bool BaseObstacle::invalidates(const ompl::base::State* state) const {
+  return isInside(state);
+}
+
+bool BaseAntiObstacle::validates(const ompl::base::State* state) const {
+  return isInside(state);
 }
 
 }  // namespace ompltools

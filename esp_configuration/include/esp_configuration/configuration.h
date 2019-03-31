@@ -72,13 +72,6 @@ class Configuration {
   // information about the state of the working directory and the OMPL seed.
   void registerAsExperiment() const;
 
-  // Get the experiment config.
-  const json::json& getExperimentConfig() const;
-
-  // Add a key-value-pair to the experiment config.
-  template <typename T>
-  void addToMiscField(const std::string& key, const T& value);
-
   // Dump the parameters.
   void dumpAll(std::ostream& out = std::cout) const;
   void dumpAll(const std::string& filename) const;
@@ -121,12 +114,6 @@ class Configuration {
   // The parameters that were actually accessed.
   mutable json::json accessedParameters_{};
 };
-
-template <typename T>
-void Configuration::addToMiscField(const std::string& key, const T& value) {
-  parameters_["Miscellaneous"][key] = value;
-  accessedParameters_["Miscellaneous"][key] = value;
-}
 
 template <typename T>
 T Configuration::get(const std::string& key) const {

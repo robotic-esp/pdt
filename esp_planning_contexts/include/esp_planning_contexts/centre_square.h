@@ -36,8 +36,9 @@
 
 #pragma once
 
-#include "esp_obstacles/hyperrectangles.h"
+#include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/context_validity_checker.h"
 #include "esp_planning_contexts/context_visitor.h"
 
 namespace esp {
@@ -55,7 +56,7 @@ class CentreSquare : public BaseContext {
   virtual bool knowsOptimum() const override;
 
   /** \brief This problem knows its optimum */
-  virtual ompl::base::Cost getOptimum() const override;
+  virtual ompl::base::Cost computeOptimum() const override;
 
   /** \brief Set the target cost as the specified multiplier of the optimum. */
   virtual void setTarget(double targetSpecifier) override;
@@ -66,16 +67,20 @@ class CentreSquare : public BaseContext {
   /** \brief Derived class specific information to include at the end. */
   virtual std::string paraInfo() const override;
 
+  // Make the width of the centre square available.
+  double getWidth() const;
+
+  // Make midpoint available.
+  std::vector<double> getMidpoint() const;
+
   // Accept a context visitor.
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
-  /** \brief The obstacle world */
-  std::shared_ptr<Hyperrectangles> rectObs_{};
-  /** \brief The lower-left corner of an obstacle half-way between the start and goal */
-  std::shared_ptr<ompl::base::ScopedState<> > sightLineObs_{};
-  /** The widths of the sight-line obstacle */
-  double obsWidth_{0.0};
+  std::shared_ptr<ContextValidityChecker> validityChecker_{};
+  std::shared_ptr<Hyperrectangle<BaseObstacle>> centreSquare_{};
+  std::unique_ptr<ompl::base::ScopedState<>> midpoint_{};
+  std::vector<double> widths_{};
 
   // The start and goal positions.
   double startPos_{0.0};

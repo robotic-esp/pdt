@@ -47,6 +47,8 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
+#include "esp_obstacles/hyperrectangle.h"
+
 namespace esp {
 
 namespace ompltools {
@@ -57,128 +59,119 @@ CentreSquare::CentreSquare(const unsigned int dim, const double obsWidth, const 
                 std::vector<std::pair<double, double>>(
                     dim, std::pair<double, double>(-0.5 * worldWidth, 0.5 * worldWidth)),
                 runSeconds, "CentreSquare"),
-    obsWidth_(obsWidth),
+    widths_(dim, obsWidth),
     startPos_(-0.5),
     goalPos_(0.5) {
-  // Variable
-  // The state space
-  std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
-  // The problem bounds
-  ompl::base::RealVectorBounds problemBounds(BaseContext::dim_);
-
-  // Make the state space Rn:
-  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseContext::dim_);
+  // Create a state space and set the bounds.
+  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
+  stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
 
   // Create the space information class:
-  BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
+  spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
 
-  // Allocate the obstacle world
-  rectObs_ = std::make_shared<Hyperrectangles>(BaseContext::si_, false);
+  // Create the obstacle.
+  midpoint_ = std::make_unique<ompl::base::ScopedState<>>(spaceInfo_);
+  (*midpoint_)[0] = (startPos_ + goalPos_) / 2.0;
+  for (std::size_t i = 1u; i < dimensionality_; ++i) {
+    (*midpoint_)[i] = 0.0;
+  }
+  centreSquare_ = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, *midpoint_, widths_);
 
-  // Set the problem bounds:
-  problemBounds.setLow(BaseContext::limits_.at(0u).first);
-  problemBounds.setHigh(BaseContext::limits_.at(0u).second);
+  // Create the validity checker and add the obstacle.
+  validityChecker_ = std::make_shared<ContextValidityChecker>(spaceInfo_);
+  validityChecker_->addObstacle(centreSquare_);
 
-  // Store the problem bounds:
-  ss->setBounds(problemBounds);
+  // Set the validity checker and the check resolution.
+  spaceInfo_->setStateValidityChecker(
+      static_cast<ompl::base::StateValidityCheckerPtr>(validityChecker_));
+  spaceInfo_->setStateValidityCheckingResolution(checkResolution);
 
-  // Set the validity checker and checking resolution
-  BaseContext::si_->setStateValidityChecker(
-      static_cast<ompl::base::StateValidityCheckerPtr>(rectObs_));
-  BaseContext::si_->setStateValidityCheckingResolution(checkResolution);
-
-  // Call setup!
-  BaseContext::si_->setup();
+  // Set up the space info.
+  spaceInfo_->setup();
 
   // Allocate the optimization objective
-  BaseContext::opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseContext::si_);
+  optimizationObjective_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
 
   // Set the heuristic to the default:
-  BaseContext::opt_->setCostToGoHeuristic(
+  optimizationObjective_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
-  // Create my start:
-  // Create a start state on the vector:
-  BaseContext::startStates_.push_back(ompl::base::ScopedState<>(ss));
+  // Create a start state.
+  startStates_.push_back(ompl::base::ScopedState<>(spaceInfo_));
 
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
+  for (unsigned int j = 0u; j < dimensionality_; ++j) {
     if (j == 0u) {
-      BaseContext::startStates_.back()[j] = startPos_;
+      startStates_.back()[j] = startPos_;
     } else {
-      BaseContext::startStates_.back()[j] = 0.0;
+      startStates_.back()[j] = 0.0;
     }
   }
 
-  // Create my goal:
   // Create a goal state on the vector:
-  BaseContext::goalStates_.push_back(ompl::base::ScopedState<>(ss));
-
+  goalStates_.push_back(ompl::base::ScopedState<>(spaceInfo_));
   // Assign to each component
-  for (unsigned int j = 0u; j < BaseContext::dim_; ++j) {
+  for (unsigned int j = 0u; j < dimensionality_; ++j) {
     if (j == 0u) {
-      BaseContext::goalStates_.back()[j] = goalPos_;
+      goalStates_.back()[j] = goalPos_;
     } else {
-      BaseContext::goalStates_.back()[j] = 0.0;
+      goalStates_.back()[j] = 0.0;
     }
   }
+  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
 
-  // Allocate the goal:
-  BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
-
-  // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
-
-  // Set the obstacle's lower-left corner:
-  sightLineObs_ = std::make_shared<ompl::base::ScopedState<>>(ss);
-  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
-    (*sightLineObs_)[i] =
-        (BaseContext::goalStates_.back()[i] + BaseContext::startStates_.back()[i]) / 2.0 -
-        0.5 * obsWidth_;
-  }
-
-  // Add the obstacle:
-  rectObs_->addObstacle(
-      std::make_pair(sightLineObs_->get(), std::vector<double>(BaseContext::dim_, obsWidth_)));
-
-  // Finally specify the optimization target:
-  BaseContext::opt_->setCostThreshold(this->getOptimum());
+  // Finally specify the optimization target.
+  optimizationObjective_->setCostThreshold(computeOptimum());
 }
 
 bool CentreSquare::knowsOptimum() const {
   return true;
 }
 
-ompl::base::Cost CentreSquare::getOptimum() const {
+ompl::base::Cost CentreSquare::computeOptimum() const {
   ompl::base::Cost startToCorner(
-      std::sqrt(std::pow((*sightLineObs_)[0u] - BaseContext::startStates_.front()[0u], 2.0) +
-                std::pow((*sightLineObs_)[1u] - BaseContext::startStates_.front()[1u], 2.0)));
-  ompl::base::Cost obsEdge(obsWidth_);
-  ompl::base::Cost otherCornerToGoal(std::sqrt(
-      std::pow(BaseContext::goalStates_.front()[0u] - ((*sightLineObs_)[0u] + obsWidth_), 2.0) +
-      std::pow(BaseContext::goalStates_.front()[1u] - (*sightLineObs_)[1u], 2.0)));
+      std::sqrt(std::pow(std::abs(startStates_.front()[0u] - (*midpoint_)[0u]), 2.0) -
+                std::pow(centreSquare_->computeMinCircumscribingRadius(), 2.0)));
+  ompl::base::Cost centreSquareEdge(centreSquare_->getWidths().at(0));
+  ompl::base::Cost goalToCorner(
+      std::sqrt(std::pow(std::abs(goalStates_.front()[0u] - (*midpoint_)[0u]), 2.0) -
+                std::pow(centreSquare_->computeMinCircumscribingRadius(), 2.0)));
 
-  // Combine and return:
-  return BaseContext::opt_->combineCosts(BaseContext::opt_->combineCosts(startToCorner, obsEdge),
-                                         otherCornerToGoal);
+  // Combine and return.
+  return optimizationObjective_->combineCosts(
+      optimizationObjective_->combineCosts(startToCorner, centreSquareEdge), goalToCorner);
 }
 
 void CentreSquare::setTarget(double targetSpecifier) {
-  BaseContext::opt_->setCostThreshold(
-      ompl::base::Cost(targetSpecifier * this->getOptimum().value()));
+  optimizationObjective_->setCostThreshold(
+      ompl::base::Cost(targetSpecifier * this->computeOptimum().value()));
 }
 
 std::string CentreSquare::lineInfo() const {
   std::stringstream rval;
 
-  rval << "Obstacle width: " << obsWidth_ << ".";
+  rval << "Obstacle width: " << centreSquare_->getWidths().at(0) << ".";
 
   return rval.str();
 }
 
 std::string CentreSquare::paraInfo() const {
   return std::string();
+}
+
+double CentreSquare::getWidth() const {
+  return centreSquare_->getWidths().at(0);
+}
+
+std::vector<double> CentreSquare::getMidpoint() const {
+  std::vector<double> coordinates{};
+  for (std::size_t i = 0; i < dimensionality_; ++i) {
+    std::cout << (*midpoint_)[i] << '\n';
+    coordinates.emplace_back((*midpoint_)[i]);
+  }
+  return coordinates;
 }
 
 void CentreSquare::accept(const ContextVisitor& visitor) const {

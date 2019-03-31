@@ -47,22 +47,12 @@ namespace esp {
 
 namespace ompltools {
 
-BinaryMap::BinaryMap(ompl::base::SpaceInformation* si, const double obsThreshold,
-                     const std::string& fullCsvFileName, const bool plotCsv,
-                     const bool flipCsvRows /*= false*/,
-                     const std::string& fullPngFileName /*= ""*/) :
-    BaseObstacle(si),
-    threshold_(obsThreshold),
-    csvFile_(fullCsvFileName),
-    pngFile_(fullPngFileName),
-    plotCsv_(plotCsv) {
-  this->construct(flipCsvRows);
-}
 BinaryMap::BinaryMap(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
                      const std::string& fullCsvFileName, const bool plotCsv,
                      const bool flipCsvRows /*= false*/,
                      const std::string& fullPngFileName /*= ""*/) :
-    BaseObstacle(si),
+    BaseObstacle(),
+    spaceInfo_(si),
     threshold_(obsThreshold),
     csvFile_(fullCsvFileName),
     pngFile_(fullPngFileName),

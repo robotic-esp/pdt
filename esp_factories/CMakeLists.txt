@@ -7,7 +7,6 @@ find_package(ompl REQUIRED)
 # Include necessary header directories.
 include_directories(
   ${OMPL_INCLUDE_DIRS}
-  ${NLOHMANN_JSON_INCLUDE_BUILD_DIR}
   ${PROJECT_SOURCE_DIR}/include)
 
 # Build the library.
@@ -17,8 +16,6 @@ add_library(esp_factories
 
 # Link the library.
 target_link_libraries(esp_factories
-  PRIVATE # Libraries not exposed in API.
-  nlohmann_json::nlohmann_json
   PUBLIC # Libraries exposed in API.
   ${OMPL_LIBRARIES}
   esp_common

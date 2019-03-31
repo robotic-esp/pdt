@@ -45,6 +45,7 @@
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/StateSpace.h>
+#include <ompl/datastructures/NearestNeighborsGNAT.h>
 #include <ompl/util/Console.h>
 #include <ompl/util/Exception.h>
 
@@ -111,7 +112,7 @@ class BaseContext {
   virtual bool knowsOptimum() const = 0;
 
   /** \brief Returns the global optimum if known, otherwise throws. */
-  virtual ompl::base::Cost getOptimum() const = 0;
+  virtual ompl::base::Cost computeOptimum() const = 0;
 
   /** \brief Set the target cost. How this is defined depends on the specific experiment. */
   virtual void setTarget(double targetSpecifier) = 0;
@@ -126,13 +127,13 @@ class BaseContext {
   /** \brief The context name */
   std::string name_{"UnnamedContext"};
   /** \brief The problem dimension */
-  unsigned int dim_{0u};
+  unsigned int dimensionality_{0u};
   /** \brief The problem limits */
-  std::vector<std::pair<double, double>> limits_{};
+  std::vector<std::pair<double, double>> bounds_{};
   /** \brief The space information for the experiment */
-  ompl::base::SpaceInformationPtr si_{};
+  ompl::base::SpaceInformationPtr spaceInfo_{};
   /** \brief The optimization objective */
-  ompl::base::OptimizationObjectivePtr opt_{};
+  ompl::base::OptimizationObjectivePtr optimizationObjective_{};
   /** \brief The runtime for the experiment */
   time::Duration targetDuration_{};
   /** \brief The start states */

@@ -32,45 +32,46 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Marlin Strub
 
 #pragma once
 
-#include "esp_obstacles/hyperrectangles.h"
-#include "esp_planning_contexts/base_context.h"
+#include <memory>
+#include <utility>
+
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/StateValidityChecker.h>
+#include <ompl/datastructures/NearestNeighborsGNAT.h>
+
+#include "esp_obstacles/base_obstacle.h"
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief An with 2 starts, 3 goals and random obstacles. */
-class MultiStartGoal : public BaseContext {
+class ContextValidityChecker : public ompl::base::StateValidityChecker {
  public:
-  /** \brief Constructor. */
-  MultiStartGoal(const unsigned int dim, const unsigned int numObs, const double obsRatio,
-                 const double runSeconds, const double checkResolution);
+  ContextValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo);
+  virtual ~ContextValidityChecker() = default;
 
-  /** \brief This problem \e does \e not know its optimum */
-  virtual bool knowsOptimum() const;
+  // Check if a state is valid.
+  virtual bool isValid(const ompl::base::State* state) const override;
 
-  /** \brief As the optimum is unknown, throw. */
-  virtual ompl::base::Cost getOptimum() const;
+  // Add obstacles.
+  virtual void addObstacle(const std::shared_ptr<const BaseObstacle>& obstacle);
+  virtual void addObstacles(const std::vector<std::shared_ptr<const BaseObstacle>>& obstacles);
 
-  /** \brief Set the optimization target as the specified cost. */
-  virtual void setTarget(double targetSpecifier);
+  // Add antiobstacles.
+  virtual void addAntiObstacle(const std::shared_ptr<const BaseAntiObstacle>& anti);
+  virtual void addAntiObstacles(const std::vector<std::shared_ptr<const BaseAntiObstacle>>& antis);
 
-  /** \brief Derived class specific information to include in the title line. */
-  virtual std::string lineInfo() const;
-
-  /** \brief Derived class specific information to include at the end. */
-  virtual std::string paraInfo() const;
-
-  virtual void accept(const ContextVisitor& visitor) const;
+  // Make obstacles accessible.
+  virtual std::vector<std::shared_ptr<const BaseObstacle>> getObstacles() const;
+  virtual std::vector<std::shared_ptr<const BaseAntiObstacle>> getAntiObstacles() const;
 
  protected:
-  // Variables
-  /** \brief The obstacle world */
-  std::shared_ptr<Hyperrectangles> rectObs_{};
+  std::vector<std::shared_ptr<const BaseObstacle>> obstacles_{};
+  std::vector<std::shared_ptr<const BaseAntiObstacle>> antiObstacles_{};
 };
 
 }  // namespace ompltools

@@ -34,54 +34,13 @@
 
 /* Authors: Jonathan Gammell */
 
-#pragma once
+#include "esp_obstacles/hyperrectangle.h"
 
-#include "esp_obstacles/hyperrectangles.h"
-#include "esp_planning_contexts/base_context.h"
+#include <functional>
 
 namespace esp {
 
 namespace ompltools {
-
-/** \brief An experiment with a singularly placed square obstacle*/
-class RandomRectangles : public BaseContext {
- public:
-  /** \brief Constructor. */
-  RandomRectangles(const unsigned int dim, const unsigned int numObs, const double obsRatio,
-                   const double runSeconds, const double checkResolution);
-
-  /** \brief This problem \e does \e not know its optimum */
-  virtual bool knowsOptimum() const;
-
-  /** \brief As the optimum is unknown, throw. */
-  virtual ompl::base::Cost getOptimum() const;
-
-  /** \brief Set the optimization target as the specified cost. */
-  virtual void setTarget(double targetSpecifier);
-
-  /** \brief Derived class specific information to include in the title line. */
-  virtual std::string lineInfo() const;
-
-  /** \brief Derived class specific information to include at the end. */
-  virtual std::string paraInfo() const;
-
-  virtual void accept(const ContextVisitor& visitor) const;
-
- protected:
-  // Variables
-  /** \brief The obstacle world */
-  std::shared_ptr<Hyperrectangles> rectObs_{};
-  /** \brief The lower-left corner of an obstacle half-way between the start and goal */
-  std::shared_ptr<ompl::base::ScopedState<>> sightLineObs_{};
-
-  // Constant Parameters
-  /** \brief The start position */
-  double startPos_{-0.5};
-  /** \brief The goal position */
-  double goalPos_{0.5};
-  /** \brief The mean obstacle width*/
-  double meanObsWidth_{0.0};
-};
 
 }  // namespace ompltools
 

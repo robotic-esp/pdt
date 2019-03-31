@@ -44,7 +44,6 @@
 #pragma GCC diagnostic ignored "-Wuninitialized"
 #include <Eigen/Core>
 #pragma GCC diagnostic pop
-#pragma GCC diagnostic pop
 
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/StateValidityChecker.h>
@@ -81,6 +80,7 @@ class BinaryMap : public BaseObstacle {
                 std::vector<std::vector<double> >* data);
 
   // Variables
+  ompl::base::SpaceInformationPtr spaceInfo_;
   /// \brief The cost threshold
   double threshold_{0.0};
   /// \brief The csv file of costs

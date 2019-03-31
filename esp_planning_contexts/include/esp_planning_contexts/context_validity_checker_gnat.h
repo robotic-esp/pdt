@@ -32,45 +32,47 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Jonathan Gammell, Marlin Strub
 
 #pragma once
 
 #include <memory>
-#include <vector>
+#include <utility>
+
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/datastructures/NearestNeighborsGNAT.h>
 
 #include "esp_obstacles/base_obstacle.h"
+#include "esp_planning_contexts/context_validity_checker.h"
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief A world consisting of obstacles defined by obstacles and "anti-obstacles". A state is in
- * collision if it is in an obstacle and not in an anti-obstacle. */
-class CutoutObstacles : public BaseObstacle {
+class ContextValidityCheckerGNAT : public ContextValidityChecker {
  public:
-  CutoutObstacles(ompl::base::SpaceInformation* si);
-  CutoutObstacles(const ompl::base::SpaceInformationPtr& si);
-  virtual ~CutoutObstacles() = default;
+  ContextValidityCheckerGNAT(const ompl::base::SpaceInformationPtr& spaceInfo);
+  ~ContextValidityCheckerGNAT() = default;
 
-  /** \brief Check for state validity */
-  bool isValid(const ompl::base::State* state) const override;
+  // Check if a state is valid.
+  virtual bool isValid(const ompl::base::State* state) const override;
 
-  /** \brief Add an obstacle to the obstacle space */
-  void addObstacle(const std::shared_ptr<BaseObstacle>& newObstaclePtr);
+  // Add obstacles.
+  virtual void addObstacle(const std::shared_ptr<const BaseObstacle>& obstacle) override;
+  virtual void addObstacles(
+      const std::vector<std::shared_ptr<const BaseObstacle>>& obstacles) override;
 
-  /** \brief Add an anti-obstacle to the obstacle space */
-  void addAntiObstacle(const std::shared_ptr<BaseObstacle>& newAntiObstaclePtr);
-
-  // Implement accepting a visitor.
-  virtual void accept(const ObstacleVisitor& visitor) const override;
+  // Add antiobstacles.
+  virtual void addAntiObstacle(const std::shared_ptr<const BaseAntiObstacle>& anti) override;
+  virtual void addAntiObstacles(
+      const std::vector<std::shared_ptr<const BaseAntiObstacle>>& antis) override;
 
  private:
-  /** \brief A vector of obstacles */
-  std::vector<std::shared_ptr<BaseObstacle>> obstaclePtrs_{};
-
-  /** \brief A vector of anti-obstacles */
-  std::vector<std::shared_ptr<BaseObstacle>> antiObstaclePtrs_{};
+  double maxObstacleRadius_{0.0};
+  double maxAntiObstacleRadius_{0.0};
+  ompl::NearestNeighborsGNAT<std::pair<std::size_t, const ompl::base::State*>> obstacleAnchors_{};
+  ompl::NearestNeighborsGNAT<std::pair<std::size_t, const ompl::base::State*>>
+      antiObstacleAnchors_{};
 };
 
 }  // namespace ompltools

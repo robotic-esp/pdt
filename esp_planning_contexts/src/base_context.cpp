@@ -36,6 +36,10 @@
 
 #include "esp_planning_contexts/base_context.h"
 
+#include <algorithm>
+
+#include <ompl/base/spaces/RealVectorStateSpace.h>
+
 namespace esp {
 
 namespace ompltools {
@@ -44,17 +48,17 @@ BaseContext::BaseContext(const unsigned int dim,
                          const std::vector<std::pair<double, double>> limits,
                          const double runSeconds, std::string name) :
     name_(name),
-    dim_(dim),
-    limits_(limits),
+    dimensionality_(dim),
+    bounds_(limits),
     targetDuration_(time::seconds(runSeconds)) {
 }
 
 ompl::base::SpaceInformationPtr BaseContext::getSpaceInformation() const {
-  return si_;
+  return spaceInfo_;
 }
 
 ompl::base::StateSpacePtr BaseContext::getStateSpace() const {
-  return si_->getStateSpace();
+  return spaceInfo_->getStateSpace();
 }
 
 ompl::base::ProblemDefinitionPtr BaseContext::newProblemDefinition() const {
@@ -62,10 +66,10 @@ ompl::base::ProblemDefinitionPtr BaseContext::newProblemDefinition() const {
   // The problem definition
   ompl::base::ProblemDefinitionPtr pdef;
   // Allocate
-  pdef = std::make_shared<ompl::base::ProblemDefinition>(si_);
+  pdef = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
 
   // Store the optimization objective
-  pdef->setOptimizationObjective(opt_);
+  pdef->setOptimizationObjective(optimizationObjective_);
 
   // Add the start state(s)
   for (unsigned int i = 0u; i < startStates_.size(); ++i) {
@@ -80,7 +84,7 @@ ompl::base::ProblemDefinitionPtr BaseContext::newProblemDefinition() const {
 }
 
 ompl::base::OptimizationObjectivePtr BaseContext::getOptimizationObjective() const {
-  return opt_;
+  return optimizationObjective_;
 }
 
 time::Duration BaseContext::getTargetDuration() const {
@@ -104,21 +108,21 @@ std::string BaseContext::getName() const {
 }
 
 std::vector<std::pair<double, double>> BaseContext::getLimits() const {
-  return limits_;
+  return bounds_;
 }
 
 unsigned int BaseContext::getDimensions() const {
-  return dim_;
+  return dimensionality_;
 }
 
 ompl::base::Cost BaseContext::getMinimum() const {
   // Return the minimum of each start to the goal
-  ompl::base::Cost minCost = opt_->infiniteCost();
+  ompl::base::Cost minCost = optimizationObjective_->infiniteCost();
 
   // Iterate over the list of starts:
   for (unsigned int i = 0u; i < startStates_.size(); ++i) {
     // Store the best cost to go from this start
-    minCost = opt_->betterCost(
+    minCost = optimizationObjective_->betterCost(
         minCost, ompl::base::goalRegionCostToGo(startStates_.at(i).get(), goalPtr_.get()));
   }
 
@@ -126,27 +130,26 @@ ompl::base::Cost BaseContext::getMinimum() const {
 }
 
 void BaseContext::print(const bool verbose /* == false */) const {
-  std::cout << name_ << " in R^" << dim_
-            << ". runtime: " << time::seconds(targetDuration_)
-            << ". target: " << opt_->getCostThreshold();
+  std::cout << name_ << " in R^" << dimensionality_ << ". runtime: " << time::seconds(targetDuration_)
+            << ". target: " << optimizationObjective_->getCostThreshold();
   if (this->knowsOptimum()) {
-    std::cout << " (opt: " << this->getOptimum() << ")";
+    std::cout << " (opt: " << this->computeOptimum() << ")";
   }
   // No else
-  std::cout << ". map: (" << limits_.at(0u).first << ", " << limits_.at(0u).second << "). "
+  std::cout << ". map: (" << bounds_.at(0u).first << ", " << bounds_.at(0u).second << "). "
             << this->lineInfo() << std::endl;
 
   if (verbose == true) {
     std::cout << "starts =" << std::endl;
     for (unsigned int i = 0u; i < startStates_.size(); ++i) {
       std::cout << "    [" << startStates_.at(i)[0u] << ", " << startStates_.at(i)[1u] << ", ..."
-                << startStates_.at(i)[dim_ - 1u] << "]" << std::endl;
+                << startStates_.at(i)[dimensionality_ - 1u] << "]" << std::endl;
     }
 
     std::cout << "goals =" << std::endl;
     for (unsigned int i = 0u; i < goalStates_.size(); ++i) {
       std::cout << "    [" << goalStates_.at(i)[0u] << ", " << goalStates_.at(i)[1u] << ", ..."
-                << goalStates_.at(i)[dim_ - 1u] << "]" << std::endl;
+                << goalStates_.at(i)[dimensionality_ - 1u] << "]" << std::endl;
     }
 
     std::cout << this->paraInfo();

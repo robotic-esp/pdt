@@ -26,11 +26,12 @@ add_library(esp_configuration
 
 # Link the library.
 target_link_libraries(esp_configuration
+  PRIVATE # Libraries not exposed in API.
+  nlohmann_json::nlohmann_json
   PUBLIC # Libraries exposed in API.
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
   stdc++fs
-  nlohmann_json::nlohmann_json
   esp_time)
 
 # Specify the include directories exported by this library.

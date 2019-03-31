@@ -181,23 +181,6 @@ void Configuration::load(int argc, char **argv) {
   }
 }
 
-const json::json &Configuration::getExperimentConfig() const {
-  if (parameters_.count("Experiment") == 0) {
-    throw std::runtime_error("Requested configuration for experiment, but none exists.");
-  }
-  if (accessedParameters_.count("Experiment") != 0) {
-    if (accessedParameters_["Experiment"] != parameters_["Experiment"]) {
-      OMPL_ERROR(
-          "Experiment parameters have changed during execution. Results might not be "
-          "reproducable.");
-      throw std::runtime_error("Reproducibility error.");
-    }
-  } else {
-    accessedParameters_["Experiment"] = parameters_["Experiment"];
-  }
-  return parameters_["Experiment"];
-}
-
 bool Configuration::contains(const std::string &key) const {
   return contains(key, parameters_);
 }

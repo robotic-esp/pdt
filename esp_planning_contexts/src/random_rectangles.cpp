@@ -58,96 +58,90 @@ RandomRectangles::RandomRectangles(const unsigned int dim, const unsigned int nu
                 std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
                 runSeconds, "RandRect") {
   // Variable
-  // The state space
-  std::shared_ptr<ompl::base::RealVectorStateSpace> ss;
-  // The problem bounds
-  ompl::base::RealVectorBounds problemBounds(BaseContext::dim_);
   // The width of the sightline obstacle
   double sightLineWidth;
   // The measure of obstacles
   double obsMeasure;
 
-  // Make the state space Rn:
-  ss = std::make_shared<ompl::base::RealVectorStateSpace>(BaseContext::dim_);
+  // Create a state space with appropriate bounds.
+  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dim_);
+  stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
 
-  // Create the space information class:
-  BaseContext::si_ = std::make_shared<ompl::base::SpaceInformation>(ss);
+  // Reset the space information to this new space.
+  si_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+
+  // Setup the nearest neighbor structure to hold obstacles.
+  obstacles_ = std::make_shared<ompl::NearestNeighborsGNAT<Hyperrectangle>>();
+
 
   // Allocate the obstacle world
-  rectObs_ = std::make_shared<Hyperrectangles>(BaseContext::si_, false);
-
-  // Set the problem bounds:
-  problemBounds.setLow(BaseContext::limits_.at(0u).first);
-  problemBounds.setHigh(BaseContext::limits_.at(0u).second);
-
-  // Store the problem bounds:
-  ss->setBounds(problemBounds);
+  rectObs_ = std::make_shared<Hyperrectangles>(si_, false);
 
   // Set the validity checker and checking resolution
-  BaseContext::si_->setStateValidityChecker(
+  si_->setStateValidityChecker(
       static_cast<ompl::base::StateValidityCheckerPtr>(rectObs_));
-  BaseContext::si_->setStateValidityCheckingResolution(checkResolution);
+  si_->setStateValidityCheckingResolution(checkResolution);
 
   // Call setup!
-  BaseContext::si_->setup();
+  si_->setup();
 
   // Allocate the optimization objective
-  BaseContext::opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(BaseContext::si_);
+  opt_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(si_);
 
   // Set the heuristic to the default:
-  BaseContext::opt_->setCostToGoHeuristic(
+  opt_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
   // Create my start:
   // Create a start state on the vector:
-  BaseContext::startStates_.push_back(ompl::base::ScopedState<>(ss));
+  startStates_.push_back(ompl::base::ScopedState<>(stateSpace));
 
   // Assign to each component
-  BaseContext::startStates_.back()[0u] = startPos_;
-  for (unsigned int j = 1u; j < BaseContext::dim_; ++j) {
-    BaseContext::startStates_.back()[j] = 0.0;
+  startStates_.back()[0u] = startPos_;
+  for (unsigned int j = 1u; j < dim_; ++j) {
+    startStates_.back()[j] = 0.0;
   }
 
   // Create my goal:
   // Create a goal state on the vector:
-  BaseContext::goalStates_.push_back(ompl::base::ScopedState<>(ss));
+  goalStates_.push_back(ompl::base::ScopedState<>(stateSpace));
 
   // Assign to each component
-  BaseContext::goalStates_.back()[0u] = goalPos_;
-  for (unsigned int j = 1u; j < BaseContext::dim_; ++j) {
-    BaseContext::goalStates_.back()[j] = 0.0;
+  goalStates_.back()[0u] = goalPos_;
+  for (unsigned int j = 1u; j < dim_; ++j) {
+    goalStates_.back()[j] = 0.0;
   }
 
   // Allocate the goal:
-  BaseContext::goalPtr_ = std::make_shared<ompl::base::GoalState>(BaseContext::si_);
+  goalPtr_ = std::make_shared<ompl::base::GoalState>(si_);
 
   // Add
-  BaseContext::goalPtr_->as<ompl::base::GoalState>()->setState(BaseContext::goalStates_.back());
+  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
 
   // Calculate the minimum and maximum radius of the obstacles:
   // First, calculate the desired obstacle volume of the problem:
-  obsMeasure = obsRatio * BaseContext::si_->getSpaceMeasure();
+  obsMeasure = obsRatio * si_->getSpaceMeasure();
 
   // Then, calculate the mean radius necessary to get the desired obstacle volume with the desired
   // number of obstacles:
-  meanObsWidth_ = std::pow(obsMeasure / static_cast<double>(numObs), 1.0 / BaseContext::dim_);
+  meanObsWidth_ = std::pow(obsMeasure / static_cast<double>(numObs), 1.0 / dim_);
 
   // And then the sightline width.  The min is here to make sure we don't swallow either the start
   // or goal
-  sightLineWidth = std::min(BaseContext::getMinimum().value() / 7.5, meanObsWidth_);
+  sightLineWidth = std::min(getMinimum().value() / 7.5, meanObsWidth_);
 
   // Set the sight-line obstacle's lower-left corner:
-  sightLineObs_ = std::make_shared<ompl::base::ScopedState<>>(ss);
-  for (unsigned int i = 0u; i < BaseContext::dim_; ++i) {
+  sightLineObs_ = std::make_shared<ompl::base::ScopedState<>>(stateSpace);
+  for (unsigned int i = 0u; i < dim_; ++i) {
     (*sightLineObs_)[i] =
-        (BaseContext::goalStates_.back()[i] + BaseContext::startStates_.back()[i]) / 2.0 -
+        (goalStates_.back()[i] + startStates_.back()[i]) / 2.0 -
         0.5 * sightLineWidth;
   }
 
   // Add the obstacle.:
   rectObs_->addObstacle(
-      std::make_pair(sightLineObs_->get(), std::vector<double>(BaseContext::dim_, sightLineWidth)));
+      std::make_pair(sightLineObs_->get(), std::vector<double>(dim_, sightLineWidth)));
 
   // Create a random set of obstacles
   if (obsRatio > 0.0) {
@@ -155,14 +149,14 @@ RandomRectangles::RandomRectangles(const unsigned int dim, const unsigned int nu
     std::vector<ompl::base::ScopedState<>> tVec;
 
     // Copy into
-    tVec.insert(tVec.end(), BaseContext::startStates_.begin(), BaseContext::startStates_.end());
-    tVec.insert(tVec.end(), BaseContext::goalStates_.begin(), BaseContext::goalStates_.end());
+    tVec.insert(tVec.end(), startStates_.begin(), startStates_.end());
+    tVec.insert(tVec.end(), goalStates_.begin(), goalStates_.end());
 
     rectObs_->randomize(0.50 * meanObsWidth_, 1.5 * meanObsWidth_, obsRatio, tVec);
   }
 
   // Finally specify the optimization target:
-  BaseContext::opt_->setCostThreshold(BaseContext::getMinimum());
+  opt_->setCostThreshold(getMinimum());
 }
 
 bool RandomRectangles::knowsOptimum() const {
@@ -170,11 +164,11 @@ bool RandomRectangles::knowsOptimum() const {
 }
 
 ompl::base::Cost RandomRectangles::getOptimum() const {
-  throw ompl::Exception("The global optimum is unknown", BaseContext::name_);
+  throw ompl::Exception("The global optimum is unknown", name_);
 }
 
 void RandomRectangles::setTarget(double targetSpecifier) {
-  BaseContext::opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
+  opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
 }
 
 std::string RandomRectangles::lineInfo() const {

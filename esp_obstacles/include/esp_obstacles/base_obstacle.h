@@ -36,30 +36,70 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
+#include <ompl/base/ScopedState.h>
 #include <ompl/base/SpaceInformation.h>
-#include <ompl/base/StateValidityChecker.h>
 
 #include "esp_obstacles/obstacle_visitor.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
 
 namespace esp {
 
 namespace ompltools {
 
-// The base class for obstacles. This is a wrapper arround OMPL's state validity checker that
-// accepts visitors.
-class BaseObstacle : public ompl::base::StateValidityChecker {
+// Obstacles are geometric primitives.
+class GeometricShape {
  public:
-  BaseObstacle(ompl::base::SpaceInformation* si);
-  BaseObstacle(const ompl::base::SpaceInformationPtr& si);
-  virtual ~BaseObstacle() = default;
+  GeometricShape(const ompl::base::SpaceInformationPtr& spaceInfo);
+  virtual ~GeometricShape() = default;
+
+  // Set the anchor point for this shape.
+  virtual void setAnchor(const ompl::base::ScopedState<>& state);
+
+  // Get the anchor point of this shape.
+  virtual ompl::base::ScopedState<> getAnchor() const;
+
+  // Get the measure of this obstacle.
+  virtual double computeMeasure() const = 0;
+
+  // The radius of the smallest circumscribing hypersphere with center at the anchor.
+  virtual double computeMinCircumscribingRadius() const = 0;
 
   // Accept a visitor.
   virtual void accept(const ObstacleVisitor& visitor) const = 0;
+
+ protected:
+  // Whether a state is inside this shape.
+  virtual bool isInside(const ompl::base::State* state) const = 0;
+
+  // Information about the space this shape lives in.
+  ompl::base::SpaceInformationPtr spaceInfo_{};
+
+  // The anchor point.
+  ompl::base::ScopedState<> anchor_;
+};
+
+class BaseObstacle : public GeometricShape {
+ public:
+  BaseObstacle(const ompl::base::SpaceInformationPtr& spaceInfo);
+  virtual ~BaseObstacle() = default;
+
+  // Return whether this obstacle invalidates a state.
+  virtual bool invalidates(const ompl::base::State* state) const final;
+};
+
+class BaseAntiObstacle : public GeometricShape {
+ public:
+  BaseAntiObstacle(const ompl::base::SpaceInformationPtr& spaceInfo);
+  virtual ~BaseAntiObstacle() = default;
+
+  // Return whether this antiobstacle validates a state.
+  virtual bool validates(const ompl::base::State* state) const final;
 };
 
 }  // namespace ompltools
 
 }  // namespace esp
+
+#pragma GCC diagnostic pop
