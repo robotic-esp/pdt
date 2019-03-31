@@ -137,7 +137,7 @@ void InteractiveVisualizer::run() {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
   } else {
-    throw std::runtime_error("Visualizer2D cannot visualize non-2D-context.");
+    throw std::runtime_error("Interactive visualizer can currently only visualize 2D-context.");
   }
   // This sets the color used when clearing the screen.
   glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -206,7 +206,23 @@ void InteractiveVisualizer::run() {
   }
 }
 
-void InteractiveVisualizer::visit(const CentreSquare& /* centreSquare */) const {
+void InteractiveVisualizer::visit(const CentreSquare& centreSquare) const {
+  // Draw the start states.
+  glColor3fv(green);
+  glPointSize(5.0);
+  std::vector<Eigen::Vector2d> starts;
+  for (const auto& start : centreSquare.getStartStates()) {
+    starts.emplace_back(start[0], start[1]);
+  }
+  pangolin::glDrawPoints(starts);
+  // Draw the goal states.
+  glColor3fv(red);
+  std::vector<Eigen::Vector2d> goals;
+  for (const auto& goal : centreSquare.getGoalStates()) {
+    goals.emplace_back(goal[0], goal[1]);
+  }
+  pangolin::glDrawPoints(goals);
+  glPointSize(2.0);
 }
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
