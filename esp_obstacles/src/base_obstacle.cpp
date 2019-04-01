@@ -54,7 +54,12 @@ ompl::base::ScopedState<> GeometricShape::getAnchor() const {
 }
 
 std::vector<double> GeometricShape::getAnchorCoordinates() const {
-  return anchor_.reals();
+  // return anchor_.reals() ?
+  std::vector<double> coordinates(spaceInfo_->getStateSpace()->getDimension(), 0.0);
+  for (std::size_t i = 0; i < coordinates.size(); ++i) {
+    coordinates[i] = anchor_[i];
+  }
+  return coordinates;
 }
 
 BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& spaceInfo) :

@@ -16,7 +16,7 @@ add_library(esp_planning_contexts
   src/context_validity_checker.cpp
   src/context_validity_checker_gnat.cpp
   src/centre_square.cpp
-  # src/dividing_wall.cpp
+  src/dividing_walls.cpp
   # src/double_enclosure.cpp
   # src/flanking_gap.cpp
   # src/goal_enclosure.cpp

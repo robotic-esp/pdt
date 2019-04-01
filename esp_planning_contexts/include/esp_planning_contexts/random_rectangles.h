@@ -32,15 +32,17 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Jonathan Gammell, Marlin Strub
 
 #pragma once
+
+#include <ompl/util/RandomNumbers.h>
 
 #include "esp_configuration/configuration.h"
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
-#include "esp_planning_contexts/context_validity_checker.h"
+#include "esp_planning_contexts/context_validity_checker_gnat.h"
 #include "esp_planning_contexts/context_visitor.h"
 
 namespace esp {
@@ -48,10 +50,11 @@ namespace esp {
 namespace ompltools {
 
 /** \brief An experiment with a singularly placed square obstacle*/
-class CentreSquare : public BaseContext {
+class RandomRectangles : public BaseContext {
  public:
-  CentreSquare(const std::shared_ptr<const Configuration>& config, const std::string& name);
-  virtual ~CentreSquare() = default;
+  /** \brief Constructor */
+  RandomRectangles(const std::shared_ptr<const Configuration>& config, const std::string& name);
+  virtual ~RandomRectangles() = default;
 
   /** \brief Whether the problem has an exact expression for the optimum */
   virtual bool knowsOptimum() const override;
@@ -72,12 +75,19 @@ class CentreSquare : public BaseContext {
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
+  // Create the random obstacles.
+  void createObstacles();
+  
   // The validity checker.
-  std::shared_ptr<ContextValidityChecker> validityChecker_{};
+  std::shared_ptr<ContextValidityCheckerGNAT> validityChecker_{};
+
+  // The random number generator.
+  ompl::RNG rng_{};
 
   // Direct access to obstacle information.
-  std::unique_ptr<ompl::base::ScopedState<>> midpoint_{};
-  std::vector<double> widths_{};
+  std::size_t numRectangles_{};
+  double minSideLength_{};
+  double maxSideLength_{};
 
   // The start and goal positions.
   std::vector<double> startPos_{};

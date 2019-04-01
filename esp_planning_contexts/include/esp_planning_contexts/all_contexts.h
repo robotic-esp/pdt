@@ -1,6 +1,6 @@
 #include "esp_planning_contexts/base_context.h"
 #include "esp_planning_contexts/centre_square.h"
-// #include "esp_planning_contexts/dividing_wall.h"
+#include "esp_planning_contexts/dividing_walls.h"
 // #include "esp_planning_contexts/double_enclosure.h"
 // #include "esp_planning_contexts/flanking_gap.h"
 // #include "esp_planning_contexts/goal_enclosure.h"

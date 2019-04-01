@@ -120,7 +120,7 @@ unsigned int BaseContext::getDimensions() const {
   return dimensionality_;
 }
 
-ompl::base::Cost BaseContext::getMinimum() const {
+ompl::base::Cost BaseContext::computeMinPossibleCost() const {
   // Return the minimum of each start to the goal
   ompl::base::Cost minCost = optimizationObjective_->infiniteCost();
 
@@ -169,6 +169,28 @@ void BaseContext::print(const bool verbose /* == false */) const {
     std::cout << this->paraInfo();
   }
 }
+
+  void BaseContext::addStartState(const std::vector<double>& coordinates) {
+    if (coordinates.size() != dimensionality_) {
+      OMPL_ERROR("%s: Requested to add start state of wrong dimensionality.", name_.c_str());
+      throw std::runtime_error("Context error.");
+    }
+    startStates_.emplace_back(ompl::base::ScopedState<>(spaceInfo_));
+    for (std::size_t i = 0u; i < dimensionality_; ++i) {
+      startStates_.back()[i] = coordinates[i];
+    }
+  }
+
+  void BaseContext::addGoalState(const std::vector<double>& coordinates) {
+    if (coordinates.size() != dimensionality_) {
+      OMPL_ERROR("%s: Requested to add goal state of wrong dimensionality.", name_.c_str());
+      throw std::runtime_error("Context error.");
+    }
+    goalStates_.emplace_back(ompl::base::ScopedState<>(spaceInfo_));
+    for (std::size_t i = 0u; i < dimensionality_; ++i) {
+      goalStates_.back()[i] = coordinates[i];
+    }
+  }
 
 }  // namespace ompltools
 

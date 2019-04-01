@@ -123,13 +123,11 @@ template <typename T>
 bool Hyperrectangle<T>::isInside(const ompl::base::State* state) const {
   // Let's be conservative here.
   auto rstate = static_cast<const ompl::base::RealVectorStateSpace::StateType*>(state);
-  auto anchor =
-      static_cast<const ompl::base::RealVectorStateSpace::StateType*>(T::getAnchor().get());
   for (std::size_t dim = 0; dim < spaceInfo_->getStateDimension(); ++dim) {
     if (rstate->values[dim] <
-            anchor->values[dim] - widths_[dim] / 2.0 - std::numeric_limits<double>::epsilon() ||
+            T::anchor_[dim] - widths_[dim] / 2.0 - std::numeric_limits<double>::epsilon() ||
         rstate->values[dim] >
-            anchor->values[dim] + widths_[dim] / 2.0 + std::numeric_limits<double>::epsilon()) {
+            T::anchor_[dim] + widths_[dim] / 2.0 + std::numeric_limits<double>::epsilon()) {
       return false;
     }
   }

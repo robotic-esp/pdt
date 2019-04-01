@@ -103,7 +103,7 @@ class BaseContext {
   unsigned int getDimensions() const;
 
   /** \brief The global minimum that may or may not be attainable in a problem. */
-  ompl::base::Cost getMinimum() const;
+  ompl::base::Cost computeMinPossibleCost() const;
 
   // Get the obstacles.
   std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const;
@@ -113,6 +113,10 @@ class BaseContext {
 
   /** \brief Print out summary of the experiment */
   void print(const bool verbose = false) const;
+
+  void addStartState(const std::vector<double>& coordinates);
+
+  void addGoalState(const std::vector<double>& coordinates);
 
   // Accept a visitor.
   virtual void accept(const ContextVisitor& visitor) const = 0;

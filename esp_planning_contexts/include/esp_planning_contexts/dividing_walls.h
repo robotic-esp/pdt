@@ -32,34 +32,32 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Jonathan Gammell, Marlin Strub
 
 #pragma once
 
 #include "esp_configuration/configuration.h"
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
 #include "esp_planning_contexts/context_validity_checker.h"
-#include "esp_planning_contexts/context_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief An experiment with a singularly placed square obstacle*/
-class CentreSquare : public BaseContext {
+/** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
+ * a multiple homotopy-class experiment that scales to N dimensions. */
+class DividingWalls : public BaseContext {
  public:
-  CentreSquare(const std::shared_ptr<const Configuration>& config, const std::string& name);
-  virtual ~CentreSquare() = default;
+  // An odd number of gaps results in a straight line solution.
+  DividingWalls(const std::shared_ptr<const Configuration>& config, const std::string& name);
 
-  /** \brief Whether the problem has an exact expression for the optimum */
+  /** \brief This problem could knows its optimum, but doesn't at the moment */
   virtual bool knowsOptimum() const override;
 
-  /** \brief This problem knows its optimum */
+  /** \brief As the optimum isn't implemented, throw. */
   virtual ompl::base::Cost computeOptimum() const override;
 
-  /** \brief Set the target cost as the specified multiplier of the optimum. */
+  /** \brief Set the optimization target as the specified cost. */
   virtual void setTarget(double targetSpecifier) override;
 
   /** \brief Derived class specific information to include in the title line. */
@@ -72,16 +70,24 @@ class CentreSquare : public BaseContext {
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
+  // Create the obstacles.
+  void createObstacles();
+  
+  // Create the obstacles.
+  void createAntiObstacles();
+  
+  // Direct access to obstacle information.
+  std::size_t numWalls_;
+  std::vector<double> wallThicknesses_;
+  std::size_t numGaps_;
+  std::vector<double> gapWidths_;
+
   // The validity checker.
   std::shared_ptr<ContextValidityChecker> validityChecker_{};
 
-  // Direct access to obstacle information.
-  std::unique_ptr<ompl::base::ScopedState<>> midpoint_{};
-  std::vector<double> widths_{};
-
   // The start and goal positions.
-  std::vector<double> startPos_{};
-  std::vector<double> goalPos_{};
+  std::vector<double> startPos_;
+  std::vector<double> goalPos_;
 };
 
 }  // namespace ompltools

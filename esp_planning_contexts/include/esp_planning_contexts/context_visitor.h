@@ -42,7 +42,7 @@ namespace ompltools {
 
 // Forward declarations.
 class CentreSquare;
-class DividingWall;
+class DividingWalls;
 class DoubleEnclosure;
 class FlankingGap;
 class GoalEnclosure;

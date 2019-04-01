@@ -54,7 +54,7 @@ namespace ompltools {
 
 enum class CONTEXT_TYPE {
   CENTRE_SQUARE,
-  DIVIDING_WALL,
+  DIVIDING_WALLS,
   DOUBLE_ENCLOSURE,
   FLANKING_GAP,
   GOAL_ENCLOSURE,
@@ -70,7 +70,7 @@ enum class CONTEXT_TYPE {
 NLOHMANN_JSON_SERIALIZE_ENUM(CONTEXT_TYPE,
                              {
                                  {CONTEXT_TYPE::CENTRE_SQUARE, "CentreSquare"},
-                                 {CONTEXT_TYPE::DIVIDING_WALL, "DividingWall"},
+                                 {CONTEXT_TYPE::DIVIDING_WALLS, "DividingWalls"},
                                  {CONTEXT_TYPE::DOUBLE_ENCLOSURE, "DoubleEnclosure"},
                                  {CONTEXT_TYPE::FLANKING_GAP, "FlankingGap"},
                                  {CONTEXT_TYPE::GOAL_ENCLOSURE, "GoalEnclosure"},
