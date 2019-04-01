@@ -25,7 +25,7 @@ add_library(esp_planning_contexts
   src/random_rectangles.cpp
   # src/regular_rectangles.cpp
   # src/spiral.cpp
-  # src/start_enclosure.cpp
+  src/start_enclosure.cpp
   # src/wall_gap.cpp
   )
 

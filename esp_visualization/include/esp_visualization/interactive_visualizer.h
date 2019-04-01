@@ -70,10 +70,14 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   void drawStates(const std::vector<ompl::base::ScopedState<>>& states, const float* color,
                   float size) const;
 
+  // Implement visualizations of contexts.
   void visit(const CentreSquare& context) const override;
   void visit(const DividingWalls& context) const override;
   void visit(const DoubleEnclosure& context) const override;
   void visit(const RandomRectangles& context) const override;
+  void visit(const StartEnclosure& context) const override;
+
+  // Implement visualizations of obstacles.
   void visit(const Hyperrectangle<BaseObstacle>& obstacle) const override;
   void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;
 };

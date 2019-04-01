@@ -77,6 +77,15 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
             "context factory and the json file.");
       }
     }
+    case CONTEXT_TYPE::DOUBLE_ENCLOSURE: {
+      try {
+        return std::make_shared<DoubleEnclosure>(config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error(
+            "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in"
+            "the context factory and the json file.");
+      }
+    }
     case CONTEXT_TYPE::RANDOM_RECTANGLES: {
       try {
         return std::make_shared<RandomRectangles>(config_, contextName);
@@ -86,12 +95,12 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
             "the context factory and the json file.");
       }
     }
-    case CONTEXT_TYPE::DOUBLE_ENCLOSURE: {
+    case CONTEXT_TYPE::START_ENCLOSURE: {
       try {
-        return std::make_shared<DoubleEnclosure>(config_, contextName);
+        return std::make_shared<StartEnclosure>(config_, contextName);
       } catch (const json::detail::type_error& e) {
         throw std::runtime_error(
-            "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in"
+            "Error allocating a StartEnclosure context. Check the spelling of the parameters in"
             "the context factory and the json file.");
       }
     }

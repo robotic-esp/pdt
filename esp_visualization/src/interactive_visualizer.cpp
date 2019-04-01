@@ -208,32 +208,39 @@ void InteractiveVisualizer::run() {
   }
 }
 
-void InteractiveVisualizer::visit(const CentreSquare& centreSquare) const {
+void InteractiveVisualizer::visit(const CentreSquare& context) const {
   // Draw the start states.
-  drawStates(centreSquare.getStartStates(), red, 5.0);
+  drawStates(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(centreSquare.getGoalStates(), green, 5.0);
+  drawStates(context.getGoalStates(), green, 5.0);
 }
 
-void InteractiveVisualizer::visit(const DividingWalls& dividingWalls) const {
+void InteractiveVisualizer::visit(const DividingWalls& context) const {
   // Draw the start states.
-  drawStates(dividingWalls.getStartStates(), red, 5.0);
+  drawStates(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(dividingWalls.getGoalStates(), green, 5.0);
+  drawStates(context.getGoalStates(), green, 5.0);
 }
 
-void InteractiveVisualizer::visit(const DoubleEnclosure& doubleEnclosure) const {
+void InteractiveVisualizer::visit(const DoubleEnclosure& context) const {
   // Draw the start states.
-  drawStates(doubleEnclosure.getStartStates(), red, 5.0);
+  drawStates(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(doubleEnclosure.getGoalStates(), green, 5.0);
+  drawStates(context.getGoalStates(), green, 5.0);
 }
 
-void InteractiveVisualizer::visit(const RandomRectangles& randomRectangles) const {
+void InteractiveVisualizer::visit(const RandomRectangles& context) const {
   // Draw the start states.
-  drawStates(randomRectangles.getStartStates(), red, 5.0);
+  drawStates(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(randomRectangles.getGoalStates(), green, 5.0);
+  drawStates(context.getGoalStates(), green, 5.0);
+}
+
+void InteractiveVisualizer::visit(const StartEnclosure& context) const {
+  // Draw the start states.
+  drawStates(context.getStartStates(), red, 5.0);
+  // Draw the goal states.
+  drawStates(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::drawRectangle2D(const std::vector<double>& midpoint,

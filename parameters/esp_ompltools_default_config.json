@@ -113,15 +113,15 @@
         },
         "StartEnclosure": {
             "type": "StartEnclosure",
+            "start": [-0.5, 0.0],
+            "goal": [0.5, 0.0],
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
-            "startPositionX": -0.5,
-            "goalPositionX": 0.5,
             "collisionCheckResolution": 0.001,
-            "insideWidth": 0.3,
-            "wallThickness": 0.05,
-            "openingWidth": 0.1
+            "startOutsideWidth": 0.5,
+            "startInsideWidth": 0.4,
+            "startGapWidth": 0.3
         },
         "WallGap": {
             "type": "WallGap",
