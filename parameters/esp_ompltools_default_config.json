@@ -127,15 +127,16 @@
         },
         "WallGap": {
             "type": "WallGap",
+            "start": [-0.5, 0.0],
+            "goal": [0.5, 0.0],
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
-            "startPositionX": -0.5,
-            "goalPositionX": 0.5,
             "collisionCheckResolution": 0.001,
-            "gapWidth": 0.05,
-            "gapOffset": 0.05,
-            "flankWidth": 1.5
+            "wallWidth": 1.8,
+            "wallThickness": 0.2,
+            "gapOffset": 0.1,
+            "gapWidth": 0.02
         }
     },
     "Planners": {

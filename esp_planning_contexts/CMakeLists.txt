@@ -26,7 +26,7 @@ add_library(esp_planning_contexts
   # src/regular_rectangles.cpp
   # src/spiral.cpp
   src/start_enclosure.cpp
-  # src/wall_gap.cpp
+  src/wall_gap.cpp
   )
 
 # Link the library.

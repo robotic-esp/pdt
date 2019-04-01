@@ -10,4 +10,4 @@
 // #include "esp_planning_contexts/regular_rectangles.h"
 // #include "esp_planning_contexts/spiral.h"
 #include "esp_planning_contexts/start_enclosure.h"
-// #include "esp_planning_contexts/wall_gap.h"
+#include "esp_planning_contexts/wall_gap.h"

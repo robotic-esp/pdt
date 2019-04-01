@@ -122,6 +122,15 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
             "the context factory and the json file.");
       }
     }
+    case CONTEXT_TYPE::WALL_GAP: {
+      try {
+        return std::make_shared<WallGap>(config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error(
+            "Error allocating a WallGap context. Check the spelling of the parameters in"
+            "the context factory and the json file.");
+      }
+    }
     default: {
       OMPL_ERROR("Context '%s' has unknown type.", contextName.c_str());
       throw std::runtime_error("Requested to create context of unknown type at factory.");

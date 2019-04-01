@@ -257,6 +257,13 @@ void InteractiveVisualizer::visit(const StartEnclosure& context) const {
   drawStates(context.getGoalStates(), green, 5.0);
 }
 
+void InteractiveVisualizer::visit(const WallGap& context) const {
+  // Draw the start states.
+  drawStates(context.getStartStates(), red, 5.0);
+  // Draw the goal states.
+  drawStates(context.getGoalStates(), green, 5.0);
+}
+
 void InteractiveVisualizer::drawRectangle2D(const std::vector<double>& midpoint,
                                             const std::vector<double>& widths,
                                             const float* color) const {
