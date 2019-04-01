@@ -86,22 +86,15 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
             "the context factory and the json file.");
       }
     }
-    // case CONTEXT_TYPE::DOUBLE_ENCLOSURE: {
-    //   try {
-    //     return std::make_shared<DoubleEnclosure>(
-    //         config_->get<std::size_t>(parentKey + "/dimensions"),
-    //         config_->get<double>(parentKey + "/boundarySideLengths"),
-    //         config_->get<double>(parentKey + "/insideWidth"),
-    //         config_->get<double>(parentKey + "/wallThickness"),
-    //         config_->get<double>(parentKey + "/openingWidth"),
-    //         config_->get<double>(parentKey + "/maxTime"),
-    //         config_->get<double>(parentKey + "/collisionCheckResolution"));
-    //   } catch (const json::detail::type_error& e) {
-    //     throw std::runtime_error(
-    //         "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in
-    //         " "the context factory and the json file.");
-    //   }
-    // }
+    case CONTEXT_TYPE::DOUBLE_ENCLOSURE: {
+      try {
+        return std::make_shared<DoubleEnclosure>(config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error(
+            "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in"
+            "the context factory and the json file.");
+      }
+    }
     default: {
       OMPL_ERROR("Context '%s' has unknown type.", contextName.c_str());
       throw std::runtime_error("Requested to create context of unknown type at factory.");

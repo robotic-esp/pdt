@@ -48,10 +48,10 @@ namespace esp {
 namespace ompltools {
 
 /** \brief An experiment with a singularly placed square obstacle*/
-class CentreSquare : public BaseContext {
+class DoubleEnclosure : public BaseContext {
  public:
-  CentreSquare(const std::shared_ptr<const Configuration>& config, const std::string& name);
-  virtual ~CentreSquare() = default;
+  DoubleEnclosure(const std::shared_ptr<const Configuration>& config, const std::string& name);
+  virtual ~DoubleEnclosure() = default;
 
   /** \brief Whether the problem has an exact expression for the optimum */
   virtual bool knowsOptimum() const override;
@@ -72,12 +72,20 @@ class CentreSquare : public BaseContext {
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
+  // Create obstacles and antiobstacles.
+  void createObstacles();
+  void createAntiObstacles();
+
   // The validity checker.
   std::shared_ptr<ContextValidityChecker> validityChecker_{};
 
   // Direct access to obstacle information.
-  std::unique_ptr<ompl::base::ScopedState<>> midpoint_{};
-  std::vector<double> widths_{};
+  double startOutsideWidth_{0.0};
+  double startInsideWidth_{0.0};
+  double startGapWidth_{0.0};
+  double goalOutsideWidth_{0.0};
+  double goalInsideWidth_{0.0};
+  double goalGapWidth_{0.0};
 
   // The start and goal positions.
   std::vector<double> startPos_{};

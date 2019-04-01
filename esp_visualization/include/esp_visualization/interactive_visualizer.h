@@ -72,6 +72,7 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
 
   void visit(const CentreSquare& context) const override;
   void visit(const DividingWalls& context) const override;
+  void visit(const DoubleEnclosure& context) const override;
   void visit(const RandomRectangles& context) const override;
   void visit(const Hyperrectangle<BaseObstacle>& obstacle) const override;
   void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;

@@ -62,7 +62,7 @@ class ContextVisitor {
   // Any context visitor must implement its actions on all contexts.
   virtual void visit(const CentreSquare &context) const = 0;
   virtual void visit(const DividingWalls &context) const = 0;
-  // virtual void visit(const DoubleEnclosure &context) const = 0;
+  virtual void visit(const DoubleEnclosure &context) const = 0;
   // virtual void visit(const FlankingGap &context) const = 0;
   // virtual void visit(const GoalEnclosure &context) const = 0;
   // virtual void visit(const MultiStartGoal &context) const = 0;
@@ -76,7 +76,9 @@ class ContextVisitor {
   // This is only needed until all other contexts are implemented.
   // ADL should resolve to the above methods.
   template <typename C>
-  void visit(const C& /* context */) const {}
+  void visit(const C& /* context */) const {
+    OMPL_WARN("Context visitor visits unknown context.");
+  }
 };
 
 }  // namespace ompltools

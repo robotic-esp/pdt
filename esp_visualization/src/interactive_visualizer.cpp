@@ -222,6 +222,13 @@ void InteractiveVisualizer::visit(const DividingWalls& dividingWalls) const {
   drawStates(dividingWalls.getGoalStates(), green, 5.0);
 }
 
+void InteractiveVisualizer::visit(const DoubleEnclosure& doubleEnclosure) const {
+  // Draw the start states.
+  drawStates(doubleEnclosure.getStartStates(), red, 5.0);
+  // Draw the goal states.
+  drawStates(doubleEnclosure.getGoalStates(), green, 5.0);
+}
+
 void InteractiveVisualizer::visit(const RandomRectangles& randomRectangles) const {
   // Draw the start states.
   drawStates(randomRectangles.getStartStates(), red, 5.0);
