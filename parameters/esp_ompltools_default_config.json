@@ -181,6 +181,8 @@
             "useKNearest": false,
             "rewireFactor": 1.1,
             "goalBias": 0.05,
+            "variant": 0,
+            "epsilon": 0.0,
             "maxEdgeLength": {
                 "2d": 0.3,
                 "4d": 0.5,
