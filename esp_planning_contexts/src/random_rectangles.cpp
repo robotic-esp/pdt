@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Jonathan Gammell, Marlin Strub
 
 #include "esp_planning_contexts/random_rectangles.h"
 
@@ -47,135 +47,94 @@
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
+#include "esp_obstacles/hyperrectangle.h"
+
 namespace esp {
 
 namespace ompltools {
 
-RandomRectangles::RandomRectangles(const unsigned int dim, const unsigned int numObs,
-                                   const double obsRatio, const double runSeconds,
-                                   const double checkResolution) :
-    BaseContext(dim,
-                std::vector<std::pair<double, double>>(dim, std::pair<double, double>(-1.0, 1.0)),
-                runSeconds, "RandRect") {
-  // Variable
-  // The width of the sightline obstacle
-  double sightLineWidth;
-  // The measure of obstacles
-  double obsMeasure;
-
-  // Create a state space with appropriate bounds.
-  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dim_);
+RandomRectangles::RandomRectangles(const std::shared_ptr<const Configuration>& config,
+                                   const std::string& name) :
+    BaseContext(config, name),
+    numRectangles_(config->get<std::size_t>("Contexts/" + name + "/numObstacles")),
+    minSideLength_(config->get<double>("Contexts/" + name + "/minSideLength")),
+    maxSideLength_(config->get<double>("Contexts/" + name + "/maxSideLength")),
+    startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
+    goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
+  // Assert configuration sanity.
+  if (startPos_.size() != dimensionality_) {
+    OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
+               name.c_str());
+    throw std::runtime_error("Context error.");
+  }
+  if (goalPos_.size() != dimensionality_) {
+    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
+               name.c_str());
+    throw std::runtime_error("Context error.");
+  }
+  if (minSideLength_ > maxSideLength_) {
+    OMPL_ERROR("%s: Specified min side length is greater than specified max side length.",
+               name.c_str());
+    throw std::runtime_error("Context error.");
+  }
+  // Create a state space and set the bounds.
+  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
   stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
 
-  // Reset the space information to this new space.
-  si_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+  // Create the space information class:
+  spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
 
-  // Setup the nearest neighbor structure to hold obstacles.
-  obstacles_ = std::make_shared<ompl::NearestNeighborsGNAT<Hyperrectangle>>();
+  // Create the obstacles.
+  createObstacles();
 
+  // Create the validity checker and add the obstacle.
+  validityChecker_ = std::make_shared<ContextValidityCheckerGNAT>(spaceInfo_);
+  validityChecker_->addObstacles(obstacles_);
 
-  // Allocate the obstacle world
-  rectObs_ = std::make_shared<Hyperrectangles>(si_, false);
+  // Set the validity checker and the check resolution.
+  spaceInfo_->setStateValidityChecker(
+      static_cast<ompl::base::StateValidityCheckerPtr>(validityChecker_));
+  spaceInfo_->setStateValidityCheckingResolution(
+      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
 
-  // Set the validity checker and checking resolution
-  si_->setStateValidityChecker(
-      static_cast<ompl::base::StateValidityCheckerPtr>(rectObs_));
-  si_->setStateValidityCheckingResolution(checkResolution);
-
-  // Call setup!
-  si_->setup();
+  // Set up the space info.
+  spaceInfo_->setup();
 
   // Allocate the optimization objective
-  opt_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(si_);
+  optimizationObjective_ =
+      std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
 
   // Set the heuristic to the default:
-  opt_->setCostToGoHeuristic(
+  optimizationObjective_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
-  // Create my start:
-  // Create a start state on the vector:
-  startStates_.push_back(ompl::base::ScopedState<>(stateSpace));
+  // Create a start state.
+  addStartState(startPos_);
 
-  // Assign to each component
-  startStates_.back()[0u] = startPos_;
-  for (unsigned int j = 1u; j < dim_; ++j) {
-    startStates_.back()[j] = 0.0;
-  }
-
-  // Create my goal:
-  // Create a goal state on the vector:
-  goalStates_.push_back(ompl::base::ScopedState<>(stateSpace));
-
-  // Assign to each component
-  goalStates_.back()[0u] = goalPos_;
-  for (unsigned int j = 1u; j < dim_; ++j) {
-    goalStates_.back()[j] = 0.0;
-  }
-
-  // Allocate the goal:
-  goalPtr_ = std::make_shared<ompl::base::GoalState>(si_);
-
-  // Add
+  // Create a goal state.
+  addGoalState(goalPos_);
+  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
   goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
 
-  // Calculate the minimum and maximum radius of the obstacles:
-  // First, calculate the desired obstacle volume of the problem:
-  obsMeasure = obsRatio * si_->getSpaceMeasure();
-
-  // Then, calculate the mean radius necessary to get the desired obstacle volume with the desired
-  // number of obstacles:
-  meanObsWidth_ = std::pow(obsMeasure / static_cast<double>(numObs), 1.0 / dim_);
-
-  // And then the sightline width.  The min is here to make sure we don't swallow either the start
-  // or goal
-  sightLineWidth = std::min(getMinimum().value() / 7.5, meanObsWidth_);
-
-  // Set the sight-line obstacle's lower-left corner:
-  sightLineObs_ = std::make_shared<ompl::base::ScopedState<>>(stateSpace);
-  for (unsigned int i = 0u; i < dim_; ++i) {
-    (*sightLineObs_)[i] =
-        (goalStates_.back()[i] + startStates_.back()[i]) / 2.0 -
-        0.5 * sightLineWidth;
-  }
-
-  // Add the obstacle.:
-  rectObs_->addObstacle(
-      std::make_pair(sightLineObs_->get(), std::vector<double>(dim_, sightLineWidth)));
-
-  // Create a random set of obstacles
-  if (obsRatio > 0.0) {
-    // A temporary vector
-    std::vector<ompl::base::ScopedState<>> tVec;
-
-    // Copy into
-    tVec.insert(tVec.end(), startStates_.begin(), startStates_.end());
-    tVec.insert(tVec.end(), goalStates_.begin(), goalStates_.end());
-
-    rectObs_->randomize(0.50 * meanObsWidth_, 1.5 * meanObsWidth_, obsRatio, tVec);
-  }
-
-  // Finally specify the optimization target:
-  opt_->setCostThreshold(getMinimum());
+  // Specify the optimization target.
+  optimizationObjective_->setCostThreshold(computeMinPossibleCost());
 }
 
 bool RandomRectangles::knowsOptimum() const {
   return false;
 }
 
-ompl::base::Cost RandomRectangles::getOptimum() const {
-  throw ompl::Exception("The global optimum is unknown", name_);
+ompl::base::Cost RandomRectangles::computeOptimum() const {
+  throw ompl::Exception("The global optimum is unknown.", BaseContext::name_);
 }
 
 void RandomRectangles::setTarget(double targetSpecifier) {
-  opt_->setCostThreshold(ompl::base::Cost(targetSpecifier));
+  optimizationObjective_->setCostThreshold(
+      ompl::base::Cost(targetSpecifier * this->computeOptimum().value()));
 }
 
 std::string RandomRectangles::lineInfo() const {
   std::stringstream rval;
-
-  rval << " #Obs: " << rectObs_->getObstacles().size() << ". Widths ~ [" << 0.5 * meanObsWidth_
-       << ", " << 1.5 * meanObsWidth_ << "].";
 
   return rval.str();
 }
@@ -186,6 +145,22 @@ std::string RandomRectangles::paraInfo() const {
 
 void RandomRectangles::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
+}
+
+void RandomRectangles::createObstacles() {
+  for (std::size_t i = 0; i < numRectangles_; ++i) {
+    // Create a random midpoint (uniform).
+    ompl::base::ScopedState<> midpoint(spaceInfo_);
+    midpoint.random();
+    // Create random widths (uniform).
+    std::vector<double> widths(dimensionality_, 0.0);
+    for (std::size_t j = 0; j < dimensionality_; ++j) {
+      widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
+    }
+    // Add to the obstacles.
+    obstacles_.emplace_back(
+        std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths));
+  }
 }
 
 }  // namespace ompltools

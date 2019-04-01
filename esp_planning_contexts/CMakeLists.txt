@@ -22,7 +22,7 @@ add_library(esp_planning_contexts
   # src/goal_enclosure.cpp
   # src/multi_start_goal.cpp
   # src/obstacle_free.cpp
-  # src/random_rectangles.cpp
+  src/random_rectangles.cpp
   # src/regular_rectangles.cpp
   # src/spiral.cpp
   # src/start_enclosure.cpp

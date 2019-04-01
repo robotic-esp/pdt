@@ -53,6 +53,10 @@ ompl::base::ScopedState<> GeometricShape::getAnchor() const {
   return anchor_;
 }
 
+const ompl::base::State* GeometricShape::getState() const {
+  return anchor_.get();
+}
+
 std::vector<double> GeometricShape::getAnchorCoordinates() const {
   // return anchor_.reals() ?
   std::vector<double> coordinates(spaceInfo_->getStateSpace()->getDimension(), 0.0);

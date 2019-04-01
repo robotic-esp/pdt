@@ -56,6 +56,9 @@ ContextValidityCheckerGNAT::ContextValidityCheckerGNAT(
 }
 
 bool ContextValidityCheckerGNAT::isValid(const ompl::base::State* state) const {
+  if (!state) {
+    throw std::runtime_error("ContextValidityCheckerGNAT recieved nullptr state.");
+  }
   // If the state does not satisfy the space bounds, it is not valid.
   if (!si_->satisfiesBounds(state)) {
     return false;
@@ -101,7 +104,7 @@ void ContextValidityCheckerGNAT::addObstacle(const std::shared_ptr<BaseObstacle>
     maxObstacleRadius_ = circumscribingRadius;
   }
   obstacles_.push_back(obstacle);
-  obstacleAnchors_.add(std::make_pair(obstacles_.size() - 1u, obstacle->getAnchor().get()));
+  obstacleAnchors_.add(std::make_pair(obstacles_.size() - 1u, obstacle->getState()));
 }
 
 void ContextValidityCheckerGNAT::addObstacles(
@@ -115,7 +118,7 @@ void ContextValidityCheckerGNAT::addObstacles(
       maxObstacleRadius_ = circumscribingRadius;
     }
     obstacles_.push_back(obstacle);
-    obstacleAnchors_.add(std::make_pair(obstacles_.size() - 1u, obstacle->getAnchor().get()));
+    obstacleAnchors_.add(std::make_pair(obstacles_.size() - 1u, obstacle->getState()));
   }
 }
 
@@ -125,7 +128,7 @@ void ContextValidityCheckerGNAT::addAntiObstacle(const std::shared_ptr<BaseAntiO
     maxAntiObstacleRadius_ = circumscribingRadius;
   }
   antiObstacles_.push_back(anti);
-  antiObstacleAnchors_.add(std::make_pair(antiObstacles_.size() - 1u, anti->getAnchor().get()));
+  antiObstacleAnchors_.add(std::make_pair(antiObstacles_.size() - 1u, anti->getState()));
 }
 
 void ContextValidityCheckerGNAT::addAntiObstacles(
@@ -137,7 +140,7 @@ void ContextValidityCheckerGNAT::addAntiObstacles(
       maxAntiObstacleRadius_ = circumscribingRadius;
     }
     antiObstacles_.push_back(anti);
-    antiObstacleAnchors_.add(std::make_pair(antiObstacles_.size() - 1u, anti->getAnchor().get()));
+    antiObstacleAnchors_.add(std::make_pair(antiObstacles_.size() - 1u, anti->getState()));
   }
 }
 
