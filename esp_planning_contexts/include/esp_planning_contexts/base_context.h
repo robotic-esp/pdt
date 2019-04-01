@@ -49,6 +49,7 @@
 #include <ompl/util/Console.h>
 #include <ompl/util/Exception.h>
 
+#include "esp_configuration/configuration.h"
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_time/time.h"
@@ -60,8 +61,7 @@ namespace ompltools {
 /** \brief The base class for an experiment */
 class BaseContext {
  public:
-  BaseContext(const unsigned int dim, const std::vector<std::pair<double, double>> limits,
-              const double runSeconds, std::string name);
+  BaseContext(const std::shared_ptr<const Configuration>& config, const std::string& name);
 
   // Use default virtual destructor.
   virtual ~BaseContext() = default;

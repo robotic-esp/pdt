@@ -61,9 +61,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
   switch (type) {
     case CONTEXT_TYPE::CENTRE_SQUARE: {
       try {
-        auto context = std::make_shared<CentreSquare>(config_);
-        context->setName(contextName);
-        return context;
+        return std::make_shared<CentreSquare>(config_, contextName);
       } catch (const json::detail::type_error& e) {
         throw std::runtime_error(
             "Error allocating a CentreSquare context. Check the spelling of the parameters in the "
@@ -104,7 +102,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
     default: {
       OMPL_ERROR("Context '%s' has unknown type.", contextName.c_str());
       throw std::runtime_error("Requested to create context of unknown type at factory.");
-      return std::make_shared<CentreSquare>(config_);
+      return std::make_shared<CentreSquare>(config_, contextName);
     }
   }
 }

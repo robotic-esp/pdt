@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Jonathan Gammell, Marlin Strub
 
 #include "esp_planning_contexts/centre_square.h"
 
@@ -53,16 +53,10 @@ namespace esp {
 
 namespace ompltools {
 
-CentreSquare::CentreSquare(const std::shared_ptr<const Configuration>& config) :
-    BaseContext(config->get<std::size_t>("Contexts/CentreSquare/dimensions"),
-                std::vector<std::pair<double, double>>(
-                    config->get<std::size_t>("Contexts/CentreSquare/dimensions"),
-                    std::pair<double, double>(
-                        -0.5 * config->get<double>("Contexts/CentreSquare/boundarySideLengths"),
-                        0.5 * config->get<double>("Contexts/CentreSquare/boundarySideLengths"))),
-                config->get<double>("Contexts/CentreSquare/maxTime"), "CentreSquare"),
-    widths_(config->get<std::size_t>("Contexts/CentreSquare/dimensions"),
-            config->get<double>("Contexts/CentreSquare/obstacleWidth")),
+CentreSquare::CentreSquare(const std::shared_ptr<const Configuration>& config,
+                           const std::string& name) :
+    BaseContext(config, name),
+    widths_(dimensionality_, config->get<double>("Contexts/CentreSquare/obstacleWidth")),
     startPos_(config->get<double>("Contexts/CentreSquare/startX")),
     goalPos_(config->get<double>("Contexts/CentreSquare/goalX")) {
   // Create a state space and set the bounds.
@@ -136,6 +130,9 @@ bool CentreSquare::knowsOptimum() const {
 }
 
 ompl::base::Cost CentreSquare::computeOptimum() const {
+  if (dimensionality_ != 2) {
+    OMPL_ERROR("Centre square only computes the optimum cost for 2d.");
+  }
   ompl::base::Cost startToCorner(std::sqrt(
       std::pow(std::abs(startStates_.front()[0u] - (*midpoint_)[0u]) - widths_[0] / 2.0, 2.0) -
       std::pow(widths_[1] / 2.0, 2.0)));

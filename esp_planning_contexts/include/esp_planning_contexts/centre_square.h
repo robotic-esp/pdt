@@ -51,7 +51,7 @@ namespace ompltools {
 class CentreSquare : public BaseContext {
  public:
   /** \brief Constructor */
-  CentreSquare(const std::shared_ptr<const Configuration>& config);
+  CentreSquare(const std::shared_ptr<const Configuration>& config, const std::string& name);
 
   /** \brief Whether the problem has an exact expression for the optimum */
   virtual bool knowsOptimum() const override;

@@ -44,13 +44,14 @@ namespace esp {
 
 namespace ompltools {
 
-BaseContext::BaseContext(const unsigned int dim,
-                         const std::vector<std::pair<double, double>> limits,
-                         const double runSeconds, std::string name) :
+BaseContext::BaseContext(const std::shared_ptr<const Configuration>& config,
+                         const std::string& name) :
     name_(name),
-    dimensionality_(dim),
-    bounds_(limits),
-    targetDuration_(time::seconds(runSeconds)) {
+    dimensionality_(config->get<std::size_t>("Contexts/" + name + "/dimensions")),
+    bounds_(dimensionality_,
+            {-0.5 * config->get<double>("Contexts/" + name + "/boundarySideLengths"),
+             0.5 * config->get<double>("Contexts/" + name + "/boundarySideLengths")}),
+    targetDuration_(time::seconds(config->get<double>("Contexts/" + name + "/maxTime"))) {
 }
 
 ompl::base::SpaceInformationPtr BaseContext::getSpaceInformation() const {
@@ -107,7 +108,7 @@ std::string BaseContext::getName() const {
   return name_;
 }
 
-void BaseContext::setName(const std::string &name) {
+void BaseContext::setName(const std::string& name) {
   name_ = name;
 }
 
