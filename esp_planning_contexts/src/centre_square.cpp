@@ -136,13 +136,13 @@ bool CentreSquare::knowsOptimum() const {
 }
 
 ompl::base::Cost CentreSquare::computeOptimum() const {
-  ompl::base::Cost startToCorner(
-      std::sqrt(std::pow(std::abs(startStates_.front()[0u] - (*midpoint_)[0u]), 2.0) -
-                std::pow(obstacles_.back()->computeMinCircumscribingRadius(), 2.0)));
+  ompl::base::Cost startToCorner(std::sqrt(
+      std::pow(std::abs(startStates_.front()[0u] - (*midpoint_)[0u]) - widths_[0] / 2.0, 2.0) -
+      std::pow(widths_[1] / 2.0, 2.0)));
   ompl::base::Cost centreSquareEdge(widths_.at(0));
-  ompl::base::Cost goalToCorner(
-      std::sqrt(std::pow(std::abs(goalStates_.front()[0u] - (*midpoint_)[0u]), 2.0) -
-                std::pow(obstacles_.back()->computeMinCircumscribingRadius(), 2.0)));
+  ompl::base::Cost goalToCorner(std::sqrt(
+      std::pow(std::abs(goalStates_.front()[0u] - (*midpoint_)[0u]) - widths_[0] / 2.0, 2.0) -
+      std::pow(widths_[1] / 2.0, 2.0)));
 
   // Combine and return.
   return optimizationObjective_->combineCosts(
