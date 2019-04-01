@@ -51,15 +51,15 @@
         },
         "GoalEnclosure": {
             "type": "GoalEnclosure",
+            "start": [-0.5, 0.0],
+            "goal": [0.5, 0.0],
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
-            "startPositionX": -0.5,
-            "goalPositionX": 0.5,
             "collisionCheckResolution": 0.001,
-            "insideWidth": 0.3,
-            "wallThickness": 0.05,
-            "openingWidth": 0.1
+            "goalOutsideWidth": 0.5,
+            "goalInsideWidth": 0.4,
+            "goalGapWidth": 0.3
         },
         "MultiStartGoal": {
             "type": "MultiStartGoal",

@@ -32,53 +32,61 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Jonathan Gammell, Marlin Strub
 
 #pragma once
+
+#include "esp_configuration/configuration.h"
+#include "esp_obstacles/base_obstacle.h"
+#include "esp_obstacles/hyperrectangle.h"
+#include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/context_validity_checker.h"
+#include "esp_planning_contexts/context_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
-// Forward declarations.
-class CentreSquare;
-class DividingWalls;
-class DoubleEnclosure;
-class FlankingGap;
-class GoalEnclosure;
-class MultiStartGoal;
-class ObstacleFree;
-class RandomRectangles;
-class RegularRectangles;
-class Spiral;
-class StartEnclosure;
-class WallGap;
-
-class ContextVisitor {
+/** \brief An experiment with a singularly placed square obstacle*/
+class GoalEnclosure : public BaseContext {
  public:
-  ContextVisitor() = default;
-  virtual ~ContextVisitor() = default;
+  GoalEnclosure(const std::shared_ptr<const Configuration>& config, const std::string& name);
+  virtual ~GoalEnclosure() = default;
 
-  // Any context visitor must implement its actions on all contexts.
-  virtual void visit(const CentreSquare &context) const = 0;
-  virtual void visit(const DividingWalls &context) const = 0;
-  virtual void visit(const DoubleEnclosure &context) const = 0;
-  // virtual void visit(const FlankingGap &context) const = 0;
-  virtual void visit(const GoalEnclosure &context) const = 0;
-  // virtual void visit(const MultiStartGoal &context) const = 0;
-  // virtual void visit(const ObstacleFree &context) const = 0;
-  virtual void visit(const RandomRectangles &context) const = 0;
-  // virtual void visit(const RegularRectangles &context) const = 0;
-  // virtual void visit(const Spiral &context) const = 0;
-  virtual void visit(const StartEnclosure &context) const = 0;
-  // virtual void visit(const WallGap &context) const = 0;
+  /** \brief Whether the problem has an exact expression for the optimum */
+  virtual bool knowsOptimum() const override;
 
-  // This is only needed until all other contexts are implemented.
-  // ADL should resolve to the above methods.
-  template <typename C>
-  void visit(const C& /* context */) const {
-    OMPL_WARN("Context visitor visits unknown context.");
-  }
+  /** \brief This problem knows its optimum */
+  virtual ompl::base::Cost computeOptimum() const override;
+
+  /** \brief Set the target cost as the specified multiplier of the optimum. */
+  virtual void setTarget(double targetSpecifier) override;
+
+  /** \brief Derived class specific information to include in the title line. */
+  virtual std::string lineInfo() const override;
+
+  /** \brief Derived class specific information to include at the end. */
+  virtual std::string paraInfo() const override;
+
+  // Accept a context visitor.
+  virtual void accept(const ContextVisitor& visitor) const override;
+
+ protected:
+  // Create obstacles and antiobstacles.
+  void createObstacles();
+  void createAntiObstacles();
+
+  // The validity checker.
+  std::shared_ptr<ContextValidityChecker> validityChecker_{};
+
+  // Direct access to obstacle information.
+  double goalOutsideWidth_{0.0};
+  double goalInsideWidth_{0.0};
+  double goalGapWidth_{0.0};
+
+  // The start and goal positions.
+  std::vector<double> startPos_{};
+  std::vector<double> goalPos_{};
 };
 
 }  // namespace ompltools
