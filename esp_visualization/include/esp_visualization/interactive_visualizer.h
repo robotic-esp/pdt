@@ -64,7 +64,15 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   void run();
 
  private:
+  // Helper methods to draw.
+  void drawRectangle2D(const std::vector<double>& midpoint, const std::vector<double>& widths,
+                       const float* color) const;
+  void drawStates(const std::vector<ompl::base::ScopedState<>>& states, const float* color,
+                  float size) const;
+
   void visit(const CentreSquare& context) const override;
+  void visit(const DividingWalls& context) const override;
+  void visit(const RandomRectangles& context) const override;
   void visit(const Hyperrectangle<BaseObstacle>& obstacle) const override;
   void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;
 };

@@ -192,6 +192,7 @@ void InteractiveVisualizer::run() {
 
     // Draw the vertices.
     glColor3fv(blue);
+    glPointSize(2.0);
     pangolin::glDrawPoints(vertices);
     if (optionDrawEdges) {
       glColor3fv(green);
@@ -209,40 +210,60 @@ void InteractiveVisualizer::run() {
 
 void InteractiveVisualizer::visit(const CentreSquare& centreSquare) const {
   // Draw the start states.
-  glColor3fv(green);
-  glPointSize(5.0);
-  std::vector<Eigen::Vector2d> starts;
-  for (const auto& start : centreSquare.getStartStates()) {
-    starts.emplace_back(start[0], start[1]);
-  }
-  pangolin::glDrawPoints(starts);
+  drawStates(centreSquare.getStartStates(), red, 5.0);
   // Draw the goal states.
-  glColor3fv(red);
-  std::vector<Eigen::Vector2d> goals;
-  for (const auto& goal : centreSquare.getGoalStates()) {
-    goals.emplace_back(goal[0], goal[1]);
+  drawStates(centreSquare.getGoalStates(), green, 5.0);
+}
+
+void InteractiveVisualizer::visit(const DividingWalls& dividingWalls) const {
+  // Draw the start states.
+  drawStates(dividingWalls.getStartStates(), red, 5.0);
+  // Draw the goal states.
+  drawStates(dividingWalls.getGoalStates(), green, 5.0);
+}
+
+void InteractiveVisualizer::visit(const RandomRectangles& randomRectangles) const {
+  // Draw the start states.
+  drawStates(randomRectangles.getStartStates(), red, 5.0);
+  // Draw the goal states.
+  drawStates(randomRectangles.getGoalStates(), green, 5.0);
+}
+
+void InteractiveVisualizer::drawRectangle2D(const std::vector<double>& midpoint,
+                                            const std::vector<double>& widths,
+                                            const float* color) const {
+  glColor3fv(color);
+  if (widths.size() != 2 || midpoint.size() != 2) {
+    throw std::runtime_error("This methods draws 2d rectangles.");
   }
-  pangolin::glDrawPoints(goals);
-  glPointSize(2.0);
+  pangolin::glDrawRect(midpoint.at(0) - widths.at(0) / 2.0, midpoint.at(1) - widths.at(1) / 2.0,
+                       midpoint.at(0) + widths.at(0) / 2.0, midpoint.at(1) + widths.at(1) / 2.0);
+}
+
+void InteractiveVisualizer::drawStates(const std::vector<ompl::base::ScopedState<>>& states,
+                                       const float* color, float size) const {
+  glColor3fv(color);
+  glPointSize(size);
+  std::vector<Eigen::Vector2d> points;
+  for (const auto& state : states) {
+    points.emplace_back(state[0], state[1]);
+  }
+  pangolin::glDrawPoints(points);
 }
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
-  glColor3fv(black);
-  std::vector<double> widths = obstacle.getWidths();
-  std::vector<double> midpoint = obstacle.getAnchorCoordinates();
-  if (widths.size() == 2 && midpoint.size() == 2) {
-    pangolin::glDrawRect(midpoint.at(0) - widths.at(0) / 2.0, midpoint.at(1) - widths.at(1) / 2.0,
-                         midpoint.at(0) + widths.at(0) / 2.0, midpoint.at(1) + widths.at(1) / 2.0);
+  if (obstacle.getWidths().size() == 2) {
+    drawRectangle2D(obstacle.getAnchorCoordinates(), obstacle.getWidths(), black);
+  } else {
+    OMPL_ERROR("Interactive visualizer does not yet know how to draw 3D rectangle obstacles.");
   }
 }
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
-  glColor3fv(white);
-  std::vector<double> widths = antiObstacle.getWidths();
-  std::vector<double> midpoint = antiObstacle.getAnchorCoordinates();
-  if (widths.size() == 2 && midpoint.size() == 2) {
-    pangolin::glDrawRect(midpoint.at(0) - widths.at(0) / 2.0, midpoint.at(1) - widths.at(1) / 2.0,
-                         midpoint.at(0) + widths.at(0) / 2.0, midpoint.at(1) + widths.at(1) / 2.0);
+  if (antiObstacle.getWidths().size() == 2) {
+    drawRectangle2D(antiObstacle.getAnchorCoordinates(), antiObstacle.getWidths(), white);
+  } else {
+    OMPL_ERROR("Interactive visualizer does not yet know how to draw 3D rectangle antiobstacles.");
   }
 }
 

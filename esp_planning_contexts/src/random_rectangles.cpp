@@ -148,6 +148,16 @@ void RandomRectangles::accept(const ContextVisitor& visitor) const {
 }
 
 void RandomRectangles::createObstacles() {
+  // Create local copies of the start and goal states to check that they're not invalidated.
+  ompl::base::ScopedState<> start(spaceInfo_);
+  for (std::size_t i = 0; i < dimensionality_; ++i) {
+    start[i] = startPos_[i];
+  }
+  ompl::base::ScopedState<> goal(spaceInfo_);
+  for (std::size_t i = 0; i < dimensionality_; ++i) {
+    goal[i] = goalPos_[i];
+  }
+  // Instantiate obstacles.
   for (std::size_t i = 0; i < numRectangles_; ++i) {
     // Create a random midpoint (uniform).
     ompl::base::ScopedState<> midpoint(spaceInfo_);
@@ -157,9 +167,11 @@ void RandomRectangles::createObstacles() {
     for (std::size_t j = 0; j < dimensionality_; ++j) {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
-    // Add to the obstacles.
-    obstacles_.emplace_back(
-        std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths));
+    auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths);
+    // Add this to the obstacles if it doesn't invalidate the start or goal state.
+    if (!obstacle->invalidates(start.get()) && !obstacle->invalidates(goal.get())) {
+      obstacles_.emplace_back(obstacle);
+    }
   }
 }
 

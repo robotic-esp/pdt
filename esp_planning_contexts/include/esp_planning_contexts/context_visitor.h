@@ -61,13 +61,13 @@ class ContextVisitor {
 
   // Any context visitor must implement its actions on all contexts.
   virtual void visit(const CentreSquare &context) const = 0;
-  // virtual void visit(const DividingWall &context) const = 0;
+  virtual void visit(const DividingWalls &context) const = 0;
   // virtual void visit(const DoubleEnclosure &context) const = 0;
   // virtual void visit(const FlankingGap &context) const = 0;
   // virtual void visit(const GoalEnclosure &context) const = 0;
   // virtual void visit(const MultiStartGoal &context) const = 0;
   // virtual void visit(const ObstacleFree &context) const = 0;
-  // virtual void visit(const RandomRectangles &context) const = 0;
+  virtual void visit(const RandomRectangles &context) const = 0;
   // virtual void visit(const RegularRectangles &context) const = 0;
   // virtual void visit(const Spiral &context) const = 0;
   // virtual void visit(const StartEnclosure &context) const = 0;
