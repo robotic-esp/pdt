@@ -243,6 +243,13 @@ void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
   drawStates(context.getGoalStates(), green, 5.0);
 }
 
+void InteractiveVisualizer::visit(const ObstacleFree& context) const {
+  // Draw the start states.
+  drawStates(context.getStartStates(), red, 5.0);
+  // Draw the goal states.
+  drawStates(context.getGoalStates(), green, 5.0);
+}
+
 void InteractiveVisualizer::visit(const RandomRectangles& context) const {
   // Draw the start states.
   drawStates(context.getStartStates(), red, 5.0);

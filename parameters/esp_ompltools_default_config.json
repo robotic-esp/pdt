@@ -76,11 +76,11 @@
         },
         "ObstacleFree": {
             "type": "ObstacleFree",
+            "start": [-0.5, 0.0],
+            "goal": [0.5, 0.0],
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
-            "numStarts": 3,
-            "numGoals": 3,
             "collisionCheckResolution": 0.001
         },
         "RandomRectangles": {

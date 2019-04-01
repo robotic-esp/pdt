@@ -34,7 +34,7 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_planning_contexts/centre_square.h"
+#include "esp_planning_contexts/obstacle_free.h"
 
 #include <cmath>
 #include <functional>
@@ -53,10 +53,9 @@ namespace esp {
 
 namespace ompltools {
 
-CentreSquare::CentreSquare(const std::shared_ptr<const Configuration>& config,
+ObstacleFree::ObstacleFree(const std::shared_ptr<const Configuration>& config,
                            const std::string& name) :
     BaseContext(config, name),
-    widths_(dimensionality_, config->get<double>("Contexts/" + name + "/obstacleWidth")),
     startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
     goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
   // Assert configuration sanity.
@@ -70,11 +69,6 @@ CentreSquare::CentreSquare(const std::shared_ptr<const Configuration>& config,
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (widths_.at(0u) < 0.0) {
-    OMPL_ERROR("%s: Obstacle width must be positive.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
   // Create a state space and set the bounds.
   auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
   stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
@@ -82,17 +76,8 @@ CentreSquare::CentreSquare(const std::shared_ptr<const Configuration>& config,
   // Create the space information class:
   spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
 
-  // Create the obstacle.
-  midpoint_ = std::make_unique<ompl::base::ScopedState<>>(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    (*midpoint_)[i] = (startPos_.at(i) + goalPos_.at(i)) / 2.0;
-  }
-  obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, *midpoint_, widths_));
-
-  // Create the validity checker and add the obstacle.
+  // Create the validity checker. All states will be valid.
   validityChecker_ = std::make_shared<ContextValidityChecker>(spaceInfo_);
-  validityChecker_->addObstacles(obstacles_);
 
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(
@@ -123,46 +108,30 @@ CentreSquare::CentreSquare(const std::shared_ptr<const Configuration>& config,
   optimizationObjective_->setCostThreshold(computeOptimum());
 }
 
-bool CentreSquare::knowsOptimum() const {
+bool ObstacleFree::knowsOptimum() const {
   return true;
 }
 
-ompl::base::Cost CentreSquare::computeOptimum() const {
-  if (dimensionality_ != 2) {
-    OMPL_ERROR("Centre square only computes the optimum cost for 2d.");
-    throw std::runtime_error("Context error.");
-  }
-  ompl::base::Cost startToCorner(std::sqrt(
-      std::pow(std::abs(startStates_.front()[0u] - (*midpoint_)[0u]) - widths_[0] / 2.0, 2.0) -
-      std::pow(widths_[1] / 2.0, 2.0)));
-  ompl::base::Cost centreSquareEdge(widths_.at(0));
-  ompl::base::Cost goalToCorner(std::sqrt(
-      std::pow(std::abs(goalStates_.front()[0u] - (*midpoint_)[0u]) - widths_[0] / 2.0, 2.0) -
-      std::pow(widths_[1] / 2.0, 2.0)));
-
-  // Combine and return.
-  return optimizationObjective_->combineCosts(
-      optimizationObjective_->combineCosts(startToCorner, centreSquareEdge), goalToCorner);
+ompl::base::Cost ObstacleFree::computeOptimum() const {
+  return computeMinPossibleCost();
 }
 
-void CentreSquare::setTarget(double targetSpecifier) {
+void ObstacleFree::setTarget(double targetSpecifier) {
   optimizationObjective_->setCostThreshold(
       ompl::base::Cost(targetSpecifier * this->computeOptimum().value()));
 }
 
-std::string CentreSquare::lineInfo() const {
+std::string ObstacleFree::lineInfo() const {
   std::stringstream rval;
-
-  rval << "Obstacle width: " << widths_.at(0) << ".";
 
   return rval.str();
 }
 
-std::string CentreSquare::paraInfo() const {
+std::string ObstacleFree::paraInfo() const {
   return std::string();
 }
 
-void CentreSquare::accept(const ContextVisitor& visitor) const {
+void ObstacleFree::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 

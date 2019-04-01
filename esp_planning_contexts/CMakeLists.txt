@@ -21,7 +21,7 @@ add_library(esp_planning_contexts
   src/flanking_gap.cpp
   src/goal_enclosure.cpp
   # src/multi_start_goal.cpp
-  # src/obstacle_free.cpp
+  src/obstacle_free.cpp
   src/random_rectangles.cpp
   # src/regular_rectangles.cpp
   # src/spiral.cpp
