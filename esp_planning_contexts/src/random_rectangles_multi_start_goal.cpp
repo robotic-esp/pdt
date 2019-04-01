@@ -34,7 +34,7 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_planning_contexts/random_rectangles.h"
+#include "esp_planning_contexts/random_rectangles_multi_start_goal.h"
 
 #include <cmath>
 #include <functional>
@@ -53,23 +53,21 @@ namespace esp {
 
 namespace ompltools {
 
-RandomRectangles::RandomRectangles(const std::shared_ptr<const Configuration>& config,
+RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(const std::shared_ptr<const Configuration>& config,
                                    const std::string& name) :
     BaseContext(config, name),
     numRectangles_(config->get<std::size_t>("Contexts/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("Contexts/" + name + "/minSideLength")),
     maxSideLength_(config->get<double>("Contexts/" + name + "/maxSideLength")),
-    startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
-    goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
+    numStarts_(config->get<std::size_t>("Contexts/" + name + "/numStarts")),
+    numGoals_(config->get<std::size_t>("Contexts/" + name + "/numGoals")) {
   // Assert configuration sanity.
-  if (startPos_.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
+  if (numStarts_ == 0u) {
+    OMPL_ERROR("%s: Must at least have one start.", name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (goalPos_.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
-               name.c_str());
+  if (numGoals_ == 0u) {
+    OMPL_ERROR("%s: Must at least have one goal.", name.c_str());
     throw std::runtime_error("Context error.");
   }
   if (minSideLength_ > maxSideLength_) {
@@ -83,6 +81,28 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<const Configuration>& c
 
   // Create the space information class:
   spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+
+  // Create the start states.
+  for (std::size_t i = 0u; i < numStarts_; ++i) {
+    startStates_.emplace_back(spaceInfo_);
+    startStates_.back().random();
+  }
+
+  // Create the goal states.
+  for (std::size_t i = 0u; i < numGoals_; ++i) {
+    goalStates_.emplace_back(spaceInfo_);
+    goalStates_.back().random();
+  }
+
+  if (numGoals_ > 1u) {
+    goalPtr_ = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
+    for (std::size_t i = 0u; i < numGoals_; ++i) {
+      goalPtr_->as<ompl::base::GoalStates>()->addState(goalStates_.at(i));
+    }
+  } else {
+    goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+    goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
+  }
 
   // Create the obstacles.
   createObstacles();
@@ -108,55 +128,38 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<const Configuration>& c
   optimizationObjective_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
-  // Create a start state.
-  addStartState(startPos_);
-
-  // Create a goal state.
-  addGoalState(goalPos_);
-  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
-
   // Specify the optimization target.
   optimizationObjective_->setCostThreshold(computeMinPossibleCost());
 }
 
-bool RandomRectangles::knowsOptimum() const {
+bool RandomRectanglesMultiStartGoal::knowsOptimum() const {
   return false;
 }
 
-ompl::base::Cost RandomRectangles::computeOptimum() const {
+ompl::base::Cost RandomRectanglesMultiStartGoal::computeOptimum() const {
   throw ompl::Exception("The global optimum is unknown.", BaseContext::name_);
 }
 
-void RandomRectangles::setTarget(double targetSpecifier) {
+void RandomRectanglesMultiStartGoal::setTarget(double targetSpecifier) {
   optimizationObjective_->setCostThreshold(
       ompl::base::Cost(targetSpecifier * this->computeOptimum().value()));
 }
 
-std::string RandomRectangles::lineInfo() const {
+std::string RandomRectanglesMultiStartGoal::lineInfo() const {
   std::stringstream rval;
 
   return rval.str();
 }
 
-std::string RandomRectangles::paraInfo() const {
+std::string RandomRectanglesMultiStartGoal::paraInfo() const {
   return std::string();
 }
 
-void RandomRectangles::accept(const ContextVisitor& visitor) const {
+void RandomRectanglesMultiStartGoal::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
-void RandomRectangles::createObstacles() {
-  // Create local copies of the start and goal states to check that they're not invalidated.
-  ompl::base::ScopedState<> start(spaceInfo_);
-  for (std::size_t i = 0; i < dimensionality_; ++i) {
-    start[i] = startPos_[i];
-  }
-  ompl::base::ScopedState<> goal(spaceInfo_);
-  for (std::size_t i = 0; i < dimensionality_; ++i) {
-    goal[i] = goalPos_[i];
-  }
+void RandomRectanglesMultiStartGoal::createObstacles() {
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
     // Create a random midpoint (uniform).
@@ -167,9 +170,24 @@ void RandomRectangles::createObstacles() {
     for (std::size_t j = 0; j < dimensionality_; ++j) {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
+    bool invalidates = false;
     auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths);
-    // Add this to the obstacles if it doesn't invalidate the start or goal state.
-    if (!obstacle->invalidates(start.get()) && !obstacle->invalidates(goal.get())) {
+    // Add this to the obstacles if it doesn't invalidate the start or goal states.
+    for (const auto& start : startStates_) {
+      if (obstacle->invalidates(start.get())) {
+        invalidates = true;
+        break;
+      }
+    }
+    if (!invalidates) {
+      for (const auto& goal : goalStates_) {
+        if (obstacle->invalidates(goal.get())) {
+          invalidates = true;
+          break;
+        }
+      }
+    }
+    if (!invalidates) {
       obstacles_.emplace_back(obstacle);
     } else {
       --i;

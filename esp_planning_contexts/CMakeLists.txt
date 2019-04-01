@@ -20,9 +20,9 @@ add_library(esp_planning_contexts
   src/double_enclosure.cpp
   src/flanking_gap.cpp
   src/goal_enclosure.cpp
-  # src/multi_start_goal.cpp
   src/obstacle_free.cpp
   src/random_rectangles.cpp
+  src/random_rectangles_multi_start_goal.cpp
   # src/regular_rectangles.cpp
   # src/spiral.cpp
   src/start_enclosure.cpp

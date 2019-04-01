@@ -68,11 +68,12 @@
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
-            "numStarts": 2,
+            "numStarts": 1,
             "numGoals": 3,
             "collisionCheckResolution": 0.001,
-            "numObstacles": 30,
-            "obstacleRatio": 0.8
+            "numObstacles": 50,
+            "maxSideLength": 0.3,
+            "minSideLength": 0.05
         },
         "ObstacleFree": {
             "type": "ObstacleFree",
