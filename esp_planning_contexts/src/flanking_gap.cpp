@@ -34,7 +34,7 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_planning_contexts/dividing_walls.h"
+#include "esp_planning_contexts/flanking_gap.h"
 
 #include <cmath>
 #include <functional>
@@ -50,13 +50,13 @@ namespace esp {
 
 namespace ompltools {
 
-DividingWalls::DividingWalls(const std::shared_ptr<const Configuration>& config,
-                           const std::string& name) :
+FlankingGap::FlankingGap(const std::shared_ptr<const Configuration>& config,
+                         const std::string& name) :
     BaseContext(config, name),
-    numWalls_(config->get<std::size_t>("Contexts/" + name + "/numWalls")),
-    wallThicknesses_(config->get<std::vector<double>>("Contexts/" + name + "/wallThicknesses")),
-    numGaps_(config->get<std::size_t>("Contexts/" + name + "/numGaps")),
-    gapWidths_(config->get<std::vector<double>>("Contexts/" + name + "/gapWidths")),
+    wallWidth_(config->get<double>("Contexts/" + name + "/wallWidth")),
+    wallThickness_(config->get<double>("Contexts/" + name + "/wallThickness")),
+    gapWidth_(config->get<double>("Contexts/" + name + "/gapWidth")),
+    gapOffset_(config->get<double>("Contexts/" + name + "/gapOffset")),
     startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
     goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
   // Assert configuration sanity.
@@ -70,12 +70,16 @@ DividingWalls::DividingWalls(const std::shared_ptr<const Configuration>& config,
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (numWalls_ != wallThicknesses_.size()) {
-    OMPL_ERROR("%s: Number of walls number of wall thicknesses do not match.", name.c_str());
+  if (wallWidth_ < 0.0) {
+    OMPL_ERROR("%s: Wall width is negative.", name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (numGaps_ != gapWidths_.size()) {
-    OMPL_ERROR("%s: Number of gaps number of gap widths do not match.", name.c_str());
+  if (wallThickness_ < 0.0) {
+    OMPL_ERROR("%s: Wall thickness is negative.", name.c_str());
+    throw std::runtime_error("Context error.");
+  }
+  if (gapWidth_ < 0.0) {
+    OMPL_ERROR("%s: Gap width is negative.", name.c_str());
     throw std::runtime_error("Context error.");
   }
 
@@ -125,91 +129,73 @@ DividingWalls::DividingWalls(const std::shared_ptr<const Configuration>& config,
   optimizationObjective_->setCostThreshold(computeMinPossibleCost());
 }
 
-bool DividingWalls::knowsOptimum() const {
+bool FlankingGap::knowsOptimum() const {
   return false;
 }
 
-ompl::base::Cost DividingWalls::computeOptimum() const {
+ompl::base::Cost FlankingGap::computeOptimum() const {
   throw ompl::Exception("The global optimum is unknown, though it could be", BaseContext::name_);
 }
 
-void DividingWalls::setTarget(double targetSpecifier) {
+void FlankingGap::setTarget(double targetSpecifier) {
   optimizationObjective_->setCostThreshold(ompl::base::Cost(targetSpecifier));
 }
 
-std::string DividingWalls::lineInfo() const {
+std::string FlankingGap::lineInfo() const {
   std::stringstream rval;
-
-  for (unsigned w = 0u; w < numWalls_; ++w) {
-    rval << " gap_width/obs_width: " << gapWidths_.at(w) << "/" << wallThicknesses_.at(w) << " = "
-         << gapWidths_.at(w) / wallThicknesses_.at(w);
-  }
-  rval << ".";
 
   return rval.str();
 }
 
-std::string DividingWalls::paraInfo() const {
+std::string FlankingGap::paraInfo() const {
   std::stringstream rval;
   rval << lineInfo();
   return rval.str();
 }
 
-void DividingWalls::accept(const ContextVisitor& visitor) const {
+void FlankingGap::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
-void DividingWalls::createObstacles() {
-  for (std::size_t i = 0; i < numWalls_; ++i) {
-    // Create an obstacle midpoint for this wall.
-    ompl::base::ScopedState<> midpoint(spaceInfo_);
-    // Set the obstacle midpoint in the first dimension.
-    midpoint[0u] = ((i + 1u) * (bounds_.at(0u).second - bounds_.at(0u).first) / (numWalls_ + 1u)) +
-                   bounds_.at(0u).first;
-    // Set the obstacle midpoint in the remaining dimension.
-    for (std::size_t j = 1; j < dimensionality_; ++j) {
-      midpoint[j] = (bounds_.at(j).first + bounds_.at(j).second) / 2.0;
-    }
-    // Create the widths of this wall.
-    std::vector<double> widths(dimensionality_, 0.0);
-    // Set the obstacle width in the first dimension.
-    widths.at(0) = wallThicknesses_.at(i);
-    // The wall spans all other dimensions.
-    for (std::size_t j = 1; j < dimensionality_; ++j) {
-      widths.at(j) = bounds_.at(j).second - bounds_.at(j).first;
-    }
-    obstacles_.emplace_back(
-        std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths));
+void FlankingGap::createObstacles() {
+  ompl::base::ScopedState<> midpoint(spaceInfo_);
+  // Set the obstacle midpoint in the middle of the state space.
+  for (std::size_t j = 1; j < dimensionality_; ++j) {
+    midpoint[j] = (bounds_.at(j).first + bounds_.at(j).second) / 2.0;
   }
+  // Create the widths of this wall.
+  std::vector<double> widths(dimensionality_, 0.0);
+  // Set the obstacle width in the first dimension.
+  widths.at(0) = wallThickness_;
+  // The wall has the specified width in all other dimensions.
+  for (std::size_t j = 1; j < dimensionality_; ++j) {
+    widths.at(j) = wallWidth_;
+  }
+  obstacles_.emplace_back(
+      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths));
 }
 
-void DividingWalls::createAntiObstacles() {
-  // Compute midpoints for obstacles.
-  for (std::size_t i = 0; i < numGaps_; ++i) {
-    // Create an obstacle midpoint for this gap.
-    ompl::base::ScopedState<> midpoint(spaceInfo_);
-    // Set the obstacle midpoint in the second dimension.
-    midpoint[1u] = (i + 1u) * (bounds_.at(1u).second - bounds_.at(1u).first) / (numGaps_ + 1u) +
-                   bounds_.at(1).first;
-    // Set the obstacle midpoint in the remaining dimension.
-    for (std::size_t j = 0; j < dimensionality_; ++j) {
-      if (j != 1u) {
-        midpoint[j] = (bounds_.at(j).first + bounds_.at(j).second) / 2.0;
-      }
+void FlankingGap::createAntiObstacles() {
+  ompl::base::ScopedState<> midpoint(spaceInfo_);
+  // Set the obstacle midpoint in the second dimension.
+  midpoint[1u] = gapOffset_;
+  // Set the obstacle midpoint in the remaining dimension.
+  for (std::size_t j = 0; j < dimensionality_; ++j) {
+    if (j != 1u) {
+      midpoint[j] = (bounds_.at(j).first + bounds_.at(j).second) / 2.0;
     }
-    // Create the widths of this wall.
-    std::vector<double> widths(dimensionality_, 0.0);
-    // Set the obstacle width in the first dimension.
-    widths.at(1) = gapWidths_.at(i);
-    // The wall spans all other dimensions.
-    for (std::size_t j = 0; j < dimensionality_; ++j) {
-      if (j != 1) {
-        widths.at(j) = (bounds_.at(j).second - bounds_.at(j).first);
-      }
-    }
-    antiObstacles_.emplace_back(
-        std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, midpoint, widths));
   }
+  // Create the widths of gap.
+  std::vector<double> widths(dimensionality_, 0.0);
+  // Set the obstacle width in the first dimension.
+  widths.at(0) = wallThickness_ + std::numeric_limits<double>::epsilon();
+  widths.at(1) = gapWidth_;
+  // The wall spans all other dimensions.
+  for (std::size_t j = 2; j < dimensionality_; ++j) {
+    widths.at(j) = (bounds_.at(j).second - bounds_.at(j).first);
+  }
+  antiObstacles_.emplace_back(
+      std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, midpoint, widths));
 }
 
 }  // namespace ompltools

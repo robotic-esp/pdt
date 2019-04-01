@@ -86,6 +86,15 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
             "the context factory and the json file.");
       }
     }
+    case CONTEXT_TYPE::FLANKING_GAP: {
+      try {
+        return std::make_shared<FlankingGap>(config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error(
+            "Error allocating a FlankingGap context. Check the spelling of the parameters in"
+            "the context factory and the json file.");
+      }
+    }
     case CONTEXT_TYPE::GOAL_ENCLOSURE: {
       try {
         return std::make_shared<GoalEnclosure>(config_, contextName);

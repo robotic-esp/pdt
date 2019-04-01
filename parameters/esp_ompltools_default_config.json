@@ -40,14 +40,16 @@
         },
         "FlankingGap": {
             "type": "FlankingGap",
+            "start": [-0.5, 0.0],
+            "goal": [0.5, 0.0],
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
-            "startPositionX": -0.5,
-            "goalPositionX": 0.5,
             "collisionCheckResolution": 0.001,
-            "wallThickness": 0.05,
-            "gapWidths": 0.01
+            "wallWidth": 1.5,
+            "wallThickness": 0.2,
+            "gapOffset": 0.1,
+            "gapWidth": 0.02
         },
         "GoalEnclosure": {
             "type": "GoalEnclosure",

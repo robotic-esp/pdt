@@ -18,7 +18,7 @@ add_library(esp_planning_contexts
   src/centre_square.cpp
   src/dividing_walls.cpp
   src/double_enclosure.cpp
-  # src/flanking_gap.cpp
+  src/flanking_gap.cpp
   src/goal_enclosure.cpp
   # src/multi_start_goal.cpp
   # src/obstacle_free.cpp
