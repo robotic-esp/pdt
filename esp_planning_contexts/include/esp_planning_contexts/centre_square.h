@@ -36,6 +36,7 @@
 
 #pragma once
 
+#include "esp_configuration/configuration.h"
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/base_context.h"
@@ -50,8 +51,7 @@ namespace ompltools {
 class CentreSquare : public BaseContext {
  public:
   /** \brief Constructor */
-  CentreSquare(const unsigned int dim, const double obsWidth, const double worldWidth,
-               const double runSeconds, const double checkResolution);
+  CentreSquare(const std::shared_ptr<const Configuration>& config);
 
   /** \brief Whether the problem has an exact expression for the optimum */
   virtual bool knowsOptimum() const override;

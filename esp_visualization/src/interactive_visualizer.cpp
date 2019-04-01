@@ -180,11 +180,6 @@ void InteractiveVisualizer::run() {
     // Clear the viewport.
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Draw the context.
-    if (optionDrawContext) {
-      context_->accept(*this);
-    }
-
     // Draw the obstacles.
     if (optionDrawObstacles) {
       for (auto obstacle : context_->getObstacles()) {
@@ -202,6 +197,12 @@ void InteractiveVisualizer::run() {
       glColor3fv(green);
       pangolin::glDrawLines(edges);
     }
+
+    // Draw the context.
+    if (optionDrawContext) {
+      context_->accept(*this);
+    }
+
     pangolin::FinishFrame();
   }
 }

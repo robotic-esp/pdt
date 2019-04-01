@@ -2,6 +2,8 @@
     "Contexts": {
         "CentreSquare": {
             "type": "CentreSquare",
+            "startX": -0.75,
+            "goalX": 0.75,
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
@@ -205,6 +207,6 @@
         }
     },
     "Log": {
-        "level": "warn"
+        "level": "false"
     }
 }

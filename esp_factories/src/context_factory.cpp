@@ -61,12 +61,9 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
   switch (type) {
     case CONTEXT_TYPE::CENTRE_SQUARE: {
       try {
-        return std::make_shared<CentreSquare>(
-            config_->get<std::size_t>(parentKey + "/dimensions"),
-            config_->get<double>(parentKey + "/obstacleWidth"),
-            config_->get<double>(parentKey + "/boundarySideLengths"),
-            config_->get<double>(parentKey + "/maxTime"),
-            config_->get<double>(parentKey + "/collisionCheckResolution"));
+        auto context = std::make_shared<CentreSquare>(config_);
+        context->setName(contextName);
+        return context;
       } catch (const json::detail::type_error& e) {
         throw std::runtime_error(
             "Error allocating a CentreSquare context. Check the spelling of the parameters in the "
@@ -84,8 +81,8 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
     //         config_->get<double>(parentKey + "/collisionCheckResolution"));
     //   } catch (const json::detail::type_error& e) {
     //     throw std::runtime_error(
-    //         "Error allocating a DividingWall context. Check the spelling of the parameters in the "
-    //         "context factory and the json file.");
+    //         "Error allocating a DividingWall context. Check the spelling of the parameters in the
+    //         " "context factory and the json file.");
     //   }
     // }
     // case CONTEXT_TYPE::DOUBLE_ENCLOSURE: {
@@ -100,13 +97,14 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
     //         config_->get<double>(parentKey + "/collisionCheckResolution"));
     //   } catch (const json::detail::type_error& e) {
     //     throw std::runtime_error(
-    //         "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in "
-    //         "the context factory and the json file.");
+    //         "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in
+    //         " "the context factory and the json file.");
     //   }
     // }
     default: {
+      OMPL_ERROR("Context '%s' has unknown type.", contextName.c_str());
       throw std::runtime_error("Requested to create context of unknown type at factory.");
-      return std::make_shared<CentreSquare>(0u, 0.0, 0.0, 0.0, 0.0);
+      return std::make_shared<CentreSquare>(config_);
     }
   }
 }

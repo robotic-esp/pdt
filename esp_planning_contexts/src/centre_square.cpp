@@ -53,15 +53,18 @@ namespace esp {
 
 namespace ompltools {
 
-CentreSquare::CentreSquare(const unsigned int dim, const double obsWidth, const double worldWidth,
-                           const double runSeconds, const double checkResolution) :
-    BaseContext(dim,
+CentreSquare::CentreSquare(const std::shared_ptr<const Configuration>& config) :
+    BaseContext(config->get<std::size_t>("Contexts/CentreSquare/dimensions"),
                 std::vector<std::pair<double, double>>(
-                    dim, std::pair<double, double>(-0.5 * worldWidth, 0.5 * worldWidth)),
-                runSeconds, "CentreSquare"),
-    widths_(dim, obsWidth),
-    startPos_(-0.5),
-    goalPos_(0.5) {
+                    config->get<std::size_t>("Contexts/CentreSquare/dimensions"),
+                    std::pair<double, double>(
+                        -0.5 * config->get<double>("Contexts/CentreSquare/boundarySideLengths"),
+                        0.5 * config->get<double>("Contexts/CentreSquare/boundarySideLengths"))),
+                config->get<double>("Contexts/CentreSquare/maxTime"), "CentreSquare"),
+    widths_(config->get<std::size_t>("Contexts/CentreSquare/dimensions"),
+            config->get<double>("Contexts/CentreSquare/obstacleWidth")),
+    startPos_(config->get<double>("Contexts/CentreSquare/startX")),
+    goalPos_(config->get<double>("Contexts/CentreSquare/goalX")) {
   // Create a state space and set the bounds.
   auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
   stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
@@ -85,7 +88,8 @@ CentreSquare::CentreSquare(const unsigned int dim, const double obsWidth, const 
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(
       static_cast<ompl::base::StateValidityCheckerPtr>(validityChecker_));
-  spaceInfo_->setStateValidityCheckingResolution(checkResolution);
+  spaceInfo_->setStateValidityCheckingResolution(
+      config->get<double>("Contexts/CentreSquare/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();

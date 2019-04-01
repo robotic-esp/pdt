@@ -107,6 +107,10 @@ std::string BaseContext::getName() const {
   return name_;
 }
 
+void BaseContext::setName(const std::string &name) {
+  name_ = name;
+}
+
 std::vector<std::pair<double, double>> BaseContext::getLimits() const {
   return bounds_;
 }

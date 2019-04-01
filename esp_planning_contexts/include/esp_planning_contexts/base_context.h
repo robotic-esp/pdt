@@ -93,6 +93,9 @@ class BaseContext {
   /** \brief Get the name */
   std::string getName() const;
 
+  /** \brief Set the name */
+  void setName(const std::string& name);
+
   /** \brief Get the state-space limit */
   std::vector<std::pair<double, double>> getLimits() const;
 
