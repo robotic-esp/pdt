@@ -97,7 +97,7 @@ class BaseContext {
   void setName(const std::string& name);
 
   /** \brief Get the state-space limit */
-  std::vector<std::pair<double, double>> getLimits() const;
+  std::vector<std::pair<double, double>> getBoundaries() const;
 
   /** \brief Get the dimensionality of the underlying search space */
   unsigned int getDimensions() const;

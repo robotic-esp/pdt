@@ -88,16 +88,17 @@ class BaseVisualizer {
   std::atomic<std::size_t> largestIteration_{0u};
 
   // Some nice colors.
-  float black[3] = {0.0, 0.0, 0.0};
-  float white[3] = {1.0, 1.0, 1.0};
-  float gray[3] = {0.471, 0.471, 0.471};
-  float red[3] = {0.808, 0.243, 0.082};
-  float blue[3] = {0.043, 0.365, 0.682};
-  float yellow[3] = {0.910, 0.639, 0.102};
-  float green[3] = {0.392, 0.631, 0.106};
-  float purple[3] = {0.416, 0.078, 0.490};
-  float lightblue[3] = {0.231, 0.686, 0.925};
-  float darkred[3] = {0.569, 0.000, 0.129};
+  float black[4] = {0.0, 0.0, 0.0, 1.0};
+  float white[4] = {1.0, 1.0, 1.0, 1.0};
+  float transparent[4] = {0.0, 0.0, 0.0, 0.0};
+  float gray[4] = {0.471, 0.471, 0.471, 1.0};
+  float red[4] = {0.808, 0.243, 0.082, 1.0};
+  float blue[4] = {0.043, 0.365, 0.682, 1.0};
+  float yellow[4] = {0.910, 0.639, 0.102, 1.0};
+  float green[4] = {0.392, 0.631, 0.106, 1.0};
+  float purple[4] = {0.416, 0.078, 0.490, 1.0};
+  float lightblue[4] = {0.231, 0.686, 0.925, 1.0};
+  float darkred[4] = {0.569, 0.000, 0.129, 1.0};
 
  private:
   // Create the data to visualize. This should be called on a separate thread.

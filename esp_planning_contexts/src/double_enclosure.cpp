@@ -210,7 +210,7 @@ void DoubleEnclosure::createAntiObstacles() {
   }
   std::vector<double> startGapWidths(dimensionality_, startGapWidth_);
   startGapWidths.at(0u) =
-      (startOutsideWidth_ - startInsideWidth_) / 2.0 + std::numeric_limits<double>::epsilon();
+      (startOutsideWidth_ - startInsideWidth_) / 2.0 + 1e-3;
   antiObstacles_.emplace_back(std::make_shared<Hyperrectangle<BaseAntiObstacle>>(
       spaceInfo_, startGapMidpoint, startGapWidths));
 
@@ -223,7 +223,7 @@ void DoubleEnclosure::createAntiObstacles() {
   }
   std::vector<double> goalGapWidths(dimensionality_, goalGapWidth_);
   goalGapWidths.at(0u) =
-      (goalOutsideWidth_ - goalInsideWidth_) / 2.0 + std::numeric_limits<double>::epsilon();
+      (goalOutsideWidth_ - goalInsideWidth_) / 2.0 + 1e-3;
   antiObstacles_.emplace_back(std::make_shared<Hyperrectangle<BaseAntiObstacle>>(
       spaceInfo_, goalGapMidpoint, goalGapWidths));
 }

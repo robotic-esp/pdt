@@ -120,7 +120,7 @@ CentreSquare::CentreSquare(const std::shared_ptr<const Configuration>& config,
   goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
 
   // Specify the optimization target.
-  optimizationObjective_->setCostThreshold(computeOptimum());
+  optimizationObjective_->setCostThreshold(computeMinPossibleCost());
 }
 
 bool CentreSquare::knowsOptimum() const {

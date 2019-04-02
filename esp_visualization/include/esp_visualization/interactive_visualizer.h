@@ -64,13 +64,25 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   void run();
 
  private:
+  void drawRectangle(const std::vector<double>& midpoint, const std::vector<double>& widths,
+                     const float* faceColor, const float* edgeColor) const;
   void drawRectangle2D(const std::vector<double>& midpoint, const std::vector<double>& widths,
-                       const float* color) const;
+                       const float* faceColor, const float* edgeColor) const;
+  void drawRectangle3D(const std::vector<double>& midpoint, const std::vector<double>& widths,
+                       const float* faceColor, const float* edgeColor) const;
+  void drawBoundary(const BaseContext& context) const;
   void drawPoints(const std::vector<Eigen::Vector2d>& points, const float* color, float size) const;
+  void drawPoints(const std::vector<Eigen::Vector3d>& points, const float* color, float size) const;
   void drawPoints(const std::vector<ompl::base::ScopedState<>>& states, const float* color,
                   float size) const;
-  void drawLines(const std::vector<Eigen::Vector2d>& points, const float* color, float width) const;
-  void drawPath(const std::vector<Eigen::Vector2d>& points, const float* color, float width) const;
+  void drawLines(const std::vector<Eigen::Vector2d>& points, float width, const float* color,
+                 float alpha = 1.0) const;
+  void drawLines(const std::vector<Eigen::Vector3d>& points, float width, const float* color,
+                 float alpha = 1.0) const;
+  void drawPath(const std::vector<Eigen::Vector2d>& points, float width, const float* color,
+                float alpha = 1.0) const;
+  void drawPath(const std::vector<Eigen::Vector3d>& points, float width, const float* color,
+                float alpha = 1.0) const;
 
   // Implement visualizations of contexts.
   void visit(const CentreSquare& context) const override;
@@ -90,11 +102,16 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;
 
   // Helpers.
-  std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>> getVerticesAndEdges(
+  std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>> getVerticesAndEdges2D(
       std::size_t iteration) const;
-  std::vector<Eigen::Vector2d> getVertices(std::size_t iteration) const;
-  std::vector<Eigen::Vector2d> getEdges(std::size_t iteration) const;
-  std::vector<Eigen::Vector2d> getPath(std::size_t iteration) const;
+  std::pair<std::vector<Eigen::Vector3d>, std::vector<Eigen::Vector3d>> getVerticesAndEdges3D(
+      std::size_t iteration) const;
+  std::vector<Eigen::Vector2d> getVertices2D(std::size_t iteration) const;
+  std::vector<Eigen::Vector3d> getVertices3D(std::size_t iteration) const;
+  std::vector<Eigen::Vector2d> getEdges2D(std::size_t iteration) const;
+  std::vector<Eigen::Vector3d> getEdges3D(std::size_t iteration) const;
+  std::vector<Eigen::Vector2d> getPath2D(std::size_t iteration) const;
+  std::vector<Eigen::Vector3d> getPath3D(std::size_t iteration) const;
 };
 
 }  // namespace ompltools
