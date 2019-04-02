@@ -34,7 +34,7 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_planning_contexts/random_rectangles.h"
+#include "esp_planning_contexts/repeating_rectangles.h"
 
 #include <cmath>
 #include <functional>
@@ -53,12 +53,11 @@ namespace esp {
 
 namespace ompltools {
 
-RandomRectangles::RandomRectangles(const std::shared_ptr<const Configuration>& config,
-                                   const std::string& name) :
+RepeatingRectangles::RepeatingRectangles(const std::shared_ptr<const Configuration>& config,
+                                         const std::string& name) :
     BaseContext(config, name),
-    numRectangles_(config->get<std::size_t>("Contexts/" + name + "/numObstacles")),
-    minSideLength_(config->get<double>("Contexts/" + name + "/minSideLength")),
-    maxSideLength_(config->get<double>("Contexts/" + name + "/maxSideLength")),
+    numObsPerDim_(config->get<std::size_t>("Contexts/" + name + "/numObstaclesPerDim")),
+    obsWidth_(config->get<double>("Contexts/" + name + "/obstacleWidth")),
     startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
     goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
   // Assert configuration sanity.
@@ -72,10 +71,12 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<const Configuration>& c
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (minSideLength_ > maxSideLength_) {
-    OMPL_ERROR("%s: Specified min side length is greater than specified max side length.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
+  for (std::size_t i = 1u; i < dimensionality_; ++i) {
+    if ((bounds_.at(i).second - bounds_.at(i).first) !=
+        bounds_.at(0u).second - bounds_.at(0u).first) {
+      OMPL_ERROR("%s: Repeating rectangles assumes a (hyper)square.");
+      throw std::runtime_error("Context error.");
+    }
   }
   // Create a state space and set the bounds.
   auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
@@ -83,14 +84,6 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<const Configuration>& c
 
   // Create the space information class:
   spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-
-  // Create a start state.
-  addStartState(startPos_);
-
-  // Create a goal state.
-  addGoalState(goalPos_);
-  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
 
   // Create the obstacles.
   createObstacles();
@@ -116,57 +109,88 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<const Configuration>& c
   optimizationObjective_->setCostToGoHeuristic(
       std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 
+  // Create a start state.
+  addStartState(startPos_);
+
+  // Create a goal state.
+  addGoalState(goalPos_);
+  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
+
   // Specify the optimization target.
   optimizationObjective_->setCostThreshold(computeMinPossibleCost());
 }
 
-bool RandomRectangles::knowsOptimum() const {
+bool RepeatingRectangles::knowsOptimum() const {
   return false;
 }
 
-ompl::base::Cost RandomRectangles::computeOptimum() const {
+ompl::base::Cost RepeatingRectangles::computeOptimum() const {
   throw ompl::Exception("The global optimum is unknown.", BaseContext::name_);
 }
 
-void RandomRectangles::setTarget(double targetSpecifier) {
+void RepeatingRectangles::setTarget(double targetSpecifier) {
   optimizationObjective_->setCostThreshold(
       ompl::base::Cost(targetSpecifier * this->computeOptimum().value()));
 }
 
-std::string RandomRectangles::lineInfo() const {
+std::string RepeatingRectangles::lineInfo() const {
   std::stringstream rval;
 
   return rval.str();
 }
 
-std::string RandomRectangles::paraInfo() const {
+std::string RepeatingRectangles::paraInfo() const {
   return std::string();
 }
 
-void RandomRectangles::accept(const ContextVisitor& visitor) const {
+void RepeatingRectangles::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
-void RandomRectangles::createObstacles() {
-  // Instantiate obstacles.
-  for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
-    // Create a random midpoint (uniform).
-    ompl::base::ScopedState<> midpoint(spaceInfo_);
-    midpoint.random();
-    // Create random widths (uniform).
-    std::vector<double> widths(dimensionality_, 0.0);
-    for (std::size_t j = 0; j < dimensionality_; ++j) {
-      widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
-    }
-    auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths);
-    // Add this to the obstacles if it doesn't invalidate the start or goal state.
-    if (!obstacle->invalidates(startStates_.back().get()) &&
-        !obstacle->invalidates(goalStates_.back().get())) {
-      obstacles_.emplace_back(obstacle);
-    } else {
-      --i;
+void RepeatingRectangles::createObstacles() {
+  // Let's try to keep this general for any number of dimensions.
+
+  // Generate evenly spaced coordinates.
+  for (std::size_t i = 1u; i < dimensionality_; ++i) {
+    if ((bounds_.at(i).second - bounds_.at(i).first) !=
+        bounds_.at(0u).second - bounds_.at(0u).first) {
+      OMPL_ERROR("%s: Repeating rectangles assumes a (hyper)square.");
+      throw std::runtime_error("Context error.");
     }
   }
+  std::vector<double> coordinates{};
+  coordinates.reserve(numObsPerDim_ * dimensionality_);
+  for (std::size_t i = 0u; i < numObsPerDim_; ++i) {
+    coordinates.emplace_back(
+        ((i + 1u) * (bounds_.at(0).second - bounds_.at(0).first) / (numObsPerDim_ + 1u)) +
+        bounds_.at(0u).first);
+  }
+  // Let d be the dimensionality. We need all combinations of d elements from the above coordinates
+  // with replacement. The easiest way I know how to do this is to add each element d times to the
+  // collection of possible coordinates and then use a all permutations of a bitmask that chooses
+  // elements from this collection.
+  for (std::size_t i = 1u; i < dimensionality_; ++i) {
+    std::copy_n(coordinates.begin(), numObsPerDim_, std::back_inserter(coordinates));
+  }
+  std::vector<std::uint8_t> bitmask(dimensionality_, 1u);
+  bitmask.resize(numObsPerDim_ * dimensionality_, 0u);
+  do {
+    // Take the coordinates of the bitmask for the midpoint.
+    ompl::base::ScopedState<> midpoint(spaceInfo_);
+    std::size_t dim{0u};
+    for (std::size_t i = 0u; i < bitmask.size(); ++i) {
+      if (bitmask[i]) {
+        midpoint[dim++] = coordinates[i];
+      }
+    }
+    // The widths are a parameter, so just take this.
+    std::vector<double> widths(dimensionality_, obsWidth_);
+
+    // Add the obstacle.
+    obstacles_.emplace_back(
+        std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths));
+  } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
 }
 
 }  // namespace ompltools

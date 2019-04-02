@@ -7,7 +7,7 @@
 #include "esp_planning_contexts/obstacle_free.h"
 #include "esp_planning_contexts/random_rectangles.h"
 #include "esp_planning_contexts/random_rectangles_multi_start_goal.h"
-// #include "esp_planning_contexts/regular_rectangles.h"
+#include "esp_planning_contexts/repeating_rectangles.h"
 // #include "esp_planning_contexts/spiral.h"
 #include "esp_planning_contexts/start_enclosure.h"
 #include "esp_planning_contexts/wall_gap.h"

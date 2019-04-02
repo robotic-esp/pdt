@@ -195,7 +195,7 @@ void InteractiveVisualizer::run() {
     glPointSize(2.0);
     pangolin::glDrawPoints(vertices);
     if (optionDrawEdges) {
-      glColor3fv(green);
+      glColor3fv(gray);
       pangolin::glDrawLines(edges);
     }
 
@@ -258,6 +258,13 @@ void InteractiveVisualizer::visit(const RandomRectangles& context) const {
 }
 
 void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const {
+  // Draw the start states.
+  drawStates(context.getStartStates(), red, 5.0);
+  // Draw the goal states.
+  drawStates(context.getGoalStates(), green, 5.0);
+}
+
+void InteractiveVisualizer::visit(const RepeatingRectangles& context) const {
   // Draw the start states.
   drawStates(context.getStartStates(), red, 5.0);
   // Draw the goal states.

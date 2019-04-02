@@ -49,7 +49,7 @@
             "wallWidth": 1.5,
             "wallThickness": 0.2,
             "gapOffset": 0.1,
-            "gapWidth": 0.02
+            "gapWidth": 0.04
         },
         "GoalEnclosure": {
             "type": "GoalEnclosure",
@@ -96,15 +96,16 @@
             "maxSideLength": 0.3,
             "minSideLength": 0.05
         },
-        "RegularRectangles": {
-            "type": "RegularRectangles",
+        "RepeatingRectangles": {
+            "type": "RepeatingRectangles",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
-            "startPositionX": -0.5,
-            "goalPositionX": 0.5,
+            "start": [-0.5, -0.5],
+            "goal": [0.5, 0.5],
             "collisionCheckResolution": 0.001,
-            "numObstaclesBetween": 5
+            "numObstaclesPerDim": 9,
+            "obstacleWidth": 0.1
         },
         "Spiral": {
             "type": "Spiral",

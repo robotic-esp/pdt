@@ -23,7 +23,7 @@ add_library(esp_planning_contexts
   src/obstacle_free.cpp
   src/random_rectangles.cpp
   src/random_rectangles_multi_start_goal.cpp
-  # src/regular_rectangles.cpp
+  src/repeating_rectangles.cpp
   # src/spiral.cpp
   src/start_enclosure.cpp
   src/wall_gap.cpp
