@@ -63,25 +63,18 @@ ompl::base::StateSpacePtr BaseContext::getStateSpace() const {
 }
 
 ompl::base::ProblemDefinitionPtr BaseContext::newProblemDefinition() const {
-  // Variables
-  // The problem definition
-  ompl::base::ProblemDefinitionPtr pdef;
-  // Allocate
-  pdef = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
 
-  // Store the optimization objective
-  pdef->setOptimizationObjective(optimizationObjective_);
+  // Store the optimization objective.
+  problemDefinition->setOptimizationObjective(optimizationObjective_);
 
-  // Add the start state(s)
-  for (unsigned int i = 0u; i < startStates_.size(); ++i) {
-    pdef->addStartState(startStates_.at(i));
+  // Set the goal and add start states.
+  problemDefinition->setGoal(goalPtr_);
+  for (const auto& start : startStates_) {
+    problemDefinition->addStartState(start);
   }
 
-  // Store
-  pdef->setGoal(goalPtr_);
-
-  // Return
-  return pdef;
+  return problemDefinition;
 }
 
 ompl::base::OptimizationObjectivePtr BaseContext::getOptimizationObjective() const {

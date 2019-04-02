@@ -63,8 +63,7 @@ BaseVisualizer::~BaseVisualizer() {
   dataThread_.join();
 }
 
-void BaseVisualizer::setContext(
-    const std::shared_ptr<BaseContext>& context) {
+void BaseVisualizer::setContext(const std::shared_ptr<BaseContext> &context) {
   // Setting a new context means all the data is invalid.
   viewedIteration_ = 0u;
 
@@ -127,6 +126,16 @@ std::shared_ptr<const ompl::base::PlannerData> BaseVisualizer::getPlannerData(
   return plannerData_.at(iteration);
 }
 
+const ompl::base::PathPtr BaseVisualizer::getSolutionPath(std::size_t iteration) const {
+  std::scoped_lock lock(solutionPathsMutex_);
+  if (iteration >= solutionPaths_.size()) {
+    std::cout << "Requested iteration: " << iteration << ", available: " << plannerData_.size()
+              << '\n';
+    throw std::runtime_error("Requested planner data of iteration that has not yet been processed");
+  }
+  return solutionPaths_.at(iteration);
+}
+
 time::Duration BaseVisualizer::getIterationDuration(std::size_t iteration) const {
   std::scoped_lock lock(durationsMutex_);
   if (iteration >= plannerData_.size()) {
@@ -159,7 +168,7 @@ void BaseVisualizer::createData() {
     setupDuration_ = time::Clock::now() - setupStartTime;
   }
 
-  while (dataThreadStopSignal_.wait_for(std::chrono::milliseconds(1)) ==
+  while (dataThreadStopSignal_.wait_for(std::chrono::nanoseconds(1)) ==
          std::future_status::timeout) {
     // Create a new iteration if we we're viewing one thats uncomfortably close.
     if (viewedIteration_ + iterationBuffer_ > largestIteration_) {
@@ -178,6 +187,15 @@ void BaseVisualizer::createData() {
       {  // Store the iteration duration.
         std::scoped_lock lock(durationsMutex_);
         durations_.emplace_back(iterationDuration);
+      }
+
+      {  // Store the solution path.
+        std::scoped_lock lock(solutionPathsMutex_);
+        if (planner_->getProblemDefinition()->hasExactSolution()) {
+          solutionPaths_.emplace_back(planner_->getProblemDefinition()->getSolutionPath());
+        } else {
+          solutionPaths_.emplace_back(nullptr);
+        }
       }
 
       {  // Store the planner data.

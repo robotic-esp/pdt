@@ -64,11 +64,13 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   void run();
 
  private:
-  // Helper methods to draw.
   void drawRectangle2D(const std::vector<double>& midpoint, const std::vector<double>& widths,
                        const float* color) const;
-  void drawStates(const std::vector<ompl::base::ScopedState<>>& states, const float* color,
+  void drawPoints(const std::vector<Eigen::Vector2d>& points, const float* color, float size) const;
+  void drawPoints(const std::vector<ompl::base::ScopedState<>>& states, const float* color,
                   float size) const;
+  void drawLines(const std::vector<Eigen::Vector2d>& points, const float* color, float width) const;
+  void drawPath(const std::vector<Eigen::Vector2d>& points, const float* color, float width) const;
 
   // Implement visualizations of contexts.
   void visit(const CentreSquare& context) const override;
@@ -86,6 +88,13 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   // Implement visualizations of obstacles.
   void visit(const Hyperrectangle<BaseObstacle>& obstacle) const override;
   void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;
+
+  // Helpers.
+  std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>> getVerticesAndEdges(
+      std::size_t iteration) const;
+  std::vector<Eigen::Vector2d> getVertices(std::size_t iteration) const;
+  std::vector<Eigen::Vector2d> getEdges(std::size_t iteration) const;
+  std::vector<Eigen::Vector2d> getPath(std::size_t iteration) const;
 };
 
 }  // namespace ompltools

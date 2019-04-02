@@ -36,6 +36,8 @@
 
 #include "esp_visualization/interactive_visualizer.h"
 
+#include <ompl/geometric/PathGeometric.h>
+
 namespace esp {
 
 namespace ompltools {
@@ -44,6 +46,10 @@ InteractiveVisualizer::InteractiveVisualizer(
     const std::shared_ptr<BaseContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
     BaseVisualizer(context, plannerPair) {
+  if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
+    OMPL_ERROR("Visualizer only tested for real vector state spaces.");
+    throw std::runtime_error("Visualizer error.");
+  }
 }
 
 void InteractiveVisualizer::run() {
@@ -57,18 +63,16 @@ void InteractiveVisualizer::run() {
   // Create the options panel.
   const std::string optionsName{"options"};
   pangolin::CreatePanel(optionsName).SetBounds(0.0f, 1.0f, 0.0f, pangolin::Attach::Pix(200));
-  pangolin::Var<bool> optionDrawEdges(optionsName + ".Draw Edges", true, true);
-  pangolin::Var<bool> optionDrawObstacles(optionsName + ".Draw Obstacles", true, true);
   pangolin::Var<bool> optionDrawContext(optionsName + ".Draw Context", true, true);
+  pangolin::Var<bool> optionDrawObstacles(optionsName + ".Draw Obstacles", true, true);
+  pangolin::Var<bool> optionDrawVertices(optionsName + ".Draw Vertices", true, true);
+  pangolin::Var<bool> optionDrawEdges(optionsName + ".Draw Edges", true, true);
+  pangolin::Var<bool> optionDrawSolution(optionsName + ".Draw Solution", true, true);
 
   // Register some keypresses.
   pangolin::RegisterKeyPressCallback('f', [this]() {
     if (viewedIteration_ < largestIteration_) {
       ++viewedIteration_;
-      std::cout << "Viewed iteration: " << viewedIteration_ << '\n';
-      std::cout << "Largest iteration: " << largestIteration_ << '\n';
-    } else {
-      OMPL_WARN("Cannot advance iteration.");
     }
   });
   pangolin::RegisterKeyPressCallback('b', [this]() {
@@ -85,8 +89,6 @@ void InteractiveVisualizer::run() {
       ++viewedIteration_;
       ++iter;
     }
-    std::cout << "Viewed iteration: " << viewedIteration_ << '\n';
-    std::cout << "Largest iteration: " << largestIteration_ << '\n';
   });
   pangolin::RegisterKeyPressCallback('B', [this]() {
     const std::size_t maxIters = 50u;
@@ -95,8 +97,6 @@ void InteractiveVisualizer::run() {
       --viewedIteration_;
       ++iter;
     }
-    std::cout << "Viewed iteration: " << viewedIteration_ << '\n';
-    std::cout << "Largest iteration: " << largestIteration_ << '\n';
   });
 
   // Set up a viewport. A viewport is where OpenGL draws to. We can
@@ -126,14 +126,13 @@ void InteractiveVisualizer::run() {
       ));
 
   // Get the bounds of the context to setup a correct renderstate.
-  if (BaseVisualizer::context_->getDimensions() == 2u) {
+  if (context_->getDimensions() == 2u) {
     glShadeModel(GL_FLAT);
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glLineWidth(1.0);
-    glPointSize(2.0);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
   } else {
@@ -143,42 +142,16 @@ void InteractiveVisualizer::run() {
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
   while (!pangolin::ShouldQuit()) {
-    const auto& currentPlannerData = getPlannerData(viewedIteration_);
-
-    // Get the vertices and edges in the format supported by Panglin.
-    std::vector<Eigen::Vector2d> vertices{};
-    std::vector<Eigen::Vector2d> edges{};  // Size must be multiple of two.
-    for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
-      auto parent = currentPlannerData->getVertex(i);
-      // Check the vertex is valid.
-      if (parent != ompl::base::PlannerData::NO_VERTEX) {
-        // Do I really have to make an extra allocation just to get at the coordinates?
-        ompl::base::ScopedState<> scopedParent(context_->getStateSpace(), parent.getState());
-        vertices.emplace_back(scopedParent[0], scopedParent[1]);
-
-        // Get the outgoing edges of this vertex.
-        std::vector<unsigned int> outgoingEdges{};
-        currentPlannerData->getEdges(i, outgoingEdges);
-        for (std::size_t j = 0; j < outgoingEdges.size(); ++j) {
-          // Check that the vertex is valid.
-          auto child = currentPlannerData->getVertex(outgoingEdges.at(j));
-          if (child != ompl::base::PlannerData::NO_VERTEX) {
-            // Add the parent.
-            edges.emplace_back(scopedParent[0], scopedParent[1]);
-
-            // Add the child.
-            ompl::base::ScopedState<> scopedChild(context_->getStateSpace(), child.getState());
-            edges.emplace_back(scopedChild[0], scopedChild[1]);
-          }
-        }
-      }
-    }
-
     // Activate this render state for the canvas.
     canvas.Activate(renderState);
 
     // Clear the viewport.
     glClear(GL_COLOR_BUFFER_BIT);
+
+    // Only draw obstacles if context is drawn.
+    if (!optionDrawContext) {
+      optionDrawObstacles = false;
+    }
 
     // Draw the obstacles.
     if (optionDrawObstacles) {
@@ -190,13 +163,23 @@ void InteractiveVisualizer::run() {
       }
     }
 
-    // Draw the vertices.
-    glColor3fv(blue);
-    glPointSize(2.0);
-    pangolin::glDrawPoints(vertices);
-    if (optionDrawEdges) {
-      glColor3fv(gray);
-      pangolin::glDrawLines(edges);
+    // Draw the vertices and edges.
+    if (optionDrawVertices && optionDrawEdges) {
+      auto [vertices, edges] = getVerticesAndEdges(viewedIteration_);
+      drawPoints(vertices, blue, 2.0);
+      drawLines(edges, gray, 1.0);
+    } else if (optionDrawVertices) {
+      auto vertices = getVertices(viewedIteration_);
+      drawPoints(vertices, blue, 2.0);
+    } else if (optionDrawEdges) {
+      auto edges = getEdges(viewedIteration_);
+      drawLines(edges, gray, 1.0);
+    }
+
+    // Draw the solution.
+    if (optionDrawSolution) {
+      auto path = getPath(viewedIteration_);
+      drawPath(path, purple, 3.0);
     }
 
     // Draw the context.
@@ -210,79 +193,79 @@ void InteractiveVisualizer::run() {
 
 void InteractiveVisualizer::visit(const CentreSquare& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::visit(const DividingWalls& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::visit(const DoubleEnclosure& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::visit(const FlankingGap& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::visit(const ObstacleFree& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::visit(const RandomRectangles& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::visit(const RepeatingRectangles& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::visit(const StartEnclosure& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::visit(const WallGap& context) const {
   // Draw the start states.
-  drawStates(context.getStartStates(), red, 5.0);
+  drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
-  drawStates(context.getGoalStates(), green, 5.0);
+  drawPoints(context.getGoalStates(), green, 5.0);
 }
 
 void InteractiveVisualizer::drawRectangle2D(const std::vector<double>& midpoint,
@@ -296,15 +279,35 @@ void InteractiveVisualizer::drawRectangle2D(const std::vector<double>& midpoint,
                        midpoint.at(0) + widths.at(0) / 2.0, midpoint.at(1) + widths.at(1) / 2.0);
 }
 
-void InteractiveVisualizer::drawStates(const std::vector<ompl::base::ScopedState<>>& states,
+void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector2d>& points,
                                        const float* color, float size) const {
   glColor3fv(color);
   glPointSize(size);
+  pangolin::glDrawPoints(points);
+}
+
+void InteractiveVisualizer::drawPoints(const std::vector<ompl::base::ScopedState<>>& states,
+                                       const float* color, float size) const {
   std::vector<Eigen::Vector2d> points;
   for (const auto& state : states) {
     points.emplace_back(state[0], state[1]);
   }
-  pangolin::glDrawPoints(points);
+  drawPoints(points, color, size);
+}
+
+void InteractiveVisualizer::drawLines(const std::vector<Eigen::Vector2d>& points,
+                                      const float* color, float width) const {
+  assert(points.size() % 2 == 0u);
+  glColor3fv(color);
+  glLineWidth(width);
+  pangolin::glDrawLines(points);
+}
+
+void InteractiveVisualizer::drawPath(const std::vector<Eigen::Vector2d>& points, const float* color,
+                                     float width) const {
+  glColor3fv(color);
+  glLineWidth(width);
+  pangolin::glDrawLineStrip(points);
 }
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
@@ -321,6 +324,102 @@ void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiOb
   } else {
     OMPL_ERROR("Interactive visualizer does not yet know how to draw 3D rectangle antiobstacles.");
   }
+}
+
+std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>>
+InteractiveVisualizer::getVerticesAndEdges(std::size_t iteration) const {
+  const auto& currentPlannerData = getPlannerData(iteration);
+  // Get the vertices and edges in the format supported by Panglin.
+  std::vector<Eigen::Vector2d> vertices{};
+  std::vector<Eigen::Vector2d> edges{};  // Size must be multiple of two.
+  for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
+    auto vertex = currentPlannerData->getVertex(i);
+    // Check the vertex is valid.
+    if (vertex != ompl::base::PlannerData::NO_VERTEX) {
+      const auto* vertexState =
+          static_cast<const ompl::base::RealVectorStateSpace::StateType*>(vertex.getState());
+      vertices.emplace_back(vertexState->values[0], vertexState->values[1]);
+
+      // Get the outgoing edges of this vertex.
+      std::vector<unsigned int> outgoingEdges{};
+      currentPlannerData->getEdges(i, outgoingEdges);
+      for (std::size_t j = 0; j < outgoingEdges.size(); ++j) {
+        // Check that the vertex is valid.
+        auto child = currentPlannerData->getVertex(outgoingEdges.at(j));
+        if (child != ompl::base::PlannerData::NO_VERTEX) {
+          // Add the parent.
+          edges.emplace_back(vertexState->values[0], vertexState->values[1]);
+
+          // Add the child.
+          const auto* childState =
+              static_cast<const ompl::base::RealVectorStateSpace::StateType*>(child.getState());
+          edges.emplace_back(childState->values[0], childState->values[1]);
+        }
+      }
+    }
+  }
+  return {vertices, edges};
+}
+
+std::vector<Eigen::Vector2d> InteractiveVisualizer::getVertices(std::size_t iteration) const {
+  const auto& currentPlannerData = getPlannerData(iteration);
+  // Get the vertices in a format supported by Pangolin.
+  std::vector<Eigen::Vector2d> vertices{};
+  for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
+    auto vertex = currentPlannerData->getVertex(i);
+    // Check the vertex is valid.
+    if (vertex != ompl::base::PlannerData::NO_VERTEX) {
+      const auto* vertexState =
+          static_cast<const ompl::base::RealVectorStateSpace::StateType*>(vertex.getState());
+      vertices.emplace_back(vertexState->values[0], vertexState->values[1]);
+    }
+  }
+  return vertices;
+}
+
+std::vector<Eigen::Vector2d> InteractiveVisualizer::getEdges(std::size_t iteration) const {
+  const auto& currentPlannerData = getPlannerData(iteration);
+  std::vector<Eigen::Vector2d> edges{};  // Size must be multiple of two.
+  for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
+    auto parent = currentPlannerData->getVertex(i);
+    // Check the vertex is valid.
+    if (parent != ompl::base::PlannerData::NO_VERTEX) {
+      const auto* parentState =
+          static_cast<const ompl::base::RealVectorStateSpace::StateType*>(parent.getState());
+
+      // Get the outgoing edges of this vertex.
+      std::vector<unsigned int> outgoingEdges{};
+      currentPlannerData->getEdges(i, outgoingEdges);
+      for (std::size_t j = 0; j < outgoingEdges.size(); ++j) {
+        // Check that the vertex is valid.
+        auto child = currentPlannerData->getVertex(outgoingEdges.at(j));
+        if (child != ompl::base::PlannerData::NO_VERTEX) {
+          // Add the parent.
+          edges.emplace_back(parentState->values[0], parentState->values[1]);
+
+          // Add the child.
+      const auto* childState =
+          static_cast<const ompl::base::RealVectorStateSpace::StateType*>(child.getState());
+          edges.emplace_back(childState->values[0], childState->values[1]);
+        }
+      }
+    }
+  }
+  return edges;
+}
+
+std::vector<Eigen::Vector2d> InteractiveVisualizer::getPath(std::size_t iteration) const {
+  std::vector<Eigen::Vector2d> points{};
+  auto solution = getSolutionPath(iteration);
+  if (solution != nullptr) {
+    auto path = solution->as<ompl::geometric::PathGeometric>()->getStates();
+    points.reserve(path.size());
+    for (const auto state : path) {
+      const auto* rstate = static_cast<const ompl::base::RealVectorStateSpace::StateType*>(state);
+      points.emplace_back(rstate->values[0], rstate->values[1]);
+    }
+  }
+  return points;
 }
 
 }  // namespace ompltools

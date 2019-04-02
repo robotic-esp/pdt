@@ -73,6 +73,7 @@ class BaseVisualizer {
   // Make data available to derived classes.
   std::shared_ptr<const ompl::base::PlannerData> getPlannerData(std::size_t iteration) const;
   time::Duration getIterationDuration(std::size_t iteration) const;
+  const ompl::base::PathPtr getSolutionPath(std::size_t iteration) const;
   time::Duration getTotalElapsedDuration(std::size_t iteration) const;
 
   // The current context.
@@ -117,7 +118,8 @@ class BaseVisualizer {
   time::Duration setupDuration_{};
   mutable std::mutex setupDurationMutex_{};
 
-  // std::map<std::size_t, const ompl::base::Path> solutionPath_;
+  std::vector<ompl::base::PathPtr> solutionPaths_{};
+  mutable std::mutex solutionPathsMutex_{};
   // TODO add a generic datastructure to hold planner specific data.
 
   // The thread that creates the data, i.e., solves the given planning problem.
