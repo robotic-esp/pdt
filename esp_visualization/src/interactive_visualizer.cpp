@@ -164,6 +164,10 @@ void InteractiveVisualizer::run() {
   minCost_ = context_->computeMinPossibleCost().value();
   while (!pangolin::ShouldQuit()) {
     // Register input.
+    if (pangolin::Pushed(optionScreenshot)) {
+      contextView.SaveOnRender("screenshot" + std::to_string(screenshotId_++) + '_' +
+                               context_->getName() + '_' + planner_->getName());
+    }
     if (pangolin::Pushed(optionPlay)) {
       optionTrack = false;
       playToIteration_ = true;
@@ -177,6 +181,7 @@ void InteractiveVisualizer::run() {
     // Set values if we're playing in realtime.
     if (playToIteration_) {
       if (displayIteration_ >= iterationToPlayTo_) {
+        displayIteration_ = iterationToPlayTo_;
         playToIteration_ = false;
       } else {
         actualDisplayDuration_ += time::Duration(

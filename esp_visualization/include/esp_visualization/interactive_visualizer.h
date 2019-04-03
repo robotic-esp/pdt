@@ -74,6 +74,7 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   time::Duration desiredDisplayDuration_{};
   time::Duration actualDisplayDuration_{};
   time::Clock::time_point displayStartTime_{};
+  std::size_t screenshotId_{0u};
 
   // Plotting.
   pangolin::DataLog costLog_{};
