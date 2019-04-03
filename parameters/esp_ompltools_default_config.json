@@ -12,16 +12,16 @@
         },
         "DividingWalls": {
             "type": "DividingWalls",
-            "start": [-0.5, 0.0],
-            "goal": [0.5, 0.0],
+            "start": [-0.9, 0.0],
+            "goal": [0.9, 0.0],
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 2,
             "collisionCheckResolution": 0.001,
             "numWalls": 3,
-            "wallThicknesses": [0.1, 0.2, 0.1],
-            "numGaps": 4,
-            "gapWidths": [0.2, 0.1, 0.1, 0.2]
+            "wallThicknesses": [0.04, 0.15, 0.05],
+            "numGaps": 8,
+            "gapWidths": [0.12, 0.08, 0.05, 0.01, 0.01, 0.05, 0.08, 0.12]
         },
         "DoubleEnclosure": {
             "type": "DoubleEnclosure",

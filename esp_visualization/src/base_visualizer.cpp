@@ -65,7 +65,7 @@ BaseVisualizer::~BaseVisualizer() {
 
 void BaseVisualizer::setContext(const std::shared_ptr<BaseContext> &context) {
   // Setting a new context means all the data is invalid.
-  viewedIteration_ = 0u;
+  displayIteration_ = 0u;
 
   // Stop iterating.
   dataThreadPromise_.set_value();
@@ -91,7 +91,7 @@ void BaseVisualizer::setContext(const std::shared_ptr<BaseContext> &context) {
 void BaseVisualizer::setPlanner(
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> &plannerPair) {
   // Setting a new context means all the data is invalid.
-  viewedIteration_ = 0u;
+  displayIteration_ = 0u;
 
   // Stop iterating.
   dataThreadPromise_.set_value();
@@ -171,7 +171,7 @@ void BaseVisualizer::createData() {
   while (dataThreadStopSignal_.wait_for(std::chrono::nanoseconds(1)) ==
          std::future_status::timeout) {
     // Create a new iteration if we we're viewing one thats uncomfortably close.
-    if (viewedIteration_ + iterationBuffer_ > largestIteration_) {
+    if (displayIteration_ + iterationBuffer_ > largestIteration_) {
       // Create a termination condition that stops the planner after one iteration.
       ompl::base::IterationTerminationCondition terminationCondition(1u);
 

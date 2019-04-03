@@ -84,7 +84,7 @@ class BaseVisualizer {
   PLANNER_TYPE plannerType_{};
 
   // The currently viewed and largest iterations.
-  std::atomic<std::size_t> viewedIteration_{0u};
+  std::atomic<std::size_t> displayIteration_{0u};
   std::atomic<std::size_t> largestIteration_{0u};
 
   // Some nice colors.

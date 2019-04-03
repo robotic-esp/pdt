@@ -64,6 +64,19 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   void run();
 
  private:
+  // General helpers.
+  void incrementIteration(std::size_t num = 1u);
+  void decrementIteration(std::size_t num = 1u);
+
+  // Plotting.
+  pangolin::DataLog costLog_{};
+  void updateCostLog();
+  double minCost_{0.0};
+  double maxCost_{0.0};
+  int largestPlottedIteration_{-1};
+  void logCost();
+
+  // Drawing.
   void drawRectangle(const std::vector<double>& midpoint, const std::vector<double>& widths,
                      const float* faceColor, const float* edgeColor) const;
   void drawRectangle2D(const std::vector<double>& midpoint, const std::vector<double>& widths,

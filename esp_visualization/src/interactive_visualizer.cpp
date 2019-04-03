@@ -55,63 +55,33 @@ InteractiveVisualizer::InteractiveVisualizer(
 void InteractiveVisualizer::run() {
   // The default window width and height.
   constexpr std::size_t windowWidth = 800;
-  constexpr std::size_t windowHeight = 600;
+  constexpr std::size_t windowHeight = 800;
+
+  costLog_.SetLabels(std::vector<std::string>({planner_->getName()}));
 
   // Create a window and bind it to the current OpenGL context.
   pangolin::CreateWindowAndBind("esp ompltools", windowWidth, windowHeight);
 
-  // Create the options panel.
-  const std::string optionsName{"options"};
-  pangolin::CreatePanel(optionsName).SetBounds(0.0f, 1.0f, 0.0f, pangolin::Attach::Pix(200));
-  pangolin::Var<bool> optionDrawContext(optionsName + ".Draw Context", true, true);
-  pangolin::Var<bool> optionDrawObstacles(optionsName + ".Draw Obstacles", true, true);
-  pangolin::Var<bool> optionDrawVertices(optionsName + ".Draw Vertices", true, true);
-  pangolin::Var<bool> optionDrawEdges(optionsName + ".Draw Edges", true, true);
-  pangolin::Var<bool> optionDrawSolution(optionsName + ".Draw Solution", true, true);
-
-  // Register some keypresses.
-  pangolin::RegisterKeyPressCallback('f', [this]() {
-    if (viewedIteration_ < largestIteration_) {
-      ++viewedIteration_;
-    }
-  });
-  pangolin::RegisterKeyPressCallback('b', [this]() {
-    if (viewedIteration_ > 0u) {
-      --viewedIteration_;
-    } else {
-      OMPL_WARN("Already displaying iteration 0.");
-    }
-  });
-  pangolin::RegisterKeyPressCallback('F', [this]() {
-    const std::size_t maxIters = 50u;
-    std::size_t iter = 0u;
-    while (viewedIteration_ < largestIteration_ && iter < maxIters) {
-      ++viewedIteration_;
-      ++iter;
-    }
-  });
-  pangolin::RegisterKeyPressCallback('B', [this]() {
-    const std::size_t maxIters = 50u;
-    std::size_t iter = 0u;
-    while (viewedIteration_ > 0u && iter < maxIters) {
-      --viewedIteration_;
-      ++iter;
-    }
-  });
-
   // Set up a viewport. A viewport is where OpenGL draws to. We can
   // have multiple viewports for different parts of a window. Any draw
   // command will draw to the active viewport.
-  pangolin::View& canvas = pangolin::CreateDisplay();
+  pangolin::View& contextView = pangolin::CreateDisplay();
+  pangolin::View& plotView = pangolin::CreateDisplay();
 
   // We can set the bounds of this viewport. The coordinates are with
   // respect to the window boundaries (0 is left/bottom, 1 is right/top).
   // We can also set an aspect ratio such that even if the window gets
   // rescaled the drawings in the viewport do not get distorted.
   auto bounds = context_->getBoundaries();
-  canvas.SetBounds(pangolin::Attach::Pix(5), pangolin::Attach::ReversePix(5),
-                   pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5), (bounds.at(0).second - bounds.at(0).first) / (bounds.at(1).second - bounds.at(1).first));
-  // (bounds.at(0).second - bounds.at(0).first) / (bounds.at(1).second - bounds.at(1).first));
+  contextView.SetBounds(
+      pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5), pangolin::Attach::Pix(205),
+      pangolin::Attach::ReversePix(5),
+      (bounds.at(0).second - bounds.at(0).first) / (bounds.at(1).second - bounds.at(1).first));
+  plotView.SetBounds(pangolin::Attach::Pix(5), pangolin::Attach::Pix(200),
+                     pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5));
+  pangolin::Plotter plotter(&costLog_, 0.0, 1.0, 0.0, 5.0);
+  plotter.SetBackgroundColour(pangolin::Colour::White());
+  plotView.AddDisplay(plotter);
 
   // Create an OpenGL render state. This controls how coordinates are
   // processed before they are drawn in OpenGL's [-1, 1] x [-1, 1] coordinates.
@@ -146,17 +116,41 @@ void InteractiveVisualizer::run() {
     renderState.SetProjectionMatrix(
         pangolin::ProjectionMatrix(640, 480, 420, 420, 320, 240, 0.2, 100));
     renderState.SetModelViewMatrix(pangolin::ModelViewLookAt(-2, 2, -2, 0, 0, 0, pangolin::AxisY));
-    canvas.SetHandler(&handler);
+    contextView.SetHandler(&handler);
   } else {
     throw std::runtime_error(
         "Interactive visualizer can currently only visualize 2D or 3D-context.");
   }
+
+  // Create the options panel.
+  const std::string optionsName{"options"};
+  pangolin::CreatePanel(optionsName).SetBounds(0.0f, 1.0f, 0.0f, pangolin::Attach::Pix(200));
+  pangolin::Var<bool> optionDrawContext(optionsName + ".Draw Context", true, true);
+  pangolin::Var<bool> optionDrawObstacles(optionsName + ".Draw Obstacles", true, true);
+  pangolin::Var<bool> optionDrawVertices(optionsName + ".Draw Vertices", true, true);
+  pangolin::Var<bool> optionDrawEdges(optionsName + ".Draw Edges", true, true);
+  pangolin::Var<bool> optionDrawSolution(optionsName + ".Draw Solution", true, true);
+  pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
+
+  // Register some keypresses.
+  pangolin::RegisterKeyPressCallback('f', [this]() { incrementIteration(1u); });
+  pangolin::RegisterKeyPressCallback('b', [this]() { decrementIteration(1u); });
+  pangolin::RegisterKeyPressCallback('F', [this]() {
+    incrementIteration(std::ceil(0.1 * static_cast<double>(largestIteration_)));
+  });
+  pangolin::RegisterKeyPressCallback('B', [this]() {
+    decrementIteration(std::ceil(0.1 * static_cast<double>(largestIteration_)));
+  });
+  pangolin::RegisterKeyPressCallback(' ', [&optionTrack]() { optionTrack = !optionTrack; });
+
   // This sets the color used when clearing the screen.
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
+  maxCost_ = context_->computeMinPossibleCost().value();
+  minCost_ = context_->computeMinPossibleCost().value();
   while (!pangolin::ShouldQuit()) {
     // Activate this render state for the canvas.
-    canvas.Activate(renderState);
+    contextView.Activate(renderState);
 
     // Clear the viewport.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -176,31 +170,38 @@ void InteractiveVisualizer::run() {
       }
     }
 
+    // Track the current iteration if selected.
+    if (optionTrack) {
+      while (displayIteration_ < largestIteration_) {
+        incrementIteration(100u);
+      }
+    }
+
     // Draw the vertices and edges.
     if (optionDrawVertices && optionDrawEdges) {
       if (context_->getDimensions() == 2u) {
-        auto [vertices, edges] = getVerticesAndEdges2D(viewedIteration_);
+        auto [vertices, edges] = getVerticesAndEdges2D(displayIteration_);
         drawPoints(vertices, blue, 2.0);
         drawLines(edges, 1.0, gray);
       } else if (context_->getDimensions() == 3u) {
-        auto [vertices, edges] = getVerticesAndEdges3D(viewedIteration_);
+        auto [vertices, edges] = getVerticesAndEdges3D(displayIteration_);
         drawPoints(vertices, blue, 2.0);
         drawLines(edges, 1.0, gray, 0.8);
       }
     } else if (optionDrawVertices) {
       if (context_->getDimensions() == 2u) {
-        auto vertices = getVertices2D(viewedIteration_);
+        auto vertices = getVertices2D(displayIteration_);
         drawPoints(vertices, blue, 2.0);
       } else if (context_->getDimensions() == 3u) {
-        auto vertices = getVertices3D(viewedIteration_);
+        auto vertices = getVertices3D(displayIteration_);
         drawPoints(vertices, blue, 2.0);
       }
     } else if (optionDrawEdges) {
       if (context_->getDimensions() == 2u) {
-        auto edges = getEdges2D(viewedIteration_);
+        auto edges = getEdges2D(displayIteration_);
         drawLines(edges, 1.0, gray);
       } else if (context_->getDimensions() == 3u) {
-        auto edges = getEdges3D(viewedIteration_);
+        auto edges = getEdges3D(displayIteration_);
         drawLines(edges, 1.0, gray, 0.8);
       }
     }
@@ -208,10 +209,10 @@ void InteractiveVisualizer::run() {
     // Draw the solution.
     if (optionDrawSolution) {
       if (context_->getDimensions() == 2u) {
-        auto path = getPath2D(viewedIteration_);
+        auto path = getPath2D(displayIteration_);
         drawPath(path, 3.0, purple);
       } else if (context_->getDimensions() == 3u) {
-        auto path = getPath3D(viewedIteration_);
+        auto path = getPath3D(displayIteration_);
         drawPath(path, 3.0, purple, 1.0);
       }
     }
@@ -220,7 +221,67 @@ void InteractiveVisualizer::run() {
     if (optionDrawContext) {
       context_->accept(*this);
     }
+
+    // Set the correct view of the plot.
+    plotter.SetView(pangolin::XYRangef(0, 1.06 * static_cast<float>(largestPlottedIteration_),
+                                       0.98 * minCost_, 1.02 * maxCost_));
+
+    plotter.ClearMarkers();
+    plotter.AddMarker(pangolin::Marker(
+        pangolin::Marker::Direction::Vertical, static_cast<float>(displayIteration_),
+        pangolin::Marker::Equality::Equal, pangolin::Colour(black[0], black[1], black[2])));
+
+    // Tell pangolin to render the frame.
     pangolin::FinishFrame();
+  }
+}
+
+void InteractiveVisualizer::incrementIteration(std::size_t num) {
+  if (num == 1u) {
+    if (displayIteration_ < largestIteration_) {
+      ++displayIteration_;
+      updateCostLog();
+    }
+  } else {
+    while (displayIteration_ < largestIteration_ && num > 0u) {
+      ++displayIteration_;
+      --num;
+      updateCostLog();
+    }
+  }
+}
+
+void InteractiveVisualizer::decrementIteration(std::size_t num) {
+  if (num == 1u) {
+    if (displayIteration_ > 0u) {
+      --displayIteration_;
+      updateCostLog();
+    }
+  } else {
+    while (displayIteration_ > 0u && num > 0u) {
+      --displayIteration_;
+      --num;
+      updateCostLog();
+    }
+  }
+}
+
+void InteractiveVisualizer::updateCostLog() {
+  while (largestPlottedIteration_ < static_cast<int>(displayIteration_)) {
+    auto path = getSolutionPath(++largestPlottedIteration_)->as<ompl::geometric::PathGeometric>();
+    if (path != nullptr) {
+      double cost =
+          path->cost(planner_->getProblemDefinition()->getOptimizationObjective()).value();
+      if (cost > maxCost_) {
+        maxCost_ = cost;
+      }
+      if (cost < minCost_) {
+        minCost_ = cost;
+      }
+      costLog_.Log(cost);
+    } else {
+      costLog_.Log(std::numeric_limits<double>::max());
+    }
   }
 }
 
@@ -301,6 +362,8 @@ void InteractiveVisualizer::visit(const RepeatingRectangles& context) const {
   drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
   drawPoints(context.getGoalStates(), green, 5.0);
+  // Draw the boundaries.
+  drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const StartEnclosure& context) const {
@@ -308,6 +371,8 @@ void InteractiveVisualizer::visit(const StartEnclosure& context) const {
   drawPoints(context.getStartStates(), red, 5.0);
   // Draw the goal states.
   drawPoints(context.getGoalStates(), green, 5.0);
+  // Draw the boundaries.
+  drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const WallGap& context) const {
@@ -329,30 +394,30 @@ void InteractiveVisualizer::drawBoundary(const BaseContext& context) const {
   } else if (context.getDimensions() == 3u) {
     auto bounds = context.getBoundaries();
     std::vector<Eigen::Vector3d> points{
-      {bounds.at(0).first, bounds.at(1).first, bounds.at(2).first},
-      {bounds.at(0).first, bounds.at(1).first, bounds.at(2).second},
-      {bounds.at(0).first, bounds.at(1).first, bounds.at(2).first},
-      {bounds.at(0).first, bounds.at(1).second, bounds.at(2).first},
-      {bounds.at(0).first, bounds.at(1).first, bounds.at(2).first},
-      {bounds.at(0).second, bounds.at(1).first, bounds.at(2).first},
-      {bounds.at(0).second, bounds.at(1).second, bounds.at(2).second},
-      {bounds.at(0).second, bounds.at(1).second, bounds.at(2).first},
-      {bounds.at(0).second, bounds.at(1).second, bounds.at(2).second},
-      {bounds.at(0).second, bounds.at(1).first, bounds.at(2).second},
-      {bounds.at(0).second, bounds.at(1).second, bounds.at(2).second},
-      {bounds.at(0).first, bounds.at(1).second, bounds.at(2).second},
-      {bounds.at(0).first, bounds.at(1).first, bounds.at(2).second},
-      {bounds.at(0).first, bounds.at(1).second, bounds.at(2).second},
-      {bounds.at(0).first, bounds.at(1).first, bounds.at(2).second},
-      {bounds.at(0).second, bounds.at(1).first, bounds.at(2).second},
-      {bounds.at(0).first, bounds.at(1).second, bounds.at(2).first},
-      {bounds.at(0).first, bounds.at(1).second, bounds.at(2).second},
-      {bounds.at(0).first, bounds.at(1).second, bounds.at(2).first},
-      {bounds.at(0).second, bounds.at(1).second, bounds.at(2).first},
-      {bounds.at(0).second, bounds.at(1).first, bounds.at(2).first},
-      {bounds.at(0).second, bounds.at(1).second, bounds.at(2).first},
-      {bounds.at(0).second, bounds.at(1).first, bounds.at(2).first},
-      {bounds.at(0).second, bounds.at(1).first, bounds.at(2).second},
+        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).first},
+        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).second},
+        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).first},
+        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).first},
+        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).first},
+        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).first},
+        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).second},
+        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).first},
+        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).second},
+        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).second},
+        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).second},
+        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).second},
+        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).second},
+        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).second},
+        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).second},
+        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).second},
+        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).first},
+        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).second},
+        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).first},
+        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).first},
+        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).first},
+        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).first},
+        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).first},
+        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).second},
     };
     pangolin::glDrawLines(points);
   }
@@ -482,7 +547,7 @@ void InteractiveVisualizer::drawPath(const std::vector<Eigen::Vector3d>& points,
 }
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
-  drawRectangle(obstacle.getAnchorCoordinates(), obstacle.getWidths(), black, black);
+  drawRectangle(obstacle.getAnchorCoordinates(), obstacle.getWidths(), black, gray);
 }
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
