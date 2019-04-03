@@ -105,7 +105,7 @@ class BaseVisualizer {
   void createData();
 
   // This is how many iterations we'll create ahead of the viewed iteration.
-  static constexpr std::size_t iterationBuffer_{2000u};
+  static constexpr std::size_t iterationBuffer_{5000u};
 
   // The planner data, indexed by the iteration.
   std::vector<std::shared_ptr<ompl::base::PlannerData>> plannerData_{};

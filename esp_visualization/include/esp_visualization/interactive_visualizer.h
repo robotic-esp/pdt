@@ -68,6 +68,13 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   void incrementIteration(std::size_t num = 1u);
   void decrementIteration(std::size_t num = 1u);
 
+  // Play to view and record to view.
+  bool playToIteration_{false};
+  std::size_t iterationToPlayTo_{0u};
+  time::Duration desiredDisplayDuration_{};
+  time::Duration actualDisplayDuration_{};
+  time::Clock::time_point displayStartTime_{};
+
   // Plotting.
   pangolin::DataLog costLog_{};
   void updateCostLog();

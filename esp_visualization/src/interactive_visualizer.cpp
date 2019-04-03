@@ -73,10 +73,17 @@ void InteractiveVisualizer::run() {
   // We can also set an aspect ratio such that even if the window gets
   // rescaled the drawings in the viewport do not get distorted.
   auto bounds = context_->getBoundaries();
-  contextView.SetBounds(
-      pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5), pangolin::Attach::Pix(205),
-      pangolin::Attach::ReversePix(5),
-      (bounds.at(0).second - bounds.at(0).first) / (bounds.at(1).second - bounds.at(1).first));
+  if (bounds.size() == 2u) {
+    contextView.SetBounds(
+        pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5), pangolin::Attach::Pix(205),
+        pangolin::Attach::ReversePix(5),
+        (bounds.at(0).second - bounds.at(0).first) / (bounds.at(1).second - bounds.at(1).first));
+  } else {
+    contextView.SetBounds(
+        pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5), pangolin::Attach::Pix(205),
+        pangolin::Attach::ReversePix(5),
+        -(bounds.at(0).second - bounds.at(0).first) / (bounds.at(1).second - bounds.at(1).first));
+  }
   plotView.SetBounds(pangolin::Attach::Pix(5), pangolin::Attach::Pix(200),
                      pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5));
   pangolin::Plotter plotter(&costLog_, 0.0, 1.0, 0.0, 5.0);
@@ -115,7 +122,7 @@ void InteractiveVisualizer::run() {
     glEnable(GL_DEPTH_TEST);
     renderState.SetProjectionMatrix(
         pangolin::ProjectionMatrix(640, 480, 420, 420, 320, 240, 0.2, 100));
-    renderState.SetModelViewMatrix(pangolin::ModelViewLookAt(-2, 2, -2, 0, 0, 0, pangolin::AxisY));
+    renderState.SetModelViewMatrix(pangolin::ModelViewLookAt(-2, 3, -2, 0, 0, 0, pangolin::AxisY));
     contextView.SetHandler(&handler);
   } else {
     throw std::runtime_error(
@@ -125,12 +132,19 @@ void InteractiveVisualizer::run() {
   // Create the options panel.
   const std::string optionsName{"options"};
   pangolin::CreatePanel(optionsName).SetBounds(0.0f, 1.0f, 0.0f, pangolin::Attach::Pix(200));
+
+  // Tickboxes.
   pangolin::Var<bool> optionDrawContext(optionsName + ".Draw Context", true, true);
   pangolin::Var<bool> optionDrawObstacles(optionsName + ".Draw Obstacles", true, true);
   pangolin::Var<bool> optionDrawVertices(optionsName + ".Draw Vertices", true, true);
   pangolin::Var<bool> optionDrawEdges(optionsName + ".Draw Edges", true, true);
   pangolin::Var<bool> optionDrawSolution(optionsName + ".Draw Solution", true, true);
   pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
+  // Buttons.
+  pangolin::Var<bool> optionScreenshot(optionsName + ".Screenshot Iteration", false, false);
+  pangolin::Var<double> optionSlowdown(optionsName + ".Replay Factor", 1, 1e-3, 1e1, true);
+  pangolin::Var<bool> optionPlay(optionsName + ".Play to Iteration", false, false);
+  pangolin::Var<bool> optionRecord(optionsName + ".Record to Iteration", false, false);
 
   // Register some keypresses.
   pangolin::RegisterKeyPressCallback('f', [this]() { incrementIteration(1u); });
@@ -149,6 +163,39 @@ void InteractiveVisualizer::run() {
   maxCost_ = context_->computeMinPossibleCost().value();
   minCost_ = context_->computeMinPossibleCost().value();
   while (!pangolin::ShouldQuit()) {
+    // Register input.
+    if (pangolin::Pushed(optionPlay)) {
+      optionTrack = false;
+      playToIteration_ = true;
+      iterationToPlayTo_ = displayIteration_;
+      displayIteration_ = 0u;
+      desiredDisplayDuration_ = getIterationDuration(displayIteration_);
+      actualDisplayDuration_ = time::Duration(0.0);
+      displayStartTime_ = time::Clock::now();
+    }
+
+    // Set values if we're playing in realtime.
+    if (playToIteration_) {
+      if (displayIteration_ >= iterationToPlayTo_) {
+        playToIteration_ = false;
+      } else {
+        actualDisplayDuration_ += time::Duration(
+            time::Duration((time::Clock::now() - displayStartTime_)).count() * optionSlowdown);
+        if (actualDisplayDuration_ >= desiredDisplayDuration_) {
+          // Compute how much we overshot.
+          auto overshoot = actualDisplayDuration_ - desiredDisplayDuration_;
+          time::Duration totalSkippingDuration(0.0);
+          do {
+            incrementIteration(1u);
+            totalSkippingDuration += getIterationDuration(displayIteration_);
+          } while (overshoot > totalSkippingDuration);
+          desiredDisplayDuration_ = getIterationDuration(displayIteration_);
+          actualDisplayDuration_ = time::Duration(0.0);
+        }
+        displayStartTime_ = time::Clock::now();
+      }
+    }
+
     // Activate this render state for the canvas.
     contextView.Activate(renderState);
 
@@ -225,7 +272,7 @@ void InteractiveVisualizer::run() {
     // Set the correct view of the plot.
     plotter.SetView(pangolin::XYRangef(0, 1.06 * static_cast<float>(largestPlottedIteration_),
                                        0.98 * minCost_, 1.02 * maxCost_));
-
+    // Add the marker for the current iteration to the plot.
     plotter.ClearMarkers();
     plotter.AddMarker(pangolin::Marker(
         pangolin::Marker::Direction::Vertical, static_cast<float>(displayIteration_),
