@@ -37,6 +37,9 @@
 #include "esp_visualization/interactive_visualizer.h"
 
 #include <ompl/geometric/PathGeometric.h>
+#include <pangolin/display/display_internal.h>
+
+#include "esp_visualization/fonts.h"
 
 namespace esp {
 
@@ -61,6 +64,10 @@ void InteractiveVisualizer::run() {
 
   // Create a window and bind it to the current OpenGL context.
   pangolin::CreateWindowAndBind("esp ompltools", windowWidth, windowHeight);
+
+  // Set a more pleasureable font.
+  auto GlContext = pangolin::GetCurrentContext();
+  GlContext->font = std::make_shared<pangolin::GlFont>(Fonts::ROBOTO_REGULAR.string(), 16);
 
   // Set up a viewport. A viewport is where OpenGL draws to. We can
   // have multiple viewports for different parts of a window. Any draw

@@ -70,11 +70,12 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
 
   // Play to view and record to view.
   bool playToIteration_{false};
+  bool recording_{false};
   std::size_t iterationToPlayTo_{0u};
   time::Duration desiredDisplayDuration_{};
   time::Duration actualDisplayDuration_{};
   time::Clock::time_point displayStartTime_{};
-  std::size_t screenshotId_{0u};
+  std::size_t screencaptureId_{0u};
 
   // Plotting.
   pangolin::DataLog costLog_{};

@@ -4,6 +4,9 @@ project(esp_visualization)
 # Find Pangolin.
 find_package(Pangolin REQUIRED)
 
+# Make the path to the source directory available in code.
+configure_file(src/fonts.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/fonts.cpp @ONLY)
+
 # Include necessary header directories.
 include_directories(
   ${Pangolin_INCLUDE_DIRS} 
@@ -13,7 +16,8 @@ include_directories(
 # Build the library.
 add_library(esp_visualization
   src/base_visualizer.cpp
-  src/interactive_visualizer.cpp)
+  src/interactive_visualizer.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/fonts.cpp)
 
 # Link the library.
 target_link_libraries(esp_visualization
