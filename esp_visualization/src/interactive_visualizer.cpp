@@ -141,17 +141,17 @@ void InteractiveVisualizer::run() {
   pangolin::CreatePanel(optionsName).SetBounds(0.0f, 1.0f, 0.0f, pangolin::Attach::Pix(200));
 
   // Tickboxes.
-  pangolin::Var<bool> optionDrawContext(optionsName + ".Draw Context", true, true);
-  pangolin::Var<bool> optionDrawObstacles(optionsName + ".Draw Obstacles", true, true);
-  pangolin::Var<bool> optionDrawVertices(optionsName + ".Draw Vertices", true, true);
-  pangolin::Var<bool> optionDrawEdges(optionsName + ".Draw Edges", true, true);
-  pangolin::Var<bool> optionDrawSolution(optionsName + ".Draw Solution", true, true);
+  pangolin::Var<bool> optionDrawContext(optionsName + ".Context", true, true);
+  pangolin::Var<bool> optionDrawObstacles(optionsName + ".Obstacles", true, true);
+  pangolin::Var<bool> optionDrawVertices(optionsName + ".Vertices", true, true);
+  pangolin::Var<bool> optionDrawEdges(optionsName + ".Edges", true, true);
+  pangolin::Var<bool> optionDrawSolution(optionsName + ".Solution", true, true);
   pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
   // Buttons.
-  pangolin::Var<bool> optionScreenshot(optionsName + ".Screenshot Iteration", false, false);
+  pangolin::Var<bool> optionScreenshot(optionsName + ".Screenshot", false, false);
   pangolin::Var<double> optionSlowdown(optionsName + ".Replay Factor", 1, 1e-3, 1e1, true);
-  pangolin::Var<bool> optionPlay(optionsName + ".Play to Iteration", false, false);
-  pangolin::Var<bool> optionRecord(optionsName + ".Record to Iteration", false, false);
+  pangolin::Var<bool> optionPlay(optionsName + ".Play", false, false);
+  pangolin::Var<bool> optionRecord(optionsName + ".Record", false, false);
 
   // Register some keypresses.
   pangolin::RegisterKeyPressCallback('f', [this]() { incrementIteration(1u); });
@@ -172,8 +172,8 @@ void InteractiveVisualizer::run() {
   while (!pangolin::ShouldQuit()) {
     // Register input.
     if (pangolin::Pushed(optionScreenshot)) {
-      contextView.SaveOnRender("screenshot" + std::to_string(screenshotId_++) + '_' +
-                               context_->getName() + '_' + planner_->getName());
+      contextView.SaveOnRender(std::to_string(screencaptureId_++) + '_' + context_->getName() +
+                               '_' + planner_->getName());
     }
     if (pangolin::Pushed(optionPlay)) {
       optionTrack = false;
@@ -184,12 +184,30 @@ void InteractiveVisualizer::run() {
       actualDisplayDuration_ = time::Duration(0.0);
       displayStartTime_ = time::Clock::now();
     }
+    if (pangolin::Pushed(optionRecord)) {
+      optionTrack = false;
+      playToIteration_ = true;
+      iterationToPlayTo_ = displayIteration_;
+      displayIteration_ = 0u;
+      desiredDisplayDuration_ = getIterationDuration(displayIteration_);
+      actualDisplayDuration_ = time::Duration(0.0);
+      displayStartTime_ = time::Clock::now();
+      recording_ = true;
+      contextView.RecordOnRender("ffmpeg:[fps=60,bps=100000000,unique_filename]//" +
+                                 std::to_string(screencaptureId_++) + '_' + context_->getName() +
+                                 '_' + planner_->getName() + ".avi");
+    }
 
     // Set values if we're playing in realtime.
     if (playToIteration_) {
       if (displayIteration_ >= iterationToPlayTo_) {
         displayIteration_ = iterationToPlayTo_;
         playToIteration_ = false;
+        if (recording_) {
+          contextView.RecordOnRender("ffmpeg:[fps=60,bps=100000000,unique_filename]//" +
+                                     std::to_string(screencaptureId_) + '_' + context_->getName() +
+                                     '_' + planner_->getName() + ".avi");
+        }
       } else {
         actualDisplayDuration_ += time::Duration(
             time::Duration((time::Clock::now() - displayStartTime_)).count() * optionSlowdown);
