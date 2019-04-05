@@ -82,6 +82,7 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   void updateCostLog();
   double minCost_{0.0};
   double maxCost_{0.0};
+  float plotBackgroundColor_[4] {0.9, 0.9, 0.9, 1.0};
   int largestPlottedIteration_{-1};
   void logCost();
 

@@ -214,7 +214,7 @@ class PerformanceLog {
   };
 
   fs::path getFilePath() const {
-    return fs::current_path() /= fs::path(filename_);
+    return fs::current_path() / fs::path(filename_);
   }
 
   void addResult(const std::string& plannerName, const Logger& logger) {

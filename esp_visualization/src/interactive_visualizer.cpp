@@ -91,10 +91,10 @@ void InteractiveVisualizer::run() {
         pangolin::Attach::ReversePix(5),
         -(bounds.at(0).second - bounds.at(0).first) / (bounds.at(1).second - bounds.at(1).first));
   }
-  plotView.SetBounds(pangolin::Attach::Pix(5), pangolin::Attach::Pix(200),
-                     pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5));
+  plotView.SetBounds(0.0, pangolin::Attach::Pix(200), pangolin::Attach::Pix(200), 1.0);
   pangolin::Plotter plotter(&costLog_, 0.0, 1.0, 0.0, 5.0);
-  plotter.SetBackgroundColour(pangolin::Colour::White());
+  plotter.SetBackgroundColour(
+      pangolin::Colour(plotBackgroundColor_[0], plotBackgroundColor_[1], plotBackgroundColor_[2]));
   plotView.AddDisplay(plotter);
 
   // Create an OpenGL render state. This controls how coordinates are
