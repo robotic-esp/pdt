@@ -34,16 +34,6 @@
 
 // Authors: Marlin Strub
 
-// I really don't like having to do this, but I don't see any way around it. The main issue is that
-// the planner base class does not provide access to the current best cost. It does for some
-// planners (through the progressProperties) but the planner implementations are free to choose the
-// corresponding property name themselves and of course its not the same for all planners (e.g.,
-// "best cost REAL" vs "best cost DOUBLE"). Similarly, most anytime planners provide direct access
-// to their current best cost, but the corresponding function is not named (e.g., getBestCost() in
-// LBTRRT and bestCost() in RRT). On top of that the planner base class does not have a type
-// property (only a name). But I don't feel comfortable comparing strings all the time, especially
-// when logging the best costs.
-
 #pragma once
 
 #include "nlohmann/json.hpp"

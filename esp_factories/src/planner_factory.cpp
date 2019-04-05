@@ -121,7 +121,6 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setGoalBias(config_->get<double>(parentKey + "/goalBias"));
       planner->setSampleRejection(config_->get<bool>(parentKey + "/enableSampleRejection"));
       planner->setVariant(config_->get<std::size_t>(parentKey + "/variant"));
-      planner->setEpsilon(config_->get<std::size_t>(parentKey + "/epsilon"));
       planner->setInformedSampling(false);
       return {planner, PLANNER_TYPE::RRTSHARP};
     }
