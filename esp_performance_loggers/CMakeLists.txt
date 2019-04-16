@@ -11,6 +11,7 @@ include_directories(
 
 # Build the library.
 add_library(esp_performance_loggers
+  src/accumulating_loggers.cpp
   src/performance_loggers.cpp)
 
 # Link the library.

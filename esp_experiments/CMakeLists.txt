@@ -1,3 +1,11 @@
+add_executable(generate_tikz_plot
+  src/generate_tikz_plot.cpp
+  )
+target_link_libraries(generate_tikz_plot PUBLIC
+  ${Boost_LIBRARIES}
+  esp_tikz
+)
+
 add_executable(planner_initial_solution
   src/planner_initial_solution.cpp
 )
@@ -22,6 +30,7 @@ target_link_libraries(planner_performance PUBLIC
   esp_factories
   esp_planning_contexts
   esp_performance_loggers
+  esp_tikz
   esp_time
   esp_utilities
 )

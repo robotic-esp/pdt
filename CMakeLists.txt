@@ -32,13 +32,13 @@ message(STATUS "CMAKE_CXX_COMPILER_VERSION = ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "Configuring for ${CMAKE_BUILD_TYPE} mode:")
 
 # Find Threads.
-find_package(Threads)
+find_package(Threads REQUIRED)
 
 # Find Eigen.
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-# TODO: Put this in the correct CMake project.
+# TODO: Put this in the correct subproject.
 # Find Boost.
 find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options filesystem system thread)
 include_directories(${Boost_INCLUDE_DIR})
@@ -64,6 +64,8 @@ add_subdirectory(esp_factories)
 add_subdirectory(esp_obstacles)
 add_subdirectory(esp_performance_loggers)
 add_subdirectory(esp_planning_contexts)
+add_subdirectory(esp_statistics)
+add_subdirectory(esp_tikz)
 add_subdirectory(esp_time)
 add_subdirectory(esp_utilities)
 add_subdirectory(esp_visualization)

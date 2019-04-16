@@ -1,4 +1,4 @@
-function confidenceIntervalTest(n, i, j)
+function out = confidenceIntervalTest(n, i, j)
     %Calculates the probability that the median the true population lies
     %within the open interval (i, j)
     
@@ -21,6 +21,6 @@ function confidenceIntervalTest(n, i, j)
 
     %If we undo the symmetry assumption from the second approach above, we get
     out = 1 - binocdf(i - 1,n,0.5) - binocdf(n - j,n,0.5);
-    fprintf('CI (%d, %d): %6.6f\n', i, j, out);
+%     fprintf('CI (%d, %d): %6.6f\n', i, j, out);
     
 end

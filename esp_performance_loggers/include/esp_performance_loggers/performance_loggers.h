@@ -213,9 +213,7 @@ class PerformanceLog {
                     fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
   };
 
-  fs::path getFilePath() const {
-    return fs::current_path() / fs::path(filename_);
-  }
+  fs::path getFilePath() const { return fs::current_path() / fs::path(filename_); }
 
   void addResult(const std::string& plannerName, const Logger& logger) {
     // Make sure we can write to this file.
@@ -240,7 +238,7 @@ class PerformanceLog {
     // This file should not accidentally be written to.
     fs::permissions(filename_,
                     fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
-  };
+  }
 
  private:
   std::string filename_;

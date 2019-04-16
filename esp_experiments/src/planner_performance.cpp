@@ -49,7 +49,9 @@
 #include "esp_factories/context_factory.h"
 #include "esp_factories/planner_factory.h"
 #include "esp_performance_loggers/performance_loggers.h"
+#include "esp_performance_loggers/accumulating_loggers.h"
 #include "esp_planning_contexts/all_contexts.h"
+#include "esp_tikz/performance_plotter.h"
 #include "esp_time/time.h"
 #include "esp_utilities/get_best_cost.h"
 
@@ -78,17 +80,16 @@ int main(int argc, char **argv) {
   std::cout << '\n';
 
   // Create the performance log.
-  esp::ompltools::PerformanceLog<esp::ompltools::TimeCostLogger> performanceLog(
-      config->get<std::string>("Experiment/executable") + std::string("_logs/") +
-      experimentStartTimeString + '_' + context->getName() + std::string(".csv"));
+  esp::ompltools::AccumulatingCostLog log(
+      config->get<std::vector<std::string>>("Experiment/planners"), context->getTargetDuration(),
+      config->get<double>("Experiment/logFrequency"));
+  log.createLogFile(config->get<std::string>("Experiment/executable") + std::string("_logs/") +
+                    experimentStartTimeString + '_' + context->getName() + std::string(".csv"));
 
   // May the best planner win.
   for (std::size_t i = 0; i < config->get<std::size_t>("Experiment/numRuns"); ++i) {
     std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << " | ";
     for (const auto &plannerName : config->get<std::vector<std::string>>("Experiment/planners")) {
-      // Create the logger for this run.
-      esp::ompltools::TimeCostLogger logger(context->getTargetDuration(),
-                                            config->get<std::size_t>("Experiment/logFrequency"));
       // Allocate the planner.
       auto [planner, plannerType] = plannerFactory.create(plannerName);
 
@@ -107,8 +108,9 @@ int main(int argc, char **argv) {
           [&planner, &maxSolveDuration]() { planner->solve(maxSolveDuration); });
       // Log the intermediate best costs.
       do {
-        logger.addMeasurement(setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime),
-                              esp::ompltools::utilities::getBestCost(planner, plannerType));
+        log.addMeasurement(plannerName,
+                           setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime),
+                           esp::ompltools::utilities::getBestCost(planner, plannerType));
       } while (!solveThread.try_join_for(
           boost::chrono::duration<double>(1.0 / config->get<double>("Experiment/logFrequency"))));
 
@@ -118,18 +120,18 @@ int main(int argc, char **argv) {
       // Store the final cost.
       auto problem = planner->getProblemDefinition();
       if (problem->hasExactSolution()) {
-        logger.addMeasurement(
-            totalDuration, problem->getSolutionPath()->cost(context->getOptimizationObjective()));
+        log.addMeasurement(plannerName, totalDuration,
+                           problem->getSolutionPath()->cost(context->getOptimizationObjective()));
       } else {
-        logger.addMeasurement(totalDuration,
-                              ompl::base::Cost(std::numeric_limits<double>::infinity()));
+        log.addMeasurement(plannerName, totalDuration,
+                           ompl::base::Cost(std::numeric_limits<double>::infinity()));
       }
 
       // Add this run to the log and report it to the console.
-      performanceLog.addResult(planner->getName(), logger);
-      auto result = logger.lastMeasurement();
-      std::cout << std::setw(17) << std::left << result.first << std::setw(8) << std::fixed
-                << result.second << " | " << std::flush;
+      log.processMeasurements();
+      // auto result = logger.lastMeasurement();
+      // std::cout << std::setw(17) << std::left << result.first << std::setw(8) << std::fixed
+      //           << result.second << " | " << std::flush;
     }
   }
 
@@ -139,7 +141,7 @@ int main(int argc, char **argv) {
   esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
 
   // Log some info to a log file.
-  auto performanceLogPath = performanceLog.getFilePath();
+  auto performanceLogPath = log.getFilePath();
   auto experimentLogPath =
       std::experimental::filesystem::path(performanceLogPath).replace_extension(".log");
   ompl::msg::OutputHandlerFile experimentLog(experimentLogPath.c_str());
@@ -152,6 +154,10 @@ int main(int argc, char **argv) {
   OMPL_INFORM("Duration of experiment: '%s'",
               esp::ompltools::time::toDurationString(experimentDuration).c_str());
   OMPL_INFORM("Wrote results to '%s'", performanceLogPath.c_str());
+
+  // Generate the plot.
+  esp::ompltools::PerformancePlotter plotter(performanceLogPath.parent_path());
+  plotter.generateQuantileCostPlot(log, 0.5);
 
   // Dump the accessed parameters next to the results file.
   auto configPath =

@@ -46,41 +46,32 @@ function makeHistoryPlots(R)
     %Plot time:
     if (R == 0.2)
         %Interp spacing (us):
-        interpTime = 100*1e-6;
+        interpTime = 1 / 10000.0;
         
         %Number of experiments in each file:
-        numExp = 10;
+        numExp = 50;
     
         %The run time
         plotTime = 0.2;
 
         %The filesnames. Ommit the data/ and the .csv.
         filenames = {
-            '2019-03-25_16:18:45'
-%             'R8S18439071351109370200RegularRects'
-%             'R8S18439071143733709969RandRect'
-%             'R4S18439071184667532744RandRect'
-%             'R4S18439071184930502469RandRect'
-%             'R4S18439071185187944460RandRect'
-%             'R4S18439071185450992270RandRect'
-%             'R4S18439071185709980611RandRect'
-%             'R4S18439071185974167306RandRect'
-%             'R4S18439071186242979955RandRect'
+            '2019-04-12_12-28-53_FlankingGap'
         };
 
         figures = {};
 
         planners = {
-                    'BITstar',            'BIT*',             b, '-';
+%                     'BITstar',            'BIT*',             b, '-';
 %                     'BITstarRegression100', 'BIT* (reg)',       c, '-';
-%                     'ABITstar100',           'SBIT*',            g, '-';
-                    'RRTConnect',            'RRTConnect',       k, '-';
+                    'SBITstar',           'SBIT*',            g, '-';
+%                     'RRTConnect',            'RRTConnect',       k, '-';
 %                     'LBTRRT',                'LBTRRT',           p, '-';
                     'RRTstar',               'RRT*',             r, '-';
 %                     'RRTsharp',              'RRT$^{\#}$',       o, '-';
                     };
 
-        ignorePlanners = {'DELETEME'};   
+        ignorePlanners = {};
     elseif (R == 0.4)
         %Interp spacing (us):
         interpTime = 1000*1e-6;
