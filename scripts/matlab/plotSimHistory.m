@@ -44,60 +44,159 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
         plotAverageSTDErrorBars = false;
         if numExp == 50
             %See confidenceIntervalTest(n, i, j)
-%             %For 96.7%. (i.e., 95%)
+%             %For 95.11%. (i.e., 95%).
 %             lowIdx = 18;
-%             highIdx = 33;
-            %For 99.9%. (i.e., 99%)
-            lowIdx = 14;
-            highIdx = 37;
+%             highIdx = 32;
+            %For 99.10%. (i.e., 99%).
+            lowIdx = 15;
+            highIdx = 34;
             plotMedianCIErrorBars = true;
         elseif numExp == 100
             %See confidenceIntervalTest(n, i, j)
-%             %For 96.5 (i.e., 95%).
+%             %For 95.40% (i.e., 95%).
 %             lowIdx = 40;
-%             highIdx = 61;
-            %For 99.9% (i.e., 99%)
-            lowIdx = 34;
-            highIdx = 67;
+%             highIdx = 60;
+            %For 99.07% (i.e., 99%)
+            lowIdx = 37;
+            highIdx = 63;
             plotMedianCIErrorBars = true;
         elseif numExp == 200
             %See confidenceIntervalTest(n, i, j)
-%             %For 96.0% (i.e., 95%). 
+%             %For 95.20% (i.e., 95%).
 %             lowIdx = 86;
-%             highIdx = 115;
-            %For 99.1% (i.e., 99%).
-            lowIdx = 82;
-            highIdx = 119;
+%             highIdx = 114;
+            %For 99.06% (i.e., 99%).
+            lowIdx = 81;
+            highIdx = 118;
             plotMedianCIErrorBars = true;
         elseif numExp == 250
             %See confidenceIntervalTest(n, i, j)
-%             %For 95.0% (i.e., 95%). 
+%             %For 95.03% (i.e., 95%).
 %             lowIdx = 110;
 %             highIdx = 141;
-            %For 99.1% (i.e., 99%).
-            lowIdx = 105;
-            highIdx = 146;
+            %For 99.00% (i.e., 99%).
+            lowIdx = 104;
+            highIdx = 145;
 %             %For 99.92% (i.e., 99.9%)
 %             lowIdx = 99;
 %             highIdx = 152;
             plotMedianCIErrorBars = true;
         elseif numExp == 300
             %See confidenceIntervalTest(n, i, j)
-%             %For 95.7% (i.e., 95%). 
+%             %For 95.02% (i.e., 95%).
 %             lowIdx = 133;
-%             highIdx = 168;
-            %For 99.1% (i.e., 99%).
-            lowIdx = 128;
-            highIdx = 173;
+%             highIdx = 167;
+            %For 99.03% (i.e., 99%).
+            lowIdx = 127;
+            highIdx = 172;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 400
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.22% (i.e., 95%).
+%             lowIdx = 179;
+%             highIdx = 219;
+            %For 99.07% (i.e., 99%).
+            lowIdx = 174;
+            highIdx = 226;
             plotMedianCIErrorBars = true;
         elseif numExp == 500
             %See confidenceIntervalTest(n, i, j)
-%             %For 95.6% (i.e., 95%). 
+%             %For 95.08% (i.e., 95%).
 %             lowIdx = 228;
-%             highIdx = 273;
-            %For 99.1% (i.e., 99%).
+%             highIdx = 272;
+            %For 99.05% (i.e., 99%).
             lowIdx = 221;
-            highIdx = 280;
+            highIdx = 279;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 600
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.08% (i.e., 95%).
+%             lowIdx = 274;
+%             highIdx = 323;
+            %For 99.07% (i.e., 99%).
+            lowIdx = 267;
+            highIdx = 331;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 700
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.17% (i.e., 95%).
+%             lowIdx = 324;
+%             highIdx = 376;
+            %For 99.01% (i.e., 99%).
+            lowIdx = 314;
+            highIdx = 383;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 800
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.11% (i.e., 95%).
+%             lowIdx = 371;
+%             highIdx = 427;
+            %For 99.00% (i.e., 99%).
+            lowIdx = 363;
+            highIdx = 436;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 900
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.03% (i.e., 95%).
+%             lowIdx = 420;
+%             highIdx = 479;
+            %For 99.04% (i.e., 99%).
+            lowIdx = 410;
+            highIdx = 488;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 1000
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.00% (i.e., 95%).
+%             lowIdx = 469;
+%             highIdx = 531;
+            %For 99.05% (i.e., 99%).
+            lowIdx = 458;
+            highIdx = 540;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 2000
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.04% (i.e., 95%).
+%             lowIdx = 955;
+%             highIdx = 1043;
+            %For 99.01% (i.e., 99%).
+            lowIdx = 940;
+            highIdx = 1056;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 5000
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.03% (i.e., 95%).
+%             lowIdx = 2429;
+%             highIdx = 2568;
+            %For 99.01% (i.e., 99%).
+            lowIdx = 2406;
+            highIdx = 2589;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 10000
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.00% (i.e., 95%).
+%             lowIdx = 4897;
+%             highIdx = 5094;
+            %For 99.00% (i.e., 99%).
+            lowIdx = 4869;
+            highIdx = 5127;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 100000
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.00% (i.e., 95%).
+%             lowIdx = 49687;
+%             highIdx = 50307;
+            %For 99.00% (i.e., 99%).
+            lowIdx = 49588;
+            highIdx = 50403;
+            plotMedianCIErrorBars = true;
+        elseif numExp == 1000000
+            %See confidenceIntervalTest(n, i, j)
+%             %For 95.00% (i.e., 95%).
+%             lowIdx = 499018;
+%             highIdx = 500978;
+            %For 99.00% (i.e., 99%).
+            lowIdx = 498707;
+            highIdx = 501283;
             plotMedianCIErrorBars = true;
         else
             %Unknown number of experiments.
