@@ -51,6 +51,7 @@ include_directories(${OMPL_INCLUDE_DIRS})
 set(JSON_BuildTests OFF CACHE INTERNAL "") # Don't build the tests for json.
 set(JSON_Install OFF CACHE INTERNAL "")    # Don't install the json lib.
 add_subdirectory(thirdparty/json)
+include_directories(thirdparty)
 
 # Enable additional warnings and treat warnings as errors for our own code.
 set(ESP_CXX_COMPILE_FLAGS "-Wall -Wextra -Weffc++ -Werror -Wdisabled-optimization -pedantic-errors -fdiagnostics-color=auto")
