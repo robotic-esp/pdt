@@ -35,6 +35,15 @@ target_link_libraries(planner_performance PUBLIC
   esp_utilities
 )
 
+add_executable(planner_performance_plots
+  src/planner_performance_plots.cpp
+)
+target_link_libraries(planner_performance_plots PUBLIC
+  esp_configuration
+  esp_statistics
+  esp_tikz
+)
+
 add_executable(planner_visualization
   src/planner_visualization.cpp
   )

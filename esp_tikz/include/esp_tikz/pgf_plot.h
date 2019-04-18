@@ -49,7 +49,7 @@ namespace ompltools {
 struct PgfPlotOptions {
   std::string string() const;
   // Line options.
-  double lineWidth{1.0};
+  double lineWidth{1.5};
   std::string color{"black"};
 
   // Mark options.
@@ -68,6 +68,7 @@ class PgfPlot {
   ~PgfPlot() = default;
 
   void setOptions(const PgfPlotOptions& options);
+  void setLegend(const std::string& legend);
   void setPlottable(const std::shared_ptr<PlottableInterface>& plottable);
 
   std::string string() const;
@@ -75,6 +76,7 @@ class PgfPlot {
  private:
   std::shared_ptr<PlottableInterface> plottable_{};
   PgfPlotOptions options_{};
+  std::string legend_{""};
 };
 
 }  // namespace ompltools

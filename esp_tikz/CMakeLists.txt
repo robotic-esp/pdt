@@ -18,7 +18,8 @@ add_library(esp_tikz
   src/tikz_picture.cpp)
 
 target_link_libraries(esp_tikz
-  esp_performance_loggers)
+  esp_common
+  esp_statistics)
 
 # Specify the include directories exported by this library.
 target_include_directories(esp_tikz

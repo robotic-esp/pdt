@@ -1,7 +1,8 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, University of Toronto
+ *  Copyright (c) 2014-2017     University of Toronto
+ *  Copyright (c) 2018-present  University of Oxford
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +15,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Toronto nor the names of its
+ *   * Neither the names of the copyright holders nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -34,36 +35,43 @@
 
 // Authors: Marlin Strub
 
-#pragma once
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <vector>
 
 #include <experimental/filesystem>
-#include <string>
 
+#include "esp_configuration/configuration.h"
 #include "esp_statistics/performance_statistics.h"
-#include "esp_tikz/tikz_picture.h"
+#include "esp_tikz/performance_plotter.h"
 
-namespace esp {
+using namespace std::string_literals;
 
-namespace ompltools {
+int main(int argc, char **argv) {
+  // Read the config files.
+  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
 
-class PerformancePlotter {
- public:
-  PerformancePlotter() = default;
-  ~PerformancePlotter() = default;
+  // Get the results.
+  std::experimental::filesystem::path resultsPath = config->get<std::string>("Experiment/results");
 
-  void generateQuantileCostPlot(const PerformanceStatistics& stats, double quantile,
-                                const std::vector<double>& durations,
-                                const std::experimental::filesystem::path& filename);
-  void generateSuccessPlot(const PerformanceStatistics& stats,
-                           const std::experimental::filesystem::path& filename);
+  // Get the statistics.
+  esp::ompltools::PerformanceStatistics stats(resultsPath);
 
-  void compilePlot(const std::experimental::filesystem::path& filename) const;
+  // Generate the plot.
+  auto contextName = config->get<std::string>("Experiment/context");
+  std::size_t numMeasurements = std::floor(config->get<double>("Contexts/" + contextName + "/maxTime") *
+                                           config->get<double>("Experiment/logFrequency"));
+  double binSize = 1.0 / config->get<double>("Experiment/logFrequency");
+  std::vector<double> durations;
+  durations.reserve(numMeasurements);
+  for (std::size_t i = 0u; i < numMeasurements; ++i) {
+    durations.emplace_back(((i * binSize) + ((i + 1u) * binSize)) / 2.0);
+  }
+  esp::ompltools::PerformancePlotter plotter;
+  auto costPlotPath = ((resultsPath.parent_path() / resultsPath.stem()) += "_cost_plot.tex"s);
+  plotter.generateQuantileCostPlot(stats, 0.5, durations, costPlotPath);
+  plotter.compilePlot(costPlotPath);
 
- private:
-  void writePictureToFile(const TikzPicture& picture,
-                          const std::experimental::filesystem::path& filename) const;
-};
-
-}  // namespace ompltools
-
-}  // namespace esp
+  return 0;
+}

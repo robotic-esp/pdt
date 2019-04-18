@@ -36,53 +36,93 @@
 
 #include "esp_tikz/performance_plotter.h"
 
+#include <stdlib.h>
 #include <fstream>
 
+#include "esp_tikz/colormap.h"
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_plot.h"
 #include "esp_tikz/pgf_table.h"
+#include "esp_tikz/colormap.h"
 
 namespace esp {
 
 namespace ompltools {
 
-PerformancePlotter::PerformancePlotter(const std::experimental::filesystem::path& outDirectory) :
-    outDirectory_(outDirectory) {
-}
+using namespace std::string_literals;
 
-void PerformancePlotter::generateQuantileCostPlot(const AccumulatingCostLog& log, double quantile,
-                                                  const std::string& filename) {
+void PerformancePlotter::generateQuantileCostPlot(
+    const PerformanceStatistics& stats, double quantile, const std::vector<double>& durations,
+    const std::experimental::filesystem::path& filename) {
   // Create an axis for this plot.
+  PgfAxisOptions axisOptions;
+  axisOptions.xlog = true;
+  axisOptions.xminorgrids = true;
+  axisOptions.xlabel = "Computation time"s;
+  axisOptions.ylabel = "Solution cost"s;
   auto axis = std::make_shared<PgfAxis>();
+  axis->setOptions(axisOptions);
 
   // Create a picture that holds this axis.
   TikzPicture picture;
   picture.addAxis(axis);
 
-  for (const auto& name : log.getPlannerNames()) {
+  // This seems so hacky. How to make this better?
+  std::map<std::string, std::string> plannerColors;
+  auto color = espcolors.begin();
+  for (const auto& name : stats.getPlannerNames()) {
+    plannerColors.emplace(name, color->first);
+    ++color;
+    // Wrap around?
+    if (color == espcolors.end()) {
+      color = espcolors.begin();
+    }
+  }
+  
+  // Plot the cost evolution, if applicable.
+  for (const auto& name : stats.getPlannerNames()) {
+    // This doesn't apply to planners that aren't anytime.
+    if (name == "RRTConnect"s) {
+      continue;
+    }
     // Get the data and store it in a pgf table.
-    auto [times, costs] = log.getQuantile(name, quantile);
+    auto costs = stats.getQuantileEvolution(name, quantile, durations);
     auto table = std::make_shared<PgfTable>();
-    table->addColumn(times);
+    table->addColumn(durations);
     table->addColumn(costs);
 
     // Create a pgf plot with this data and add it to the axis.
+    PgfPlotOptions plotOptions;
+    plotOptions.markSize = 0.0;
+    plotOptions.color = plannerColors.at(name);
     auto plot = std::make_shared<PgfPlot>(table);
+    plot->setOptions(plotOptions);
+    plot->setLegend(name);
     axis->addPlot(plot);
   }
 
-  if (filename == std::string("")) {
-    writePictureToFile(picture, "quantile_plot.tex");
-  } else {
-    writePictureToFile(picture, filename);
-  }
+  // // Plot the initial solutions.
+  // for (const auto& name : stats.getPlannerNames()) {
+  //   // Get the data and store it in a pgf table.
+  //   auto [duration, cost] = stats.getInitialSolution(name, quantile);
+  //   auto table = std::make_shared<PgfTable>();
+  //   table->addColumn({duration});
+  //   table->addColumn({cost});
+
+  //   // Create the pgf plot with this data and add it to the axis.
+  //   auto plot = std::make_shared<PgfPlot>(table);
+  //   axis->addPlot(plot);
+  // }
+
+  // Write it to a file.
+  writePictureToFile(picture, filename);
 }
 
-void PerformancePlotter::writePictureToFile(const TikzPicture& picture,
-                                            const std::string& filename) const {
+void PerformancePlotter::writePictureToFile(
+    const TikzPicture& picture, const std::experimental::filesystem::path& filename) const {
   // Open a file.
   std::ofstream texFile;
-  texFile.open(outDirectory_ / std::experimental::filesystem::path(filename));
+  texFile.open(filename.string());
 
   // Check on the failbit.
   if (texFile.fail() == true) {
@@ -93,17 +133,30 @@ void PerformancePlotter::writePictureToFile(const TikzPicture& picture,
   texFile << "\\documentclass{standalone}\n"
           << "\\usepackage{tikz}\n"
           << "\\usepackage{pgfplots}\n"
-          << "\\pgfplotsset{compat=1.15}\n\n"
-          << "\\begin{document}";
+          << "\\pgfplotsset{compat=1.15}\n"
+          << "\\usepackage{xcolor}\n";
+  for (const auto& [name, values] : espcolors) {
+    texFile << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
+            << values[2u] << "}\n";
+  }
 
   // Write the picture.
-  texFile << picture.string() << '\n';
-
-  // End the document.
-  texFile << "\\end{document}\n";
+  texFile << "\n\n\\begin{document}\n\n";
+  texFile << picture.string();
+  texFile << "\n\n\\end{document}\n";
 
   // Close the file.
   texFile.close();
+}
+
+void PerformancePlotter::compilePlot(const std::experimental::filesystem::path& filename) const {
+  // Compile the plot.
+  auto currentPath = std::experimental::filesystem::current_path();
+  auto cmd = "cd "s + filename.parent_path().string() +
+             " && pdflatex -file-line-error -interaction=nonstopmode "s +
+             filename.filename().string() + " && cd "s + currentPath.string();
+  int retval = std::system(cmd.c_str());
+  (void)retval;
 }
 
 }  // namespace ompltools

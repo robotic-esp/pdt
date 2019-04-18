@@ -44,14 +44,16 @@ namespace ompltools {
 
 std::string PgfTableOptions::string() const {
   std::ostringstream stream{};
-  stream << "\n  row sep=" << rowSep
-         << ",\n  col sep=" << colSep;
+  stream << "\n  row sep=" << rowSep << ",\n  col sep=" << colSep;
   return stream.str();
 }
 
 void PgfTable::addColumn(const std::vector<double>& column) {
   if (!data_.empty() && column.size() != data_.at(0u).size()) {
     throw std::runtime_error("Number of elements in column does not match table.");
+  }
+  if (data_.size() > 1) {
+    throw std::runtime_error("Table currently only implemented for 2 dimensional data.");
   }
   data_.push_back(column);
 }
@@ -66,6 +68,9 @@ void PgfTable::addRow(const std::vector<double>& row) {
       throw std::runtime_error("Cannot add row; columns have unequal entries.");
     }
   }
+  if (row.size() > 1) {
+    throw std::runtime_error("Table currently only implemented for 2 dimensional data.");
+  }
 
   // Append row to table.
   for (std::size_t i = 0u; i < row.size(); ++i) {
@@ -78,19 +83,34 @@ void PgfTable::setOptions(const PgfTableOptions& options) {
 }
 
 std::string PgfTable::string() const {
-  if (data_.empty()) {
+  // We clean the table here. Values that are sandwiched are be omitted.
+  if (data_.size() != 2) {
+    throw std::runtime_error("Table currently only implemented for 2 dimensional data.");
+  }
+  // No output if the table is empty.
+  if (data_.empty() || data_.at(0u).empty() || data_.at(1u).empty()) {
     return {};
   }
   std::ostringstream stream{};
+  double lowX = data_.at(0).at(0);
+  double lowY = data_.at(1).at(0);
+  double lastX = data_.at(1).at(0);
   stream << "table [" << options_.string() << "\n]{\n";
-  for (std::size_t row = 0u; row < data_.at(0u).size(); ++row) {
-    for (std::size_t col = 0u; col < data_.size(); ++col) {
-      stream << data_.at(col).at(row);
-      if (col == data_.size() - 1u) {
-        stream << ' ' << options_.rowSep << '\n';
-      } else {
-        stream << ' ' << options_.colSep << ' ';
+  stream << lowX << ' ' << options_.colSep << ' ' << lowY << options_.rowSep << '\n';
+  for (std::size_t row = 1u; row < data_.at(0u).size(); ++row) {
+    auto x = data_.at(0u).at(row);
+    auto y = data_.at(1u).at(row);
+    if (y == lowY) {
+      lowX = x;
+      continue;
+    } else {
+      if (lastX != lowX) {
+        stream << lowX << ' ' << options_.colSep << ' ' << lowY << options_.rowSep << '\n';
       }
+      stream << x << ' ' << options_.colSep << ' ' << y << options_.rowSep << '\n';
+      lastX = x;
+      lowX = x;
+      lowY = y;
     }
   }
   stream << "};\n";

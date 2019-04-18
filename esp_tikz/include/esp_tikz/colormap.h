@@ -36,33 +36,20 @@
 
 #pragma once
 
-#include <experimental/filesystem>
+#include <array>
+#include <map>
 #include <string>
 
-#include "esp_statistics/performance_statistics.h"
-#include "esp_tikz/tikz_picture.h"
+#include "esp_common/planner_type.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class PerformancePlotter {
- public:
-  PerformancePlotter() = default;
-  ~PerformancePlotter() = default;
-
-  void generateQuantileCostPlot(const PerformanceStatistics& stats, double quantile,
-                                const std::vector<double>& durations,
-                                const std::experimental::filesystem::path& filename);
-  void generateSuccessPlot(const PerformanceStatistics& stats,
-                           const std::experimental::filesystem::path& filename);
-
-  void compilePlot(const std::experimental::filesystem::path& filename) const;
-
- private:
-  void writePictureToFile(const TikzPicture& picture,
-                          const std::experimental::filesystem::path& filename) const;
-};
+const std::map<std::string, std::array<int, 3>> espcolors{
+    {"espgray", {120, 120, 120}},     {"espblue", {11, 93, 174}},   {"espred", {206, 62, 21}},
+    {"espyellow", {232, 163, 26}},    {"espgreen", {100, 161, 27}}, {"esppurple", {106, 20, 125}},
+    {"esplightblue", {59, 175, 236}}, {"espdarkred", {145, 0, 33}}};
 
 }  // namespace ompltools
 

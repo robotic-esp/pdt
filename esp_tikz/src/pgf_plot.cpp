@@ -42,11 +42,11 @@ namespace esp {
 
 namespace ompltools {
 
+using namespace std::string_literals;
+
 std::string PgfPlotOptions::string() const {
   std::ostringstream stream{};
-  stream << "\n  line width=" << lineWidth
-         << ",\n  color=" << color
-         << ",\n  mark=" << mark
+  stream << "\n  line width=" << lineWidth << ",\n  color=" << color << ",\n  mark=" << mark
          << ",\n  mark size=" << markSize;
   if (onlyMarks) {
     stream << ",\n only marks";
@@ -64,6 +64,10 @@ void PgfPlot::setOptions(const PgfPlotOptions& options) {
   options_ = options;
 }
 
+void PgfPlot::setLegend(const std::string& legend) {
+  legend_ = legend;
+}
+
 void PgfPlot::setPlottable(const std::shared_ptr<PlottableInterface>& plottable) {
   plottable_ = plottable;
 }
@@ -75,6 +79,9 @@ std::string PgfPlot::string() const {
   std::ostringstream stream{};
   stream << "\\addplot [" << options_.string() << "\n] ";
   stream << plottable_->string();
+  if (legend_ != ""s) {
+    stream << "\\addlegendentry{" << legend_ << "}\n";
+  }
   return stream.str();
 }
 
