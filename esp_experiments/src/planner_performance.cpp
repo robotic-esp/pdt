@@ -54,6 +54,8 @@
 #include "esp_time/time.h"
 #include "esp_utilities/get_best_cost.h"
 
+using namespace std::string_literals;
+
 int main(int argc, char **argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
@@ -79,16 +81,18 @@ int main(int argc, char **argv) {
   std::cout << '\n';
 
   // Create the performance log.
-  esp::ompltools::AccumulatingCostLog log(
-      config->get<std::vector<std::string>>("Experiment/planners"), context->getTargetDuration(),
-      config->get<double>("Experiment/logFrequency"));
-  log.createLogFile(config->get<std::string>("Experiment/executable") + std::string("_logs/") +
-                    experimentStartTimeString + '_' + context->getName() + std::string(".csv"));
+  esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(
+      config->get<std::string>("Experiment/executable") + std::string("_logs/") +
+      experimentStartTimeString + '_' + context->getName() + std::string(".csv"));
 
   // May the best planner win.
   for (std::size_t i = 0; i < config->get<std::size_t>("Experiment/numRuns"); ++i) {
     std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << " | ";
     for (const auto &plannerName : config->get<std::vector<std::string>>("Experiment/planners")) {
+      // Create the logger for this run.
+      esp::ompltools::TimeCostLogger logger(context->getTargetDuration(),
+                                            config->get<std::size_t>("Experiment/logFrequency"));
+
       // Allocate the planner.
       auto [planner, plannerType] = plannerFactory.create(plannerName);
 
@@ -107,9 +111,8 @@ int main(int argc, char **argv) {
           [&planner, &maxSolveDuration]() { planner->solve(maxSolveDuration); });
       // Log the intermediate best costs.
       do {
-        log.addMeasurement(plannerName,
-                           setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime),
-                           esp::ompltools::utilities::getBestCost(planner, plannerType));
+        logger.addMeasurement(setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime),
+                              esp::ompltools::utilities::getBestCost(planner, plannerType));
       } while (!solveThread.try_join_for(
           boost::chrono::duration<double>(1.0 / config->get<double>("Experiment/logFrequency"))));
 
@@ -119,18 +122,18 @@ int main(int argc, char **argv) {
       // Store the final cost.
       auto problem = planner->getProblemDefinition();
       if (problem->hasExactSolution()) {
-        log.addMeasurement(plannerName, totalDuration,
-                           problem->getSolutionPath()->cost(context->getOptimizationObjective()));
+        logger.addMeasurement(
+            totalDuration, problem->getSolutionPath()->cost(context->getOptimizationObjective()));
       } else {
-        log.addMeasurement(plannerName, totalDuration,
-                           ompl::base::Cost(std::numeric_limits<double>::infinity()));
+        logger.addMeasurement(totalDuration,
+                              ompl::base::Cost(std::numeric_limits<double>::infinity()));
       }
 
       // Add this run to the log and report it to the console.
-      log.processMeasurements();
-      // auto result = logger.lastMeasurement();
-      // std::cout << std::setw(17) << std::left << result.first << std::setw(8) << std::fixed
-      //           << result.second << " | " << std::flush;
+      results.addResult(planner->getName(), logger);
+      auto result = logger.lastMeasurement();
+      std::cout << std::setw(17) << std::left << result.first << std::setw(8) << std::fixed
+                << result.second << " | " << std::flush;
     }
   }
 
@@ -140,35 +143,30 @@ int main(int argc, char **argv) {
   esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
 
   // Log some info to a log file.
-  auto performanceLogPath = log.getFilePath();
-  auto experimentLogPath =
-      std::experimental::filesystem::path(performanceLogPath).replace_extension(".log");
-  ompl::msg::OutputHandlerFile experimentLog(experimentLogPath.c_str());
+  auto resultsPath = results.getFilePath();
+  auto logPath = std::experimental::filesystem::path(resultsPath).replace_extension(".log");
+  ompl::msg::OutputHandlerFile log(logPath.c_str());
   ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
-  ompl::msg::useOutputHandler(&experimentLog);
+  ompl::msg::useOutputHandler(&log);
   OMPL_INFORM("Start of experiment: '%s'",
               esp::ompltools::time::toDateString(experimentStartTime).c_str());
   OMPL_INFORM("End of experiment: '%s'",
               esp::ompltools::time::toDateString(experimentEndTime).c_str());
   OMPL_INFORM("Duration of experiment: '%s'",
               esp::ompltools::time::toDurationString(experimentDuration).c_str());
-  OMPL_INFORM("Wrote results to '%s'", performanceLogPath.c_str());
-
-  // Generate the plot.
-  esp::ompltools::PerformancePlotter plotter(performanceLogPath.parent_path());
-  plotter.generateQuantileCostPlot(log, 0.5);
+  OMPL_INFORM("Wrote results to '%s'", resultsPath.c_str());
 
   // Dump the accessed parameters next to the results file.
-  auto configPath =
-      std::experimental::filesystem::path(performanceLogPath).replace_extension(".json");
+  auto configPath = std::experimental::filesystem::path(resultsPath).replace_extension(".json");
+  config->add<std::string>("Experiment/results", resultsPath.string());
   config->dumpAccessed(configPath.string());
   OMPL_INFORM("Wrote configuration to '%s'", configPath.c_str());
 
   // Report success.
   std::cout << "\n\nExperiment ran for:\t" << (experimentEndTime - experimentStartTime) << "\t\t("
             << experimentStartTimeString << " -- " << experimentEndTimeString << ")\n"
-            << "\nWrote results to:\t" << performanceLogPath.string() << "\nWrote config to:\t"
-            << configPath.string() << "\nWrote log to:\t\t" << experimentLogPath.string() << "\n\n";
+            << "\nWrote results to:\t" << resultsPath.string() << "\nWrote config to:\t"
+            << configPath.string() << "\nWrote log to:\t\t" << logPath.string() << "\n\n";
 
   return 0;
 }

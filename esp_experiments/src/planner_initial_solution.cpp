@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
   std::cout << '\n';
 
   // Create the performance log.
-  esp::ompltools::PerformanceLog<esp::ompltools::TimeCostLogger> performanceLog(
+  esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> performanceLog(
       config->get<std::string>("Experiment/executable") + std::string("_logs/") +
       experimentStartTimeString + '_' + context->getName() + std::string(".csv"));
 

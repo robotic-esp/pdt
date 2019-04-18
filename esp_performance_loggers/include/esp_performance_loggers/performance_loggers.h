@@ -199,9 +199,9 @@ class TargetTimeResults {
 //******* The file that writes the data to disk*******//
 /** \brief A class to write results to disk. */
 template <class Logger>
-class PerformanceLog {
+class ResultLog {
  public:
-  PerformanceLog(const std::string& fullFileName) : filename_(fullFileName) {
+  ResultLog(const std::string& fullFileName) : filename_(fullFileName) {
     // Create parent directories, if needed.
     fs::create_directories(fs::path(filename_).parent_path());
 
