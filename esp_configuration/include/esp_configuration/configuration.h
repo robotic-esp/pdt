@@ -68,6 +68,9 @@ class Configuration {
   template <typename T>
   T get(const std::string& key) const;
 
+  template <typename T>
+  void add(const std::string& key, const T& value);
+
   // This adds to or creates an "Experiment" entry in the accessed parameters with various
   // information about the state of the working directory and the OMPL seed.
   void registerAsExperiment() const;
@@ -85,6 +88,9 @@ class Configuration {
   // Recursive implementation of public get method.
   template <typename T>
   T get(const std::string& key, const json::json& parameters, const std::string& prevNs) const;
+
+  template <typename T>
+  void add(const std::string& key, const T& value, json::json* parameters);
 
   // Recursively register an accessed parameter.
   template <typename T>
@@ -140,6 +146,34 @@ T Configuration::get(const std::string& key, const json::json& parameters,
       OMPL_ERROR("Requested nonexisting parameter '%s'.", key.c_str());
       throw std::runtime_error("Configuration error.");
     }
+  }
+}
+
+template <typename T>
+void Configuration::add(const std::string& key, const T& value) {
+  // We allow overwriting the results field of the experiment. Conceptually this seems ok.
+  if (contains(key) && key == std::string("Experiment/results")) {
+    parameters_["Experiment"].erase("results");
+  }
+  // We should prevent overwriting any other parameter to ensure reproducibility.
+  if (contains(key) && get<T>(key) != value) {
+    OMPL_ERROR("'%s': Parameter already exists with a different value.", key.c_str());
+    throw std::runtime_error("Reproducibility error.");
+  }
+  add<T>(key, value, &parameters_);
+  registerAccess(key, value, &accessedParameters_);
+}
+
+template <typename T>
+void Configuration::add(const std::string& key, const T& value, json::json* parameters) {
+  if (!isNestedKey(key)) {
+    (*parameters)[key] = value;
+  } else {
+    auto [ns, rest] = split(key);
+    if (!parameters->contains(ns)) {
+      (*parameters)[ns] = json::json();
+    }
+    add<T>(rest, value, &((*parameters)[ns]));
   }
 }
 
