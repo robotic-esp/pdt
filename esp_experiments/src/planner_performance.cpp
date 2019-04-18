@@ -97,30 +97,32 @@ int main(int argc, char **argv) {
       auto [planner, plannerType] = plannerFactory.create(plannerName);
 
       // Set it up.
-      auto setupStartTime = esp::ompltools::time::Clock::now();
+      const auto setupStartTime = esp::ompltools::time::Clock::now();
       planner->setup();
-      auto setupDuration = esp::ompltools::time::Clock::now() - setupStartTime;
+      const auto setupDuration = esp::ompltools::time::Clock::now() - setupStartTime;
 
       // Compute the duration we have left for solving.
-      auto maxSolveDuration =
+      const auto maxSolveDuration =
           esp::ompltools::time::seconds(context->getTargetDuration() - setupDuration);
+      const boost::chrono::duration<double> idle(1.0 /
+                                                 config->get<double>("Experiment/logFrequency"));
 
       // Solve the problem on a separate thread.
-      auto solveStartTime = esp::ompltools::time::Clock::now();
+      const auto solveStartTime = esp::ompltools::time::Clock::now();
       boost::thread solveThread(
           [&planner, &maxSolveDuration]() { planner->solve(maxSolveDuration); });
       // Log the intermediate best costs.
       do {
         logger.addMeasurement(setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime),
                               esp::ompltools::utilities::getBestCost(planner, plannerType));
-      } while (!solveThread.try_join_for(
-          boost::chrono::duration<double>(1.0 / config->get<double>("Experiment/logFrequency"))));
+      } while (!solveThread.try_join_for(idle));
 
       // Get the final runtime.
-      auto totalDuration = setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
+      const auto totalDuration =
+          setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
 
       // Store the final cost.
-      auto problem = planner->getProblemDefinition();
+      const auto problem = planner->getProblemDefinition();
       if (problem->hasExactSolution()) {
         logger.addMeasurement(
             totalDuration, problem->getSolutionPath()->cost(context->getOptimizationObjective()));
@@ -131,7 +133,7 @@ int main(int argc, char **argv) {
 
       // Add this run to the log and report it to the console.
       results.addResult(planner->getName(), logger);
-      auto result = logger.lastMeasurement();
+      const auto result = logger.lastMeasurement();
       std::cout << std::setw(17) << std::left << result.first << std::setw(8) << std::fixed
                 << result.second << " | " << std::flush;
     }
