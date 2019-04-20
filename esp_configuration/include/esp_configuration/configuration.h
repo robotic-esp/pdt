@@ -97,10 +97,8 @@ class Configuration {
   void registerAccess(const std::string& key, const T& value, json::json* accessedParameters) const;
 
   // Helper to load the default config from the default path.
-  void loadDefaultConfigFromDefaultPath();
-
-  // Helper to load any config from a specified path.
-  void loadConfigFromSpecifiedPath(std::experimental::filesystem::path path);
+  void loadDefaultConfigs(bool loadDefaultContextConfigs = true,
+                          bool loadDefaultPlannerConfigs = true);
 
   // Check if the name is nested, i.e., contains a '/'.
   bool isNestedKey(const std::string& name) const;
