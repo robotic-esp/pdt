@@ -49,10 +49,22 @@ std::string PgfPlotOptions::string() const {
   stream << "\n  line width=" << lineWidth << ",\n  color=" << color << ",\n  mark=" << mark
          << ",\n  mark size=" << markSize;
   if (onlyMarks) {
-    stream << ",\n only marks";
+    stream << ",\n  only marks";
   }
   if (forgetPlot) {
-    stream << ",\n forget plot";
+    stream << ",\n  forget plot";
+  }
+  if (constPlot) {
+    stream << ",\n  const plot";
+  }
+  if (namePath != ""s) {
+    stream << ",\n  name path={" << namePath << '}';
+  }
+  if (fillOpacity != 1.0) {
+    stream << ",\n  fill opacity=" << fillOpacity;
+  }
+  if (drawOpacity != 1.0) {
+    stream << ",\n  draw opacity=" << drawOpacity;
   }
   return stream.str();
 }

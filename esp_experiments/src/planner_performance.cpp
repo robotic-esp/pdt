@@ -36,14 +36,15 @@
 // Authors: Marlin Strub
 
 #include <functional>
+#include <future>
 #include <iomanip>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 #include <experimental/filesystem>
 
 #include <ompl/util/Console.h>
-#include <boost/thread/thread.hpp>
 
 #include "esp_configuration/configuration.h"
 #include "esp_factories/context_factory.h"
@@ -104,18 +105,23 @@ int main(int argc, char **argv) {
       // Compute the duration we have left for solving.
       const auto maxSolveDuration =
           esp::ompltools::time::seconds(context->getTargetDuration() - setupDuration);
-      const boost::chrono::duration<double> idle(1.0 /
-                                                 config->get<double>("Experiment/logFrequency"));
+      const std::chrono::microseconds idle(1000000u /
+                                           config->get<std::size_t>("Experiment/logFrequency"));
 
       // Solve the problem on a separate thread.
+      esp::ompltools::time::Clock::time_point addMeasurementStart;
       const auto solveStartTime = esp::ompltools::time::Clock::now();
-      boost::thread solveThread(
-          [&planner, &maxSolveDuration]() { planner->solve(maxSolveDuration); });
+      std::future<void> future = std::async(std::launch::async, [&planner, &maxSolveDuration]() {
+        planner->solve(maxSolveDuration);
+      });
+
       // Log the intermediate best costs.
       do {
+        addMeasurementStart = esp::ompltools::time::Clock::now();
         logger.addMeasurement(setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime),
                               esp::ompltools::utilities::getBestCost(planner, plannerType));
-      } while (!solveThread.try_join_for(idle));
+      } while (future.wait_until(addMeasurementStart + idle) != std::future_status::ready);
+      future.get();
 
       // Get the final runtime.
       const auto totalDuration =

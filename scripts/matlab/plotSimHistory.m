@@ -77,9 +77,6 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
             %For 99.00% (i.e., 99%).
             lowIdx = 104;
             highIdx = 145;
-%             %For 99.92% (i.e., 99.9%)
-%             lowIdx = 99;
-%             highIdx = 152;
             plotMedianCIErrorBars = true;
         elseif numExp == 300
             %See confidenceIntervalTest(n, i, j)

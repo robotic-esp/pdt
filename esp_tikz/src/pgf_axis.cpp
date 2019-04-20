@@ -42,11 +42,21 @@ namespace esp {
 
 namespace ompltools {
 
+using namespace std::string_literals;
+
 std::string PgfAxisOptions::string() const {
   std::ostringstream stream{};
-  stream << "\n  width=" << width
-         << ",\n  height=" << height
-         << ",\n  at={" << at << '}';
+  stream << "\n  width=" << width << ",\n  height=" << height << ",\n  at={" << at << '}'
+         << ",\n  unbounded coords=" << unboundedCoords;
+  if (name != ""s) {
+    stream << ",\n  name=" << name;
+  }
+  if (anchor != ""s) {
+    stream << ",\n  anchor=" << anchor;
+  }
+  if (hideAxis) {
+    stream << ",\n  hide axis";
+  }
   if (scaleOnlyAxis) {
     stream << ",\n  scale only axis";
   }
@@ -78,7 +88,7 @@ std::string PgfAxisOptions::string() const {
     stream << ",\n  ymin=" << ymin;
   }
   if (ymax != std::numeric_limits<double>::infinity()) {
-    stream << ",\n  ymay=" << ymax;
+    stream << ",\n  ymax=" << ymax;
   }
   if (xlog) {
     stream << ",\n  xmode=log";
@@ -86,11 +96,44 @@ std::string PgfAxisOptions::string() const {
   if (ylog) {
     stream << ",\n  ymode=log";
   }
-  if (xlabel != std::string("")) {
+  if (xlabel != ""s) {
     stream << ",\n  xlabel={" << xlabel << '}';
   }
-  if (ylabel != std::string("")) {
+  if (xlabelStyle != ""s) {
+    stream << ",\n  xlabel style={" << xlabelStyle << '}';
+  }
+  if (xtick != ""s) {
+    stream << ",\n  xtick={" << xtick << '}';
+  }
+  if (xticklabel != ""s) {
+    stream << ",\n  xticklabel={" << xticklabel << '}';
+  }
+  if (xticklabelStyle != ""s) {
+    stream << ",\n  xticklabel style={" << xticklabelStyle << '}';
+  }
+  if (ylabel != ""s) {
     stream << ",\n  ylabel={" << ylabel << '}';
+  }
+  if (ylabelStyle != ""s) {
+    stream << ",\n  ylabel style={" << ylabelStyle << '}';
+  }
+  if (ytick != ""s) {
+    stream << ",\n  ytick={" << ytick << '}';
+  }
+  if (yticklabel != ""s) {
+    stream << ",\n  yticklabel={" << yticklabel << '}';
+  }
+  if (yticklabelStyle != ""s) {
+    stream << ",\n  yticklabel style={" << yticklabelStyle << '}';
+  }
+  if (legendStyle != ""s) {
+    stream << ",\n  legend style={" << legendStyle << '}';
+  }
+  if (xshift != ""s) {
+    stream << ",\n  xshift=" << xshift;
+  }
+  if (yshift != ""s) {
+    stream << ",\n  yshift=" << yshift;
   }
   return stream.str();
 }
@@ -103,14 +146,21 @@ void PgfAxis::addPlot(const std::shared_ptr<PgfPlot>& plot) {
   plots_.emplace_back(plot);
 }
 
+void PgfAxis::addLegendEntry(const std::string& entry, const std::string& imageOptions) {
+  legendEntries_.emplace_back(entry, imageOptions);
+}
+
 std::string PgfAxis::string() const {
-  if (plots_.empty()) {
-    return {};
-  }
   std::ostringstream stream{};
   stream << "\\begin{axis} [" << options_.string() << "\n]\n\n";
   for (const auto& plot : plots_) {
     stream << plot->string() << '\n';
+  }
+  for (const auto& entry : legendEntries_) {
+    if (entry.second != ""s) {
+      stream << "\\addlegendimage{" << entry.second << "}\n";
+    }
+    stream << "\\addlegendentry{" << entry.first << "}\n";
   }
   stream << "\\end{axis}\n";
   return stream.str();

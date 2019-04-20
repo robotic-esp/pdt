@@ -49,7 +49,7 @@ namespace ompltools {
 struct PgfPlotOptions {
   std::string string() const;
   // Line options.
-  double lineWidth{1.5};
+  double lineWidth{1.0};
   std::string color{"black"};
 
   // Mark options.
@@ -59,6 +59,10 @@ struct PgfPlotOptions {
 
   // Plot options.
   bool forgetPlot{false};
+  bool constPlot{true};
+  std::string namePath{""};
+  float fillOpacity{1.0};
+  float drawOpacity{1.0};
 };
 
 class PgfPlot {

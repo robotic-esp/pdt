@@ -13,6 +13,7 @@ include_directories(
 add_library(esp_tikz
   src/performance_plotter.cpp
   src/pgf_axis.cpp
+  src/pgf_fillbetween.cpp
   src/pgf_plot.cpp
   src/pgf_table.cpp
   src/tikz_picture.cpp)
