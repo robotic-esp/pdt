@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, University of Toronto
+ *  Copyright (c) 2018, University of Oxford
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Toronto nor the names of its
+ *   * Neither the name of the University of Oxford nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -34,39 +34,32 @@
 
 // Authors: Marlin Strub
 
-#pragma once
+#include "esp_tikz/pgf_fillbetween.h"
 
-#include <experimental/filesystem>
-#include <string>
-
-#include "esp_statistics/performance_statistics.h"
-#include "esp_tikz/tikz_picture.h"
+#include <sstream>
 
 namespace esp {
 
 namespace ompltools {
 
-class PerformancePlotter {
- public:
-  PerformancePlotter() = default;
-  ~PerformancePlotter() = default;
+std::string PgfFillBetweenOptions::string() const {
+  std::ostringstream stream{};
+  stream << "\n  of=" << name1 << " and " << name2;
+  if (split) {
+    stream << ",\n  split";
+  }
+  return stream.str();
+}
 
-  void generateMedianCostAndSuccessPlot(const PerformanceStatistics& stats,
-                                        const std::vector<double>& durations,
-                                        const std::experimental::filesystem::path& filename,
-                                        std::size_t confidence = 99u) const;
-  void compilePlot(const std::experimental::filesystem::path& filename) const;
+void PgfFillBetween::setOptions(const PgfFillBetweenOptions& options) {
+  options_ = options;
+}
 
- private:
-  std::shared_ptr<PgfAxis> generateMedianCostPlot(const PerformanceStatistics& stats,
-                                                  const std::vector<double>& durations,
-                                                  std::size_t confidence) const;
-  std::shared_ptr<PgfAxis> generateSuccessPlot(const PerformanceStatistics& stats) const;
-  std::shared_ptr<PgfAxis> generateLegendAxis(const PerformanceStatistics& stats) const;
-
-  void writePictureToFile(const TikzPicture& picture,
-                          const std::experimental::filesystem::path& filename) const;
-};
+std::string PgfFillBetween::string() const {
+  std::ostringstream stream{};
+  stream << "fill between [" << options_.string() << "\n];";
+  return stream.str();
+}
 
 }  // namespace ompltools
 

@@ -49,12 +49,19 @@ namespace ompltools {
 struct PgfAxisOptions {
   std::string string() const;
   // General options.
-  std::string width{"\\textwidth"};
-  std::string height{"0.8\\textwidth"};
   std::string at{"(0cm, 0cm)"};
+  std::string anchor{""};
+  std::string width{"\\textwidth"};
+  std::string height{"0.5\\textwidth"};
+  bool hideAxis{false};
   std::string majorGridStyle{"{densely dotted, black!20}"};
   std::string minorGridStyle{"{densely dotted, black!20}"};
   bool scaleOnlyAxis{false};
+  std::string legendStyle{""};
+  std::string name{""};
+  std::string xshift{""};
+  std::string yshift{""};
+  std::string unboundedCoords{"jump"};
 
   // X-Axis options.
   bool xlog{false};
@@ -62,8 +69,11 @@ struct PgfAxisOptions {
   bool xminorgrids{false};
   double xmin{std::numeric_limits<double>::infinity()};
   double xmax{std::numeric_limits<double>::infinity()};
+  std::string xtick{""};
+  std::string xticklabel{""};
+  std::string xticklabelStyle{"font=\\footnotesize"};
   std::string xlabel{""};
-  std::string xlabelStyle{"{}"};
+  std::string xlabelStyle{"font=\\footnotesize"};
 
   // Y-Axis options.
   bool ylog{false};
@@ -71,7 +81,11 @@ struct PgfAxisOptions {
   bool yminorgrids{false};
   double ymin{std::numeric_limits<double>::infinity()};
   double ymax{std::numeric_limits<double>::infinity()};
+  std::string ytick{""};
+  std::string yticklabel{""};
+  std::string yticklabelStyle{"font=\\footnotesize"};
   std::string ylabel{""};
+  std::string ylabelStyle{"font=\\footnotesize"};
 };
 
 class PgfAxis {
@@ -81,11 +95,14 @@ class PgfAxis {
 
   void setOptions(const PgfAxisOptions& options);
   void addPlot(const std::shared_ptr<PgfPlot>& plot);
+  void addLegendEntry(const std::string& entry, const std::string& imageOptions = "");
 
   std::string string() const;
 
  private:
   std::vector<std::shared_ptr<const PgfPlot>> plots_{};
+  std::vector<std::pair<std::string, std::string>> legendEntries_{};
+  
   PgfAxisOptions options_{};
 };
 

@@ -60,18 +60,19 @@ int main(int argc, char **argv) {
 
   // Generate the plot.
   auto contextName = config->get<std::string>("Experiment/context");
-  std::size_t numMeasurements = std::floor(config->get<double>("Contexts/" + contextName + "/maxTime") *
-                                           config->get<double>("Experiment/logFrequency"));
+  std::size_t numMeasurements =
+      std::ceil(config->get<double>("Contexts/" + contextName + "/maxTime") *
+                config->get<double>("Experiment/logFrequency"));
   double binSize = 1.0 / config->get<double>("Experiment/logFrequency");
   std::vector<double> durations;
   durations.reserve(numMeasurements);
   for (std::size_t i = 0u; i < numMeasurements; ++i) {
-    durations.emplace_back(((i * binSize) + ((i + 1u) * binSize)) / 2.0);
+    durations.emplace_back(static_cast<double>(i + 1u) * binSize);
   }
   esp::ompltools::PerformancePlotter plotter;
-  auto costPlotPath = ((resultsPath.parent_path() / resultsPath.stem()) += "_cost_plot.tex"s);
-  plotter.generateQuantileCostPlot(stats, 0.5, durations, costPlotPath);
-  plotter.compilePlot(costPlotPath);
+  auto plotPath = ((resultsPath.parent_path() / resultsPath.stem()) += "_median_cost_plot.tex"s);
+  plotter.generateMedianCostAndSuccessPlot(stats, durations, plotPath);
+  plotter.compilePlot(plotPath);
 
   return 0;
 }

@@ -37,6 +37,8 @@
 #include "esp_statistics/performance_statistics.h"
 
 #include <algorithm>
+#include <cassert>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 
@@ -55,6 +57,54 @@ namespace ompltools {
 
 using namespace std::string_literals;
 
+const std::vector<PlannerData::RunData>& PlannerData::getAllRunsAt(
+    const std::vector<double>& durations) const {
+  // Check if we have to generate the costs at these durations or if we have computed them before.
+  bool cached = true;
+  for (const auto& interpolatedRun : interpolatedRuns_) {
+    if (!std::equal(durations.begin(), durations.end(), interpolatedRun.begin(),
+                    interpolatedRun.end(),
+                    [](const auto& a, const auto& b) { return a == b.first; })) {
+      cached = false;
+    }
+  }
+  if (cached && !interpolatedRuns_.empty()) {
+    return interpolatedRuns_;
+  }
+
+  // We have to generate new values. Clear the vector in case we comuted different values before.
+  interpolatedRuns_.clear();
+
+  // Generate values (i.e., interpolate or make infinity) for each run.
+  for (const auto& measuredRun : measuredRuns_) {
+    // Each measured run gets an associated interpolated run.
+    interpolatedRuns_.emplace_back();
+    interpolatedRuns_.back().reserve(durations.size());
+
+    // Create an interpolant for this run.
+    LinearInterpolator<double, double> interpolant(measuredRun);
+
+    // Get the min and max elements of this run to detect extrapolation.
+    // This gets the min and max wrt the durations as std::pair uses a lexicographical comparator.
+    auto [min, max] = std::minmax_element(measuredRun.begin(), measuredRun.end());
+
+    // Compute the costs for each requested duration.
+    for (const auto duration : durations) {
+      if (duration < min->first) {
+        interpolatedRuns_.back().emplace_back(duration, std::numeric_limits<double>::infinity());
+      } else if (duration > max->first) {
+        OMPL_ERROR("Requested to extrapolate. Max duration: %d, queried duration: %d", max->first,
+                   duration);
+        throw std::runtime_error("Fairness error.");
+      } else {
+        interpolatedRuns_.back().emplace_back(duration, interpolant(duration));
+      }
+    }
+  }
+
+  return interpolatedRuns_;
+}
+
 void PlannerData::addMeasuredRun(const PlannerData::RunData& run) {
   measuredRuns_.emplace_back(run);
 }
@@ -69,22 +119,6 @@ void PlannerData::clearMeasuredRuns() {
 
 std::size_t PlannerData::numMeasuredRuns() const {
   return measuredRuns_.size();
-}
-
-void PlannerData::addInterpolatedRun(const PlannerData::RunData& run) {
-  interpolatedRuns_.emplace_back(run);
-}
-
-const PlannerData::RunData& PlannerData::getInterpolatedRun(std::size_t i) const {
-  return interpolatedRuns_.at(i);
-}
-
-void PlannerData::clearInterpolatedRuns() {
-  interpolatedRuns_.clear();
-}
-
-std::size_t PlannerData::numInterpolatedRuns() const {
-  return interpolatedRuns_.size();
 }
 
 PerformanceStatistics::PerformanceStatistics(const std::experimental::filesystem::path& filename) :
@@ -118,8 +152,24 @@ PerformanceStatistics::PerformanceStatistics(const std::experimental::filesystem
     for (std::size_t i = 1u; i < row.size(); ++i) {
       if (timeRow) {
         run.emplace_back(std::stod(row.at(i)), std::numeric_limits<double>::signaling_NaN());
+        if (std::stod(row.at(i)) < minDuration_) {
+          minDuration_ = std::stod(row.at(i));
+        }
+        if (std::stod(row.at(i)) > maxDuration_) {
+          maxDuration_ = std::stod(row.at(i));
+        }
       } else {
         run.at(i - 1u).second = std::stod(row.at(i));
+        if (std::stod(row.at(i)) < minCost_) {
+          minCost_ = std::stod(row.at(i));
+        }
+        if (std::stod(row.at(i)) > maxCost_) {
+          maxCost_ = std::stod(row.at(i));
+        }
+        if (std::stod(row.at(i)) != std::numeric_limits<double>::infinity() &&
+            std::stod(row.at(i)) > maxNonInfCost_) {
+          maxNonInfCost_ = std::stod(row.at(i));
+        }
       }
     }
     if (!timeRow) {
@@ -133,107 +183,152 @@ std::vector<std::string> PerformanceStatistics::getPlannerNames() const {
   return plannerNames_;
 }
 
-std::vector<double> PerformanceStatistics::getQuantileEvolution(
-    const std::string& name, double quantile, const std::vector<double>& durations) const {
-  if (name == "RRTConnect"s) {
-    throw std::runtime_error("Non-anytime planners don't have a quantile evolution.");
+std::size_t PerformanceStatistics::getNumRunsPerPlanner() const {
+  if (data_.empty()) {
+    return 0u;
   }
-  if (durations.empty()) {
-    throw std::runtime_error("Expected at least one duration.");
-  }
-  if (quantile != 0.5) {
-    throw std::runtime_error("Not implemented for other quantile than median.");
-  }
-  std::vector<std::vector<double>> interpolatedRuns(durations.size());
-
-  // Generate values (i.e., interpolate or extrapolate) for each run.
-  const auto& plannerData = data_.at(name);
-  for (std::size_t runIdx = 0u; runIdx < plannerData.numMeasuredRuns(); ++runIdx) {
-    const auto& measuredRun = plannerData.getMeasuredRun(runIdx);
-    // Create an interpolator for this run.
-    LinearInterpolator<double, double> interpolant(measuredRun);
-
-    // Create the interpolated data for this run (std::pair has lexicographical compare, so this
-    // works).
-    auto [minDuration, maxDuration] = (std::minmax_element(measuredRun.begin(), measuredRun.end()));
-
-    for (std::size_t i = 0u; i < durations.size(); ++i) {
-      auto duration = durations[i];
-      auto& run = interpolatedRuns[i];
-      if (duration < minDuration->first) {
-        run.emplace_back(std::numeric_limits<double>::infinity());
-      } else if (duration > maxDuration->first) {  // What to do here?
-        OMPL_ERROR("Requested to extrapolate. Max duration: %d, queried duration: %d", *maxDuration,
-                   duration);
-        throw std::runtime_error("Fairness error.");
-      } else {
-        run.emplace_back(interpolant(duration));
-      }
+  // Make sure all planners have the same amount of runs.
+  for (auto it = ++data_.begin(); it != data_.end(); ++it) {
+    if ((--it)->second.numMeasuredRuns() != (++it)->second.numMeasuredRuns()) {
+      auto msg = "Not all planners have the same amount of runs."s;
+      throw std::runtime_error(msg);
     }
   }
-
-  // Get the quantiles.
-  std::vector<double> quantiles;
-  quantiles.reserve(durations.size());
-  for (std::size_t i = 0u; i < durations.size(); ++i) {
-    quantiles.emplace_back(getQuantile(&interpolatedRuns.at(i), quantile));
-  }
-
-  return quantiles;
+  return data_.begin()->second.numMeasuredRuns();
 }
 
-std::pair<double, double> PerformanceStatistics::getInitialSolution(const std::string& name,
-                                                                    double quantile) const {
-  if (data_.find(name) == data_.end()) {
-    auto msg = "Cannot find statistics for planner '"s + name + "'."s;
+double PerformanceStatistics::getMinCost() const {
+  return minCost_;
+}
+
+double PerformanceStatistics::getMaxCost() const {
+  return maxCost_;
+}
+
+double PerformanceStatistics::getMaxNonInfCost() const {
+  return maxNonInfCost_;
+}
+
+double PerformanceStatistics::getMinDuration() const {
+  return minDuration_;
+}
+
+double PerformanceStatistics::getMaxDuration() const {
+  return maxDuration_;
+}
+
+std::vector<double> PerformanceStatistics::getNthCosts(const std::string& name, std::size_t n,
+                                                       const std::vector<double>& durations) const {
+  if (name == "RRTConnect"s) {
+    auto msg = "Cannot specify durations for planners with nonanytime behaviour."s;
     throw std::runtime_error(msg);
   }
+  if (durations.empty()) {
+    auto msg = "Expected at least one duration."s;
+    throw std::runtime_error(msg);
+  }
+  std::vector<double> nthCosts;
+  nthCosts.reserve(durations.size());
+  const auto& interpolatedRuns = data_.at(name).getAllRunsAt(durations);
+  for (std::size_t durationIndex = 0u; durationIndex < durations.size(); ++durationIndex) {
+    std::vector<double> costs;
+    costs.reserve(interpolatedRuns.size());
+    for (const auto& run : interpolatedRuns) {
+      assert(run.at(durationIndex).first == durations.at(durationIndex));
+      costs.emplace_back(run.at(durationIndex).second);
+    }
+    if (n > costs.size()) {
+      auto msg = "Cannot get "s + std::to_string(n) + "th cost, there are only "s +
+                 std::to_string(costs.size()) + " costs at this time."s;
+      throw std::runtime_error(msg);
+    }
+    auto nthCost = costs.begin() + n;
+    std::nth_element(costs.begin(), nthCost, costs.end());
+    nthCosts.emplace_back(*nthCost);
+  }
+  return nthCosts;
+}
+
+std::vector<double> PerformanceStatistics::getInitialSolutionDurations(
+    const std::string& name) const {
+  // Get the durations of the initial solutions of all runs.
   std::vector<double> initialDurations{};
   initialDurations.reserve(data_.at(name).numMeasuredRuns());
-  std::vector<double> initialCosts{};
-  initialCosts.reserve(data_.at(name).numMeasuredRuns());
-
   const auto& plannerData = data_.at(name);
   for (std::size_t run = 0u; run < plannerData.numMeasuredRuns(); ++run) {
     // Get the durations and costs of this run.
     const auto& measuredRun = plannerData.getMeasuredRun(run);
 
     // Find the first cost that's less than infinity.
-    double initialDuration = std::numeric_limits<double>::infinity();
-    double initialCost = std::numeric_limits<double>::infinity();
     for (const auto& measurement : measuredRun) {
       if (measurement.second < std::numeric_limits<double>::infinity()) {
-        initialDuration = measurement.first;
-        initialCost = measurement.second;
+        initialDurations.emplace_back(measurement.first);
         break;
       }
     }
-    initialDurations.emplace_back(initialDuration);
-    initialCosts.emplace_back(initialCost);
   }
 
-  return {getQuantile(&initialDurations, quantile), getQuantile(&initialCosts, quantile)};
+  return initialDurations;
 }
 
-double PerformanceStatistics::getQuantile(std::vector<double>* values, double quantile) const {
-  if (quantile != 0.5) {
-    auto msg = "Quantile not implemented except for 0.5"s;
+std::vector<double> PerformanceStatistics::getInitialSolutionCosts(const std::string& name) const {
+  if (data_.find(name) == data_.end()) {
+    auto msg = "Cannot find statistics for planner '"s + name + "'."s;
     throw std::runtime_error(msg);
   }
-  auto numValues = values->size();
-  if (numValues % 2 == 1) {
-    auto median = values->begin() + ((numValues - 1u) / 2);
-    std::nth_element(values->begin(), median, values->end());
-    return *median;
-  } else {
-    auto lowerMedian = values->begin() + ((numValues - 1u) / 2);
-    std::nth_element(values->begin(), lowerMedian, values->end());
-    auto low = *lowerMedian;
-    auto upperMedian = values->begin() + ((numValues + 1u) / 2);
-    std::nth_element(values->begin(), upperMedian, values->end());
-    auto up = *upperMedian;
-    return (low + up) / 2.0;
+
+  // Get the costs of the initial solutions of all runs.
+  std::vector<double> initialCosts{};
+  initialCosts.reserve(data_.at(name).numMeasuredRuns());
+  const auto& plannerData = data_.at(name);
+  for (std::size_t run = 0u; run < plannerData.numMeasuredRuns(); ++run) {
+    // Get the durations and costs of this run.
+    const auto& measuredRun = plannerData.getMeasuredRun(run);
+
+    // Find the first cost that's less than infinity.
+    for (const auto& measurement : measuredRun) {
+      if (measurement.second < std::numeric_limits<double>::infinity()) {
+        initialCosts.emplace_back(measurement.second);
+        break;
+      }
+    }
   }
+
+  return initialCosts;
+}
+
+double PerformanceStatistics::getNthInitialSolutionDuration(const std::string& name,
+                                                            std::size_t n) const {
+  if (data_.find(name) == data_.end()) {
+    auto msg = "Cannot find statistics for planner '"s + name + "'."s;
+    throw std::runtime_error(msg);
+  }
+
+  // Get the durations of the initial solutions of all runs.
+  auto initialDurations = getInitialSolutionDurations(name);
+
+  // Get the nth element of this collection of durations.
+  auto nthDuration = initialDurations.begin() + n;
+  std::nth_element(initialDurations.begin(), nthDuration, initialDurations.end());
+
+  return *nthDuration;
+}
+
+double PerformanceStatistics::getNthInitialSolutionCost(const std::string& name,
+                                                        std::size_t n) const {
+  if (data_.find(name) == data_.end()) {
+    auto msg = "Cannot find statistics for planner '"s + name + "'."s;
+    throw std::runtime_error(msg);
+  }
+
+  // Get the costs of the initial solutions of all runs.
+  auto initialCosts = getInitialSolutionCosts(name);
+
+  // Get the nth element of this collection of costs.
+  auto nthCost = initialCosts.begin() + n;
+  std::nth_element(initialCosts.begin(), nthCost, initialCosts.end());
+
+  return *nthCost;
 }
 
 }  // namespace ompltools

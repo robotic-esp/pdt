@@ -60,7 +60,7 @@ void PgfTable::addColumn(const std::vector<double>& column) {
 
 void PgfTable::addRow(const std::vector<double>& row) {
   // Sanity checks.
-  if (data_.size() != row.size()) {
+  if (!data_.empty() && data_.size() != row.size()) {
     throw std::runtime_error("Number of elements in row does not match table.");
   }
   for (std::size_t i = 1; i < data_.size(); ++i) {
@@ -68,11 +68,14 @@ void PgfTable::addRow(const std::vector<double>& row) {
       throw std::runtime_error("Cannot add row; columns have unequal entries.");
     }
   }
-  if (row.size() > 1) {
+  if (row.size() != 2u) {
     throw std::runtime_error("Table currently only implemented for 2 dimensional data.");
   }
 
   // Append row to table.
+  if (data_.empty()) {
+    data_.resize(row.size(), {});
+  }
   for (std::size_t i = 0u; i < row.size(); ++i) {
     data_.at(i).emplace_back(row.at(i));
   }
@@ -100,7 +103,7 @@ std::string PgfTable::string() const {
   for (std::size_t row = 1u; row < data_.at(0u).size(); ++row) {
     auto x = data_.at(0u).at(row);
     auto y = data_.at(1u).at(row);
-    if (y == lowY) {
+    if (y == lowY && row != data_.at(0u).size() - 1u) { // We need the last result.
       lowX = x;
       continue;
     } else {

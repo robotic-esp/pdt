@@ -47,10 +47,13 @@ namespace ompltools {
 
 class PlannerData {
  public:
-  // The safer option is a vector of pairs, so that durations and costs cannot get mixed.
+  // The safest option is a vector of pairs, so that durations and costs cannot get decoupled.
   using RunData = std::vector<std::pair<double, double>>;
   PlannerData() = default;
   ~PlannerData() = default;
+
+  // Interpolate the runs.
+  const std::vector<RunData>& getAllRunsAt(const std::vector<double>& durations) const;
 
   // Access to measured runs.
   void addMeasuredRun(const RunData& run);
@@ -58,15 +61,9 @@ class PlannerData {
   void clearMeasuredRuns();
   std::size_t numMeasuredRuns() const;
 
-  // Access to interpolated runs.
-  void addInterpolatedRun(const RunData& run);
-  const RunData& getInterpolatedRun(std::size_t i) const;
-  void clearInterpolatedRuns();
-  std::size_t numInterpolatedRuns() const;
-
  private:
   std::vector<RunData> measuredRuns_{};
-  std::vector<RunData> interpolatedRuns_{};
+  mutable std::vector<RunData> interpolatedRuns_{};
 };
 
 class PerformanceStatistics {
@@ -75,18 +72,33 @@ class PerformanceStatistics {
   ~PerformanceStatistics() = default;
 
   std::vector<std::string> getPlannerNames() const;
-  std::vector<double> getQuantileEvolution(const std::string& name, double quantile,
-                                           const std::vector<double>& durations) const;
-  std::pair<double, double> getInitialSolution(const std::string& name, double quantile) const;
+  std::size_t getNumRunsPerPlanner() const;
+  double getMinCost() const;
+  double getMaxCost() const;
+  double getMaxNonInfCost() const;
+  double getMinDuration() const;
+  double getMaxDuration() const;
+
+  std::vector<double> getNthCosts(const std::string& name, std::size_t n,
+                                  const std::vector<double>& durations) const;
+  std::vector<double> getInitialSolutionDurations(const std::string& name) const;
+  std::vector<double> getInitialSolutionCosts(const std::string& name) const;
+  double getNthInitialSolutionDuration(const std::string& name, std::size_t n) const;
+  double getNthInitialSolutionCost(const std::string& name, std::size_t n) const;
 
  private:
-  double getQuantile(std::vector<double>* values, double quantile) const;
-  
 
   const std::experimental::filesystem::path filename_;
   std::vector<std::string> plannerNames_{};
+
+
   // Can we afford loading all of this into memory? Let's see.
   std::map<std::string, PlannerData> data_{};
+  double minCost_{std::numeric_limits<double>::infinity()};
+  double maxCost_{std::numeric_limits<double>::lowest()};
+  double maxNonInfCost_{std::numeric_limits<double>::lowest()};
+  double minDuration_{std::numeric_limits<double>::infinity()};
+  double maxDuration_{std::numeric_limits<double>::lowest()};
 };
 
 }  // namespace ompltools
