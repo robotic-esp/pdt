@@ -65,8 +65,7 @@ void Configuration::load(int argc, char **argv) {
   // Declare the available options.
   po::options_description availableOptions("Configuration options");
   availableOptions.add_options()("help,h", "Display available options.")(
-      "default-config,c", po::value<std::string>(), "Location of the default configuration file.")(
-      "patch-config,p", po::value<std::string>(), "Location of the patch configuration file.");
+      "config-patch,c", po::value<std::string>(), "Path to the configuration patch file.");
 
   // Parse the command line arguments to see which options were invoked.
   po::variables_map invokedOptions;
@@ -79,20 +78,11 @@ void Configuration::load(int argc, char **argv) {
     std::terminate();
   }
 
-  // There are the following supported scenarios:
-  //   - No options are invoked -> Look for a default config at default location.
-  //   - A default config is provided without a patch config -> Load the provided default.
-  //   - Only a patch config is provided -> Check the config whether to load a default.
-  //   - A default and a patch config is provided -> Check the patch config whether to load the
-  //     default.
-
-  if (!invokedOptions.count("default-config") && !invokedOptions.count("patch-config")) {
-    loadDefaultConfigFromDefaultPath();
-  } else if (invokedOptions.count("default-config") && !invokedOptions.count("patch-config")) {
-    fs::path defaultConfig(invokedOptions["default-config"].as<std::string>());
-    loadConfigFromSpecifiedPath(defaultConfig);
-  } else if (!invokedOptions.count("default-config") && invokedOptions.count("patch-config")) {
-    fs::path patchConfig(invokedOptions["patch-config"].as<std::string>());
+  // If the user does not provide a config file, we should always load the default configs.
+  if (!invokedOptions.count("config-patch")) {
+    loadDefaultConfigs();
+  } else {
+    fs::path patchConfig(invokedOptions["config-patch"].as<std::string>());
     if (fs::exists(patchConfig)) {
       // If it the file is a symlink, read the actual file.
       if (fs::is_symlink(patchConfig)) {
@@ -102,57 +92,26 @@ void Configuration::load(int argc, char **argv) {
       std::ifstream file(patchConfig.string());
       json::json patch;
       file >> patch;
+      bool loadDefaultPlannerConfigs{true};
+      bool loadDefaultContextConfigs{true};
       if (patch.contains("Experiment")) {
-        if (patch["Experiment"].contains("useOnlyThisConfig")) {
-          // Check if the patch claims to be complete.
-          if (!patch["Experiment"]["useOnlyThisConfig"]) {
-            // Load the default config.
-            loadDefaultConfigFromDefaultPath();
-          }
+        if (patch["Experiment"].contains("loadDefaultPlannerConfig")) {
+          loadDefaultPlannerConfigs = patch["Experiment"]["loadDefaultPlannerConfig"].get<bool>();
+        }
+        if (patch["Experiment"].contains("loadDefaultContextConfig")) {
+          loadDefaultContextConfigs = patch["Experiment"]["loadDefaultContextConfig"].get<bool>();
         }
       }
-      // Load the patch, possibly overriding default values.
-      parameters_.merge_patch(patch);
-      OMPL_INFORM("Loaded patch configuration from %s", patchConfig.c_str());
-    } else {
-      // The provided patch config file does not exist.
-      OMPL_ERROR("Cannot find provided configuration file at %s", patchConfig.c_str());
-      throw std::ios_base::failure("Cannot find patch config file.");
-    }
-  } else if (invokedOptions.count("default-config") && invokedOptions.count("patch-config")) {
-    fs::path patchConfig(invokedOptions["patch-config"].as<std::string>());
-    if (fs::exists(patchConfig)) {
-      // If it the file is a symlink, read the actual file.
-      if (fs::is_symlink(patchConfig)) {
-        patchConfig = fs::read_symlink(patchConfig);
-      }
-      // Load the patch config.
-      std::ifstream file(patchConfig.string());
-      json::json patch;
-      file >> patch;
-      if (patch.contains("Experiment")) {
-        if (patch["Experiment"].contains("useOnlyThisConfig") &&
-            patch["Experiment"]["useOnlyThisConfig"].get<bool>()) {
-          OMPL_WARN(
-              "Provided a default config but patch says 'useOnlyThisConfig'. Not loading the "
-              "provided default config.");
-        } else {
-          fs::path defaultConfig(invokedOptions["default-config"].as<std::string>());
-          loadConfigFromSpecifiedPath(defaultConfig);
-        }
-      }
-
+      // Load the default config.
+      loadDefaultConfigs(loadDefaultContextConfigs, loadDefaultPlannerConfigs);
       // Merge the patch, possibly overriding default values.
       parameters_.merge_patch(patch);
-      OMPL_INFORM("Loaded patch configuration from %s", patchConfig.c_str());
+      OMPL_INFORM("Loaded configuration patch from %s", patchConfig.c_str());
     } else {
       // The provided patch config file does not exist.
       OMPL_ERROR("Cannot find provided configuration file at %s", patchConfig.c_str());
       throw std::ios_base::failure("Cannot find patch config file.");
     }
-  } else {
-    // How did we get here?
-    assert(false);
   }
 
   // Set the appropriate log level.
@@ -251,35 +210,47 @@ void Configuration::dumpAccessed(const std::string &filename) const {
   fs::permissions(filename, fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
 }
 
-void Configuration::loadDefaultConfigFromDefaultPath() {
-  fs::path defaultConfig(Directory::SOURCE / "parameters/esp_ompltools_default_config.json");
-  if (fs::exists(defaultConfig)) {
-    // Load the default config.
-    std::ifstream file(defaultConfig.string());
-    file >> parameters_;
-    OMPL_INFORM("Loaded default configuration from %s", defaultConfig.c_str());
+void Configuration::loadDefaultConfigs(bool loadDefaultContextConfigs,
+                                       bool loadDefaultPlannerConfigs) {
+  fs::path defaultConfigDirectory(Directory::SOURCE / "parameters/defaults/");
+  if (fs::exists(defaultConfigDirectory)) {
+    // Load all files in this directory as patches.
+    for (auto &directoryEntry : fs::directory_iterator(defaultConfigDirectory)) {
+      if (!fs::exists(directoryEntry.path())) {
+        OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
+                  defaultConfigDirectory.c_str(), directoryEntry.path().c_str());
+        continue;
+      }
+      std::ifstream configFile(directoryEntry.path().string());
+      if (configFile.fail()) {
+        OMPL_ERROR("File '%s' exists but cannot be opened.", directoryEntry.path().string());
+        throw std::ios_base::failure("Configuration error.");
+      }
+      json::json config;
+      configFile >> config;
+      // Skip the context and planner configs if desired.
+      if ((config.contains("Contexts") && !loadDefaultContextConfigs) ||
+          (config.contains("Planners") && !loadDefaultPlannerConfigs)) {
+        OMPL_INFORM("Skipped configuration from '%s'.", directoryEntry.path().c_str());
+        continue;
+      }
+
+      // Check that the default configs don't specify the same parameter twice.
+      for (const auto &entry : config.items()) {
+        if (parameters_.contains(entry.key())) {
+          OMPL_ERROR("The parameter '%s' is defined multiple times in the default configs",
+                     entry.key());
+          throw std::ios_base::failure("Configuration failure.");
+        }
+      }
+      parameters_.merge_patch(config);
+      OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
+      // No need to close config, std::ifstreams are closed on destruction.
+    }
   } else {
     // Cannot find default config at default location.
-    OMPL_ERROR("No configuration file is provided and cannot find default at %s",
-               defaultConfig.c_str());
-    throw std::ios_base::failure("Cannot find default config file.");
-  }
-}
-
-void Configuration::loadConfigFromSpecifiedPath(fs::path path) {
-  if (fs::exists(path)) {
-    // If it the file is a symlink, read the actual file.
-    if (fs::is_symlink(path)) {
-      path = fs::read_symlink(path);
-    }
-    // Load the provided default config.
-    std::ifstream file(path.string());
-    file >> parameters_;
-    OMPL_INFORM("Loaded configuration from %s", path.c_str());
-  } else {
-    // The provided default config file does not exist.
-    OMPL_ERROR("Cannot find provided configuration file at %s", path.c_str());
-    throw std::ios_base::failure("Cannot find default config file.");
+    OMPL_ERROR("Default config directory does not exist at '%s'.", defaultConfigDirectory.c_str());
+    throw std::ios_base::failure("Configuration failure.");
   }
 }
 
@@ -343,8 +314,10 @@ void Configuration::registerAsExperiment() const {
   accessedParameters_["Experiment"]["version"]["branch"] = Version::GIT_REFSPEC;
   accessedParameters_["Experiment"]["version"]["status"] = Version::GIT_STATUS;
 
-  // This ensures we don't load any additional config when rerunning this experiment.
-  accessedParameters_["Experiment"]["useOnlyThisConfig"] = true;
+  // This ensures we don't load any additional context or planner config when rerunning this
+  // experiment.
+  accessedParameters_["Experiment"]["loadDefaultContextConfig"] = false;
+  accessedParameters_["Experiment"]["loadDefaultPlannerConfig"] = false;
 
   // If in debug, ensure we've set the seed.
   assert(allParameters_["Experiment"]["seed"].get<unsigned int>() == ompl::RNG::getSeed());

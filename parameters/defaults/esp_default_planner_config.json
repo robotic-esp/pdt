@@ -1,0 +1,84 @@
+{
+    "Planners": {
+        "BITstar": {
+            "type": "BITstar",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "samplesPerBatch": 100,
+            "enablePruning": false,
+            "pruningThreshold": 0.1,
+            "useJustInTimeSampling": false,
+            "dropSamplesOnPrune": false,
+            "stopOnSolutionImprovement": false
+        },
+        "LBTRRT" : {
+            "type": "LBTRRT",
+            "approximationFactor": 0.4,
+            "goalBias": 0.05,
+            "maxEdgeLength": {
+                "2d": 0.3,
+                "4d": 0.5,
+                "6d": 0.9,
+                "8d": 1.25,
+                "16d": 3.0
+            }
+        },
+        "RRTConnect": {
+            "type": "RRTConnect",
+            "useKNearest": false,
+            "maxEdgeLength": {
+                "2d": 0.3,
+                "4d": 0.5,
+                "6d": 0.9,
+                "8d": 1.25,
+                "16d": 3.0
+            },
+            "addIntermediateStates": false
+        },
+        "RRTsharp": {
+            "type": "RRTsharp",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "goalBias": 0.05,
+            "variant": 0,
+            "epsilon": 0.0,
+            "maxEdgeLength": {
+                "2d": 0.3,
+                "4d": 0.5,
+                "6d": 0.9,
+                "8d": 1.25,
+                "16d": 3.0
+            },
+            "enableSampleRejection": true
+        },
+        "RRTstar": {
+            "type": "RRTstar",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "goalBias": 0.05,
+            "maxEdgeLength": {
+                "2d": 0.3,
+                "4d": 0.5,
+                "6d": 0.9,
+                "8d": 1.25,
+                "16d": 3.0
+            },
+            "delayCollisionChecks": true,
+            "useAdmissibleCostToCome": true
+        },
+        "SBITstar": {
+            "type": "SBITstar",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "samplesPerBatch": 100,
+            "enablePruning": false,
+            "pruningThreshold": 0.1,
+            "useJustInTimeSampling": false,
+            "dropSamplesOnPrune": false,
+            "stopOnSolutionImprovement": false,
+            "initialInflation": 1000000,
+            "inflationParameter": 10,
+            "truncationParameter": 5
+        }
+    }
+}
