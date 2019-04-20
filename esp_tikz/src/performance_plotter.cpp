@@ -141,6 +141,10 @@ void PerformancePlotter::generateMedianCostAndSuccessPlot(
   auto legendAxis = generateLegendAxis(stats);
   legendAxis->setOptions(legendAxisOptions);
 
+<<<<<<< HEAD
+=======
+  // picture.addAxis(medianCostsAxis);
+>>>>>>> ef91c5ca7a574eb843b522a2e001934491fdaf13
   picture.addAxis(successAxis);
   picture.addAxis(medianCostAxis);
   picture.addAxis(legendAxis);
