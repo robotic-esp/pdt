@@ -11,12 +11,20 @@
         "esplightblue": [ 59, 175, 236 ],
         "espdarkred": [ 145, 0, 33 ]
     },
-    "PlannerColors": {
+    "PlannerPlotColors": {
         "BITstar": "espblue",
         "LBTRRT" : "esppurple",
         "RRTConnect": "espblack",
         "RRTsharp": "espyellow",
         "RRTstar": "espred",
         "SBITstar": "espgreen"
+    },
+    "PlannerPlotNames": {
+        "BITstar": "BIT*",
+        "LBTRRT": "LBT-RRT",
+        "RRTConnect": "RRT-Connect",
+        "RRTsharp": "RRT$^\\#$",
+        "RRTstar": "RRT*",
+        "SBITstar": "SBIT*"
     }
 }

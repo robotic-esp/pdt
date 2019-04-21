@@ -151,8 +151,9 @@ void PerformancePlotter::generateMedianCostAndSuccessPlot(
   legendAxisOptions.ymax = 10;
   legendAxisOptions.hideAxis = true;
   legendAxisOptions.legendStyle =
-      "anchor=north, legend cell align=left, legend columns=-1, at={($(MedianCostAxis.south) + "
-      "(0.0em," + legendAxisOptions.height + " + 5em)$)}";  // Why do I have to shift so far up?
+      "anchor=north, legend cell align=left, legend columns=6, at={($(MedianCostAxis.south) + "
+      "(0.0em," +
+      legendAxisOptions.height + " + 5em)$)}";  // Why do I have to shift so far up?
   auto legendAxis = generateLegendAxis(stats);
   legendAxis->setOptions(legendAxisOptions);
 
@@ -199,7 +200,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
     // Create the pgf plot with this data and add it to the axis.
     PgfPlotOptions initialSolutionPlotOptions;
     initialSolutionPlotOptions.markSize = 0.5;
-    initialSolutionPlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
+    initialSolutionPlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
     auto initialSolutionPlot = std::make_shared<PgfPlot>(initialSolutionTable);
     initialSolutionPlot->setOptions(initialSolutionPlotOptions);
     axis->addPlot(initialSolutionPlot);
@@ -235,7 +236,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
       initialSolutionDurationIntervalPlotOptions.mark = "|";
       initialSolutionDurationIntervalPlotOptions.lineWidth = 0.5;
       initialSolutionDurationIntervalPlotOptions.color =
-          config_->get<std::string>("PlannerColors/" + name);
+          config_->get<std::string>("PlannerPlotColors/" + name);
       auto initialSolutionDurationIntervalPlot =
           std::make_shared<PgfPlot>(initialSolutionDurationIntervalTable);
       initialSolutionDurationIntervalPlot->setOptions(initialSolutionDurationIntervalPlotOptions);
@@ -247,7 +248,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
       initialSolutionCostIntervalPlotOptions.mark = "-";
       initialSolutionCostIntervalPlotOptions.lineWidth = 0.5;
       initialSolutionCostIntervalPlotOptions.color =
-          config_->get<std::string>("PlannerColors/" + name);
+          config_->get<std::string>("PlannerPlotColors/" + name);
       auto initialSolutionCostIntervalPlot =
           std::make_shared<PgfPlot>(initialSolutionCostIntervalTable);
       initialSolutionCostIntervalPlot->setOptions(initialSolutionCostIntervalPlotOptions);
@@ -284,7 +285,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
     // Let's plot the median costs right away.
     PgfPlotOptions medianCostsPlotOptions;
     medianCostsPlotOptions.markSize = 0.0;
-    medianCostsPlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
+    medianCostsPlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
     medianCostsPlotOptions.namePath = name + "Median"s;
     auto medianCostsPlot = std::make_shared<PgfPlot>(medianCostsTable);
     medianCostsPlot->setOptions(medianCostsPlotOptions);
@@ -321,7 +322,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
       PgfPlotOptions medianLowConfidencePlotOptions;
       medianLowConfidencePlotOptions.markSize = 0.0;
       medianLowConfidencePlotOptions.lineWidth = 0.5;
-      medianLowConfidencePlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
+      medianLowConfidencePlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
       medianLowConfidencePlotOptions.fillOpacity = 0.0;
       medianLowConfidencePlotOptions.drawOpacity = 0.2;
       medianLowConfidencePlotOptions.namePath = name + "LowConfidence"s;
@@ -337,7 +338,8 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
       PgfPlotOptions medianHighConfidencePlotOptions;
       medianHighConfidencePlotOptions.markSize = 0.0;
       medianHighConfidencePlotOptions.lineWidth = 0.5;
-      medianHighConfidencePlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
+      medianHighConfidencePlotOptions.color =
+          config_->get<std::string>("PlannerPlotColors/" + name);
       medianHighConfidencePlotOptions.fillOpacity = 0.0;
       medianHighConfidencePlotOptions.drawOpacity = 0.2;
       medianHighConfidencePlotOptions.namePath = name + "HighConfidence"s;
@@ -352,7 +354,8 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
       auto fillBetween = std::make_shared<PgfFillBetween>();
       fillBetween->setOptions(fillBetweenOptions);
       PgfPlotOptions confidenceIntervalFillPlotOptions;
-      confidenceIntervalFillPlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
+      confidenceIntervalFillPlotOptions.color =
+          config_->get<std::string>("PlannerPlotColors/" + name);
       confidenceIntervalFillPlotOptions.fillOpacity = 0.1;
       confidenceIntervalFillPlotOptions.drawOpacity = 0.0;
       auto confidenceIntervalFillPlot = std::make_shared<PgfPlot>(fillBetween);
@@ -395,7 +398,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateSuccessPlot(
     // Create the plot and add it to the axis.
     PgfPlotOptions successPercentagePlotOptions;
     successPercentagePlotOptions.markSize = 0.0;
-    successPercentagePlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
+    successPercentagePlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
     successPercentagePlotOptions.namePath = name + "Success"s;
     auto successPercentagePlot = std::make_shared<PgfPlot>(successPercentagePlotTable);
     successPercentagePlot->setOptions(successPercentagePlotOptions);
@@ -413,9 +416,9 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateLegendAxis(
   auto plannerNames = stats.getPlannerNames();
   std::sort(plannerNames.begin(), plannerNames.end());
   for (const auto& name : plannerNames) {
-    std::string imageOptions{config_->get<std::string>("PlannerColors/" + name) +
+    std::string imageOptions{config_->get<std::string>("PlannerPlotColors/" + name) +
                              ", line width = 1.0pt, mark size=1.0pt, mark=square*"};
-    legendAxis->addLegendEntry(name, imageOptions);
+    legendAxis->addLegendEntry(config_->get<std::string>("PlannerPlotNames/" + name), imageOptions);
   }
   return legendAxis;
 }
