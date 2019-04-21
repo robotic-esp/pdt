@@ -121,8 +121,9 @@ std::size_t PlannerData::numMeasuredRuns() const {
   return measuredRuns_.size();
 }
 
-PerformanceStatistics::PerformanceStatistics(const std::experimental::filesystem::path& filename) :
-    filename_(filename) {
+PerformanceStatistics::PerformanceStatistics(const std::shared_ptr<Configuration>& config) :
+  config_(config),
+  filename_(config_->get<std::string>("Experiment/results")) {
   // Open the file.
   std::ifstream csvFile(filename_);
   if (csvFile.fail()) {

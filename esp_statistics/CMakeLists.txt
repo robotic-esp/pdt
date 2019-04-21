@@ -14,7 +14,7 @@ add_library(esp_statistics
   src/performance_statistics.cpp)
 
 target_link_libraries(esp_statistics
-  )
+  esp_configuration)
 
 # Specify the include directories exported by this library.
 target_include_directories(esp_statistics

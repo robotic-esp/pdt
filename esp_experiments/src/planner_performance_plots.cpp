@@ -52,11 +52,8 @@ int main(int argc, char **argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
 
-  // Get the results.
-  std::experimental::filesystem::path resultsPath = config->get<std::string>("Experiment/results");
-
   // Get the statistics.
-  esp::ompltools::PerformanceStatistics stats(resultsPath);
+  esp::ompltools::PerformanceStatistics stats(config);
 
   // Generate the plot.
   auto contextName = config->get<std::string>("Experiment/context");
@@ -70,6 +67,7 @@ int main(int argc, char **argv) {
     durations.emplace_back(static_cast<double>(i + 1u) * binSize);
   }
   esp::ompltools::PerformancePlotter plotter(config);
+  std::experimental::filesystem::path resultsPath = config->get<std::string>("Experiment/results");
   auto plotPath = ((resultsPath.parent_path() / resultsPath.stem()) += "_median_cost_plot.tex"s);
   plotter.generateMedianCostAndSuccessPlot(stats, durations, plotPath);
   plotter.compilePlot(plotPath);

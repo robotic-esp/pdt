@@ -41,6 +41,8 @@
 #include <utility>
 #include <vector>
 
+#include "esp_configuration/configuration.h"
+
 namespace esp {
 
 namespace ompltools {
@@ -68,7 +70,7 @@ class PlannerData {
 
 class PerformanceStatistics {
  public:
-  PerformanceStatistics(const std::experimental::filesystem::path& filename_);
+  PerformanceStatistics(const std::shared_ptr<Configuration>& config);
   ~PerformanceStatistics() = default;
 
   std::vector<std::string> getPlannerNames() const;
@@ -87,7 +89,7 @@ class PerformanceStatistics {
   double getNthInitialSolutionCost(const std::string& name, std::size_t n) const;
 
  private:
-
+  std::shared_ptr<Configuration> config_;
   const std::experimental::filesystem::path filename_;
   std::vector<std::string> plannerNames_{};
 
