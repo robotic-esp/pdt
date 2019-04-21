@@ -1,0 +1,40 @@
+{
+    "Experiment": {
+        "executable": "planner_initial_solution",
+        "planners": [
+            "BITstar",
+            "SBITstar",
+            "RRTstar",
+            "RRTsharp"
+        ],
+        "context": "FlankingGap",
+        "numRuns": 10,
+        "logFrequency": 10000,
+        "useOnlyThisConfig": false
+    },
+    "Planners": {
+        "BITstarWithPruning": {
+            "type": "BITstar",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "samplesPerBatch": 100,
+            "enablePruning": true,
+            "pruningThreshold": 0.1,
+            "useJustInTimeSampling": false,
+            "dropSamplesOnPrune": false,
+            "stopOnSolutionImprovement": false
+        }
+    },
+    "Contexts": {
+        "CentreSquare": {
+            "maxTime": 0.3,
+            "dimensions": 2
+        },
+        "FlankingGap": {
+            "maxTime": 0.5,
+            "dimensions": 4,
+            "start": [-0.5, 0.0, 0.0, 0.0],
+            "goal": [0.5, 0.0, 0.0, 0.0]
+        }
+    }
+}

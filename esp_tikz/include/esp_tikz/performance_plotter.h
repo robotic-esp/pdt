@@ -37,8 +37,10 @@
 #pragma once
 
 #include <experimental/filesystem>
+#include <memory>
 #include <string>
 
+#include "esp_configuration/configuration.h"
 #include "esp_statistics/performance_statistics.h"
 #include "esp_tikz/tikz_picture.h"
 
@@ -48,7 +50,7 @@ namespace ompltools {
 
 class PerformancePlotter {
  public:
-  PerformancePlotter() = default;
+  PerformancePlotter(const std::shared_ptr<Configuration>& config);
   ~PerformancePlotter() = default;
 
   void generateMedianCostAndSuccessPlot(const PerformanceStatistics& stats,
@@ -66,6 +68,8 @@ class PerformancePlotter {
 
   void writePictureToFile(const TikzPicture& picture,
                           const std::experimental::filesystem::path& filename) const;
+  const std::shared_ptr<const Configuration> config_{};
+  std::map<std::string, std::array<int, 3>> espColors_{};
 };
 
 }  // namespace ompltools

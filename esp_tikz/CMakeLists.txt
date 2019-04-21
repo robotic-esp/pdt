@@ -20,6 +20,7 @@ add_library(esp_tikz
 
 target_link_libraries(esp_tikz
   esp_common
+  esp_configuration
   esp_statistics)
 
 # Specify the include directories exported by this library.

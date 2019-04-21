@@ -42,7 +42,6 @@
 
 #include <ompl/util/Console.h>
 
-#include "esp_tikz/colormap.h"
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"
 #include "esp_tikz/pgf_plot.h"
@@ -53,6 +52,21 @@ namespace esp {
 namespace ompltools {
 
 using namespace std::string_literals;
+
+PerformancePlotter::PerformancePlotter(const std::shared_ptr<Configuration>& config) :
+    config_(config) {
+  // Easy access to color.
+  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("Colors/espblack"));
+  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("Colors/espwhite"));
+  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("Colors/espgray"));
+  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("Colors/espblue"));
+  espColors_.emplace("espred", config_->get<std::array<int, 3>>("Colors/espred"));
+  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("Colors/espyellow"));
+  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("Colors/espgreen"));
+  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("Colors/esppurple"));
+  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("Colors/esplightblue"));
+  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("Colors/espdarkred"));
+}
 
 // The lookup table for confidence intervals.
 struct Interval {
@@ -153,19 +167,6 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
   // Create an axis to hold the plots.
   auto axis = std::make_shared<PgfAxis>();
 
-  // TODO: Make this better.
-  // This seems so hacky. How to make this better?
-  std::map<std::string, std::string> plannerColors;
-  auto color = espcolors.begin();
-  for (const auto& name : stats.getPlannerNames()) {
-    plannerColors.emplace(name, color->first);
-    ++color;
-    // Wrap around?
-    if (color == espcolors.end()) {
-      color = espcolors.begin();
-    }
-  }
-
   std::size_t numRunsPerPlanner = stats.getNumRunsPerPlanner();
 
   // Plot the initial solutions.
@@ -197,7 +198,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
     // Create the pgf plot with this data and add it to the axis.
     PgfPlotOptions initialSolutionPlotOptions;
     initialSolutionPlotOptions.markSize = 0.5;
-    initialSolutionPlotOptions.color = plannerColors.at(name);
+    initialSolutionPlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
     auto initialSolutionPlot = std::make_shared<PgfPlot>(initialSolutionTable);
     initialSolutionPlot->setOptions(initialSolutionPlotOptions);
     axis->addPlot(initialSolutionPlot);
@@ -232,7 +233,8 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
       initialSolutionDurationIntervalPlotOptions.markSize = 1.0;
       initialSolutionDurationIntervalPlotOptions.mark = "|";
       initialSolutionDurationIntervalPlotOptions.lineWidth = 0.5;
-      initialSolutionDurationIntervalPlotOptions.color = plannerColors.at(name);
+      initialSolutionDurationIntervalPlotOptions.color =
+          config_->get<std::string>("PlannerColors/" + name);
       auto initialSolutionDurationIntervalPlot =
           std::make_shared<PgfPlot>(initialSolutionDurationIntervalTable);
       initialSolutionDurationIntervalPlot->setOptions(initialSolutionDurationIntervalPlotOptions);
@@ -243,7 +245,8 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
       initialSolutionCostIntervalPlotOptions.markSize = 1.0;
       initialSolutionCostIntervalPlotOptions.mark = "-";
       initialSolutionCostIntervalPlotOptions.lineWidth = 0.5;
-      initialSolutionCostIntervalPlotOptions.color = plannerColors.at(name);
+      initialSolutionCostIntervalPlotOptions.color =
+          config_->get<std::string>("PlannerColors/" + name);
       auto initialSolutionCostIntervalPlot =
           std::make_shared<PgfPlot>(initialSolutionCostIntervalTable);
       initialSolutionCostIntervalPlot->setOptions(initialSolutionCostIntervalPlotOptions);
@@ -280,7 +283,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
     // Let's plot the median costs right away.
     PgfPlotOptions medianCostsPlotOptions;
     medianCostsPlotOptions.markSize = 0.0;
-    medianCostsPlotOptions.color = plannerColors.at(name);
+    medianCostsPlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
     medianCostsPlotOptions.namePath = name + "Median"s;
     auto medianCostsPlot = std::make_shared<PgfPlot>(medianCostsTable);
     medianCostsPlot->setOptions(medianCostsPlotOptions);
@@ -317,7 +320,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
       PgfPlotOptions medianLowConfidencePlotOptions;
       medianLowConfidencePlotOptions.markSize = 0.0;
       medianLowConfidencePlotOptions.lineWidth = 0.5;
-      medianLowConfidencePlotOptions.color = plannerColors.at(name);
+      medianLowConfidencePlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
       medianLowConfidencePlotOptions.fillOpacity = 0.0;
       medianLowConfidencePlotOptions.drawOpacity = 0.2;
       medianLowConfidencePlotOptions.namePath = name + "LowConfidence"s;
@@ -333,7 +336,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
       PgfPlotOptions medianHighConfidencePlotOptions;
       medianHighConfidencePlotOptions.markSize = 0.0;
       medianHighConfidencePlotOptions.lineWidth = 0.5;
-      medianHighConfidencePlotOptions.color = plannerColors.at(name);
+      medianHighConfidencePlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
       medianHighConfidencePlotOptions.fillOpacity = 0.0;
       medianHighConfidencePlotOptions.drawOpacity = 0.2;
       medianHighConfidencePlotOptions.namePath = name + "HighConfidence"s;
@@ -348,7 +351,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
       auto fillBetween = std::make_shared<PgfFillBetween>();
       fillBetween->setOptions(fillBetweenOptions);
       PgfPlotOptions confidenceIntervalFillPlotOptions;
-      confidenceIntervalFillPlotOptions.color = plannerColors.at(name);
+      confidenceIntervalFillPlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
       confidenceIntervalFillPlotOptions.fillOpacity = 0.1;
       confidenceIntervalFillPlotOptions.drawOpacity = 0.0;
       auto confidenceIntervalFillPlot = std::make_shared<PgfPlot>(fillBetween);
@@ -365,18 +368,6 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateSuccessPlot(
   // Create an axis for this plot.
   auto axis = std::make_shared<PgfAxis>();
 
-  // TODO: Make this better.
-  // This seems so hacky. How to make this better?
-  std::map<std::string, std::string> plannerColors;
-  auto color = espcolors.begin();
-  for (const auto& name : stats.getPlannerNames()) {
-    plannerColors.emplace(name, color->first);
-    ++color;
-    // Wrap around?
-    if (color == espcolors.end()) {
-      color = espcolors.begin();
-    }
-  }
   // Only plot the sample CDF for now.
   for (const auto& name : stats.getPlannerNames()) {
     // Get the initial solution durations.
@@ -403,7 +394,7 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateSuccessPlot(
     // Create the plot and add it to the axis.
     PgfPlotOptions successPercentagePlotOptions;
     successPercentagePlotOptions.markSize = 0.0;
-    successPercentagePlotOptions.color = plannerColors.at(name);
+    successPercentagePlotOptions.color = config_->get<std::string>("PlannerColors/" + name);
     successPercentagePlotOptions.namePath = name + "Success"s;
     auto successPercentagePlot = std::make_shared<PgfPlot>(successPercentagePlotTable);
     successPercentagePlot->setOptions(successPercentagePlotOptions);
@@ -416,24 +407,13 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateSuccessPlot(
 std::shared_ptr<PgfAxis> PerformancePlotter::generateLegendAxis(
     const PerformanceStatistics& stats) const {
   auto legendAxis = std::make_shared<PgfAxis>();
-  // TODO: Make this better.
-  // This seems so hacky. How to make this better?
-  std::map<std::string, std::string> plannerColors;
-  auto color = espcolors.begin();
-  for (const auto& name : stats.getPlannerNames()) {
-    plannerColors.emplace(name, color->first);
-    ++color;
-    // Wrap around?
-    if (color == espcolors.end()) {
-      color = espcolors.begin();
-    }
-  }
-  for (const auto& name : stats.getPlannerNames()) {
-    std::string imageOptions{plannerColors.at(name) +
+
+  // Make sure the names are alphabetic.
+  auto plannerNames = stats.getPlannerNames();
+  std::sort(plannerNames.begin(), plannerNames.end());
+  for (const auto& name : plannerNames) {
+    std::string imageOptions{config_->get<std::string>("PlannerColors/" + name) +
                              ", line width = 1.0pt, mark size=1.0pt, mark=square*"};
-    if (name == "RRTConnect") {
-      imageOptions += ", only marks";
-    }
     legendAxis->addLegendEntry(name, imageOptions);
   }
   return legendAxis;
@@ -468,7 +448,7 @@ void PerformancePlotter::writePictureToFile(
           << "\\pgfplotsset{compat=1.15}\n"
           << "\\usepgfplotslibrary{fillbetween}\n"
           << "\\usepackage{xcolor}\n";
-  for (const auto& [name, values] : espcolors) {
+  for (const auto& [name, values] : espColors_) {
     texFile << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
             << values[2u] << "}\n";
   }

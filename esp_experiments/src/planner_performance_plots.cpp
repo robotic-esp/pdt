@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
   for (std::size_t i = 0u; i < numMeasurements; ++i) {
     durations.emplace_back(static_cast<double>(i + 1u) * binSize);
   }
-  esp::ompltools::PerformancePlotter plotter;
+  esp::ompltools::PerformancePlotter plotter(config);
   auto plotPath = ((resultsPath.parent_path() / resultsPath.stem()) += "_median_cost_plot.tex"s);
   plotter.generateMedianCostAndSuccessPlot(stats, durations, plotPath);
   plotter.compilePlot(plotPath);
