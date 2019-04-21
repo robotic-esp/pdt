@@ -142,16 +142,17 @@ void PerformancePlotter::generateMedianCostAndSuccessPlot(
 
   // Create the axis that holds the plot legend.
   PgfAxisOptions legendAxisOptions;
-  legendAxisOptions.at =
-      "($(MedianCostAxis.south) - (3.0em, 3.0em)$)";  // Why do I have to shift in x?
+  legendAxisOptions.at = "($(MedianCostAxis.south) - (0.0em, 0.3em)$)";
   legendAxisOptions.anchor = "north";
   legendAxisOptions.name = "LegendAxis";
   legendAxisOptions.xmin = minDurationToBePlotted;
   legendAxisOptions.xmax = maxDurationToBePlotted;
-  legendAxisOptions.ymin = 0;
-  legendAxisOptions.ymax = 101;
+  legendAxisOptions.ymin = 1;
+  legendAxisOptions.ymax = 10;
   legendAxisOptions.hideAxis = true;
-  legendAxisOptions.legendStyle = "legend cell align=left, align=center, legend columns=-1";
+  legendAxisOptions.legendStyle =
+      "anchor=north, legend cell align=left, legend columns=-1, at={($(MedianCostAxis.south) + "
+      "(0.0em," + legendAxisOptions.height + " + 5em)$)}";  // Why do I have to shift so far up?
   auto legendAxis = generateLegendAxis(stats);
   legendAxis->setOptions(legendAxisOptions);
 
