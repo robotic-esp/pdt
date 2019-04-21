@@ -122,6 +122,9 @@ void PerformancePlotter::generateMedianCostAndSuccessPlot(
   successAxisOptions.ymax = 100.2;
   successAxisOptions.ytick = "0,25,50,75,100";
   successAxisOptions.ylabel = "Success [\\%]"s;
+  successAxisOptions.ylabelAbsolute = true;
+  successAxisOptions.ylabelStyle =
+      "font=\\footnotesize, text depth=0.0em, text height=0.5em";
   auto successAxis = generateSuccessPlot(stats);
   successAxis->setOptions(successAxisOptions);
 
@@ -135,8 +138,11 @@ void PerformancePlotter::generateMedianCostAndSuccessPlot(
   medianCostAxisOptions.ymax = stats.getMaxNonInfCost();
   medianCostAxisOptions.xlog = true;
   medianCostAxisOptions.xminorgrids = true;
-  medianCostAxisOptions.xlabel = "Computation time [s]"s;
-  medianCostAxisOptions.ylabel = "Median cost"s;
+  medianCostAxisOptions.xlabel = "Computation time [s]";
+  medianCostAxisOptions.ylabel = "Median cost";
+  medianCostAxisOptions.ylabelAbsolute = true;
+  medianCostAxisOptions.ylabelStyle =
+      "font=\\footnotesize, text depth=0.0em, text height=0.5em";
   auto medianCostAxis = generateMedianCostPlot(stats, durations, confidence);
   medianCostAxis->setOptions(medianCostAxisOptions);
 

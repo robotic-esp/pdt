@@ -102,6 +102,9 @@ std::string PgfAxisOptions::string() const {
   if (xlabelStyle != ""s) {
     stream << ",\n  xlabel style={" << xlabelStyle << '}';
   }
+  if (xlabelAbsolute) {
+    stream << ",\n  xlabel absolute";
+  }
   if (xtick != ""s) {
     stream << ",\n  xtick={" << xtick << '}';
   }
@@ -116,6 +119,9 @@ std::string PgfAxisOptions::string() const {
   }
   if (ylabelStyle != ""s) {
     stream << ",\n  ylabel style={" << ylabelStyle << '}';
+  }
+  if (ylabelAbsolute) {
+    stream << ",\n  ylabel absolute";
   }
   if (ytick != ""s) {
     stream << ",\n  ytick={" << ytick << '}';

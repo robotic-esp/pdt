@@ -74,6 +74,7 @@ struct PgfAxisOptions {
   std::string xticklabelStyle{"font=\\footnotesize"};
   std::string xlabel{""};
   std::string xlabelStyle{"font=\\footnotesize"};
+  bool xlabelAbsolute{false};
 
   // Y-Axis options.
   bool ylog{false};
@@ -86,6 +87,7 @@ struct PgfAxisOptions {
   std::string yticklabelStyle{"font=\\footnotesize"};
   std::string ylabel{""};
   std::string ylabelStyle{"font=\\footnotesize"};
+  bool ylabelAbsolute{false};
 };
 
 class PgfAxis {
