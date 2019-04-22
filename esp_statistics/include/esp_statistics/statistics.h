@@ -83,20 +83,12 @@ class Statistics {
   std::experimental::filesystem::path extractInitialSolutionDurationCdf(
       const std::string& plannerName) const;
 
-  std::vector<std::string> getPlannerNames() const;
   std::size_t getNumRunsPerPlanner() const;
   double getMinCost() const;
   double getMaxCost() const;
   double getMaxNonInfCost() const;
   double getMinDuration() const;
   double getMaxDuration() const;
-
-  std::vector<double> getNthCosts(const std::string& name, std::size_t n,
-                                  const std::vector<double>& durations) const;
-  std::vector<double> getInitialSolutionDurations(const std::string& name) const;
-  std::vector<double> getInitialSolutionCosts(const std::string& name) const;
-  double getNthInitialSolutionDuration(const std::string& name, std::size_t n) const;
-  double getNthInitialSolutionCost(const std::string& name, std::size_t n) const;
 
  private:
   // The identifying header line that starts each file produced by this class.
@@ -124,9 +116,7 @@ class Statistics {
   std::vector<double> getInitialSolutionCosts(const PlannerResults& results) const;
 
   std::shared_ptr<Configuration> config_;
-  const std::experimental::filesystem::path resultsPath_;
   const std::experimental::filesystem::path statisticsDirectory_;
-  std::vector<std::string> plannerNames_{};
 
   // Default binning durations.
   std::vector<double> defaultBinDurations_{};
@@ -141,11 +131,6 @@ class Statistics {
   double maxNonInfCost_{std::numeric_limits<double>::lowest()};
   double minDuration_{std::numeric_limits<double>::infinity()};
   double maxDuration_{std::numeric_limits<double>::lowest()};
-
-  // Paths to the generated files in the form
-  // planner -> statstype -> path, e.g. statisticsPaths_["SBITstar"]["median"] -> path.
-  std::map<std::string, std::map<std::string, std::experimental::filesystem::path>>
-      statisticsPaths_{};
 };
 
 }  // namespace ompltools

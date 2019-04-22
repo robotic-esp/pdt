@@ -99,13 +99,7 @@ fs::path MedianCostSuccessPlot::generatePlot(const Statistics& stats, std::size_
 
   // Determine the min and max durations to be plotted.
   double maxDurationToBePlotted = durations.back();
-  double minDurationToBePlotted{std::numeric_limits<double>::infinity()};
-  for (const auto& name : stats.getPlannerNames()) {
-    double minDuration = stats.getNthInitialSolutionDuration(name, 0u);
-    if (minDuration < minDurationToBePlotted) {
-      minDurationToBePlotted = minDuration;
-    }
-  }
+  double minDurationToBePlotted = durations.front();
 
   // Set the axis options for the success plot.
   PgfAxisOptions successAxisOptions;
@@ -157,7 +151,7 @@ fs::path MedianCostSuccessPlot::generatePlot(const Statistics& stats, std::size_
       "anchor=north, legend cell align=left, legend columns=6, at={($(MedianCostAxis.south) + "
       "(0.0em," +
       legendAxisOptions.height + " + 5em)$)}";  // Why do I have to shift so far up?
-  auto legendAxis = generateLegendAxis(stats);
+  auto legendAxis = generateLegendAxis();
   legendAxis->setOptions(legendAxisOptions);
 
   // Add all axis to this plot.
@@ -179,7 +173,7 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
   auto axis = std::make_shared<PgfAxis>();
 
   // Plot the initial solutions.
-  for (const auto& name : stats.getPlannerNames()) {
+  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
     // Load the median initial duration and cost into a table.
     auto medianInitialSolutionPath = stats.extractMedianInitialSolution(name, confidence);
     auto initialSolutionTable =
@@ -247,7 +241,7 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
   }
 
   // Plot the median costs and confidence intervals.
-  for (const auto& name : stats.getPlannerNames()) {
+  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
     // This cannot be applied to planners that aren't anytime.
     if (name == "RRTConnect"s) {
       continue;
@@ -327,7 +321,7 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateSuccessPlot(const Statis
   auto axis = std::make_shared<PgfAxis>();
 
   // Only plot the sample CDF for now.
-  for (const auto& name : stats.getPlannerNames()) {
+  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
     // Get the initial solution durations.
     auto initialSolutionDurationsCdfFile = stats.extractInitialSolutionDurationCdf(name);
 
@@ -361,11 +355,11 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateSuccessPlot(const Statis
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateLegendAxis(const Statistics& stats) const {
+std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateLegendAxis() const {
   auto legendAxis = std::make_shared<PgfAxis>();
 
   // Make sure the names are alphabetic.
-  auto plannerNames = stats.getPlannerNames();
+  auto plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
   std::sort(plannerNames.begin(), plannerNames.end());
   for (const auto& name : plannerNames) {
     std::string imageOptions{config_->get<std::string>("PlannerPlotColors/" + name) +

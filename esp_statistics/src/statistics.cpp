@@ -125,15 +125,18 @@ std::size_t PlannerResults::numMeasuredRuns() const {
 
 Statistics::Statistics(const std::shared_ptr<Configuration>& config) :
     config_(config),
-    resultsPath_(config_->get<std::string>("Experiment/results")),
-    statisticsDirectory_(resultsPath_.parent_path() / "statistics/") {
+    statisticsDirectory_(fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+                         "statistics/") {
   // Create the statistics directory.
   fs::create_directories(statisticsDirectory_);
 
+  // Get the results path.
+  fs::path resultsPath = config_->get<std::string>("Experiment/results");
+
   // Open the results file.
-  std::ifstream filestream(resultsPath_.string());
+  std::ifstream filestream(resultsPath.string());
   if (filestream.fail()) {
-    auto msg = "Statistics cannot open results at '"s + resultsPath_.string() + "'."s;
+    auto msg = "Statistics cannot open results at '"s + resultsPath.string() + "'."s;
     throw std::runtime_error(msg);
   }
 
@@ -152,9 +155,6 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config) :
     if (timeRow) {
       name = row.at(0);
       run.clear();
-      if (std::find(plannerNames_.cbegin(), plannerNames_.cend(), name) == plannerNames_.cend()) {
-        plannerNames_.emplace_back(name);
-      }
     } else if (row.at(0) != name) {
       throw std::runtime_error("Csv file has unexpected structure.");
     }
@@ -338,7 +338,7 @@ fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& planne
   }
 
   // Get the initial solution durations.
-  auto initialSolutionDurations = getInitialSolutionDurations(plannerName);
+  auto initialSolutionDurations = getInitialSolutionDurations(results_.at(plannerName));
 
   // Sort them.
   std::sort(initialSolutionDurations.begin(), initialSolutionDurations.end());
@@ -417,10 +417,6 @@ Statistics::ConfidenceInterval Statistics::getMedianConfidenceInterval(
     throw std::runtime_error(msg);
   }
   return medianConfidenceIntervals.at(numRunsPerPlanner_).at(confidence);
-}
-
-std::vector<std::string> Statistics::getPlannerNames() const {
-  return plannerNames_;
 }
 
 std::size_t Statistics::getNumRunsPerPlanner() const {
@@ -523,19 +519,6 @@ std::vector<double> Statistics::getNthCosts(const PlannerResults& results, std::
   return nthCosts;
 }
 
-std::vector<double> Statistics::getNthCosts(const std::string& name, std::size_t n,
-                                            const std::vector<double>& durations) const {
-  if (name == "RRTConnect"s) {
-    auto msg = "Cannot specify durations for planners with nonanytime behaviour."s;
-    throw std::runtime_error(msg);
-  }
-  if (results_.find(name) == results_.end()) {
-    auto msg = "Cannot find results of '"s + name + "' and can therefore not get nth costs."s;
-    throw std::runtime_error(msg);
-  }
-  return getNthCosts(results_.at(name), n, durations);
-}
-
 std::vector<double> Statistics::getInitialSolutionDurations(const PlannerResults& results) const {
   // Get the durations of the initial solutions of all runs.
   std::vector<double> initialDurations{};
@@ -559,15 +542,6 @@ std::vector<double> Statistics::getInitialSolutionDurations(const PlannerResults
   }
 
   return initialDurations;
-}
-
-std::vector<double> Statistics::getInitialSolutionDurations(const std::string& name) const {
-  if (results_.find(name) == results_.end()) {
-    auto msg = "Cannot find statistics for planner '"s + name + "'."s;
-    throw std::runtime_error(msg);
-  }
-
-  return getInitialSolutionDurations(results_.at(name));
 }
 
 std::vector<double> Statistics::getInitialSolutionCosts(const PlannerResults& results) const {
@@ -595,15 +569,6 @@ std::vector<double> Statistics::getInitialSolutionCosts(const PlannerResults& re
   return initialCosts;
 }
 
-std::vector<double> Statistics::getInitialSolutionCosts(const std::string& name) const {
-  if (results_.find(name) == results_.end()) {
-    auto msg = "Cannot find statistics for planner '"s + name + "'."s;
-    throw std::runtime_error(msg);
-  }
-
-  return getInitialSolutionCosts(results_.at(name));
-}
-
 double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,
                                                  std::size_t n) const {
   // Get the durations of the initial solutions of all runs.
@@ -616,15 +581,6 @@ double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,
   return *nthDuration;
 }
 
-double Statistics::getNthInitialSolutionDuration(const std::string& name, std::size_t n) const {
-  if (results_.find(name) == results_.end()) {
-    auto msg = "Cannot find statistics for planner '"s + name + "'."s;
-    throw std::runtime_error(msg);
-  }
-
-  return getNthInitialSolutionDuration(results_.at(name), n);
-}
-
 double Statistics::getNthInitialSolutionCost(const PlannerResults& result, std::size_t n) const {
   // Get the costs of the initial solutions of all runs.
   auto initialCosts = getInitialSolutionCosts(result);
@@ -634,15 +590,6 @@ double Statistics::getNthInitialSolutionCost(const PlannerResults& result, std::
   std::nth_element(initialCosts.begin(), nthCost, initialCosts.end());
 
   return *nthCost;
-}
-
-double Statistics::getNthInitialSolutionCost(const std::string& name, std::size_t n) const {
-  if (results_.find(name) == results_.end()) {
-    auto msg = "Cannot find statistics for planner '"s + name + "'."s;
-    throw std::runtime_error(msg);
-  }
-
-  return getNthInitialSolutionCost(results_.at(name), n);
 }
 
 }  // namespace ompltools
