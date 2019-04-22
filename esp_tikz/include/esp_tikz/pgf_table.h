@@ -36,6 +36,7 @@
 
 #pragma once
 
+#include <experimental/filesystem>
 #include <string>
 #include <vector>
 
@@ -56,9 +57,10 @@ class PgfTable : public PlottableInterface {
   PgfTable() = default;
   ~PgfTable() = default;
 
-  void loadFrom();
-  void addColumn(const std::vector<double>& data);
-  void addRow(const std::vector<double>& data);
+  void loadFromPath(const std::experimental::filesystem::path& path, std::size_t skipNumCols = 0u,
+                    bool transpose = true);
+  void addColumn(const std::vector<double>& column);
+  void addRow(const std::vector<double>& row);
   void setOptions(const PgfTableOptions& options);
 
   std::string string() const override;

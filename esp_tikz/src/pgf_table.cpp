@@ -36,16 +36,67 @@
 
 #include "esp_tikz/pgf_table.h"
 
+#include <fstream>
 #include <sstream>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
+#include "csv/parser.hpp"
+#pragma GCC diagnostic pop
 
 namespace esp {
 
 namespace ompltools {
 
+using namespace std::string_literals;
+namespace fs = std::experimental::filesystem;
+
 std::string PgfTableOptions::string() const {
   std::ostringstream stream{};
   stream << "\n  row sep=" << rowSep << ",\n  col sep=" << colSep;
   return stream.str();
+}
+
+void PgfTable::loadFromPath(const std::experimental::filesystem::path& path,
+                            std::size_t skipNumCols, bool transpose) {
+  if (!transpose) {
+    throw std::invalid_argument("Not transposing is not implemented.");
+  }
+
+  // Open the file.
+  std::ifstream filestream(path.string());
+  if (filestream.fail()) {
+    auto msg = "PgfTable cannot open file at '"s + path.string() + "'."s;
+    throw std::runtime_error(msg);
+  }
+
+  // Parse the file.
+  aria::csv::CsvParser parser(filestream);
+  for (const auto& row : parser) {
+    if (row.size() == 0) {
+      throw std::runtime_error("Empty row.");
+    }
+    if (row.at(0).find('#') != std::string::npos) {
+      continue;  // Skipping comments.
+    }
+    if (row.size() <= skipNumCols) {
+      continue;  // Skipping cols.
+    }
+    std::vector<double> rowAsDoubles{};
+    rowAsDoubles.reserve(row.size());
+    for (std::size_t i = skipNumCols; i < row.size(); ++i) {
+      try {
+        rowAsDoubles.emplace_back(std::stod(row.at(i)));
+      } catch (const std::invalid_argument& e) {
+        auto msg = "Pgf Table cannot convert entry '"s + row.at(i) + "' from file '"s +
+                   path.string() + "' to double."s;
+        throw std::invalid_argument(msg);
+      }
+    }
+    if (transpose) {
+      data_.emplace_back(std::move(rowAsDoubles));
+    }
+  }
 }
 
 void PgfTable::addColumn(const std::vector<double>& column) {
@@ -103,7 +154,7 @@ std::string PgfTable::string() const {
   for (std::size_t row = 1u; row < data_.at(0u).size(); ++row) {
     auto x = data_.at(0u).at(row);
     auto y = data_.at(1u).at(row);
-    if (y == lowY && row != data_.at(0u).size() - 1u) { // We need the last result.
+    if (y == lowY && row != data_.at(0u).size() - 1u) {  // We need the last result.
       lowX = x;
       continue;
     } else {

@@ -272,6 +272,20 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
     if (name == "RRTConnect"s) {
       continue;
     }
+
+    // Get the median costs from the file.
+    auto medianCostsTable = std::make_shared<PgfTable>();
+    medianCostsTable->loadFromPath(stats.extractMedians(name), 1u);
+
+    // Let's plot the median costs right away.
+    PgfPlotOptions medianCostsPlotOptions;
+    medianCostsPlotOptions.markSize = 0.0;
+    medianCostsPlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
+    medianCostsPlotOptions.namePath = name + "Median"s;
+    auto medianCostsPlot = std::make_shared<PgfPlot>(medianCostsTable);
+    medianCostsPlot->setOptions(medianCostsPlotOptions);
+    axis->addPlot(medianCostsPlot);
+
     // Get the median costs.
     std::vector<double> medianCosts;
     medianCosts.resize(durations.size(), std::numeric_limits<double>::signaling_NaN());
@@ -286,20 +300,6 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
         medianCosts.at(i) = (lowMedianCosts.at(i) + highMedianCosts.at(i)) / 2.0;
       }
     }
-
-    // Convert this data into a table.
-    auto medianCostsTable = std::make_shared<PgfTable>();
-    medianCostsTable->addColumn(durations);
-    medianCostsTable->addColumn(medianCosts);
-
-    // Let's plot the median costs right away.
-    PgfPlotOptions medianCostsPlotOptions;
-    medianCostsPlotOptions.markSize = 0.0;
-    medianCostsPlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
-    medianCostsPlotOptions.namePath = name + "Median"s;
-    auto medianCostsPlot = std::make_shared<PgfPlot>(medianCostsTable);
-    medianCostsPlot->setOptions(medianCostsPlotOptions);
-    axis->addPlot(medianCostsPlot);
 
     // Get the confidence interval costs.
     if (medianConfidenceIntervals.find(numRunsPerPlanner) == medianConfidenceIntervals.end() ||

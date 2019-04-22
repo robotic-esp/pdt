@@ -40,6 +40,7 @@
 #include <cassert>
 #include <cmath>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 
 #include <ompl/util/Console.h>
@@ -130,14 +131,14 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config) :
   fs::create_directories(statisticsDirectory_);
 
   // Open the results file.
-  std::ifstream csvFile(resultsPath_.string());
-  if (csvFile.fail()) {
+  std::ifstream filestream(resultsPath_.string());
+  if (filestream.fail()) {
     auto msg = "Statistics cannot open results at '"s + resultsPath_.string() + "'."s;
     throw std::runtime_error(msg);
   }
 
   // Set up the parser.
-  aria::csv::CsvParser parser(csvFile);
+  aria::csv::CsvParser parser(filestream);
 
   // Parse the file in bulk for now. We could already extract some statistics here, e.g. fastest
   // initial solution time and associated cost for every planner.
