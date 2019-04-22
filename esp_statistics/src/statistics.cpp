@@ -181,10 +181,235 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config) :
       }
     }
     if (!timeRow) {
-      data_[name].addMeasuredRun(run);
+      results_[name].addMeasuredRun(run);
     }
     timeRow = !timeRow;
   }
+
+  // Get the number of runs per planner, check that they're equal.
+  if (results_.empty()) {
+    numRunsPerPlanner_ = 0u;
+  } else {
+    // Make sure all planners have the same amount of runs.
+    for (auto it = ++results_.begin(); it != results_.end(); ++it) {
+      if ((--it)->second.numMeasuredRuns() != (++it)->second.numMeasuredRuns()) {
+        auto msg = "Not all planners have the same amount of runs."s;
+        throw std::runtime_error(msg);
+      }
+    }
+    numRunsPerPlanner_ = results_.begin()->second.numMeasuredRuns();
+  }
+
+  // Compute the default binning durations.
+  auto contextName = config_->get<std::string>("Experiment/context");
+  std::size_t numMeasurements =
+      std::ceil(config_->get<double>("Contexts/" + contextName + "/maxTime") *
+                config_->get<double>("Experiment/logFrequency"));
+  double binSize = 1.0 / config_->get<double>("Experiment/logFrequency");
+  defaultBinDurations_.reserve(numMeasurements);
+  for (std::size_t i = 0u; i < numMeasurements; ++i) {
+    defaultBinDurations_.emplace_back(static_cast<double>(i + 1u) * binSize);
+  }
+}
+
+fs::path Statistics::extractMedians(const std::string& plannerName,
+                                    const std::vector<double>& binDurations) const {
+  if (plannerName == "RRTConnect") {
+    auto msg = "This method extracts median costs over time for anytime planners. '" + plannerName +
+               "' is not an anytime planner."s;
+    throw std::runtime_error(msg);
+  }
+
+  if (results_.find(plannerName) == results_.end()) {
+    auto msg =
+        "Cannot find results for '" + plannerName + "' and can therefore not extract medians."s;
+    throw std::runtime_error(msg);
+  }
+
+  // Get the requested bin durations.
+  const auto& durations = binDurations.empty() ? defaultBinDurations_ : binDurations;
+
+  // Get the median costs.
+  auto medianCosts = getMedianCosts(results_.at(plannerName), durations);
+
+  // Write to file.
+  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
+                                              plannerName + "_medians.csv");
+  std::ofstream filestream(filepath.string());
+  if (filestream.fail()) {
+    auto msg = "Cannot write medians for '"s + plannerName + "' to '"s + filepath.string() + "'."s;
+    throw std::ios_base::failure(msg);
+  }
+
+  filestream << createHeader("Median", plannerName);
+  filestream << std::setprecision(21);
+  filestream << "durations";
+  for (const auto duration : durations) {
+    filestream << ',' << duration;
+  }
+  filestream << "\nmedian costs";
+  for (const auto cost : medianCosts) {
+    filestream << ',' << cost;
+  }
+  filestream << '\n';
+
+  return filepath;  // Note: std::ofstream closes itself upon destruction.
+}
+
+fs::path Statistics::extractMedianConfidenceIntervals(
+    const std::string& plannerName, std::size_t confidence,
+    const std::vector<double>& binDurations) const {
+  if (plannerName == "RRTConnect") {
+    auto msg =
+        "This method extracts median confidence intervals over time for anytime planners. '" +
+        plannerName + "' is not an anytime planner."s;
+    throw std::runtime_error(msg);
+  }
+
+  if (results_.find(plannerName) == results_.end()) {
+    auto msg = "Cannot find results for '" + plannerName +
+               "' and can therefore not extract confidence intervals for medians."s;
+    throw std::runtime_error(msg);
+  }
+
+  // Get the interval indices.
+  auto interval = getMedianConfidenceInterval(confidence);
+
+  // Get the requested bin durations.
+  const auto& durations = binDurations.empty() ? defaultBinDurations_ : binDurations;
+
+  // Get the interval bound costs.
+  auto lowerCosts = getNthCosts(results_.at(plannerName), interval.lower, durations);
+  auto upperCosts = getNthCosts(results_.at(plannerName), interval.upper, durations);
+
+  // We need to clean up these costs. If the median is infinite, the lower and upper bounds should
+  // be nan.
+  auto medianCosts = getMedianCosts(results_.at(plannerName), durations);
+  for (std::size_t i = 0u; i < medianCosts.size(); ++i) {
+    if (medianCosts.at(i) == std::numeric_limits<double>::infinity()) {
+      lowerCosts.at(i) = std::numeric_limits<double>::quiet_NaN();
+      upperCosts.at(i) = std::numeric_limits<double>::quiet_NaN();
+    } else {
+      break;  // Once the first median cost is not infinity, none of the following will be.
+    }
+  }
+
+  // Write to file.
+  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
+                                              plannerName + "_median_confidence_intervals.csv");
+  std::ofstream filestream(filepath.string());
+  if (filestream.fail()) {
+    auto msg = "Cannot write median confidence intervals for '"s + plannerName + "' to '"s +
+               filepath.string() + "'."s;
+    throw std::ios_base::failure(msg);
+  }
+
+  filestream << createHeader("Median confidence intervals", plannerName);
+  filestream << std::setprecision(21);
+  filestream << "durations";
+  for (const auto duration : durations) {
+    filestream << ',' << duration;
+  }
+  filestream << "\nlower bounding costs";
+  for (const auto cost : lowerCosts) {
+    filestream << ',' << cost;
+  }
+  filestream << "\nupper bounding costs";
+  for (const auto cost : upperCosts) {
+    filestream << ',' << cost;
+  }
+  filestream << '\n';
+
+  return filepath;  // Note: std::ofstream closes itself upon destruction.
+}
+
+fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& plannerName) const {
+  if (results_.find(plannerName) == results_.end()) {
+    auto msg = "Cannot find results for '" + plannerName +
+               "' and can therefore not extract initial solution duration cdf."s;
+    throw std::runtime_error(msg);
+  }
+
+  // Get the initial solution durations.
+  auto initialSolutionDurations = getInitialSolutionDurations(plannerName);
+
+  // Sort them.
+  std::sort(initialSolutionDurations.begin(), initialSolutionDurations.end());
+
+  // Prepare variable to calculate solution percentages.
+  std::size_t numSolvedRuns = 0;
+
+  // Write to file.
+  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
+                                              plannerName + "_initial_solution_durations_cdf.csv");
+  std::ofstream filestream(filepath.string());
+  if (filestream.fail()) {
+    auto msg = "Cannot write initial solution duration cdf for '"s + plannerName + "' to '"s +
+               filepath.string() + "'."s;
+    throw std::ios_base::failure(msg);
+  }
+
+  filestream << createHeader("Initial solution duration cdf", plannerName);
+  filestream << std::setprecision(21);
+  filestream << "durations";
+  for (const auto duration : initialSolutionDurations) {
+    filestream << ',' << duration;
+  }
+  filestream << "\ncdf";
+  for (std::size_t i = 0u; i < initialSolutionDurations.size(); ++i) {
+    filestream << ','
+               << static_cast<double>(++numSolvedRuns) / static_cast<double>(numRunsPerPlanner_);
+  }
+  filestream << '\n';
+
+  return filepath;  // Note: std::ofstream closes itself upon destruction.
+}
+
+std::string Statistics::createHeader(const std::string& statisticType,
+                                     const std::string& plannerName) const {
+  std::stringstream stream;
+  stream << "# Experiment: " << config_->get<std::string>("Experiment/name") << '\n';
+  stream << "# Planner: " << plannerName << '\n';
+  stream << "# Statistic: " << statisticType << '\n';
+  return stream.str();
+}
+
+Statistics::ConfidenceInterval Statistics::getMedianConfidenceInterval(
+    std::size_t confidence) const {
+  static const std::map<std::size_t, std::map<std::size_t, ConfidenceInterval>>
+      medianConfidenceIntervals = {
+          {10u, {{95u, {1u, 8u, 0.9511}}, {99u, {0u, 9u, 0.9910}}}},
+          {50u, {{95u, {18u, 32u, 0.9511}}, {99u, {15u, 34u, 0.9910}}}},
+          {100u, {{95u, {40u, 60u, 0.9540}}, {99u, {37u, 63u, 0.9907}}}},
+          {200u, {{95u, {86u, 114u, 0.9520}}, {99u, {81u, 118u, 0.9906}}}},
+          {250u, {{95u, {110u, 141u, 0.9503}}, {99u, {104u, 145u, 0.9900}}}},
+          {300u, {{95u, {133u, 167u, 0.9502}}, {99u, {127u, 172u, 0.9903}}}},
+          {400u, {{95u, {179u, 219u, 0.9522}}, {99u, {174u, 226u, 0.9907}}}},
+          {500u, {{95u, {228u, 272u, 0.9508}}, {99u, {221u, 279u, 0.9905}}}},
+          {600u, {{95u, {274u, 323u, 0.9508}}, {99u, {267u, 331u, 0.9907}}}},
+          {700u, {{95u, {324u, 376u, 0.9517}}, {99u, {314u, 383u, 0.9901}}}},
+          {800u, {{95u, {371u, 427u, 0.9511}}, {99u, {363u, 436u, 0.9900}}}},
+          {900u, {{95u, {420u, 479u, 0.9503}}, {99u, {410u, 488u, 0.9904}}}},
+          {1000u, {{95u, {469u, 531u, 0.9500}}, {99u, {458u, 531u, 0.9905}}}},
+          {2000u, {{95u, {955u, 1043u, 0.9504}}, {99u, {940u, 1056u, 0.9901}}}},
+          {5000u, {{95u, {2429u, 2568u, 0.9503}}, {99u, {2406u, 2589u, 0.9901}}}},
+          {10000u, {{95u, {4897u, 5094u, 0.9500}}, {99u, {4869u, 5127u, 0.9900}}}},
+          {100000u, {{95u, {49687u, 50307u, 0.9500}}, {99u, {49588u, 50403u, 0.9900}}}},
+          {1000000u, {{95u, {499018u, 500978u, 0.9500}}, {99u, {498707u, 501283u, 0.9900}}}}};
+  if (medianConfidenceIntervals.find(numRunsPerPlanner_) == medianConfidenceIntervals.end()) {
+    auto msg = "No precomputed values for the median confidence interval with "s +
+               std::to_string(numRunsPerPlanner_) + " runs. The precomputed values are:\n"s;
+    for (const auto& entry : medianConfidenceIntervals) {
+      msg += std::to_string(entry.first) + '\n';
+    }
+    throw std::runtime_error(msg);
+  }
+  if (confidence != 95u && confidence != 99u) {
+    auto msg =
+        "Invalid confidence, only know confidence intervals for 95 and 99 percent confidence."s;
+    throw std::runtime_error(msg);
+  }
+  return medianConfidenceIntervals.at(numRunsPerPlanner_).at(confidence);
 }
 
 std::vector<std::string> Statistics::getPlannerNames() const {
@@ -192,17 +417,17 @@ std::vector<std::string> Statistics::getPlannerNames() const {
 }
 
 std::size_t Statistics::getNumRunsPerPlanner() const {
-  if (data_.empty()) {
+  if (results_.empty()) {
     return 0u;
   }
   // Make sure all planners have the same amount of runs.
-  for (auto it = ++data_.begin(); it != data_.end(); ++it) {
+  for (auto it = ++results_.begin(); it != results_.end(); ++it) {
     if ((--it)->second.numMeasuredRuns() != (++it)->second.numMeasuredRuns()) {
       auto msg = "Not all planners have the same amount of runs."s;
       throw std::runtime_error(msg);
     }
   }
-  return data_.begin()->second.numMeasuredRuns();
+  return results_.begin()->second.numMeasuredRuns();
 }
 
 double Statistics::getMinCost() const {
@@ -225,19 +450,32 @@ double Statistics::getMaxDuration() const {
   return maxDuration_;
 }
 
-std::vector<double> Statistics::getNthCosts(const std::string& name, std::size_t n,
-                                            const std::vector<double>& durations) const {
-  if (name == "RRTConnect"s) {
-    auto msg = "Cannot specify durations for planners with nonanytime behaviour."s;
-    throw std::runtime_error(msg);
+std::vector<double> Statistics::getMedianCosts(const PlannerResults& results,
+                                               const std::vector<double>& durations) const {
+  std::vector<double> medianCosts;
+  medianCosts.resize(durations.size(), std::numeric_limits<double>::signaling_NaN());
+  if (numRunsPerPlanner_ % 2 == 1) {
+    medianCosts = getNthCosts(results, (numRunsPerPlanner_ - 1u) / 2, durations);
+  } else {
+    std::vector<double> lowMedianCosts = getNthCosts(results, numRunsPerPlanner_ / 2, durations);
+    std::vector<double> highMedianCosts =
+        getNthCosts(results, (numRunsPerPlanner_ + 2u) / 2, durations);
+    for (std::size_t i = 0u; i < medianCosts.size(); ++i) {
+      medianCosts.at(i) = (lowMedianCosts.at(i) + highMedianCosts.at(i)) / 2.0;
+    }
   }
+  return medianCosts;
+}
+
+std::vector<double> Statistics::getNthCosts(const PlannerResults& results, std::size_t n,
+                                            const std::vector<double>& durations) const {
   if (durations.empty()) {
     auto msg = "Expected at least one duration."s;
     throw std::runtime_error(msg);
   }
   std::vector<double> nthCosts;
   nthCosts.reserve(durations.size());
-  const auto& interpolatedRuns = data_.at(name).getAllRunsAt(durations);
+  const auto& interpolatedRuns = results.getAllRunsAt(durations);
   for (std::size_t durationIndex = 0u; durationIndex < durations.size(); ++durationIndex) {
     std::vector<double> costs;
     costs.reserve(interpolatedRuns.size());
@@ -257,11 +495,24 @@ std::vector<double> Statistics::getNthCosts(const std::string& name, std::size_t
   return nthCosts;
 }
 
+std::vector<double> Statistics::getNthCosts(const std::string& name, std::size_t n,
+                                            const std::vector<double>& durations) const {
+  if (name == "RRTConnect"s) {
+    auto msg = "Cannot specify durations for planners with nonanytime behaviour."s;
+    throw std::runtime_error(msg);
+  }
+  if (results_.find(name) == results_.end()) {
+    auto msg = "Cannot find results of '"s + name + "' and can therefore not get nth costs."s;
+    throw std::runtime_error(msg);
+  }
+  return getNthCosts(results_.at(name), n, durations);
+}
+
 std::vector<double> Statistics::getInitialSolutionDurations(const std::string& name) const {
   // Get the durations of the initial solutions of all runs.
   std::vector<double> initialDurations{};
-  initialDurations.reserve(data_.at(name).numMeasuredRuns());
-  const auto& plannerData = data_.at(name);
+  initialDurations.reserve(results_.at(name).numMeasuredRuns());
+  const auto& plannerData = results_.at(name);
   for (std::size_t run = 0u; run < plannerData.numMeasuredRuns(); ++run) {
     // Get the durations and costs of this run.
     const auto& measuredRun = plannerData.getMeasuredRun(run);
@@ -279,15 +530,15 @@ std::vector<double> Statistics::getInitialSolutionDurations(const std::string& n
 }
 
 std::vector<double> Statistics::getInitialSolutionCosts(const std::string& name) const {
-  if (data_.find(name) == data_.end()) {
+  if (results_.find(name) == results_.end()) {
     auto msg = "Cannot find statistics for planner '"s + name + "'."s;
     throw std::runtime_error(msg);
   }
 
   // Get the costs of the initial solutions of all runs.
   std::vector<double> initialCosts{};
-  initialCosts.reserve(data_.at(name).numMeasuredRuns());
-  const auto& plannerData = data_.at(name);
+  initialCosts.reserve(results_.at(name).numMeasuredRuns());
+  const auto& plannerData = results_.at(name);
   for (std::size_t run = 0u; run < plannerData.numMeasuredRuns(); ++run) {
     // Get the durations and costs of this run.
     const auto& measuredRun = plannerData.getMeasuredRun(run);
@@ -305,7 +556,7 @@ std::vector<double> Statistics::getInitialSolutionCosts(const std::string& name)
 }
 
 double Statistics::getNthInitialSolutionDuration(const std::string& name, std::size_t n) const {
-  if (data_.find(name) == data_.end()) {
+  if (results_.find(name) == results_.end()) {
     auto msg = "Cannot find statistics for planner '"s + name + "'."s;
     throw std::runtime_error(msg);
   }
@@ -321,7 +572,7 @@ double Statistics::getNthInitialSolutionDuration(const std::string& name, std::s
 }
 
 double Statistics::getNthInitialSolutionCost(const std::string& name, std::size_t n) const {
-  if (data_.find(name) == data_.end()) {
+  if (results_.find(name) == results_.end()) {
     auto msg = "Cannot find statistics for planner '"s + name + "'."s;
     throw std::runtime_error(msg);
   }

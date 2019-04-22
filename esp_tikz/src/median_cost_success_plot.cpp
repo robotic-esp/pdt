@@ -61,7 +61,7 @@ MedianCostSuccessPlot::MedianCostSuccessPlot(const std::shared_ptr<Configuration
 
 // The lookup table for confidence intervals.
 struct Interval {
-  std::size_t low{0u}, high{0u};
+  std::size_t lower{0u}, upper{0u};
   float probability{0.0f};
 };
 static const std::map<std::size_t, std::map<std::size_t, Interval>> medianConfidenceIntervals = {
@@ -84,8 +84,7 @@ static const std::map<std::size_t, std::map<std::size_t, Interval>> medianConfid
     {100000u, {{95u, {49687u, 50307u, 0.9500}}, {99u, {49588u, 50403u, 0.9900}}}},
     {1000000u, {{95u, {499018u, 500978u, 0.9500}}, {99u, {498707u, 501283u, 0.9900}}}}};
 
-fs::path MedianCostSuccessPlot::generatePlot(const Statistics& stats,
-                                             std::size_t confidence) {
+fs::path MedianCostSuccessPlot::generatePlot(const Statistics& stats, std::size_t confidence) {
   // Compute the duration bin size.
   auto contextName = config_->get<std::string>("Experiment/context");
   std::size_t numMeasurements =
@@ -167,16 +166,15 @@ fs::path MedianCostSuccessPlot::generatePlot(const Statistics& stats,
   axes_.emplace_back(legendAxis);
 
   // Generate the path to write to.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /=
-      fs::path(config_->get<std::string>("Experiment/results")).stem() +=
-      "_median_cost_success_plot.tikz"s;
+  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+                     fs::path("tikz/"s + config_->get<std::string>("Experiment/name") +
+                              "_median_cost_success_plot.tikz");
   write(picturePath);
   return picturePath;
 }
 
 std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
-    const Statistics& stats, const std::vector<double>& durations,
-    std::size_t confidence) const {
+    const Statistics& stats, const std::vector<double>& durations, std::size_t confidence) const {
   // Create an axis to hold the plots.
   auto axis = std::make_shared<PgfAxis>();
 
@@ -227,10 +225,10 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
       auto interval = medianConfidenceIntervals.at(numRunsPerPlanner).at(confidence);
 
       // Get the corresponding durations and cost.
-      auto lowerIntervalDuration = stats.getNthInitialSolutionDuration(name, interval.low);
-      auto upperIntervalDuration = stats.getNthInitialSolutionDuration(name, interval.high);
-      auto lowerIntervalCost = stats.getNthInitialSolutionCost(name, interval.low);
-      auto upperIntervalCost = stats.getNthInitialSolutionCost(name, interval.high);
+      auto lowerIntervalDuration = stats.getNthInitialSolutionDuration(name, interval.lower);
+      auto upperIntervalDuration = stats.getNthInitialSolutionDuration(name, interval.upper);
+      auto lowerIntervalCost = stats.getNthInitialSolutionCost(name, interval.lower);
+      auto upperIntervalCost = stats.getNthInitialSolutionCost(name, interval.upper);
 
       // Store the duration interval in a table.
       auto initialSolutionDurationIntervalTable = std::make_shared<PgfTable>();
@@ -314,8 +312,8 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
       auto interval = medianConfidenceIntervals.at(numRunsPerPlanner).at(confidence);
 
       // Get the costs for the intervals.
-      std::vector<double> intervalLowCosts = stats.getNthCosts(name, interval.low, durations);
-      std::vector<double> intervalHighCosts = stats.getNthCosts(name, interval.high, durations);
+      std::vector<double> intervalLowCosts = stats.getNthCosts(name, interval.lower, durations);
+      std::vector<double> intervalHighCosts = stats.getNthCosts(name, interval.upper, durations);
 
       // If the median cost is infinity, the low and high costs are as well.
       for (std::size_t i = 0u; i < medianCosts.size(); ++i) {
@@ -379,8 +377,7 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateSuccessPlot(
-    const Statistics& stats) const {
+std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateSuccessPlot(const Statistics& stats) const {
   // Create an axis for this plot.
   auto axis = std::make_shared<PgfAxis>();
 
@@ -420,8 +417,7 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateSuccessPlot(
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateLegendAxis(
-    const Statistics& stats) const {
+std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateLegendAxis(const Statistics& stats) const {
   auto legendAxis = std::make_shared<PgfAxis>();
 
   // Make sure the names are alphabetic.
@@ -437,12 +433,13 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateLegendAxis(
 
 fs::path MedianCostSuccessPlot::generatePdf() const {
   // Generate the path to write to.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /=
-      fs::path(config_->get<std::string>("Experiment/results")).stem() +=
-      "_median_cost_success_plot.tikz"s;
-  auto texFilePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /=
-      fs::path(config_->get<std::string>("Experiment/results")).stem() +=
-      "_median_cost_success_plot.tex"s;
+  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+                     fs::path("tikz/"s + config_->get<std::string>("Experiment/name") +
+                              "_median_cost_success_plot.tikz");
+  auto texFilePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+                     fs::path("plots/"s + config_->get<std::string>("Experiment/name") +
+                              "_median_cost_success_plot.tex");
+  fs::create_directories(texFilePath.parent_path());
   std::ofstream texFile;
   texFile.open(texFilePath.c_str());
 

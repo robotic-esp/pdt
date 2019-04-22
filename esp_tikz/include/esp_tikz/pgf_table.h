@@ -56,6 +56,7 @@ class PgfTable : public PlottableInterface {
   PgfTable() = default;
   ~PgfTable() = default;
 
+  void loadFrom();
   void addColumn(const std::vector<double>& data);
   void addRow(const std::vector<double>& data);
   void setOptions(const PgfTableOptions& options);

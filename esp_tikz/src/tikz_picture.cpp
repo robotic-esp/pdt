@@ -43,6 +43,7 @@ namespace esp {
 namespace ompltools {
 
 using namespace std::string_literals;
+namespace fs = std::experimental::filesystem;
 
 std::string TikzPictureOptions::string() const {
   std::ostringstream stream{};
@@ -93,6 +94,9 @@ std::string TikzPicture::string() const {
 }
 
 void TikzPicture::write(const std::experimental::filesystem::path& path) const {
+  // Make sure the directories to the path exist.
+  fs::create_directories(path.parent_path());
+
   // Open a file.
   std::ofstream texFile;
   texFile.open(path.string());

@@ -73,6 +73,16 @@ class Statistics {
   Statistics(const std::shared_ptr<Configuration>& config);
   ~Statistics() = default;
 
+  std::experimental::filesystem::path extractMedians(
+      const std::string& plannerName, const std::vector<double>& binDurations = {}) const;
+
+  std::experimental::filesystem::path extractMedianConfidenceIntervals(
+      const std::string& plannerName, std::size_t confidence = 99u,
+      const std::vector<double>& binDurations = {}) const;
+
+  std::experimental::filesystem::path extractInitialSolutionDurationCdf(
+      const std::string& plannerName) const;
+
   std::vector<std::string> getPlannerNames() const;
   std::size_t getNumRunsPerPlanner() const;
   double getMinCost() const;
@@ -80,8 +90,6 @@ class Statistics {
   double getMaxNonInfCost() const;
   double getMinDuration() const;
   double getMaxDuration() const;
-
-  std::experimental::filesystem::path extractMedians() const;
 
   std::vector<double> getNthCosts(const std::string& name, std::size_t n,
                                   const std::vector<double>& durations) const;
@@ -91,13 +99,34 @@ class Statistics {
   double getNthInitialSolutionCost(const std::string& name, std::size_t n) const;
 
  private:
+  // The identifying header line that starts each file produced by this class.
+  std::string createHeader(const std::string& statisticType, const std::string& plannerName) const;
+
+  // Get the median confidence interval.
+  struct ConfidenceInterval {
+    std::size_t lower{0u}, upper{0u};
+    float probability{0.0f};
+  };
+  ConfidenceInterval getMedianConfidenceInterval(std::size_t confidence) const;
+
+  std::vector<double> getMedianCosts(const PlannerResults& results,
+                                     const std::vector<double>& durations) const;
+  std::vector<double> getNthCosts(const PlannerResults& results, std::size_t n,
+                                  const std::vector<double>& durations) const;
+
   std::shared_ptr<Configuration> config_;
   const std::experimental::filesystem::path resultsPath_;
   const std::experimental::filesystem::path statisticsDirectory_;
   std::vector<std::string> plannerNames_{};
 
+  // Default binning durations.
+  std::vector<double> defaultBinDurations_{};
+
+  // The number of runs per planner.
+  std::size_t numRunsPerPlanner_{0u};
+
   // Can we afford loading all of this into memory? Let's see.
-  std::map<std::string, PlannerResults> data_{};
+  std::map<std::string, PlannerResults> results_{};
   double minCost_{std::numeric_limits<double>::infinity()};
   double maxCost_{std::numeric_limits<double>::lowest()};
   double maxNonInfCost_{std::numeric_limits<double>::lowest()};

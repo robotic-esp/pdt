@@ -48,12 +48,19 @@
 
 using namespace std::string_literals;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
 
   // Get the statistics.
   esp::ompltools::Statistics stats(config);
+  for (const auto& name : config->get<std::vector<std::string>>("Experiment/planners")) {
+    if (name != "RRTConnect") {
+      stats.extractMedians(name);
+      stats.extractMedianConfidenceIntervals(name);
+    }
+    stats.extractInitialSolutionDurationCdf(name);
+  }
 
   // Create a median cost success plot.
   esp::ompltools::MedianCostSuccessPlot medianCostSuccessPlot(config);
