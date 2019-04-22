@@ -141,7 +141,7 @@ void PgfTable::loadFromPath(const std::experimental::filesystem::path& path,
   }
 }
 
-void PgfTable::addColumn(const std::vector<double>& column) {
+void PgfTable::addColumn(const std::deque<double>& column) {
   if (!data_.empty() && column.size() != data_.at(0u).size()) {
     throw std::runtime_error("Number of elements in column does not match table.");
   }
@@ -151,21 +151,35 @@ void PgfTable::addColumn(const std::vector<double>& column) {
   data_.push_back(column);
 }
 
-void PgfTable::addRow(const std::vector<double>& row) {
-  // Sanity checks.
-  if (!data_.empty() && data_.size() != row.size()) {
-    throw std::runtime_error("Number of elements in row does not match table.");
-  }
-  for (std::size_t i = 1; i < data_.size(); ++i) {
-    if (data_.at(i).size() != data_.at(0u).size()) {
-      throw std::runtime_error("Cannot add row; columns have unequal entries.");
-    }
-  }
-  if (row.size() != 2u) {
-    throw std::runtime_error("Table currently only implemented for 2 dimensional data.");
-  }
+void PgfTable::setOptions(const PgfTableOptions& options) {
+  options_ = options;
+}
 
-  // Append row to table.
+void PgfTable::replaceInDomain(double number, double replacement) {
+  std::replace(data_.at(0u).begin(), data_.at(0u).end(), number, replacement);
+}
+
+void PgfTable::replaceInDomain(const std::function<double(double)>& replacement) {
+  for (auto& number : data_.at(0u)) {
+    number = replacement(number);
+  }
+}
+
+void PgfTable::replaceInCodomain(double number, double replacement) {
+  std::replace(data_.at(1u).begin(), data_.at(1u).end(), number, replacement);
+}
+
+void PgfTable::replaceInCodomain(const std::function<double(double)>& replacement) {
+  for (auto& number : data_.at(1u)) {
+    number = replacement(number);
+  }
+}
+
+void PgfTable::appendRow(const std::vector<double>& row) {
+  if (!data_.empty() && row.size() != data_.size()) {
+    auto msg = "In Pgf Tables, all rows must have the same number of columns."s;
+    throw std::invalid_argument(msg);
+  }
   if (data_.empty()) {
     data_.resize(row.size(), {});
   }
@@ -174,14 +188,47 @@ void PgfTable::addRow(const std::vector<double>& row) {
   }
 }
 
-void PgfTable::setOptions(const PgfTableOptions& options) {
-  options_ = options;
+void PgfTable::prependRow(const std::vector<double>& row) {
+  if (row.size() != data_.size()) {
+    auto msg = "In Pgf Tables, all rows must have the same number of columns."s;
+    throw std::invalid_argument(msg);
+  }
+  for (std::size_t i = 0u; i < row.size(); ++i) {
+    data_.at(i).emplace_front(row.at(i));
+  }
 }
 
-void PgfTable::replaceNumbers(double number, double replacement) {
-  for (auto& col : data_) {
-    std::replace(col.begin(), col.end(), number, replacement);
+void PgfTable::removeRowIfDomainEquals(double number) {
+  while (std::find(data_.at(0u).begin(), data_.at(0u).end(), number) != data_.at(0u).end()) {
+    auto itDomain = std::find(data_.at(0u).begin(), data_.at(0u).end(), number);
+    auto dist = std::distance(data_.at(0u).begin(), itDomain);
+    auto itCodomain = data_.at(1u).begin() + dist;
+    data_.at(0u).erase(itDomain);
+    data_.at(1u).erase(itCodomain);
   }
+}
+
+void PgfTable::removeRowIfCodomainEquals(double number) {
+  while (std::find(data_.at(1u).begin(), data_.at(1u).end(), number) != data_.at(1u).end()) {
+    auto itCodomain = std::find(data_.at(1u).begin(), data_.at(1u).end(), number);
+    auto dist = std::distance(data_.at(1u).begin(), itCodomain);
+    auto itDomain = data_.at(0u).begin() + dist;
+    data_.at(0u).erase(itDomain);
+    data_.at(1u).erase(itCodomain);
+  }
+}
+
+std::size_t PgfTable::getNumRows() const {
+  return data_.at(0u).size();
+}
+
+std::vector<double> PgfTable::getRow(std::size_t index) const {
+  std::vector<double> row;
+  row.reserve(data_.size());
+  for (const auto col : data_) {
+    row.emplace_back(col.at(index));
+  }
+  return row;
 }
 
 std::string PgfTable::string() const {

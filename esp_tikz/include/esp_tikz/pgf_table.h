@@ -36,7 +36,9 @@
 
 #pragma once
 
+#include <deque>
 #include <experimental/filesystem>
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -64,17 +66,33 @@ class PgfTable : public PlottableInterface {
                     const std::string& codomain);
 
   void setOptions(const PgfTableOptions& options);
-  void replaceNumbers(double number, double replacement);
+
+  // Add numbers.
+  void prependRow(const std::vector<double>& row);
+  void appendRow(const std::vector<double>& row);
+
+  // Replace numbers.
+  void replaceInDomain(double number, double replacement);
+  void replaceInDomain(const std::function<double(double)>& replacement);
+  void replaceInCodomain(double number, double replacement);
+  void replaceInCodomain(const std::function<double(double)>& replacement);
+
+  // Remove numbers.
+  void removeRowIfDomainEquals(double number);
+  void removeRowIfCodomainEquals(double number);
+
+  // Get rows.
+  std::size_t getNumRows() const;
+  std::vector<double> getRow(std::size_t index) const;
 
   // Deprecated
-  void addColumn(const std::vector<double>& column);
-  void addRow(const std::vector<double>& row);
+  void addColumn(const std::deque<double>& column);
 
   // Convert this table to a string.
   std::string string() const override;
 
  private:
-  std::vector<std::vector<double>> data_{};
+  std::vector<std::deque<double>> data_{};
   PgfTableOptions options_{};
 };
 

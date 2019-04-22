@@ -232,13 +232,13 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
 
       // Store the duration interval in a table.
       auto initialSolutionDurationIntervalTable = std::make_shared<PgfTable>();
-      initialSolutionDurationIntervalTable->addRow({lowerIntervalDuration, medianInitialCost});
-      initialSolutionDurationIntervalTable->addRow({upperIntervalDuration, medianInitialCost});
+      initialSolutionDurationIntervalTable->appendRow({lowerIntervalDuration, medianInitialCost});
+      initialSolutionDurationIntervalTable->appendRow({upperIntervalDuration, medianInitialCost});
 
       // Store the Cost interval in a table.
       auto initialSolutionCostIntervalTable = std::make_shared<PgfTable>();
-      initialSolutionCostIntervalTable->addRow({medianInitialDuration, lowerIntervalCost});
-      initialSolutionCostIntervalTable->addRow({medianInitialDuration, upperIntervalCost});
+      initialSolutionCostIntervalTable->appendRow({medianInitialDuration, lowerIntervalCost});
+      initialSolutionCostIntervalTable->appendRow({medianInitialDuration, upperIntervalCost});
 
       // Create a plot for the duration and add it to the axis.
       PgfPlotOptions initialSolutionDurationIntervalPlotOptions;
@@ -309,8 +309,8 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
         std::make_shared<PgfTable>(medianCostsFile, "durations", "upper confidence bound");
 
     // Replace the infinite values with very high values, otherwise they're not plotted.
-    medianHighConfidenceTable->replaceNumbers(std::numeric_limits<double>::infinity(),
-                                              3 * stats.getMaxNonInfCost());
+    medianHighConfidenceTable->replaceInCodomain(std::numeric_limits<double>::infinity(),
+                                                 3 * stats.getMaxNonInfCost());
 
     PgfPlotOptions medianUpperConfidencePlotOptions;
     medianUpperConfidencePlotOptions.markSize = 0.0;
@@ -349,25 +349,24 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateSuccessPlot(const Statis
   // Only plot the sample CDF for now.
   for (const auto& name : stats.getPlannerNames()) {
     // Get the initial solution durations.
-    auto initialSolutionDurations = stats.getInitialSolutionDurations(name);
-
-    // I don't think there's a way around sorting them.
-    std::sort(initialSolutionDurations.begin(), initialSolutionDurations.end());
-
-    // Prepare variable to calculate solution percentages.
-    double successPercentage = 0.0;
-    double numSolvedRuns = 0.0;
-    auto numRunsPerPlanner = static_cast<double>(stats.getNumRunsPerPlanner());
+    auto initialSolutionDurationsCdfFile = stats.extractInitialSolutionDurationCdf(name);
 
     // Compute the solution percentages and store them in a pgf table.
-    auto successPercentagePlotTable = std::make_shared<PgfTable>();
-    successPercentagePlotTable->addRow({0.1e-9, 0.0});
-    for (const auto duration : initialSolutionDurations) {
-      numSolvedRuns += 1.0;
-      successPercentage = numSolvedRuns / numRunsPerPlanner * 100.0;
-      successPercentagePlotTable->addRow({duration, successPercentage});
-    }
-    successPercentagePlotTable->addRow({stats.getMaxDuration(), successPercentage});
+    auto successPercentagePlotTable =
+        std::make_shared<PgfTable>(initialSolutionDurationsCdfFile, "durations", "cdf");
+    // Multiply the cdf values by 100 to get the percentage.
+    successPercentagePlotTable->replaceInCodomain([](double number) { return 100.0 * number; });
+
+    // A zero in the domain will result in a jumped coordinate, because its a logarithmic plot.
+    successPercentagePlotTable->replaceInDomain(0.0, 1e-9);
+
+    // Remove if rows for which domain is infinite.
+    successPercentagePlotTable->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
+
+    // Add a row to draw the last element.
+    successPercentagePlotTable->appendRow(
+        {stats.getMaxDuration(),
+         successPercentagePlotTable->getRow(successPercentagePlotTable->getNumRows() - 1u).at(1u)});
 
     // Create the plot and add it to the axis.
     PgfPlotOptions successPercentagePlotOptions;

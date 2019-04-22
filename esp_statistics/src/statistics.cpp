@@ -260,7 +260,7 @@ fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t 
     throw std::ios_base::failure(msg);
   }
 
-  filestream << createHeader("Median, "s + std::to_string(confidence) + "% confidence bounds"s,
+  filestream << createHeader("Median with "s + std::to_string(confidence) + "% confidence bounds"s,
                              plannerName);
   filestream << std::setprecision(21);
   filestream << "durations";
@@ -312,11 +312,11 @@ fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& planne
 
   filestream << createHeader("Initial solution duration cdf", plannerName);
   filestream << std::setprecision(21);
-  filestream << "durations";
+  filestream << "durations, 0.0";
   for (const auto duration : initialSolutionDurations) {
     filestream << ',' << duration;
   }
-  filestream << "\ncdf";
+  filestream << "\ncdf, 0.0";
   for (std::size_t i = 0u; i < initialSolutionDurations.size(); ++i) {
     filestream << ','
                << static_cast<double>(++numSolvedRuns) / static_cast<double>(numRunsPerPlanner_);
