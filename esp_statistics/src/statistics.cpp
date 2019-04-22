@@ -284,6 +284,52 @@ fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t 
   return filepath;  // Note: std::ofstream closes itself upon destruction.
 }
 
+fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName,
+                                                  std::size_t confidence) const {
+  if (results_.find(plannerName) == results_.end()) {
+    auto msg = "Cannot find results for '" + plannerName +
+               "' and can therefore not extract median initial solution."s;
+    throw std::runtime_error(msg);
+  }
+
+  // Get the median initial solution duration.
+  double medianDuration = getMedianInitialSolutionDuration(results_.at(plannerName));
+
+  // Get the median initial solution cost.
+  double medianCost = getMedianInitialSolutionCost(results_.at(plannerName));
+
+  // Get the interval for the upper and lower bounds.
+  auto interval = getMedianConfidenceInterval(confidence);
+
+  // Get the upper and lower confidence bounds on the median initial solution duration and cost.
+  auto lowerDurationBound = getNthInitialSolutionDuration(results_.at(plannerName), interval.lower);
+  auto upperDurationBound = getNthInitialSolutionDuration(results_.at(plannerName), interval.upper);
+  auto lowerCostBound = getNthInitialSolutionCost(results_.at(plannerName), interval.lower);
+  auto upperCostBound = getNthInitialSolutionCost(results_.at(plannerName), interval.upper);
+
+  // Write to file.
+  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
+                                              plannerName + "_median_initial_solution.csv");
+  std::ofstream filestream(filepath.string());
+  if (filestream.fail()) {
+    auto msg = "Cannot write median initial solution for '"s + plannerName + "' to '"s +
+               filepath.string() + "'."s;
+    throw std::ios_base::failure(msg);
+  }
+
+  filestream << createHeader(
+      "Median initial solution with "s + std::to_string(confidence) + "% confidence bounds"s,
+      plannerName);
+  filestream << std::setprecision(21) << "median initial solution duration," << medianDuration
+             << "\nlower initial solution duration confidence bound," << lowerDurationBound
+             << "\nupper initial solution duration confidence bound," << upperDurationBound
+             << "\nmedian initial solution cost," << medianCost
+             << "\nlower initial solution cost confidence bound," << lowerCostBound
+             << "\nupper initial solution cost confidence bound," << upperCostBound << '\n';
+
+  return filepath;  // Note: std::ofstream closes itself upon destruction.
+}
+
 fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& plannerName) const {
   if (results_.find(plannerName) == results_.end()) {
     auto msg = "Cannot find results for '" + plannerName +
@@ -323,7 +369,7 @@ fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& planne
   }
   filestream << '\n';
 
-  return filepath;  // Note: std::ofstream closes itself upon destruction.
+  return filepath;  // Note: std::ofstream is a big boy and closes itself upon destruction.
 }
 
 std::string Statistics::createHeader(const std::string& statisticType,
@@ -428,6 +474,27 @@ std::vector<double> Statistics::getMedianCosts(const PlannerResults& results,
   return medianCosts;
 }
 
+double Statistics::getMedianInitialSolutionDuration(const PlannerResults& results) const {
+  if (numRunsPerPlanner_ % 2 == 1) {
+    return getNthInitialSolutionDuration(results, (numRunsPerPlanner_ - 1u) / 2);
+  } else {
+    double lowerMedianDuration =
+        getNthInitialSolutionDuration(results, (numRunsPerPlanner_ - 2u) / 2);
+    double upperMedianDuration = getNthInitialSolutionDuration(results, numRunsPerPlanner_ / 2);
+    return (lowerMedianDuration + upperMedianDuration) / 2.0;
+  }
+}
+
+double Statistics::getMedianInitialSolutionCost(const PlannerResults& results) const {
+  if (numRunsPerPlanner_ % 2 == 1) {
+    return getNthInitialSolutionCost(results, (numRunsPerPlanner_ - 1u) / 2);
+  } else {
+    double lowerMedianCost = getNthInitialSolutionCost(results, (numRunsPerPlanner_ - 2u) / 2);
+    double upperMedianCost = getNthInitialSolutionCost(results, numRunsPerPlanner_ / 2);
+    return (lowerMedianCost + upperMedianCost) / 2.0;
+  }
+}
+
 std::vector<double> Statistics::getNthCosts(const PlannerResults& results, std::size_t n,
                                             const std::vector<double>& durations) const {
   if (durations.empty()) {
@@ -469,14 +536,13 @@ std::vector<double> Statistics::getNthCosts(const std::string& name, std::size_t
   return getNthCosts(results_.at(name), n, durations);
 }
 
-std::vector<double> Statistics::getInitialSolutionDurations(const std::string& name) const {
+std::vector<double> Statistics::getInitialSolutionDurations(const PlannerResults& results) const {
   // Get the durations of the initial solutions of all runs.
   std::vector<double> initialDurations{};
-  initialDurations.reserve(results_.at(name).numMeasuredRuns());
-  const auto& plannerData = results_.at(name);
-  for (std::size_t run = 0u; run < plannerData.numMeasuredRuns(); ++run) {
+  initialDurations.reserve(results.numMeasuredRuns());
+  for (std::size_t run = 0u; run < results.numMeasuredRuns(); ++run) {
     // Get the durations and costs of this run.
-    const auto& measuredRun = plannerData.getMeasuredRun(run);
+    const auto& measuredRun = results.getMeasuredRun(run);
 
     // Find the first cost that's less than infinity.
     for (const auto& measurement : measuredRun) {
@@ -485,24 +551,32 @@ std::vector<double> Statistics::getInitialSolutionDurations(const std::string& n
         break;
       }
     }
+
+    // If all costs are infinity, there is no initial solution.
+    if (initialDurations.size() == run) {
+      initialDurations.emplace_back(std::numeric_limits<double>::infinity());
+    }
   }
 
   return initialDurations;
 }
 
-std::vector<double> Statistics::getInitialSolutionCosts(const std::string& name) const {
+std::vector<double> Statistics::getInitialSolutionDurations(const std::string& name) const {
   if (results_.find(name) == results_.end()) {
     auto msg = "Cannot find statistics for planner '"s + name + "'."s;
     throw std::runtime_error(msg);
   }
 
+  return getInitialSolutionDurations(results_.at(name));
+}
+
+std::vector<double> Statistics::getInitialSolutionCosts(const PlannerResults& results) const {
   // Get the costs of the initial solutions of all runs.
   std::vector<double> initialCosts{};
-  initialCosts.reserve(results_.at(name).numMeasuredRuns());
-  const auto& plannerData = results_.at(name);
-  for (std::size_t run = 0u; run < plannerData.numMeasuredRuns(); ++run) {
+  initialCosts.reserve(results.numMeasuredRuns());
+  for (std::size_t run = 0u; run < results.numMeasuredRuns(); ++run) {
     // Get the durations and costs of this run.
-    const auto& measuredRun = plannerData.getMeasuredRun(run);
+    const auto& measuredRun = results.getMeasuredRun(run);
 
     // Find the first cost that's less than infinity.
     for (const auto& measurement : measuredRun) {
@@ -511,19 +585,29 @@ std::vector<double> Statistics::getInitialSolutionCosts(const std::string& name)
         break;
       }
     }
+
+    // If none was less than infinity, the initial solution is infinity...?
+    if (initialCosts.size() == run) {
+      initialCosts.emplace_back(std::numeric_limits<double>::infinity());
+    }
   }
 
   return initialCosts;
 }
 
-double Statistics::getNthInitialSolutionDuration(const std::string& name, std::size_t n) const {
+std::vector<double> Statistics::getInitialSolutionCosts(const std::string& name) const {
   if (results_.find(name) == results_.end()) {
     auto msg = "Cannot find statistics for planner '"s + name + "'."s;
     throw std::runtime_error(msg);
   }
 
+  return getInitialSolutionCosts(results_.at(name));
+}
+
+double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,
+                                                 std::size_t n) const {
   // Get the durations of the initial solutions of all runs.
-  auto initialDurations = getInitialSolutionDurations(name);
+  auto initialDurations = getInitialSolutionDurations(results);
 
   // Get the nth element of this collection of durations.
   auto nthDuration = initialDurations.begin() + n;
@@ -532,20 +616,33 @@ double Statistics::getNthInitialSolutionDuration(const std::string& name, std::s
   return *nthDuration;
 }
 
-double Statistics::getNthInitialSolutionCost(const std::string& name, std::size_t n) const {
+double Statistics::getNthInitialSolutionDuration(const std::string& name, std::size_t n) const {
   if (results_.find(name) == results_.end()) {
     auto msg = "Cannot find statistics for planner '"s + name + "'."s;
     throw std::runtime_error(msg);
   }
 
+  return getNthInitialSolutionDuration(results_.at(name), n);
+}
+
+double Statistics::getNthInitialSolutionCost(const PlannerResults& result, std::size_t n) const {
   // Get the costs of the initial solutions of all runs.
-  auto initialCosts = getInitialSolutionCosts(name);
+  auto initialCosts = getInitialSolutionCosts(result);
 
   // Get the nth element of this collection of costs.
   auto nthCost = initialCosts.begin() + n;
   std::nth_element(initialCosts.begin(), nthCost, initialCosts.end());
 
   return *nthCost;
+}
+
+double Statistics::getNthInitialSolutionCost(const std::string& name, std::size_t n) const {
+  if (results_.find(name) == results_.end()) {
+    auto msg = "Cannot find statistics for planner '"s + name + "'."s;
+    throw std::runtime_error(msg);
+  }
+
+  return getNthInitialSolutionCost(results_.at(name), n);
 }
 
 }  // namespace ompltools

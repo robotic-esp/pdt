@@ -77,6 +77,9 @@ class Statistics {
       const std::string& plannerName, std::size_t confidence = 99u,
       const std::vector<double>& binDurations = {}) const;
 
+  std::experimental::filesystem::path extractMedianInitialSolution(
+      const std::string& plannerName, std::size_t confidence = 99u) const;
+
   std::experimental::filesystem::path extractInitialSolutionDurationCdf(
       const std::string& plannerName) const;
 
@@ -110,6 +113,15 @@ class Statistics {
                                      const std::vector<double>& durations) const;
   std::vector<double> getNthCosts(const PlannerResults& results, std::size_t n,
                                   const std::vector<double>& durations) const;
+
+  double getMedianInitialSolutionDuration(const PlannerResults& results) const;
+  double getMedianInitialSolutionCost(const PlannerResults& results) const;
+
+  double getNthInitialSolutionDuration(const PlannerResults& results, std::size_t n) const;
+  double getNthInitialSolutionCost(const PlannerResults& results, std::size_t n) const;
+
+  std::vector<double> getInitialSolutionDurations(const PlannerResults& results) const;
+  std::vector<double> getInitialSolutionCosts(const PlannerResults& results) const;
 
   std::shared_ptr<Configuration> config_;
   const std::experimental::filesystem::path resultsPath_;

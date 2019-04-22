@@ -72,8 +72,10 @@ void PgfTable::loadFromPath(const std::experimental::filesystem::path& path,
     throw std::runtime_error(msg);
   }
 
-  // Prepare that data.
-  data_.resize(2u, {});
+  // Prepare data.
+  if (data_.size() == 0u) {
+    data_.resize(2u, {});
+  }
 
   // Parse the file.
   aria::csv::CsvParser parser(filestream);

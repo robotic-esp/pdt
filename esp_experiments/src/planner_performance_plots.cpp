@@ -58,6 +58,7 @@ int main(int argc, char** argv) {
     if (name != "RRTConnect") {
       stats.extractMedians(name);
     }
+    stats.extractMedianInitialSolution(name);
     stats.extractInitialSolutionDurationCdf(name);
   }
 

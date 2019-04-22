@@ -178,92 +178,72 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
   // Create an axis to hold the plots.
   auto axis = std::make_shared<PgfAxis>();
 
-  // Get the number of runs per planner and compute the bin durations.
-  std::size_t numRunsPerPlanner = stats.getNumRunsPerPlanner();
-
   // Plot the initial solutions.
   for (const auto& name : stats.getPlannerNames()) {
-    // Get the median costs.
-    double medianInitialDuration{std::numeric_limits<double>::signaling_NaN()};
-    double medianInitialCost{std::numeric_limits<double>::signaling_NaN()};
-    if (numRunsPerPlanner % 2 == 1) {
-      medianInitialDuration =
-          stats.getNthInitialSolutionDuration(name, (numRunsPerPlanner + 1u) / 2);
-      medianInitialCost = stats.getNthInitialSolutionCost(name, (numRunsPerPlanner + 1u) / 2);
-    } else {
-      auto lowMedianInitialDuration =
-          stats.getNthInitialSolutionDuration(name, numRunsPerPlanner / 2);
-      auto highMedianInitialDuration =
-          stats.getNthInitialSolutionDuration(name, (numRunsPerPlanner + 2u) / 2);
-      auto lowMedianInitialCost = stats.getNthInitialSolutionCost(name, numRunsPerPlanner / 2);
-      auto highMedianInitialCost =
-          stats.getNthInitialSolutionCost(name, (numRunsPerPlanner + 2u) / 2);
-      medianInitialDuration = (lowMedianInitialDuration + highMedianInitialDuration) / 2.0;
-      medianInitialCost = (lowMedianInitialCost + highMedianInitialCost) / 2.0;
-    }
-
-    // Store the duration and cost in a table.
-    auto initialSolutionTable = std::make_shared<PgfTable>();
-    initialSolutionTable->addColumn({medianInitialDuration});
-    initialSolutionTable->addColumn({medianInitialCost});
+    // Load the median initial duration and cost into a table.
+    auto medianInitialSolutionPath = stats.extractMedianInitialSolution(name, confidence);
+    auto initialSolutionTable =
+        std::make_shared<PgfTable>(medianInitialSolutionPath, "median initial solution duration",
+                                   "median initial solution cost");
 
     // Create the pgf plot with this data and add it to the axis.
     PgfPlotOptions initialSolutionPlotOptions;
     initialSolutionPlotOptions.markSize = 0.5;
+    initialSolutionPlotOptions.namePath = name + "MedianInitialSolution"s;
     initialSolutionPlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
     auto initialSolutionPlot = std::make_shared<PgfPlot>(initialSolutionTable);
     initialSolutionPlot->setOptions(initialSolutionPlotOptions);
     axis->addPlot(initialSolutionPlot);
 
-    if (medianConfidenceIntervals.find(numRunsPerPlanner) == medianConfidenceIntervals.end() ||
-        (confidence != 95u && confidence != 99u)) {
-      OMPL_WARN(
-          "Median confidence intervals with %d percent confidence not precomputed for %d runs.",
-          confidence, numRunsPerPlanner);
-    } else {
-      // Get the interval indices.
-      auto interval = medianConfidenceIntervals.at(numRunsPerPlanner).at(confidence);
+    // We need to load the other values as well.
+    PgfTable lowerBoundSolutionTable(medianInitialSolutionPath,
+                                     "lower initial solution duration confidence bound",
+                                     "lower initial solution cost confidence bound");
+    PgfTable upperBoundSolutionTable(medianInitialSolutionPath,
+                                     "upper initial solution duration confidence bound",
+                                     "upper initial solution cost confidence bound");
+    double medianDuration = initialSolutionTable->getRow(0u).at(0u);
+    double medianCost = initialSolutionTable->getRow(0u).at(1u);
+    double lowerDurationBound = lowerBoundSolutionTable.getRow(0u).at(0u);
+    double upperDurationBound = upperBoundSolutionTable.getRow(0u).at(0u);
+    double lowerCostBound = lowerBoundSolutionTable.getRow(0u).at(1u);
+    double upperCostBound = upperBoundSolutionTable.getRow(0u).at(1u);
 
-      // Get the corresponding durations and cost.
-      auto lowerIntervalDuration = stats.getNthInitialSolutionDuration(name, interval.lower);
-      auto upperIntervalDuration = stats.getNthInitialSolutionDuration(name, interval.upper);
-      auto lowerIntervalCost = stats.getNthInitialSolutionCost(name, interval.lower);
-      auto upperIntervalCost = stats.getNthInitialSolutionCost(name, interval.upper);
+    // Create a table for the duration confidence intervals.
+    auto initialSolutionDurationIntervalTable = std::make_shared<PgfTable>();
+    initialSolutionDurationIntervalTable->appendRow({lowerDurationBound, medianCost});
+    initialSolutionDurationIntervalTable->appendRow({upperDurationBound, medianCost});
 
-      // Store the duration interval in a table.
-      auto initialSolutionDurationIntervalTable = std::make_shared<PgfTable>();
-      initialSolutionDurationIntervalTable->appendRow({lowerIntervalDuration, medianInitialCost});
-      initialSolutionDurationIntervalTable->appendRow({upperIntervalDuration, medianInitialCost});
+    // Create a plot for the duration and add it to the axis.
+    PgfPlotOptions initialSolutionDurationIntervalPlotOptions;
+    initialSolutionDurationIntervalPlotOptions.markSize = 1.0;
+    initialSolutionDurationIntervalPlotOptions.mark = "|";
+    initialSolutionDurationIntervalPlotOptions.lineWidth = 0.5;
+    initialSolutionPlotOptions.namePath = name + "MedianInitialSolutionDurationConfidenceInterval"s;
+    initialSolutionDurationIntervalPlotOptions.color =
+        config_->get<std::string>("PlannerPlotColors/" + name);
+    auto initialSolutionDurationIntervalPlot =
+        std::make_shared<PgfPlot>(initialSolutionDurationIntervalTable);
+    initialSolutionDurationIntervalPlot->setOptions(initialSolutionDurationIntervalPlotOptions);
+    axis->addPlot(initialSolutionDurationIntervalPlot);
 
-      // Store the Cost interval in a table.
-      auto initialSolutionCostIntervalTable = std::make_shared<PgfTable>();
-      initialSolutionCostIntervalTable->appendRow({medianInitialDuration, lowerIntervalCost});
-      initialSolutionCostIntervalTable->appendRow({medianInitialDuration, upperIntervalCost});
+    // Create a table for the duration confidence intervals.
+    auto initialSolutionCostIntervalTable = std::make_shared<PgfTable>();
+    initialSolutionCostIntervalTable->appendRow({medianDuration, lowerCostBound});
+    initialSolutionCostIntervalTable->appendRow({medianDuration, upperCostBound});
 
-      // Create a plot for the duration and add it to the axis.
-      PgfPlotOptions initialSolutionDurationIntervalPlotOptions;
-      initialSolutionDurationIntervalPlotOptions.markSize = 1.0;
-      initialSolutionDurationIntervalPlotOptions.mark = "|";
-      initialSolutionDurationIntervalPlotOptions.lineWidth = 0.5;
-      initialSolutionDurationIntervalPlotOptions.color =
-          config_->get<std::string>("PlannerPlotColors/" + name);
-      auto initialSolutionDurationIntervalPlot =
-          std::make_shared<PgfPlot>(initialSolutionDurationIntervalTable);
-      initialSolutionDurationIntervalPlot->setOptions(initialSolutionDurationIntervalPlotOptions);
-      axis->addPlot(initialSolutionDurationIntervalPlot);
-
-      // Create a plot for the cost and add it to the axis.
-      PgfPlotOptions initialSolutionCostIntervalPlotOptions;
-      initialSolutionCostIntervalPlotOptions.markSize = 1.0;
-      initialSolutionCostIntervalPlotOptions.mark = "-";
-      initialSolutionCostIntervalPlotOptions.lineWidth = 0.5;
-      initialSolutionCostIntervalPlotOptions.color =
-          config_->get<std::string>("PlannerPlotColors/" + name);
-      auto initialSolutionCostIntervalPlot =
-          std::make_shared<PgfPlot>(initialSolutionCostIntervalTable);
-      initialSolutionCostIntervalPlot->setOptions(initialSolutionCostIntervalPlotOptions);
-      axis->addPlot(initialSolutionCostIntervalPlot);
-    }
+    // Create a plot for the cost and add it to the axis.
+    PgfPlotOptions initialSolutionCostIntervalPlotOptions;
+    initialSolutionCostIntervalPlotOptions.markSize = 1.0;
+    initialSolutionCostIntervalPlotOptions.mark = "-";
+    initialSolutionCostIntervalPlotOptions.lineWidth = 0.5;
+    initialSolutionPlotOptions.namePath = name + "MedianInitialSolutionCostConfidenceInterval"s;
+    initialSolutionCostIntervalPlotOptions.color =
+        config_->get<std::string>("PlannerPlotColors/" + name);
+    auto initialSolutionCostIntervalPlot =
+        std::make_shared<PgfPlot>(initialSolutionCostIntervalTable);
+    initialSolutionCostIntervalPlot->setOptions(initialSolutionCostIntervalPlotOptions);
+    axis->addPlot(initialSolutionCostIntervalPlot);
   }
 
   // Plot the median costs and confidence intervals.
