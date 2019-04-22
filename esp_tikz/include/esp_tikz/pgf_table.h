@@ -38,6 +38,7 @@
 
 #include <experimental/filesystem>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "esp_tikz/pgf_plottable.h"
@@ -55,18 +56,25 @@ struct PgfTableOptions {
 class PgfTable : public PlottableInterface {
  public:
   PgfTable() = default;
+  PgfTable(const std::experimental::filesystem::path& path, const std::string& domain,
+           const std::string& codomain);
   ~PgfTable() = default;
 
-  void loadFromPath(const std::experimental::filesystem::path& path, std::size_t skipNumCols = 0u,
-                    bool transpose = true);
+  void loadFromPath(const std::experimental::filesystem::path& path, const std::string& domain,
+                    const std::string& codomain);
+
+  void setOptions(const PgfTableOptions& options);
+  void replaceNumbers(double number, double replacement);
+
+  // Deprecated
   void addColumn(const std::vector<double>& column);
   void addRow(const std::vector<double>& row);
-  void setOptions(const PgfTableOptions& options);
 
+  // Convert this table to a string.
   std::string string() const override;
 
  private:
-  std::vector<std::vector<double>> data_{};  // col-major data.
+  std::vector<std::vector<double>> data_{};
   PgfTableOptions options_{};
 };
 

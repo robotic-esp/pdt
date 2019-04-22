@@ -59,7 +59,6 @@ class MedianCostSuccessPlot : public TikzPicture {
 
  private:
   std::shared_ptr<PgfAxis> generateMedianCostPlot(const Statistics& stats,
-                                                  const std::vector<double>& durations,
                                                   std::size_t confidence) const;
   std::shared_ptr<PgfAxis> generateSuccessPlot(const Statistics& stats) const;
   std::shared_ptr<PgfAxis> generateLegendAxis(const Statistics& stats) const;

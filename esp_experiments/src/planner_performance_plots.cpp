@@ -57,7 +57,6 @@ int main(int argc, char** argv) {
   for (const auto& name : config->get<std::vector<std::string>>("Experiment/planners")) {
     if (name != "RRTConnect") {
       stats.extractMedians(name);
-      stats.extractMedianConfidenceIntervals(name);
     }
     stats.extractInitialSolutionDurationCdf(name);
   }

@@ -74,9 +74,6 @@ class Statistics {
   ~Statistics() = default;
 
   std::experimental::filesystem::path extractMedians(
-      const std::string& plannerName, const std::vector<double>& binDurations = {}) const;
-
-  std::experimental::filesystem::path extractMedianConfidenceIntervals(
       const std::string& plannerName, std::size_t confidence = 99u,
       const std::vector<double>& binDurations = {}) const;
 

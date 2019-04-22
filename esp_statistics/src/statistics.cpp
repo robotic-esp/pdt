@@ -213,7 +213,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config) :
   }
 }
 
-fs::path Statistics::extractMedians(const std::string& plannerName,
+fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t confidence,
                                     const std::vector<double>& binDurations) const {
   if (plannerName == "RRTConnect") {
     auto msg = "This method extracts median costs over time for anytime planners. '" + plannerName +
@@ -233,51 +233,8 @@ fs::path Statistics::extractMedians(const std::string& plannerName,
   // Get the median costs.
   auto medianCosts = getMedianCosts(results_.at(plannerName), durations);
 
-  // Write to file.
-  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_medians.csv");
-  std::ofstream filestream(filepath.string());
-  if (filestream.fail()) {
-    auto msg = "Cannot write medians for '"s + plannerName + "' to '"s + filepath.string() + "'."s;
-    throw std::ios_base::failure(msg);
-  }
-
-  filestream << createHeader("Median", plannerName);
-  filestream << std::setprecision(21);
-  filestream << "durations";
-  for (const auto duration : durations) {
-    filestream << ',' << duration;
-  }
-  filestream << "\nmedian costs";
-  for (const auto cost : medianCosts) {
-    filestream << ',' << cost;
-  }
-  filestream << '\n';
-
-  return filepath;  // Note: std::ofstream closes itself upon destruction.
-}
-
-fs::path Statistics::extractMedianConfidenceIntervals(
-    const std::string& plannerName, std::size_t confidence,
-    const std::vector<double>& binDurations) const {
-  if (plannerName == "RRTConnect") {
-    auto msg =
-        "This method extracts median confidence intervals over time for anytime planners. '" +
-        plannerName + "' is not an anytime planner."s;
-    throw std::runtime_error(msg);
-  }
-
-  if (results_.find(plannerName) == results_.end()) {
-    auto msg = "Cannot find results for '" + plannerName +
-               "' and can therefore not extract confidence intervals for medians."s;
-    throw std::runtime_error(msg);
-  }
-
   // Get the interval indices.
   auto interval = getMedianConfidenceInterval(confidence);
-
-  // Get the requested bin durations.
-  const auto& durations = binDurations.empty() ? defaultBinDurations_ : binDurations;
 
   // Get the interval bound costs.
   auto lowerCosts = getNthCosts(results_.at(plannerName), interval.lower, durations);
@@ -285,7 +242,6 @@ fs::path Statistics::extractMedianConfidenceIntervals(
 
   // We need to clean up these costs. If the median is infinite, the lower and upper bounds should
   // be nan.
-  auto medianCosts = getMedianCosts(results_.at(plannerName), durations);
   for (std::size_t i = 0u; i < medianCosts.size(); ++i) {
     if (medianCosts.at(i) == std::numeric_limits<double>::infinity()) {
       lowerCosts.at(i) = std::numeric_limits<double>::quiet_NaN();
@@ -297,25 +253,29 @@ fs::path Statistics::extractMedianConfidenceIntervals(
 
   // Write to file.
   fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_median_confidence_intervals.csv");
+                                              plannerName + "_medians.csv");
   std::ofstream filestream(filepath.string());
   if (filestream.fail()) {
-    auto msg = "Cannot write median confidence intervals for '"s + plannerName + "' to '"s +
-               filepath.string() + "'."s;
+    auto msg = "Cannot write medians for '"s + plannerName + "' to '"s + filepath.string() + "'."s;
     throw std::ios_base::failure(msg);
   }
 
-  filestream << createHeader("Median confidence intervals", plannerName);
+  filestream << createHeader("Median, "s + std::to_string(confidence) + "% confidence bounds"s,
+                             plannerName);
   filestream << std::setprecision(21);
   filestream << "durations";
   for (const auto duration : durations) {
     filestream << ',' << duration;
   }
-  filestream << "\nlower bounding costs";
+  filestream << "\nmedian costs";
+  for (const auto cost : medianCosts) {
+    filestream << ',' << cost;
+  }
+  filestream << "\nlower confidence bound";
   for (const auto cost : lowerCosts) {
     filestream << ',' << cost;
   }
-  filestream << "\nupper bounding costs";
+  filestream << "\nupper confidence bound";
   for (const auto cost : upperCosts) {
     filestream << ',' << cost;
   }

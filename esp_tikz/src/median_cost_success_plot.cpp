@@ -140,7 +140,7 @@ fs::path MedianCostSuccessPlot::generatePlot(const Statistics& stats, std::size_
   medianCostAxisOptions.ylabel = "Median cost";
   medianCostAxisOptions.ylabelAbsolute = true;
   medianCostAxisOptions.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
-  auto medianCostAxis = generateMedianCostPlot(stats, durations, confidence);
+  auto medianCostAxis = generateMedianCostPlot(stats, confidence);
   medianCostAxis->setOptions(medianCostAxisOptions);
 
   // Create the axis that holds the plot legend.
@@ -174,7 +174,7 @@ fs::path MedianCostSuccessPlot::generatePlot(const Statistics& stats, std::size_
 }
 
 std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
-    const Statistics& stats, const std::vector<double>& durations, std::size_t confidence) const {
+    const Statistics& stats, std::size_t confidence) const {
   // Create an axis to hold the plots.
   auto axis = std::make_shared<PgfAxis>();
 
@@ -273,9 +273,12 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
       continue;
     }
 
-    // Get the median costs from the file.
-    auto medianCostsTable = std::make_shared<PgfTable>();
-    medianCostsTable->loadFromPath(stats.extractMedians(name), 1u);
+    // Get the median costs file, this needs to be moved.
+    auto medianCostsFile = stats.extractMedians(name);
+
+    // Load a table from this file.
+    auto medianCostsTable =
+        std::make_shared<PgfTable>(medianCostsFile, "durations", "median costs");
 
     // Let's plot the median costs right away.
     PgfPlotOptions medianCostsPlotOptions;
@@ -286,92 +289,54 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
     medianCostsPlot->setOptions(medianCostsPlotOptions);
     axis->addPlot(medianCostsPlot);
 
-    // Get the median costs.
-    std::vector<double> medianCosts;
-    medianCosts.resize(durations.size(), std::numeric_limits<double>::signaling_NaN());
-    if (numRunsPerPlanner % 2 == 1) {
-      medianCosts = stats.getNthCosts(name, (numRunsPerPlanner - 1u) / 2, durations);
-    } else {
-      std::vector<double> lowMedianCosts =
-          stats.getNthCosts(name, numRunsPerPlanner / 2, durations);
-      std::vector<double> highMedianCosts =
-          stats.getNthCosts(name, (numRunsPerPlanner + 2u) / 2, durations);
-      for (std::size_t i = 0u; i < medianCosts.size(); ++i) {
-        medianCosts.at(i) = (lowMedianCosts.at(i) + highMedianCosts.at(i)) / 2.0;
-      }
-    }
+    // Plot the lower bound of the confidence interval.
+    auto medianLowConfidenceTable =
+        std::make_shared<PgfTable>(medianCostsFile, "durations", "lower confidence bound");
 
-    // Get the confidence interval costs.
-    if (medianConfidenceIntervals.find(numRunsPerPlanner) == medianConfidenceIntervals.end() ||
-        (confidence != 95u && confidence != 99u)) {
-      OMPL_WARN(
-          "Median confidence intervals with %d percent confidence not precomputed for %d runs.",
-          confidence, numRunsPerPlanner);
-    } else {
-      // Get the interval indices.
-      auto interval = medianConfidenceIntervals.at(numRunsPerPlanner).at(confidence);
+    PgfPlotOptions medianLowerConfidencePlotOptions;
+    medianLowerConfidencePlotOptions.markSize = 0.0;
+    medianLowerConfidencePlotOptions.lineWidth = 0.5;
+    medianLowerConfidencePlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
+    medianLowerConfidencePlotOptions.fillOpacity = 0.0;
+    medianLowerConfidencePlotOptions.drawOpacity = 0.2;
+    medianLowerConfidencePlotOptions.namePath = name + "LowConfidence"s;
+    auto medianLowConfidencePlot = std::make_shared<PgfPlot>(medianLowConfidenceTable);
+    medianLowConfidencePlot->setOptions(medianLowerConfidencePlotOptions);
+    axis->addPlot(medianLowConfidencePlot);
 
-      // Get the costs for the intervals.
-      std::vector<double> intervalLowCosts = stats.getNthCosts(name, interval.lower, durations);
-      std::vector<double> intervalHighCosts = stats.getNthCosts(name, interval.upper, durations);
+    // Plot the upper bound of the confidence interval.
+    auto medianHighConfidenceTable =
+        std::make_shared<PgfTable>(medianCostsFile, "durations", "upper confidence bound");
 
-      // If the median cost is infinity, the low and high costs are as well.
-      for (std::size_t i = 0u; i < medianCosts.size(); ++i) {
-        if (medianCosts.at(i) == std::numeric_limits<double>::infinity()) {
-          intervalLowCosts.at(i) = std::numeric_limits<double>::infinity();
-        } else if (intervalHighCosts.at(i) == std::numeric_limits<double>::infinity()) {
-          intervalHighCosts.at(i) = stats.getMaxNonInfCost() + 10.0;
-        }
-      }
+    // Replace the infinite values with very high values, otherwise they're not plotted.
+    medianHighConfidenceTable->replaceNumbers(std::numeric_limits<double>::infinity(),
+                                              3 * stats.getMaxNonInfCost());
 
-      // Plot the lower bound of the confidence interval.
-      auto medianLowConfidenceTable = std::make_shared<PgfTable>();
-      medianLowConfidenceTable->addColumn(durations);
-      medianLowConfidenceTable->addColumn(intervalLowCosts);
+    PgfPlotOptions medianUpperConfidencePlotOptions;
+    medianUpperConfidencePlotOptions.markSize = 0.0;
+    medianUpperConfidencePlotOptions.lineWidth = 0.5;
+    medianUpperConfidencePlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
+    medianUpperConfidencePlotOptions.fillOpacity = 0.0;
+    medianUpperConfidencePlotOptions.drawOpacity = 0.2;
+    medianUpperConfidencePlotOptions.namePath = name + "HighConfidence"s;
+    auto medianHighConfidencePlot = std::make_shared<PgfPlot>(medianHighConfidenceTable);
+    medianHighConfidencePlot->setOptions(medianUpperConfidencePlotOptions);
+    axis->addPlot(medianHighConfidencePlot);
 
-      PgfPlotOptions medianLowConfidencePlotOptions;
-      medianLowConfidencePlotOptions.markSize = 0.0;
-      medianLowConfidencePlotOptions.lineWidth = 0.5;
-      medianLowConfidencePlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
-      medianLowConfidencePlotOptions.fillOpacity = 0.0;
-      medianLowConfidencePlotOptions.drawOpacity = 0.2;
-      medianLowConfidencePlotOptions.namePath = name + "LowConfidence"s;
-      auto medianLowConfidencePlot = std::make_shared<PgfPlot>(medianLowConfidenceTable);
-      medianLowConfidencePlot->setOptions(medianLowConfidencePlotOptions);
-      axis->addPlot(medianLowConfidencePlot);
-
-      // Plot the upper bound of the confidence interval.
-      auto medianHighConfidenceTable = std::make_shared<PgfTable>();
-      medianHighConfidenceTable->addColumn(durations);
-      medianHighConfidenceTable->addColumn(intervalHighCosts);
-
-      PgfPlotOptions medianHighConfidencePlotOptions;
-      medianHighConfidencePlotOptions.markSize = 0.0;
-      medianHighConfidencePlotOptions.lineWidth = 0.5;
-      medianHighConfidencePlotOptions.color =
-          config_->get<std::string>("PlannerPlotColors/" + name);
-      medianHighConfidencePlotOptions.fillOpacity = 0.0;
-      medianHighConfidencePlotOptions.drawOpacity = 0.2;
-      medianHighConfidencePlotOptions.namePath = name + "HighConfidence"s;
-      auto medianHighConfidencePlot = std::make_shared<PgfPlot>(medianHighConfidenceTable);
-      medianHighConfidencePlot->setOptions(medianHighConfidencePlotOptions);
-      axis->addPlot(medianHighConfidencePlot);
-
-      // Fill the areas between the upper and lower bound
-      PgfFillBetweenOptions fillBetweenOptions;
-      fillBetweenOptions.name1 = medianHighConfidencePlotOptions.namePath;
-      fillBetweenOptions.name2 = medianLowConfidencePlotOptions.namePath;
-      auto fillBetween = std::make_shared<PgfFillBetween>();
-      fillBetween->setOptions(fillBetweenOptions);
-      PgfPlotOptions confidenceIntervalFillPlotOptions;
-      confidenceIntervalFillPlotOptions.color =
-          config_->get<std::string>("PlannerPlotColors/" + name);
-      confidenceIntervalFillPlotOptions.fillOpacity = 0.1;
-      confidenceIntervalFillPlotOptions.drawOpacity = 0.0;
-      auto confidenceIntervalFillPlot = std::make_shared<PgfPlot>(fillBetween);
-      confidenceIntervalFillPlot->setOptions(confidenceIntervalFillPlotOptions);
-      axis->addPlot(confidenceIntervalFillPlot);
-    }
+    // Fill the areas between the upper and lower bound
+    PgfFillBetweenOptions fillBetweenOptions;
+    fillBetweenOptions.name1 = medianUpperConfidencePlotOptions.namePath;
+    fillBetweenOptions.name2 = medianLowerConfidencePlotOptions.namePath;
+    auto fillBetween = std::make_shared<PgfFillBetween>();
+    fillBetween->setOptions(fillBetweenOptions);
+    PgfPlotOptions confidenceIntervalFillPlotOptions;
+    confidenceIntervalFillPlotOptions.color =
+        config_->get<std::string>("PlannerPlotColors/" + name);
+    confidenceIntervalFillPlotOptions.fillOpacity = 0.1;
+    confidenceIntervalFillPlotOptions.drawOpacity = 0.0;
+    auto confidenceIntervalFillPlot = std::make_shared<PgfPlot>(fillBetween);
+    confidenceIntervalFillPlot->setOptions(confidenceIntervalFillPlotOptions);
+    axis->addPlot(confidenceIntervalFillPlot);
   }
 
   return axis;
