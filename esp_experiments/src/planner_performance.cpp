@@ -55,6 +55,7 @@
 #include "esp_utilities/get_best_cost.h"
 
 using namespace std::string_literals;
+namespace fs = std::experimental::filesystem;
 
 int main(int argc, char **argv) {
   // Read the config files.
@@ -80,10 +81,16 @@ int main(int argc, char **argv) {
   }
   std::cout << '\n';
 
+  // Create a name for this experiment.
+  std::string experimentName = experimentStartTimeString + '_' + context->getName();
+
+  // Create the directory for the results of this experiment to live in.
+  fs::path experimentDirectory(config->get<std::string>("Experiment/executable") + "_logs/"s +
+                               experimentName);
+
   // Create the performance log.
   esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(
-      config->get<std::string>("Experiment/executable") + std::string("_logs/") +
-      experimentStartTimeString + '_' + context->getName() + std::string(".csv"));
+      experimentDirectory / experimentName += "_results.csv"s);
 
   // May the best planner win.
   for (std::size_t i = 0; i < config->get<std::size_t>("Experiment/numRuns"); ++i) {
@@ -150,8 +157,7 @@ int main(int argc, char **argv) {
   esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
 
   // Log some info to a log file.
-  auto resultsPath = results.getFilePath();
-  auto logPath = std::experimental::filesystem::path(resultsPath).replace_extension(".log");
+  auto logPath = experimentDirectory / experimentName += "_log.txt"s;
   ompl::msg::OutputHandlerFile log(logPath.c_str());
   ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
   ompl::msg::useOutputHandler(&log);
@@ -161,19 +167,20 @@ int main(int argc, char **argv) {
               esp::ompltools::time::toDateString(experimentEndTime).c_str());
   OMPL_INFORM("Duration of experiment: '%s'",
               esp::ompltools::time::toDurationString(experimentDuration).c_str());
-  OMPL_INFORM("Wrote results to '%s'", resultsPath.c_str());
+  OMPL_INFORM("Wrote results to '%s'", results.getFilePath().c_str());
 
   // Dump the accessed parameters next to the results file.
-  auto configPath = std::experimental::filesystem::path(resultsPath).replace_extension(".json");
-  config->add<std::string>("Experiment/results", resultsPath.string());
-  config->dumpAccessed(configPath.string());
+  auto configPath = experimentDirectory / experimentName += "_config.json"s;
+  config->add<std::string>("Experiment/results", results.getFilePath());
+  config->dumpAccessed(fs::current_path().string() + '/' + configPath.string());
   OMPL_INFORM("Wrote configuration to '%s'", configPath.c_str());
 
   // Report success.
   std::cout << "\n\nExperiment ran for:\t" << (experimentEndTime - experimentStartTime) << "\t\t("
             << experimentStartTimeString << " -- " << experimentEndTimeString << ")\n"
-            << "\nWrote results to:\t" << resultsPath.string() << "\nWrote config to:\t"
-            << configPath.string() << "\nWrote log to:\t\t" << logPath.string() << "\n\n";
+            << "\nWrote results to:\t" << results.getFilePath() << "\nWrote config to:\t"
+            << fs::current_path() / configPath << "\nWrote log to:\t\t"
+            << fs::current_path() / logPath << "\n\n";
 
   return 0;
 }

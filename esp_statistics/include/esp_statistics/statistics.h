@@ -81,7 +81,7 @@ class Statistics {
   double getMinDuration() const;
   double getMaxDuration() const;
 
-  std::experimental::filesystem::path generateMedianFiles() const;
+  std::experimental::filesystem::path extractMedians() const;
 
   std::vector<double> getNthCosts(const std::string& name, std::size_t n,
                                   const std::vector<double>& durations) const;
@@ -93,8 +93,8 @@ class Statistics {
  private:
   std::shared_ptr<Configuration> config_;
   const std::experimental::filesystem::path resultsPath_;
+  const std::experimental::filesystem::path statisticsDirectory_;
   std::vector<std::string> plannerNames_{};
-
 
   // Can we afford loading all of this into memory? Let's see.
   std::map<std::string, PlannerResults> data_{};
@@ -103,6 +103,11 @@ class Statistics {
   double maxNonInfCost_{std::numeric_limits<double>::lowest()};
   double minDuration_{std::numeric_limits<double>::infinity()};
   double maxDuration_{std::numeric_limits<double>::lowest()};
+
+  // Paths to the generated files in the form
+  // planner -> statstype -> path, e.g. statisticsPaths_["SBITstar"]["median"] -> path.
+  std::map<std::string, std::map<std::string, std::experimental::filesystem::path>>
+      statisticsPaths_{};
 };
 
 }  // namespace ompltools

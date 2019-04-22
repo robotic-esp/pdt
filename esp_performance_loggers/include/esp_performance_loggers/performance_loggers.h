@@ -200,48 +200,60 @@ class TargetTimeResults {
 /** \brief A class to write results to disk. */
 template <class Logger>
 class ResultLog {
- public:
-  ResultLog(const std::string& fullFileName) : filename_(fullFileName) {
-    // Create parent directories, if needed.
-    fs::create_directories(fs::path(filename_).parent_path());
 
-    // Create the file.
-    std::ofstream file(filename_);
+ public:
+  ResultLog(const std::experimental::filesystem::path& filepath) : filepath_(filepath) {
+    // Create parent directories, if needed.
+    fs::create_directories(filepath_.parent_path());
+
+    // Open the file.
+    std::ofstream filestream;
+    filestream.open(filepath_.string(), std::ofstream::out | std::ofstream::app);
+
+    // Check on the failbit.
+    if (filestream.fail() == true) {
+      using namespace std::string_literals;
+      auto msg = "Could not open results file at "s + filepath_.string() + "."s;
+      throw std::ios_base::failure(msg);
+    }
+    
 
     // Set the permissions to read only.
-    fs::permissions(filename_,
+    fs::permissions(filepath_,
                     fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
   };
 
-  fs::path getFilePath() const { return fs::current_path() / fs::path(filename_); }
+  fs::path getFilePath() const { return fs::current_path() / filepath_; }
 
   void addResult(const std::string& plannerName, const Logger& logger) {
     // Make sure we can write to this file.
-    fs::permissions(filename_, fs::perms::owner_read | fs::perms::owner_write |
+    fs::permissions(filepath_, fs::perms::owner_read | fs::perms::owner_write |
                                    fs::perms::group_read | fs::perms::others_read);
 
     // Open the file.
-    std::ofstream csvFile;
-    csvFile.open(filename_, std::ofstream::out | std::ofstream::app);
+    std::ofstream filestream;
+    filestream.open(filepath_.string(), std::ofstream::out | std::ofstream::app);
 
     // Check on the failbit.
-    if (csvFile.fail() == true) {
-      throw std::ios_base::failure("Could not open log file.");
+    if (filestream.fail() == true) {
+      using namespace std::string_literals;
+      auto msg = "Could not open results file at "s + filepath_.string() + "."s;
+      throw std::ios_base::failure(msg);
     }
 
     // Write the data.
-    csvFile << logger.createLogString(plannerName);
+    filestream << logger.createLogString(plannerName);
 
     // Close the file:
-    csvFile.close();
+    filestream.close();
 
     // This file should not accidentally be written to.
-    fs::permissions(filename_,
+    fs::permissions(filepath_,
                     fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
   }
 
  private:
-  std::string filename_;
+  std::experimental::filesystem::path filepath_;
 };
 
 }  // namespace ompltools
