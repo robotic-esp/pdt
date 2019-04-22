@@ -42,11 +42,26 @@ namespace esp {
 
 namespace ompltools {
 
+using namespace std::string_literals;
+
 std::string TikzPictureOptions::string() const {
   std::ostringstream stream{};
-  stream << "\n  xscale=" << xscale
-         << ",\n  yscale=" << yscale;
+  stream << "\n  xscale=" << xscale << ",\n  yscale=" << yscale;
   return stream.str();
+}
+
+TikzPicture::TikzPicture(const std::shared_ptr<Configuration>& config) {
+  // Load colors from config.
+  espColors_.emplace("espblack", config->get<std::array<int, 3>>("Colors/espblack"));
+  espColors_.emplace("espwhite", config->get<std::array<int, 3>>("Colors/espwhite"));
+  espColors_.emplace("espgray", config->get<std::array<int, 3>>("Colors/espgray"));
+  espColors_.emplace("espblue", config->get<std::array<int, 3>>("Colors/espblue"));
+  espColors_.emplace("espred", config->get<std::array<int, 3>>("Colors/espred"));
+  espColors_.emplace("espyellow", config->get<std::array<int, 3>>("Colors/espyellow"));
+  espColors_.emplace("espgreen", config->get<std::array<int, 3>>("Colors/espgreen"));
+  espColors_.emplace("esppurple", config->get<std::array<int, 3>>("Colors/esppurple"));
+  espColors_.emplace("esplightblue", config->get<std::array<int, 3>>("Colors/esplightblue"));
+  espColors_.emplace("espdarkred", config->get<std::array<int, 3>>("Colors/espdarkred"));
 }
 
 void TikzPicture::setOptions(const TikzPictureOptions& options) {
@@ -62,12 +77,33 @@ std::string TikzPicture::string() const {
     return {};
   }
   std::ostringstream stream{};
+  // Make sure the colors are defined.
+  for (const auto& [name, values] : espColors_) {
+    stream << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
+           << values[2u] << "}\n";
+  }
+
+  // Write the picture.
   stream << "\\begin{tikzpicture} [" << options_.string() << "\n]\n\n";
   for (const auto& axis : axes_) {
     stream << axis->string() << '\n';
   }
   stream << "\\end{tikzpicture}\n";
   return stream.str();
+}
+
+void TikzPicture::write(const std::experimental::filesystem::path& path) const {
+  // Open a file.
+  std::ofstream texFile;
+  texFile.open(path.string());
+
+  // Check on the failbit.
+  if (texFile.fail() == true) {
+    auto msg = "TikzPicture could not write to file '"s + path.string() + "'."s;
+    throw std::ios_base::failure(msg);
+  }
+
+  texFile << string();
 }
 
 }  // namespace ompltools

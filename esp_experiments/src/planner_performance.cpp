@@ -51,7 +51,6 @@
 #include "esp_factories/planner_factory.h"
 #include "esp_performance_loggers/performance_loggers.h"
 #include "esp_planning_contexts/all_contexts.h"
-#include "esp_tikz/performance_plotter.h"
 #include "esp_time/time.h"
 #include "esp_utilities/get_best_cost.h"
 

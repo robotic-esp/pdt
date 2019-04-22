@@ -47,31 +47,31 @@ namespace esp {
 
 namespace ompltools {
 
-class PlannerData {
+class PlannerResults {
  public:
   // The safest option is a vector of pairs, so that durations and costs cannot get decoupled.
-  using RunData = std::vector<std::pair<double, double>>;
-  PlannerData() = default;
-  ~PlannerData() = default;
+  using PlannerResult = std::vector<std::pair<double, double>>;
+  PlannerResults() = default;
+  ~PlannerResults() = default;
 
   // Interpolate the runs.
-  const std::vector<RunData>& getAllRunsAt(const std::vector<double>& durations) const;
+  const std::vector<PlannerResult>& getAllRunsAt(const std::vector<double>& durations) const;
 
   // Access to measured runs.
-  void addMeasuredRun(const RunData& run);
-  const RunData& getMeasuredRun(std::size_t i) const;
+  void addMeasuredRun(const PlannerResult& run);
+  const PlannerResult& getMeasuredRun(std::size_t i) const;
   void clearMeasuredRuns();
   std::size_t numMeasuredRuns() const;
 
  private:
-  std::vector<RunData> measuredRuns_{};
-  mutable std::vector<RunData> interpolatedRuns_{};
+  std::vector<PlannerResult> measuredRuns_{};
+  mutable std::vector<PlannerResult> interpolatedRuns_{};
 };
 
-class PerformanceStatistics {
+class Statistics {
  public:
-  PerformanceStatistics(const std::shared_ptr<Configuration>& config);
-  ~PerformanceStatistics() = default;
+  Statistics(const std::shared_ptr<Configuration>& config);
+  ~Statistics() = default;
 
   std::vector<std::string> getPlannerNames() const;
   std::size_t getNumRunsPerPlanner() const;
@@ -80,6 +80,8 @@ class PerformanceStatistics {
   double getMaxNonInfCost() const;
   double getMinDuration() const;
   double getMaxDuration() const;
+
+  std::experimental::filesystem::path generateMedianFiles() const;
 
   std::vector<double> getNthCosts(const std::string& name, std::size_t n,
                                   const std::vector<double>& durations) const;
@@ -90,12 +92,12 @@ class PerformanceStatistics {
 
  private:
   std::shared_ptr<Configuration> config_;
-  const std::experimental::filesystem::path filename_;
+  const std::experimental::filesystem::path resultsPath_;
   std::vector<std::string> plannerNames_{};
 
 
   // Can we afford loading all of this into memory? Let's see.
-  std::map<std::string, PlannerData> data_{};
+  std::map<std::string, PlannerResults> data_{};
   double minCost_{std::numeric_limits<double>::infinity()};
   double maxCost_{std::numeric_limits<double>::lowest()};
   double maxNonInfCost_{std::numeric_limits<double>::lowest()};

@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_statistics/performance_statistics.h"
+#include "esp_statistics/statistics.h"
 
 #include <algorithm>
 #include <cassert>
@@ -57,7 +57,7 @@ namespace ompltools {
 
 using namespace std::string_literals;
 
-const std::vector<PlannerData::RunData>& PlannerData::getAllRunsAt(
+const std::vector<PlannerResults::PlannerResult>& PlannerResults::getAllRunsAt(
     const std::vector<double>& durations) const {
   // Check if we have to generate the costs at these durations or if we have computed them before.
   bool cached = true;
@@ -105,30 +105,32 @@ const std::vector<PlannerData::RunData>& PlannerData::getAllRunsAt(
   return interpolatedRuns_;
 }
 
-void PlannerData::addMeasuredRun(const PlannerData::RunData& run) {
+void PlannerResults::addMeasuredRun(const PlannerResults::PlannerResult& run) {
   measuredRuns_.emplace_back(run);
 }
 
-const PlannerData::RunData& PlannerData::getMeasuredRun(std::size_t i) const {
+const PlannerResults::PlannerResult& PlannerResults::getMeasuredRun(std::size_t i) const {
   return measuredRuns_.at(i);
 }
 
-void PlannerData::clearMeasuredRuns() {
+void PlannerResults::clearMeasuredRuns() {
   measuredRuns_.clear();
 }
 
-std::size_t PlannerData::numMeasuredRuns() const {
+std::size_t PlannerResults::numMeasuredRuns() const {
   return measuredRuns_.size();
 }
 
-PerformanceStatistics::PerformanceStatistics(const std::shared_ptr<Configuration>& config) :
+Statistics::Statistics(const std::shared_ptr<Configuration>& config) :
   config_(config),
-  filename_(config_->get<std::string>("Experiment/results")) {
+  resultsPath_(config_->get<std::string>("Experiment/results")) {
   // Open the file.
-  std::ifstream csvFile(filename_);
+  std::ifstream csvFile(resultsPath_.string());
   if (csvFile.fail()) {
-    throw std::runtime_error("Unable to open csv file for performance statistics.");
+    auto msg = "Statistics cannot open results at '"s + resultsPath_.string() + "'."s;
+    throw std::runtime_error(msg);
   }
+
   // Set up the parser.
   aria::csv::CsvParser parser(csvFile);
 
@@ -136,7 +138,7 @@ PerformanceStatistics::PerformanceStatistics(const std::shared_ptr<Configuration
   // initial solution time and associated cost for every planner.
   bool timeRow = true;
   std::string name{""};
-  PlannerData::RunData run;
+  PlannerResults::PlannerResult run;
   for (auto& row : parser) {
     if (row.size() == 0) {
       throw std::runtime_error("Empty row.");
@@ -180,11 +182,11 @@ PerformanceStatistics::PerformanceStatistics(const std::shared_ptr<Configuration
   }
 }
 
-std::vector<std::string> PerformanceStatistics::getPlannerNames() const {
+std::vector<std::string> Statistics::getPlannerNames() const {
   return plannerNames_;
 }
 
-std::size_t PerformanceStatistics::getNumRunsPerPlanner() const {
+std::size_t Statistics::getNumRunsPerPlanner() const {
   if (data_.empty()) {
     return 0u;
   }
@@ -198,27 +200,27 @@ std::size_t PerformanceStatistics::getNumRunsPerPlanner() const {
   return data_.begin()->second.numMeasuredRuns();
 }
 
-double PerformanceStatistics::getMinCost() const {
+double Statistics::getMinCost() const {
   return minCost_;
 }
 
-double PerformanceStatistics::getMaxCost() const {
+double Statistics::getMaxCost() const {
   return maxCost_;
 }
 
-double PerformanceStatistics::getMaxNonInfCost() const {
+double Statistics::getMaxNonInfCost() const {
   return maxNonInfCost_;
 }
 
-double PerformanceStatistics::getMinDuration() const {
+double Statistics::getMinDuration() const {
   return minDuration_;
 }
 
-double PerformanceStatistics::getMaxDuration() const {
+double Statistics::getMaxDuration() const {
   return maxDuration_;
 }
 
-std::vector<double> PerformanceStatistics::getNthCosts(const std::string& name, std::size_t n,
+std::vector<double> Statistics::getNthCosts(const std::string& name, std::size_t n,
                                                        const std::vector<double>& durations) const {
   if (name == "RRTConnect"s) {
     auto msg = "Cannot specify durations for planners with nonanytime behaviour."s;
@@ -250,7 +252,7 @@ std::vector<double> PerformanceStatistics::getNthCosts(const std::string& name, 
   return nthCosts;
 }
 
-std::vector<double> PerformanceStatistics::getInitialSolutionDurations(
+std::vector<double> Statistics::getInitialSolutionDurations(
     const std::string& name) const {
   // Get the durations of the initial solutions of all runs.
   std::vector<double> initialDurations{};
@@ -272,7 +274,7 @@ std::vector<double> PerformanceStatistics::getInitialSolutionDurations(
   return initialDurations;
 }
 
-std::vector<double> PerformanceStatistics::getInitialSolutionCosts(const std::string& name) const {
+std::vector<double> Statistics::getInitialSolutionCosts(const std::string& name) const {
   if (data_.find(name) == data_.end()) {
     auto msg = "Cannot find statistics for planner '"s + name + "'."s;
     throw std::runtime_error(msg);
@@ -298,7 +300,7 @@ std::vector<double> PerformanceStatistics::getInitialSolutionCosts(const std::st
   return initialCosts;
 }
 
-double PerformanceStatistics::getNthInitialSolutionDuration(const std::string& name,
+double Statistics::getNthInitialSolutionDuration(const std::string& name,
                                                             std::size_t n) const {
   if (data_.find(name) == data_.end()) {
     auto msg = "Cannot find statistics for planner '"s + name + "'."s;
@@ -315,7 +317,7 @@ double PerformanceStatistics::getNthInitialSolutionDuration(const std::string& n
   return *nthDuration;
 }
 
-double PerformanceStatistics::getNthInitialSolutionCost(const std::string& name,
+double Statistics::getNthInitialSolutionCost(const std::string& name,
                                                         std::size_t n) const {
   if (data_.find(name) == data_.end()) {
     auto msg = "Cannot find statistics for planner '"s + name + "'."s;

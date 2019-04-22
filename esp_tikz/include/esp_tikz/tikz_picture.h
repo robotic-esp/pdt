@@ -40,6 +40,7 @@
 #include <string>
 #include <vector>
 
+#include "esp_configuration/configuration.h"
 #include "esp_tikz/pgf_axis.h"
 
 namespace esp {
@@ -54,17 +55,19 @@ struct TikzPictureOptions {
 
 class TikzPicture {
  public:
-  TikzPicture() = default;
+  TikzPicture(const std::shared_ptr<Configuration>& config);
   ~TikzPicture() = default;
 
   void setOptions(const TikzPictureOptions& options);
   void addAxis(const std::shared_ptr<PgfAxis>& axis);
 
   std::string string() const;
+  void write(const std::experimental::filesystem::path& path) const;
 
- private:
+ protected:
   std::vector<std::shared_ptr<const PgfAxis>> axes_{};
   TikzPictureOptions options_{};
+  std::map<std::string, std::array<int, 3>> espColors_{};
 };
 
 }  // namespace ompltools

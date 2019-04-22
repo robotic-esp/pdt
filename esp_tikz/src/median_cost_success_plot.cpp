@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/performance_plotter.h"
+#include "esp_tikz/median_cost_success_plot.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -52,20 +52,11 @@ namespace esp {
 namespace ompltools {
 
 using namespace std::string_literals;
+namespace fs = std::experimental::filesystem;
 
-PerformancePlotter::PerformancePlotter(const std::shared_ptr<Configuration>& config) :
+MedianCostSuccessPlot::MedianCostSuccessPlot(const std::shared_ptr<Configuration>& config) :
+    TikzPicture(config),
     config_(config) {
-  // Easy access to color.
-  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("Colors/espblack"));
-  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("Colors/espwhite"));
-  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("Colors/espgray"));
-  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("Colors/espblue"));
-  espColors_.emplace("espred", config_->get<std::array<int, 3>>("Colors/espred"));
-  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("Colors/espyellow"));
-  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("Colors/espgreen"));
-  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("Colors/esppurple"));
-  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("Colors/esplightblue"));
-  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("Colors/espdarkred"));
 }
 
 // The lookup table for confidence intervals.
@@ -74,6 +65,7 @@ struct Interval {
   float probability{0.0f};
 };
 static const std::map<std::size_t, std::map<std::size_t, Interval>> medianConfidenceIntervals = {
+    {10u, {{95u, {1u, 8u, 0.9511}}, {99u, {0u, 9u, 0.9910}}}},
     {50u, {{95u, {18u, 32u, 0.9511}}, {99u, {15u, 34u, 0.9910}}}},
     {100u, {{95u, {40u, 60u, 0.9540}}, {99u, {37u, 63u, 0.9907}}}},
     {200u, {{95u, {86u, 114u, 0.9520}}, {99u, {81u, 118u, 0.9906}}}},
@@ -92,11 +84,19 @@ static const std::map<std::size_t, std::map<std::size_t, Interval>> medianConfid
     {100000u, {{95u, {49687u, 50307u, 0.9500}}, {99u, {49588u, 50403u, 0.9900}}}},
     {1000000u, {{95u, {499018u, 500978u, 0.9500}}, {99u, {498707u, 501283u, 0.9900}}}}};
 
-void PerformancePlotter::generateMedianCostAndSuccessPlot(
-    const PerformanceStatistics& stats, const std::vector<double>& durations,
-    const std::experimental::filesystem::path& filename, std::size_t confidence) const {
-  // Create a picture that holds the axes. The default options are fine.
-  TikzPicture picture;
+fs::path MedianCostSuccessPlot::generatePlot(const Statistics& stats,
+                                             std::size_t confidence) {
+  // Compute the duration bin size.
+  auto contextName = config_->get<std::string>("Experiment/context");
+  std::size_t numMeasurements =
+      std::ceil(config_->get<double>("Contexts/" + contextName + "/maxTime") *
+                config_->get<double>("Experiment/logFrequency"));
+  double binSize = 1.0 / config_->get<double>("Experiment/logFrequency");
+  std::vector<double> durations;
+  durations.reserve(numMeasurements);
+  for (std::size_t i = 0u; i < numMeasurements; ++i) {
+    durations.emplace_back(static_cast<double>(i + 1u) * binSize);
+  }
 
   // Determine the min and max durations to be plotted.
   double maxDurationToBePlotted = durations.back();
@@ -123,8 +123,7 @@ void PerformancePlotter::generateMedianCostAndSuccessPlot(
   successAxisOptions.ytick = "0,25,50,75,100";
   successAxisOptions.ylabel = "Success [\\%]"s;
   successAxisOptions.ylabelAbsolute = true;
-  successAxisOptions.ylabelStyle =
-      "font=\\footnotesize, text depth=0.0em, text height=0.5em";
+  successAxisOptions.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
   auto successAxis = generateSuccessPlot(stats);
   successAxis->setOptions(successAxisOptions);
 
@@ -141,8 +140,7 @@ void PerformancePlotter::generateMedianCostAndSuccessPlot(
   medianCostAxisOptions.xlabel = "Computation time [s]";
   medianCostAxisOptions.ylabel = "Median cost";
   medianCostAxisOptions.ylabelAbsolute = true;
-  medianCostAxisOptions.ylabelStyle =
-      "font=\\footnotesize, text depth=0.0em, text height=0.5em";
+  medianCostAxisOptions.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
   auto medianCostAxis = generateMedianCostPlot(stats, durations, confidence);
   medianCostAxis->setOptions(medianCostAxisOptions);
 
@@ -163,18 +161,26 @@ void PerformancePlotter::generateMedianCostAndSuccessPlot(
   auto legendAxis = generateLegendAxis(stats);
   legendAxis->setOptions(legendAxisOptions);
 
-  picture.addAxis(successAxis);
-  picture.addAxis(medianCostAxis);
-  picture.addAxis(legendAxis);
-  writePictureToFile(picture, filename);
+  // Add all axis to this plot.
+  axes_.emplace_back(successAxis);
+  axes_.emplace_back(medianCostAxis);
+  axes_.emplace_back(legendAxis);
+
+  // Generate the path to write to.
+  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /=
+      fs::path(config_->get<std::string>("Experiment/results")).stem() +=
+      "_median_cost_success_plot.tikz"s;
+  write(picturePath);
+  return picturePath;
 }
 
-std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
-    const PerformanceStatistics& stats, const std::vector<double>& durations,
+std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
+    const Statistics& stats, const std::vector<double>& durations,
     std::size_t confidence) const {
   // Create an axis to hold the plots.
   auto axis = std::make_shared<PgfAxis>();
 
+  // Get the number of runs per planner and compute the bin durations.
   std::size_t numRunsPerPlanner = stats.getNumRunsPerPlanner();
 
   // Plot the initial solutions.
@@ -373,8 +379,8 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateMedianCostPlot(
   return axis;
 }
 
-std::shared_ptr<PgfAxis> PerformancePlotter::generateSuccessPlot(
-    const PerformanceStatistics& stats) const {
+std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateSuccessPlot(
+    const Statistics& stats) const {
   // Create an axis for this plot.
   auto axis = std::make_shared<PgfAxis>();
 
@@ -414,8 +420,8 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateSuccessPlot(
   return axis;
 }
 
-std::shared_ptr<PgfAxis> PerformancePlotter::generateLegendAxis(
-    const PerformanceStatistics& stats) const {
+std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateLegendAxis(
+    const Statistics& stats) const {
   auto legendAxis = std::make_shared<PgfAxis>();
 
   // Make sure the names are alphabetic.
@@ -429,25 +435,21 @@ std::shared_ptr<PgfAxis> PerformancePlotter::generateLegendAxis(
   return legendAxis;
 }
 
-void PerformancePlotter::compilePlot(const std::experimental::filesystem::path& filename) const {
-  // Compile the plot.
-  auto currentPath = std::experimental::filesystem::current_path();
-  auto cmd = "cd "s + filename.parent_path().string() +
-             " && pdflatex -file-line-error -interaction=nonstopmode "s +
-             filename.filename().string() + " && cd "s + currentPath.string();
-  int retval = std::system(cmd.c_str());
-  (void)retval;
-}
-
-void PerformancePlotter::writePictureToFile(
-    const TikzPicture& picture, const std::experimental::filesystem::path& filename) const {
-  // Open a file.
+fs::path MedianCostSuccessPlot::generatePdf() const {
+  // Generate the path to write to.
+  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /=
+      fs::path(config_->get<std::string>("Experiment/results")).stem() +=
+      "_median_cost_success_plot.tikz"s;
+  auto texFilePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /=
+      fs::path(config_->get<std::string>("Experiment/results")).stem() +=
+      "_median_cost_success_plot.tex"s;
   std::ofstream texFile;
-  texFile.open(filename.string());
+  texFile.open(texFilePath.c_str());
 
   // Check on the failbit.
   if (texFile.fail() == true) {
-    throw std::ios_base::failure("Could not open performance plot file.");
+    auto msg = "MedianCostSuccessPlot could not open picture at '" + texFilePath.string() + "'."s;
+    throw std::ios_base::failure(msg);
   }
 
   // Write the preamble.
@@ -458,18 +460,23 @@ void PerformancePlotter::writePictureToFile(
           << "\\pgfplotsset{compat=1.15}\n"
           << "\\usepgfplotslibrary{fillbetween}\n"
           << "\\usepackage{xcolor}\n";
-  for (const auto& [name, values] : espColors_) {
-    texFile << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
-            << values[2u] << "}\n";
-  }
 
-  // Write the picture.
+  // Include the picture.
   texFile << "\n\n\\begin{document}\n\n";
-  texFile << picture.string();
+  texFile << "\n\\input{" << picturePath.string() << "}\n";
   texFile << "\n\n\\end{document}\n";
 
   // Close the file.
   texFile.close();
+
+  // Compile the plot.
+  auto currentPath = std::experimental::filesystem::current_path();
+  auto cmd = "cd "s + texFilePath.parent_path().string() +
+             " && pdflatex -file-line-error -interaction=nonstopmode "s +
+             texFilePath.filename().string() + " && cd "s + currentPath.string();
+  int retval = std::system(cmd.c_str());
+  (void)retval;
+  return fs::path(texFilePath).replace_extension(".pdf");
 }
 
 }  // namespace ompltools

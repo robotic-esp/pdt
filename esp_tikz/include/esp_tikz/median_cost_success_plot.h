@@ -41,35 +41,32 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/performance_statistics.h"
+#include "esp_statistics/statistics.h"
 #include "esp_tikz/tikz_picture.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class PerformancePlotter {
+class MedianCostSuccessPlot : public TikzPicture {
  public:
-  PerformancePlotter(const std::shared_ptr<Configuration>& config);
-  ~PerformancePlotter() = default;
+  MedianCostSuccessPlot(const std::shared_ptr<Configuration>& config);
+  ~MedianCostSuccessPlot() = default;
 
-  void generateMedianCostAndSuccessPlot(const PerformanceStatistics& stats,
-                                        const std::vector<double>& durations,
-                                        const std::experimental::filesystem::path& filename,
-                                        std::size_t confidence = 99u) const;
-  void compilePlot(const std::experimental::filesystem::path& filename) const;
+  std::experimental::filesystem::path generatePlot(const Statistics& stats,
+                                                   std::size_t confidence = 99u);
+  std::experimental::filesystem::path generatePdf() const;
 
  private:
-  std::shared_ptr<PgfAxis> generateMedianCostPlot(const PerformanceStatistics& stats,
+  std::shared_ptr<PgfAxis> generateMedianCostPlot(const Statistics& stats,
                                                   const std::vector<double>& durations,
                                                   std::size_t confidence) const;
-  std::shared_ptr<PgfAxis> generateSuccessPlot(const PerformanceStatistics& stats) const;
-  std::shared_ptr<PgfAxis> generateLegendAxis(const PerformanceStatistics& stats) const;
+  std::shared_ptr<PgfAxis> generateSuccessPlot(const Statistics& stats) const;
+  std::shared_ptr<PgfAxis> generateLegendAxis(const Statistics& stats) const;
 
   void writePictureToFile(const TikzPicture& picture,
                           const std::experimental::filesystem::path& filename) const;
   const std::shared_ptr<const Configuration> config_{};
-  std::map<std::string, std::array<int, 3>> espColors_{};
 };
 
 }  // namespace ompltools

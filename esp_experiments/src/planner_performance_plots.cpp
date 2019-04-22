@@ -43,8 +43,8 @@
 #include <experimental/filesystem>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/performance_statistics.h"
-#include "esp_tikz/performance_plotter.h"
+#include "esp_statistics/statistics.h"
+#include "esp_tikz/median_cost_success_plot.h"
 
 using namespace std::string_literals;
 
@@ -53,24 +53,13 @@ int main(int argc, char **argv) {
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
 
   // Get the statistics.
-  esp::ompltools::PerformanceStatistics stats(config);
+  esp::ompltools::Statistics stats(config);
 
-  // Generate the plot.
-  auto contextName = config->get<std::string>("Experiment/context");
-  std::size_t numMeasurements =
-      std::ceil(config->get<double>("Contexts/" + contextName + "/maxTime") *
-                config->get<double>("Experiment/logFrequency"));
-  double binSize = 1.0 / config->get<double>("Experiment/logFrequency");
-  std::vector<double> durations;
-  durations.reserve(numMeasurements);
-  for (std::size_t i = 0u; i < numMeasurements; ++i) {
-    durations.emplace_back(static_cast<double>(i + 1u) * binSize);
-  }
-  esp::ompltools::PerformancePlotter plotter(config);
-  std::experimental::filesystem::path resultsPath = config->get<std::string>("Experiment/results");
-  auto plotPath = ((resultsPath.parent_path() / resultsPath.stem()) += "_median_cost_plot.tex"s);
-  plotter.generateMedianCostAndSuccessPlot(stats, durations, plotPath);
-  plotter.compilePlot(plotPath);
+  // Create a median cost success plot.
+  esp::ompltools::MedianCostSuccessPlot medianCostSuccessPlot(config);
+  auto medianCostSuccessPlotPath = medianCostSuccessPlot.generatePlot(stats);
+  std::cout << "Wrote median cost success plot to " << medianCostSuccessPlotPath << '\n';
+  medianCostSuccessPlot.generatePdf();
 
   return 0;
 }

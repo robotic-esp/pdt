@@ -11,7 +11,7 @@ include_directories(
 
 # Add the library as an interface.
 add_library(esp_statistics
-  src/performance_statistics.cpp)
+  src/statistics.cpp)
 
 target_link_libraries(esp_statistics
   esp_configuration)
