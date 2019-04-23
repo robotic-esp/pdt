@@ -83,12 +83,30 @@ class Statistics {
   std::experimental::filesystem::path extractInitialSolutionDurationCdf(
       const std::string& plannerName) const;
 
+  std::experimental::filesystem::path extractInitialSolutionDurationPdf(
+      const std::string& plannerName, const std::vector<double>& binDurations = {}) const;
+
   std::size_t getNumRunsPerPlanner() const;
+
+  // Getters for overall min max values.
   double getMinCost() const;
   double getMaxCost() const;
   double getMaxNonInfCost() const;
   double getMinDuration() const;
   double getMaxDuration() const;
+  double getMinInitialSolutionDuration() const;
+  double getMaxNonInfInitialSolutionDuration() const;
+
+  // Getters for planner specific min max values.
+  double getMinCost(const std::string& plannerName) const;
+  double getMaxCost(const std::string& plannerName) const;
+  double getMaxNonInfCost(const std::string& plannerName) const;
+  double getMinDuration(const std::string& plannerName) const;
+  double getMaxDuration(const std::string& plannerName) const;
+  double getMinInitialSolutionDuration(const std::string& plannerName) const;
+  double getMaxNonInfInitialSolutionDuration(const std::string& plannerName) const;
+
+  std::vector<double> getDefaultBinDurations() const;
 
  private:
   // The identifying header line that starts each file produced by this class.
@@ -130,11 +148,24 @@ class Statistics {
 
   // Can we afford loading all of this into memory? Let's see.
   std::map<std::string, PlannerResults> results_{};
+
+  // Planner specific min and max values.
+  std::map<std::string, double> minCosts_{};
+  std::map<std::string, double> maxCosts_{};
+  std::map<std::string, double> maxNonInfCosts_{};
+  std::map<std::string, double> minDurations_{};
+  std::map<std::string, double> maxDurations_{};
+  std::map<std::string, double> minInitialSolutionDurations_{};
+  std::map<std::string, double> maxNonInfInitialSolutionDurations_{};
+
+  // Overall min and max values.
   double minCost_{std::numeric_limits<double>::infinity()};
   double maxCost_{std::numeric_limits<double>::lowest()};
   double maxNonInfCost_{std::numeric_limits<double>::lowest()};
   double minDuration_{std::numeric_limits<double>::infinity()};
   double maxDuration_{std::numeric_limits<double>::lowest()};
+  double minInitialSolutionDuration_{std::numeric_limits<double>::infinity()};
+  double maxNonInfInitialSolutionDuration_{std::numeric_limits<double>::lowest()};
 };
 
 }  // namespace ompltools

@@ -147,6 +147,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
   // Parse the file in bulk for now. We could already extract some statistics here, e.g. fastest
   // initial solution time and associated cost for every planner.
   bool timeRow = true;
+  double lastCost{std::numeric_limits<double>::infinity()};
   std::string name{""};
   PlannerResults::PlannerResult run;
   for (auto& row : parser) {
@@ -155,35 +156,100 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
     }
     if (timeRow) {
       name = row.at(0);
-      run.clear();
+
+      // If this is the first time we're parsing this planner, we need to setup a min max value
+      // containers.
+      if (results_.find(name) == results_.end() && run.empty()) {
+        minCosts_[name] = std::numeric_limits<double>::infinity();
+        maxCosts_[name] = std::numeric_limits<double>::lowest();
+        maxNonInfCosts_[name] = std::numeric_limits<double>::lowest();
+        minDurations_[name] = std::numeric_limits<double>::infinity();
+        maxDurations_[name] = std::numeric_limits<double>::lowest();
+        minInitialSolutionDurations_[name] = std::numeric_limits<double>::infinity();
+        maxNonInfInitialSolutionDurations_[name] = std::numeric_limits<double>::lowest();
+      }
     } else if (row.at(0) != name) {
       throw std::runtime_error("Csv file has unexpected structure.");
     }
+    // Let's get the min and max values on first pass.
     for (std::size_t i = 1u; i < row.size(); ++i) {
       if (timeRow) {
-        run.emplace_back(std::stod(row.at(i)), std::numeric_limits<double>::signaling_NaN());
-        if (std::stod(row.at(i)) < minDuration_) {
-          minDuration_ = std::stod(row.at(i));
+        double duration = std::stod(row.at(i));
+        // Fill the cost row with nan's while filling the time row.
+        run.emplace_back(duration, std::numeric_limits<double>::signaling_NaN());
+
+        // Register overall min and max durations.
+        if (duration < minDuration_) {
+          minDuration_ = duration;
         }
-        if (std::stod(row.at(i)) > maxDuration_) {
-          maxDuration_ = std::stod(row.at(i));
+        if (duration > maxDuration_) {
+          maxDuration_ = duration;
+        }
+
+        // Register planner specific min and max durations.
+        if (duration < minDurations_.at(name)) {
+          minDurations_.at(name) = duration;
+        }
+        if (duration > maxDurations_.at(name)) {
+          maxDurations_.at(name) = duration;
         }
       } else {
-        run.at(i - 1u).second = std::stod(row.at(i));
-        if (std::stod(row.at(i)) < minCost_) {
-          minCost_ = std::stod(row.at(i));
+        run.at(i - 1u).second =
+            std::stod(row.at(i));  // i - 1 because the row index (i) has the name as
+                                   // 0th element which is not stored in the run.
+
+        double duration = run.at(i - 1u).first;
+        double cost = run.at(i - 1u).second;
+
+        // Register overall min and max costs.
+        if (cost < minCost_) {
+          minCost_ = cost;
         }
-        if (std::stod(row.at(i)) > maxCost_) {
-          maxCost_ = std::stod(row.at(i));
+        if (cost > maxCost_) {
+          maxCost_ = cost;
         }
-        if (std::stod(row.at(i)) != std::numeric_limits<double>::infinity() &&
-            std::stod(row.at(i)) > maxNonInfCost_) {
-          maxNonInfCost_ = std::stod(row.at(i));
+        if (cost != std::numeric_limits<double>::infinity() && cost > maxNonInfCost_) {
+          maxNonInfCost_ = cost;
         }
+
+        // Register the overall initial solution durations.
+        if (cost != std::numeric_limits<double>::infinity() &&
+            duration < minInitialSolutionDuration_) {
+          minInitialSolutionDuration_ = duration;
+        }
+        if (cost != std::numeric_limits<double>::infinity() &&
+            lastCost == std::numeric_limits<double>::infinity() &&
+            duration > maxNonInfInitialSolutionDuration_) {
+          maxNonInfInitialSolutionDuration_ = duration;
+        }
+
+        // Register planner specific min and max costs.
+        if (cost < minCosts_.at(name)) {
+          minCosts_.at(name) = cost;
+        }
+        if (cost > maxCosts_.at(name)) {
+          maxCosts_.at(name) = cost;
+        }
+        if (cost != std::numeric_limits<double>::infinity() && cost > maxNonInfCosts_.at(name)) {
+          maxNonInfCosts_.at(name) = cost;
+        }
+        if (cost != std::numeric_limits<double>::infinity() &&
+            duration < minInitialSolutionDurations_.at(name)) {
+          minInitialSolutionDurations_.at(name) = duration;
+        }
+        if (cost != std::numeric_limits<double>::infinity() &&
+            lastCost == std::numeric_limits<double>::infinity() &&
+            duration > maxNonInfInitialSolutionDurations_.at(name)) {
+          maxNonInfInitialSolutionDurations_.at(name) = duration;
+        }
+
+        // Remember this cost (for max initial solution durations).
+        lastCost = cost;
       }
     }
     if (!timeRow) {
       results_[name].addMeasuredRun(run);
+      run.clear();
     }
     timeRow = !timeRow;
   }
@@ -202,15 +268,26 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
     numRunsPerPlanner_ = results_.begin()->second.numMeasuredRuns();
   }
 
-  // Compute the default binning durations.
+  // Compute the default binning durations for the medians.
   auto contextName = config_->get<std::string>("Experiment/context");
   std::size_t numMeasurements =
       std::ceil(config_->get<double>("Contexts/" + contextName + "/maxTime") *
                 config_->get<double>("Experiment/logFrequency"));
-  double binSize = 1.0 / config_->get<double>("Experiment/logFrequency");
-  defaultBinDurations_.reserve(numMeasurements);
+  double medianBinSize = 1.0 / config_->get<double>("Experiment/logFrequency");
+  defaultMedianBinDurations_.reserve(numMeasurements);
   for (std::size_t i = 0u; i < numMeasurements; ++i) {
-    defaultBinDurations_.emplace_back(static_cast<double>(i + 1u) * binSize);
+    defaultMedianBinDurations_.emplace_back(static_cast<double>(i + 1u) * medianBinSize);
+  }
+
+  // Compute the default binning durations for the initial solution pdf.
+  double initDurationNumBins =
+      config_->get<std::size_t>("Statistics/InitialSolutions/numDurationBins");
+  double minExp = std::log10(minInitialSolutionDuration_);
+  double maxExp = std::log10(maxNonInfInitialSolutionDuration_);
+  double binExpStep = (maxExp - minExp) / initDurationNumBins;
+  for (std::size_t i = 0u; i < initDurationNumBins; ++i) {
+    defaultInitialSolutionBinDurations_.emplace_back(
+        std::pow(10.0, minExp + static_cast<double>(i) * binExpStep));
   }
 }
 
