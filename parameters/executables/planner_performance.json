@@ -8,8 +8,8 @@
             "RRTsharp",
             "RRTConnect"
         ],
-        "context": "WallGap4D",
-        "numRuns": 10,
+        "context": "WallGap8D",
+        "numRuns": 100,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true
@@ -33,10 +33,23 @@
         },
         "WallGap8D": {
             "type": "WallGap",
-            "maxTime": 8.0,
+            "maxTime": 5.0,
             "dimensions": 8,
             "start": [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
             "goal": [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "wallWidth": 1.8,
+            "wallThickness": 0.2,
+            "gapOffset": 0.05,
+            "gapWidth": 0.5
+        },
+        "WallGap3D": {
+            "type": "WallGap",
+            "maxTime": 0.5,
+            "dimensions": 3,
+            "start": [-0.5, 0.0, 0.0],
+            "goal": [0.5, 0.0, 0.0],
             "boundarySideLengths" : 2,
             "collisionCheckResolution": 0.001,
             "wallWidth": 1.8,
