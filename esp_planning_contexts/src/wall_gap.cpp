@@ -180,7 +180,7 @@ void WallGap::createObstacles() {
 void WallGap::createAntiObstacles() {
   ompl::base::ScopedState<> midpoint(spaceInfo_);
   // Set the obstacle midpoint in the second dimension.
-  midpoint[1u] = gapOffset_;
+  midpoint[1u] = gapOffset_ + gapWidth_ / 2.0;
   // Set the obstacle midpoint in the remaining dimension.
   for (std::size_t j = 0; j < dimensionality_; ++j) {
     if (j != 1u) {
@@ -191,10 +191,10 @@ void WallGap::createAntiObstacles() {
   std::vector<double> widths(dimensionality_, 0.0);
   // Set the obstacle width in the first dimension.
   widths.at(0) = wallThickness_ + std::numeric_limits<double>::epsilon();
-  widths.at(1) = gapWidth_;
+  // widths.at(1) = gapWidth_;
   // The wall spans all other dimensions.
-  for (std::size_t j = 2; j < dimensionality_; ++j) {
-    widths.at(j) = (bounds_.at(j).second - bounds_.at(j).first);
+  for (std::size_t j = 1u; j < dimensionality_; ++j) {
+    widths.at(j) = gapWidth_;
   }
   antiObstacles_.emplace_back(
       std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, midpoint, widths));
