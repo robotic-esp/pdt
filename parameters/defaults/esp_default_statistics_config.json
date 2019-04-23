@@ -1,3 +1,10 @@
 {
-    "binFrequency": "logFrequency"
+    "Statistics": {
+        "Medians": {
+            "binFrequency": "logFrequency"
+        },
+        "InitialSolutions": {
+            "numDurationBins": 10
+        }
+    }
 }

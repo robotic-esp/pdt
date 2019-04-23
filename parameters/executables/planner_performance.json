@@ -3,13 +3,10 @@
         "executable": "planner_performance",
         "planners": [
             "SBITstar",
-            "BITstar",
-            "RRTstar",
-            "RRTsharp",
-            "RRTConnect"
+            "RRTstar"
         ],
-        "context": "WallGap8D",
-        "numRuns": 100,
+        "context": "FlankingGap",
+        "numRuns": 50,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true
@@ -28,8 +25,8 @@
         }
     },
     "Contexts": {
-        "GoalEnclosure": {
-            "maxTime": 0.1
+        "FlankingGap": {
+            "maxTime": 0.3
         },
         "WallGap8D": {
             "type": "WallGap",
@@ -59,7 +56,7 @@
         },
         "WallGap4D": {
             "type": "WallGap",
-            "maxTime": 0.5,
+            "maxTime": 5.0,
             "dimensions": 4,
             "start": [-0.5, 0.0, 0.0, 0.0],
             "goal": [0.5, 0.0, 0.0, 0.0],
@@ -68,7 +65,7 @@
             "wallWidth": 1.8,
             "wallThickness": 0.2,
             "gapOffset": 0.1,
-            "gapWidth": 0.02
+            "gapWidth": 0.2
         },
         "CentreSquare": {
             "maxTime": 0.3
@@ -90,14 +87,14 @@
         },
         "FlankingGap8D": {
             "type": "FlankingGap",
-            "maxTime": 0.5,
+            "maxTime": 3.0,
             "boundarySideLengths" : 2,
             "collisionCheckResolution": 0.001,
             "dimensions": 8,
             "wallWidth": 1.8,
             "wallThickness": 0.2,
             "gapOffset": 0.1,
-            "gapWidth": 0.04,
+            "gapWidth": 0.4,
             "start": [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
             "goal": [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         }

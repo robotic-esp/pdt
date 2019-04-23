@@ -313,7 +313,7 @@ fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t 
   }
 
   // Get the requested bin durations.
-  const auto& durations = binDurations.empty() ? defaultBinDurations_ : binDurations;
+  const auto& durations = binDurations.empty() ? defaultMedianBinDurations_ : binDurations;
 
   // Get the median costs.
   auto medianCosts = getMedianCosts(results_.at(plannerName), durations);
@@ -465,6 +465,72 @@ fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& planne
   return filepath;  // Note: std::ofstream is a big boy and closes itself upon destruction.
 }
 
+fs::path Statistics::extractInitialSolutionDurationPdf(
+    const std::string& plannerName, const std::vector<double>& binDurations) const {
+  if (results_.find(plannerName) == results_.end()) {
+    auto msg = "Cannot find results for '" + plannerName +
+               "' and can therefore not extract initial solution duration pdf."s;
+    throw std::runtime_error(msg);
+  }
+
+  // Check if the file already exists.
+  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
+                                              plannerName + "_initial_solution_durations_pdf.csv");
+  if (fs::exists(filepath) && !forceComputation_) {
+    return filepath;
+  }
+
+  // We'll take the bin durations to be the centers of the bins.
+  const auto& bins = binDurations.empty() ? defaultInitialSolutionBinDurations_ : binDurations;
+
+  // Get the initial solution durations.
+  auto initialSolutionDurations = getInitialSolutionDurations(results_.at(plannerName));
+
+  // Count how many durations fall in each bin.
+  std::vector<std::size_t> binCounts(bins.size(), 0u);
+  for (auto duration : initialSolutionDurations) {
+    // std::lower_bound returns an iterator to the first element that is greater or equal to, or
+    // end.
+    auto lower = std::lower_bound(bins.begin(), bins.end(), duration);
+    if (lower == bins.end()) {
+      // There is no element greater or equal to duration, this falls into the last bin.
+      --lower;
+    } else if (lower != bins.begin()) {
+      // The first element greater or equal to is not the beginning. Maybe the element before was
+      // really close?
+      auto before = lower - 1u;
+      if (duration - *before < *lower - duration) {
+        lower = before;
+      }
+    }
+    // Lower now points to the element closest to the durations. Increase the corresponding bin
+    // count.
+    binCounts.at(std::distance(bins.begin(), lower))++;
+  }
+
+  // Write to file.
+  std::ofstream filestream(filepath.string());
+  if (filestream.fail()) {
+    auto msg = "Cannot write initial solution duration cdf for '"s + plannerName + "' to '"s +
+               filepath.string() + "'."s;
+    throw std::ios_base::failure(msg);
+  }
+
+  filestream << createHeader("Initial solution duration pdf", plannerName);
+  filestream << std::setprecision(21);
+  filestream << "bin centers";
+  for (const auto duration : bins) {
+    filestream << ',' << duration;
+  }
+  filestream << "\nbin counts";
+  for (const auto count : binCounts) {
+    filestream << ',' << count;
+  }
+  filestream << '\n';
+
+  return filepath;  // Note: std::ofstream is a big boy and closes itself upon destruction.
+}
+
 std::string Statistics::createHeader(const std::string& statisticType,
                                      const std::string& plannerName) const {
   std::stringstream stream;
@@ -544,6 +610,46 @@ double Statistics::getMinDuration() const {
 
 double Statistics::getMaxDuration() const {
   return maxDuration_;
+}
+
+double Statistics::getMinInitialSolutionDuration() const {
+  return minInitialSolutionDuration_;
+}
+
+double Statistics::getMaxNonInfInitialSolutionDuration() const {
+  return maxNonInfInitialSolutionDuration_;
+}
+
+double Statistics::getMinCost(const std::string& plannerName) const {
+  return minCosts_.at(plannerName);
+}
+
+double Statistics::getMaxCost(const std::string& plannerName) const {
+  return maxCosts_.at(plannerName);
+}
+
+double Statistics::getMaxNonInfCost(const std::string& plannerName) const {
+  return maxNonInfCosts_.at(plannerName);
+}
+
+double Statistics::getMinDuration(const std::string& plannerName) const {
+  return minDurations_.at(plannerName);
+}
+
+double Statistics::getMaxDuration(const std::string& plannerName) const {
+  return maxDurations_.at(plannerName);
+}
+
+double Statistics::getMinInitialSolutionDuration(const std::string& plannerName) const {
+  return minInitialSolutionDurations_.at(plannerName);
+}
+
+double Statistics::getMaxNonInfInitialSolutionDuration(const std::string& plannerName) const {
+  return maxNonInfInitialSolutionDurations_.at(plannerName);
+}
+
+std::vector<double> Statistics::getDefaultBinDurations() const {
+  return defaultMedianBinDurations_;
 }
 
 std::vector<double> Statistics::getMedianCosts(const PlannerResults& results,

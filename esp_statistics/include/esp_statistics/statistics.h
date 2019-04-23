@@ -141,7 +141,8 @@ class Statistics {
   bool forceComputation_{false};
 
   // Default binning durations.
-  std::vector<double> defaultBinDurations_{};
+  std::vector<double> defaultMedianBinDurations_{};
+  std::vector<double> defaultInitialSolutionBinDurations_{};
 
   // The number of runs per planner.
   std::size_t numRunsPerPlanner_{0u};
