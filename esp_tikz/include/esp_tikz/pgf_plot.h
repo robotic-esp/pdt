@@ -51,6 +51,7 @@ struct PgfPlotOptions {
   // Line options.
   double lineWidth{1.0};
   std::string color{"black"};
+  std::string fill{""};
 
   // Mark options.
   double markSize{2.0};

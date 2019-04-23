@@ -60,6 +60,9 @@ std::string PgfPlotOptions::string() const {
   if (namePath != ""s) {
     stream << ",\n  name path={" << namePath << '}';
   }
+  if (fill != ""s) {
+    stream << ",\n  fill=" << fill;
+  }
   if (fillOpacity != 1.0) {
     stream << ",\n  fill opacity=" << fillOpacity;
   }
