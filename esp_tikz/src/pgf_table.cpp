@@ -157,6 +157,10 @@ void PgfTable::setOptions(const PgfTableOptions& options) {
   options_ = options;
 }
 
+void PgfTable::setCleanData(bool cleanData) {
+  cleanData_ = cleanData;
+}
+
 void PgfTable::replaceInDomain(double number, double replacement) {
   std::replace(data_.at(0u).begin(), data_.at(0u).end(), number, replacement);
 }
@@ -250,25 +254,33 @@ std::string PgfTable::string() const {
 
   // We clean the table here. Values that are sandwiched are omitted.
   std::ostringstream stream{};
-  double lowX = data_.at(0u).at(0);
-  double lowY = data_.at(1u).at(0);
-  double lastX = data_.at(0u).at(0);
   stream << "table [" << options_.string() << "\n]{\n";
-  stream << lowX << ' ' << options_.colSep << ' ' << lowY << options_.rowSep << '\n';
-  for (std::size_t row = 1u; row < data_.at(0u).size(); ++row) {
-    auto x = data_.at(0u).at(row);
-    auto y = data_.at(1u).at(row);
-    if (y == lowY && row != data_.at(0u).size() - 1u) {  // We need the last result.
-      lowX = x;
-      continue;
-    } else {
-      if (lastX != lowX) {
-        stream << lowX << ' ' << options_.colSep << ' ' << lowY << options_.rowSep << '\n';
+  if (cleanData_) {
+    double lowX = data_.at(0u).at(0);
+    double lowY = data_.at(1u).at(0);
+    double lastX = data_.at(0u).at(0);
+    stream << lowX << ' ' << options_.colSep << ' ' << lowY << options_.rowSep << '\n';
+    for (std::size_t row = 1u; row < data_.at(0u).size(); ++row) {
+      auto x = data_.at(0u).at(row);
+      auto y = data_.at(1u).at(row);
+      if (y == lowY && row != data_.at(0u).size() - 1u) {  // We need the last result.
+        lowX = x;
+        continue;
+      } else {
+        if (lastX != lowX) {
+          stream << lowX << ' ' << options_.colSep << ' ' << lowY << options_.rowSep << '\n';
+        }
+        stream << x << ' ' << options_.colSep << ' ' << y << options_.rowSep << '\n';
+        lastX = x;
+        lowX = x;
+        lowY = y;
       }
+    }
+  } else {
+    for (std::size_t row = 0u; row < data_.at(0u).size(); ++row) {
+      auto x = data_.at(0u).at(row);
+      auto y = data_.at(1u).at(row);
       stream << x << ' ' << options_.colSep << ' ' << y << options_.rowSep << '\n';
-      lastX = x;
-      lowX = x;
-      lowY = y;
     }
   }
   stream << "};\n";

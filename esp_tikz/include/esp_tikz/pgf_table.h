@@ -66,6 +66,7 @@ class PgfTable : public PlottableInterface {
                     const std::string& codomain);
 
   void setOptions(const PgfTableOptions& options);
+  void setCleanData(bool cleanData);
 
   // Add numbers.
   void prependRow(const std::vector<double>& row);
@@ -93,6 +94,7 @@ class PgfTable : public PlottableInterface {
 
  private:
   std::vector<std::deque<double>> data_{};
+  bool cleanData_{true};
   PgfTableOptions options_{};
 };
 
