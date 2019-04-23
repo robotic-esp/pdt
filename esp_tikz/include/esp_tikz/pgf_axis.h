@@ -53,17 +53,19 @@ struct PgfAxisOptions {
   std::string anchor{""};
   std::string width{"\\textwidth"};
   std::string height{"0.5\\textwidth"};
-  bool hideAxis{false};
   std::string majorGridStyle{"{densely dotted, black!20}"};
   std::string minorGridStyle{"{densely dotted, black!20}"};
-  bool scaleOnlyAxis{false};
   std::string legendStyle{""};
   std::string name{""};
   std::string xshift{""};
   std::string yshift{""};
   std::string unboundedCoords{"jump"};
+  std::string barWidth{""};
+  bool hideAxis{false};
+  bool scaleOnlyAxis{false};
 
   // X-Axis options.
+  bool xbar{false};
   bool xlog{false};
   bool xmajorgrids{true};
   bool xminorgrids{false};
@@ -77,6 +79,7 @@ struct PgfAxisOptions {
   bool xlabelAbsolute{false};
 
   // Y-Axis options.
+  bool ybar{false};
   bool ylog{false};
   bool ymajorgrids{true};
   bool yminorgrids{false};

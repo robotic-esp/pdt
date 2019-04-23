@@ -57,6 +57,9 @@ std::string PgfAxisOptions::string() const {
   if (hideAxis) {
     stream << ",\n  hide axis";
   }
+  if (barWidth != ""s) {
+    stream << ",\n  bar width=" << barWidth;
+  }
   if (scaleOnlyAxis) {
     stream << ",\n  scale only axis";
   }
@@ -89,6 +92,12 @@ std::string PgfAxisOptions::string() const {
   }
   if (ymax != std::numeric_limits<double>::infinity()) {
     stream << ",\n  ymax=" << ymax;
+  }
+  if (xbar) {
+    stream << ",\n  xbar";
+  }
+  if (ybar) {
+    stream << ",\n  ybar";
   }
   if (xlog) {
     stream << ",\n  xmode=log";
