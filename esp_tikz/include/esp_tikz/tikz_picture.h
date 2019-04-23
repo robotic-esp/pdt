@@ -65,9 +65,11 @@ class TikzPicture {
   void write(const std::experimental::filesystem::path& path) const;
 
  protected:
+  std::shared_ptr<PgfAxis> generateLegendAxis() const;
   std::vector<std::shared_ptr<const PgfAxis>> axes_{};
   TikzPictureOptions options_{};
   std::map<std::string, std::array<int, 3>> espColors_{};
+  const std::shared_ptr<const Configuration> config_;
 };
 
 }  // namespace ompltools

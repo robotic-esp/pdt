@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/median_cost_success_plot.h"
+#include "esp_tikz/median_cost_success_picture.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -54,7 +54,7 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianCostSuccessPlot::MedianCostSuccessPlot(const std::shared_ptr<Configuration>& config) :
+MedianCostSuccessPicture::MedianCostSuccessPicture(const std::shared_ptr<Configuration>& config) :
     TikzPicture(config),
     config_(config) {
 }
@@ -84,7 +84,7 @@ static const std::map<std::size_t, std::map<std::size_t, Interval>> medianConfid
     {100000u, {{95u, {49687u, 50307u, 0.9500}}, {99u, {49588u, 50403u, 0.9900}}}},
     {1000000u, {{95u, {499018u, 500978u, 0.9500}}, {99u, {498707u, 501283u, 0.9900}}}}};
 
-fs::path MedianCostSuccessPlot::generatePlot(const Statistics& stats, std::size_t confidence) {
+fs::path MedianCostSuccessPicture::generatePlot(const Statistics& stats, std::size_t confidence) {
   // Compute the duration bin size.
   auto contextName = config_->get<std::string>("Experiment/context");
   std::size_t numMeasurements =
@@ -167,7 +167,7 @@ fs::path MedianCostSuccessPlot::generatePlot(const Statistics& stats, std::size_
   return picturePath;
 }
 
-std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
+std::shared_ptr<PgfAxis> MedianCostSuccessPicture::generateMedianCostPlot(
     const Statistics& stats, std::size_t confidence) const {
   // Create an axis to hold the plots.
   auto axis = std::make_shared<PgfAxis>();
@@ -316,7 +316,7 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateMedianCostPlot(
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateSuccessPlot(const Statistics& stats) const {
+std::shared_ptr<PgfAxis> MedianCostSuccessPicture::generateSuccessPlot(const Statistics& stats) const {
   // Create an axis for this plot.
   auto axis = std::make_shared<PgfAxis>();
 
@@ -355,21 +355,7 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateSuccessPlot(const Statis
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCostSuccessPlot::generateLegendAxis() const {
-  auto legendAxis = std::make_shared<PgfAxis>();
-
-  // Make sure the names are alphabetic.
-  auto plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
-  std::sort(plannerNames.begin(), plannerNames.end());
-  for (const auto& name : plannerNames) {
-    std::string imageOptions{config_->get<std::string>("PlannerPlotColors/" + name) +
-                             ", line width = 1.0pt, mark size=1.0pt, mark=square*"};
-    legendAxis->addLegendEntry(config_->get<std::string>("PlannerPlotNames/" + name), imageOptions);
-  }
-  return legendAxis;
-}
-
-fs::path MedianCostSuccessPlot::generatePdf() const {
+fs::path MedianCostSuccessPicture::generatePdf() const {
   // Generate the path to write to.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
                      fs::path("tikz/"s + config_->get<std::string>("Experiment/name") +

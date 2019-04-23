@@ -44,7 +44,7 @@
 
 #include "esp_configuration/configuration.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/median_cost_success_plot.h"
+#include "esp_tikz/median_cost_success_picture.h"
 
 using namespace std::string_literals;
 

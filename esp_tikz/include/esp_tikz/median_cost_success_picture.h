@@ -48,10 +48,10 @@ namespace esp {
 
 namespace ompltools {
 
-class MedianCostSuccessPlot : public TikzPicture {
+class MedianCostSuccessPicture : public TikzPicture {
  public:
-  MedianCostSuccessPlot(const std::shared_ptr<Configuration>& config);
-  ~MedianCostSuccessPlot() = default;
+  MedianCostSuccessPicture(const std::shared_ptr<Configuration>& config);
+  ~MedianCostSuccessPicture() = default;
 
   std::experimental::filesystem::path generatePlot(const Statistics& stats,
                                                    std::size_t confidence = 99u);
@@ -61,10 +61,7 @@ class MedianCostSuccessPlot : public TikzPicture {
   std::shared_ptr<PgfAxis> generateMedianCostPlot(const Statistics& stats,
                                                   std::size_t confidence) const;
   std::shared_ptr<PgfAxis> generateSuccessPlot(const Statistics& stats) const;
-  std::shared_ptr<PgfAxis> generateLegendAxis() const;
 
-  void writePictureToFile(const TikzPicture& picture,
-                          const std::experimental::filesystem::path& filename) const;
   const std::shared_ptr<const Configuration> config_{};
 };
 

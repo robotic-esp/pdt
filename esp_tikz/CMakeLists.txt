@@ -11,7 +11,7 @@ include_directories(
 
 # Add the library.
 add_library(esp_tikz
-  src/median_cost_success_plot.cpp
+  src/median_cost_success_picture.cpp
   src/pgf_axis.cpp
   src/pgf_fillbetween.cpp
   src/pgf_plot.cpp
