@@ -70,7 +70,7 @@ class PlannerResults {
 
 class Statistics {
  public:
-  Statistics(const std::shared_ptr<Configuration>& config);
+  Statistics(const std::shared_ptr<Configuration>& config, bool forceComputation = false);
   ~Statistics() = default;
 
   std::experimental::filesystem::path extractMedians(
@@ -117,6 +117,10 @@ class Statistics {
 
   std::shared_ptr<Configuration> config_;
   const std::experimental::filesystem::path statisticsDirectory_;
+
+  // When this is false, all extractions check if the file they would creat exists. If it does, the
+  // path to the file is returned instead of recomputing.
+  bool forceComputation_{false};
 
   // Default binning durations.
   std::vector<double> defaultBinDurations_{};

@@ -123,10 +123,11 @@ std::size_t PlannerResults::numMeasuredRuns() const {
   return measuredRuns_.size();
 }
 
-Statistics::Statistics(const std::shared_ptr<Configuration>& config) :
+Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceComputation) :
     config_(config),
     statisticsDirectory_(fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
-                         "statistics/") {
+                         "statistics/"),
+    forceComputation_(forceComputation) {
   // Create the statistics directory.
   fs::create_directories(statisticsDirectory_);
 
@@ -227,6 +228,13 @@ fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t 
     throw std::runtime_error(msg);
   }
 
+  // Check if the file already exists.
+  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
+                                              plannerName + "_medians.csv");
+  if (fs::exists(filepath) && !forceComputation_) {
+    return filepath;
+  }
+
   // Get the requested bin durations.
   const auto& durations = binDurations.empty() ? defaultBinDurations_ : binDurations;
 
@@ -252,8 +260,6 @@ fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t 
   }
 
   // Write to file.
-  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_medians.csv");
   std::ofstream filestream(filepath.string());
   if (filestream.fail()) {
     auto msg = "Cannot write medians for '"s + plannerName + "' to '"s + filepath.string() + "'."s;
@@ -292,6 +298,13 @@ fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName
     throw std::runtime_error(msg);
   }
 
+  // Check if the file already exists.
+  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
+                                              plannerName + "_median_initial_solution.csv");
+  if (fs::exists(filepath) && !forceComputation_) {
+    return filepath;
+  }
+
   // Get the median initial solution duration.
   double medianDuration = getMedianInitialSolutionDuration(results_.at(plannerName));
 
@@ -308,8 +321,6 @@ fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName
   auto upperCostBound = getNthInitialSolutionCost(results_.at(plannerName), interval.upper);
 
   // Write to file.
-  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_median_initial_solution.csv");
   std::ofstream filestream(filepath.string());
   if (filestream.fail()) {
     auto msg = "Cannot write median initial solution for '"s + plannerName + "' to '"s +
@@ -337,6 +348,13 @@ fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& planne
     throw std::runtime_error(msg);
   }
 
+  // Check if the file already exists.
+  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
+                                              plannerName + "_initial_solution_durations_cdf.csv");
+  if (fs::exists(filepath) && !forceComputation_) {
+    return filepath;
+  }
+
   // Get the initial solution durations.
   auto initialSolutionDurations = getInitialSolutionDurations(results_.at(plannerName));
 
@@ -347,8 +365,6 @@ fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& planne
   std::size_t numSolvedRuns = 0;
 
   // Write to file.
-  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_initial_solution_durations_cdf.csv");
   std::ofstream filestream(filepath.string());
   if (filestream.fail()) {
     auto msg = "Cannot write initial solution duration cdf for '"s + plannerName + "' to '"s +
