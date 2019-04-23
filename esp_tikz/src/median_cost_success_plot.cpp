@@ -388,13 +388,15 @@ fs::path MedianCostSuccessPlot::generatePdf() const {
   }
 
   // Write the preamble.
+  texFile << "% The package 'luatex85' is needed for the standalone document class.\n "
+             "\\RequirePackage{luatex85}\n";
   texFile << "\\documentclass{standalone}\n"
           << "\\usepackage{tikz}\n"
           << "\\usetikzlibrary{calc,plotmarks}\n"
           << "\\usepackage{pgfplots}\n"
           << "\\pgfplotsset{compat=1.15}\n"
           << "\\usepgfplotslibrary{fillbetween}\n"
-          << "\\usepackage{xcolor}\n";
+          << "\\usepackage{xcolor}\n\n";
 
   // Include the picture.
   texFile << "\n\n\\begin{document}\n\n";
@@ -405,10 +407,12 @@ fs::path MedianCostSuccessPlot::generatePdf() const {
   texFile.close();
 
   // Compile the plot.
-  auto currentPath = std::experimental::filesystem::current_path();
-  auto cmd = "cd "s + texFilePath.parent_path().string() +
-             " && pdflatex -file-line-error -interaction=nonstopmode "s +
-             texFilePath.filename().string() + " && cd "s + currentPath.string();
+  // Compiling with lualatex is slower than pdflatex but has dynamic memory allocation. Since these
+  // plots can be quite large, pdflatex has run into memory issues. Lualatex should be available
+  // with all major tex distributions.
+  auto currentPath = fs::current_path();
+  auto cmd = "cd \""s + texFilePath.parent_path().string() + "\" && lualatex \""s +
+             texFilePath.string() + "\" && cd \""s + currentPath.string() + '\"';
   int retval = std::system(cmd.c_str());
   (void)retval;
   return fs::path(texFilePath).replace_extension(".pdf");
