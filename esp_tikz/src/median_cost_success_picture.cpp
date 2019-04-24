@@ -100,7 +100,7 @@ fs::path MedianCostSuccessPicture::generatePlot(const Statistics& stats, std::si
 
   // Determine the min and max durations to be plotted.
   double maxDurationToBePlotted = durations.back();
-  double minDurationToBePlotted = durations.front();
+  double minDurationToBePlotted = stats.getMinInitialSolutionDuration();
 
   // Set the axis options for the success plot.
   PgfAxisOptions successAxisOptions;
@@ -143,15 +143,13 @@ fs::path MedianCostSuccessPicture::generatePlot(const Statistics& stats, std::si
   legendAxisOptions.at = "($(MedianCostAxis.south) - (0.0em, 0.3em)$)";
   legendAxisOptions.anchor = "north";
   legendAxisOptions.name = "LegendAxis";
-  legendAxisOptions.xmin = minDurationToBePlotted;
-  legendAxisOptions.xmax = maxDurationToBePlotted;
-  legendAxisOptions.ymin = 1;
+  legendAxisOptions.xmin = 0;
+  legendAxisOptions.xmax = 10;
+  legendAxisOptions.ymin = 0;
   legendAxisOptions.ymax = 10;
   legendAxisOptions.hideAxis = true;
   legendAxisOptions.legendStyle =
-      "anchor=north, legend cell align=left, legend columns=6, at={($(MedianCostAxis.south) + "
-      "(0.0em," +
-      legendAxisOptions.height + " + 5em)$)}";  // Why do I have to shift so far up?
+      "anchor=south, legend cell align=left, legend columns=6, at={(axis cs:5, 6)}";
   auto legendAxis = generateLegendAxis();
   legendAxis->setOptions(legendAxisOptions);
 
@@ -317,7 +315,8 @@ std::shared_ptr<PgfAxis> MedianCostSuccessPicture::generateMedianCostPlot(
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCostSuccessPicture::generateSuccessPlot(const Statistics& stats) const {
+std::shared_ptr<PgfAxis> MedianCostSuccessPicture::generateSuccessPlot(
+    const Statistics& stats) const {
   // Create an axis for this plot.
   auto axis = std::make_shared<PgfAxis>();
 

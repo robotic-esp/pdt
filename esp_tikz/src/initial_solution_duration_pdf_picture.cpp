@@ -114,6 +114,22 @@ fs::path InitialSolutionDurationPdfPicture::generatePlot(const Statistics& stats
   AllInitialSolutionDurationAxis->setOptions(AllInitialSolutionDurationAxisOptions);
   axes_.emplace_back(AllInitialSolutionDurationAxis);
 
+  // Create the axis that holds the plot legend.
+  PgfAxisOptions legendAxisOptions;
+  legendAxisOptions.at = "($(AllInitialSolutionDurationPdf.south) - (0.0em, 0.3em)$)";
+  legendAxisOptions.anchor = "north";
+  legendAxisOptions.name = "LegendAxis";
+  legendAxisOptions.xmin = 0;
+  legendAxisOptions.xmax = 10;
+  legendAxisOptions.ymin = 0;
+  legendAxisOptions.ymax = 10;
+  legendAxisOptions.hideAxis = true;
+  legendAxisOptions.legendStyle =
+      "anchor=south, legend cell align=left, legend columns=6, at={(axis cs:5, 6)}";
+  auto legendAxis = generateLegendAxis();
+  legendAxis->setOptions(legendAxisOptions);
+  axes_.emplace_back(legendAxis);
+
   // Generate the path to write to.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
                      fs::path("tikz/"s + config_->get<std::string>("Experiment/name") +
@@ -132,7 +148,7 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPicture::generateInitialSolut
     // Load the median initial duration and cost into a table.
     auto medianInitialSolutionPath = stats.extractInitialSolutionDurationPdf(name);
     auto initialSolutionTable =
-        std::make_shared<PgfTable>(medianInitialSolutionPath, "bin centers", "bin counts");
+        std::make_shared<PgfTable>(medianInitialSolutionPath, "bin begin durations", "bin counts");
     initialSolutionTable->setCleanData(false);
     // These extra datapoints are because this should look like a filled histogram.
     auto firstRow = initialSolutionTable->getRow(0u);
@@ -163,7 +179,7 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPicture::generateInitialSolut
   // Load the median initial duration and cost into a table.
   auto medianInitialSolutionPath = stats.extractInitialSolutionDurationPdf(plannerName);
   auto initialSolutionTable =
-      std::make_shared<PgfTable>(medianInitialSolutionPath, "bin centers", "bin counts");
+      std::make_shared<PgfTable>(medianInitialSolutionPath, "bin begin durations", "bin counts");
   initialSolutionTable->setCleanData(false);
   // These extra datapoints are because this should look like a filled histogram.
   auto firstRow = initialSolutionTable->getRow(0u);
@@ -181,7 +197,6 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPicture::generateInitialSolut
   initialSolutionPlotOptions.lineWidth = 0.0;
   auto initialSolutionPlot = std::make_shared<PgfPlot>(initialSolutionTable);
   initialSolutionPlot->setOptions(initialSolutionPlotOptions);
-  initialSolutionPlot->setLegend(config_->get<std::string>("PlannerPlotNames/" + plannerName));
   axis->addPlot(initialSolutionPlot);
 
   return axis;
