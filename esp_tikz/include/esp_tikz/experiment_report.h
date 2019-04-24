@@ -1,8 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014-2017     University of Toronto
- *  Copyright (c) 2018-present  University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -15,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the names of the copyright holders nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -35,43 +34,55 @@
 
 // Authors: Marlin Strub
 
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <vector>
+#pragma once
 
 #include <experimental/filesystem>
+#include <memory>
+#include <set>
+#include <sstream>
+#include <string>
 
 #include "esp_configuration/configuration.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/median_cost_success_picture.h"
-#include "esp_tikz/initial_solution_duration_pdf_picture.h"
-#include "esp_tikz/experiment_report.h"
+#include "esp_tikz/tikz_picture.h"
 
-using namespace std::string_literals;
+namespace esp {
 
-int main(int argc, char** argv) {
-  // Read the config files.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+namespace ompltools {
 
-  // Get the statistics.
-  esp::ompltools::Statistics stats(config, true);
+class ExperimentReport {
+ public:
+  ExperimentReport(const std::shared_ptr<Configuration>& config, const Statistics& stats);
+  ~ExperimentReport() = default;
 
-  // Create a median cost success plot.
-  esp::ompltools::MedianCostSuccessPicture medianCostSuccessPicture(config);
-  auto medianCostSuccessPicturePath = medianCostSuccessPicture.generatePlot(stats);
-  std::cout << "Wrote median cost success plot to " << medianCostSuccessPicturePath << '\n';
-  medianCostSuccessPicture.generatePdf();
+  std::experimental::filesystem::path generateReport();
+  std::experimental::filesystem::path compileReport() const;
 
-  // Create a initial solution duration pdf plot.
-  esp::ompltools::InitialSolutionDurationPdfPicture initialSolutionDurationPdfPicture(config);
-  auto initialSolutionDurationPdfPicturePath = initialSolutionDurationPdfPicture.generatePlot(stats);
-  std::cout << "Wrote initial solution duration pdf plot to " << initialSolutionDurationPdfPicturePath << '\n';
-  initialSolutionDurationPdfPicture.generatePdf();
+ private:
+  std::stringstream preamble() const;
+  std::stringstream overview() const;
+  std::stringstream individualResults() const;
+  std::stringstream appendix() const;
 
-  esp::ompltools::ExperimentReport report(config, stats);
-  report.generateReport();
-  report.compileReport();
+  const std::set<std::string> requirePackages_{"luatex85"};
+  const std::set<std::string> usePackages_{"appendix", "listings", "tikz", "pgfplots", "xcolor"};
+  const std::set<std::string> lstSet_{};
+  const std::set<std::string> tikzLibraries_{"calc", "plotmarks"};
+  const std::set<std::string> pgfLibraries_{"fillbetween"};
+  const std::set<std::string> pgfPlotsset_{"compat=1.15"};
 
-  return 0;
-}
+  std::string experimentName_{};
+  std::map<std::string, const std::string> plotPlannerNames_{};
+
+  const std::shared_ptr<const Configuration> config_;
+  const Statistics& stats_;
+
+  // Helper to replace _ with \_, see [1].
+  void findAndReplaceAll(std::string* string, const std::string& key, const std::string& replacement) const;
+};
+
+}  // namespace ompltools
+
+}  // namespace esp
+
+// [1] https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c/

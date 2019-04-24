@@ -13,6 +13,7 @@ include_directories(
 add_library(esp_tikz
   src/initial_solution_duration_pdf_picture.cpp
   src/median_cost_success_picture.cpp
+  src/experiment_report.cpp
   src/pgf_axis.cpp
   src/pgf_fillbetween.cpp
   src/pgf_plot.cpp
