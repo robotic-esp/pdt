@@ -65,47 +65,59 @@ fs::path InitialSolutionDurationPdfPicture::generatePlot(const Statistics& stats
   auto defaultBinDurations = stats.getDefaultBinDurations();
 
   // Determine the min and max durations to be plotted.
-  double maxDurationToBePlotted = stats.getMaxNonInfInitialSolutionDuration();
-  double minDurationToBePlotted = stats.getMinInitialSolutionDuration();
+  // double minDurationToBePlotted = 0.9 * stats.getMinInitialSolutionDuration();
+  // double maxDurationToBePlotted = 0.98 * stats.getMaxNonInfInitialSolutionDuration();
 
-  // Set the axis options for the median cost plot.
-  PgfAxisOptions initialSolutionDurationAxisOptions;
-  initialSolutionDurationAxisOptions.name = "InitialSolutionDurationPdf";
-  initialSolutionDurationAxisOptions.xmin = minDurationToBePlotted;
-  initialSolutionDurationAxisOptions.xmax = maxDurationToBePlotted;
-  initialSolutionDurationAxisOptions.xlog = true;
-  initialSolutionDurationAxisOptions.xminorgrids = true;
-  initialSolutionDurationAxisOptions.xlabel = "Computation time [s]";
-  initialSolutionDurationAxisOptions.ybar = true;
-  initialSolutionDurationAxisOptions.barWidth = "0.2pt";
-  initialSolutionDurationAxisOptions.ylabel = "Initial Solution Counts";
-  initialSolutionDurationAxisOptions.ylabelAbsolute = true;
-  initialSolutionDurationAxisOptions.ylabelStyle =
+  // Generate an axis of initial solution durations pdf plots individually for each planner.
+  auto plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
+  for (std::size_t i = 0u; i < plannerNames.size(); ++i) {
+    PgfAxisOptions initialSolutionDurationAxisOptions;
+    initialSolutionDurationAxisOptions.name = plannerNames.at(i) + "InitialSolutionDurationPdf"s;
+    initialSolutionDurationAxisOptions.anchor = "north";
+    // Place the initial plot at the origin.
+    if (i == 0u) {
+      initialSolutionDurationAxisOptions.at = "(0cm, 0cm)"s;
+    } else {  // Place all subsequent plots below the one before.
+      initialSolutionDurationAxisOptions.at =
+          "($("s + plannerNames.at(i - 1u) + "InitialSolutionDurationPdf.south) - (0em, 0.5em)$)"s;
+    }
+    // initialSolutionDurationAxisOptions.xmin = minDurationToBePlotted;
+    // initialSolutionDurationAxisOptions.xmax = maxDurationToBePlotted;
+    initialSolutionDurationAxisOptions.xlog = true;
+    initialSolutionDurationAxisOptions.xminorgrids = true;
+    initialSolutionDurationAxisOptions.xlabel = "\\empty";
+    initialSolutionDurationAxisOptions.majorTickLength = "0.0pt";
+    initialSolutionDurationAxisOptions.minorTickLength = "0.0pt";
+    initialSolutionDurationAxisOptions.xticklabel = "\\empty";
+    initialSolutionDurationAxisOptions.ybar = true;
+    initialSolutionDurationAxisOptions.ylabel = "Initial Solution Counts";
+    initialSolutionDurationAxisOptions.ylabelAbsolute = true;
+    initialSolutionDurationAxisOptions.ylabelStyle =
+        "font=\\footnotesize, text depth=0.0em, text height=0.5em";
+    auto initialSolutionDurationAxis =
+        generateInitialSolutionDurationPdfPlot(stats, plannerNames.at(i));
+    initialSolutionDurationAxis->setOptions(initialSolutionDurationAxisOptions);
+    axes_.emplace_back(initialSolutionDurationAxis);
+  }
+
+  // Generate an axis with all results together.
+  PgfAxisOptions AllInitialSolutionDurationAxisOptions;
+  AllInitialSolutionDurationAxisOptions.name = "AllInitialSolutionDurationPdf"s;
+  AllInitialSolutionDurationAxisOptions.anchor = "north";
+  AllInitialSolutionDurationAxisOptions.at =
+      "($("s + plannerNames.back() + "InitialSolutionDurationPdf.south) - (0em, 0.5em)$)";
+  // AllInitialSolutionDurationAxisOptions.xmin = minDurationToBePlotted;
+  // AllInitialSolutionDurationAxisOptions.xmax = maxDurationToBePlotted;
+  AllInitialSolutionDurationAxisOptions.xlog = true;
+  AllInitialSolutionDurationAxisOptions.xminorgrids = true;
+  AllInitialSolutionDurationAxisOptions.xlabel = "Computation time [s]";
+  AllInitialSolutionDurationAxisOptions.ylabel = "Initial Solution Counts";
+  AllInitialSolutionDurationAxisOptions.ylabelAbsolute = true;
+  AllInitialSolutionDurationAxisOptions.ylabelStyle =
       "font=\\footnotesize, text depth=0.0em, text height=0.5em";
-  auto initialSolutionDurationAxis = generateInitialSolutionDurationPdfPlot(stats);
-  initialSolutionDurationAxis->setOptions(initialSolutionDurationAxisOptions);
-
-  // Create the axis that holds the plot legend.
-  PgfAxisOptions legendAxisOptions;
-  legendAxisOptions.at = "($(InitialSolutionDurationPdf.south) - (0.0em, 0.3em)$)";
-  legendAxisOptions.anchor = "north";
-  legendAxisOptions.name = "LegendAxis";
-  legendAxisOptions.xmin = minDurationToBePlotted;
-  legendAxisOptions.xmax = maxDurationToBePlotted;
-  legendAxisOptions.ymin = 1;
-  legendAxisOptions.ymax = 10;
-  legendAxisOptions.hideAxis = true;
-  legendAxisOptions.legendStyle =
-      "anchor=north, legend cell align=left, legend columns=6, "
-      "at={($(InitialSolutionDurationPdf.south) + "
-      "(0.0em," +
-      legendAxisOptions.height + " + 5em)$)}";  // Why do I have to shift so far up?
-  auto legendAxis = generateLegendAxis();
-  legendAxis->setOptions(legendAxisOptions);
-
-  // Add all axis to this plot.
-  axes_.emplace_back(initialSolutionDurationAxis);
-  axes_.emplace_back(legendAxis);
+  auto AllInitialSolutionDurationAxis = generateInitialSolutionDurationPdfPlot(stats);
+  AllInitialSolutionDurationAxis->setOptions(AllInitialSolutionDurationAxisOptions);
+  axes_.emplace_back(AllInitialSolutionDurationAxis);
 
   // Generate the path to write to.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
@@ -130,16 +142,43 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPicture::generateInitialSolut
 
     // Create the pgf plot with this data and add it to the axis.
     PgfPlotOptions initialSolutionPlotOptions;
-    initialSolutionPlotOptions.constPlot = false;
     initialSolutionPlotOptions.markSize = 0.0;
     initialSolutionPlotOptions.namePath = name + "InitialSolutionDurationPdf"s;
     initialSolutionPlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
     initialSolutionPlotOptions.fill = config_->get<std::string>("PlannerPlotColors/" + name);
-    initialSolutionPlotOptions.fillOpacity = 1.0;
+    initialSolutionPlotOptions.fillOpacity = 0.2;
     auto initialSolutionPlot = std::make_shared<PgfPlot>(initialSolutionTable);
     initialSolutionPlot->setOptions(initialSolutionPlotOptions);
     axis->addPlot(initialSolutionPlot);
   }
+  return axis;
+}
+
+std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPicture::generateInitialSolutionDurationPdfPlot(
+    const Statistics& stats, const std::string& plannerName) const {
+  // Create an axis to hold the plots.
+  auto axis = std::make_shared<PgfAxis>();
+
+  // Plot the initial solutions.
+  // Load the median initial duration and cost into a table.
+  auto medianInitialSolutionPath = stats.extractInitialSolutionDurationPdf(plannerName);
+  auto initialSolutionTable =
+      std::make_shared<PgfTable>(medianInitialSolutionPath, "bin centers", "bin counts");
+  initialSolutionTable->setCleanData(false);
+
+  // Create the pgf plot with this data and add it to the axis.
+  PgfPlotOptions initialSolutionPlotOptions;
+  initialSolutionPlotOptions.constPlot = false;
+  initialSolutionPlotOptions.markSize = 0.0;
+  initialSolutionPlotOptions.namePath = plannerName + "InitialSolutionDurationPdf"s;
+  initialSolutionPlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  initialSolutionPlotOptions.fill = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  initialSolutionPlotOptions.fillOpacity = 1.0;
+  auto initialSolutionPlot = std::make_shared<PgfPlot>(initialSolutionTable);
+  initialSolutionPlot->setOptions(initialSolutionPlotOptions);
+  initialSolutionPlot->setLegend(config_->get<std::string>("PlannerPlotNames/" + plannerName));
+  axis->addPlot(initialSolutionPlot);
+
   return axis;
 }
 

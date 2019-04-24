@@ -58,6 +58,7 @@ class InitialSolutionDurationPdfPicture : public TikzPicture {
 
  private:
   std::shared_ptr<PgfAxis> generateInitialSolutionDurationPdfPlot(const Statistics& stats) const;
+  std::shared_ptr<PgfAxis> generateInitialSolutionDurationPdfPlot(const Statistics& stats, const std::string& plannerName) const;
 
   const std::shared_ptr<const Configuration> config_{};
 };
