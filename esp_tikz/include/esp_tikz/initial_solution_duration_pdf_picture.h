@@ -50,7 +50,7 @@ namespace ompltools {
 
 class InitialSolutionDurationPdfPicture : public TikzPicture {
  public:
-  InitialSolutionDurationPdfPicture(const std::shared_ptr<Configuration>& config);
+  InitialSolutionDurationPdfPicture(const std::shared_ptr<const Configuration>& config);
   ~InitialSolutionDurationPdfPicture() = default;
 
   std::experimental::filesystem::path generatePlot(const Statistics& stats);

@@ -51,7 +51,7 @@ std::string TikzPictureOptions::string() const {
   return stream.str();
 }
 
-TikzPicture::TikzPicture(const std::shared_ptr<Configuration>& config) : config_(config) {
+TikzPicture::TikzPicture(const std::shared_ptr<const Configuration>& config) : config_(config) {
   // Load colors from config.
   espColors_.emplace("espblack", config_->get<std::array<int, 3>>("Colors/espblack"));
   espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("Colors/espwhite"));

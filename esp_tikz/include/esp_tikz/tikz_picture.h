@@ -55,7 +55,7 @@ struct TikzPictureOptions {
 
 class TikzPicture {
  public:
-  TikzPicture(const std::shared_ptr<Configuration>& config);
+  TikzPicture(const std::shared_ptr<const Configuration>& config);
   ~TikzPicture() = default;
 
   void setOptions(const TikzPictureOptions& options);

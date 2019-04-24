@@ -55,7 +55,7 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 InitialSolutionDurationPdfPicture::InitialSolutionDurationPdfPicture(
-    const std::shared_ptr<Configuration>& config) :
+    const std::shared_ptr<const Configuration>& config) :
     TikzPicture(config),
     config_(config) {
 }

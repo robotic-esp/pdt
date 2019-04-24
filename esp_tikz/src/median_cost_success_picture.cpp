@@ -54,7 +54,8 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianCostSuccessPicture::MedianCostSuccessPicture(const std::shared_ptr<Configuration>& config) :
+MedianCostSuccessPicture::MedianCostSuccessPicture(
+    const std::shared_ptr<const Configuration>& config) :
     TikzPicture(config),
     config_(config) {
 }

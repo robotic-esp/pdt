@@ -50,7 +50,7 @@ namespace ompltools {
 
 class MedianCostSuccessPicture : public TikzPicture {
  public:
-  MedianCostSuccessPicture(const std::shared_ptr<Configuration>& config);
+  MedianCostSuccessPicture(const std::shared_ptr<const Configuration>& config);
   ~MedianCostSuccessPicture() = default;
 
   std::experimental::filesystem::path generatePlot(const Statistics& stats,
