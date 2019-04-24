@@ -2,6 +2,33 @@
 
 This repository contains our inhouse tools developed around OMPL.
 
+## Mission
+
+ESP's OMPL tools aim to facilitate scientifically sound path planning research.
+
+## Features
+
+- [x] Reproducible experiments
+- [x] Automatic plot generation
+- [x] Interactive visualization of planner progress
+- [x] Videos of planner progress (realtime and constant iteration per second)
+- [x] Easy to define experiments (obstacles and antiobstacles)
+- [ ] Statistical analysis
+- [ ] Automatic stopping based on p-values
+- [ ] Guidance on number of runs
+- [ ] Reporting of p-values
+- [ ] Large automated runs
+- [ ] Physically founded generated experiments (remove bespoke problems from literature)
+
+## Why OMPL?
+
+- Already well adopted in field (helps our mission)
+- Major changes in OMPL base classes needed
+- Mark & Lydia have release experience
+- Mark & Lydia can help with reasonable problem definitions
+- Possible integration with PlannerArena
+- Possible integration in core OMPL
+
 ## Maps
 
 To create a map from a `.png` follow these steps:
