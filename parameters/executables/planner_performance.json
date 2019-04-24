@@ -2,11 +2,14 @@
     "Experiment": {
         "executable": "planner_performance",
         "planners": [
+            "BITstar",
+            "RRTsharp",
             "SBITstar",
-            "RRTstar"
+            "RRTstar",
+            "RRTConnect"
         ],
         "context": "FlankingGap",
-        "numRuns": 50,
+        "numRuns": 500,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true
@@ -26,7 +29,7 @@
     },
     "Contexts": {
         "FlankingGap": {
-            "maxTime": 0.3
+            "maxTime": 0.1
         },
         "WallGap8D": {
             "type": "WallGap",

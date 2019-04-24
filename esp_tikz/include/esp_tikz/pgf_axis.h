@@ -55,6 +55,8 @@ struct PgfAxisOptions {
   std::string height{"0.5\\textwidth"};
   std::string majorGridStyle{"{densely dotted, black!20}"};
   std::string minorGridStyle{"{densely dotted, black!20}"};
+  std::string majorTickLength{""};
+  std::string minorTickLength{""};
   std::string legendStyle{""};
   std::string name{""};
   std::string xshift{""};
@@ -66,12 +68,15 @@ struct PgfAxisOptions {
 
   // X-Axis options.
   bool xbar{false};
+  bool xbarInterval{false};
   bool xlog{false};
   bool xmajorgrids{true};
   bool xminorgrids{false};
   double xmin{std::numeric_limits<double>::infinity()};
   double xmax{std::numeric_limits<double>::infinity()};
+  std::string axisXLine{""};
   std::string xtick{""};
+  std::string xtickAlign{"inside"};
   std::string xticklabel{""};
   std::string xticklabelStyle{"font=\\footnotesize"};
   std::string xlabel{""};
@@ -80,12 +85,15 @@ struct PgfAxisOptions {
 
   // Y-Axis options.
   bool ybar{false};
+  bool ybarInterval{false};
   bool ylog{false};
   bool ymajorgrids{true};
   bool yminorgrids{false};
   double ymin{std::numeric_limits<double>::infinity()};
   double ymax{std::numeric_limits<double>::infinity()};
+  std::string axisYLine{""};
   std::string ytick{""};
+  std::string ytickAlign{"inside"};
   std::string yticklabel{""};
   std::string yticklabelStyle{"font=\\footnotesize"};
   std::string ylabel{""};

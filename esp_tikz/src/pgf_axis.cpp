@@ -47,7 +47,8 @@ using namespace std::string_literals;
 std::string PgfAxisOptions::string() const {
   std::ostringstream stream{};
   stream << "\n  width=" << width << ",\n  height=" << height << ",\n  at={" << at << '}'
-         << ",\n  unbounded coords=" << unboundedCoords;
+         << ",\n  unbounded coords=" << unboundedCoords << ",\n  xtick align=" << xtickAlign
+         << ",\n  ytick align=" << ytickAlign;
   if (name != ""s) {
     stream << ",\n  name=" << name;
   }
@@ -81,6 +82,12 @@ std::string PgfAxisOptions::string() const {
   if (xminorgrids || yminorgrids) {
     stream << ",\n  minor grid style=" << minorGridStyle;
   }
+  if (majorTickLength != ""s) {
+    stream << ",\n major tick length=" << majorTickLength;
+  }
+  if (minorTickLength != ""s) {
+    stream << ",\n minor tick length=" << minorTickLength;
+  }
   if (xmin != std::numeric_limits<double>::infinity()) {
     stream << ",\n  xmin=" << xmin;
   }
@@ -93,6 +100,12 @@ std::string PgfAxisOptions::string() const {
   if (ymax != std::numeric_limits<double>::infinity()) {
     stream << ",\n  ymax=" << ymax;
   }
+  if (xbarInterval) {
+    stream << ",\n  xbar interval";
+  }
+  if (ybarInterval) {
+    stream << ",\n  ybar interval";
+  }
   if (xbar) {
     stream << ",\n  xbar";
   }
@@ -104,6 +117,12 @@ std::string PgfAxisOptions::string() const {
   }
   if (ylog) {
     stream << ",\n  ymode=log";
+  }
+  if (axisXLine != ""s) {
+    stream << ",\n  axis x line=" << axisXLine;
+  }
+  if (axisYLine != ""s) {
+    stream << ",\n  axis y line=" << axisYLine;
   }
   if (xlabel != ""s) {
     stream << ",\n  xlabel={" << xlabel << '}';
