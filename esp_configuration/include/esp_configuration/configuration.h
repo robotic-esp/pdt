@@ -39,6 +39,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <sstream>
 
 #include <experimental/filesystem>
 
@@ -64,6 +65,9 @@ class Configuration {
   // Check if a key exists.
   bool contains(const std::string& key) const;
 
+  // Print a parameter.
+  std::string dump(const std::string& key = "") const;
+
   // Get a parameter by its key.
   template <typename T>
   T get(const std::string& key) const;
@@ -82,8 +86,11 @@ class Configuration {
   void dumpAccessed(const std::string& filename) const;
 
  private:
-  // Recursive implementation of public contain method.
+  // Recursive implementation of public contains method.
   bool contains(const std::string& key, const json::json& parameters) const;
+
+  // Recursive implementation of public dump method.
+  std::string dump(const std::string& key, const json::json& parameters) const;
 
   // Recursive implementation of public get method.
   template <typename T>
@@ -127,13 +134,14 @@ T Configuration::get(const std::string& key) const {
 template <typename T>
 T Configuration::get(const std::string& key, const json::json& parameters,
                      const std::string& path) const {
+  using namespace std::string_literals;
   if (!isNestedKey(key)) {
     if (parameters.contains(key)) {
       registerAccess<T>(path + key, parameters[key].get<T>(), &accessedParameters_);
       return parameters[key].get<T>();
     } else {
-      OMPL_ERROR("Requested nonexisting parameter '%s'.", key.c_str());
-      throw std::runtime_error("Configuration error.");
+      auto msg = "Requested nonexisting parameter '"s + key + "'."s;
+      throw std::invalid_argument(msg);
     }
   } else {
     auto [ns, rest] = split(key);
@@ -141,15 +149,17 @@ T Configuration::get(const std::string& key, const json::json& parameters,
       auto nestedParameters = parameters[ns];
       return get<T>(rest, nestedParameters, path + ns + "/");
     } else {
-      OMPL_ERROR("Requested nonexisting parameter '%s'.", key.c_str());
-      throw std::runtime_error("Configuration error.");
+      auto msg = "Requested nonexisting parameter '"s + key + "'."s;
+      throw std::invalid_argument(msg);
     }
   }
 }
 
 template <typename T>
 void Configuration::add(const std::string& key, const T& value) {
-  // We allow overwriting the results field of the experiment. Conceptually this seems ok.
+  // We allow overwriting the results field of the experiment. Conceptually this seems ok, but from
+  // a software architecture standpoint this hints at a flaw. Would it be cleaner to have an
+  // "Accessed" element in parameters_ rather than having accessedParameters_?
   if (contains(key) && key == std::string("Experiment/results")) {
     parameters_["Experiment"].erase("results");
   }

@@ -53,6 +53,7 @@ namespace esp {
 namespace ompltools {
 
 // Convenience namespaces.
+using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 namespace po = boost::program_options;
 
@@ -159,6 +160,32 @@ bool Configuration::contains(const std::string &key, const json::json &parameter
     } else {
       return false;
     }
+  }
+}
+
+std::string Configuration::dump(const std::string &key) const {
+  if (!contains(key)) {
+    auto msg = "Requested to dump nonexisting parameter '"s + key + "'.";
+    throw std::invalid_argument(msg);
+  }
+  return dump(key, parameters_);
+}
+
+std::string Configuration::dump(const std::string &key, const json::json &parameters) const {
+  if (isNestedKey(key)) {
+    auto [ns, rest] = split(key);
+    if (!parameters.contains(ns)) {
+      auto msg = "Internally requesting nonexisting parameter '"s + ns + "'. This is a bug."s;
+      throw std::invalid_argument(msg);
+    }
+    auto nestedParameters = parameters[ns];
+    return dump(rest, nestedParameters);
+  } else {
+    if (!parameters.contains(key)) {
+      auto msg = "Internally requesting nonexisting parameter '"s + key + "'. This is a bug."s;
+      throw std::invalid_argument(msg);
+    }
+    return parameters[key].dump(2);
   }
 }
 
