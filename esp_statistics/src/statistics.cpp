@@ -508,7 +508,7 @@ fs::path Statistics::extractInitialSolutionDurationPdf(
 
   filestream << createHeader("Initial solution duration pdf", plannerName);
   filestream << std::setprecision(21);
-  filestream << "bin centers";
+  filestream << "bin begin durations";
   for (const auto duration : bins) {
     filestream << ',' << duration;
   }
@@ -649,9 +649,9 @@ std::vector<double> Statistics::getMedianCosts(const PlannerResults& results,
   if (numRunsPerPlanner_ % 2 == 1) {
     medianCosts = getNthCosts(results, (numRunsPerPlanner_ - 1u) / 2, durations);
   } else {
-    std::vector<double> lowMedianCosts = getNthCosts(results, numRunsPerPlanner_ / 2, durations);
-    std::vector<double> highMedianCosts =
-        getNthCosts(results, (numRunsPerPlanner_ + 2u) / 2, durations);
+    std::vector<double> lowMedianCosts =
+        getNthCosts(results, (numRunsPerPlanner_ - 2u) / 2, durations);
+    std::vector<double> highMedianCosts = getNthCosts(results, numRunsPerPlanner_ / 2, durations);
     for (std::size_t i = 0u; i < medianCosts.size(); ++i) {
       medianCosts.at(i) = (lowMedianCosts.at(i) + highMedianCosts.at(i)) / 2.0;
     }
