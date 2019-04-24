@@ -4,7 +4,7 @@
             "binFrequency": "logFrequency"
         },
         "InitialSolutions": {
-            "numDurationBins": 25
+            "numDurationBins": 50
         }
     }
 }

@@ -81,16 +81,12 @@ fs::path InitialSolutionDurationPdfPicture::generatePlot(const Statistics& stats
       initialSolutionDurationAxisOptions.at =
           "($("s + plannerNames.at(i - 1u) + "InitialSolutionDurationPdf.south) - (0em, 0.5em)$)"s;
     }
-    // initialSolutionDurationAxisOptions.xmin = minDurationToBePlotted;
-    // initialSolutionDurationAxisOptions.xmax = maxDurationToBePlotted;
+    initialSolutionDurationAxisOptions.height = "0.28\\textwidth";
     initialSolutionDurationAxisOptions.xlog = true;
     initialSolutionDurationAxisOptions.xminorgrids = true;
     initialSolutionDurationAxisOptions.xlabel = "\\empty";
-    initialSolutionDurationAxisOptions.majorTickLength = "0.0pt";
-    initialSolutionDurationAxisOptions.minorTickLength = "0.0pt";
     initialSolutionDurationAxisOptions.xticklabel = "\\empty";
-    initialSolutionDurationAxisOptions.ybar = true;
-    initialSolutionDurationAxisOptions.ylabel = "Initial Solution Counts";
+    initialSolutionDurationAxisOptions.ylabel = "Counts";
     initialSolutionDurationAxisOptions.ylabelAbsolute = true;
     initialSolutionDurationAxisOptions.ylabelStyle =
         "font=\\footnotesize, text depth=0.0em, text height=0.5em";
@@ -102,16 +98,15 @@ fs::path InitialSolutionDurationPdfPicture::generatePlot(const Statistics& stats
 
   // Generate an axis with all results together.
   PgfAxisOptions AllInitialSolutionDurationAxisOptions;
+  AllInitialSolutionDurationAxisOptions.height = "0.28\\textwidth";
   AllInitialSolutionDurationAxisOptions.name = "AllInitialSolutionDurationPdf"s;
   AllInitialSolutionDurationAxisOptions.anchor = "north";
   AllInitialSolutionDurationAxisOptions.at =
       "($("s + plannerNames.back() + "InitialSolutionDurationPdf.south) - (0em, 0.5em)$)";
-  // AllInitialSolutionDurationAxisOptions.xmin = minDurationToBePlotted;
-  // AllInitialSolutionDurationAxisOptions.xmax = maxDurationToBePlotted;
   AllInitialSolutionDurationAxisOptions.xlog = true;
   AllInitialSolutionDurationAxisOptions.xminorgrids = true;
   AllInitialSolutionDurationAxisOptions.xlabel = "Computation time [s]";
-  AllInitialSolutionDurationAxisOptions.ylabel = "Initial Solution Counts";
+  AllInitialSolutionDurationAxisOptions.ylabel = "Counts";
   AllInitialSolutionDurationAxisOptions.ylabelAbsolute = true;
   AllInitialSolutionDurationAxisOptions.ylabelStyle =
       "font=\\footnotesize, text depth=0.0em, text height=0.5em";
@@ -139,6 +134,11 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPicture::generateInitialSolut
     auto initialSolutionTable =
         std::make_shared<PgfTable>(medianInitialSolutionPath, "bin centers", "bin counts");
     initialSolutionTable->setCleanData(false);
+    // These extra datapoints are because this should look like a filled histogram.
+    auto firstRow = initialSolutionTable->getRow(0u);
+    auto lastRow = initialSolutionTable->getRow(initialSolutionTable->getNumRows() - 1u);
+    initialSolutionTable->prependRow({firstRow.at(0u), 0.0});
+    initialSolutionTable->appendRow({lastRow.at(0u), 0.0});
 
     // Create the pgf plot with this data and add it to the axis.
     PgfPlotOptions initialSolutionPlotOptions;
@@ -165,15 +165,20 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPicture::generateInitialSolut
   auto initialSolutionTable =
       std::make_shared<PgfTable>(medianInitialSolutionPath, "bin centers", "bin counts");
   initialSolutionTable->setCleanData(false);
+  // These extra datapoints are because this should look like a filled histogram.
+  auto firstRow = initialSolutionTable->getRow(0u);
+  auto lastRow = initialSolutionTable->getRow(initialSolutionTable->getNumRows() - 1u);
+  initialSolutionTable->prependRow({firstRow.at(0u), 0.0});
+  initialSolutionTable->appendRow({lastRow.at(0u), 0.0});
 
   // Create the pgf plot with this data and add it to the axis.
   PgfPlotOptions initialSolutionPlotOptions;
-  initialSolutionPlotOptions.constPlot = false;
   initialSolutionPlotOptions.markSize = 0.0;
   initialSolutionPlotOptions.namePath = plannerName + "InitialSolutionDurationPdf"s;
   initialSolutionPlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
   initialSolutionPlotOptions.fill = config_->get<std::string>("PlannerPlotColors/" + plannerName);
   initialSolutionPlotOptions.fillOpacity = 1.0;
+  initialSolutionPlotOptions.lineWidth = 0.0;
   auto initialSolutionPlot = std::make_shared<PgfPlot>(initialSolutionTable);
   initialSolutionPlot->setOptions(initialSolutionPlotOptions);
   initialSolutionPlot->setLegend(config_->get<std::string>("PlannerPlotNames/" + plannerName));

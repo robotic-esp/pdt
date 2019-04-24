@@ -480,7 +480,7 @@ fs::path Statistics::extractInitialSolutionDurationPdf(
     return filepath;
   }
 
-  // We'll take the bin durations to be the centers of the bins.
+  // We'll take the bin durations to bt the start of the bins.
   const auto& bins = binDurations.empty() ? defaultInitialSolutionBinDurations_ : binDurations;
 
   // Get the initial solution durations.
@@ -492,19 +492,9 @@ fs::path Statistics::extractInitialSolutionDurationPdf(
     // std::lower_bound returns an iterator to the first element that is greater or equal to, or
     // end.
     auto lower = std::lower_bound(bins.begin(), bins.end(), duration);
-    if (lower == bins.end()) {
-      // There is no element greater or equal to duration, this falls into the last bin.
+    if (lower != bins.begin()) {
       --lower;
-    } else if (lower != bins.begin()) {
-      // The first element greater or equal to is not the beginning. Maybe the element before was
-      // really close?
-      auto before = lower - 1u;
-      if (duration - *before < *lower - duration) {
-        lower = before;
-      }
     }
-    // Lower now points to the element closest to the durations. Increase the corresponding bin
-    // count.
     binCounts.at(std::distance(bins.begin(), lower))++;
   }
 
