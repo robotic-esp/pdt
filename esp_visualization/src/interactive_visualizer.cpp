@@ -624,7 +624,7 @@ void InteractiveVisualizer::drawPath(const std::vector<Eigen::Vector3d>& points,
 }
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
-  drawRectangle(obstacle.getAnchorCoordinates(), obstacle.getWidths(), black, gray);
+  drawRectangle(obstacle.getAnchorCoordinates(), obstacle.getWidths(), black, black);
 }
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
