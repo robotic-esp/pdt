@@ -106,13 +106,13 @@ void InteractiveVisualizer::run() {
 
   // Get the bounds of the context to setup a correct renderstate.
   if (context_->getDimensions() == 2u) {
-    glShadeModel(GL_FLAT);
-    glEnable(GL_LINE_SMOOTH);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
+    // glShadeModel(GL_FLAT);
+    // glEnable(GL_LINE_SMOOTH);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    // glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_LIGHTING);
     renderState.SetProjectionMatrix(pangolin::ProjectionMatrixOrthographic(
         bounds.at(0).first,   // The left boundary of the problem
         bounds.at(0).second,  // The right boundary of the problem
