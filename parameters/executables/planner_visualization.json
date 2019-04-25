@@ -2,8 +2,9 @@
     "Experiment": {
         "executable": "planner_visualization",
         "planner": "SBITstar",
-        "context": "WallGap3D",
-        "useOnlyThisConfig": false
+        "context": "MultiStartGoal",
+        "useOnlyThisConfig": false,
+        "seed": 18439076888595815967
     },
     "Planners": {
         "RRTstar": {
@@ -18,6 +19,18 @@
         }
     },
     "Contexts": {
+        "MultiStartGoal": {
+            "type": "MultiStartGoal",
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "numStarts": 2,
+            "numGoals": 3,
+            "collisionCheckResolution": 0.001,
+            "numObstacles": 50,
+            "maxSideLength": 0.3,
+            "minSideLength": 0.05
+        },
         "WallGap3D": {
             "type": "WallGap",
             "maxTime": 0.5,
