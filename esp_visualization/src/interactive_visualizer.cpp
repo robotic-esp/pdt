@@ -149,7 +149,7 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
   // Buttons.
   pangolin::Var<bool> optionScreenshot(optionsName + ".Screenshot", false, false);
-  pangolin::Var<double> optionSlowdown(optionsName + ".Replay Factor", 1, 1e-3, 1e1, true);
+  pangolin::Var<double> optionSlowdown(optionsName + ".Replay Factor", 1, 1e-3, 1e2, true);
   pangolin::Var<bool> optionPlay(optionsName + ".Play", false, false);
   pangolin::Var<bool> optionRecord(optionsName + ".Record", false, false);
 
