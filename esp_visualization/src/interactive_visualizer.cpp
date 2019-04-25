@@ -259,11 +259,11 @@ void InteractiveVisualizer::run() {
       if (context_->getDimensions() == 2u) {
         auto [vertices, edges] = getVerticesAndEdges2D(displayIteration_);
         drawPoints(vertices, blue, 2.0);
-        drawLines(edges, 1.0, gray);
+        drawLines(edges, 1.5, gray);
       } else if (context_->getDimensions() == 3u) {
         auto [vertices, edges] = getVerticesAndEdges3D(displayIteration_);
         drawPoints(vertices, blue, 2.0);
-        drawLines(edges, 1.0, gray, 0.8);
+        drawLines(edges, 1.5, gray, 0.8);
       }
     } else if (optionDrawVertices) {
       if (context_->getDimensions() == 2u) {
@@ -276,10 +276,10 @@ void InteractiveVisualizer::run() {
     } else if (optionDrawEdges) {
       if (context_->getDimensions() == 2u) {
         auto edges = getEdges2D(displayIteration_);
-        drawLines(edges, 1.0, gray);
+        drawLines(edges, 1.5, gray);
       } else if (context_->getDimensions() == 3u) {
         auto edges = getEdges3D(displayIteration_);
-        drawLines(edges, 1.0, gray, 0.8);
+        drawLines(edges, 1.5, gray, 0.8);
       }
     }
 
