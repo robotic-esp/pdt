@@ -565,8 +565,9 @@ void InteractiveVisualizer::drawRectangle3D(const std::vector<double>& midpoint,
 void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector2d>& points,
                                        const float* color, float size) const {
   glColor4fv(color);
-  glPointSize(size);
-  pangolin::glDrawPoints(points);
+  for (const auto& point : points) {
+    pangolin::glDrawCircle(point[0], point[1], size / 1000.0);
+  }
 }
 
 void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector3d>& points,
