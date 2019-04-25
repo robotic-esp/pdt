@@ -364,99 +364,99 @@ void InteractiveVisualizer::updateCostLog() {
 
 void InteractiveVisualizer::visit(const CentreSquare& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const DividingWalls& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const DoubleEnclosure& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const FlankingGap& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const ObstacleFree& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const RandomRectangles& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const RepeatingRectangles& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const StartEnclosure& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const WallGap& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 5.0);
+  drawPoints(context.getStartStates(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 5.0);
+  drawPoints(context.getGoalStates(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
