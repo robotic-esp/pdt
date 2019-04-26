@@ -9,7 +9,7 @@
             "RRTConnect"
         ],
         "context": "FlankingGap",
-        "numRuns": 500,
+        "numRuns": 10,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true

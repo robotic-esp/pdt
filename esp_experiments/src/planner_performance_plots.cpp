@@ -57,18 +57,6 @@ int main(int argc, char** argv) {
   // Get the statistics.
   esp::ompltools::Statistics stats(config, true);
 
-  // Create a median cost success plot.
-  esp::ompltools::MedianCostSuccessPicture medianCostSuccessPicture(config);
-  auto medianCostSuccessPicturePath = medianCostSuccessPicture.generatePlot(stats);
-  std::cout << "Wrote median cost success plot to " << medianCostSuccessPicturePath << '\n';
-  medianCostSuccessPicture.generatePdf();
-
-  // Create a initial solution duration pdf plot.
-  esp::ompltools::InitialSolutionDurationPdfPicture initialSolutionDurationPdfPicture(config);
-  auto initialSolutionDurationPdfPicturePath = initialSolutionDurationPdfPicture.generatePlot(stats);
-  std::cout << "Wrote initial solution duration pdf plot to " << initialSolutionDurationPdfPicturePath << '\n';
-  initialSolutionDurationPdfPicture.generatePdf();
-
   esp::ompltools::ExperimentReport report(config, stats);
   report.generateReport();
   report.compileReport();

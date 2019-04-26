@@ -199,11 +199,11 @@ std::stringstream ExperimentReport::overview() const {
   overview << "\\section{Overview}\\label{sec:overview}\n";
 
   // Provide some basic info about this experiment.
-  overview
-      << "\nMaybe add something like:\n\nThis report was automatically generated using ESP OMPLtools. It presents the results "
-         "for the "
-      << experimentName_ << " experiment, which executed "
-      << config_->get<std::size_t>("Experiment/numRuns") << " runs of ";
+  overview << "\nMaybe add something like:\n\nThis report was automatically generated using ESP "
+              "OMPLtools. It presents the results "
+              "for the "
+           << experimentName_ << " experiment, which executed "
+           << config_->get<std::size_t>("Experiment/numRuns") << " runs of ";
   const auto& plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
   for (std::size_t i = 0u; i < plannerNames.size() - 1u; ++i) {
     overview << plotPlannerNames_.at(plannerNames.at(i)) << ", ";
@@ -220,8 +220,8 @@ std::stringstream ExperimentReport::overview() const {
               "version of it.\n";
 
   overview << "\\subsection{Results}\\label{sec:overview-results}\n";
-  MedianCostSuccessPicture resultsOverview(config_);
-  overview << "\\begin{center}\n\\input{" << resultsOverview.generatePlot(stats_).string()
+  MedianCostSuccessPicture resultsOverview(config_, stats_);
+  overview << "\\begin{center}\n\\input{" << resultsOverview.createCombinedPicture().string()
            << "}\n\\end{center}\n";
 
   return overview;
@@ -231,17 +231,31 @@ std::stringstream ExperimentReport::individualResults() const {
   std::stringstream results;
 
   // Create a section for every planner.
+  InitialSolutionDurationPdfPicture initialSolutionDurationPdfPicture(config_, stats_);
+  MedianCostSuccessPicture medianCostSuccessPicture(config_, stats_);
   const auto& plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
   for (const auto& name : plannerNames) {
+    results << "\n\\pagebreak\n";
     results << "\\section{" << plotPlannerNames_.at(name) << "}\\label{sec:" << name << "}\n";
-    results << "\\subsection{Results}\\label{sec:" << name << "-results}\n";
-    results << "TODO: Add some nice plots and tables here.\n";
-  }
 
-  InitialSolutionDurationPdfPicture initialSolutionDurationPdfPicture(config_);
-  results << "\\begin{center}\n\\input{"
-          << initialSolutionDurationPdfPicture.generatePlot(stats_).string()
-          << "}\n\\end{center}\n";
+    // Initial solution plots.
+    results << "\\subsection{Initial Solution}\\label{sec:" << name << "-initial-solution}\n";
+    results << "\\begin{center}\n\\input{"
+            << medianCostSuccessPicture.createSuccessPicture(name).string()
+            << "}\n\\end{center}\n";
+    results
+        << "\\begin{center}\n\\input{"
+        << initialSolutionDurationPdfPicture.createInitialSolutionDurationPdfPicture(name).string()
+        << "}\n\\end{center}\n";
+
+    if (name != "RRTConnect") {
+    // Cost evolution plots.
+    results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";
+    results << "\\begin{center}\n\\input{"
+            << medianCostSuccessPicture.createMedianCostPicture(name).string()
+            << "}\n\\end{center}\n";
+    }
+  }
 
   return results;
 }
