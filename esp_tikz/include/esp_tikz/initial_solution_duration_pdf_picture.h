@@ -50,17 +50,36 @@ namespace ompltools {
 
 class InitialSolutionDurationPdfPicture : public TikzPicture {
  public:
-  InitialSolutionDurationPdfPicture(const std::shared_ptr<const Configuration>& config);
+  InitialSolutionDurationPdfPicture(const std::shared_ptr<const Configuration>& config,
+                                    const Statistics& stats);
   ~InitialSolutionDurationPdfPicture() = default;
 
-  std::experimental::filesystem::path generatePlot(const Statistics& stats);
-  std::experimental::filesystem::path generatePdf() const;
+  // Creates a pgf axis that hold the initial solution duration pdf of all planners.
+  std::shared_ptr<PgfAxis> createInitialSolutionDurationPdfAxis() const;
+
+  // Creates a pgf axis that hold the initial solution duration pdf of the specified planner.
+  std::shared_ptr<PgfAxis> createInitialSolutionDurationPdfAxis(
+      const std::string& plannerName) const;
+
+  // Creates a tikz picture that contains the initial solution duration pdf axis of all planners.
+  std::experimental::filesystem::path createInitialSolutionDurationPdfPicture() const;
+
+  // Creates a tikz picture that contains the initial solution duration pdf axis of all planners.
+  std::experimental::filesystem::path createInitialSolutionDurationPdfPicture(
+      const std::string& plannerName) const;
+
+  // Compiles the given tikzpicture to a pdf document.
+  std::experimental::filesystem::path compileStandalonePdf(
+      const std::experimental::filesystem::path& tikzPicture) const;
 
  private:
-  std::shared_ptr<PgfAxis> generateInitialSolutionDurationPdfPlot(const Statistics& stats) const;
-  std::shared_ptr<PgfAxis> generateInitialSolutionDurationPdfPlot(const Statistics& stats, const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createInitialSolutionDurationPdfPlot(
+      const std::string& plannerName) const;
+
+  void setInitialSolutionDurationPdfAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
   const std::shared_ptr<const Configuration> config_{};
+  const Statistics& stats_;
 };
 
 }  // namespace ompltools
