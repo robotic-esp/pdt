@@ -50,17 +50,56 @@ namespace ompltools {
 
 class MedianCostSuccessPicture : public TikzPicture {
  public:
-  MedianCostSuccessPicture(const std::shared_ptr<const Configuration>& config);
+  MedianCostSuccessPicture(const std::shared_ptr<const Configuration>& config,
+                           const Statistics& stats);
   ~MedianCostSuccessPicture() = default;
 
-  std::experimental::filesystem::path generatePlot(const Statistics& stats,
-                                                   std::size_t confidence = 99u);
-  std::experimental::filesystem::path generatePdf() const;
+  // Returns a pgf axis that holds the median cost at binned durations for all planners.
+  std::shared_ptr<PgfAxis> createMedianCostAxis() const;
+
+  // Returns a pgf axis that holds the median cost at binned durations for the specified planner.
+  std::shared_ptr<PgfAxis> createMedianCostAxis(const std::string& plannerName) const;
+
+  // Returns a pgf axis that holds the success percentage over time for all planners.
+  std::shared_ptr<PgfAxis> createSuccessAxis() const;
+
+  // Returns a pgf axis that holds the success percentage over time for the specified planner.
+  std::shared_ptr<PgfAxis> createSuccessAxis(const std::string& plannerName) const;
+
+  // Creates a tikz picture that contains the median cost axis of all planners.
+  std::experimental::filesystem::path createMedianCostPicture() const;
+
+  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  std::experimental::filesystem::path createMedianCostPicture(const std::string& plannerName) const;
+
+  // Creates a tikz picture that contains the success axis of all planners.
+  std::experimental::filesystem::path createSuccessPicture() const;
+
+  // Creates a tikz picture that contains the success axis of the specified planner.
+  std::experimental::filesystem::path createSuccessPicture(const std::string& plannerName) const;
+
+  // Creates a combined tikz picture with success and median costs of all planners.
+  std::experimental::filesystem::path createCombinedPicture() const;
+
+  // Creates a combined tikz picture with success and median costs of the specified planner.
+  std::experimental::filesystem::path createCombinedPicture(const std::string& plannerName) const;
+
+  // Compiles the given tikzpicture to a pdf document.
+  std::experimental::filesystem::path compileStandalonePdf(
+      const std::experimental::filesystem::path& tikzPicture) const;
 
  private:
+  // Plots with all planners.
   std::shared_ptr<PgfAxis> generateMedianCostPlot(const Statistics& stats,
                                                   std::size_t confidence) const;
   std::shared_ptr<PgfAxis> generateSuccessPlot(const Statistics& stats) const;
+
+  // Plots of individual planners.
+  std::shared_ptr<PgfAxis> generateMedianCostPlot(const Statistics& stats,
+                                                  const std::string& plannerName,
+                                                  std::size_t confidence) const;
+  std::shared_ptr<PgfAxis> generateSuccessPlot(const Statistics& stats,
+                                               const std::string& plannerName) const;
 
   const std::shared_ptr<const Configuration> config_{};
 };
