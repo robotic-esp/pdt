@@ -11,7 +11,7 @@ ESP's OMPL tools aim to facilitate scientifically sound path planning research.
 - [x] Reproducible experiments
 - [x] Automatic plot generation
 - [x] Interactive visualization of planner progress
-- [x] Videos of planner progress (realtime and constant iteration per second)
+- [x] Videos of planner progress
 - [x] Easy to define experiments (obstacles and antiobstacles)
 - [ ] Statistical analysis
 - [ ] Automatic stopping based on p-values
@@ -29,7 +29,12 @@ ESP's OMPL tools aim to facilitate scientifically sound path planning research.
 - Possible integration with PlannerArena
 - Possible integration in core OMPL
 
-## Maps
+## Backlog
+- [ ] Implement feature to record/play at constant 'iteration per second' rate
+- [ ] Implement feature to export every iteration as png
+- [ ] Improve quality of recorded videos
+
+## How to create maps from `.png`s
 
 To create a map from a `.png` follow these steps:
    1. Open the `.png` in GIMP
