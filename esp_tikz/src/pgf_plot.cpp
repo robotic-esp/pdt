@@ -44,39 +44,7 @@ namespace ompltools {
 
 using namespace std::string_literals;
 
-std::string PgfPlotOptions::string() const {
-  std::ostringstream stream{};
-  stream << "\n  line width=" << lineWidth << ",\n  color=" << color << ",\n  mark=" << mark
-         << ",\n  mark size=" << markSize;
-  if (onlyMarks) {
-    stream << ",\n  only marks";
-  }
-  if (forgetPlot) {
-    stream << ",\n  forget plot";
-  }
-  if (constPlot) {
-    stream << ",\n  const plot";
-  }
-  if (namePath != ""s) {
-    stream << ",\n  name path={" << namePath << '}';
-  }
-  if (fill != ""s) {
-    stream << ",\n  fill=" << fill;
-  }
-  if (fillOpacity != 1.0) {
-    stream << ",\n  fill opacity=" << fillOpacity;
-  }
-  if (drawOpacity != 1.0) {
-    stream << ",\n  draw opacity=" << drawOpacity;
-  }
-  return stream.str();
-}
-
 PgfPlot::PgfPlot(const std::shared_ptr<PlottableInterface>& plottable) : plottable_(plottable) {
-}
-
-void PgfPlot::setOptions(const PgfPlotOptions& options) {
-  options_ = options;
 }
 
 void PgfPlot::setLegend(const std::string& legend) {
@@ -92,7 +60,31 @@ std::string PgfPlot::string() const {
     return {};
   }
   std::ostringstream stream{};
-  stream << "\\addplot [" << options_.string() << "\n] ";
+  stream << "\\addplot [\n";
+  stream << "  line width=" << options.lineWidth << ",\n  color=" << options.color << ",\n  mark=" << options.mark
+         << ",\n  mark size=" << options.markSize;
+  if (options.onlyMarks) {
+    stream << ",\n  only marks";
+  }
+  if (options.forgetPlot) {
+    stream << ",\n  forget plot";
+  }
+  if (options.constPlot) {
+    stream << ",\n  const plot";
+  }
+  if (options.namePath != ""s) {
+    stream << ",\n  name path={" << options.namePath << '}';
+  }
+  if (options.fill != ""s) {
+    stream << ",\n  fill=" << options.fill;
+  }
+  if (options.fillOpacity != 1.0) {
+    stream << ",\n  fill opacity=" << options.fillOpacity;
+  }
+  if (options.drawOpacity != 1.0) {
+    stream << ",\n  draw opacity=" << options.drawOpacity;
+  }
+  stream << "\n] ";
   stream << plottable_->string();
   if (legend_ != ""s) {
     stream << "\\addlegendentry{" << legend_ << "}\n";

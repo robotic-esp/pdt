@@ -47,22 +47,21 @@ namespace ompltools {
 
 struct PgfFillBetweenOptions {
   std::string string() const;
-  std::string name1{""};
-  std::string name2{""};
   bool split{false};
 };
 
 class PgfFillBetween : public PlottableInterface {
  public:
-  PgfFillBetween() = default;
+  PgfFillBetween(const std::string& name1, const std::string& name2);
   ~PgfFillBetween() = default;
-
-  void setOptions(const PgfFillBetweenOptions& options);
 
   std::string string() const override;
 
- private:
-  PgfFillBetweenOptions options_{};
+  struct {
+    bool split{false};
+    std::string name1{""};
+    std::string name2{""};
+  } options{};
 };
 
 }  // namespace ompltools

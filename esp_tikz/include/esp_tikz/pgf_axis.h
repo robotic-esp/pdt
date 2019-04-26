@@ -46,67 +46,11 @@ namespace esp {
 
 namespace ompltools {
 
-struct PgfAxisOptions {
-  std::string string() const;
-  // General options.
-  std::string at{"(0cm, 0cm)"};
-  std::string anchor{""};
-  std::string width{"\\textwidth"};
-  std::string height{"0.5\\textwidth"};
-  std::string majorGridStyle{"{densely dotted, black!20}"};
-  std::string minorGridStyle{"{densely dotted, black!20}"};
-  std::string majorTickLength{""};
-  std::string minorTickLength{""};
-  std::string legendStyle{""};
-  std::string name{""};
-  std::string xshift{""};
-  std::string yshift{""};
-  std::string unboundedCoords{"jump"};
-  std::string barWidth{""};
-  bool hideAxis{false};
-  bool scaleOnlyAxis{false};
-
-  // X-Axis options.
-  bool xbar{false};
-  bool xbarInterval{false};
-  bool xlog{false};
-  bool xmajorgrids{true};
-  bool xminorgrids{false};
-  double xmin{std::numeric_limits<double>::infinity()};
-  double xmax{std::numeric_limits<double>::infinity()};
-  std::string axisXLine{""};
-  std::string xtick{""};
-  std::string xtickAlign{"inside"};
-  std::string xticklabel{""};
-  std::string xticklabelStyle{"font=\\footnotesize"};
-  std::string xlabel{""};
-  std::string xlabelStyle{"font=\\footnotesize"};
-  bool xlabelAbsolute{false};
-
-  // Y-Axis options.
-  bool ybar{false};
-  bool ybarInterval{false};
-  bool ylog{false};
-  bool ymajorgrids{true};
-  bool yminorgrids{false};
-  double ymin{std::numeric_limits<double>::infinity()};
-  double ymax{std::numeric_limits<double>::infinity()};
-  std::string axisYLine{""};
-  std::string ytick{""};
-  std::string ytickAlign{"inside"};
-  std::string yticklabel{""};
-  std::string yticklabelStyle{"font=\\footnotesize"};
-  std::string ylabel{""};
-  std::string ylabelStyle{"font=\\footnotesize"};
-  bool ylabelAbsolute{false};
-};
-
 class PgfAxis {
  public:
   PgfAxis() = default;
   ~PgfAxis() = default;
 
-  void setOptions(const PgfAxisOptions& options);
   void addPlot(const std::shared_ptr<PgfPlot>& plot);
   void addLegendEntry(const std::string& entry, const std::string& imageOptions = "");
 
@@ -115,8 +59,62 @@ class PgfAxis {
  private:
   std::vector<std::shared_ptr<const PgfPlot>> plots_{};
   std::vector<std::pair<std::string, std::string>> legendEntries_{};
-  
-  PgfAxisOptions options_{};
+
+ public:
+  struct {
+    std::string string() const;
+    // General options.
+    std::string at{"(0cm, 0cm)"};
+    std::string anchor{""};
+    std::string width{"\\textwidth"};
+    std::string height{"0.5\\textwidth"};
+    std::string majorGridStyle{"{densely dotted, black!20}"};
+    std::string minorGridStyle{"{densely dotted, black!20}"};
+    std::string majorTickLength{""};
+    std::string minorTickLength{""};
+    std::string legendStyle{""};
+    std::string name{""};
+    std::string xshift{""};
+    std::string yshift{""};
+    std::string unboundedCoords{"jump"};
+    std::string barWidth{""};
+    bool hideAxis{false};
+    bool scaleOnlyAxis{false};
+
+    // X-Axis options.
+    bool xbar{false};
+    bool xbarInterval{false};
+    bool xlog{false};
+    bool xmajorgrids{true};
+    bool xminorgrids{false};
+    double xmin{std::numeric_limits<double>::infinity()};
+    double xmax{std::numeric_limits<double>::infinity()};
+    std::string axisXLine{""};
+    std::string xtick{""};
+    std::string xtickAlign{"inside"};
+    std::string xticklabel{""};
+    std::string xticklabelStyle{"font=\\footnotesize"};
+    std::string xlabel{""};
+    std::string xlabelStyle{"font=\\footnotesize"};
+    bool xlabelAbsolute{false};
+
+    // Y-Axis options.
+    bool ybar{false};
+    bool ybarInterval{false};
+    bool ylog{false};
+    bool ymajorgrids{true};
+    bool yminorgrids{false};
+    double ymin{std::numeric_limits<double>::infinity()};
+    double ymax{std::numeric_limits<double>::infinity()};
+    std::string axisYLine{""};
+    std::string ytick{""};
+    std::string ytickAlign{"inside"};
+    std::string yticklabel{""};
+    std::string yticklabelStyle{"font=\\footnotesize"};
+    std::string ylabel{""};
+    std::string ylabelStyle{"font=\\footnotesize"};
+    bool ylabelAbsolute{false};
+  } options{};
 };
 
 }  // namespace ompltools

@@ -42,22 +42,18 @@ namespace esp {
 
 namespace ompltools {
 
-std::string PgfFillBetweenOptions::string() const {
-  std::ostringstream stream{};
-  stream << "\n  of=" << name1 << " and " << name2;
-  if (split) {
-    stream << ",\n  split";
-  }
-  return stream.str();
-}
-
-void PgfFillBetween::setOptions(const PgfFillBetweenOptions& options) {
-  options_ = options;
+PgfFillBetween::PgfFillBetween(const std::string& name1, const std::string& name2) {
+  options.name1 = name1;
+  options.name2 = name2;
 }
 
 std::string PgfFillBetween::string() const {
   std::ostringstream stream{};
-  stream << "fill between [" << options_.string() << "\n];";
+  stream << "fill between [\n  of =" << options.name1 << " and " << options.name2;
+  if (options.split) {
+    stream << ",\n  split";
+  }
+  stream << "\n];";
   return stream.str();
 }
 

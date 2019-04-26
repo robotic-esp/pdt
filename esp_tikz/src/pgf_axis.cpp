@@ -44,138 +44,6 @@ namespace ompltools {
 
 using namespace std::string_literals;
 
-std::string PgfAxisOptions::string() const {
-  std::ostringstream stream{};
-  stream << "\n  width=" << width << ",\n  height=" << height << ",\n  at={" << at << '}'
-         << ",\n  unbounded coords=" << unboundedCoords << ",\n  xtick align=" << xtickAlign
-         << ",\n  ytick align=" << ytickAlign;
-  if (name != ""s) {
-    stream << ",\n  name=" << name;
-  }
-  if (anchor != ""s) {
-    stream << ",\n  anchor=" << anchor;
-  }
-  if (hideAxis) {
-    stream << ",\n  hide axis";
-  }
-  if (barWidth != ""s) {
-    stream << ",\n  bar width=" << barWidth;
-  }
-  if (scaleOnlyAxis) {
-    stream << ",\n  scale only axis";
-  }
-  if (xmajorgrids) {
-    stream << ",\n  xmajorgrids";
-  }
-  if (xminorgrids) {
-    stream << ",\n  xminorgrids";
-  }
-  if (ymajorgrids) {
-    stream << ",\n  ymajorgrids";
-  }
-  if (yminorgrids) {
-    stream << ",\n  yminorgrids";
-  }
-  if (xmajorgrids || ymajorgrids) {
-    stream << ",\n  major grid style=" << majorGridStyle;
-  }
-  if (xminorgrids || yminorgrids) {
-    stream << ",\n  minor grid style=" << minorGridStyle;
-  }
-  if (majorTickLength != ""s) {
-    stream << ",\n major tick length=" << majorTickLength;
-  }
-  if (minorTickLength != ""s) {
-    stream << ",\n minor tick length=" << minorTickLength;
-  }
-  if (xmin != std::numeric_limits<double>::infinity()) {
-    stream << ",\n  xmin=" << xmin;
-  }
-  if (xmax != std::numeric_limits<double>::infinity()) {
-    stream << ",\n  xmax=" << xmax;
-  }
-  if (ymin != std::numeric_limits<double>::infinity()) {
-    stream << ",\n  ymin=" << ymin;
-  }
-  if (ymax != std::numeric_limits<double>::infinity()) {
-    stream << ",\n  ymax=" << ymax;
-  }
-  if (xbarInterval) {
-    stream << ",\n  xbar interval";
-  }
-  if (ybarInterval) {
-    stream << ",\n  ybar interval";
-  }
-  if (xbar) {
-    stream << ",\n  xbar";
-  }
-  if (ybar) {
-    stream << ",\n  ybar";
-  }
-  if (xlog) {
-    stream << ",\n  xmode=log";
-  }
-  if (ylog) {
-    stream << ",\n  ymode=log";
-  }
-  if (axisXLine != ""s) {
-    stream << ",\n  axis x line=" << axisXLine;
-  }
-  if (axisYLine != ""s) {
-    stream << ",\n  axis y line=" << axisYLine;
-  }
-  if (xlabel != ""s) {
-    stream << ",\n  xlabel={" << xlabel << '}';
-  }
-  if (xlabelStyle != ""s) {
-    stream << ",\n  xlabel style={" << xlabelStyle << '}';
-  }
-  if (xlabelAbsolute) {
-    stream << ",\n  xlabel absolute";
-  }
-  if (xtick != ""s) {
-    stream << ",\n  xtick={" << xtick << '}';
-  }
-  if (xticklabel != ""s) {
-    stream << ",\n  xticklabel={" << xticklabel << '}';
-  }
-  if (xticklabelStyle != ""s) {
-    stream << ",\n  xticklabel style={" << xticklabelStyle << '}';
-  }
-  if (ylabel != ""s) {
-    stream << ",\n  ylabel={" << ylabel << '}';
-  }
-  if (ylabelStyle != ""s) {
-    stream << ",\n  ylabel style={" << ylabelStyle << '}';
-  }
-  if (ylabelAbsolute) {
-    stream << ",\n  ylabel absolute";
-  }
-  if (ytick != ""s) {
-    stream << ",\n  ytick={" << ytick << '}';
-  }
-  if (yticklabel != ""s) {
-    stream << ",\n  yticklabel={" << yticklabel << '}';
-  }
-  if (yticklabelStyle != ""s) {
-    stream << ",\n  yticklabel style={" << yticklabelStyle << '}';
-  }
-  if (legendStyle != ""s) {
-    stream << ",\n  legend style={" << legendStyle << '}';
-  }
-  if (xshift != ""s) {
-    stream << ",\n  xshift=" << xshift;
-  }
-  if (yshift != ""s) {
-    stream << ",\n  yshift=" << yshift;
-  }
-  return stream.str();
-}
-
-void PgfAxis::setOptions(const PgfAxisOptions& options) {
-  options_ = options;
-}
-
 void PgfAxis::addPlot(const std::shared_ptr<PgfPlot>& plot) {
   plots_.emplace_back(plot);
 }
@@ -186,7 +54,131 @@ void PgfAxis::addLegendEntry(const std::string& entry, const std::string& imageO
 
 std::string PgfAxis::string() const {
   std::ostringstream stream{};
-  stream << "\\begin{axis} [" << options_.string() << "\n]\n\n";
+  stream << "\\begin{axis} [";
+  stream << "\n  width=" << options.width << ",\n  height=" << options.height << ",\n  at={"
+         << options.at << '}' << ",\n  unbounded coords=" << options.unboundedCoords
+         << ",\n  xtick align=" << options.xtickAlign << ",\n  ytick align=" << options.ytickAlign;
+  if (options.name != ""s) {
+    stream << ",\n  name=" << options.name;
+  }
+  if (options.anchor != ""s) {
+    stream << ",\n  anchor=" << options.anchor;
+  }
+  if (options.hideAxis) {
+    stream << ",\n  hide axis";
+  }
+  if (options.barWidth != ""s) {
+    stream << ",\n  bar width=" << options.barWidth;
+  }
+  if (options.scaleOnlyAxis) {
+    stream << ",\n  scale only axis";
+  }
+  if (options.xmajorgrids) {
+    stream << ",\n  xmajorgrids";
+  }
+  if (options.xminorgrids) {
+    stream << ",\n  xminorgrids";
+  }
+  if (options.ymajorgrids) {
+    stream << ",\n  ymajorgrids";
+  }
+  if (options.yminorgrids) {
+    stream << ",\n  yminorgrids";
+  }
+  if (options.xmajorgrids || options.ymajorgrids) {
+    stream << ",\n  major grid style=" << options.majorGridStyle;
+  }
+  if (options.xminorgrids || options.yminorgrids) {
+    stream << ",\n  minor grid style=" << options.minorGridStyle;
+  }
+  if (options.majorTickLength != ""s) {
+    stream << ",\n major tick length=" << options.majorTickLength;
+  }
+  if (options.minorTickLength != ""s) {
+    stream << ",\n minor tick length=" << options.minorTickLength;
+  }
+  if (options.xmin != std::numeric_limits<double>::infinity()) {
+    stream << ",\n  xmin=" << options.xmin;
+  }
+  if (options.xmax != std::numeric_limits<double>::infinity()) {
+    stream << ",\n  xmax=" << options.xmax;
+  }
+  if (options.ymin != std::numeric_limits<double>::infinity()) {
+    stream << ",\n  ymin=" << options.ymin;
+  }
+  if (options.ymax != std::numeric_limits<double>::infinity()) {
+    stream << ",\n  ymax=" << options.ymax;
+  }
+  if (options.xbarInterval) {
+    stream << ",\n  xbar interval";
+  }
+  if (options.ybarInterval) {
+    stream << ",\n  ybar interval";
+  }
+  if (options.xbar) {
+    stream << ",\n  xbar";
+  }
+  if (options.ybar) {
+    stream << ",\n  ybar";
+  }
+  if (options.xlog) {
+    stream << ",\n  xmode=log";
+  }
+  if (options.ylog) {
+    stream << ",\n  ymode=log";
+  }
+  if (options.axisXLine != ""s) {
+    stream << ",\n  axis x line=" << options.axisXLine;
+  }
+  if (options.axisYLine != ""s) {
+    stream << ",\n  axis y line=" << options.axisYLine;
+  }
+  if (options.xlabel != ""s) {
+    stream << ",\n  xlabel={" << options.xlabel << '}';
+  }
+  if (options.xlabelStyle != ""s) {
+    stream << ",\n  xlabel style={" << options.xlabelStyle << '}';
+  }
+  if (options.xlabelAbsolute) {
+    stream << ",\n  xlabel absolute";
+  }
+  if (options.xtick != ""s) {
+    stream << ",\n  xtick={" << options.xtick << '}';
+  }
+  if (options.xticklabel != ""s) {
+    stream << ",\n  xticklabel={" << options.xticklabel << '}';
+  }
+  if (options.xticklabelStyle != ""s) {
+    stream << ",\n  xticklabel style={" << options.xticklabelStyle << '}';
+  }
+  if (options.ylabel != ""s) {
+    stream << ",\n  ylabel={" << options.ylabel << '}';
+  }
+  if (options.ylabelStyle != ""s) {
+    stream << ",\n  ylabel style={" << options.ylabelStyle << '}';
+  }
+  if (options.ylabelAbsolute) {
+    stream << ",\n  ylabel absolute";
+  }
+  if (options.ytick != ""s) {
+    stream << ",\n  ytick={" << options.ytick << '}';
+  }
+  if (options.yticklabel != ""s) {
+    stream << ",\n  yticklabel={" << options.yticklabel << '}';
+  }
+  if (options.yticklabelStyle != ""s) {
+    stream << ",\n  yticklabel style={" << options.yticklabelStyle << '}';
+  }
+  if (options.legendStyle != ""s) {
+    stream << ",\n  legend style={" << options.legendStyle << '}';
+  }
+  if (options.xshift != ""s) {
+    stream << ",\n  xshift=" << options.xshift;
+  }
+  if (options.yshift != ""s) {
+    stream << ",\n  yshift=" << options.yshift;
+  }
+  stream << "\n]\n";
   for (const auto& plot : plots_) {
     stream << plot->string() << '\n';
   }

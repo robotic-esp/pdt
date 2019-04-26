@@ -49,12 +49,6 @@ namespace esp {
 
 namespace ompltools {
 
-struct PgfTableOptions {
-  std::string string() const;
-  std::string colSep{"&"};
-  std::string rowSep{"\\\\"};
-};
-
 class PgfTable : public PlottableInterface {
  public:
   PgfTable() = default;
@@ -65,7 +59,6 @@ class PgfTable : public PlottableInterface {
   void loadFromPath(const std::experimental::filesystem::path& path, const std::string& domain,
                     const std::string& codomain);
 
-  void setOptions(const PgfTableOptions& options);
   void setCleanData(bool cleanData);
 
   // Add numbers.
@@ -86,7 +79,7 @@ class PgfTable : public PlottableInterface {
   std::size_t getNumRows() const;
   std::vector<double> getRow(std::size_t index) const;
 
-  // Deprecated
+  // Add a col. (Deprecated?)
   void addColumn(const std::deque<double>& column);
 
   // Convert this table to a string.
@@ -95,7 +88,12 @@ class PgfTable : public PlottableInterface {
  private:
   std::vector<std::deque<double>> data_{};
   bool cleanData_{true};
-  PgfTableOptions options_{};
+
+ public:
+  struct {
+    std::string colSep{"&"};
+    std::string rowSep{"\\\\"};
+  } options{};
 };
 
 }  // namespace ompltools

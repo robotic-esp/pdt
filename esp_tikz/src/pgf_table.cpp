@@ -52,12 +52,6 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-std::string PgfTableOptions::string() const {
-  std::ostringstream stream{};
-  stream << "\n  row sep=" << rowSep << ",\n  col sep=" << colSep;
-  return stream.str();
-}
-
 PgfTable::PgfTable(const std::experimental::filesystem::path& path, const std::string& domain,
                    const std::string& codomain) {
   loadFromPath(path, domain, codomain);
@@ -151,10 +145,6 @@ void PgfTable::addColumn(const std::deque<double>& column) {
     throw std::runtime_error("Table currently only implemented for 2 dimensional data.");
   }
   data_.push_back(column);
-}
-
-void PgfTable::setOptions(const PgfTableOptions& options) {
-  options_ = options;
 }
 
 void PgfTable::setCleanData(bool cleanData) {
@@ -254,12 +244,13 @@ std::string PgfTable::string() const {
 
   // We clean the table here. Values that are sandwiched are omitted.
   std::ostringstream stream{};
-  stream << "table [" << options_.string() << "\n]{\n";
+  stream << "table [\n"
+         << "  row sep=" << options.rowSep << ",\n  col sep=" << options.colSep << "\n]{\n";
   if (cleanData_) {
     double lowX = data_.at(0u).at(0);
     double lowY = data_.at(1u).at(0);
     double lastX = data_.at(0u).at(0);
-    stream << lowX << ' ' << options_.colSep << ' ' << lowY << options_.rowSep << '\n';
+    stream << lowX << ' ' << options.colSep << ' ' << lowY << options.rowSep << '\n';
     for (std::size_t row = 1u; row < data_.at(0u).size(); ++row) {
       auto x = data_.at(0u).at(row);
       auto y = data_.at(1u).at(row);
@@ -268,9 +259,9 @@ std::string PgfTable::string() const {
         continue;
       } else {
         if (lastX != lowX) {
-          stream << lowX << ' ' << options_.colSep << ' ' << lowY << options_.rowSep << '\n';
+          stream << lowX << ' ' << options.colSep << ' ' << lowY << options.rowSep << '\n';
         }
-        stream << x << ' ' << options_.colSep << ' ' << y << options_.rowSep << '\n';
+        stream << x << ' ' << options.colSep << ' ' << y << options.rowSep << '\n';
         lastX = x;
         lowX = x;
         lowY = y;
@@ -280,7 +271,7 @@ std::string PgfTable::string() const {
     for (std::size_t row = 0u; row < data_.at(0u).size(); ++row) {
       auto x = data_.at(0u).at(row);
       auto y = data_.at(1u).at(row);
-      stream << x << ' ' << options_.colSep << ' ' << y << options_.rowSep << '\n';
+      stream << x << ' ' << options.colSep << ' ' << y << options.rowSep << '\n';
     }
   }
   stream << "};\n";

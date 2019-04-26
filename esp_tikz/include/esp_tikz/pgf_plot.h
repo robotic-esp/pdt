@@ -46,33 +46,12 @@ namespace esp {
 
 namespace ompltools {
 
-struct PgfPlotOptions {
-  std::string string() const;
-  // Line options.
-  double lineWidth{1.0};
-  std::string color{"black"};
-  std::string fill{""};
-
-  // Mark options.
-  double markSize{2.0};
-  std::string mark{"square*"};
-  bool onlyMarks{false};
-
-  // Plot options.
-  bool forgetPlot{false};
-  bool constPlot{true};
-  std::string namePath{""};
-  float fillOpacity{1.0};
-  float drawOpacity{1.0};
-};
-
 class PgfPlot {
  public:
   PgfPlot() = default;
   PgfPlot(const std::shared_ptr<PlottableInterface>& plottable);
   ~PgfPlot() = default;
 
-  void setOptions(const PgfPlotOptions& options);
   void setLegend(const std::string& legend);
   void setPlottable(const std::shared_ptr<PlottableInterface>& plottable);
 
@@ -80,8 +59,28 @@ class PgfPlot {
 
  private:
   std::shared_ptr<PlottableInterface> plottable_{};
-  PgfPlotOptions options_{};
   std::string legend_{""};
+
+ public:
+  // The supported plot options.
+  struct {
+    // Line options.
+    double lineWidth{1.0};
+    std::string color{"black"};
+    std::string fill{""};
+
+    // Mark options.
+    double markSize{2.0};
+    std::string mark{"square*"};
+    bool onlyMarks{false};
+
+    // Plot options.
+    bool forgetPlot{false};
+    bool constPlot{true};
+    std::string namePath{""};
+    float fillOpacity{1.0};
+    float drawOpacity{1.0};
+  } options{};
 };
 
 }  // namespace ompltools
