@@ -1,0 +1,72 @@
+{
+    "Colors": {
+        "espblack": [ 0, 0, 0 ],
+        "espwhite": [ 255, 255, 255 ],
+        "espgray": [ 120, 120, 120 ],
+        "espblue": [ 11, 93, 174 ],
+        "espred": [ 206, 62, 21 ],
+        "espyellow": [ 232, 163, 26 ],
+        "espgreen": [ 100, 161, 27 ],
+        "esppurple": [ 106, 20, 125 ],
+        "esplightblue": [ 59, 175, 236 ],
+        "espdarkred": [ 145, 0, 33 ]
+    },
+    "PlannerPlotColors": {
+        "BITstar": "espblue",
+        "LBTRRT" : "esppurple",
+        "RRTConnect": "espblack",
+        "RRTsharp": "espyellow",
+        "RRTstar": "espred",
+        "SBITstar": "espgreen"
+    },
+    "PlannerPlotNames": {
+        "BITstar": "BIT*",
+        "LBTRRT": "LBT-RRT",
+        "RRTConnect": "RRT-Connect",
+        "RRTsharp": "RRT$^\\#$",
+        "RRTstar": "RRT*",
+        "SBITstar": "SBIT*"
+    },
+    "SuccessPlots": {
+        "xlog": true,
+        "markSize": 0.0,
+        "lineWidth": 1.0,
+        "axisWidth": "\\textwidth",
+        "axisHeight": "0.4\\textwidth",
+        "xminorgrids": true,
+        "xmajorgrids": true,
+        "yminorgrids": false,
+        "ymajorgrids": true,
+        "ytick": "0,25,50,75,100"
+    },
+    "MedianCostPlots": {
+        "xlog": true,
+        "markSize": 0.5,
+        "medianLineWidth": 1.0,
+        "confidence": 99,
+        "plotConfidenceIntervalInAllPlots": false,
+        "confidenceIntervalLineWidth": 0.5,
+        "confidenceIntervalDrawOpacity": 0.2,
+        "confidenceIntervalFillOpacity": 0.1,
+        "initialConfidenceIntervalMarkSize": 1.0,
+        "initialConfidenceIntervalLineWidth": 0.5,
+        "axisWidth": "\\textwidth",
+        "axisHeight": "0.5\\textwidth",
+        "xminorgrids": true,
+        "xmajorgrids": true,
+        "yminorgrids": false,
+        "ymajorgrids": true
+    },
+    "InitialSolutionPlots": {
+        "xlog": true,
+        "markSize": 0.0,
+        "lineWidth": 1.0,
+        "combinedFillOpacity": 0.1,
+        "axisWidth": "\\textwidth",
+        "axisHeight": "0.28\\textwidth",
+        "xminorgrids": true,
+        "xmajorgrids": true,
+        "yminorgrids": false,
+        "ymajorgrids": true
+    }
+}
