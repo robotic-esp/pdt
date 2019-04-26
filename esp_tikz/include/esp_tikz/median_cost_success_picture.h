@@ -54,29 +54,29 @@ class MedianCostSuccessPicture : public TikzPicture {
                            const Statistics& stats);
   ~MedianCostSuccessPicture() = default;
 
-  // Returns a pgf axis that holds the median cost at binned durations for all planners.
-  std::shared_ptr<PgfAxis> createMedianCostAxis() const;
-
-  // Returns a pgf axis that holds the median cost at binned durations for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianCostAxis(const std::string& plannerName) const;
-
-  // Returns a pgf axis that holds the success percentage over time for all planners.
+  // Creates a pgf axis that holds the success percentage over time for all planners.
   std::shared_ptr<PgfAxis> createSuccessAxis() const;
 
-  // Returns a pgf axis that holds the success percentage over time for the specified planner.
+  // Creates a pgf axis that holds the success percentage over time for the specified planner.
   std::shared_ptr<PgfAxis> createSuccessAxis(const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the median cost axis of all planners.
-  std::experimental::filesystem::path createMedianCostPicture() const;
+  // Creates a pgf axis that holds the median cost at binned durations for all planners.
+  std::shared_ptr<PgfAxis> createMedianCostAxis() const;
 
-  // Creates a tikz picture that contains the median cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianCostPicture(const std::string& plannerName) const;
+  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
+  std::shared_ptr<PgfAxis> createMedianCostAxis(const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the success axis of all planners.
   std::experimental::filesystem::path createSuccessPicture() const;
 
   // Creates a tikz picture that contains the success axis of the specified planner.
   std::experimental::filesystem::path createSuccessPicture(const std::string& plannerName) const;
+
+  // Creates a tikz picture that contains the median cost axis of all planners.
+  std::experimental::filesystem::path createMedianCostPicture() const;
+
+  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  std::experimental::filesystem::path createMedianCostPicture(const std::string& plannerName) const;
 
   // Creates a combined tikz picture with success and median costs of all planners.
   std::experimental::filesystem::path createCombinedPicture() const;
@@ -89,19 +89,26 @@ class MedianCostSuccessPicture : public TikzPicture {
       const std::experimental::filesystem::path& tikzPicture) const;
 
  private:
-  // Plots with all planners.
-  std::shared_ptr<PgfAxis> generateMedianCostPlot(const Statistics& stats,
-                                                  std::size_t confidence) const;
-  std::shared_ptr<PgfAxis> generateSuccessPlot(const Statistics& stats) const;
+  std::shared_ptr<PgfPlot> createSuccessPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionUpperCIPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionLowerCIPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionFillCIPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianInitialSolutionPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianInitialSolutionDurationCIPlot(
+      const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianInitialSolutionCostCIPlot(
+      const std::string& plannerName) const;
 
-  // Plots of individual planners.
-  std::shared_ptr<PgfAxis> generateMedianCostPlot(const Statistics& stats,
-                                                  const std::string& plannerName,
-                                                  std::size_t confidence) const;
-  std::shared_ptr<PgfAxis> generateSuccessPlot(const Statistics& stats,
-                                               const std::string& plannerName) const;
+  void setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  const std::shared_ptr<const Configuration> config_{};
+  std::vector<double> binnedDurations_{};
+  double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
+  double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
+
+  const std::shared_ptr<const Configuration> config_;
+  const Statistics& stats_;
 };
 
 }  // namespace ompltools

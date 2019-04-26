@@ -55,9 +55,23 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 MedianCostSuccessPicture::MedianCostSuccessPicture(
-    const std::shared_ptr<const Configuration>& config) :
+    const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
     TikzPicture(config),
-    config_(config) {
+    config_(config),
+    stats_(stats) {
+  // Compute the duration bin size.
+  auto contextName = config_->get<std::string>("Experiment/context");
+  std::size_t numBins = std::ceil(config_->get<double>("Contexts/" + contextName + "/maxTime") *
+                                  config_->get<double>("Experiment/logFrequency"));
+  double binSize = 1.0 / config_->get<double>("Experiment/logFrequency");
+  binnedDurations_.reserve(numBins);
+  for (std::size_t i = 0u; i < numBins; ++i) {
+    binnedDurations_.emplace_back(static_cast<double>(i + 1u) * binSize);
+  }
+
+  // Determine the min and max durations to be plotted.
+  maxDurationToBePlotted_ = binnedDurations_.back();
+  minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 
 // The lookup table for confidence intervals.
@@ -85,323 +99,464 @@ static const std::map<std::size_t, std::map<std::size_t, Interval>> medianConfid
     {100000u, {{95u, {49687u, 50307u, 0.9500}}, {99u, {49588u, 50403u, 0.9900}}}},
     {1000000u, {{95u, {499018u, 500978u, 0.9500}}, {99u, {498707u, 501283u, 0.9900}}}}};
 
-fs::path MedianCostSuccessPicture::generatePlot(const Statistics& stats, std::size_t confidence) {
-  // Compute the duration bin size.
-  auto contextName = config_->get<std::string>("Experiment/context");
-  std::size_t numMeasurements =
-      std::ceil(config_->get<double>("Contexts/" + contextName + "/maxTime") *
-                config_->get<double>("Experiment/logFrequency"));
-  double binSize = 1.0 / config_->get<double>("Experiment/logFrequency");
-  std::vector<double> durations;
-  durations.reserve(numMeasurements);
-  for (std::size_t i = 0u; i < numMeasurements; ++i) {
-    durations.emplace_back(static_cast<double>(i + 1u) * binSize);
+std::shared_ptr<PgfAxis> MedianCostSuccessPicture::createSuccessAxis() const {
+  auto axis = std::make_shared<PgfAxis>();
+  setSuccessAxisOptions(axis);
+
+  // Fill the axis with the success plots of all planners.
+  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
+    axis->addPlot(createSuccessPlot(name));
   }
 
-  // Determine the min and max durations to be plotted.
-  double maxDurationToBePlotted = durations.back();
-  double minDurationToBePlotted = stats.getMinInitialSolutionDuration();
+  return axis;
+}
 
-  // Set the axis options for the success plot.
-  PgfAxisOptions successAxisOptions;
-  successAxisOptions.name = "SuccessAxis";
-  successAxisOptions.height = "0.4\\textwidth";
-  successAxisOptions.xmin = minDurationToBePlotted;
-  successAxisOptions.xmax = maxDurationToBePlotted;
-  successAxisOptions.xlog = true;
-  successAxisOptions.xminorgrids = true;
-  successAxisOptions.xlabel = "{\\empty}"s;
-  successAxisOptions.xticklabel = "{\\empty}"s;
-  successAxisOptions.ymin = 0;
-  successAxisOptions.ymax = 100.2;
-  successAxisOptions.ytick = "0,25,50,75,100";
-  successAxisOptions.ylabel = "Success [\\%]"s;
-  successAxisOptions.ylabelAbsolute = true;
-  successAxisOptions.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
-  auto successAxis = generateSuccessPlot(stats);
-  successAxis->setOptions(successAxisOptions);
+std::shared_ptr<PgfAxis> MedianCostSuccessPicture::createSuccessAxis(
+    const std::string& plannerName) const {
+  auto axis = std::make_shared<PgfAxis>();
+  setSuccessAxisOptions(axis);
+  axis->addPlot(createSuccessPlot(plannerName));
+  return axis;
+}
 
-  // Set the axis options for the median cost plot.
-  PgfAxisOptions medianCostAxisOptions;
-  medianCostAxisOptions.at = "($(SuccessAxis.south) - (0.0em, 0.3em)$)";
-  medianCostAxisOptions.anchor = "north";
-  medianCostAxisOptions.name = "MedianCostAxis";
-  medianCostAxisOptions.xmin = minDurationToBePlotted;
-  medianCostAxisOptions.xmax = maxDurationToBePlotted;
-  medianCostAxisOptions.ymax = stats.getMaxNonInfCost();
-  medianCostAxisOptions.xlog = true;
-  medianCostAxisOptions.xminorgrids = true;
-  medianCostAxisOptions.xlabel = "Computation time [s]";
-  medianCostAxisOptions.ylabel = "Median cost";
-  medianCostAxisOptions.ylabelAbsolute = true;
-  medianCostAxisOptions.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
-  auto medianCostAxis = generateMedianCostPlot(stats, confidence);
-  medianCostAxis->setOptions(medianCostAxisOptions);
+std::shared_ptr<PgfAxis> MedianCostSuccessPicture::createMedianCostAxis() const {
+  auto axis = std::make_shared<PgfAxis>();
+  setMedianCostAxisOptions(axis);
 
-  // Create the axis that holds the plot legend.
-  PgfAxisOptions legendAxisOptions;
-  legendAxisOptions.at = "($(MedianCostAxis.south) - (0.0em, 0.3em)$)";
-  legendAxisOptions.anchor = "north";
-  legendAxisOptions.name = "LegendAxis";
-  legendAxisOptions.xmin = 0;
-  legendAxisOptions.xmax = 10;
-  legendAxisOptions.ymin = 0;
-  legendAxisOptions.ymax = 10;
-  legendAxisOptions.hideAxis = true;
-  legendAxisOptions.legendStyle =
-      "anchor=south, legend cell align=left, legend columns=6, at={(axis cs:5, 6)}";
-  auto legendAxis = generateLegendAxis();
-  legendAxis->setOptions(legendAxisOptions);
+  // Fill the axis with the median cost plots of all planners.
+  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
+    if (name != "RRTConnect"s) {
+      // First the lower and upper confidence bounds, if desired.
+      if (config_->get<bool>("MedianCostPlots/plotConfidenceIntervalInAllPlots")) {
+        axis->addPlot(createMedianCostEvolutionUpperCIPlot(name));
+        axis->addPlot(createMedianCostEvolutionLowerCIPlot(name));
+        axis->addPlot(createMedianCostEvolutionFillCIPlot(name));
+      }
 
-  // Add all axis to this plot.
-  axes_.emplace_back(successAxis);
-  axes_.emplace_back(medianCostAxis);
-  axes_.emplace_back(legendAxis);
+      // Then the median cost evolution.
+      axis->addPlot(createMedianCostEvolutionPlot(name));
+    }
 
-  // Generate the path to write to.
+    // Then the initial solutions.
+    axis->addPlot(createMedianInitialSolutionPlot(name));
+    axis->addPlot(createMedianInitialSolutionDurationCIPlot(name));
+    axis->addPlot(createMedianInitialSolutionCostCIPlot(name));
+  }
+
+  return axis;
+}
+
+std::shared_ptr<PgfAxis> MedianCostSuccessPicture::createMedianCostAxis(
+    const std::string& plannerName) const {
+  auto axis = std::make_shared<PgfAxis>();
+  setMedianCostAxisOptions(axis);
+
+  // First the median cost evolution.
+  axis->addPlot(createMedianCostEvolutionUpperCIPlot(plannerName));
+  axis->addPlot(createMedianCostEvolutionLowerCIPlot(plannerName));
+  axis->addPlot(createMedianCostEvolutionFillCIPlot(plannerName));
+  axis->addPlot(createMedianCostEvolutionPlot(plannerName));
+
+  // Then the initial solutions.
+  axis->addPlot(createMedianInitialSolutionPlot(plannerName));
+  axis->addPlot(createMedianInitialSolutionDurationCIPlot(plannerName));
+  axis->addPlot(createMedianInitialSolutionCostCIPlot(plannerName));
+
+  return axis;
+}
+
+fs::path MedianCostSuccessPicture::createSuccessPicture() const {
+  // Create the picture and add the axis.
+  TikzPicture picture(config_);
+  picture.addAxis(createSuccessAxis());
+
+  // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
-                     fs::path("tikz/"s + config_->get<std::string>("Experiment/name") +
-                              "_median_cost_success_plot.tikz");
-  write(picturePath);
+                     fs::path("tikz/all_planners_success_plot.tikz");
+  picture.write(picturePath);
   return picturePath;
 }
 
-std::shared_ptr<PgfAxis> MedianCostSuccessPicture::generateMedianCostPlot(
-    const Statistics& stats, std::size_t confidence) const {
-  // Create an axis to hold the plots.
-  auto axis = std::make_shared<PgfAxis>();
+fs::path MedianCostSuccessPicture::createSuccessPicture(const std::string& plannerName) const {
+  // Create the picture and add the axis.
+  TikzPicture picture(config_);
+  picture.addAxis(createSuccessAxis(plannerName));
 
-  // Plot the initial solutions.
-  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
-    // Load the median initial duration and cost into a table.
-    auto medianInitialSolutionPath = stats.extractMedianInitialSolution(name, confidence);
-    auto initialSolutionTable =
-        std::make_shared<PgfTable>(medianInitialSolutionPath, "median initial solution duration",
-                                   "median initial solution cost");
-
-    // Create the pgf plot with this data and add it to the axis.
-    PgfPlotOptions initialSolutionPlotOptions;
-    initialSolutionPlotOptions.markSize = 0.5;
-    initialSolutionPlotOptions.namePath = name + "MedianInitialSolution"s;
-    initialSolutionPlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
-    auto initialSolutionPlot = std::make_shared<PgfPlot>(initialSolutionTable);
-    initialSolutionPlot->setOptions(initialSolutionPlotOptions);
-    axis->addPlot(initialSolutionPlot);
-
-    // We need to load the other values as well.
-    PgfTable lowerBoundSolutionTable(medianInitialSolutionPath,
-                                     "lower initial solution duration confidence bound",
-                                     "lower initial solution cost confidence bound");
-    PgfTable upperBoundSolutionTable(medianInitialSolutionPath,
-                                     "upper initial solution duration confidence bound",
-                                     "upper initial solution cost confidence bound");
-    double medianDuration = initialSolutionTable->getRow(0u).at(0u);
-    double medianCost = initialSolutionTable->getRow(0u).at(1u);
-    double lowerDurationBound = lowerBoundSolutionTable.getRow(0u).at(0u);
-    double upperDurationBound = upperBoundSolutionTable.getRow(0u).at(0u);
-    double lowerCostBound = lowerBoundSolutionTable.getRow(0u).at(1u);
-    double upperCostBound = upperBoundSolutionTable.getRow(0u).at(1u);
-
-    // Create a table for the duration confidence intervals.
-    auto initialSolutionDurationIntervalTable = std::make_shared<PgfTable>();
-    initialSolutionDurationIntervalTable->appendRow({lowerDurationBound, medianCost});
-    initialSolutionDurationIntervalTable->appendRow({upperDurationBound, medianCost});
-
-    // Create a plot for the duration and add it to the axis.
-    PgfPlotOptions initialSolutionDurationIntervalPlotOptions;
-    initialSolutionDurationIntervalPlotOptions.markSize = 1.0;
-    initialSolutionDurationIntervalPlotOptions.mark = "|";
-    initialSolutionDurationIntervalPlotOptions.lineWidth = 0.5;
-    initialSolutionPlotOptions.namePath = name + "MedianInitialSolutionDurationConfidenceInterval"s;
-    initialSolutionDurationIntervalPlotOptions.color =
-        config_->get<std::string>("PlannerPlotColors/" + name);
-    auto initialSolutionDurationIntervalPlot =
-        std::make_shared<PgfPlot>(initialSolutionDurationIntervalTable);
-    initialSolutionDurationIntervalPlot->setOptions(initialSolutionDurationIntervalPlotOptions);
-    axis->addPlot(initialSolutionDurationIntervalPlot);
-
-    // Create a table for the duration confidence intervals.
-    auto initialSolutionCostIntervalTable = std::make_shared<PgfTable>();
-    initialSolutionCostIntervalTable->appendRow({medianDuration, lowerCostBound});
-    initialSolutionCostIntervalTable->appendRow({medianDuration, upperCostBound});
-
-    // Create a plot for the cost and add it to the axis.
-    PgfPlotOptions initialSolutionCostIntervalPlotOptions;
-    initialSolutionCostIntervalPlotOptions.markSize = 1.0;
-    initialSolutionCostIntervalPlotOptions.mark = "-";
-    initialSolutionCostIntervalPlotOptions.lineWidth = 0.5;
-    initialSolutionPlotOptions.namePath = name + "MedianInitialSolutionCostConfidenceInterval"s;
-    initialSolutionCostIntervalPlotOptions.color =
-        config_->get<std::string>("PlannerPlotColors/" + name);
-    auto initialSolutionCostIntervalPlot =
-        std::make_shared<PgfPlot>(initialSolutionCostIntervalTable);
-    initialSolutionCostIntervalPlot->setOptions(initialSolutionCostIntervalPlotOptions);
-    axis->addPlot(initialSolutionCostIntervalPlot);
-  }
-
-  // Plot the median costs and confidence intervals.
-  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
-    // This cannot be applied to planners that aren't anytime.
-    if (name == "RRTConnect"s) {
-      continue;
-    }
-
-    // Get the median costs file, this needs to be moved.
-    auto medianCostsFile = stats.extractMedians(name);
-
-    // Load a table from this file.
-    auto medianCostsTable =
-        std::make_shared<PgfTable>(medianCostsFile, "durations", "median costs");
-
-    // Let's plot the median costs right away.
-    PgfPlotOptions medianCostsPlotOptions;
-    medianCostsPlotOptions.markSize = 0.0;
-    medianCostsPlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
-    medianCostsPlotOptions.namePath = name + "Median"s;
-    auto medianCostsPlot = std::make_shared<PgfPlot>(medianCostsTable);
-    medianCostsPlot->setOptions(medianCostsPlotOptions);
-    axis->addPlot(medianCostsPlot);
-
-    // Plot the lower bound of the confidence interval.
-    auto medianLowConfidenceTable =
-        std::make_shared<PgfTable>(medianCostsFile, "durations", "lower confidence bound");
-
-    PgfPlotOptions medianLowerConfidencePlotOptions;
-    medianLowerConfidencePlotOptions.markSize = 0.0;
-    medianLowerConfidencePlotOptions.lineWidth = 0.5;
-    medianLowerConfidencePlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
-    medianLowerConfidencePlotOptions.fillOpacity = 0.0;
-    medianLowerConfidencePlotOptions.drawOpacity = 0.2;
-    medianLowerConfidencePlotOptions.namePath = name + "LowConfidence"s;
-    auto medianLowConfidencePlot = std::make_shared<PgfPlot>(medianLowConfidenceTable);
-    medianLowConfidencePlot->setOptions(medianLowerConfidencePlotOptions);
-    axis->addPlot(medianLowConfidencePlot);
-
-    // Plot the upper bound of the confidence interval.
-    auto medianHighConfidenceTable =
-        std::make_shared<PgfTable>(medianCostsFile, "durations", "upper confidence bound");
-
-    // Replace the infinite values with very high values, otherwise they're not plotted.
-    medianHighConfidenceTable->replaceInCodomain(std::numeric_limits<double>::infinity(),
-                                                 3 * stats.getMaxNonInfCost());
-
-    PgfPlotOptions medianUpperConfidencePlotOptions;
-    medianUpperConfidencePlotOptions.markSize = 0.0;
-    medianUpperConfidencePlotOptions.lineWidth = 0.5;
-    medianUpperConfidencePlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
-    medianUpperConfidencePlotOptions.fillOpacity = 0.0;
-    medianUpperConfidencePlotOptions.drawOpacity = 0.2;
-    medianUpperConfidencePlotOptions.namePath = name + "HighConfidence"s;
-    auto medianHighConfidencePlot = std::make_shared<PgfPlot>(medianHighConfidenceTable);
-    medianHighConfidencePlot->setOptions(medianUpperConfidencePlotOptions);
-    axis->addPlot(medianHighConfidencePlot);
-
-    // Fill the areas between the upper and lower bound
-    PgfFillBetweenOptions fillBetweenOptions;
-    fillBetweenOptions.name1 = medianUpperConfidencePlotOptions.namePath;
-    fillBetweenOptions.name2 = medianLowerConfidencePlotOptions.namePath;
-    auto fillBetween = std::make_shared<PgfFillBetween>();
-    fillBetween->setOptions(fillBetweenOptions);
-    PgfPlotOptions confidenceIntervalFillPlotOptions;
-    confidenceIntervalFillPlotOptions.color =
-        config_->get<std::string>("PlannerPlotColors/" + name);
-    confidenceIntervalFillPlotOptions.fillOpacity = 0.1;
-    confidenceIntervalFillPlotOptions.drawOpacity = 0.0;
-    auto confidenceIntervalFillPlot = std::make_shared<PgfPlot>(fillBetween);
-    confidenceIntervalFillPlot->setOptions(confidenceIntervalFillPlotOptions);
-    axis->addPlot(confidenceIntervalFillPlot);
-  }
-
-  return axis;
-}
-
-std::shared_ptr<PgfAxis> MedianCostSuccessPicture::generateSuccessPlot(
-    const Statistics& stats) const {
-  // Create an axis for this plot.
-  auto axis = std::make_shared<PgfAxis>();
-
-  // Only plot the sample CDF for now.
-  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
-    // Get the initial solution durations.
-    auto initialSolutionDurationsCdfFile = stats.extractInitialSolutionDurationCdf(name);
-
-    // Compute the solution percentages and store them in a pgf table.
-    auto successPercentagePlotTable =
-        std::make_shared<PgfTable>(initialSolutionDurationsCdfFile, "durations", "cdf");
-    // Multiply the cdf values by 100 to get the percentage.
-    successPercentagePlotTable->replaceInCodomain([](double number) { return 100.0 * number; });
-
-    // A zero in the domain will result in a jumped coordinate, because its a logarithmic plot.
-    successPercentagePlotTable->replaceInDomain(0.0, 1e-9);
-
-    // Remove if rows for which domain is infinite.
-    successPercentagePlotTable->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
-
-    // Add a row to draw the last element.
-    successPercentagePlotTable->appendRow(
-        {stats.getMaxDuration(),
-         successPercentagePlotTable->getRow(successPercentagePlotTable->getNumRows() - 1u).at(1u)});
-
-    // Create the plot and add it to the axis.
-    PgfPlotOptions successPercentagePlotOptions;
-    successPercentagePlotOptions.markSize = 0.0;
-    successPercentagePlotOptions.color = config_->get<std::string>("PlannerPlotColors/" + name);
-    successPercentagePlotOptions.namePath = name + "Success"s;
-    auto successPercentagePlot = std::make_shared<PgfPlot>(successPercentagePlotTable);
-    successPercentagePlot->setOptions(successPercentagePlotOptions);
-    axis->addPlot(successPercentagePlot);
-  }
-
-  return axis;
-}
-
-fs::path MedianCostSuccessPicture::generatePdf() const {
-  // Generate the path to write to.
+  // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
-                     fs::path("tikz/"s + config_->get<std::string>("Experiment/name") +
-                              "_median_cost_success_plot.tikz");
-  auto texFilePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
-                     fs::path("plots/"s + config_->get<std::string>("Experiment/name") +
-                              "_median_cost_success_plot.tex");
-  fs::create_directories(texFilePath.parent_path());
-  std::ofstream texFile;
-  texFile.open(texFilePath.c_str());
+                     fs::path("tikz/"s + plannerName + "_success_plot.tikz"s);
+  picture.write(picturePath);
+  return picturePath;
+}
+
+fs::path MedianCostSuccessPicture::createMedianCostPicture() const {
+  // Create the picture and add the axis.
+  TikzPicture picture(config_);
+  picture.addAxis(createMedianCostAxis());
+
+  // Generate the tikz file.
+  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+                     fs::path("tikz/all_planners_median_cost_plot.tikz");
+  picture.write(picturePath);
+  return picturePath;
+}
+
+fs::path MedianCostSuccessPicture::createMedianCostPicture(const std::string& plannerName) const {
+  // Create the picture and add the axis.
+  TikzPicture picture(config_);
+  picture.addAxis(createMedianCostAxis(plannerName));
+
+  // Generate the tikz file.
+  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+                     fs::path("tikz/"s + plannerName + "_median_cost_plot.tikz"s);
+  picture.write(picturePath);
+  return picturePath;
+}
+
+fs::path MedianCostSuccessPicture::createCombinedPicture() const {
+  // Create the success axis and override some options.
+  auto successAxis = createSuccessAxis();
+  successAxis->options.name = "AllPlannersCombinedSuccessAxis"s;
+  successAxis->options.xlabel = "{\\empty}"s;
+  successAxis->options.xticklabel = "{\\empty}"s;
+
+  // Create the median cost axis and override some options.
+  auto medianCostAxis = createMedianCostAxis();
+  medianCostAxis->options.at = "($(AllPlannersCombinedSuccessAxis.south) - (0.0em, 0.3em)$)";
+  medianCostAxis->options.anchor = "north";
+  medianCostAxis->options.name = "AllPlannersCombinedMedianCostAxis"s;
+
+  // Create the picture and add the axes.
+  TikzPicture picture(config_);
+  picture.addAxis(successAxis);
+  picture.addAxis(medianCostAxis);
+
+  // Generate the tikz file.
+  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+                     fs::path("tikz/all_planners_combined_success_median_cost_plot.tikz");
+  picture.write(picturePath);
+  return picturePath;
+}
+
+fs::path MedianCostSuccessPicture::createCombinedPicture(const std::string& plannerName) const {
+  // Create the success axis and override some options.
+  auto successAxis = createSuccessAxis(plannerName);
+  successAxis->options.name = plannerName + "CombinedSuccessAxis"s;
+  successAxis->options.xlabel = "{\\empty}"s;
+  successAxis->options.xticklabel = "{\\empty}"s;
+
+  // Create the median cost axis and override some options.
+  auto medianCostAxis = createMedianCostAxis(plannerName);
+  medianCostAxis->options.at =
+      "($("s + plannerName + "CombinedSuccessAxis.south) - (0.0em, 0.3em)$)"s;
+  medianCostAxis->options.anchor = "north";
+  medianCostAxis->options.name = plannerName + "CombinedMedianCostAxis"s;
+
+  // Create the picture and add the axes.
+  TikzPicture picture(config_);
+  picture.addAxis(successAxis);
+  picture.addAxis(medianCostAxis);
+
+  // Generate the tikz file.
+  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+                     fs::path("tikz/"s + plannerName + "_combined_success_median_cost_plot.tikz"s);
+  picture.write(picturePath);
+  return picturePath;
+}
+
+void MedianCostSuccessPicture::setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+  axis->options.name = "SuccessAxis";
+  axis->options.width = config_->get<std::string>("SuccessPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("SuccessPlots/axisHeight");
+  axis->options.xmin = minDurationToBePlotted_;
+  axis->options.xmax = maxDurationToBePlotted_;
+  axis->options.ymin = 0;
+  axis->options.ymax = 100;
+  axis->options.xlog = config_->get<bool>("SuccessPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("SuccessPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("SuccessPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("SuccessPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("SuccessPlots/ymajorgrids");
+  axis->options.xlabel = "Computation time [s]"s;
+  axis->options.ytick = config_->get<std::string>("SuccessPlots/ytick");
+  axis->options.ylabel = "Success [\\%]"s;
+  axis->options.ylabelAbsolute = true;
+  axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
+}
+
+void MedianCostSuccessPicture::setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+  axis->options.name = "MedianCostAxis";
+  axis->options.width = config_->get<std::string>("MedianCostPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("MedianCostPlots/axisHeight");
+  axis->options.xmin = minDurationToBePlotted_;
+  axis->options.xmax = maxDurationToBePlotted_;
+  axis->options.ymax = stats_.getMaxNonInfCost();
+  axis->options.xlog = config_->get<bool>("MedianCostPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("MedianCostPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("MedianCostPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("MedianCostPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("MedianCostPlots/ymajorgrids");
+  axis->options.xlabel = "Computation time [s]"s;
+  axis->options.ylabel = "Median cost"s;
+  axis->options.ylabelAbsolute = true;
+  axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
+}
+
+std::shared_ptr<PgfPlot> MedianCostSuccessPicture::createSuccessPlot(
+    const std::string& plannerName) const {
+  // Store the initial solution cdf in a pgf table.
+  auto table = std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationCdf(plannerName),
+                                          "durations", "cdf");
+
+  // Multiply the cdf values by 100 to get the percentage.
+  table->replaceInCodomain([](double number) { return 100.0 * number; });
+
+  // A zero in the domain will result in a jumped coordinate, because its a logarithmic plot.
+  table->replaceInDomain(0.0, 1e-9);
+
+  // Remove all rows for which domain is infinite.
+  table->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
+
+  // Add a row to draw the last element.
+  table->appendRow({stats_.getMaxDuration(), table->getRow(table->getNumRows() - 1u).at(1u)});
+
+  // Create the plot from this table.
+  auto plot = std::make_shared<PgfPlot>(table);
+
+  // Add the appropriate options.
+  plot->options.markSize = config_->get<double>("SuccessPlots/markSize");
+  plot->options.lineWidth = config_->get<double>("SuccessPlots/lineWidth");
+  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.namePath = plannerName + "Success"s;
+
+  return plot;
+}
+
+std::shared_ptr<PgfPlot> MedianCostSuccessPicture::createMedianCostEvolutionPlot(
+    const std::string& plannerName) const {
+  // This cannot be applied to planners that aren't anytime.
+  if (plannerName == "RRTConnect"s) {
+    auto msg =
+        "Cannot create median cost evolution plot of nonanytime planner '"s + plannerName + "'."s;
+    throw std::invalid_argument(msg);
+  }
+
+  // Get the table from the appropriate file.
+  auto table =
+      std::make_shared<PgfTable>(stats_.extractMedians(plannerName), "durations", "median costs");
+
+  // Create the plot and set the options.
+  auto plot = std::make_shared<PgfPlot>(table);
+  plot->options.markSize = 0.0;
+  plot->options.lineWidth = config_->get<double>("MedianCostPlots/medianLineWidth");
+  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.namePath = plannerName + "MedianCostEvolution"s;
+
+  return plot;
+}
+
+std::shared_ptr<PgfPlot> MedianCostSuccessPicture::createMedianCostEvolutionUpperCIPlot(
+    const std::string& plannerName) const {
+  // This cannot be applied to planners that aren't anytime.
+  if (plannerName == "RRTConnect"s) {
+    auto msg = "Cannot create median cost upper CI evolution plot of nonanytime planner '"s +
+               plannerName + "'."s;
+    throw std::invalid_argument(msg);
+  }
+
+  // Get the table from the appropriate file.
+  auto table = std::make_shared<PgfTable>(stats_.extractMedians(plannerName), "durations",
+                                          "upper confidence bound");
+
+  // Replace the infinite values with very high values, otherwise they're not plotted.
+  table->replaceInCodomain(std::numeric_limits<double>::infinity(), 3 * stats_.getMaxNonInfCost());
+
+  // Create the plot and set the options.
+  auto plot = std::make_shared<PgfPlot>(table);
+  plot->options.markSize = 0.0;
+  plot->options.lineWidth = config_->get<double>("MedianCostPlots/confidenceIntervalLineWidth");
+  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.namePath = plannerName + "MedianCostEvolutionUpperConfidence"s;
+  plot->options.drawOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalFillOpacity");
+
+  return plot;
+}
+
+std::shared_ptr<PgfPlot> MedianCostSuccessPicture::createMedianCostEvolutionLowerCIPlot(
+    const std::string& plannerName) const {
+  // This cannot be applied to planners that aren't anytime.
+  if (plannerName == "RRTConnect"s) {
+    auto msg = "Cannot create median cost lower CI evolution plot of nonanytime planner '"s +
+               plannerName + "'."s;
+    throw std::invalid_argument(msg);
+  }
+
+  // Get the table from the appropriate file.
+  auto table = std::make_shared<PgfTable>(stats_.extractMedians(plannerName), "durations",
+                                          "lower confidence bound");
+
+  // Create the plot and set the options.
+  auto plot = std::make_shared<PgfPlot>(table);
+  plot->options.markSize = 0.0;
+  plot->options.lineWidth = config_->get<double>("MedianCostPlots/confidenceIntervalLineWidth");
+  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.namePath = plannerName + "MedianCostEvolutionLowerConfidence"s;
+  plot->options.drawOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalFillOpacity");
+
+  return plot;
+}
+
+std::shared_ptr<PgfPlot> MedianCostSuccessPicture::createMedianCostEvolutionFillCIPlot(
+    const std::string& plannerName) const {
+  // Fill the areas between the upper and lower bound.
+  auto fillBetween =
+      std::make_shared<PgfFillBetween>(plannerName + "MedianCostEvolutionUpperConfidence",
+                                       plannerName + "MedianCostEvolutionLowerConfidence");
+
+  // Create the plot.
+  auto plot = std::make_shared<PgfPlot>(fillBetween);
+  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.fillOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity = 0.0;
+
+  return plot;
+}
+
+std::shared_ptr<PgfPlot> MedianCostSuccessPicture::createMedianInitialSolutionPlot(
+    const std::string& plannerName) const {
+  // Load the median initial duration and cost into a table.
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedianInitialSolution(plannerName,
+                                          config_->get<std::size_t>("MedianCostPlots/confidence")),
+      "median initial solution duration", "median initial solution cost");
+
+  // Create the plot.
+  auto plot = std::make_shared<PgfPlot>(table);
+  plot->options.markSize = config_->get<double>("MedianCostPlots/markSize");
+  plot->options.onlyMarks = true;
+  plot->options.namePath = plannerName + "MedianInitialSolution"s;
+  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+
+  return plot;
+}
+
+std::shared_ptr<PgfPlot> MedianCostSuccessPicture::createMedianInitialSolutionDurationCIPlot(
+    const std::string& plannerName) const {
+  // Totally misusing the table class for reading in values from csvs...
+  // Load the median initial solution.
+  PgfTable medianInitialSolution(
+      stats_.extractMedianInitialSolution(plannerName,
+                                          config_->get<std::size_t>("MedianCostPlots/confidence")),
+      "median initial solution duration", "median initial solution cost");
+
+  // Load the duration confidence interval.
+  PgfTable interval(stats_.extractMedianInitialSolution(
+                        plannerName, config_->get<std::size_t>("MedianCostPlots/confidence")),
+                    "lower initial solution duration confidence bound",
+                    "upper initial solution duration confidence bound");
+
+  double medianCost = medianInitialSolution.getRow(0u).at(1u);
+  double lowerDurationBound = interval.getRow(0u).at(0u);
+  double upperDurationBound = interval.getRow(0u).at(1u);
+
+  // Create a table with the correct coordinates.
+  auto table = std::make_shared<PgfTable>();
+  table->appendRow({lowerDurationBound, medianCost});
+  table->appendRow({upperDurationBound, medianCost});
+
+  // Create the plot.
+  auto plot = std::make_shared<PgfPlot>(table);
+  plot->options.markSize =
+      config_->get<double>("MedianCostPlots/initialConfidenceIntervalMarkSize");
+  plot->options.mark = "|";
+  plot->options.lineWidth =
+      config_->get<double>("MedianCostPlots/initialConfidenceIntervalLineWidth");
+  plot->options.namePath = plannerName + "MedianInitialSolutionDurationConfidenceInterval"s;
+  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+
+  return plot;
+}
+
+std::shared_ptr<PgfPlot> MedianCostSuccessPicture::createMedianInitialSolutionCostCIPlot(
+    const std::string& plannerName) const {
+  // Totally misusing the table class for reading in values from csvs...
+  // Load the median initial solution.
+  PgfTable medianInitialSolution(
+      stats_.extractMedianInitialSolution(plannerName,
+                                          config_->get<std::size_t>("MedianCostPlots/confidence")),
+      "median initial solution duration", "median initial solution cost");
+
+  // Load the duration confidence interval.
+  PgfTable interval(stats_.extractMedianInitialSolution(
+                        plannerName, config_->get<std::size_t>("MedianCostPlots/confidence")),
+                    "lower initial solution cost confidence bound",
+                    "upper initial solution cost confidence bound");
+
+  double medianDuration = medianInitialSolution.getRow(0u).at(0u);
+  double lowerCostBound = interval.getRow(0u).at(0u);
+  double upperCostBound = interval.getRow(0u).at(1u);
+
+  // Create a table with the correct coordinates.
+  auto table = std::make_shared<PgfTable>();
+  table->appendRow({medianDuration, lowerCostBound});
+  table->appendRow({medianDuration, upperCostBound});
+
+  // Create the plot.
+  auto plot = std::make_shared<PgfPlot>(table);
+  plot->options.markSize =
+      config_->get<double>("MedianCostPlots/initialConfidenceIntervalMarkSize");
+  plot->options.mark = "-";
+  plot->options.lineWidth =
+      config_->get<double>("MedianCostPlots/initialConfidenceIntervalLineWidth");
+  plot->options.namePath = plannerName + "MedianInitialSolutionDurationConfidenceInterval"s;
+  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+
+  return plot;
+}
+
+fs::path MedianCostSuccessPicture::compileStandalonePdf(const fs::path& tikzPicture) const {
+  // Generate the path to write to.
+  auto path = fs::path(tikzPicture).replace_extension(".tex");
+  std::ofstream filestream;
+  filestream.open(path.c_str());
 
   // Check on the failbit.
-  if (texFile.fail() == true) {
-    auto msg = "MedianCostSuccessPlot could not open picture at '" + texFilePath.string() + "'."s;
+  if (filestream.fail() == true) {
+    auto msg = "MedianCostSuccessPicture could not open picture at '" + path.string() + "'."s;
     throw std::ios_base::failure(msg);
   }
 
   // Write the preamble.
-  texFile << "% The package 'luatex85' is needed for the standalone document class.\n "
-             "\\RequirePackage{luatex85}\n";
-  texFile << "\\documentclass{standalone}\n"
-          << "\\usepackage{tikz}\n"
-          << "\\usetikzlibrary{calc,plotmarks}\n"
-          << "\\usepackage{pgfplots}\n"
-          << "\\pgfplotsset{compat=1.15}\n"
-          << "\\usepgfplotslibrary{fillbetween}\n"
-          << "\\usepackage{xcolor}\n\n";
+  filestream << "% The package 'luatex85' is needed for the standalone document class.\n"
+                "\\RequirePackage{luatex85}\n";
+  filestream << "\\documentclass{standalone}\n"
+             << "\\usepackage{tikz}\n"
+             << "\\usetikzlibrary{calc,plotmarks}\n"
+             << "\\usepackage{pgfplots}\n"
+             << "\\pgfplotsset{compat=1.15}\n"
+             << "\\usepgfplotslibrary{fillbetween}\n"
+             << "\\usepackage{xcolor}\n\n";
 
   // Include the picture.
-  texFile << "\n\n\\begin{document}\n\n";
-  texFile << "\n\\input{" << picturePath.string() << "}\n";
-  texFile << "\n\n\\end{document}\n";
+  filestream << "\n\n\\begin{document}\n\n";
+  filestream << "\n\\input{" << tikzPicture.string() << "}\n";
+  filestream << "\n\n\\end{document}\n";
 
   // Close the file.
-  texFile.close();
+  filestream.close();
 
   // Compile the plot.
   // Compiling with lualatex is slower than pdflatex but has dynamic memory allocation. Since these
   // plots can be quite large, pdflatex has run into memory issues. Lualatex should be available
   // with all major tex distributions.
   auto currentPath = fs::current_path();
-  auto cmd = "cd \""s + texFilePath.parent_path().string() + "\" && lualatex \""s +
-             texFilePath.string() + "\" && cd \""s + currentPath.string() + '\"';
+  auto cmd = "cd \""s + path.parent_path().string() + "\" && lualatex \""s + path.string() +
+             "\" && cd \""s + currentPath.string() + '\"';
   int retval = std::system(cmd.c_str());
   (void)retval;
-  return fs::path(texFilePath).replace_extension(".pdf");
+  return path;
 }
 
 }  // namespace ompltools
