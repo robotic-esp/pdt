@@ -93,7 +93,7 @@ static const std::map<std::size_t, std::map<std::size_t, Interval>> medianConfid
     {100000u, {{95u, {49687u, 50307u, 0.9500}}, {99u, {49588u, 50403u, 0.9900}}}},
     {1000000u, {{95u, {499018u, 500978u, 0.9500}}, {99u, {498707u, 501283u, 0.9900}}}}};
 
-std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostAxis() const {
+std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAxis() const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianCostAxisOptions(axis);
 
@@ -110,39 +110,29 @@ std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostAxis() cons
       // Then the median cost evolution.
       axis->addPlot(createMedianCostEvolutionPlot(name));
     }
-
-    // Then the initial solutions.
-    axis->addPlot(createMedianInitialSolutionPlot(name));
-    axis->addPlot(createMedianInitialSolutionDurationCIPlot(name));
-    axis->addPlot(createMedianInitialSolutionCostCIPlot(name));
   }
 
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostAxis(
+std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianCostAxisOptions(axis);
 
-  // First the median cost evolution.
+  // Add all the the median cost evolution plots.
   axis->addPlot(createMedianCostEvolutionUpperCIPlot(plannerName));
   axis->addPlot(createMedianCostEvolutionLowerCIPlot(plannerName));
   axis->addPlot(createMedianCostEvolutionFillCIPlot(plannerName));
   axis->addPlot(createMedianCostEvolutionPlot(plannerName));
 
-  // Then the initial solutions.
-  axis->addPlot(createMedianInitialSolutionPlot(plannerName));
-  axis->addPlot(createMedianInitialSolutionDurationCIPlot(plannerName));
-  axis->addPlot(createMedianInitialSolutionCostCIPlot(plannerName));
-
   return axis;
 }
 
-fs::path MedianCostEvolutionPlotter::createMedianCostPicture() const {
+fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  picture.addAxis(createMedianCostAxis());
+  picture.addAxis(createMedianCostEvolutionAxis());
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
@@ -151,10 +141,10 @@ fs::path MedianCostEvolutionPlotter::createMedianCostPicture() const {
   return picturePath;
 }
 
-fs::path MedianCostEvolutionPlotter::createMedianCostPicture(const std::string& plannerName) const {
+fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture(const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  picture.addAxis(createMedianCostAxis(plannerName));
+  picture.addAxis(createMedianCostEvolutionAxis(plannerName));
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
@@ -197,7 +187,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionPl
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("MedianCostPlots/medianLineWidth");
+  plot->options.lineWidth = config_->get<double>("MedianCostPlots/lineWidth");
   plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
   plot->options.namePath = plannerName + "MedianCostEvolution"s;
 
@@ -269,98 +259,6 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionFi
   plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
   plot->options.fillOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
-
-  return plot;
-}
-
-std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianInitialSolutionPlot(
-    const std::string& plannerName) const {
-  // Load the median initial duration and cost into a table.
-  auto table = std::make_shared<PgfTable>(
-      stats_.extractMedianInitialSolution(plannerName,
-                                          config_->get<std::size_t>("MedianCostPlots/confidence")),
-      "median initial solution duration", "median initial solution cost");
-
-  // Create the plot.
-  auto plot = std::make_shared<PgfPlot>(table);
-  plot->options.markSize = config_->get<double>("MedianCostPlots/markSize");
-  plot->options.onlyMarks = true;
-  plot->options.namePath = plannerName + "MedianInitialSolution"s;
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
-
-  return plot;
-}
-
-std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianInitialSolutionDurationCIPlot(
-    const std::string& plannerName) const {
-  // Totally misusing the table class for reading in values from csvs...
-  // Load the median initial solution.
-  PgfTable medianInitialSolution(
-      stats_.extractMedianInitialSolution(plannerName,
-                                          config_->get<std::size_t>("MedianCostPlots/confidence")),
-      "median initial solution duration", "median initial solution cost");
-
-  // Load the duration confidence interval.
-  PgfTable interval(stats_.extractMedianInitialSolution(
-                        plannerName, config_->get<std::size_t>("MedianCostPlots/confidence")),
-                    "lower initial solution duration confidence bound",
-                    "upper initial solution duration confidence bound");
-
-  double medianCost = medianInitialSolution.getRow(0u).at(1u);
-  double lowerDurationBound = interval.getRow(0u).at(0u);
-  double upperDurationBound = interval.getRow(0u).at(1u);
-
-  // Create a table with the correct coordinates.
-  auto table = std::make_shared<PgfTable>();
-  table->appendRow({lowerDurationBound, medianCost});
-  table->appendRow({upperDurationBound, medianCost});
-
-  // Create the plot.
-  auto plot = std::make_shared<PgfPlot>(table);
-  plot->options.markSize =
-      config_->get<double>("MedianCostPlots/initialConfidenceIntervalMarkSize");
-  plot->options.mark = "|";
-  plot->options.lineWidth =
-      config_->get<double>("MedianCostPlots/initialConfidenceIntervalLineWidth");
-  plot->options.namePath = plannerName + "MedianInitialSolutionDurationConfidenceInterval"s;
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
-
-  return plot;
-}
-
-std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianInitialSolutionCostCIPlot(
-    const std::string& plannerName) const {
-  // Totally misusing the table class for reading in values from csvs...
-  // Load the median initial solution.
-  PgfTable medianInitialSolution(
-      stats_.extractMedianInitialSolution(plannerName,
-                                          config_->get<std::size_t>("MedianCostPlots/confidence")),
-      "median initial solution duration", "median initial solution cost");
-
-  // Load the duration confidence interval.
-  PgfTable interval(stats_.extractMedianInitialSolution(
-                        plannerName, config_->get<std::size_t>("MedianCostPlots/confidence")),
-                    "lower initial solution cost confidence bound",
-                    "upper initial solution cost confidence bound");
-
-  double medianDuration = medianInitialSolution.getRow(0u).at(0u);
-  double lowerCostBound = interval.getRow(0u).at(0u);
-  double upperCostBound = interval.getRow(0u).at(1u);
-
-  // Create a table with the correct coordinates.
-  auto table = std::make_shared<PgfTable>();
-  table->appendRow({medianDuration, lowerCostBound});
-  table->appendRow({medianDuration, upperCostBound});
-
-  // Create the plot.
-  auto plot = std::make_shared<PgfPlot>(table);
-  plot->options.markSize =
-      config_->get<double>("MedianCostPlots/initialConfidenceIntervalMarkSize");
-  plot->options.mark = "-";
-  plot->options.lineWidth =
-      config_->get<double>("MedianCostPlots/initialConfidenceIntervalLineWidth");
-  plot->options.namePath = plannerName + "MedianInitialSolutionDurationConfidenceInterval"s;
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
 
   return plot;
 }

@@ -55,16 +55,16 @@ class MedianCostEvolutionPlotter : public LatexPlotter {
   ~MedianCostEvolutionPlotter() = default;
 
   // Creates a pgf axis that holds the median cost at binned durations for all planners.
-  std::shared_ptr<PgfAxis> createMedianCostAxis() const;
+  std::shared_ptr<PgfAxis> createMedianCostEvolutionAxis() const;
 
   // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianCostAxis(const std::string& plannerName) const;
+  std::shared_ptr<PgfAxis> createMedianCostEvolutionAxis(const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the median cost axis of all planners.
-  std::experimental::filesystem::path createMedianCostPicture() const;
+  std::experimental::filesystem::path createMedianCostEvolutionPicture() const;
 
   // Creates a tikz picture that contains the median cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianCostPicture(const std::string& plannerName) const;
+  std::experimental::filesystem::path createMedianCostEvolutionPicture(const std::string& plannerName) const;
 
  private:
   std::shared_ptr<PgfPlot> createMedianCostEvolutionPlot(const std::string& plannerName) const;
@@ -73,11 +73,6 @@ class MedianCostEvolutionPlotter : public LatexPlotter {
   std::shared_ptr<PgfPlot> createMedianCostEvolutionLowerCIPlot(
       const std::string& plannerName) const;
   std::shared_ptr<PgfPlot> createMedianCostEvolutionFillCIPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionDurationCIPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionCostCIPlot(
       const std::string& plannerName) const;
 
   void setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;

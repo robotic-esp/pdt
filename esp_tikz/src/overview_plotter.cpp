@@ -67,7 +67,7 @@ fs::path OverviewPlotter::createCombinedPicture() const {
 
   // Create the median cost axis and override some options.
   MedianCostEvolutionPlotter medianCostPlotter(config_, stats_);
-  auto medianCostAxis = medianCostPlotter.createMedianCostAxis();
+  auto medianCostAxis = medianCostPlotter.createMedianCostEvolutionAxis();
   medianCostAxis->options.at = "($(AllPlannersCombinedSuccessAxis.south) - (0.0em, 0.3em)$)";
   medianCostAxis->options.anchor = "north";
   medianCostAxis->options.name = "AllPlannersCombinedMedianCostAxis"s;
@@ -97,7 +97,7 @@ fs::path OverviewPlotter::createCombinedPicture(const std::string& plannerName) 
 
   // Create the median cost axis and override some options.
   MedianCostEvolutionPlotter medianCostPlotter(config_, stats_);
-  auto medianCostAxis = medianCostPlotter.createMedianCostAxis(plannerName);
+  auto medianCostAxis = medianCostPlotter.createMedianCostEvolutionAxis(plannerName);
   medianCostAxis->options.at =
       "($("s + plannerName + "CombinedSuccessAxis.south) - (0.0em, 0.3em)$)"s;
   medianCostAxis->options.anchor = "north";

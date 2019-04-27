@@ -56,8 +56,10 @@ namespace fs = std::experimental::filesystem;
 
 ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
                                    const Statistics& stats) :
+    latexPlotter_(config),
     initialSolutionDurationPdfPlotter_(config, stats),
     medianCostEvolutionPlotter_(config, stats),
+    medianInitialSolutionPlotter_(config, stats),
     successPlotter_(config, stats),
     overviewPlotter_(config, stats),
     config_(config),
@@ -225,7 +227,20 @@ std::stringstream ExperimentReport::overview() const {
 
   // Create the results summary section.
   overview << "\\subsection{Results Summary}\\label{sec:overview-results-summary}\n";
-  overview << "\\begin{center}\n\\input{" << overviewPlotter_.createCombinedPicture().string()
+
+  // Create all axes to be displayed in the results summary.
+  auto medianCostEvolutionAxis = medianCostEvolutionPlotter_.createMedianCostEvolutionAxis();
+  auto medianInitialSolutionAxis = medianInitialSolutionPlotter_.createMedianInitialSolutionAxis();
+  auto successAxis = successPlotter_.createSuccessAxis();
+  // Merge the intial solution axis into the cost evolution axis.
+  medianCostEvolutionAxis->mergePlots(medianInitialSolutionAxis);
+
+  // Stack the success axis and the median cost evolution axis.
+  latexPlotter_.align(successAxis, medianCostEvolutionAxis);
+  latexPlotter_.stack(successAxis, medianCostEvolutionAxis);
+
+  overview << "\\begin{center}\n\\input{"
+           << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis).string()
            << "}\n\\end{center}\n";
 
   // Create the initial solution overview section.
@@ -279,7 +294,7 @@ std::stringstream ExperimentReport::individualResults() const {
       // Cost evolution plots.
       results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";
       results << "\\begin{center}\n\\input{"
-              << medianCostPlotter.createMedianCostPicture(name).string() << "}\n\\end{center}\n";
+              << medianCostPlotter.createMedianCostEvolutionPicture(name).string() << "}\n\\end{center}\n";
     }
   }
 

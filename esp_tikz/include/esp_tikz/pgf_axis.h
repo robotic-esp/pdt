@@ -54,6 +54,9 @@ class PgfAxis {
   void addPlot(const std::shared_ptr<PgfPlot>& plot);
   void addLegendEntry(const std::string& entry, const std::string& imageOptions = "");
 
+  template <typename... Axes>
+  void mergePlots(Axes... args);
+
   std::vector<std::shared_ptr<PgfPlot>> getPlots();
 
   // Places this axis on top of the other.
@@ -133,6 +136,23 @@ class PgfAxis {
     bool ylabelAbsolute{false};
   } options{};
 };
+
+template <typename... Axes>
+void PgfAxis::mergePlots(Axes... args) {
+  // Collect the args in a vector.
+  std::vector<std::shared_ptr<PgfAxis>> axes{};
+  (axes.emplace_back(args), ...);
+
+  // Add all plots of all axes, making sure all values are plotted.
+  for (const auto& axis : axes) {
+    expandRangeOfAbszisse(*axis);
+    expandRangeOfOrdinate(*axis);
+
+    for (const auto& plot : axis->getPlots()) {
+      addPlot(plot);
+    }
+  }
+}
 
 }  // namespace ompltools
 
