@@ -57,7 +57,7 @@ namespace fs = std::experimental::filesystem;
 ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
                                    const Statistics& stats) :
     initialSolutionDurationPdfPlotter_(config, stats),
-    medianCostPlotter_(config, stats),
+    medianCostEvolutionPlotter_(config, stats),
     successPlotter_(config, stats),
     overviewPlotter_(config, stats),
     config_(config),
@@ -253,7 +253,7 @@ std::stringstream ExperimentReport::individualResults() const {
 
   // Create a section for every planner.
   InitialSolutionDurationPdfPlotter initialSolutionDurationPdfPicture(config_, stats_);
-  MedianCostPlotter medianCostPlotter(config_, stats_);
+  MedianCostEvolutionPlotter medianCostPlotter(config_, stats_);
   SuccessPlotter successPlotter(config_, stats_);
   const auto& plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
   for (const auto& name : plannerNames) {

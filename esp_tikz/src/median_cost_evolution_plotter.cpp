@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/median_cost_plotter.h"
+#include "esp_tikz/median_cost_evolution_plotter.h"
 
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"
@@ -49,7 +49,7 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianCostPlotter::MedianCostPlotter(const std::shared_ptr<const Configuration>& config,
+MedianCostEvolutionPlotter::MedianCostEvolutionPlotter(const std::shared_ptr<const Configuration>& config,
                                      const Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
@@ -93,7 +93,7 @@ static const std::map<std::size_t, std::map<std::size_t, Interval>> medianConfid
     {100000u, {{95u, {49687u, 50307u, 0.9500}}, {99u, {49588u, 50403u, 0.9900}}}},
     {1000000u, {{95u, {499018u, 500978u, 0.9500}}, {99u, {498707u, 501283u, 0.9900}}}}};
 
-std::shared_ptr<PgfAxis> MedianCostPlotter::createMedianCostAxis() const {
+std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostAxis() const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianCostAxisOptions(axis);
 
@@ -120,7 +120,7 @@ std::shared_ptr<PgfAxis> MedianCostPlotter::createMedianCostAxis() const {
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCostPlotter::createMedianCostAxis(
+std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianCostAxisOptions(axis);
@@ -139,7 +139,7 @@ std::shared_ptr<PgfAxis> MedianCostPlotter::createMedianCostAxis(
   return axis;
 }
 
-fs::path MedianCostPlotter::createMedianCostPicture() const {
+fs::path MedianCostEvolutionPlotter::createMedianCostPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   picture.addAxis(createMedianCostAxis());
@@ -151,7 +151,7 @@ fs::path MedianCostPlotter::createMedianCostPicture() const {
   return picturePath;
 }
 
-fs::path MedianCostPlotter::createMedianCostPicture(const std::string& plannerName) const {
+fs::path MedianCostEvolutionPlotter::createMedianCostPicture(const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   picture.addAxis(createMedianCostAxis(plannerName));
@@ -163,7 +163,7 @@ fs::path MedianCostPlotter::createMedianCostPicture(const std::string& plannerNa
   return picturePath;
 }
 
-void MedianCostPlotter::setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+void MedianCostEvolutionPlotter::setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const {
   axis->options.name = "MedianCostAxis";
   axis->options.width = config_->get<std::string>("MedianCostPlots/axisWidth");
   axis->options.height = config_->get<std::string>("MedianCostPlots/axisHeight");
@@ -181,7 +181,7 @@ void MedianCostPlotter::setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) 
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianCostEvolutionPlot(
+std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionPlot(
     const std::string& plannerName) const {
   // This cannot be applied to planners that aren't anytime.
   if (plannerName == "RRTConnect"s) {
@@ -204,7 +204,7 @@ std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianCostEvolutionPlot(
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianCostEvolutionUpperCIPlot(
+std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUpperCIPlot(
     const std::string& plannerName) const {
   // This cannot be applied to planners that aren't anytime.
   if (plannerName == "RRTConnect"s) {
@@ -232,7 +232,7 @@ std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianCostEvolutionUpperCIPlot
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianCostEvolutionLowerCIPlot(
+std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionLowerCIPlot(
     const std::string& plannerName) const {
   // This cannot be applied to planners that aren't anytime.
   if (plannerName == "RRTConnect"s) {
@@ -257,7 +257,7 @@ std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianCostEvolutionLowerCIPlot
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianCostEvolutionFillCIPlot(
+std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionFillCIPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =
@@ -273,7 +273,7 @@ std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianCostEvolutionFillCIPlot(
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianInitialSolutionPlot(
+std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianInitialSolutionPlot(
     const std::string& plannerName) const {
   // Load the median initial duration and cost into a table.
   auto table = std::make_shared<PgfTable>(
@@ -291,7 +291,7 @@ std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianInitialSolutionPlot(
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianInitialSolutionDurationCIPlot(
+std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianInitialSolutionDurationCIPlot(
     const std::string& plannerName) const {
   // Totally misusing the table class for reading in values from csvs...
   // Load the median initial solution.
@@ -328,7 +328,7 @@ std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianInitialSolutionDurationC
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCostPlotter::createMedianInitialSolutionCostCIPlot(
+std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianInitialSolutionCostCIPlot(
     const std::string& plannerName) const {
   // Totally misusing the table class for reading in values from csvs...
   // Load the median initial solution.

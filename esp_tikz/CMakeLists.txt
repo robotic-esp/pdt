@@ -13,7 +13,7 @@ include_directories(
 add_library(esp_tikz
   src/experiment_report.cpp
   src/initial_solution_duration_pdf_plotter.cpp
-  src/median_cost_plotter.cpp
+  src/median_cost_evolution_plotter.cpp
   src/overview_plotter.cpp
   src/latex_plotter.cpp
   src/pgf_axis.cpp

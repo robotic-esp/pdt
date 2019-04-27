@@ -49,10 +49,10 @@ namespace esp {
 
 namespace ompltools {
 
-class MedianCostPlotter : public LatexPlotter {
+class MedianCostEvolutionPlotter : public LatexPlotter {
  public:
-  MedianCostPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
-  ~MedianCostPlotter() = default;
+  MedianCostEvolutionPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
+  ~MedianCostEvolutionPlotter() = default;
 
   // Creates a pgf axis that holds the median cost at binned durations for all planners.
   std::shared_ptr<PgfAxis> createMedianCostAxis() const;
