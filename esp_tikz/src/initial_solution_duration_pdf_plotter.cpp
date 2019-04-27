@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/initial_solution_duration_pdf_picture.h"
+#include "esp_tikz/initial_solution_duration_pdf_plotter.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -54,14 +54,13 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-InitialSolutionDurationPdfPicture::InitialSolutionDurationPdfPicture(
+InitialSolutionDurationPdfPlotter::InitialSolutionDurationPdfPlotter(
     const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
-    TikzPicture(config),
-    config_(config),
+    LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPicture::createInitialSolutionDurationPdfAxis()
+std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfAxis()
     const {
   auto axis = std::make_shared<PgfAxis>();
   setInitialSolutionDurationPdfAxisOptions(axis);
@@ -76,15 +75,16 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPicture::createInitialSolutio
   return axis;
 }
 
-std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPicture::createInitialSolutionDurationPdfAxis(
+std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setInitialSolutionDurationPdfAxisOptions(axis);
+  axis->options.name = plannerName + "InitialSolutionDurationPdfAxis"s;
   axis->addPlot(createInitialSolutionDurationPdfPlot(plannerName));
   return axis;
 }
 
-fs::path InitialSolutionDurationPdfPicture::createInitialSolutionDurationPdfPicture() const {
+fs::path InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   picture.addAxis(createInitialSolutionDurationPdfAxis());
@@ -96,7 +96,7 @@ fs::path InitialSolutionDurationPdfPicture::createInitialSolutionDurationPdfPict
   return picturePath;
 }
 
-fs::path InitialSolutionDurationPdfPicture::createInitialSolutionDurationPdfPicture(
+fs::path InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -109,7 +109,7 @@ fs::path InitialSolutionDurationPdfPicture::createInitialSolutionDurationPdfPict
   return picturePath;
 }
 
-std::shared_ptr<PgfPlot> InitialSolutionDurationPdfPicture::createInitialSolutionDurationPdfPlot(
+std::shared_ptr<PgfPlot> InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPlot(
     const std::string& plannerName) const {
   // Load the data into a pgf table.
   auto table = std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationPdf(plannerName),
@@ -131,17 +131,17 @@ std::shared_ptr<PgfPlot> InitialSolutionDurationPdfPicture::createInitialSolutio
   plot->options.namePath = plannerName + "InitialSolutionDurationPdf"s;
   plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
   plot->options.fill = config_->get<std::string>("PlannerPlotColors/" + plannerName);
-  plot->options.fillOpacity = 1.0;
 
   return plot;
 }
 
-void InitialSolutionDurationPdfPicture::setInitialSolutionDurationPdfAxisOptions(
+void InitialSolutionDurationPdfPlotter::setInitialSolutionDurationPdfAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.height = config_->get<std::string>("InitialSolutionPlots/axisHeight");
   axis->options.width = config_->get<std::string>("InitialSolutionPlots/axisWidth");
   axis->options.name = "InitialSolutionDurationPdfAxis"s;
   axis->options.xlog = config_->get<bool>("InitialSolutionPlots/xlog");
+  axis->options.ymin = 0.0;
   axis->options.xminorgrids = config_->get<bool>("InitialSolutionPlots/xminorgrids");
   axis->options.xmajorgrids = config_->get<bool>("InitialSolutionPlots/xmajorgrids");
   axis->options.yminorgrids = config_->get<bool>("InitialSolutionPlots/yminorgrids");
@@ -150,51 +150,6 @@ void InitialSolutionDurationPdfPicture::setInitialSolutionDurationPdfAxisOptions
   axis->options.ylabel = "Counts";
   axis->options.ylabelAbsolute = true;
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
-}
-
-fs::path InitialSolutionDurationPdfPicture::compileStandalonePdf(
-    const fs::path& tikzPicture) const {
-  // Generate the path to write to.
-  auto path = fs::path(tikzPicture).replace_extension(".tex");
-  std::ofstream filestream;
-  filestream.open(path.c_str());
-
-  // Check on the failbit.
-  if (filestream.fail() == true) {
-    auto msg =
-        "InitialSolutionDurationPdfPicture could not open picture at '" + path.string() + "'."s;
-    throw std::ios_base::failure(msg);
-  }
-
-  // Write the preamble.
-  filestream << "% The package 'luatex85' is needed for the standalone document class.\n"
-                "\\RequirePackage{luatex85}\n";
-  filestream << "\\documentclass{standalone}\n"
-             << "\\usepackage{tikz}\n"
-             << "\\usetikzlibrary{calc,plotmarks}\n"
-             << "\\usepackage{pgfplots}\n"
-             << "\\pgfplotsset{compat=1.15}\n"
-             << "\\usepgfplotslibrary{fillbetween}\n"
-             << "\\usepackage{xcolor}\n\n";
-
-  // Include the picture.
-  filestream << "\n\n\\begin{document}\n\n";
-  filestream << "\n\\input{" << tikzPicture.string() << "}\n";
-  filestream << "\n\n\\end{document}\n";
-
-  // Close the file.
-  filestream.close();
-
-  // Compile the plot.
-  // Compiling with lualatex is slower than pdflatex but has dynamic memory allocation. Since these
-  // plots can be quite large, pdflatex has run into memory issues. Lualatex should be available
-  // with all major tex distributions.
-  auto currentPath = fs::current_path();
-  auto cmd = "cd \""s + path.parent_path().string() + "\" && lualatex \""s + path.string() +
-             "\" && cd \""s + currentPath.string() + '\"';
-  int retval = std::system(cmd.c_str());
-  (void)retval;
-  return path;
 }
 
 }  // namespace ompltools

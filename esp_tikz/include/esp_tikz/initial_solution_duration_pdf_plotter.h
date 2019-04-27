@@ -42,17 +42,17 @@
 
 #include "esp_configuration/configuration.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/tikz_picture.h"
+#include "esp_tikz/latex_plotter.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class InitialSolutionDurationPdfPicture : public TikzPicture {
+class InitialSolutionDurationPdfPlotter : public LatexPlotter {
  public:
-  InitialSolutionDurationPdfPicture(const std::shared_ptr<const Configuration>& config,
+  InitialSolutionDurationPdfPlotter(const std::shared_ptr<const Configuration>& config,
                                     const Statistics& stats);
-  ~InitialSolutionDurationPdfPicture() = default;
+  ~InitialSolutionDurationPdfPlotter() = default;
 
   // Creates a pgf axis that hold the initial solution duration pdf of all planners.
   std::shared_ptr<PgfAxis> createInitialSolutionDurationPdfAxis() const;
@@ -68,17 +68,12 @@ class InitialSolutionDurationPdfPicture : public TikzPicture {
   std::experimental::filesystem::path createInitialSolutionDurationPdfPicture(
       const std::string& plannerName) const;
 
-  // Compiles the given tikzpicture to a pdf document.
-  std::experimental::filesystem::path compileStandalonePdf(
-      const std::experimental::filesystem::path& tikzPicture) const;
-
  private:
   std::shared_ptr<PgfPlot> createInitialSolutionDurationPdfPlot(
       const std::string& plannerName) const;
 
   void setInitialSolutionDurationPdfAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  const std::shared_ptr<const Configuration> config_{};
   const Statistics& stats_;
 };
 
