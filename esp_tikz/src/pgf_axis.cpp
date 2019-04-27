@@ -52,6 +52,57 @@ void PgfAxis::addLegendEntry(const std::string& entry, const std::string& imageO
   legendEntries_.emplace_back(entry, imageOptions);
 }
 
+std::vector<std::shared_ptr<const PgfPlot>> PgfAxis::getPlots() const {
+  return plots_;
+}
+
+void PgfAxis::overlay(PgfAxis* other) {
+  // Align the abszissen.
+  PgfAxis::alignAbszissen(this, other);
+
+  // Make sure they are the same height and width.
+  options.height = other->options.height;
+  options.width = other->options.width;
+
+  // Make sure they are at the same position
+  options.at = other->options.at;
+  options.anchor = other->options.anchor;
+
+  // Don't display this axis' abszisse.
+  options.xtick = "{\\empty}";
+  options.xticklabel = "{\\empty}";
+  options.axisYLine = "right";
+  options.axisXLine = "none";
+}
+
+void PgfAxis::expandRangeOfAbszisse(const PgfAxis& other) {
+  if (options.xmin < other.options.xmin) {
+    options.xmin = other.options.xmin;
+  }
+  if (options.xmax < other.options.xmax) {
+    options.xmax = other.options.xmax;
+  }
+}
+
+void PgfAxis::expandRangeOfOrdinate(const PgfAxis& other) {
+  if (options.ymin < other.options.ymin) {
+    options.ymin = other.options.ymin;
+  }
+  if (options.ymax < other.options.ymax) {
+    options.ymax = other.options.ymax;
+  }
+}
+
+void PgfAxis::alignAbszissen(PgfAxis* first, PgfAxis* second) {
+  first->includeAbszisse(*other);
+  second->includeAbszisse(*first);
+}
+
+void PgfAxis::alignOrdinates(PgfAxis* first, PgfAxis* second) {
+  first->includeOrdinate(*other);
+  second->includeOrdinate(*first);
+}
+
 std::string PgfAxis::string() const {
   std::ostringstream stream{};
   stream << "\\begin{axis} [";
