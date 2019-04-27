@@ -50,7 +50,7 @@ namespace fs = std::experimental::filesystem;
 
 SuccessPlotter::SuccessPlotter(const std::shared_ptr<const Configuration>& config,
                                const Statistics& stats) :
-    config_(config),
+    LatexPlotter(config),
     stats_(stats) {
   // Determine the min and max durations to be plotted.
   maxDurationToBePlotted_ = stats_.getMaxNonInfInitialSolutionDuration();

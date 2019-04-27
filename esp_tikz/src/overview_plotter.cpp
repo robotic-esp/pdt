@@ -53,7 +53,7 @@ namespace fs = std::experimental::filesystem;
 
 OverviewPlotter::OverviewPlotter(const std::shared_ptr<const Configuration>& config,
                                  const Statistics& stats) :
-    config_(config),
+    LatexPlotter(config),
     stats_(stats) {
 }
 
@@ -73,7 +73,7 @@ fs::path OverviewPlotter::createCombinedPicture() const {
   medianCostAxis->options.name = "AllPlannersCombinedMedianCostAxis"s;
 
   // Make sure these axis cover the same domain.
-  PgfAxis::alignDomains(medianCostAxis.get(), successAxis.get());
+  PgfAxis::alignAbszissen(medianCostAxis.get(), successAxis.get());
   
   // Create the picture and add the axes.
   TikzPicture picture(config_);

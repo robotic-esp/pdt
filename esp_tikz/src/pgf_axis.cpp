@@ -52,13 +52,13 @@ void PgfAxis::addLegendEntry(const std::string& entry, const std::string& imageO
   legendEntries_.emplace_back(entry, imageOptions);
 }
 
-std::vector<std::shared_ptr<const PgfPlot>> PgfAxis::getPlots() const {
+std::vector<std::shared_ptr<PgfPlot>> PgfAxis::getPlots() {
   return plots_;
 }
 
 void PgfAxis::overlay(PgfAxis* other) {
   // Align the abszissen.
-  PgfAxis::alignAbszissen(this, other);
+  matchAbszisse(*other);
 
   // Make sure they are the same height and width.
   options.height = other->options.height;
@@ -71,12 +71,18 @@ void PgfAxis::overlay(PgfAxis* other) {
   // Don't display this axis' abszisse.
   options.xtick = "{\\empty}";
   options.xticklabel = "{\\empty}";
-  options.axisYLine = "right";
   options.axisXLine = "none";
+  options.ylabelAbsolute = false;
+  options.axisYLine = "right";
+}
+
+void PgfAxis::matchAbszisse(const PgfAxis& other) {
+  options.xmin = other.options.xmin;
+  options.xmax = other.options.xmax;
 }
 
 void PgfAxis::expandRangeOfAbszisse(const PgfAxis& other) {
-  if (options.xmin < other.options.xmin) {
+  if (options.xmin > other.options.xmin) {
     options.xmin = other.options.xmin;
   }
   if (options.xmax < other.options.xmax) {
@@ -94,13 +100,13 @@ void PgfAxis::expandRangeOfOrdinate(const PgfAxis& other) {
 }
 
 void PgfAxis::alignAbszissen(PgfAxis* first, PgfAxis* second) {
-  first->includeAbszisse(*other);
-  second->includeAbszisse(*first);
+  first->expandRangeOfAbszisse(*second);
+  second->expandRangeOfAbszisse(*first);
 }
 
 void PgfAxis::alignOrdinates(PgfAxis* first, PgfAxis* second) {
-  first->includeOrdinate(*other);
-  second->includeOrdinate(*first);
+  first->expandRangeOfOrdinate(*second);
+  second->expandRangeOfOrdinate(*first);
 }
 
 std::string PgfAxis::string() const {
@@ -182,7 +188,7 @@ std::string PgfAxis::string() const {
     stream << ",\n  axis x line=" << options.axisXLine;
   }
   if (options.axisYLine != ""s) {
-    stream << ",\n  axis y line=" << options.axisYLine;
+    stream << ",\n  axis y line*=" << options.axisYLine;
   }
   if (options.xlabel != ""s) {
     stream << ",\n  xlabel={" << options.xlabel << '}';

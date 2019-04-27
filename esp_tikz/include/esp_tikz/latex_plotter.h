@@ -38,37 +38,93 @@
 
 #include <experimental/filesystem>
 
+#include "esp_configuration/configuration.h"
+#include "esp_tikz/tikz_picture.h"
+
 namespace esp {
 
 namespace ompltools {
 
 class LatexPlotter {
  public:
-  LatexPlotter() = default;
+  LatexPlotter(const std::shared_ptr<const Configuration>& config);
   virtual ~LatexPlotter() = default;
 
-  // Creates a picture from axes and a file name.
+  // Align multiple axes.
   template <typename... Axes>
-  std::shared_ptr<TikzPicture> createPicture(std::shared_ptr<PgfAxis> axis, Axes... axes) const;
+  void align(Axes... args) const;
+  void align(const std::vector<std::shared_ptr<PgfAxis>>& axes) const;
+
+  // Stack multiple axes.
+  template <typename... Axes>
+  void stack(Axes... args) const;
+  void stack(const std::vector<std::shared_ptr<PgfAxis>>& axes) const;
+
+  // Collect multiple axes in a tikzpicture.
+  template <typename... Axes>
+  std::shared_ptr<TikzPicture> collect(Axes... args) const;
+  std::shared_ptr<TikzPicture> collect(const std::vector<std::shared_ptr<PgfAxis>>& axes) const;
+
+  // Create a tikzpicture from multiple axes.
+  template <typename... Axes>
+  std::experimental::filesystem::path createPicture(Axes... args) const;
+  std::experimental::filesystem::path createPicture(
+      const std::vector<std::shared_ptr<PgfAxis>>& axes) const;
 
   // Compiles the given tikzpicture to a pdf document.
   std::experimental::filesystem::path compileStandalonePdf(
       const std::experimental::filesystem::path& tikzPicture) const;
 
- private:
-  template <typename... Axes>
-  std::shared_ptr<TikzPicture> createPicture(std::shared_ptr<TikzPicture> picture,
-                                             std::shared_ptr<PgfAxis> axis, Axes... axis) const;
+ protected:
+  const std::shared_ptr<const Configuration> config_;
 };
 
 template <typename... Axes>
-std::shared_ptr<TikzPicture> LatexPlotter::createPicture(std::shared_ptr<PgfAxis> axis,
-                                                         Axes..axes) const {
-  auto picture = std::make_shared<TikzPicture>();
-  picture.addAxis(axis);
-  if constexpr (sizeof...(axes) > 0) {
-      return createPicture()
+void LatexPlotter::align(Axes... args) const {
+  // Collect the axes in a vector
+  std::vector<std::shared_ptr<PgfAxis>> axes{};
+  (axes.push_back(args), ...);
+
+  // Align all axes.
+  align(axes);
+}
+
+template <typename... Axes>
+void LatexPlotter::stack(Axes... args) const {
+  using namespace std::string_literals;
+  // Collect the axes in a vector
+  std::vector<std::shared_ptr<PgfAxis>> axes{};
+  (axes.push_back(args), ...);
+
+  // Stack them.
+  stack(axes);
+}
+
+template <typename... Axes>
+std::shared_ptr<TikzPicture> LatexPlotter::collect(Axes... args) const {
+  auto picture = std::make_shared<TikzPicture>(config_);
+
+  // Collect the axes in a picture.
+  (picture->addAxis(args), ...);
+
+  return picture;
+}
+
+template <typename... Axes>
+std::experimental::filesystem::path LatexPlotter::createPicture(Axes... args) const {
+  // Collect all axes in a tikz picture.
+  auto picture = collect(args...);
+
+  // Create the name of this picture.
+  auto path = std::experimental::filesystem::path(config_->get<std::string>("Experiment/results"))
+                  .parent_path() /
+              std::experimental::filesystem::path("tikz/");
+  for (const auto& axis : picture->getAxes()) {
+    path += std::experimental::filesystem::path(axis->options.name + '_');
   }
+  path += ".tikz";
+  picture->write(path);
+  return path;
 }
 
 }  // namespace ompltools

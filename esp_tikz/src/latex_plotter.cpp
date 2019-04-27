@@ -45,6 +45,65 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
+LatexPlotter::LatexPlotter(const std::shared_ptr<const Configuration>& config) : config_(config) {
+}
+
+void LatexPlotter::align(const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
+  // Align all pairs.
+  for (auto a : axes) {
+    for (auto b : axes) {
+      a->expandRangeOfAbszisse(*b);
+      b->expandRangeOfAbszisse(*a);
+    }
+  }
+}
+
+void LatexPlotter::stack(const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
+  // Take the first axis as the base, stack the rest underneath.
+  if (axes.empty()) {
+    return;
+  }
+  axes.at(0u)->options.xlabel = "{\\empty}";
+  axes.at(0u)->options.xticklabel = "{\\empty}";
+  for (std::size_t i = 1u; i < axes.size(); ++i) {
+    axes.at(i)->options.at = "($("s + axes.at(i - 1u)->options.name + ".south) - (0.0em, 0.3em)$)"s;
+    axes.at(i)->options.anchor = "north";
+    // Romve the xlabel and xticklabel from the axes
+    if (i != axes.size() - 1u) {
+      axes.at(i)->options.xlabel = "{\\empty}";
+      axes.at(i)->options.xticklabel = "{\\empty}";
+    }
+  }
+}
+
+std::shared_ptr<TikzPicture> LatexPlotter::collect(
+    const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
+  auto picture = std::make_shared<TikzPicture>(config_);
+
+  // Collect the axes in a picture.
+  for (const auto& axis : axes) {
+    picture->addAxis(axis);
+  }
+
+  return picture;
+}
+
+std::experimental::filesystem::path LatexPlotter::createPicture(
+    const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
+  auto picture = collect(axes);
+
+  // Create the name of this picture.
+  auto path = std::experimental::filesystem::path(config_->get<std::string>("Experiment/results"))
+                  .parent_path() /
+              std::experimental::filesystem::path("tikz/");
+  for (const auto& axis : picture->getAxes()) {
+    path += std::experimental::filesystem::path(axis->options.name + '_');
+  }
+  path += ".tikz";
+  picture->write(path);
+  return path;
+}
+
 fs::path LatexPlotter::compileStandalonePdf(const fs::path& tikzPicture) const {
   // Generate the path to write to.
   auto path = fs::path(tikzPicture).replace_extension(".tex");
@@ -75,9 +134,9 @@ fs::path LatexPlotter::compileStandalonePdf(const fs::path& tikzPicture) const {
   filestream.close();
 
   // Compile the plot.
-  // Compiling with lualatex is slower than pdflatex but has dynamic memory allocation. Since these
-  // plots can be quite large, pdflatex has run into memory issues. Lualatex should be available
-  // with all major tex distributions.
+  // Compiling with lualatex is slower than pdflatex but has dynamic memory allocation. Since
+  // these plots can be quite large, pdflatex has run into memory issues. Lualatex should be
+  // available with all major tex distributions.
   auto currentPath = fs::current_path();
   auto cmd = "cd \""s + path.parent_path().string() + "\" && lualatex \""s + path.string() +
              "\" && cd \""s + currentPath.string() + '\"';

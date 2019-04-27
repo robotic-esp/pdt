@@ -74,7 +74,6 @@ class SuccessPlotter : public LatexPlotter {
   double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
   double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
 
-  const std::shared_ptr<const Configuration> config_;
   const Statistics& stats_;
 };
 

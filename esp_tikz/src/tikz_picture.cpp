@@ -73,6 +73,10 @@ void TikzPicture::addAxis(const std::shared_ptr<PgfAxis>& axis) {
   axes_.emplace_back(axis);
 }
 
+std::vector<std::shared_ptr<PgfAxis>> TikzPicture::getAxes() {
+  return axes_;
+}
+
 std::shared_ptr<PgfAxis> TikzPicture::generateLegendAxis() const {
   auto legendAxis = std::make_shared<PgfAxis>();
 

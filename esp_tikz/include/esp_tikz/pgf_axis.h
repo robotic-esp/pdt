@@ -54,10 +54,13 @@ class PgfAxis {
   void addPlot(const std::shared_ptr<PgfPlot>& plot);
   void addLegendEntry(const std::string& entry, const std::string& imageOptions = "");
 
-  std::vector<std::shared_ptr<const PgfPlot>> getPlots() const;
+  std::vector<std::shared_ptr<PgfPlot>> getPlots();
 
   // Places this axis on top of the other.
   void overlay(PgfAxis* other);
+
+  // Matches the range of this abszisse to that of the other.
+  void matchAbszisse(const PgfAxis& other);
 
   // Expands the range of the abszisse to include the range of the abszisse of the other axis.
   void expandRangeOfAbszisse(const PgfAxis& other);
@@ -71,7 +74,7 @@ class PgfAxis {
   static void alignOrdinates(PgfAxis* first, PgfAxis* second);
 
  private:
-  std::vector<std::shared_ptr<const PgfPlot>> plots_{};
+  std::vector<std::shared_ptr<PgfPlot>> plots_{};
   std::vector<std::pair<std::string, std::string>> legendEntries_{};
 
  public:

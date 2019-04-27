@@ -60,7 +60,6 @@ class OverviewPlotter : public LatexPlotter {
   std::experimental::filesystem::path createCombinedPicture(const std::string& plannerName) const;
 
  private:
-  const std::shared_ptr<const Configuration> config_;
   const Statistics& stats_;
 };
 

@@ -51,7 +51,7 @@ namespace fs = std::experimental::filesystem;
 
 MedianCostPlotter::MedianCostPlotter(const std::shared_ptr<const Configuration>& config,
                                      const Statistics& stats) :
-    config_(config),
+    LatexPlotter(config),
     stats_(stats) {
   // Compute the duration bin size.
   auto contextName = config_->get<std::string>("Experiment/context");

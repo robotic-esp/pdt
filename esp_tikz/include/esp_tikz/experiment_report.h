@@ -44,6 +44,10 @@
 
 #include "esp_configuration/configuration.h"
 #include "esp_statistics/statistics.h"
+#include "esp_tikz/initial_solution_duration_pdf_plotter.h"
+#include "esp_tikz/median_cost_plotter.h"
+#include "esp_tikz/overview_plotter.h"
+#include "esp_tikz/success_plotter.h"
 #include "esp_tikz/tikz_picture.h"
 
 namespace esp {
@@ -74,11 +78,18 @@ class ExperimentReport {
   std::string experimentName_{};
   std::map<std::string, const std::string> plotPlannerNames_{};
 
+  // Plotters.
+  InitialSolutionDurationPdfPlotter initialSolutionDurationPdfPlotter_;
+  MedianCostPlotter medianCostPlotter_;
+  SuccessPlotter successPlotter_;
+  OverviewPlotter overviewPlotter_;
+
   const std::shared_ptr<const Configuration> config_;
   const Statistics& stats_;
 
   // Helper to replace _ with \_, see [1].
-  void findAndReplaceAll(std::string* string, const std::string& key, const std::string& replacement) const;
+  void findAndReplaceAll(std::string* string, const std::string& key,
+                         const std::string& replacement) const;
 };
 
 }  // namespace ompltools

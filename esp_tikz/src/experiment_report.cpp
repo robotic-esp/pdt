@@ -42,14 +42,10 @@
 
 #include <ompl/util/Console.h>
 
-#include "esp_tikz/initial_solution_duration_pdf_picture.h"
-#include "esp_tikz/median_cost_plotter.h"
-#include "esp_tikz/overview_plotter.h"
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"
 #include "esp_tikz/pgf_plot.h"
 #include "esp_tikz/pgf_table.h"
-#include "esp_tikz/success_plotter.h"
 
 namespace esp {
 
@@ -60,6 +56,10 @@ namespace fs = std::experimental::filesystem;
 
 ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
                                    const Statistics& stats) :
+    initialSolutionDurationPdfPlotter_(config, stats),
+    medianCostPlotter_(config, stats),
+    successPlotter_(config, stats),
+    overviewPlotter_(config, stats),
     config_(config),
     stats_(stats) {
   // Latex doesn't like unescaped underscores in text mode.
@@ -197,6 +197,9 @@ std::stringstream ExperimentReport::preamble() const {
 
 std::stringstream ExperimentReport::overview() const {
   std::stringstream overview;
+  // We often refer to the planner names, this reference just makes it more convenient.
+  const auto& plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
+
   // Create the section header.
   overview << "\\section{Overview}\\label{sec:overview}\n";
 
@@ -206,7 +209,6 @@ std::stringstream ExperimentReport::overview() const {
               "for the "
            << experimentName_ << " experiment, which executed "
            << config_->get<std::size_t>("Experiment/numRuns") << " runs of ";
-  const auto& plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
   for (std::size_t i = 0u; i < plannerNames.size() - 1u; ++i) {
     overview << plotPlannerNames_.at(plannerNames.at(i)) << ", ";
   }
@@ -221,10 +223,27 @@ std::stringstream ExperimentReport::overview() const {
   overview << "TODO: Describe (?) the planning context and add the a visualization of the 2D "
               "version of it.\n";
 
-  overview << "\\subsection{Results}\\label{sec:overview-results}\n";
-  OverviewPlotter overviewPlotter(config_, stats_);
-  overview << "\\begin{center}\n\\input{" << overviewPlotter.createCombinedPicture().string()
+  // Create the results summary section.
+  overview << "\\subsection{Results Summary}\\label{sec:overview-results-summary}\n";
+  overview << "\\begin{center}\n\\input{" << overviewPlotter_.createCombinedPicture().string()
            << "}\n\\end{center}\n";
+
+  // Create the initial solution overview section.
+  overview << "\\subsection{Initial Solutions}\\label{sec:overview-initial-solutions}\n";
+
+  // Collect all initial solution duration pdf plots.
+  std::vector<std::shared_ptr<PgfAxis>> initialSolutionDurationPdfAxes{};
+  for (const auto& name : plannerNames) {
+    initialSolutionDurationPdfAxes.emplace_back(
+        initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name));
+  }
+  initialSolutionDurationPdfPlotter_.align(initialSolutionDurationPdfAxes);
+  initialSolutionDurationPdfPlotter_.stack(initialSolutionDurationPdfAxes);
+
+  overview
+      << "\\begin{center}\n\\input{"
+      << initialSolutionDurationPdfPlotter_.createPicture(initialSolutionDurationPdfAxes).string()
+      << "}\n\\end{center}";
 
   return overview;
 }
@@ -233,21 +252,28 @@ std::stringstream ExperimentReport::individualResults() const {
   std::stringstream results;
 
   // Create a section for every planner.
-  InitialSolutionDurationPdfPicture initialSolutionDurationPdfPicture(config_, stats_);
+  InitialSolutionDurationPdfPlotter initialSolutionDurationPdfPicture(config_, stats_);
   MedianCostPlotter medianCostPlotter(config_, stats_);
   SuccessPlotter successPlotter(config_, stats_);
   const auto& plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
   for (const auto& name : plannerNames) {
+    // Create the section title on a new page.
     results << "\n\\pagebreak\n";
     results << "\\section{" << plotPlannerNames_.at(name) << "}\\label{sec:" << name << "}\n";
 
+    // First report on the initial solutions.
     results << "\\subsection{Initial Solution}\\label{sec:" << name << "-initial-solution}\n";
-    results << "\\begin{center}\n\\input{" << successPlotter.createSuccessPicture(name).string()
+
+    // Get the two relevant axes.
+    auto cdf = successPlotter_.createSuccessAxis(name);
+    auto pdf = initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name);
+    pdf->overlay(cdf.get());
+    for (const auto& plot : pdf->getPlots()) {
+      plot->options.drawOpacity = 0.2;
+      plot->options.fillOpacity = 0.1;
+    }
+    results << "\\begin{center}\n\\input{" << successPlotter_.createPicture(cdf, pdf).string()
             << "}\n\\end{center}\n";
-    results
-        << "\\begin{center}\n\\input{"
-        << initialSolutionDurationPdfPicture.createInitialSolutionDurationPdfPicture(name).string()
-        << "}\n\\end{center}\n";
 
     if (name != "RRTConnect") {
       // Cost evolution plots.
