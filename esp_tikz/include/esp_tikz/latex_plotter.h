@@ -1,8 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014-2017     University of Toronto
- *  Copyright (c) 2018-present  University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -15,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the names of the copyright holders nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -35,29 +34,43 @@
 
 // Authors: Marlin Strub
 
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <vector>
+#pragma once
 
 #include <experimental/filesystem>
 
-#include "esp_configuration/configuration.h"
-#include "esp_statistics/statistics.h"
-#include "esp_tikz/experiment_report.h"
+namespace esp {
 
-using namespace std::string_literals;
+namespace ompltools {
 
-int main(int argc, char** argv) {
-  // Read the config files.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+class LatexPlotter {
+ public:
+  LatexPlotter() = default;
+  virtual ~LatexPlotter() = default;
 
-  // Get the statistics.
-  esp::ompltools::Statistics stats(config, true);
+  // Creates a picture from axes and a file name.
+  template <typename... Axes>
+  std::shared_ptr<TikzPicture> createPicture(std::shared_ptr<PgfAxis> axis, Axes... axes) const;
 
-  esp::ompltools::ExperimentReport report(config, stats);
-  report.generateReport();
-  report.compileReport();
+  // Compiles the given tikzpicture to a pdf document.
+  std::experimental::filesystem::path compileStandalonePdf(
+      const std::experimental::filesystem::path& tikzPicture) const;
 
-  return 0;
+ private:
+  template <typename... Axes>
+  std::shared_ptr<TikzPicture> createPicture(std::shared_ptr<TikzPicture> picture,
+                                             std::shared_ptr<PgfAxis> axis, Axes... axis) const;
+};
+
+template <typename... Axes>
+std::shared_ptr<TikzPicture> LatexPlotter::createPicture(std::shared_ptr<PgfAxis> axis,
+                                                         Axes..axes) const {
+  auto picture = std::make_shared<TikzPicture>();
+  picture.addAxis(axis);
+  if constexpr (sizeof...(axes) > 0) {
+      return createPicture()
+  }
 }
+
+}  // namespace ompltools
+
+}  // namespace esp

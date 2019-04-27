@@ -43,11 +43,13 @@
 #include <ompl/util/Console.h>
 
 #include "esp_tikz/initial_solution_duration_pdf_picture.h"
-#include "esp_tikz/median_cost_success_picture.h"
+#include "esp_tikz/median_cost_plotter.h"
+#include "esp_tikz/overview_plotter.h"
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"
 #include "esp_tikz/pgf_plot.h"
 #include "esp_tikz/pgf_table.h"
+#include "esp_tikz/success_plotter.h"
 
 namespace esp {
 
@@ -220,8 +222,8 @@ std::stringstream ExperimentReport::overview() const {
               "version of it.\n";
 
   overview << "\\subsection{Results}\\label{sec:overview-results}\n";
-  MedianCostSuccessPicture resultsOverview(config_, stats_);
-  overview << "\\begin{center}\n\\input{" << resultsOverview.createCombinedPicture().string()
+  OverviewPlotter overviewPlotter(config_, stats_);
+  overview << "\\begin{center}\n\\input{" << overviewPlotter.createCombinedPicture().string()
            << "}\n\\end{center}\n";
 
   return overview;
@@ -232,16 +234,15 @@ std::stringstream ExperimentReport::individualResults() const {
 
   // Create a section for every planner.
   InitialSolutionDurationPdfPicture initialSolutionDurationPdfPicture(config_, stats_);
-  MedianCostSuccessPicture medianCostSuccessPicture(config_, stats_);
+  MedianCostPlotter medianCostPlotter(config_, stats_);
+  SuccessPlotter successPlotter(config_, stats_);
   const auto& plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
   for (const auto& name : plannerNames) {
     results << "\n\\pagebreak\n";
     results << "\\section{" << plotPlannerNames_.at(name) << "}\\label{sec:" << name << "}\n";
 
-    // Initial solution plots.
     results << "\\subsection{Initial Solution}\\label{sec:" << name << "-initial-solution}\n";
-    results << "\\begin{center}\n\\input{"
-            << medianCostSuccessPicture.createSuccessPicture(name).string()
+    results << "\\begin{center}\n\\input{" << successPlotter.createSuccessPicture(name).string()
             << "}\n\\end{center}\n";
     results
         << "\\begin{center}\n\\input{"
@@ -249,11 +250,10 @@ std::stringstream ExperimentReport::individualResults() const {
         << "}\n\\end{center}\n";
 
     if (name != "RRTConnect") {
-    // Cost evolution plots.
-    results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";
-    results << "\\begin{center}\n\\input{"
-            << medianCostSuccessPicture.createMedianCostPicture(name).string()
-            << "}\n\\end{center}\n";
+      // Cost evolution plots.
+      results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";
+      results << "\\begin{center}\n\\input{"
+              << medianCostPlotter.createMedianCostPicture(name).string() << "}\n\\end{center}\n";
     }
   }
 

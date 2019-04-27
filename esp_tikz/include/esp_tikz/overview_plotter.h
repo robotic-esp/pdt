@@ -1,8 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014-2017     University of Toronto
- *  Copyright (c) 2018-present  University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -15,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the names of the copyright holders nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -35,29 +34,36 @@
 
 // Authors: Marlin Strub
 
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <vector>
+#pragma once
 
 #include <experimental/filesystem>
+#include <memory>
+#include <string>
 
 #include "esp_configuration/configuration.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/experiment_report.h"
+#include "esp_tikz/latex_plotter.h"
 
-using namespace std::string_literals;
+namespace esp {
 
-int main(int argc, char** argv) {
-  // Read the config files.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+namespace ompltools {
 
-  // Get the statistics.
-  esp::ompltools::Statistics stats(config, true);
+class OverviewPlotter : public LatexPlotter {
+ public:
+  OverviewPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
+  ~OverviewPlotter() = default;
 
-  esp::ompltools::ExperimentReport report(config, stats);
-  report.generateReport();
-  report.compileReport();
+  // Creates a combined tikz picture with success and median costs of all planners.
+  std::experimental::filesystem::path createCombinedPicture() const;
 
-  return 0;
-}
+  // Creates a combined tikz picture with success and median costs of the specified planner.
+  std::experimental::filesystem::path createCombinedPicture(const std::string& plannerName) const;
+
+ private:
+  const std::shared_ptr<const Configuration> config_;
+  const Statistics& stats_;
+};
+
+}  // namespace ompltools
+
+}  // namespace esp
