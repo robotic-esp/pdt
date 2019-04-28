@@ -11,6 +11,7 @@ include_directories(
 
 # Add the library.
 add_library(esp_tikz
+  src/cost_percentile_evolution_plotter.cpp
   src/experiment_report.cpp
   src/initial_solution_duration_pdf_plotter.cpp
   src/initial_solution_scatter_plotter.cpp

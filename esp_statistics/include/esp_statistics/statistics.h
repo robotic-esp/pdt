@@ -38,6 +38,7 @@
 
 #include <experimental/filesystem>
 #include <map>
+#include <set>
 #include <utility>
 #include <vector>
 
@@ -75,6 +76,10 @@ class Statistics {
 
   std::experimental::filesystem::path extractMedians(
       const std::string& plannerName, std::size_t confidence = 99u,
+      const std::vector<double>& binDurations = {}) const;
+
+  std::experimental::filesystem::path extractCostPercentiles(
+      const std::string& plannerName, std::set<double> percentile,
       const std::vector<double>& binDurations = {}) const;
 
   std::experimental::filesystem::path extractMedianInitialSolution(

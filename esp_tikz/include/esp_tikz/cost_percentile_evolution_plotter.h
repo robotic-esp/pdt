@@ -38,70 +38,42 @@
 
 #include <experimental/filesystem>
 #include <memory>
-#include <set>
-#include <sstream>
 #include <string>
 
 #include "esp_configuration/configuration.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/cost_percentile_evolution_plotter.h"
-#include "esp_tikz/initial_solution_duration_pdf_plotter.h"
-#include "esp_tikz/initial_solution_scatter_plotter.h"
 #include "esp_tikz/latex_plotter.h"
-#include "esp_tikz/median_cost_evolution_plotter.h"
-#include "esp_tikz/median_initial_solution_plotter.h"
-#include "esp_tikz/overview_plotter.h"
-#include "esp_tikz/success_plotter.h"
-#include "esp_tikz/tikz_picture.h"
+#include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class ExperimentReport {
+class CostPercentileEvolutionPlotter : public LatexPlotter {
  public:
-  ExperimentReport(const std::shared_ptr<Configuration>& config, const Statistics& stats);
-  ~ExperimentReport() = default;
+  CostPercentileEvolutionPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
+  ~CostPercentileEvolutionPlotter() = default;
 
-  std::experimental::filesystem::path generateReport();
-  std::experimental::filesystem::path compileReport() const;
+  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
+  std::shared_ptr<PgfAxis> createCostPercentileEvolutionAxis(const std::string& plannerName) const;
+
+  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  std::experimental::filesystem::path createCostPercentileEvolutionPicture(const std::string& plannerName) const;
 
  private:
-  std::stringstream preamble() const;
-  std::stringstream overview() const;
-  std::stringstream individualResults() const;
-  std::stringstream appendix() const;
+  std::shared_ptr<PgfPlot> createCostPercentileEvolutionPlot(const std::string& plannerName, double percentile) const;
+  std::shared_ptr<PgfPlot> createCostPercentileEvolutionFillPlot(
+      const std::string& plannerName) const;
 
-  const std::set<std::string> requirePackages_{"luatex85"};
-  const std::set<std::string> usePackages_{"appendix", "listings", "tikz", "pgfplots", "xcolor"};
-  const std::set<std::string> lstSet_{};
-  const std::set<std::string> tikzLibraries_{"calc", "plotmarks"};
-  const std::set<std::string> pgfLibraries_{"fillbetween"};
-  const std::set<std::string> pgfPlotsset_{"compat=1.15"};
+  void setCostPercentileEvolutionAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  std::string experimentName_{};
-  std::map<std::string, std::string> plotPlannerNames_{};
+  std::vector<double> binnedDurations_{};
+  double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
+  double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
 
-  // Plotters.
-  LatexPlotter latexPlotter_;
-  CostPercentileEvolutionPlotter costPercentileEvolutionPlotter_;
-  InitialSolutionDurationPdfPlotter initialSolutionDurationPdfPlotter_;
-  InitialSolutionScatterPlotter initialSolutionScatterPlotter_;
-  MedianCostEvolutionPlotter medianCostEvolutionPlotter_;
-  MedianInitialSolutionPlotter medianInitialSolutionPlotter_;
-  SuccessPlotter successPlotter_;
-  OverviewPlotter overviewPlotter_;
-
-  const std::shared_ptr<const Configuration> config_;
   const Statistics& stats_;
-
-  // Helper to replace _ with \_, see [1].
-  void findAndReplaceAll(std::string* string, const std::string& key,
-                         const std::string& replacement) const;
 };
 
 }  // namespace ompltools
 
 }  // namespace esp
-
-// [1] https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c/

@@ -367,6 +367,73 @@ fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t 
   return filepath;  // Note: std::ofstream closes itself upon destruction.
 }
 
+fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
+                                            std::set<double> percentiles,
+                                            const std::vector<double>& binDurations) const {
+  if (plannerName == "RRTConnect") {
+    auto msg = "This method extracts cost percentiles over time for anytime planners. '" +
+               plannerName + "' is not an anytime planner."s;
+    throw std::runtime_error(msg);
+  }
+
+  if (results_.find(plannerName) == results_.end()) {
+    auto msg = "Cannot find results for '" + plannerName +
+               "' and can therefore not extract cost percentiles."s;
+    throw std::runtime_error(msg);
+  }
+
+  // Check if the file already exists.
+  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
+                                              plannerName + "_cost_percentiles.csv");
+  if (fs::exists(filepath) && !forceComputation_) {
+    return filepath;
+  }
+
+  // Get the requested bin durations.
+  const auto& durations = binDurations.empty() ? defaultMedianBinDurations_ : binDurations;
+
+  // Get the percentile costs. If percentile < 0.5 flooring is conservative, if percentile > 0.5,
+  // ceiling is conservative. If percentile == 0.5, we compute the median propperly.
+  std::map<double, std::vector<double>> percentileCosts{};
+  for (const auto percentile : percentiles) {
+    std::vector<double> costs{};
+    if (percentile < 0.5) {
+      costs = getNthCosts(results_.at(plannerName), std::floor(percentile * numRunsPerPlanner_),
+                          durations);
+    } else if (percentile > 0.5) {
+      costs = getNthCosts(results_.at(plannerName), std::ceil(percentile * numRunsPerPlanner_),
+                          durations);
+    } else {
+      costs = getMedianCosts(results_.at(plannerName), durations);
+    }
+    percentileCosts[percentile] = costs;
+  }
+
+  // Write to file.
+  std::ofstream filestream(filepath.string());
+  if (filestream.fail()) {
+    auto msg =
+        "Cannot write percentiles for '"s + plannerName + "' to '"s + filepath.string() + "'."s;
+    throw std::ios_base::failure(msg);
+  }
+
+  filestream << createHeader("Binned percentiles", plannerName);
+  filestream << std::setprecision(21);
+  filestream << "durations";
+  for (const auto duration : durations) {
+    filestream << ',' << duration;
+  }
+  for (const auto& [percentile, costs] : percentileCosts) {
+    filestream << std::setprecision(3) << "\npercentile" << percentile << std::setprecision(21);
+    for (const auto cost : costs) {
+      filestream << ',' << cost;
+    }
+  }
+  filestream << '\n';
+
+  return filepath;  // Note: std::ofstream closes itself upon destruction.
+}
+
 fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName,
                                                   std::size_t confidence) const {
   if (results_.find(plannerName) == results_.end()) {

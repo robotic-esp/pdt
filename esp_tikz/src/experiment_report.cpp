@@ -315,11 +315,14 @@ std::stringstream ExperimentReport::individualResults() const {
     // Create a picture out of the three initial solution axes.
     results << "\\begin{center}\n\\input{"
             << latexPlotter_.createPicture(cdf, pdf, scatter).string() << "}\n\\end{center}\n";
+
+    // Show the cost evolution plots for anytime planners.
     if (name != "RRTConnect") {
-      // Cost evolution plots.
+      // Median cost evolution plots.
       results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";
       results << "\\begin{center}\n\\input{"
-              << medianCostPlotter.createMedianCostEvolutionPicture(name).string() << "}\n\\end{center}\n";
+              << medianCostEvolutionPlotter_.createMedianCostEvolutionPicture(name).string()
+              << "}\n\\end{center}\n";
     }
   }
 
