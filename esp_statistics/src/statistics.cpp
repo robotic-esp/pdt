@@ -162,10 +162,15 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
       if (results_.find(name) == results_.end() && run.empty()) {
         minCosts_[name] = std::numeric_limits<double>::infinity();
         maxCosts_[name] = std::numeric_limits<double>::lowest();
+        minInitialSolutionCosts_[name] = std::numeric_limits<double>::infinity();
+        maxInitialSolutionCosts_[name] = std::numeric_limits<double>::lowest();
+        minFinalCosts_[name] = std::numeric_limits<double>::infinity();
+        maxFinalCosts_[name] = std::numeric_limits<double>::lowest();
         maxNonInfCosts_[name] = std::numeric_limits<double>::lowest();
         minDurations_[name] = std::numeric_limits<double>::infinity();
         maxDurations_[name] = std::numeric_limits<double>::lowest();
         minInitialSolutionDurations_[name] = std::numeric_limits<double>::infinity();
+        maxInitialSolutionDurations_[name] = std::numeric_limits<double>::lowest();
         maxNonInfInitialSolutionDurations_[name] = std::numeric_limits<double>::lowest();
       }
     } else if (row.at(0) != name) {
@@ -222,6 +227,12 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
             duration > maxNonInfInitialSolutionDuration_) {
           maxNonInfInitialSolutionDuration_ = duration;
         }
+        if (i == row.size() - 1u && cost > maxFinalCost_) {
+          maxFinalCost_ = cost;
+        }
+        if (i == row.size() - 1u && cost < minFinalCost_) {
+          minFinalCost_ = cost;
+        }
 
         // Register planner specific min and max costs.
         if (cost < minCosts_.at(name)) {
@@ -237,10 +248,30 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
             duration < minInitialSolutionDurations_.at(name)) {
           minInitialSolutionDurations_.at(name) = duration;
         }
+        if (lastCost == std::numeric_limits<double>::infinity() &&
+            cost < minInitialSolutionCosts_.at(name)) {
+          minInitialSolutionCosts_.at(name) = cost;
+        }
+        if (lastCost == std::numeric_limits<double>::infinity() &&
+            (cost != std::numeric_limits<double>::infinity() || i == row.size() - 1u) &&
+            cost > maxInitialSolutionCosts_.at(name)) {
+          maxInitialSolutionCosts_.at(name) = cost;
+        }
+        if (lastCost == std::numeric_limits<double>::infinity() &&
+            (cost != std::numeric_limits<double>::infinity() || i == row.size() - 1u) &&
+            duration > maxInitialSolutionDurations_.at(name)) {
+          maxInitialSolutionDurations_.at(name) = duration;
+        }
         if (cost != std::numeric_limits<double>::infinity() &&
             lastCost == std::numeric_limits<double>::infinity() &&
             duration > maxNonInfInitialSolutionDurations_.at(name)) {
           maxNonInfInitialSolutionDurations_.at(name) = duration;
+        }
+        if (i == row.size() - 1u && cost > maxFinalCosts_.at(name)) {
+          maxFinalCosts_.at(name) = cost;
+        }
+        if (i == row.size() - 1u && cost < minFinalCosts_.at(name)) {
+          minFinalCosts_.at(name) = cost;
         }
 
         // Remember this cost (for max initial solution durations).
@@ -719,6 +750,26 @@ double Statistics::getMaxCost(const std::string& plannerName) const {
   return maxCosts_.at(plannerName);
 }
 
+double Statistics::getMinInitialSolutionCost(const std::string& plannerName) const {
+  return minInitialSolutionCosts_.at(plannerName);
+}
+
+double Statistics::getMaxInitialSolutionCost(const std::string& plannerName) const {
+  return maxInitialSolutionCosts_.at(plannerName);
+}
+
+double Statistics::getMinFinalCost(const std::string& plannerName) const {
+  return minFinalCosts_.at(plannerName);
+}
+
+double Statistics::getMaxFinalCost(const std::string& plannerName) const {
+  return maxFinalCosts_.at(plannerName);
+}
+
+double Statistics::getMedianFinalCost(const std::string& plannerName) const {
+  return getMedianCosts(results_.at(plannerName), defaultMedianBinDurations_).back();
+}
+
 double Statistics::getMaxNonInfCost(const std::string& plannerName) const {
   return maxNonInfCosts_.at(plannerName);
 }
@@ -735,8 +786,20 @@ double Statistics::getMinInitialSolutionDuration(const std::string& plannerName)
   return minInitialSolutionDurations_.at(plannerName);
 }
 
+double Statistics::getMaxInitialSolutionDuration(const std::string& plannerName) const {
+  return maxInitialSolutionDurations_.at(plannerName);
+}
+
 double Statistics::getMaxNonInfInitialSolutionDuration(const std::string& plannerName) const {
   return maxNonInfInitialSolutionDurations_.at(plannerName);
+}
+
+double Statistics::getMedianInitialSolutionDuration(const std::string& plannerName) const {
+  return getMedianInitialSolutionDuration(results_.at(plannerName));
+}
+
+double Statistics::getMedianInitialSolutionCost(const std::string& plannerName) const {
+  return getMedianInitialSolutionCost(results_.at(plannerName));
 }
 
 std::vector<double> Statistics::getDefaultBinDurations() const {
