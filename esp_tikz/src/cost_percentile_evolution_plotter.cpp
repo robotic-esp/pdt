@@ -76,8 +76,7 @@ std::shared_ptr<PgfAxis> CostPercentileEvolutionPlotter::createCostPercentileEvo
   setCostPercentileEvolutionAxisOptions(axis);
 
   // Add all the cost percentil evolution plots.
-  for (const auto percentile :
-       config_->get<std::set<double>>("CostPercentileEvolutionPlots/percentiles")) {
+  for (const auto percentile : percentiles) {
     axis->addPlot(createCostPercentileEvolutionPlot(plannerName, percentile));
   }
 
@@ -114,6 +113,7 @@ void CostPercentileEvolutionPlotter::setCostPercentileEvolutionAxisOptions(
   axis->options.ylabel = "Cost"s;
   axis->options.ylabelAbsolute = true;
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
+  axis->options.legendStyle = "font=\\footnotesize, legend cell align=left, legend columns=-1";
 }
 
 std::shared_ptr<PgfPlot> CostPercentileEvolutionPlotter::createCostPercentileEvolutionPlot(
@@ -128,20 +128,29 @@ std::shared_ptr<PgfPlot> CostPercentileEvolutionPlotter::createCostPercentileEvo
   // Get the table from the appropriate file.
   std::stringstream percentileName;
   percentileName << std::setprecision(3) << "percentile" << percentile;
-  auto table = std::make_shared<PgfTable>(
-      stats_.extractCostPercentiles(
-          plannerName, config_->get<std::set<double>>("CostPercentileEvolutionPlots/percentiles")),
-      "durations", percentileName.str());
+  auto table = std::make_shared<PgfTable>(stats_.extractCostPercentiles(plannerName, percentiles),
+                                          "durations", percentileName.str());
 
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
+  // Common plot options.
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("CostPercentileEvolutionPlots/lineWidth");
-  if (percentile == 0.5) {
-    plot->options.lineWidth = 2.0 * config_->get<double>("CostPercentileEvolutionPlots/lineWidth");
-  }
   plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
   plot->options.namePath = plannerName + percentileName.str() + "CostEvolution"s;
+
+  // Plot options that depend on the percentile.
+  if (percentile == 0.01 || percentile == 0.99) {
+    plot->options.lineWidth = 0.5;
+    plot->options.denselyDotted = true;
+  } else if (percentile == 0.05 || percentile == 0.95) {
+    plot->options.lineWidth = 0.5;
+    plot->options.denselyDashed = true;
+  } else if (percentile == 0.25 || percentile == 0.75) {
+    plot->options.lineWidth = 0.5;
+  } else if (percentile == 0.50) {
+    plot->options.lineWidth = 1.0;
+  }
+
   plot->setLegend(percentileName.str().substr(10, 12));
 
   return plot;

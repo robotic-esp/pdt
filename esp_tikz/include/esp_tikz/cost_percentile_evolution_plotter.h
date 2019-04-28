@@ -62,11 +62,10 @@ class CostPercentileEvolutionPlotter : public LatexPlotter {
 
  private:
   std::shared_ptr<PgfPlot> createCostPercentileEvolutionPlot(const std::string& plannerName, double percentile) const;
-  std::shared_ptr<PgfPlot> createCostPercentileEvolutionFillPlot(
-      const std::string& plannerName) const;
 
   void setCostPercentileEvolutionAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
+  const std::set<double> percentiles{0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99};
   std::vector<double> binnedDurations_{};
   double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
   double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};

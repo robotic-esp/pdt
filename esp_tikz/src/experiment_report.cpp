@@ -323,6 +323,10 @@ std::stringstream ExperimentReport::individualResults() const {
       results << "\\begin{center}\n\\input{"
               << medianCostEvolutionPlotter_.createMedianCostEvolutionPicture(name).string()
               << "}\n\\end{center}\n";
+
+      results << "\\begin{center}\n\\input{"
+              << costPercentileEvolutionPlotter_.createCostPercentileEvolutionPicture(name).string()
+              << "}\n\\end{center}\n";
     }
   }
 

@@ -91,7 +91,6 @@
     },
     "CostPercentileEvolutionPlots": {
         "xlog": true,
-        "percentiles": [0.01, 0.25, 0.5, 0.75, 0.99],
         "markSize": 0.0,
         "lineWidth": 1.0,
         "fillOpacity": 0.1,
