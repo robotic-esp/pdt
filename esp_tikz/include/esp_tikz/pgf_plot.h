@@ -68,6 +68,12 @@ class PgfPlot {
     double lineWidth{1.0};
     std::string color{"black"};
     std::string fill{""};
+    bool dashed{false};
+    bool dotted{false};
+    bool denselyDashed{false};
+    bool denselyDotted{false};
+    bool looselyDashed{false};
+    bool looselyDotted{false};
 
     // Mark options.
     double markSize{2.0};

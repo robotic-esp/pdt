@@ -72,6 +72,24 @@ std::string PgfPlot::string() const {
   if (options.constPlot) {
     stream << ",\n  const plot";
   }
+  if (options.dashed) {
+    stream << ",\n  dashed";
+  }
+  if (options.dotted) {
+    stream << ",\n  dotted";
+  }
+  if (options.denselyDashed) {
+    stream << ",\n  densely dashed";
+  }
+  if (options.denselyDotted) {
+    stream << ",\n  densely dotted";
+  }
+  if (options.looselyDashed) {
+    stream << ",\n  loosely dashed";
+  }
+  if (options.looselyDotted) {
+    stream << ",\n  loosely dotted";
+  }
   if (options.namePath != ""s) {
     stream << ",\n  name path={" << options.namePath << '}';
   }
