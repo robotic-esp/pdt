@@ -42,6 +42,8 @@
 
 #include <ompl/util/Console.h>
 
+#include "esp_factories/context_factory.h"
+#include "esp_tikz/kpi_table.h"
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"
 #include "esp_tikz/pgf_plot.h"
@@ -205,10 +207,10 @@ std::stringstream ExperimentReport::overview() const {
   const auto& plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
 
   // Create the section header.
-  overview << "\\section{Overview}\\label{sec:overview}\n";
+  overview << "\\section{Overview}\\label{sec:overview}\n\n";
 
   // Provide some basic info about this experiment.
-  overview << "\nMaybe add something like:\n\nThis report was automatically generated using ESP "
+  overview << "This report was automatically generated using ESP "
               "OMPLtools. It presents the results "
               "for the "
            << experimentName_ << " experiment, which executed "
@@ -222,13 +224,15 @@ std::stringstream ExperimentReport::overview() const {
               "information about the "
               "experiment setup.\n";
 
-  // Create the experiment overview.
-  overview << "\\subsection{Planning Context}\\label{sec:overview-planning-context}\n";
-  overview << "TODO: Describe (?) the planning context and add the a visualization of the 2D "
-              "version of it.\n";
-
   // Create the results summary section.
   overview << "\\subsection{Results Summary}\\label{sec:overview-results-summary}\n";
+
+  // Create the KPI table.
+  KpiTable kpiTable(config_, stats_);
+  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
+    kpiTable.addKpi(name, plotPlannerNames_.at(name));
+  }
+  overview << kpiTable.string() << '\n';
 
   // Create all axes to be displayed in the results summary.
   auto medianCostEvolutionAxis = medianCostEvolutionPlotter_.createMedianCostEvolutionAxis();
@@ -237,12 +241,18 @@ std::stringstream ExperimentReport::overview() const {
   // Merge the intial solution axis into the cost evolution axis.
   medianCostEvolutionAxis->mergePlots(medianInitialSolutionAxis);
 
-  // Stack the success axis and the median cost evolution axis.
+  // Align the success and median cost evolution axes.
   latexPlotter_.align(successAxis, medianCostEvolutionAxis);
-  latexPlotter_.stack(successAxis, medianCostEvolutionAxis);
+
+  // Create the legend axis.
+  auto legend =
+      latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("Experiment/planners"));
+
+  // Stack the axes
+  latexPlotter_.stack(successAxis, medianCostEvolutionAxis, legend);
 
   overview << "\\begin{center}\n\\input{"
-           << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis).string()
+           << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
            << "}\n\\end{center}\n";
 
   // Create the initial solution overview section.
@@ -254,12 +264,13 @@ std::stringstream ExperimentReport::overview() const {
     initialSolutionDurationPdfAxes.emplace_back(
         initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name));
   }
-  initialSolutionDurationPdfPlotter_.align(initialSolutionDurationPdfAxes);
-  initialSolutionDurationPdfPlotter_.stack(initialSolutionDurationPdfAxes);
+  latexPlotter_.align(initialSolutionDurationPdfAxes);
+  initialSolutionDurationPdfAxes.push_back(legend);
+  latexPlotter_.stack(initialSolutionDurationPdfAxes);
 
   overview
       << "\\begin{center}\n\\input{"
-      << initialSolutionDurationPdfPlotter_.createPicture(initialSolutionDurationPdfAxes).string()
+      << latexPlotter_.createPicture(initialSolutionDurationPdfAxes).string()
       << "}\n\\end{center}";
 
   return overview;
@@ -318,14 +329,16 @@ std::stringstream ExperimentReport::individualResults() const {
 
     // Show the cost evolution plots for anytime planners.
     if (name != "RRTConnect") {
-      // Median cost evolution plots.
+      // Cost evolution plots.
+      auto medianEvolution = medianCostEvolutionPlotter_.createMedianCostEvolutionAxis(name);
+      auto percentileEvolution =
+          costPercentileEvolutionPlotter_.createCostPercentileEvolutionAxis(name);
+      medianEvolution->matchAbszisse(*percentileEvolution);
+      latexPlotter_.stack(medianEvolution, percentileEvolution);
+
       results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";
       results << "\\begin{center}\n\\input{"
-              << medianCostEvolutionPlotter_.createMedianCostEvolutionPicture(name).string()
-              << "}\n\\end{center}\n";
-
-      results << "\\begin{center}\n\\input{"
-              << costPercentileEvolutionPlotter_.createCostPercentileEvolutionPicture(name).string()
+              << latexPlotter_.createPicture(medianEvolution, percentileEvolution).string()
               << "}\n\\end{center}\n";
     }
   }

@@ -48,6 +48,25 @@ namespace fs = std::experimental::filesystem;
 LatexPlotter::LatexPlotter(const std::shared_ptr<const Configuration>& config) : config_(config) {
 }
 
+std::shared_ptr<PgfAxis> LatexPlotter::createLegendAxis(
+    const std::vector<std::string>& plannerNames) const {
+  auto legend = std::make_shared<PgfAxis>();
+  legend->options.xlog = false;
+  legend->options.xmin = 0.0;
+  legend->options.xmax = 10.0;
+  legend->options.ymin = 0.0;
+  legend->options.ymax = 10.0;
+  legend->options.hideAxis = true;
+  legend->options.legendStyle =
+      "anchor=south, legend cell align=left, legend columns=-1, at={(axis cs:5, 6)}";
+  for (const auto& name : plannerNames) {
+    std::string imageOptions{config_->get<std::string>("PlannerPlotColors/" + name) +
+                             ", line width = 1.0pt, mark size=1.0pt, mark=square*"};
+    legend->addLegendEntry(config_->get<std::string>("PlotPlannerNames/" + name), imageOptions);
+  }
+  return legend;
+}
+
 void LatexPlotter::align(const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
   // Align all pairs.
   for (auto a : axes) {
@@ -69,9 +88,14 @@ void LatexPlotter::stack(const std::vector<std::shared_ptr<PgfAxis>>& axes) cons
     axes.at(i)->options.at = "($("s + axes.at(i - 1u)->options.name + ".south) - (0.0em, 0.6em)$)"s;
     axes.at(i)->options.anchor = "north";
     // Romve the xlabel and xticklabel from the axes
-    if (i != axes.size() - 1u) {
+    if (i < axes.size() - 2u) {
       axes.at(i)->options.xlabel = "{\\empty}";
       axes.at(i)->options.xticklabel = "{\\empty}";
+    } else if (i == axes.size() - 2u) {
+      if (!axes.back()->options.hideAxis) {
+        axes.at(i)->options.xlabel = "{\\empty}";
+        axes.at(i)->options.xticklabel = "{\\empty}";
+      }
     }
   }
 }

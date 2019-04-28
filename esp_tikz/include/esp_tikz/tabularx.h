@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, University of Toronto
+ *  Copyright (c) 2018, University of Oxford
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Toronto nor the names of its
+ *   * Neither the name of the University of Oxford nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -36,40 +36,57 @@
 
 #pragma once
 
+#include <deque>
 #include <experimental/filesystem>
-#include <memory>
+#include <functional>
 #include <string>
+#include <utility>
+#include <vector>
 
-#include "esp_configuration/configuration.h"
-#include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
-#include "esp_tikz/pgf_axis.h"
+#include "esp_tikz/pgf_plottable.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class CostPercentileEvolutionPlotter : public LatexPlotter {
+class TabularX {
  public:
-  CostPercentileEvolutionPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
-  ~CostPercentileEvolutionPlotter() = default;
+  TabularX() = default;
+  TabularX(const std::experimental::filesystem::path& path, const std::vector<std::string>& rows);
+  ~TabularX() = default;
 
-  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
-  std::shared_ptr<PgfAxis> createCostPercentileEvolutionAxis(const std::string& plannerName) const;
+  void loadFromPath(const std::experimental::filesystem::path& path,
+                    const std::vector<std::string>& rows);
 
-  // Creates a tikz picture that contains the median cost axis of the specified planner.
-  std::experimental::filesystem::path createCostPercentileEvolutionPicture(const std::string& plannerName) const;
+  // Add numbers.
+  void appendCol(const std::vector<double>& col);
+  void appendRow(const std::vector<double>& row);
+  void prependCol(const std::vector<double>& col);
+  void prependRow(const std::vector<double>& row);
 
- private:
-  std::shared_ptr<PgfPlot> createCostPercentileEvolutionPlot(const std::string& plannerName, double percentile) const;
+  // Replace numbers.
+  void replaceInCol(std::size_t col, double number, double replacement);
+  void replaceInCol(std::size_t col, const std::function<double(double)>& replacement);
 
-  void setCostPercentileEvolutionAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  // Get rows.
+  std::size_t getNumRows() const;
+  std::vector<double> getRow(std::size_t index) const;
 
-  const std::set<double> percentiles{0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99};
-  std::vector<double> binnedDurations_{};
-  double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
+  // Get cols.
+  std::size_t getNumCols() const;
+  std::vector<double> getCol(std::size_t index) const;
 
-  const Statistics& stats_;
+  // Convert this table to a string.
+  std::string string() const;
+
+ protected:
+  std::deque<std::deque<double>> data_{};
+
+ public:
+  struct {
+    std::string colSep{"&"};
+    std::string rowSep{"\\\\"};
+  } options{};
 };
 
 }  // namespace ompltools

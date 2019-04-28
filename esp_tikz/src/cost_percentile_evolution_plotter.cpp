@@ -67,7 +67,6 @@ CostPercentileEvolutionPlotter::CostPercentileEvolutionPlotter(
 
   // Determine the min and max durations to be plotted.
   maxDurationToBePlotted_ = binnedDurations_.back();
-  minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 
 std::shared_ptr<PgfAxis> CostPercentileEvolutionPlotter::createCostPercentileEvolutionAxis(
@@ -79,7 +78,8 @@ std::shared_ptr<PgfAxis> CostPercentileEvolutionPlotter::createCostPercentileEvo
   for (const auto percentile : percentiles) {
     axis->addPlot(createCostPercentileEvolutionPlot(plannerName, percentile));
   }
-
+  axis->options.name = plannerName + "CostPercentileEvolutionAxis";
+  axis->options.xmin = stats_.getMinInitialSolutionDuration(plannerName);
   return axis;
 }
 
@@ -98,10 +98,8 @@ fs::path CostPercentileEvolutionPlotter::createCostPercentileEvolutionPicture(
 
 void CostPercentileEvolutionPlotter::setCostPercentileEvolutionAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
-  axis->options.name = "CostPercentileEvolutionAxis";
   axis->options.width = config_->get<std::string>("CostPercentileEvolutionPlots/axisWidth");
   axis->options.height = config_->get<std::string>("CostPercentileEvolutionPlots/axisHeight");
-  axis->options.xmin = minDurationToBePlotted_;
   axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
   axis->options.xlog = config_->get<bool>("CostPercentileEvolutionPlots/xlog");

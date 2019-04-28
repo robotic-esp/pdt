@@ -13,6 +13,7 @@ include_directories(
 add_library(esp_tikz
   src/cost_percentile_evolution_plotter.cpp
   src/experiment_report.cpp
+  src/kpi_table.cpp
   src/initial_solution_duration_pdf_plotter.cpp
   src/initial_solution_scatter_plotter.cpp
   src/median_cost_evolution_plotter.cpp
@@ -24,11 +25,13 @@ add_library(esp_tikz
   src/pgf_plot.cpp
   src/pgf_table.cpp
   src/success_plotter.cpp
+  src/tabularx.cpp
   src/tikz_picture.cpp)
 
 target_link_libraries(esp_tikz
   esp_common
   esp_configuration
+  esp_factories
   esp_statistics)
 
 # Specify the include directories exported by this library.

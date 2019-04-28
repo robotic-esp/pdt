@@ -103,8 +103,7 @@ void PgfTable::loadFromPath(const std::experimental::filesystem::path& path,
       throw std::invalid_argument(msg);
     }
 
-    std::vector<double> rowAsDoubles{};
-    rowAsDoubles.reserve(row.size());
+    // Load elements into memory.
     for (std::size_t i = 1u; i < row.size(); ++i) {
       try {
         if (rowName == domain) {
@@ -188,6 +187,9 @@ void PgfTable::prependRow(const std::vector<double>& row) {
   if (row.size() != data_.size()) {
     auto msg = "In Pgf Tables, all rows must have the same number of columns."s;
     throw std::invalid_argument(msg);
+  }
+  if (data_.empty()) {
+    data_.resize(row.size(), {});
   }
   for (std::size_t i = 0u; i < row.size(); ++i) {
     data_.at(i).emplace_front(row.at(i));

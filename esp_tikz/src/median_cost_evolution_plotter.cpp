@@ -49,8 +49,8 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianCostEvolutionPlotter::MedianCostEvolutionPlotter(const std::shared_ptr<const Configuration>& config,
-                                     const Statistics& stats) :
+MedianCostEvolutionPlotter::MedianCostEvolutionPlotter(
+    const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   // Compute the duration bin size.
@@ -111,6 +111,7 @@ std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAx
       axis->addPlot(createMedianCostEvolutionPlot(name));
     }
   }
+  axis->options.name = "AllPlannersMedianCostAxis";
 
   return axis;
 }
@@ -125,6 +126,7 @@ std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAx
   axis->addPlot(createMedianCostEvolutionLowerCIPlot(plannerName));
   axis->addPlot(createMedianCostEvolutionFillCIPlot(plannerName));
   axis->addPlot(createMedianCostEvolutionPlot(plannerName));
+  axis->options.name = plannerName + "MedianCostAxis";
 
   return axis;
 }
@@ -132,7 +134,8 @@ std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAx
 fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  picture.addAxis(createMedianCostEvolutionAxis());
+  auto axis = createMedianCostEvolutionAxis();
+  picture.addAxis(axis);
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
@@ -141,10 +144,12 @@ fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture() const {
   return picturePath;
 }
 
-fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture(const std::string& plannerName) const {
+fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture(
+    const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  picture.addAxis(createMedianCostEvolutionAxis(plannerName));
+  auto axis = createMedianCostEvolutionAxis(plannerName);
+  picture.addAxis(axis);
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
@@ -154,10 +159,8 @@ fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture(const std:
 }
 
 void MedianCostEvolutionPlotter::setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const {
-  axis->options.name = "MedianCostAxis";
   axis->options.width = config_->get<std::string>("MedianCostPlots/axisWidth");
   axis->options.height = config_->get<std::string>("MedianCostPlots/axisHeight");
-  axis->options.xmin = minDurationToBePlotted_;
   axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
   axis->options.xlog = config_->get<bool>("MedianCostPlots/xlog");
@@ -166,7 +169,7 @@ void MedianCostEvolutionPlotter::setMedianCostAxisOptions(std::shared_ptr<PgfAxi
   axis->options.yminorgrids = config_->get<bool>("MedianCostPlots/yminorgrids");
   axis->options.ymajorgrids = config_->get<bool>("MedianCostPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]"s;
-  axis->options.ylabel = "Median cost"s;
+  axis->options.ylabel = "Cost"s;
   axis->options.ylabelAbsolute = true;
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }

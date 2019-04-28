@@ -23,7 +23,7 @@
         "BITstar": "BIT*",
         "LBTRRT": "LBT-RRT",
         "RRTConnect": "RRT-Connect",
-        "RRTsharp": "RRT$^\\#$",
+        "RRTsharp": "RRT$^{\\#}$",
         "RRTstar": "RRT*",
         "SBITstar": "SBIT*"
     },
@@ -32,7 +32,7 @@
         "markSize": 0.0,
         "lineWidth": 1.5,
         "axisWidth": "\\textwidth",
-        "axisHeight": "0.4\\textwidth",
+        "axisHeight": "0.3\\textwidth",
         "xminorgrids": true,
         "xmajorgrids": true,
         "yminorgrids": false,
@@ -49,7 +49,7 @@
         "confidenceIntervalDrawOpacity": 0.2,
         "confidenceIntervalFillOpacity": 0.1,
         "axisWidth": "\\textwidth",
-        "axisHeight": "0.5\\textwidth",
+        "axisHeight": "0.4\\textwidth",
         "xminorgrids": true,
         "xmajorgrids": true,
         "yminorgrids": false,
@@ -61,7 +61,7 @@
         "lineWidth": 0.5,
         "confidence": 99,
         "axisWidth": "\\textwidth",
-        "axisHeight": "0.5\\textwidth",
+        "axisHeight": "0.4\\textwidth",
         "xminorgrids": true,
         "xmajorgrids": true,
         "yminorgrids": false,
@@ -71,7 +71,7 @@
         "xlog": true,
         "markSize": 2.0,
         "axisWidth": "\\textwidth",
-        "axisHeight": "0.5\\textwidth",
+        "axisHeight": "0.4\\textwidth",
         "xminorgrids": true,
         "xmajorgrids": true,
         "yminorgrids": false,
@@ -83,7 +83,7 @@
         "lineWidth": 1.0,
         "combinedFillOpacity": 0.1,
         "axisWidth": "\\textwidth",
-        "axisHeight": "0.28\\textwidth",
+        "axisHeight": "0.3\\textwidth",
         "xminorgrids": true,
         "xmajorgrids": true,
         "yminorgrids": false,
@@ -95,10 +95,18 @@
         "lineWidth": 1.0,
         "fillOpacity": 0.1,
         "axisWidth": "\\textwidth",
-        "axisHeight": "0.5\\textwidth",
+        "axisHeight": "0.4\\textwidth",
         "xminorgrids": true,
         "xmajorgrids": true,
         "yminorgrids": false,
         "ymajorgrids": true
+    },
+    "Statistics": {
+        "Medians": {
+            "binFrequency": "logFrequency"
+        },
+        "InitialSolutions": {
+            "numDurationBins": 100
+        }
     }
 }

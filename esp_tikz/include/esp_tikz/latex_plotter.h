@@ -50,6 +50,9 @@ class LatexPlotter {
   LatexPlotter(const std::shared_ptr<const Configuration>& config);
   virtual ~LatexPlotter() = default;
 
+  // Create the legend axis.
+  std::shared_ptr<PgfAxis> createLegendAxis(const std::vector<std::string>& plannerNames) const;
+
   // Align multiple axes.
   template <typename... Axes>
   void align(Axes... args) const;
