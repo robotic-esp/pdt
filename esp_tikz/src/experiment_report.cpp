@@ -57,7 +57,9 @@ namespace fs = std::experimental::filesystem;
 ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
                                    const Statistics& stats) :
     latexPlotter_(config),
+    costPercentileEvolutionPlotter_(config, stats),
     initialSolutionDurationPdfPlotter_(config, stats),
+    initialSolutionScatterPlotter_(config, stats),
     medianCostEvolutionPlotter_(config, stats),
     medianInitialSolutionPlotter_(config, stats),
     successPlotter_(config, stats),
@@ -72,9 +74,9 @@ ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
   // Get the plot planner names.
   for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
     try {
-      plotPlannerNames_.emplace(name, config_->get<std::string>("PlotPlannerNames/" + name));
+      plotPlannerNames_[name] = config_->get<std::string>("PlotPlannerNames/" + name);
     } catch (const std::invalid_argument& e) {
-      plotPlannerNames_.emplace(name, name);
+      plotPlannerNames_[name] = name;
     }
   }
 }
@@ -267,9 +269,6 @@ std::stringstream ExperimentReport::individualResults() const {
   std::stringstream results;
 
   // Create a section for every planner.
-  InitialSolutionDurationPdfPlotter initialSolutionDurationPdfPicture(config_, stats_);
-  MedianCostEvolutionPlotter medianCostPlotter(config_, stats_);
-  SuccessPlotter successPlotter(config_, stats_);
   const auto& plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
   for (const auto& name : plannerNames) {
     // Create the section title on a new page.
@@ -277,19 +276,45 @@ std::stringstream ExperimentReport::individualResults() const {
     results << "\\section{" << plotPlannerNames_.at(name) << "}\\label{sec:" << name << "}\n";
 
     // First report on the initial solutions.
-    results << "\\subsection{Initial Solution}\\label{sec:" << name << "-initial-solution}\n";
+    results << "\\subsection{Initial Solutions}\\label{sec:" << name << "-initial-solution}\n";
 
-    // Get the two relevant axes.
+    // Overlay the pdf with the cdf for the first initial durations plot.
     auto cdf = successPlotter_.createSuccessAxis(name);
+    cdf->options.xmin = stats_.getMinInitialSolutionDuration(name);
+    cdf->options.xmax = stats_.getMaxNonInfInitialSolutionDuration(name);
     auto pdf = initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name);
     pdf->overlay(cdf.get());
     for (const auto& plot : pdf->getPlots()) {
       plot->options.drawOpacity = 0.2;
       plot->options.fillOpacity = 0.1;
     }
-    results << "\\begin{center}\n\\input{" << successPlotter_.createPicture(cdf, pdf).string()
-            << "}\n\\end{center}\n";
 
+    // Create the scatter axis of all initial solutions.
+    auto scatter = initialSolutionScatterPlotter_.createInitialSolutionScatterAxis(name);
+
+    // Create a median plot of all initial solutions.
+    auto median = medianInitialSolutionPlotter_.createMedianInitialSolutionAxis(name);
+    for (const auto& plot : median->getPlots()) {
+      plot->options.markSize = 2.0;
+      plot->options.lineWidth = 1.0;
+    }
+
+    // Merge the plots from the median axis into the scatter axis.
+    scatter->mergePlots(median);
+
+    // Place the scatter plot underneath the cdf/pdf plot
+    scatter->matchAbszisse(*cdf);
+    latexPlotter_.stack(cdf, scatter);
+
+    // Enlarge all x axis limits such that the earliest and latest initial solutions aren't glued to
+    // the axis box.
+    pdf->options.enlargeXLimits = "true";
+    cdf->options.enlargeXLimits = "true";
+    scatter->options.enlargeXLimits = "true";
+
+    // Create a picture out of the three initial solution axes.
+    results << "\\begin{center}\n\\input{"
+            << latexPlotter_.createPicture(cdf, pdf, scatter).string() << "}\n\\end{center}\n";
     if (name != "RRTConnect") {
       // Cost evolution plots.
       results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";

@@ -116,6 +116,7 @@ class PgfAxis {
     std::string xticklabelStyle{"font=\\footnotesize"};
     std::string xlabel{""};
     std::string xlabelStyle{"font=\\footnotesize"};
+    std::string enlargeXLimits{"false"};  // "auto, true, false, upper, lower, value=, abs value="
     bool xlabelAbsolute{false};
 
     // Y-Axis options.
@@ -133,6 +134,7 @@ class PgfAxis {
     std::string yticklabelStyle{"font=\\footnotesize"};
     std::string ylabel{""};
     std::string ylabelStyle{"font=\\footnotesize"};
+    std::string enlargeYLimits{"false"};  // "auto, true, false, upper, lower, value=, abs value="
     bool ylabelAbsolute{false};
   } options{};
 };

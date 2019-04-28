@@ -86,6 +86,8 @@ class Statistics {
   std::experimental::filesystem::path extractInitialSolutionDurationPdf(
       const std::string& plannerName, const std::vector<double>& binDurations = {}) const;
 
+  std::experimental::filesystem::path extractInitialSolutions(const std::string& plannerName) const;
+
   std::size_t getNumRunsPerPlanner() const;
 
   // Getters for overall min max values.

@@ -19,7 +19,7 @@
         "RRTstar": "espred",
         "SBITstar": "espgreen"
     },
-    "PlannerPlotNames": {
+    "PlotPlannerNames": {
         "BITstar": "BIT*",
         "LBTRRT": "LBT-RRT",
         "RRTConnect": "RRT-Connect",
@@ -60,6 +60,16 @@
         "markSize": 0.5,
         "lineWidth": 0.5,
         "confidence": 99,
+        "axisWidth": "\\textwidth",
+        "axisHeight": "0.5\\textwidth",
+        "xminorgrids": true,
+        "xmajorgrids": true,
+        "yminorgrids": false,
+        "ymajorgrids": true
+    },
+    "InitialSolutionScatterPlots": {
+        "xlog": true,
+        "markSize": 2.0,
         "axisWidth": "\\textwidth",
         "axisHeight": "0.5\\textwidth",
         "xminorgrids": true,

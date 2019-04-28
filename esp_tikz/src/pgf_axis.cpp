@@ -160,11 +160,17 @@ std::string PgfAxis::string() const {
   if (options.xmax != std::numeric_limits<double>::infinity()) {
     stream << ",\n  xmax=" << options.xmax;
   }
+  if (options.enlargeXLimits != "false"s) {
+    stream << ",\n  enlarge x limits=" << options.enlargeXLimits;
+  }
   if (options.ymin != std::numeric_limits<double>::infinity()) {
     stream << ",\n  ymin=" << options.ymin;
   }
   if (options.ymax != std::numeric_limits<double>::infinity()) {
     stream << ",\n  ymax=" << options.ymax;
+  }
+  if (options.enlargeYLimits != "false"s) {
+    stream << ",\n  enlarge y limits=" << options.enlargeXLimits;
   }
   if (options.xbarInterval) {
     stream << ",\n  xbar interval";
