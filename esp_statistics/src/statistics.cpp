@@ -401,7 +401,7 @@ fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
       costs = getNthCosts(results_.at(plannerName), std::floor(percentile * numRunsPerPlanner_),
                           durations);
     } else if (percentile > 0.5) {
-      costs = getNthCosts(results_.at(plannerName), std::ceil(percentile * numRunsPerPlanner_),
+      costs = getNthCosts(results_.at(plannerName), std::ceil(percentile * numRunsPerPlanner_) - 1u,
                           durations);
     } else {
       costs = getMedianCosts(results_.at(plannerName), durations);
