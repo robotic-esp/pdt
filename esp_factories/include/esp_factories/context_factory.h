@@ -53,7 +53,7 @@ namespace ompltools {
 // A class to create planners from config files.
 class ContextFactory {
  public:
-  ContextFactory(const std::shared_ptr<Configuration> &config);
+  ContextFactory(const std::shared_ptr<const Configuration> &config);
   ~ContextFactory() = default;
 
   // Create a planner.

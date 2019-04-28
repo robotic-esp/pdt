@@ -45,7 +45,7 @@ namespace esp {
 
 namespace ompltools {
 
-ContextFactory::ContextFactory(const std::shared_ptr<Configuration>& config) : config_(config) {
+ContextFactory::ContextFactory(const std::shared_ptr<const Configuration>& config) : config_(config) {
   if (config_->contains("Contexts") == 0) {
     OMPL_ERROR("Configuration does not contain context data.");
     throw std::runtime_error("Context factory error.");
