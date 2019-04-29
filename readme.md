@@ -9,11 +9,11 @@ ESP's OMPL tools aim to facilitate scientifically sound path planning research.
 ## Features
 
 - [x] Reproducible experiments
-- [x] Automatic plot generation
+- [x] Automatic report generation
 - [x] Interactive visualization of planner progress
 - [x] Videos of planner progress
 - [x] Easy to define experiments (obstacles and antiobstacles)
-- [ ] Statistical analysis
+- [x] Statistical analysis
 - [ ] Automatic stopping based on p-values
 - [ ] Guidance on number of runs
 - [ ] Reporting of p-values
@@ -71,7 +71,15 @@ I've had to adapt the default paths in which Pangolin looks for `ffmpeg`. I open
 
 #### LaTeX / LuaLaTeX
 
-The executable `benchmark_report` compiles a latex report of a benchmark. Initially this was done with `pdflatex`, but this has a fixed memory size (which can be too small for large experiments). A quick fix was to compile the reports with `lualatex`, which dynamically allocates as much memory as needed. The unfallible wisdom of the internet suggests that all major latex distributions include lualatex, so I figured this is not too much of an additional dependency.
+The executable `benchmark_report` compiles a latex report of a benchmark. Initially this was done using `pdflatex`, which allocates a fixed amount of memory for each compilation. For very large experiments, `pdflatex` allocated too little memory, which resulted in an error. A quick fix was to compile the reports with `lualatex` instead. LuaLaTeX dynamically allocates as much memory as needed. The unfallible wisdom of the internet suggests that all major LaTeX distributions include LuaLaTeX, so I figured this is not too much of an additional dependency.
+
+You can run
+
+```bash
+which lualatex
+```
+
+to see wether you have it installed on your system.
 
 ### ESP OMPL TOOLS
 
@@ -94,10 +102,10 @@ cd /path/to/esp_ompl_tools/build
 ./bin/benchmark -c bin/parameters/executables/benchmark.json
 ```
 
-The above command has created the `build/benchmark_logs/<date-string>_<context-name>` directory and placed a `config.json` file, a `results.csv` file, and a `log.txt` file into it. You can generate a report by running:
+The above command has created the `build/benchmarks/<date-string>_<context-name>` directory and placed a `config.json` file, a `results.csv` file, and a `log.txt` file into it. You can generate a report by running:
 
 ```bash
-./bin/report -c benchmark_logs/<date-string>_<context-name>/config.json
+./bin/report -c benchmarks/<date-string>_<context-name>/config.json
 ```
 
 To test the visualization, you can run:
@@ -106,7 +114,7 @@ To test the visualization, you can run:
 ./bin/visualization -c bin/parameters/executables/visualization.json
 ```
 
-Feel free to play around by substitution different contexts/planners into these `.json` files. Available options can be taken from the default config files in `esp_ompl_tools/parameters/defaults/`.
+Feel free to play around by substitution different contexts/planners into these `.json` files. Available options can be taken from the default config files in `esp_ompl_tools/parameters/defaults/`. The recommended way to change a default parameter is to **override** it by placing a parameter with the same name in the configuration provided with the `-c` option.
 
 ## Why OMPL?
 
