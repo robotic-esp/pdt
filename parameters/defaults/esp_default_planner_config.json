@@ -11,18 +11,6 @@
             "dropSamplesOnPrune": false,
             "stopOnSolutionImprovement": false
         },
-        "LBTRRT" : {
-            "type": "LBTRRT",
-            "approximationFactor": 0.4,
-            "goalBias": 0.05,
-            "maxEdgeLength": {
-                "2d": 0.3,
-                "4d": 0.5,
-                "6d": 0.9,
-                "8d": 1.25,
-                "16d": 3.0
-            }
-        },
         "RRTConnect": {
             "type": "RRTConnect",
             "useKNearest": false,

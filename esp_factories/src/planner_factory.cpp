@@ -39,7 +39,6 @@
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
-#include <ompl/geometric/planners/rrt/LBTRRT.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
@@ -88,17 +87,6 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setInflationFactorParameter(0.0);
       planner->setTruncationFactorParameter(0.0);
       return {planner, PLANNER_TYPE::BITSTAR};
-    }
-    case PLANNER_TYPE::LBTRRT: {
-      // Allocate and configure an LBTRRT planner.
-      auto planner = std::make_shared<ompl::geometric::LBTRRT>(context_->getSpaceInformation());
-      auto dimKey = std::to_string(context_->getDimensions()) + "d";
-      planner->setProblemDefinition(context_->newProblemDefinition());
-      planner->setName(plannerName);
-      planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
-      planner->setGoalBias(config_->get<double>(parentKey + "/goalBias"));
-      planner->setApproximationFactor(config_->get<double>(parentKey + "/approximationFactor"));
-      return {planner, PLANNER_TYPE::LBTRRT};
     }
     case PLANNER_TYPE::RRTCONNECT: {
       // Allocate and configure an RRT-Connect planner.

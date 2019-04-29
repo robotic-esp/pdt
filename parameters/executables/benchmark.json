@@ -6,7 +6,6 @@
             "BITstar",
             "RRTstar",
             "RRTsharp",
-            "LBTRRT",
             "RRTConnect"
         ],
         "context": "FlankingGap8D",
