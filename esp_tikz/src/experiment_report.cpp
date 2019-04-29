@@ -84,8 +84,8 @@ ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
 }
 
 fs::path ExperimentReport::generateReport() {
-  auto reportPath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
-                    fs::path(config_->get<std::string>("Experiment/name") + "_report.tex");
+  auto reportPath =
+      fs::path(config_->get<std::string>("Experiment/results")).parent_path() / "report.tex"s;
   // Open the filestream.
   std::ofstream report;
   report.open(reportPath.c_str());
@@ -256,6 +256,7 @@ std::stringstream ExperimentReport::overview() const {
            << "}\n\\end{center}\n";
 
   // Create the initial solution overview section.
+  overview << "\\pagebreak\n";
   overview << "\\subsection{Initial Solutions}\\label{sec:overview-initial-solutions}\n";
 
   // Collect all initial solution duration pdf plots.
@@ -268,10 +269,9 @@ std::stringstream ExperimentReport::overview() const {
   initialSolutionDurationPdfAxes.push_back(legend);
   latexPlotter_.stack(initialSolutionDurationPdfAxes);
 
-  overview
-      << "\\begin{center}\n\\input{"
-      << latexPlotter_.createPicture(initialSolutionDurationPdfAxes).string()
-      << "}\n\\end{center}";
+  overview << "\\begin{center}\n\\input{"
+           << latexPlotter_.createPicture(initialSolutionDurationPdfAxes).string()
+           << "}\n\\end{center}";
 
   return overview;
 }
@@ -380,8 +380,8 @@ fs::path ExperimentReport::compileReport() const {
   // Compiling with lualatex is slower than pdflatex but has dynamic memory allocation. Since
   // these plots can be quite large, pdflatex has run into memory issues. Lualatex should be
   // available with all major tex distributions.
-  auto reportPath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
-                    fs::path(config_->get<std::string>("Experiment/name") + "_report.tex");
+  auto reportPath =
+      fs::path(config_->get<std::string>("Experiment/results")).parent_path() / "report.tex";
   auto currentPath = fs::current_path();
   auto cmd = "cd \""s + reportPath.parent_path().string() + "\" && lualatex \""s +
              reportPath.string() + "\" && cd \""s + currentPath.string() + '\"';

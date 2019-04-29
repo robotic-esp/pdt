@@ -337,8 +337,7 @@ fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t 
   }
 
   // Check if the file already exists.
-  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_medians.csv");
+  fs::path filepath = statisticsDirectory_ / (plannerName + "_medians.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
     return filepath;
   }
@@ -414,8 +413,7 @@ fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
   }
 
   // Check if the file already exists.
-  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_cost_percentiles.csv");
+  fs::path filepath = statisticsDirectory_ / (plannerName + "_cost_percentiles.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
     return filepath;
   }
@@ -474,8 +472,7 @@ fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName
   }
 
   // Check if the file already exists.
-  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_median_initial_solution.csv");
+  fs::path filepath = statisticsDirectory_ / (plannerName + "_median_initial_solution.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
     return filepath;
   }
@@ -524,8 +521,7 @@ fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& planne
   }
 
   // Check if the file already exists.
-  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_initial_solution_durations_cdf.csv");
+  fs::path filepath = statisticsDirectory_ / (plannerName + "_initial_solution_durations_cdf.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
     return filepath;
   }
@@ -572,8 +568,7 @@ fs::path Statistics::extractInitialSolutionDurationPdf(
   }
 
   // Check if the file already exists.
-  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_initial_solution_durations_pdf.csv");
+  fs::path filepath = statisticsDirectory_ / (plannerName + "_initial_solution_durations_pdf.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
     return filepath;
   }
@@ -621,8 +616,7 @@ fs::path Statistics::extractInitialSolutionDurationPdf(
 
 fs::path Statistics::extractInitialSolutions(const std::string& plannerName) const {
   // Check if the file already exists.
-  fs::path filepath = statisticsDirectory_ / (config_->get<std::string>("Experiment/name") + '_' +
-                                              plannerName + "_initial_solutions.csv");
+  fs::path filepath = statisticsDirectory_ / (plannerName + "_initial_solutions.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
     return filepath;
   }

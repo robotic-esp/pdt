@@ -90,8 +90,8 @@ int main(int argc, char **argv) {
                                experimentName);
 
   // Create the performance log.
-  esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(
-      experimentDirectory / experimentName += "_results.csv"s);
+  esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(experimentDirectory /
+                                                                    "results.csv"s);
 
   // May the best planner win.
   for (std::size_t i = 0; i < config->get<std::size_t>("Experiment/numRuns"); ++i) {
@@ -158,7 +158,7 @@ int main(int argc, char **argv) {
   esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
 
   // Log some info to a log file.
-  auto logPath = experimentDirectory / experimentName += "_log.txt"s;
+  auto logPath = experimentDirectory / "log.txt"s;
   ompl::msg::OutputHandlerFile log(logPath.c_str());
   ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
   ompl::msg::useOutputHandler(&log);
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
   OMPL_INFORM("Wrote results to '%s'", results.getFilePath().c_str());
 
   // Dump the accessed parameters next to the results file.
-  auto configPath = experimentDirectory / experimentName += "_config.json"s;
+  auto configPath = experimentDirectory / "config.json"s;
   config->add<std::string>("Experiment/results", results.getFilePath());
   config->dumpAccessed(fs::current_path().string() + '/' + configPath.string());
   OMPL_INFORM("Wrote configuration to '%s'", configPath.c_str());
