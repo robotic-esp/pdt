@@ -40,7 +40,7 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 
 # TODO: Put this in the correct subproject.
 # Find Boost.
-find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options filesystem system thread)
+find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options thread)
 include_directories(${Boost_INCLUDE_DIR})
 
 # Find OMPL.
