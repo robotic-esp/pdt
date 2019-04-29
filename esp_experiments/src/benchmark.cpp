@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
   config->add<std::string>("Experiment/name", experimentName);
 
   // Create the directory for the results of this experiment to live in.
-  fs::path experimentDirectory(config->get<std::string>("Experiment/executable") + "_logs/"s +
+  fs::path experimentDirectory(config->get<std::string>("Experiment/executable") + "s/"s +
                                experimentName);
 
   // Create the performance log.
