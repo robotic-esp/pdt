@@ -251,9 +251,13 @@ std::stringstream ExperimentReport::overview() const {
   // Stack the axes
   latexPlotter_.stack(successAxis, medianCostEvolutionAxis, legend);
 
-  overview << "\\begin{center}\n\\input{"
-           << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
-           << "}\n\\end{center}\n";
+  overview
+      << "\\begin{center}\n\\input{"
+      << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
+      << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
+         "at any given time. (Bottom) Median cost evolution and median of initial solution with "
+      << config_->get<std::size_t>("MedianInitialSolutionPlots/confidence")
+      << "\\% confidence intervals.}\n\\end{center}\n";
 
   // Create the initial solution overview section.
   overview << "\\pagebreak\n";
@@ -271,7 +275,9 @@ std::stringstream ExperimentReport::overview() const {
 
   overview << "\\begin{center}\n\\input{"
            << latexPlotter_.createPicture(initialSolutionDurationPdfAxes).string()
-           << "}\n\\end{center}";
+           << "}\n\\captionof{figure}{\\footnotesize Sample probability density functions of "
+              "initial solution "
+              "times.}\n\\end{center}";
 
   return overview;
 }
@@ -325,7 +331,12 @@ std::stringstream ExperimentReport::individualResults() const {
 
     // Create a picture out of the three initial solution axes.
     results << "\\begin{center}\n\\input{"
-            << latexPlotter_.createPicture(cdf, pdf, scatter).string() << "}\n\\end{center}\n";
+            << latexPlotter_.createPicture(cdf, pdf, scatter).string()
+            << "}\n\\captionof{figure}{\\footnotesize (Top) Sample pdf and cdf of "
+            << plotPlannerNames_.at(name) << ". (Bottom) All initial solutions of "
+            << plotPlannerNames_.at(name) << " and their median with "
+            << config_->get<std::size_t>("MedianInitialSolutionPlots/confidence")
+            << "\\% confidence intervals.}\n\\end{center}\n";
 
     // Show the cost evolution plots for anytime planners.
     if (name != "RRTConnect") {
@@ -339,7 +350,11 @@ std::stringstream ExperimentReport::individualResults() const {
       results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";
       results << "\\begin{center}\n\\input{"
               << latexPlotter_.createPicture(medianEvolution, percentileEvolution).string()
-              << "}\n\\end{center}\n";
+              << "}\n\\captionof{figure}{\\footnotesize (Top) Median cost evolution of "
+              << plotPlannerNames_.at(name) << " with "
+              << config_->get<std::size_t>("MedianCostPlots/confidence")
+              << "\\% confidence interval. (Bottom) Seven percentiles of the cost evolution of "
+              << plotPlannerNames_.at(name) << ".}\\end{center}\n";
     }
   }
 

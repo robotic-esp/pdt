@@ -3,7 +3,11 @@
         "executable": "benchmark",
         "planners": [
             "SBITstar",
-            "RRTsharp"
+            "BITstar",
+            "RRTstar",
+            "RRTsharp",
+            "LBTRRT",
+            "RRTConnect"
         ],
         "context": "FlankingGap8D",
         "numRuns": 100,
