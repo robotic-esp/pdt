@@ -1,0 +1,29 @@
+{
+    "Experiment": {
+        "executable": "benchmark",
+        "planners": [
+            "SBITstar",
+            "RRTsharp"
+        ],
+        "context": "FlankingGap8D",
+        "numRuns": 100,
+        "logFrequency": 10000,
+        "loadDefaultContextConfig": true,
+        "loadDefaultPlannerConfig": true
+    },
+    "Contexts": {
+        "FlankingGap8D": {
+            "type": "FlankingGap",
+            "maxTime": 0.1,
+            "dimensions": 8,
+            "start": [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "goal": [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "wallWidth": 1.5,
+            "wallThickness": 0.2,
+            "gapOffset": 0.1,
+            "gapWidth": 0.04
+        }
+    }
+}

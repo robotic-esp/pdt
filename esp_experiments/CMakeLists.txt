@@ -1,7 +1,7 @@
-add_executable(planner_performance
-  src/planner_performance.cpp
+add_executable(benchmark
+  src/benchmark.cpp
 )
-target_link_libraries(planner_performance PUBLIC
+target_link_libraries(benchmark PUBLIC
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
   esp_configuration
@@ -13,19 +13,19 @@ target_link_libraries(planner_performance PUBLIC
   esp_utilities
 )
 
-add_executable(planner_performance_plots
-  src/planner_performance_plots.cpp
+add_executable(benchmark_report
+  src/benchmark_report.cpp
 )
-target_link_libraries(planner_performance_plots PUBLIC
+target_link_libraries(benchmark_report PUBLIC
   esp_configuration
   esp_statistics
   esp_tikz
 )
 
-add_executable(planner_visualization
-  src/planner_visualization.cpp
+add_executable(visualization
+  src/visualization.cpp
   )
-target_link_libraries(planner_visualization PUBLIC
+target_link_libraries(visualization PUBLIC
   ${Boost_LIBRARIES}
   ${Pangolin_LIBRARIES}
   ${OMPL_LIBRARIES}

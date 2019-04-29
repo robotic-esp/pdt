@@ -1,0 +1,35 @@
+{
+    "Experiment": {
+        "executable": "visualization",
+        "planner": "SBITstar",
+        "context": "FlankingGap",
+        "useOnlyThisConfig": false
+    },
+    "Contexts": {
+        "FlankingGap3D": {
+            "type": "FlankingGap",
+            "start": [-0.5, 0.0, 0.0],
+            "goal": [0.5, 0.0, 0.0],
+            "maxTime": 1,
+            "dimensions": 3,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "wallWidth": 1.5,
+            "wallThickness": 0.2,
+            "gapOffset": 0.1,
+            "gapWidth": 0.04
+        },
+        "RandomRectangles3D": {
+            "type": "RandomRectangles",
+            "maxTime": 1,
+            "dimensions": 3,
+            "boundarySideLengths" : 2,
+            "start": [-0.8, -0.8, -0.8],
+            "goal": [0.8, 0.8, 0.8],
+            "collisionCheckResolution": 0.001,
+            "numObstacles": 300,
+            "maxSideLength": 0.3,
+            "minSideLength": 0.05
+        }
+    }
+}
