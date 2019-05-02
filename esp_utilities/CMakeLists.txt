@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(esp_utilities)
 
-# Enable more warnings and treat warnings as errors.
-add_definitions(-std=c++17 -Wall -Wextra -Weffc++ -Werror
-  -Wdisabled-optimization -fdiagnostics-color=auto)
-
 # Find OMPL.
 find_package(ompl REQUIRED)
 

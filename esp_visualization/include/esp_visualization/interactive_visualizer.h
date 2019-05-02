@@ -36,11 +36,6 @@
 
 #pragma once
 
-// GCC complains about variadic macros with no arguments in pangolin. This should be allowed in
-// c++20 (see http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2034.htm). I haven't found a way to
-// ignore just this specific warning with a #pragma, so I include this as a system header. Not sure
-// of all the implications of this though.
-#pragma GCC system_header
 #include <pangolin/pangolin.h>
 
 #include "esp_common/context_type.h"

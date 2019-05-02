@@ -54,7 +54,7 @@ add_subdirectory(thirdparty/json)
 include_directories(thirdparty)
 
 # Enable additional warnings and treat warnings as errors for our own code.
-set(ESP_CXX_COMPILE_FLAGS "-Wall -Wextra -Weffc++ -Werror -Wdisabled-optimization -pedantic-errors -fdiagnostics-color=auto")
+set(ESP_CXX_COMPILE_FLAGS "-Wall -Wextra -Werror -Wdisabled-optimization -fdiagnostics-color=auto")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ESP_CXX_COMPILE_FLAGS}")
 
 # Add the subdirectories.
