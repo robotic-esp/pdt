@@ -93,7 +93,17 @@ cmake ..
 make
 ```
 
+## Reproducible research with ESP OMPL TOOLS
+
+Virtually all sampling-based planning algorithms can be configured by setting parameters (e.g., the connection radius for `RRT*`), or disabling parts of the algorithms (e.g, graph-pruning for `BIT*`). Planning contexts depend on parameters as well (e.g, the number of obstacles and the positions of the start and goal states). The result of an experiment, i.e., of a comparison of the performance of planners in a planning context, depends heavily on these parameters and to reproduce such a result all parameters must be known.
+
+This is why our tools set all parameters explicitly and keep track of which parameters were set. But because explicitly specifying all parameters by hand for every experiment is tedious, the tools are shipped with a set of default parameters (you can inspect them in `esp_ompl_tools/parameters/defaults/`). The intended way to change a parameter is through a configuration patch. Parameters that are specified in such a patch can extend **and overwrite** the defaults.
+
+Regardless of whether a parameter was specified in the defaults or through a patch, all accessed parameters are exported at the end of an experiment. This allows to use the exported configuration as a patch for a new experiment, which ensures that the experiment is run with the exact set of parameters and therefore makes it reproducible. When using an exported parameter set of a previous experiment, no default parameters are loaded.
+
 ## Running ESP OMPL TOOLS
+
+### Testing the installation
 
 You can test your installation with the following commands. The first one runs a quick benchmark:
 
@@ -105,7 +115,7 @@ cd /path/to/esp_ompl_tools/build
 The above command has created the `build/benchmarks/<date-string>_<context-name>` directory and placed a `config.json` file, a `results.csv` file, and a `log.txt` file into it. You can generate a report by running:
 
 ```bash
-./bin/report -c benchmarks/<date-string>_<context-name>/config.json
+./bin/benchmark_report -c benchmarks/<date-string>_<context-name>/config.json
 ```
 
 To test the visualization, you can run:
@@ -115,6 +125,35 @@ To test the visualization, you can run:
 ```
 
 Feel free to play around by substitution different contexts/planners into these `.json` files. Available options can be taken from the default config files in `esp_ompl_tools/parameters/defaults/`. The recommended way to change a default parameter is to **override** it by placing a parameter with the same name in the configuration provided with the `-c` option.
+
+### Benchmark
+
+The tools include an executable called `benchmark`. This executable should be invoked as `benchmark -c path/to/benchmark.json`, where `path/to/benchmark.json` points to a configuration patch. The configuration patch has to specify a family of `"Experiment"` parameters, such as the planners, the planning context, and the number of runs per planner. You can find an example of a suitable configuration patch at `esp_ompl_tools/parameters/executables/benchmark.json`. Notice that you can specify two planners of the same type but different configurations by giving them different names.
+
+All experiments get their own folders in `benchmarks/`. The naming convention for the folders is `<date-string>_<context-name>`. The corresponding folder contains three files when the experiment is finished:
+- `config.json`: All accessed parameters for this experiment;
+- `results.csv`: The raw data of the experiment;
+- `log.txt`: Some additional information that is not required to reproduce the results of the experiment.
+
+### Benchmark report
+
+The `benchmark_report` generates a LaTeX document that presents some statistics and plots of an experiment. It should be invoked as `benchmark_report -c path/to/benchmarks/<date-string>_<context-name>/config.json`.
+
+### Visualization
+
+At ESP we design new planning algorithms. To facilitate this, it is often helpful to visualize process of planning and not just the result. The executable `visualization` does exactly this. It is again invoked with a configuration patch, which specifies which planner and which context is to be visualized. You can invoke it as `visualization -c path/to/visualization.json`.
+
+**Important implementation detail**: The `maxTime` parameter of all planning contexts is ignored and a planner is allowed to run indefinitely when visualized. The current implementation tries to buffer 5000 iterations ahead of the currently visualized iteration. It does not perform any checks on available memory.
+
+The visualization is interactive. These are the five keys that are currently bound to some action:
+
+- 'f': forward one iteration
+- 'b': backward one iteration
+- 'F': forward 10% of largest computed iteration
+- 'B': backward 10% of largest computed iteration
+- ' ': Toggle tracking
+
+When tracking is on, the most recently computed iteration is visualized.
 
 ## Why OMPL?
 
@@ -129,6 +168,7 @@ Feel free to play around by substitution different contexts/planners into these 
 - [ ] Implement feature to record/play at constant 'iteration per second' rate
 - [ ] Implement feature to export every iteration as png
 - [ ] Improve quality of recorded videos
+- [ ] Implement "pageing" mechanism for planner visualization
 
 ## How to create maps from `.png`s
 
