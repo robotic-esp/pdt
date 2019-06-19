@@ -167,11 +167,16 @@ void WallGap::createObstacles() {
 
   // Create the widths of this wall.
   std::vector<double> widths(dimensionality_, 0.0);
-  // Set the obstacle width in the first dimension.
+
+  // Set the thickness of the wall.
   widths.at(0) = wallThickness_;
-  // The wall has the specified width in all other dimensions.
-  for (std::size_t j = 1; j < dimensionality_; ++j) {
-    widths.at(j) = wallWidth_;
+
+  // Set the width.
+  widths.at(1) = wallWidth_;
+
+  // The wall extends to the boundaries in all other dimensions.
+  for (std::size_t j = 2; j < dimensionality_; ++j) {
+    widths.at(j) = bounds_.at(j).second - bounds_.at(j).first;
   }
   obstacles_.emplace_back(
       std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths));
