@@ -37,6 +37,7 @@
 #include "esp_factories/planner_factory.h"
 
 #include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -86,6 +87,22 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setInitialInflationFactor(1.0);
       planner->setInflationFactorParameter(0.0);
       planner->setTruncationFactorParameter(0.0);
+      return {planner, PLANNER_TYPE::BITSTAR};
+    }
+    case PLANNER_TYPE::BITSTARREGRESSION: {
+      // Allocate and configure a BIT* Regression planner.
+      auto planner = std::make_shared<ompl::geometric::BITstarRegression>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setName(plannerName);
+      planner->setUseKNearest(config_->get<bool>(parentKey + "/useKNearest"));
+      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
+      planner->setSamplesPerBatch(config_->get<std::size_t>(parentKey + "/samplesPerBatch"));
+      planner->setPruning(config_->get<bool>(parentKey + "/enablePruning"));
+      planner->setPruneThresholdFraction(config_->get<double>(parentKey + "/pruningThreshold"));
+      planner->setDropSamplesOnPrune(config_->get<bool>(parentKey + "/dropSamplesOnPrune"));
+      planner->setJustInTimeSampling(config_->get<bool>(parentKey + "/useJustInTimeSampling"));
+      planner->setStopOnSolnImprovement(
+          config_->get<bool>(parentKey + "/stopOnSolutionImprovement"));
       return {planner, PLANNER_TYPE::BITSTAR};
     }
     case PLANNER_TYPE::RRTCONNECT: {

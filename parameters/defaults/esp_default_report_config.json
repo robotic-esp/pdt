@@ -13,6 +13,7 @@
     },
     "PlannerPlotColors": {
         "BITstar": "espblue",
+        "BITstarRegression": "esplightblue",
         "LBTRRT" : "esppurple",
         "RRTConnect": "espblack",
         "RRTsharp": "espyellow",
@@ -21,6 +22,7 @@
     },
     "PlotPlannerNames": {
         "BITstar": "BIT*",
+        "BITstarRegression": "BIT* Reg",
         "LBTRRT": "LBT-RRT",
         "RRTConnect": "RRT-Connect",
         "RRTsharp": "RRT$^{\\#}$",

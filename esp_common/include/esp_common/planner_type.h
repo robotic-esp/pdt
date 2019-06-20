@@ -44,6 +44,7 @@ namespace ompltools {
 
 enum class PLANNER_TYPE {
   BITSTAR,
+  BITSTARREGRESSION,
   LBTRRT,
   RRTCONNECT,
   RRTSHARP,
@@ -53,6 +54,7 @@ enum class PLANNER_TYPE {
 
 NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
                                                {PLANNER_TYPE::BITSTAR, "BITstar"},
+                                               {PLANNER_TYPE::BITSTARREGRESSION, "BITstarRegression"},
                                                {PLANNER_TYPE::LBTRRT, "LBTRRT"},
                                                {PLANNER_TYPE::RRTCONNECT, "RRTConnect"},
                                                {PLANNER_TYPE::RRTSHARP, "RRTsharp"},

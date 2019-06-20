@@ -2,13 +2,10 @@
     "Experiment": {
         "executable": "benchmark",
         "planners": [
-            "SBITstar",
             "BITstar",
-            "RRTstar",
-            "RRTsharp",
-            "RRTConnect"
+            "BITstarRegression"
         ],
-        "context": "FlankingGap8D",
+        "context": "FlankingGap",
         "numRuns": 100,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,

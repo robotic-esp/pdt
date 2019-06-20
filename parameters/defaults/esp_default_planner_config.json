@@ -11,6 +11,17 @@
             "dropSamplesOnPrune": false,
             "stopOnSolutionImprovement": false
         },
+        "BITstarRegression": {
+            "type": "BITstarRegression",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "samplesPerBatch": 100,
+            "enablePruning": false,
+            "pruningThreshold": 0.1,
+            "useJustInTimeSampling": false,
+            "dropSamplesOnPrune": false,
+            "stopOnSolutionImprovement": false
+        },
         "RRTConnect": {
             "type": "RRTConnect",
             "useKNearest": false,
