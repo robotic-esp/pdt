@@ -39,6 +39,7 @@
 #include <limits>
 #include <string>
 
+#include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
@@ -58,6 +59,9 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
   switch (plannerType) {
     case PLANNER_TYPE::BITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
+    }
+    case PLANNER_TYPE::BITSTARREGRESSION: {
+      return planner->as<ompl::geometric::BITstarRegression>()->bestCost();
     }
     case PLANNER_TYPE::RRTCONNECT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());

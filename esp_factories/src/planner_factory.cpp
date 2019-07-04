@@ -103,7 +103,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setJustInTimeSampling(config_->get<bool>(parentKey + "/useJustInTimeSampling"));
       planner->setStopOnSolnImprovement(
           config_->get<bool>(parentKey + "/stopOnSolutionImprovement"));
-      return {planner, PLANNER_TYPE::BITSTAR};
+      return {planner, PLANNER_TYPE::BITSTARREGRESSION};
     }
     case PLANNER_TYPE::RRTCONNECT: {
       // Allocate and configure an RRT-Connect planner.
