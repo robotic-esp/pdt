@@ -37,6 +37,8 @@
 #include "esp_visualization/interactive_visualizer.h"
 
 #include <ompl/geometric/PathGeometric.h>
+#include <ompl/geometric/planners/bitstar/datastructures/Vertex.h>
+
 #include <pangolin/display/display_internal.h>
 
 #include "esp_visualization/fonts.h"
@@ -282,6 +284,9 @@ void InteractiveVisualizer::run() {
         drawLines(edges, 1.5, gray, 0.8);
       }
     }
+
+    // Draw the planner specific data.
+    drawPlannerSpecificVisualizations(displayIteration_);
 
     // Draw the solution.
     if (optionDrawSolution) {
@@ -630,6 +635,57 @@ void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) 
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
   drawRectangle(antiObstacle.getAnchorCoordinates(), antiObstacle.getWidths(), white, white);
+}
+
+void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iteration) const {
+  switch (plannerType_) {
+    case PLANNER_TYPE::BITSTAR:
+    case PLANNER_TYPE::SBITSTAR: {
+      drawBITstarSpecificVisualizations(iteration);
+      return;
+    }
+    default:
+      return;
+  }
+}
+
+void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iteration) const {
+  // Get the BIT* specific data.
+  auto bitstarData =
+      std::dynamic_pointer_cast<const BITstarData>(getPlannerSpecificData(iteration));
+  if (context_->getDimensions() == 2u) {
+    // Get the edge queue.
+    auto edgeQueue = bitstarData->getEdgeQueue();
+    std::vector<Eigen::Vector2d> edges{};
+    for (const auto& edge : edgeQueue) {
+      auto parentState = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector2d((*parentState)[0u], (*parentState)[1u]));
+      auto childState = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector2d((*childState)[0u], (*childState)[1u]));
+    }
+
+    // Draw the edge queue.
+    drawLines(edges, 1.5, lightblue);
+
+    // Get the next edge in the queue.
+    auto nextEdgeStates = bitstarData->getNextEdge();
+
+    // If there are no more edges in the queue, this will return nullptrs.
+    if (nextEdgeStates.first == nullptr || nextEdgeStates.second == nullptr) {
+      return;
+    }
+    auto parentState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto childState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    std::vector<Eigen::Vector2d> nextEdge{Eigen::Vector2d((*parentState)[0u], (*parentState)[1u]),
+                                          Eigen::Vector2d((*childState)[0u], (*childState)[1u])};
+
+    // Draw the next edge.
+    drawLines(nextEdge, 3.0, red);
+  } else if (context_->getDimensions() == 3u) {
+  } else {
+    throw std::runtime_error(
+        "BITstar specific visualizations only implemented for 2d or 3d contexts.");
+  }
 }
 
 std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>>

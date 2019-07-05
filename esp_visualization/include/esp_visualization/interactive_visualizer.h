@@ -119,6 +119,10 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   void visit(const Hyperrectangle<BaseObstacle>& obstacle) const override;
   void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;
 
+  // Planner specific visualizations.
+  void drawPlannerSpecificVisualizations(std::size_t iteration) const;
+  void drawBITstarSpecificVisualizations(std::size_t iteration) const;
+
   // Helpers.
   std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>> getVerticesAndEdges2D(
       std::size_t iteration) const;

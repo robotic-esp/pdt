@@ -40,6 +40,7 @@
 #include <exception>
 
 #include <ompl/base/PlannerTerminationCondition.h>
+#include <ompl/geometric/planners/bitstar/BITstar.h>
 
 #include "esp_time/time.h"
 
@@ -126,6 +127,18 @@ std::shared_ptr<const ompl::base::PlannerData> BaseVisualizer::getPlannerData(
   return plannerData_.at(iteration);
 }
 
+std::shared_ptr<const PlannerSpecificData> BaseVisualizer::getPlannerSpecificData(
+    std::size_t iteration) const {
+  std::scoped_lock lock(plannerSpecificDataMutex_);
+  if (iteration >= plannerSpecificData_.size()) {
+    std::cout << "Requested iteration: " << iteration
+              << ", available: " << plannerSpecificData_.size() << '\n';
+    throw std::runtime_error(
+        "Requested planner specific data of iteration that has not yet been processed");
+  }
+  return plannerSpecificData_.at(iteration);
+}
+
 const ompl::base::PathPtr BaseVisualizer::getSolutionPath(std::size_t iteration) const {
   std::scoped_lock lock(solutionPathsMutex_);
   if (iteration >= solutionPaths_.size()) {
@@ -202,6 +215,22 @@ void BaseVisualizer::createData() {
         std::scoped_lock lock(plannerDataMutex_);
         plannerData_.emplace_back(plannerData);
         largestIteration_ = plannerData_.size() - 1u;
+      }
+
+      if (plannerType_ == PLANNER_TYPE::BITSTAR || plannerType_ == PLANNER_TYPE::SBITSTAR) {
+        auto bitstarData = std::make_shared<BITstarData>(context_->getSpaceInformation());
+
+        // Store the BIT* edge queue.
+        std::vector<BITstarData::BITstarEdge> edgeQueue;
+        planner_->as<ompl::geometric::BITstar>()->getEdgeQueue(&edgeQueue);
+        bitstarData->setEdgeQueue(edgeQueue);
+
+        // Store the BIT* next edge.
+        bitstarData->setNextEdge(planner_->as<ompl::geometric::BITstar>()->getNextEdgeInQueue());
+
+        // Store the data.
+        std::scoped_lock lock(plannerSpecificDataMutex_);
+        plannerSpecificData_.emplace_back(bitstarData);
       }
     }
   }
