@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+// Authors: Marlin Strub
 
 #pragma once
 
@@ -81,7 +81,17 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   int largestPlottedIteration_{-1};
   void logCost();
 
-  // Drawing.
+  // Highlevel drawing.
+  void drawVerticesAndEdges(std::size_t iteration);
+  void drawVertices(std::size_t iteration);
+  void drawEdges(std::size_t iteration);
+  void drawSolution(std::size_t iteration);
+
+  // Planner specific visualizations.
+  void drawPlannerSpecificVisualizations(std::size_t iteration) const;
+  void drawBITstarSpecificVisualizations(std::size_t iteration) const;
+
+  // Lowlevel drawing.
   void drawRectangle(const std::vector<double>& midpoint, const std::vector<double>& widths,
                      const float* faceColor, const float* edgeColor) const;
   void drawRectangle2D(const std::vector<double>& midpoint, const std::vector<double>& widths,
@@ -118,10 +128,6 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   // Implement visualizations of obstacles.
   void visit(const Hyperrectangle<BaseObstacle>& obstacle) const override;
   void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;
-
-  // Planner specific visualizations.
-  void drawPlannerSpecificVisualizations(std::size_t iteration) const;
-  void drawBITstarSpecificVisualizations(std::size_t iteration) const;
 
   // Helpers.
   std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>> getVerticesAndEdges2D(
