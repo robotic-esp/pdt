@@ -2,7 +2,7 @@
     "Experiment": {
         "executable": "visualization",
         "planner": "SBITstar",
-        "context": "RandomRectangles",
+        "context": "WallGap",
         "useOnlyThisConfig": false
     },
     "Contexts": {

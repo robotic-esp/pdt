@@ -682,6 +682,33 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
     // Draw the next edge.
     drawLines(nextEdge, 3.0, red);
   } else if (context_->getDimensions() == 3u) {
+    // Get the edge queue.
+    auto edgeQueue = bitstarData->getEdgeQueue();
+    std::vector<Eigen::Vector3d> edges{};
+    for (const auto& edge : edgeQueue) {
+      auto parentState = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector3d((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]));
+      auto childState = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector3d((*childState)[0u], (*childState)[1u], (*childState)[2u]));
+    }
+
+    // Draw the edge queue.
+    drawLines(edges, 1.5, lightblue);
+
+    // Get the next edge in the queue.
+    auto nextEdgeStates = bitstarData->getNextEdge();
+
+    // If there are no more edges in the queue, this will return nullptrs.
+    if (nextEdgeStates.first == nullptr || nextEdgeStates.second == nullptr) {
+      return;
+    }
+    auto parentState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto childState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    std::vector<Eigen::Vector3d> nextEdge{Eigen::Vector3d((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]),
+                                          Eigen::Vector3d((*childState)[0u], (*childState)[1u], (*childState)[2u])};
+
+    // Draw the next edge.
+    drawLines(nextEdge, 3.0, red);
   } else {
     throw std::runtime_error(
         "BITstar specific visualizations only implemented for 2d or 3d contexts.");
