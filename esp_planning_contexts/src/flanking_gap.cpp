@@ -160,7 +160,7 @@ void FlankingGap::accept(const ContextVisitor& visitor) const {
 void FlankingGap::createObstacles() {
   ompl::base::ScopedState<> midpoint(spaceInfo_);
   // Set the obstacle midpoint in the middle of the state space.
-  for (std::size_t j = 1; j < dimensionality_; ++j) {
+  for (std::size_t j = 0u; j < dimensionality_; ++j) {
     midpoint[j] = (bounds_.at(j).first + bounds_.at(j).second) / 2.0;
   }
   // Create the widths of this wall.
@@ -168,7 +168,7 @@ void FlankingGap::createObstacles() {
   // Set the obstacle width in the first dimension.
   widths.at(0) = wallThickness_;
   // The wall has the specified width in all other dimensions.
-  for (std::size_t j = 1; j < dimensionality_; ++j) {
+  for (std::size_t j = 1u; j < dimensionality_; ++j) {
     widths.at(j) = wallWidth_;
   }
   obstacles_.emplace_back(
