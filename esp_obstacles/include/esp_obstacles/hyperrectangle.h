@@ -95,7 +95,8 @@ class Hyperrectangle : public T {
 template <typename T>
 Hyperrectangle<T>::Hyperrectangle(const ompl::base::SpaceInformationPtr& spaceInfo) :
     T(spaceInfo),
-    spaceInfo_(spaceInfo) {
+    spaceInfo_(spaceInfo),
+    widths_(spaceInfo->getStateDimension(), 0.0) {
 }
 
 template <typename T>
@@ -122,7 +123,7 @@ void Hyperrectangle<T>::accept(const ObstacleVisitor& visitor) const {
 template <typename T>
 bool Hyperrectangle<T>::isInside(const ompl::base::State* state) const {
   // Let's be conservative here.
-  auto rstate = static_cast<const ompl::base::RealVectorStateSpace::StateType*>(state);
+  auto rstate = state->as<ompl::base::RealVectorStateSpace::StateType>();
   for (std::size_t dim = 0; dim < spaceInfo_->getStateDimension(); ++dim) {
     if (rstate->values[dim] <
             T::anchor_[dim] - widths_[dim] / 2.0 - std::numeric_limits<double>::epsilon() ||
