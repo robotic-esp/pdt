@@ -2,8 +2,7 @@
     "Experiment": {
         "executable": "benchmark",
         "planners": [
-            "BITstar",
-            "BITstarRegression"
+            "TBDstar"
         ],
         "context": "FlankingGap",
         "numRuns": 100,
@@ -12,6 +11,9 @@
         "loadDefaultPlannerConfig": true
     },
     "Contexts": {
+        "FlankingGap": {
+            "maxTime": 10.0
+        },
         "FlankingGap8D": {
             "type": "FlankingGap",
             "maxTime": 0.1,
@@ -27,6 +29,9 @@
         }
     },
     "Planners": {
+        "TBDstar": {
+            "type": "TBDstar"
+        },
         "SBITstarRegression": {
             "type": "BITstarRegression",
             "useKNearest": false,

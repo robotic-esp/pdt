@@ -46,6 +46,7 @@
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
+#include <ompl/geometric/planners/tbdstar/TBDstar.h>
 
 #include "esp_common/planner_type.h"
 
@@ -74,6 +75,9 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     }
     case PLANNER_TYPE::SBITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
+    }
+    case PLANNER_TYPE::TBDSTAR: {
+      return planner->as<ompl::geometric::TBDstar>()->bestCost();
     }
     default: {
       throw std::runtime_error("Received request to get best cost of unknown planner type.");

@@ -45,6 +45,7 @@
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
+#include <ompl/geometric/planners/tbdstar/TBDstar.h>
 
 #include "nlohmann/json.hpp"
 
@@ -91,7 +92,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     }
     case PLANNER_TYPE::BITSTARREGRESSION: {
       // Allocate and configure a BIT* Regression planner.
-      auto planner = std::make_shared<ompl::geometric::BITstarRegression>(context_->getSpaceInformation());
+      auto planner =
+          std::make_shared<ompl::geometric::BITstarRegression>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->newProblemDefinition());
       planner->setName(plannerName);
       planner->setUseKNearest(config_->get<bool>(parentKey + "/useKNearest"));
@@ -166,6 +168,13 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setTruncationFactorParameter(
           config_->get<double>(parentKey + "/truncationParameter"));
       return {planner, PLANNER_TYPE::SBITSTAR};
+    }
+    case PLANNER_TYPE::TBDSTAR: {
+      // Allocate and configure a TBD* planner.
+      auto planner = std::make_shared<ompl::geometric::TBDstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setName(plannerName);
+      return {planner, PLANNER_TYPE::TBDSTAR};
     }
     default: {
       OMPL_ERROR("Planner factory recieved request to create planner of unknown type '%s'.",

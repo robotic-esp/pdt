@@ -1,9 +1,14 @@
 {
     "Experiment": {
         "executable": "visualization",
-        "planner": "SBITstar",
+        "planner": "TBDstar",
         "context": "FlankingGap",
         "useOnlyThisConfig": false
+    },
+    "Planners": {
+        "TBDstar": {
+            "type": "TBDstar"
+        }
     },
     "Contexts": {
         "FlankingGap3D": {

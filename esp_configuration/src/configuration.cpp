@@ -346,9 +346,6 @@ void Configuration::registerAsExperiment() const {
   accessedParameters_["Experiment"]["loadDefaultContextConfig"] = false;
   accessedParameters_["Experiment"]["loadDefaultPlannerConfig"] = false;
 
-  // If in debug, ensure we've set the seed.
-  assert(allParameters_["Experiment"]["seed"].get<unsigned int>() == ompl::RNG::getSeed());
-
   // Handle seed specifications.
   handleSeedSpecification();
 }
