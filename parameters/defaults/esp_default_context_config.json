@@ -49,7 +49,7 @@
             "wallWidth": 1.5,
             "wallThickness": 0.2,
             "gapOffset": 0.1,
-            "gapWidth": 0.04
+            "gapWidth": 0.01
         },
         "GoalEnclosure": {
             "type": "GoalEnclosure",
@@ -136,9 +136,9 @@
             "boundarySideLengths" : 2,
             "collisionCheckResolution": 0.001,
             "wallWidth": 1.8,
-            "wallThickness": 0.2,
+            "wallThickness": 0.4,
             "gapOffset": 0.1,
-            "gapWidth": 0.02
+            "gapWidth": 0.01
         }
     }
 }

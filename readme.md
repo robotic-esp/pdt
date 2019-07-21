@@ -186,3 +186,21 @@ To create a map from a `.png` follow these steps:
    8. Open `.bmp` in MATLAB
    9. Export to a csv file `csvwrite('filename.csv', bmpFileName)`
    10. Use the csvObstacle class
+
+## Create a regression class of BIT*
+
+This allows for testing different versions of the algorithm in the same executable.
+
+```bash
+cd ompl/geometric/planners/
+cp -r bitstar bitstar_regression
+cd bitstar_regression
+mv BITstar.h BITstarRegression.h
+mv src/BITstar.cpp src/BITstarRegression.cpp
+sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regression|g' -e 's|BITstar|BITstarRegression|g' BITstarRegression.h
+sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regression|g' -e 's|BITstar|BITstarRegression|g' src/BITstarRegression.cpp
+cd datastructures
+sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regression|g' -e 's|BITstar|BITstarRegression|g' *.h
+cd src
+sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regression|g' -e 's|BITstar|BITstarRegression|g' *.cpp
+```

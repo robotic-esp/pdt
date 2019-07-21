@@ -37,6 +37,8 @@
 #include "esp_visualization/interactive_visualizer.h"
 
 #include <ompl/geometric/PathGeometric.h>
+#include <ompl/geometric/planners/bitstar/datastructures/Vertex.h>
+
 #include <pangolin/display/display_internal.h>
 
 #include "esp_visualization/fonts.h"
@@ -145,6 +147,7 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionDrawObstacles(optionsName + ".Obstacles", true, true);
   pangolin::Var<bool> optionDrawVertices(optionsName + ".Vertices", true, true);
   pangolin::Var<bool> optionDrawEdges(optionsName + ".Edges", true, true);
+  pangolin::Var<bool> optionDrawPlannerSpecificData(optionsName + ".Planner Specific", true, true);
   pangolin::Var<bool> optionDrawSolution(optionsName + ".Solution", true, true);
   pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
   // Buttons.
@@ -256,42 +259,21 @@ void InteractiveVisualizer::run() {
 
     // Draw the vertices and edges.
     if (optionDrawVertices && optionDrawEdges) {
-      if (context_->getDimensions() == 2u) {
-        auto [vertices, edges] = getVerticesAndEdges2D(displayIteration_);
-        drawPoints(vertices, blue, 2.0);
-        drawLines(edges, 1.5, gray);
-      } else if (context_->getDimensions() == 3u) {
-        auto [vertices, edges] = getVerticesAndEdges3D(displayIteration_);
-        drawPoints(vertices, blue, 2.0);
-        drawLines(edges, 1.5, gray, 0.8);
-      }
+      drawVerticesAndEdges(displayIteration_);
     } else if (optionDrawVertices) {
-      if (context_->getDimensions() == 2u) {
-        auto vertices = getVertices2D(displayIteration_);
-        drawPoints(vertices, blue, 2.0);
-      } else if (context_->getDimensions() == 3u) {
-        auto vertices = getVertices3D(displayIteration_);
-        drawPoints(vertices, blue, 2.0);
-      }
+      drawVertices(displayIteration_);
     } else if (optionDrawEdges) {
-      if (context_->getDimensions() == 2u) {
-        auto edges = getEdges2D(displayIteration_);
-        drawLines(edges, 1.5, gray);
-      } else if (context_->getDimensions() == 3u) {
-        auto edges = getEdges3D(displayIteration_);
-        drawLines(edges, 1.5, gray, 0.8);
-      }
+      drawEdges(displayIteration_);
+    }
+
+    // Draw the planner specific data.
+    if (optionDrawPlannerSpecificData) {
+      drawPlannerSpecificVisualizations(displayIteration_);
     }
 
     // Draw the solution.
     if (optionDrawSolution) {
-      if (context_->getDimensions() == 2u) {
-        auto path = getPath2D(displayIteration_);
-        drawPath(path, 3.0, purple);
-      } else if (context_->getDimensions() == 3u) {
-        auto path = getPath3D(displayIteration_);
-        drawPath(path, 3.0, purple, 1.0);
-      }
+      drawSolution(displayIteration_);
     }
 
     // Draw the context.
@@ -359,6 +341,48 @@ void InteractiveVisualizer::updateCostLog() {
     } else {
       costLog_.Log(std::numeric_limits<double>::max());
     }
+  }
+}
+
+void InteractiveVisualizer::drawVerticesAndEdges(std::size_t iteration) {
+  if (context_->getDimensions() == 2u) {
+    auto [vertices, edges] = getVerticesAndEdges2D(iteration);
+    drawPoints(vertices, blue, 2.0);
+    drawLines(edges, 1.5, gray);
+  } else if (context_->getDimensions() == 3u) {
+    auto [vertices, edges] = getVerticesAndEdges3D(iteration);
+    drawPoints(vertices, blue, 2.0);
+    drawLines(edges, 1.5, gray, 0.8);
+  }
+}
+
+void InteractiveVisualizer::drawVertices(std::size_t iteration) {
+  if (context_->getDimensions() == 2u) {
+    auto vertices = getVertices2D(iteration);
+    drawPoints(vertices, blue, 2.0);
+  } else if (context_->getDimensions() == 3u) {
+    auto vertices = getVertices3D(iteration);
+    drawPoints(vertices, blue, 2.0);
+  }
+}
+
+void InteractiveVisualizer::drawEdges(std::size_t iteration) {
+  if (context_->getDimensions() == 2u) {
+    auto edges = getEdges2D(iteration);
+    drawLines(edges, 1.5, gray);
+  } else if (context_->getDimensions() == 3u) {
+    auto edges = getEdges3D(iteration);
+    drawLines(edges, 1.5, gray, 0.8);
+  }
+}
+
+void InteractiveVisualizer::drawSolution(std::size_t iteration) {
+  if (context_->getDimensions() == 2u) {
+    auto path = getPath2D(iteration);
+    drawPath(path, 3.0, purple);
+  } else if (context_->getDimensions() == 3u) {
+    auto path = getPath3D(iteration);
+    drawPath(path, 3.0, purple, 1.0);
   }
 }
 
@@ -630,6 +654,85 @@ void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) 
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
   drawRectangle(antiObstacle.getAnchorCoordinates(), antiObstacle.getWidths(), white, white);
+}
+
+void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iteration) const {
+  switch (plannerType_) {
+    case PLANNER_TYPE::BITSTAR:
+    case PLANNER_TYPE::SBITSTAR: {
+      drawBITstarSpecificVisualizations(iteration);
+      return;
+    }
+    default:
+      return;
+  }
+}
+
+void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iteration) const {
+  // Get the BIT* specific data.
+  auto bitstarData =
+      std::dynamic_pointer_cast<const BITstarData>(getPlannerSpecificData(iteration));
+  if (context_->getDimensions() == 2u) {
+    // Get the edge queue.
+    auto edgeQueue = bitstarData->getEdgeQueue();
+    std::vector<Eigen::Vector2d> edges{};
+    for (const auto& edge : edgeQueue) {
+      auto parentState = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector2d((*parentState)[0u], (*parentState)[1u]));
+      auto childState = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector2d((*childState)[0u], (*childState)[1u]));
+    }
+
+    // Draw the edge queue.
+    drawLines(edges, 1.5, lightblue);
+
+    // Get the next edge in the queue.
+    auto nextEdgeStates = bitstarData->getNextEdge();
+
+    // If there are no more edges in the queue, this will return nullptrs.
+    if (nextEdgeStates.first == nullptr || nextEdgeStates.second == nullptr) {
+      return;
+    }
+    auto parentState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto childState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    std::vector<Eigen::Vector2d> nextEdge{Eigen::Vector2d((*parentState)[0u], (*parentState)[1u]),
+                                          Eigen::Vector2d((*childState)[0u], (*childState)[1u])};
+
+    // Draw the next edge.
+    drawLines(nextEdge, 3.0, red);
+  } else if (context_->getDimensions() == 3u) {
+    // Get the edge queue.
+    auto edgeQueue = bitstarData->getEdgeQueue();
+    std::vector<Eigen::Vector3d> edges{};
+    for (const auto& edge : edgeQueue) {
+      auto parentState = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector3d((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]));
+      auto childState = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector3d((*childState)[0u], (*childState)[1u], (*childState)[2u]));
+    }
+
+    // Draw the edge queue.
+    drawLines(edges, 1.5, lightblue);
+
+    // Get the next edge in the queue.
+    auto nextEdgeStates = bitstarData->getNextEdge();
+
+    // If there are no more edges in the queue, this will return nullptrs.
+    if (nextEdgeStates.first == nullptr || nextEdgeStates.second == nullptr) {
+      return;
+    }
+    auto parentState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto childState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    std::vector<Eigen::Vector3d> nextEdge{
+        Eigen::Vector3d((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]),
+        Eigen::Vector3d((*childState)[0u], (*childState)[1u], (*childState)[2u])};
+
+    // Draw the next edge.
+    drawLines(nextEdge, 3.0, red);
+  } else {
+    throw std::runtime_error(
+        "BITstar specific visualizations only implemented for 2d or 3d contexts.");
+  }
 }
 
 std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>>

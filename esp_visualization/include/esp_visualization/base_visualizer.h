@@ -49,6 +49,7 @@
 #include "esp_common/planner_type.h"
 #include "esp_planning_contexts/base_context.h"
 #include "esp_time/time.h"
+#include "esp_visualization/planner_specific_data.h"
 
 namespace esp {
 
@@ -72,6 +73,7 @@ class BaseVisualizer {
  protected:
   // Make data available to derived classes.
   std::shared_ptr<const ompl::base::PlannerData> getPlannerData(std::size_t iteration) const;
+  std::shared_ptr<const PlannerSpecificData> getPlannerSpecificData(std::size_t iteration) const;
   time::Duration getIterationDuration(std::size_t iteration) const;
   const ompl::base::PathPtr getSolutionPath(std::size_t iteration) const;
   time::Duration getTotalElapsedDuration(std::size_t iteration) const;
@@ -110,6 +112,10 @@ class BaseVisualizer {
   // The planner data, indexed by the iteration.
   std::vector<std::shared_ptr<ompl::base::PlannerData>> plannerData_{};
   mutable std::mutex plannerDataMutex_{};
+
+  // The planner specific data, indexed by the iteration.
+  std::vector<std::shared_ptr<PlannerSpecificData>> plannerSpecificData_{};
+  mutable std::mutex plannerSpecificDataMutex_{};
 
   // The iteration durations, indexed by the iteration.
   std::vector<time::Duration> durations_{};

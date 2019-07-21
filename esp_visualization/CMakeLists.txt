@@ -17,6 +17,7 @@ include_directories(
 add_library(esp_visualization
   src/base_visualizer.cpp
   src/interactive_visualizer.cpp
+  src/planner_specific_data.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/fonts.cpp)
 
 # Link the library.

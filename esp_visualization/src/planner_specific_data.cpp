@@ -34,37 +34,32 @@
 
 // Authors: Marlin Strub
 
-#pragma once
-
-#include "nlohmann/json.hpp"
+#include "esp_visualization/planner_specific_data.h"
 
 namespace esp {
 
 namespace ompltools {
 
-enum class PLANNER_TYPE {
-  BITSTAR,
-  BITSTARREGRESSION,
-  LBTRRT,
-  RRTCONNECT,
-  RRTSHARP,
-  RRTSTAR,
-  SBITSTAR,
-  TBDSTAR,
-  INVALID,
-};
+std::vector<BITstarData::BITstarEdge> BITstarData::getEdgeQueue() const {
+  return edgeQueue_;
+}
 
-NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
-                                               {PLANNER_TYPE::BITSTAR, "BITstar"},
-                                               {PLANNER_TYPE::BITSTARREGRESSION, "BITstarRegression"},
-                                               {PLANNER_TYPE::LBTRRT, "LBTRRT"},
-                                               {PLANNER_TYPE::RRTCONNECT, "RRTConnect"},
-                                               {PLANNER_TYPE::RRTSHARP, "RRTsharp"},
-                                               {PLANNER_TYPE::RRTSTAR, "RRTstar"},
-                                               {PLANNER_TYPE::SBITSTAR, "SBITstar"},
-                                               {PLANNER_TYPE::TBDSTAR, "TBDstar"},
-                                               {PLANNER_TYPE::INVALID, "invalid"},
-                                           })
+std::pair<const ompl::base::State*, const ompl::base::State*> BITstarData::getNextEdge() const {
+  return std::make_pair(parentStateNextEdge_, childStateNextEdge_);
+}
+
+void BITstarData::setEdgeQueue(const std::vector<BITstarEdge>& edges) {
+  edgeQueue_ = edges;
+}
+
+void BITstarData::setNextEdge(
+    const std::pair<const ompl::base::State*, const ompl::base::State*>& edge) {
+  if (edge.first == nullptr || edge.second == nullptr) {
+    return;
+  }
+  spaceInfo_->copyState(parentStateNextEdge_, edge.first);
+  spaceInfo_->copyState(childStateNextEdge_, edge.second);
+}
 
 }  // namespace ompltools
 

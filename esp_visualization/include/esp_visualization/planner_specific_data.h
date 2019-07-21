@@ -36,35 +36,50 @@
 
 #pragma once
 
-#include "nlohmann/json.hpp"
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/geometric/planners/bitstar/BITstar.h>
+
+#include "esp_common/planner_type.h"
 
 namespace esp {
 
 namespace ompltools {
 
-enum class PLANNER_TYPE {
-  BITSTAR,
-  BITSTARREGRESSION,
-  LBTRRT,
-  RRTCONNECT,
-  RRTSHARP,
-  RRTSTAR,
-  SBITSTAR,
-  TBDSTAR,
-  INVALID,
+class PlannerSpecificData {
+ public:
+  explicit PlannerSpecificData(const ompl::base::SpaceInformationPtr& spaceInfo) : spaceInfo_(spaceInfo) {}
+  virtual ~PlannerSpecificData() = default;
+
+ protected:
+  ompl::base::SpaceInformationPtr spaceInfo_{};
 };
 
-NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
-                                               {PLANNER_TYPE::BITSTAR, "BITstar"},
-                                               {PLANNER_TYPE::BITSTARREGRESSION, "BITstarRegression"},
-                                               {PLANNER_TYPE::LBTRRT, "LBTRRT"},
-                                               {PLANNER_TYPE::RRTCONNECT, "RRTConnect"},
-                                               {PLANNER_TYPE::RRTSHARP, "RRTsharp"},
-                                               {PLANNER_TYPE::RRTSTAR, "RRTstar"},
-                                               {PLANNER_TYPE::SBITSTAR, "SBITstar"},
-                                               {PLANNER_TYPE::TBDSTAR, "TBDstar"},
-                                               {PLANNER_TYPE::INVALID, "invalid"},
-                                           })
+class BITstarData : public PlannerSpecificData {
+ public:
+  using BITstarEdge = std::pair<std::shared_ptr<const ompl::geometric::BITstar::Vertex>,
+                                std::shared_ptr<const ompl::geometric::BITstar::Vertex>>;
+  BITstarData(const ompl::base::SpaceInformationPtr& spaceInfo) :
+    PlannerSpecificData(spaceInfo),
+    parentStateNextEdge_(spaceInfo->allocState()),
+    childStateNextEdge_(spaceInfo->allocState()) {}
+  ~BITstarData() {
+    spaceInfo_->freeState(parentStateNextEdge_);
+    spaceInfo_->freeState(childStateNextEdge_);
+  }
+
+  // Getters.
+  std::vector<BITstarEdge> getEdgeQueue() const;
+  std::pair<const ompl::base::State*, const ompl::base::State*> getNextEdge() const;
+
+  // Setters.
+  void setNextEdge(const std::pair<const ompl::base::State*, const ompl::base::State*>& edge);
+  void setEdgeQueue(const std::vector<BITstarEdge>& edges);
+
+ private:
+  std::vector<BITstarEdge> edgeQueue_{};
+  ompl::base::State* parentStateNextEdge_{};
+  ompl::base::State* childStateNextEdge_{};
+};
 
 }  // namespace ompltools
 
