@@ -18,6 +18,7 @@ add_library(esp_visualization
   src/base_visualizer.cpp
   src/interactive_visualizer.cpp
   src/planner_specific_data.cpp
+  src/tikz_visualizer.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/fonts.cpp)
 
 # Link the library.
@@ -27,7 +28,8 @@ target_link_libraries(esp_visualization
   ${Pangolin_LIBRARIES}
   esp_common
   esp_factories
-  esp_planning_contexts)
+  esp_planning_contexts
+  esp_tikz)
 
 # Specify the include directories exported by this library.
 target_include_directories(esp_visualization PUBLIC

@@ -2,17 +2,125 @@
     "Experiment": {
         "executable": "benchmark",
         "planners": [
-            "TBDstar"
+            "RRTConnect",
+            "BITstar",
+            "RRTstar",
+            "RRTsharp"
         ],
-        "context": "FlankingGap",
+        "context": "GoalEnclosure6D",
         "numRuns": 100,
-        "logFrequency": 10000,
+        "logFrequency": 1000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true
     },
     "Contexts": {
+        "GoalEnclosure6D": {
+            "type": "GoalEnclosure",
+            "start": [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "goal": [0.5, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "maxTime": 100,
+            "dimensions": 6,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "goalOutsideWidth": 0.5,
+            "goalInsideWidth": 0.4,
+            "goalGapWidth": 0.4
+        },
+        "DoubleEnclosure8D": {
+            "type": "DoubleEnclosure",
+            "start": [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "goal": [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "maxTime": 120,
+            "dimensions": 8,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "startOutsideWidth": 0.5,
+            "startInsideWidth": 0.4,
+            "startGapWidth": 0.4,
+            "goalOutsideWidth": 0.5,
+            "goalInsideWidth": 0.4,
+            "goalGapWidth": 0.4
+        },
+        "DoubleEnclosure16D": {
+            "type": "DoubleEnclosure",
+            "start": [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "goal": [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "maxTime": 100,
+            "dimensions": 16,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "startOutsideWidth": 0.5,
+            "startInsideWidth": 0.4,
+            "startGapWidth": 0.4,
+            "goalOutsideWidth": 0.5,
+            "goalInsideWidth": 0.4,
+            "goalGapWidth": 0.4
+        },
         "FlankingGap": {
-            "maxTime": 10.0
+            "maxTime": 0.1
+        },
+        "WallGap": {
+            "type": "WallGap",
+            "start": [-0.5, 0.0],
+            "goal": [0.5, 0.0],
+            "maxTime": 1.0,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.01,
+            "wallWidth": 1.7,
+            "wallThickness": 0.4,
+            "gapOffset": 0.1,
+            "gapWidth": 0.01
+        },
+        "RandomRectangles": {
+            "type": "RandomRectangles",
+            "maxTime": 0.2,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "start": [-0.5, 0.0],
+            "goal": [0.5, 0.0],
+            "collisionCheckResolution": 0.000001,
+            "numObstacles": 50,
+            "maxSideLength": 0.3,
+            "minSideLength": 0.2
+        },
+        "RandomRectangles16D": {
+            "type": "RandomRectangles",
+            "maxTime": 100,
+            "dimensions": 16,
+            "boundarySideLengths" : 2,
+            "start": [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "goal": [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "collisionCheckResolution": 0.001,
+            "numObstacles": 100000,
+            "maxSideLength": 0.9,
+            "minSideLength": 0.8
+        },
+        "WallGap4D": {
+            "type": "WallGap",
+            "dimensions": 4,
+            "start": [-0.5, 0.0, 0.0, 0.0],
+            "goal": [0.5, 0.0, 0.0, 0.0],
+            "maxTime": 0.1,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "wallWidth": 1.8,
+            "wallThickness": 0.4,
+            "gapOffset": 0.1,
+            "gapWidth": 0.01
+        },
+        "WallGap8D": {
+            "type": "WallGap",
+            "dimensions": 8,
+            "start": [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "goal": [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "maxTime": 0.1,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.0001,
+            "wallWidth": 1.8,
+            "wallThickness": 0.4,
+            "gapOffset": 0.1,
+            "gapWidth": 0.01
         },
         "FlankingGap8D": {
             "type": "FlankingGap",
@@ -30,7 +138,16 @@
     },
     "Planners": {
         "TBDstar": {
-            "type": "TBDstar"
+            "type": "TBDstar",
+            "batchSize": 100,
+            "backwardHeuristic": true,
+            "repairBackwardSearch": true
+        },
+        "TBDstarLight": {
+            "type": "TBDstar",
+            "batchSize": 100,
+            "backwardHeuristic": true,
+            "repairBackwardSearch": false
         },
         "SBITstarRegression": {
             "type": "BITstarRegression",

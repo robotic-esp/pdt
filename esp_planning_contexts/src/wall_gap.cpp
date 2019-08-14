@@ -159,7 +159,7 @@ void WallGap::accept(const ContextVisitor& visitor) const {
 void WallGap::createObstacles() {
   ompl::base::ScopedState<> midpoint(spaceInfo_);
   // Set the obstacle midpoint in the middle of the state space.
-  for (std::size_t j = 1; j < dimensionality_; ++j) {
+  for (std::size_t j = 0u; j < dimensionality_; ++j) {
     midpoint[j] = (bounds_.at(j).first + bounds_.at(j).second) / 2.0;
   }
   // Move it down in second dimension.
@@ -175,7 +175,7 @@ void WallGap::createObstacles() {
   widths.at(1) = wallWidth_;
 
   // The wall extends to the boundaries in all other dimensions.
-  for (std::size_t j = 2; j < dimensionality_; ++j) {
+  for (std::size_t j = 2u; j < dimensionality_; ++j) {
     widths.at(j) = bounds_.at(j).second - bounds_.at(j).first;
   }
   obstacles_.emplace_back(

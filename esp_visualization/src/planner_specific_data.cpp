@@ -61,6 +61,59 @@ void BITstarData::setNextEdge(
   spaceInfo_->copyState(childStateNextEdge_, edge.second);
 }
 
+std::vector<ompl::geometric::tbdstar::Edge> TBDstarData::getForwardQueue() const {
+  return forwardQueue_;
+}
+
+std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>> TBDstarData::getBackwardQueue()
+    const {
+  return backwardQueue_;
+}
+
+std::shared_ptr<ompl::geometric::tbdstar::Vertex> TBDstarData::getNextVertex() const {
+  return nextVertex_;
+}
+
+std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>
+TBDstarData::getVerticesInBackwardSearchTree() const {
+  return verticesInBackwardSearchTree_;
+}
+
+std::pair<const ompl::base::State*, const ompl::base::State*> TBDstarData::getNextEdge() const {
+  return std::make_pair(parentStateNextEdge_, childStateNextEdge_);
+}
+
+void TBDstarData::setNextEdge(
+    const std::pair<const ompl::base::State*, const ompl::base::State*>& edge) {
+  if (edge.first == nullptr || edge.second == nullptr) {
+    return;
+  }
+  spaceInfo_->copyState(parentStateNextEdge_, edge.first);
+  spaceInfo_->copyState(childStateNextEdge_, edge.second);
+}
+
+void TBDstarData::setForwardQueue(const std::vector<ompl::geometric::tbdstar::Edge>& queue) {
+  forwardQueue_ = queue;
+}
+
+void TBDstarData::setBackwardQueue(
+    const std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>& queue) {
+  backwardQueue_ = queue;
+}
+
+void TBDstarData::setNextVertex(const std::shared_ptr<ompl::geometric::tbdstar::Vertex>& vertex) {
+  nextVertex_ = vertex;
+}
+
+void TBDstarData::setVerticesInBackwardSearchTree(
+    const std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>& vertices) {
+  // We need to create a deep copy here.
+  verticesInBackwardSearchTree_.reserve(vertices.size());
+  for (const auto& vertex : vertices) {
+    verticesInBackwardSearchTree_.emplace_back(std::make_shared<ompl::geometric::tbdstar::Vertex>(*vertex));
+  }
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

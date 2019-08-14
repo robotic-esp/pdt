@@ -65,12 +65,25 @@ TikzPicture::TikzPicture(const std::shared_ptr<const Configuration>& config) : c
   espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("Colors/espdarkred"));
 }
 
+void TikzPicture::clear() {
+  axes_.clear();
+  nodes_.clear();
+}
+
 void TikzPicture::setOptions(const TikzPictureOptions& options) {
   options_ = options;
 }
 
 void TikzPicture::addAxis(const std::shared_ptr<PgfAxis>& axis) {
   axes_.emplace_back(axis);
+}
+
+void TikzPicture::addNode(const std::shared_ptr<TikzNode>& node) {
+  nodes_.emplace_back(node);
+}
+
+void TikzPicture::setClipCommand(const std::string& clip) {
+  clip_ = clip;
 }
 
 std::vector<std::shared_ptr<PgfAxis>> TikzPicture::getAxes() {
@@ -92,22 +105,30 @@ std::shared_ptr<PgfAxis> TikzPicture::generateLegendAxis() const {
 }
 
 std::string TikzPicture::string() const {
-  if (axes_.empty()) {
+  if (axes_.empty() && nodes_.empty()) {
     return {};
   }
   std::ostringstream stream{};
   // Make sure the colors are defined.
-  for (const auto& [name, values] : espColors_) {
-    stream << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
-           << values[2u] << "}\n";
-  }
+  // for (const auto& [name, values] : espColors_) {
+  //   stream << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
+  //          << values[2u] << "}\n";
+  // }
 
   // Write the picture.
-  stream << "\\begin{tikzpicture} [" << options_.string() << "\n]\n\n";
+  stream << "\\begin{tikzpicture} [" << options_.string() << "\n]\n";
+
+  if (clip_ != ""s) {
+    stream << clip_ << '\n';
+  }
+  
   for (const auto& axis : axes_) {
     stream << axis->string() << '\n';
   }
-  stream << "\\end{tikzpicture}\n";
+  for (const auto& node : nodes_) {
+    stream << node->string() << '\n';
+  }
+  stream << "\\end{tikzpicture}%";
   return stream.str();
 }
 

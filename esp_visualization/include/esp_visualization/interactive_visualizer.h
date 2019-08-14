@@ -38,12 +38,14 @@
 
 #include <pangolin/pangolin.h>
 
+#include "esp_configuration/configuration.h"
 #include "esp_common/context_type.h"
 #include "esp_common/planner_type.h"
 #include "esp_obstacles/obstacle_visitor.h"
 #include "esp_planning_contexts/all_contexts.h"
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_visualization/base_visualizer.h"
+#include "esp_visualization/tikz_visualizer.h"
 
 namespace esp {
 
@@ -52,7 +54,7 @@ namespace ompltools {
 class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, public ObstacleVisitor {
  public:
   InteractiveVisualizer(
-      const std::shared_ptr<BaseContext>& context,
+      const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
       const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
   ~InteractiveVisualizer() = default;
 
@@ -66,6 +68,7 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   // Play to view and record to view.
   bool playToIteration_{false};
   bool recording_{false};
+  bool exporting_{false};
   std::size_t iterationToPlayTo_{0u};
   time::Duration desiredDisplayDuration_{};
   time::Duration actualDisplayDuration_{};
@@ -77,7 +80,7 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   void updateCostLog();
   double minCost_{0.0};
   double maxCost_{0.0};
-  float plotBackgroundColor_[4] {0.9, 0.9, 0.9, 1.0};
+  float plotBackgroundColor_[4]{0.9, 0.9, 0.9, 1.0};
   int largestPlottedIteration_{-1};
   void logCost();
 
@@ -90,6 +93,7 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   // Planner specific visualizations.
   void drawPlannerSpecificVisualizations(std::size_t iteration) const;
   void drawBITstarSpecificVisualizations(std::size_t iteration) const;
+  void drawTBDstarSpecificVisualizations(std::size_t iteration) const;
 
   // Lowlevel drawing.
   void drawRectangle(const std::vector<double>& midpoint, const std::vector<double>& widths,
@@ -140,6 +144,9 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   std::vector<Eigen::Vector3d> getEdges3D(std::size_t iteration) const;
   std::vector<Eigen::Vector2d> getPath2D(std::size_t iteration) const;
   std::vector<Eigen::Vector3d> getPath3D(std::size_t iteration) const;
+
+  // The tikz visualizer.
+  TikzVisualizer tikzVisualizer_;
 };
 
 }  // namespace ompltools

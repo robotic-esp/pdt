@@ -42,6 +42,7 @@
 
 #include "esp_configuration/configuration.h"
 #include "esp_tikz/pgf_axis.h"
+#include "esp_tikz/tikz_node.h"
 
 namespace esp {
 
@@ -58,17 +59,35 @@ class TikzPicture {
   TikzPicture(const std::shared_ptr<const Configuration>& config);
   ~TikzPicture() = default;
 
+  // Clears the contents of this picture.
+  void clear();
+
+  // Sets the options for this tikz picture
   void setOptions(const TikzPictureOptions& options);
+
+  // Adds an axis to this picture.
   void addAxis(const std::shared_ptr<PgfAxis>& axis);
 
+  // Adds a node to this picture.
+  void addNode(const std::shared_ptr<TikzNode>& node);
+
+  // Sets the clip command.
+  void setClipCommand(const std::string& clip);
+
+  // Get all axes of this picture.
   std::vector<std::shared_ptr<PgfAxis>> getAxes();
 
+  // Returns this tikz picture as a string.
   std::string string() const;
+
+  // Writes this tikz picture to a file.
   void write(const std::experimental::filesystem::path& path) const;
 
  protected:
   std::shared_ptr<PgfAxis> generateLegendAxis() const;
   std::vector<std::shared_ptr<PgfAxis>> axes_{};
+  std::vector<std::shared_ptr<TikzNode>> nodes_{};
+  std::string clip_{""};
   TikzPictureOptions options_{};
   std::map<std::string, std::array<int, 3>> espColors_{};
   const std::shared_ptr<const Configuration> config_;

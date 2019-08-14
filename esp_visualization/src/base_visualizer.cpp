@@ -41,6 +41,7 @@
 
 #include <ompl/base/PlannerTerminationCondition.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/tbdstar/TBDstar.h>
 
 #include "esp_time/time.h"
 
@@ -211,26 +212,64 @@ void BaseVisualizer::createData() {
         }
       }
 
+      // Store the planner specific data.
+      switch (plannerType_) {
+        case PLANNER_TYPE::BITSTAR:
+        case PLANNER_TYPE::SBITSTAR: {
+          auto bitstarData = std::make_shared<BITstarData>(context_->getSpaceInformation());
+
+          // Store the BIT* edge queue.
+          std::vector<BITstarData::BITstarEdge> edgeQueue;
+          planner_->as<ompl::geometric::BITstar>()->getEdgeQueue(&edgeQueue);
+          bitstarData->setEdgeQueue(edgeQueue);
+
+          // Store the BIT* next edge.
+          bitstarData->setNextEdge(planner_->as<ompl::geometric::BITstar>()->getNextEdgeInQueue());
+
+          // Store the data.
+          std::scoped_lock lock(plannerSpecificDataMutex_);
+          plannerSpecificData_.emplace_back(bitstarData);
+          break;
+        }
+        case PLANNER_TYPE::TBDSTAR: {
+          auto tbdstarData = std::make_shared<TBDstarData>(context_->getSpaceInformation());
+
+          // Store the TBD* forward queue.
+          tbdstarData->setForwardQueue(planner_->as<ompl::geometric::TBDstar>()->getEdgesInQueue());
+
+          // Store the TBD* backward queue.
+          tbdstarData->setBackwardQueue(
+              planner_->as<ompl::geometric::TBDstar>()->getVerticesInQueue());
+
+          // Store the next edge.
+          const auto &edge = planner_->as<ompl::geometric::TBDstar>()->getNextEdgeInQueue();
+          if (edge.getParent() && edge.getChild()) {
+            tbdstarData->setNextEdge(
+                std::make_pair(edge.getParent()->getState(), edge.getChild()->getState()));
+          }
+
+          // Store the next vertex.
+          tbdstarData->setNextVertex(
+              planner_->as<ompl::geometric::TBDstar>()->getNextVertexInQueue());
+
+          // Store the backward search tree.
+          tbdstarData->setVerticesInBackwardSearchTree(
+              planner_->as<ompl::geometric::TBDstar>()->getVerticesInBackwardSearchTree());
+
+          // Store the data.
+          std::scoped_lock lock(plannerSpecificDataMutex_);
+          plannerSpecificData_.emplace_back(tbdstarData);
+          break;
+        }
+        default:
+          // Defaults to not getting any data.
+          break;
+      }
+
       {  // Store the planner data.
         std::scoped_lock lock(plannerDataMutex_);
         plannerData_.emplace_back(plannerData);
         largestIteration_ = plannerData_.size() - 1u;
-      }
-
-      if (plannerType_ == PLANNER_TYPE::BITSTAR || plannerType_ == PLANNER_TYPE::SBITSTAR) {
-        auto bitstarData = std::make_shared<BITstarData>(context_->getSpaceInformation());
-
-        // Store the BIT* edge queue.
-        std::vector<BITstarData::BITstarEdge> edgeQueue;
-        planner_->as<ompl::geometric::BITstar>()->getEdgeQueue(&edgeQueue);
-        bitstarData->setEdgeQueue(edgeQueue);
-
-        // Store the BIT* next edge.
-        bitstarData->setNextEdge(planner_->as<ompl::geometric::BITstar>()->getNextEdgeInQueue());
-
-        // Store the data.
-        std::scoped_lock lock(plannerSpecificDataMutex_);
-        plannerSpecificData_.emplace_back(bitstarData);
       }
     }
   }

@@ -277,7 +277,7 @@ void Configuration::loadDefaultConfigs(bool loadDefaultContextConfigs,
   } else {
     // Cannot find default config at default location.
     OMPL_ERROR("Default config directory does not exist at '%s'.", defaultConfigDirectory.c_str());
-    throw std::ios_base::failure("Configuration failure.");
+   throw std::ios_base::failure("Configuration failure.");
   }
 }
 

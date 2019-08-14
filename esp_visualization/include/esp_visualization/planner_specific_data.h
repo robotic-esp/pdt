@@ -38,6 +38,8 @@
 
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/tbdstar/TBDstar.h>
+#include <ompl/geometric/planners/tbdstar/datastructures/Edge.h>
 
 #include "esp_common/planner_type.h"
 
@@ -47,7 +49,8 @@ namespace ompltools {
 
 class PlannerSpecificData {
  public:
-  explicit PlannerSpecificData(const ompl::base::SpaceInformationPtr& spaceInfo) : spaceInfo_(spaceInfo) {}
+  explicit PlannerSpecificData(const ompl::base::SpaceInformationPtr& spaceInfo) :
+      spaceInfo_(spaceInfo) {}
   virtual ~PlannerSpecificData() = default;
 
  protected:
@@ -59,9 +62,9 @@ class BITstarData : public PlannerSpecificData {
   using BITstarEdge = std::pair<std::shared_ptr<const ompl::geometric::BITstar::Vertex>,
                                 std::shared_ptr<const ompl::geometric::BITstar::Vertex>>;
   BITstarData(const ompl::base::SpaceInformationPtr& spaceInfo) :
-    PlannerSpecificData(spaceInfo),
-    parentStateNextEdge_(spaceInfo->allocState()),
-    childStateNextEdge_(spaceInfo->allocState()) {}
+      PlannerSpecificData(spaceInfo),
+      parentStateNextEdge_(spaceInfo->allocState()),
+      childStateNextEdge_(spaceInfo->allocState()) {}
   ~BITstarData() {
     spaceInfo_->freeState(parentStateNextEdge_);
     spaceInfo_->freeState(childStateNextEdge_);
@@ -72,13 +75,47 @@ class BITstarData : public PlannerSpecificData {
   std::pair<const ompl::base::State*, const ompl::base::State*> getNextEdge() const;
 
   // Setters.
-  void setNextEdge(const std::pair<const ompl::base::State*, const ompl::base::State*>& edge);
   void setEdgeQueue(const std::vector<BITstarEdge>& edges);
+  void setNextEdge(const std::pair<const ompl::base::State*, const ompl::base::State*>& edge);
 
  private:
   std::vector<BITstarEdge> edgeQueue_{};
   ompl::base::State* parentStateNextEdge_{};
   ompl::base::State* childStateNextEdge_{};
+};
+
+class TBDstarData : public PlannerSpecificData {
+ public:
+  TBDstarData(const ompl::base::SpaceInformationPtr& spaceInfo) :
+      PlannerSpecificData(spaceInfo),
+      parentStateNextEdge_(spaceInfo->allocState()),
+      childStateNextEdge_(spaceInfo->allocState()) {}
+  ~TBDstarData() {
+    spaceInfo_->freeState(parentStateNextEdge_);
+    spaceInfo_->freeState(childStateNextEdge_);
+  }
+
+  // Getters.
+  std::vector<ompl::geometric::tbdstar::Edge> getForwardQueue() const;
+  std::pair<const ompl::base::State*, const ompl::base::State*> getNextEdge() const;
+  std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>> getBackwardQueue() const;
+  std::shared_ptr<ompl::geometric::tbdstar::Vertex> getNextVertex() const;
+  std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>> getVerticesInBackwardSearchTree() const;
+
+  // Setters.
+  void setForwardQueue(const std::vector<ompl::geometric::tbdstar::Edge>& edges);
+  void setNextEdge(const std::pair<const ompl::base::State*, const ompl::base::State*>& edge);
+  void setBackwardQueue(const std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>& vertices);
+  void setNextVertex(const std::shared_ptr<ompl::geometric::tbdstar::Vertex>& vertex);
+  void setVerticesInBackwardSearchTree(const std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>& vertices);
+
+ private:
+  std::vector<ompl::geometric::tbdstar::Edge> forwardQueue_{};
+  std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>> backwardQueue_{};
+  std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>> verticesInBackwardSearchTree_{};
+  ompl::base::State* parentStateNextEdge_{};
+  ompl::base::State* childStateNextEdge_{};
+  std::shared_ptr<ompl::geometric::tbdstar::Vertex> nextVertex_{};
 };
 
 }  // namespace ompltools

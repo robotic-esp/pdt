@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
   // Get the experiment config.
   config->dumpAccessed();
 
-  esp::ompltools::InteractiveVisualizer visualizer(context, {planner, plannerType});
+  esp::ompltools::InteractiveVisualizer visualizer(config, context, {planner, plannerType});
 
   visualizer.run();
 

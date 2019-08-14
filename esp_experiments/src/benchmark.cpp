@@ -73,7 +73,12 @@ int main(int argc, char **argv) {
   // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
 
-  // Report the planner names to the console.
+  // Print some basic info about this experiment.
+  std::cout << "\nExecuting " << config->get<std::size_t>("Experiment/numRuns") << " runs of "
+            << config->get<std::string>("Experiment/context") << " with "
+            << ompl::RNG::getSeed() << " as the seed and a maximum runtime of " << config->get<double>("Experiment/maxTime") << " seconds.\n";
+
+  // Setup the results table.
   std::cout << '\n';
   for (const auto &plannerName : config->get<std::vector<std::string>>("Experiment/planners")) {
     std::cout << std::setw(7) << std::setfill(' ') << ' ' << std::setw(21) << std::setfill(' ')

@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+// Authors: Marlin Strub
 
 #pragma once
 
@@ -45,6 +45,7 @@
 #include <vector>
 
 #include <ompl/base/Planner.h>
+#include <ompl/base/PlannerData.h>
 
 #include "esp_common/planner_type.h"
 #include "esp_planning_contexts/base_context.h"
@@ -107,7 +108,7 @@ class BaseVisualizer {
   void createData();
 
   // This is how many iterations we'll create ahead of the viewed iteration.
-  static constexpr std::size_t iterationBuffer_{5000u};
+  static constexpr std::size_t iterationBuffer_{1u};
 
   // The planner data, indexed by the iteration.
   std::vector<std::shared_ptr<ompl::base::PlannerData>> plannerData_{};

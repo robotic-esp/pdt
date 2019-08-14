@@ -22,6 +22,7 @@ add_library(esp_tikz
   src/pgf_table.cpp
   src/success_plotter.cpp
   src/tabularx.cpp
+  src/tikz_node.cpp
   src/tikz_picture.cpp)
 
 target_link_libraries(esp_tikz

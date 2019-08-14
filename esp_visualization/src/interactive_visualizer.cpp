@@ -48,9 +48,10 @@ namespace esp {
 namespace ompltools {
 
 InteractiveVisualizer::InteractiveVisualizer(
-    const std::shared_ptr<BaseContext>& context,
+    const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
-    BaseVisualizer(context, plannerPair) {
+    BaseVisualizer(context, plannerPair),
+    tikzVisualizer_(config, context, plannerPair.second) {
   if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
     OMPL_ERROR("Visualizer only tested for real vector state spaces.");
     throw std::runtime_error("Visualizer error.");
@@ -149,12 +150,13 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionDrawEdges(optionsName + ".Edges", true, true);
   pangolin::Var<bool> optionDrawPlannerSpecificData(optionsName + ".Planner Specific", true, true);
   pangolin::Var<bool> optionDrawSolution(optionsName + ".Solution", true, true);
-  pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
+  pangolin::Var<bool> optionTrack(optionsName + ".Track", false, true);
   // Buttons.
   pangolin::Var<bool> optionScreenshot(optionsName + ".Screenshot", false, false);
   pangolin::Var<double> optionSlowdown(optionsName + ".Replay Factor", 1, 1e-3, 1e2, true);
   pangolin::Var<bool> optionPlay(optionsName + ".Play", false, false);
   pangolin::Var<bool> optionRecord(optionsName + ".Record", false, false);
+  pangolin::Var<bool> optionExport(optionsName + ".Export", false, false);
 
   // Register some keypresses.
   pangolin::RegisterKeyPressCallback('f', [this]() { incrementIteration(1u); });
@@ -200,6 +202,12 @@ void InteractiveVisualizer::run() {
                                  std::to_string(screencaptureId_++) + '_' + context_->getName() +
                                  '_' + planner_->getName() + ".avi");
     }
+    if (pangolin::Pushed(optionExport)) {
+      optionTrack = false;
+      exporting_ = true;
+      iterationToPlayTo_ = displayIteration_;
+      displayIteration_ = 0u;
+    }
 
     // Set values if we're playing in realtime.
     if (playToIteration_) {
@@ -226,6 +234,15 @@ void InteractiveVisualizer::run() {
           actualDisplayDuration_ = time::Duration(0.0);
         }
         displayStartTime_ = time::Clock::now();
+      }
+    }
+
+    if (exporting_) {
+      if (displayIteration_ > iterationToPlayTo_) {
+        exporting_ = false;
+      } else {
+        tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_);
+        incrementIteration();
       }
     }
 
@@ -348,11 +365,11 @@ void InteractiveVisualizer::drawVerticesAndEdges(std::size_t iteration) {
   if (context_->getDimensions() == 2u) {
     auto [vertices, edges] = getVerticesAndEdges2D(iteration);
     drawPoints(vertices, blue, 2.0);
-    drawLines(edges, 1.5, gray);
+    drawLines(edges, 3.0, gray);
   } else if (context_->getDimensions() == 3u) {
     auto [vertices, edges] = getVerticesAndEdges3D(iteration);
     drawPoints(vertices, blue, 2.0);
-    drawLines(edges, 1.5, gray, 0.8);
+    drawLines(edges, 3.0, gray, 0.8);
   }
 }
 
@@ -369,10 +386,10 @@ void InteractiveVisualizer::drawVertices(std::size_t iteration) {
 void InteractiveVisualizer::drawEdges(std::size_t iteration) {
   if (context_->getDimensions() == 2u) {
     auto edges = getEdges2D(iteration);
-    drawLines(edges, 1.5, gray);
+    drawLines(edges, 3.0, gray);
   } else if (context_->getDimensions() == 3u) {
     auto edges = getEdges3D(iteration);
-    drawLines(edges, 1.5, gray, 0.8);
+    drawLines(edges, 3.0, gray, 0.8);
   }
 }
 
@@ -663,6 +680,9 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iterat
       drawBITstarSpecificVisualizations(iteration);
       return;
     }
+    case PLANNER_TYPE::TBDSTAR: {
+      drawTBDstarSpecificVisualizations(iteration);
+    }
     default:
       return;
   }
@@ -732,6 +752,107 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
   } else {
     throw std::runtime_error(
         "BITstar specific visualizations only implemented for 2d or 3d contexts.");
+  }
+}
+
+void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iteration) const {
+  // Get the TBD* specific data.
+  auto tbdstarData =
+      std::dynamic_pointer_cast<const TBDstarData>(getPlannerSpecificData(iteration));
+  if (context_->getDimensions() == 2u) {
+    // Get the edge queue.
+    auto forwardQueue = tbdstarData->getForwardQueue();
+    std::vector<Eigen::Vector2d> forwardQueueEdges;
+    forwardQueueEdges.reserve(2u * forwardQueue.size());
+    for (const auto& edge : forwardQueue) {
+      auto parentState =
+          edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      forwardQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
+      auto childState =
+          edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      forwardQueueEdges.emplace_back((*childState)[0u], (*childState)[1u]);
+    }
+
+    drawLines(forwardQueueEdges, 1.5, lightblue);
+
+    // Get the vertex queue.
+    auto backwardQueue = tbdstarData->getBackwardQueue();
+    std::vector<Eigen::Vector2d> backwardQueueVertices{};
+    for (const auto& vertex : backwardQueue) {
+      auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      backwardQueueVertices.emplace_back((*state)[0u], (*state)[1u]);
+    }
+
+    drawPoints(backwardQueueVertices, yellow, 10.0);
+
+    // Get the next vertex in the queue.
+    auto nextVertex = tbdstarData->getNextVertex();
+    if (nextVertex) {
+      auto state = nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      drawPoints(std::vector<Eigen::Vector2d>{Eigen::Vector2d((*state)[0u], (*state)[1u])}, red,
+                 25.0);
+    }
+
+    // Draw the backward search tree.
+    auto backwardSearchTree = tbdstarData->getVerticesInBackwardSearchTree();
+    std::vector<Eigen::Vector2d> backwardSearchTreeEdges;
+    for (const auto& vertex : backwardSearchTree) {
+      // Add the edge to the parent.
+      if (vertex->hasBackwardParent()) {
+        auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+        auto parent = vertex->getBackwardParent()
+                          ->getState()
+                          ->as<ompl::base::RealVectorStateSpace::StateType>();
+        backwardSearchTreeEdges.emplace_back((*state)[0u], (*state)[1u]);
+        backwardSearchTreeEdges.emplace_back((*parent)[0u], (*parent)[1u]);
+      }
+    }
+
+    drawLines(backwardSearchTreeEdges, 1.0, yellow);
+
+    // Get the next edge in the queue.
+    auto nextEdgeStates = tbdstarData->getNextEdge();
+
+    // If there are no more edges in the queue, this will return an edge with nullptrs.
+    if (!nextEdgeStates.first || !nextEdgeStates.second) {
+      return;
+    }
+    auto parentState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto childState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    std::vector<Eigen::Vector2d> nextEdge{Eigen::Vector2d((*parentState)[0u], (*parentState)[1u]),
+                                          Eigen::Vector2d((*childState)[0u], (*childState)[1u])};
+    // Draw the next edge.
+    drawLines(nextEdge, 3.0, red);
+  } else if (context_->getDimensions() == 3u) {
+    // Get the edge queue.
+    auto edgeQueue = tbdstarData->getForwardQueue();
+    std::vector<Eigen::Vector3d> edges{};
+    for (const auto& edge : edgeQueue) {
+      auto parentState =
+          edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector3d((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]));
+      auto childState =
+          edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector3d((*childState)[0u], (*childState)[1u], (*childState)[2u]));
+    }
+
+    // Draw the edge queue.
+    drawLines(edges, 1.5, lightblue);
+
+    // Get the next edge in the queue.
+    auto nextEdgeStates = tbdstarData->getNextEdge();
+
+    // If there are no more edges in the queue, this will return an edge with nullptrs.
+    if (!nextEdgeStates.first || !nextEdgeStates.second) {
+      return;
+    }
+    auto parentState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto childState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    std::vector<Eigen::Vector3d> nextEdgeVector{
+        Eigen::Vector3d((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]),
+        Eigen::Vector3d((*childState)[0u], (*childState)[1u], (*childState)[2u])};
+    // Draw the next edge.
+    drawLines(nextEdgeVector, 3.0, red);
   }
 }
 

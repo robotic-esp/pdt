@@ -2,15 +2,62 @@
     "Experiment": {
         "executable": "visualization",
         "planner": "TBDstar",
-        "context": "FlankingGap",
+        "context": "WallGap",
+        "seed": 18439085808051797609,
         "useOnlyThisConfig": false
     },
     "Planners": {
         "TBDstar": {
-            "type": "TBDstar"
+            "type": "TBDstar",
+            "batchSize": 100,
+            "backwardHeuristic": true,
+            "repairBackwardSearch": true
+        },
+        "TBDstarLight": {
+            "type": "TBDstar",
+            "batchSize": 100,
+            "backwardHeuristic": true,
+            "repairBackwardSearch": false
         }
     },
     "Contexts": {
+        "WallGap": {
+            "type": "WallGap",
+            "start": [-0.5, 0.0],
+            "goal": [0.5, 0.0],
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "wallWidth": 1.7,
+            "wallThickness": 0.4,
+            "gapOffset": 0.1,
+            "gapWidth": 0.01
+        },
+        "GoalEnclosure": {
+            "type": "GoalEnclosure",
+            "start": [-1.2, 0.0],
+            "goal": [0.75, 0.0],
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 4,
+            "collisionCheckResolution": 0.001,
+            "goalOutsideWidth": 1.2,
+            "goalInsideWidth": 0.4,
+            "goalGapWidth": 0.3
+        },
+        "RandomRectangles": {
+            "type": "RandomRectangles",
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "start": [-0.5, 0.0],
+            "goal": [0.5, 0.0],
+            "collisionCheckResolution": 0.001,
+            "numObstacles": 50,
+            "maxSideLength": 0.3,
+            "minSideLength": 0.2
+        },
         "FlankingGap3D": {
             "type": "FlankingGap",
             "start": [-0.5, 0.0, 0.0],
