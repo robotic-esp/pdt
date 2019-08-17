@@ -81,6 +81,18 @@ ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
       plotPlannerNames_[name] = name;
     }
   }
+
+  // Load the from the config.
+  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("Colors/espblack"));
+  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("Colors/espwhite"));
+  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("Colors/espgray"));
+  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("Colors/espblue"));
+  espColors_.emplace("espred", config_->get<std::array<int, 3>>("Colors/espred"));
+  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("Colors/espyellow"));
+  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("Colors/espgreen"));
+  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("Colors/esppurple"));
+  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("Colors/esplightblue"));
+  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("Colors/espdarkred"));
 }
 
 fs::path ExperimentReport::generateReport() {
@@ -186,6 +198,12 @@ std::stringstream ExperimentReport::preamble() const {
               "  {8}{{{\\color{black!70}8}}}{1}%\n"
               "  {9}{{{\\color{black!70}9}}}{1}}%\n";
   preamble << "\\lstset{language=json}\n";
+
+  // Include the colors.
+  for (const auto& [name, values] : espColors_) {
+    preamble << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
+             << values[2u] << "}\n";
+  }
 
   // Create the title.
   preamble << "\\title{\\bfseries\\LARGE Experiment \\\\ " << experimentName_ << "}\n";

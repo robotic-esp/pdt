@@ -34,69 +34,49 @@
 
 // Authors: Marlin Strub
 
-#pragma once
-
-#include <memory>
-#include <string>
-#include <vector>
-
-#include "esp_configuration/configuration.h"
-#include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/tikz_draw.h"
-#include "esp_tikz/tikz_node.h"
+
+#include <sstream>
 
 namespace esp {
 
 namespace ompltools {
 
-struct TikzPictureOptions {
-  std::string string() const;
-  double xscale{1.0};
-  double yscale{1.0};
-};
+using namespace std::string_literals;
 
-class TikzPicture {
- public:
-  TikzPicture(const std::shared_ptr<const Configuration>& config);
-  ~TikzPicture() = default;
+void TikzDraw::setFromPosition(double x, double y) {
+  from_ = std::to_string(x) + "cm, " + std::to_string(y) + "cm";
+}
 
-  // Clears the contents of this picture.
-  void clear();
+void TikzDraw::setFromPosition(const std::string& position) {
+  from_ = position;
+}
 
-  // Sets the options for this tikz picture
-  void setOptions(const TikzPictureOptions& options);
+void TikzDraw::setToPosition(double x, double y) {
+  to_ = std::to_string(x) + "cm, " + std::to_string(y) + "cm";
+}
 
-  // Adds an axis to this picture.
-  void addAxis(const std::shared_ptr<PgfAxis>& axis);
+void TikzDraw::setToPosition(const std::string& position) {
+  to_ = position;
+}
 
-  // Adds a node to this picture.
-  void addNode(const std::shared_ptr<TikzNode>& node);
+void TikzDraw::setConnection(const std::string& connection) {
+  connection_ = connection;
+}
 
-  // Adds a draw command to this picture.
-  void addDraw(const std::shared_ptr<TikzDraw>& draw);
+void TikzDraw::setOptions(const std::string& options) {
+  options_ = options;
+}
 
-  // Sets the clip command.
-  void setClipCommand(const std::string& clip);
-
-  // Get all axes of this picture.
-  std::vector<std::shared_ptr<PgfAxis>> getAxes();
-
-  // Returns this tikz picture as a string.
-  std::string string() const;
-
-  // Writes this tikz picture to a file.
-  void write(const std::experimental::filesystem::path& path) const;
-
- protected:
-  std::shared_ptr<PgfAxis> generateLegendAxis() const;
-  std::vector<std::shared_ptr<PgfAxis>> axes_{};
-  std::vector<std::shared_ptr<TikzNode>> nodes_{};
-  std::vector<std::shared_ptr<TikzDraw>> draws_{};
-  std::string clip_{""};
-  TikzPictureOptions options_{};
-  std::map<std::string, std::array<int, 3>> espColors_{};
-  const std::shared_ptr<const Configuration> config_;
-};
+std::string TikzDraw::string() const {
+  std::ostringstream stream{};
+  stream << "\\draw ";
+  if (options_ != ""s) {
+    stream << "[" << options_ << "] ";
+  }
+  stream << "(" << from_ << ") " << connection_ << " (" << to_ << ");\n";
+  return stream.str();
+}
 
 }  // namespace ompltools
 

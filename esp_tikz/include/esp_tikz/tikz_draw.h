@@ -36,66 +36,31 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
-#include <vector>
-
-#include "esp_configuration/configuration.h"
-#include "esp_tikz/pgf_axis.h"
-#include "esp_tikz/tikz_draw.h"
-#include "esp_tikz/tikz_node.h"
 
 namespace esp {
 
 namespace ompltools {
 
-struct TikzPictureOptions {
-  std::string string() const;
-  double xscale{1.0};
-  double yscale{1.0};
-};
-
-class TikzPicture {
+class TikzDraw {
  public:
-  TikzPicture(const std::shared_ptr<const Configuration>& config);
-  ~TikzPicture() = default;
+  TikzDraw() = default;
+  ~TikzDraw() = default;
 
-  // Clears the contents of this picture.
-  void clear();
+  void setFromPosition(double x, double y);
+  void setFromPosition(const std::string& position);
+  void setToPosition(double x, double y);
+  void setToPosition(const std::string& position);
+  void setConnection(const std::string& connection);
+  void setOptions(const std::string& options);
 
-  // Sets the options for this tikz picture
-  void setOptions(const TikzPictureOptions& options);
-
-  // Adds an axis to this picture.
-  void addAxis(const std::shared_ptr<PgfAxis>& axis);
-
-  // Adds a node to this picture.
-  void addNode(const std::shared_ptr<TikzNode>& node);
-
-  // Adds a draw command to this picture.
-  void addDraw(const std::shared_ptr<TikzDraw>& draw);
-
-  // Sets the clip command.
-  void setClipCommand(const std::string& clip);
-
-  // Get all axes of this picture.
-  std::vector<std::shared_ptr<PgfAxis>> getAxes();
-
-  // Returns this tikz picture as a string.
   std::string string() const;
 
-  // Writes this tikz picture to a file.
-  void write(const std::experimental::filesystem::path& path) const;
-
- protected:
-  std::shared_ptr<PgfAxis> generateLegendAxis() const;
-  std::vector<std::shared_ptr<PgfAxis>> axes_{};
-  std::vector<std::shared_ptr<TikzNode>> nodes_{};
-  std::vector<std::shared_ptr<TikzDraw>> draws_{};
-  std::string clip_{""};
-  TikzPictureOptions options_{};
-  std::map<std::string, std::array<int, 3>> espColors_{};
-  const std::shared_ptr<const Configuration> config_;
+private:
+  std::string from_{""};
+  std::string to_{""};
+  std::string options_{""};
+  std::string connection_{""};
 };
 
 }  // namespace ompltools

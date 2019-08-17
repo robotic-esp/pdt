@@ -51,7 +51,7 @@ InteractiveVisualizer::InteractiveVisualizer(
     const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
     BaseVisualizer(context, plannerPair),
-    tikzVisualizer_(config, context, plannerPair.second) {
+    tikzVisualizer_(config, context, plannerPair) {
   if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
     OMPL_ERROR("Visualizer only tested for real vector state spaces.");
     throw std::runtime_error("Visualizer error.");
@@ -150,7 +150,7 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionDrawEdges(optionsName + ".Edges", true, true);
   pangolin::Var<bool> optionDrawPlannerSpecificData(optionsName + ".Planner Specific", true, true);
   pangolin::Var<bool> optionDrawSolution(optionsName + ".Solution", true, true);
-  pangolin::Var<bool> optionTrack(optionsName + ".Track", false, true);
+  pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
   // Buttons.
   pangolin::Var<bool> optionScreenshot(optionsName + ".Screenshot", false, false);
   pangolin::Var<double> optionSlowdown(optionsName + ".Replay Factor", 1, 1e-3, 1e2, true);
@@ -241,7 +241,22 @@ void InteractiveVisualizer::run() {
       if (displayIteration_ > iterationToPlayTo_) {
         exporting_ = false;
       } else {
-        tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_);
+        OMPL_WARN("Exporting iteration %zu of %zu.", static_cast<unsigned>(displayIteration_),
+                    static_cast<unsigned>(iterationToPlayTo_));
+        if (optionDrawPlannerSpecificData) {
+          tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                                 getSolutionPath(displayIteration_),
+                                 getPlannerSpecificData(displayIteration_),
+                                 getIterationDuration(displayIteration_).count(),
+                                 getTotalElapsedDuration(displayIteration_).count(),
+                                 getSolutionCost(displayIteration_).value());
+        } else {
+          tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                                 getSolutionPath(displayIteration_), nullptr,
+                                 getIterationDuration(displayIteration_).count(),
+                                 getTotalElapsedDuration(displayIteration_).count(),
+                                 getSolutionCost(displayIteration_).value());
+        }
         incrementIteration();
       }
     }

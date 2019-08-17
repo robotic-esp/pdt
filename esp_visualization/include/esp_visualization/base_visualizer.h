@@ -77,6 +77,7 @@ class BaseVisualizer {
   std::shared_ptr<const PlannerSpecificData> getPlannerSpecificData(std::size_t iteration) const;
   time::Duration getIterationDuration(std::size_t iteration) const;
   const ompl::base::PathPtr getSolutionPath(std::size_t iteration) const;
+  ompl::base::Cost getSolutionCost(std::size_t iteration) const;
   time::Duration getTotalElapsedDuration(std::size_t iteration) const;
 
   // The current context.
@@ -108,7 +109,7 @@ class BaseVisualizer {
   void createData();
 
   // This is how many iterations we'll create ahead of the viewed iteration.
-  static constexpr std::size_t iterationBuffer_{1u};
+  static constexpr std::size_t iterationBuffer_{5000u};
 
   // The planner data, indexed by the iteration.
   std::vector<std::shared_ptr<ompl::base::PlannerData>> plannerData_{};
@@ -126,9 +127,13 @@ class BaseVisualizer {
   time::Duration setupDuration_{};
   mutable std::mutex setupDurationMutex_{};
 
+  // The solution paths.
   std::vector<ompl::base::PathPtr> solutionPaths_{};
   mutable std::mutex solutionPathsMutex_{};
-  // TODO add a generic datastructure to hold planner specific data.
+
+  // The costs of the solution paths.
+  std::vector<ompl::base::Cost> solutionCosts_{};
+  mutable std::mutex solutionCostsMutex_{};
 
   // The thread that creates the data, i.e., solves the given planning problem.
   std::thread dataThread_{};

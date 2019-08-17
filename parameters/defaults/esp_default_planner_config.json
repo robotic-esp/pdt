@@ -1,6 +1,20 @@
 {
     "Planners": {
-        "BITstar": {
+        "ABIT*": {
+            "type": "SBITstar",
+            "useKNearest": false,
+            "rewireFactor": 1.1,
+            "samplesPerBatch": 100,
+            "enablePruning": false,
+            "pruningThreshold": 0.1,
+            "useJustInTimeSampling": false,
+            "dropSamplesOnPrune": false,
+            "stopOnSolutionImprovement": false,
+            "initialInflation": 1000000,
+            "inflationParameter": 0.0,
+            "truncationParameter": 0.0
+        },
+        "BIT*": {
             "type": "BITstar",
             "useKNearest": false,
             "rewireFactor": 1.1,
@@ -64,20 +78,6 @@
             },
             "delayCollisionChecks": true,
             "useAdmissibleCostToCome": true
-        },
-        "SBITstar": {
-            "type": "SBITstar",
-            "useKNearest": false,
-            "rewireFactor": 1.1,
-            "samplesPerBatch": 100,
-            "enablePruning": false,
-            "pruningThreshold": 0.1,
-            "useJustInTimeSampling": false,
-            "dropSamplesOnPrune": false,
-            "stopOnSolutionImprovement": false,
-            "initialInflation": 1000000,
-            "inflationParameter": 10,
-            "truncationParameter": 5
         }
     }
 }

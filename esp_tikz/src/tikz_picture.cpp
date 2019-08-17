@@ -68,6 +68,7 @@ TikzPicture::TikzPicture(const std::shared_ptr<const Configuration>& config) : c
 void TikzPicture::clear() {
   axes_.clear();
   nodes_.clear();
+  draws_.clear();
 }
 
 void TikzPicture::setOptions(const TikzPictureOptions& options) {
@@ -80,6 +81,10 @@ void TikzPicture::addAxis(const std::shared_ptr<PgfAxis>& axis) {
 
 void TikzPicture::addNode(const std::shared_ptr<TikzNode>& node) {
   nodes_.emplace_back(node);
+}
+
+void TikzPicture::addDraw(const std::shared_ptr<TikzDraw>& draw) {
+  draws_.emplace_back(draw);
 }
 
 void TikzPicture::setClipCommand(const std::string& clip) {
@@ -127,6 +132,9 @@ std::string TikzPicture::string() const {
   }
   for (const auto& node : nodes_) {
     stream << node->string() << '\n';
+  }
+  for (const auto& draw : draws_) {
+    stream << draw->string() << '\n';
   }
   stream << "\\end{tikzpicture}%";
   return stream.str();

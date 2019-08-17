@@ -36,66 +36,30 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
-#include <vector>
-
-#include "esp_configuration/configuration.h"
-#include "esp_tikz/pgf_axis.h"
-#include "esp_tikz/tikz_draw.h"
-#include "esp_tikz/tikz_node.h"
 
 namespace esp {
 
 namespace ompltools {
 
-struct TikzPictureOptions {
-  std::string string() const;
-  double xscale{1.0};
-  double yscale{1.0};
-};
-
-class TikzPicture {
+class TikzNode {
  public:
-  TikzPicture(const std::shared_ptr<const Configuration>& config);
-  ~TikzPicture() = default;
+  TikzNode() = default;
+  ~TikzNode() = default;
 
-  // Clears the contents of this picture.
-  void clear();
+  void setPosition(double x, double y);
+  void setPosition(const std::string& position);
+  void setName(const std::string& name);
+  void setOptions(const std::string& options);
+  void setLabel(const std::string& label); 
 
-  // Sets the options for this tikz picture
-  void setOptions(const TikzPictureOptions& options);
-
-  // Adds an axis to this picture.
-  void addAxis(const std::shared_ptr<PgfAxis>& axis);
-
-  // Adds a node to this picture.
-  void addNode(const std::shared_ptr<TikzNode>& node);
-
-  // Adds a draw command to this picture.
-  void addDraw(const std::shared_ptr<TikzDraw>& draw);
-
-  // Sets the clip command.
-  void setClipCommand(const std::string& clip);
-
-  // Get all axes of this picture.
-  std::vector<std::shared_ptr<PgfAxis>> getAxes();
-
-  // Returns this tikz picture as a string.
   std::string string() const;
 
-  // Writes this tikz picture to a file.
-  void write(const std::experimental::filesystem::path& path) const;
-
- protected:
-  std::shared_ptr<PgfAxis> generateLegendAxis() const;
-  std::vector<std::shared_ptr<PgfAxis>> axes_{};
-  std::vector<std::shared_ptr<TikzNode>> nodes_{};
-  std::vector<std::shared_ptr<TikzDraw>> draws_{};
-  std::string clip_{""};
-  TikzPictureOptions options_{};
-  std::map<std::string, std::array<int, 3>> espColors_{};
-  const std::shared_ptr<const Configuration> config_;
+private:
+  std::string at_{""};
+  std::string name_{""};
+  std::string options_{""};
+  std::string label_{""};
 };
 
 }  // namespace ompltools

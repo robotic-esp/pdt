@@ -21,10 +21,10 @@
             "maxTime": 100,
             "dimensions": 6,
             "boundarySideLengths" : 2,
-            "collisionCheckResolution": 0.001,
+            "collisionCheckResolution": 0.0001,
             "goalOutsideWidth": 0.5,
-            "goalInsideWidth": 0.4,
-            "goalGapWidth": 0.4
+            "goalInsideWidth": 0.3,
+            "goalGapWidth": 0.3
         },
         "DoubleEnclosure8D": {
             "type": "DoubleEnclosure",

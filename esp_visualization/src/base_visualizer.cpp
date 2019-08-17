@@ -150,6 +150,16 @@ const ompl::base::PathPtr BaseVisualizer::getSolutionPath(std::size_t iteration)
   return solutionPaths_.at(iteration);
 }
 
+ompl::base::Cost BaseVisualizer::getSolutionCost(std::size_t iteration) const {
+  std::scoped_lock lock(solutionCostsMutex_);
+  if (iteration >= solutionCosts_.size()) {
+    std::cout << "Requested iteration: " << iteration << ", available: " << plannerData_.size()
+              << '\n';
+    throw std::runtime_error("Requested planner data of iteration that has not yet been processed");
+  }
+  return solutionCosts_.at(iteration);
+}
+
 time::Duration BaseVisualizer::getIterationDuration(std::size_t iteration) const {
   std::scoped_lock lock(durationsMutex_);
   if (iteration >= plannerData_.size()) {
@@ -209,6 +219,16 @@ void BaseVisualizer::createData() {
           solutionPaths_.emplace_back(planner_->getProblemDefinition()->getSolutionPath());
         } else {
           solutionPaths_.emplace_back(nullptr);
+        }
+      }
+
+      {  // Store the solution cost.
+        std::scoped_lock lock(solutionCostsMutex_);
+        if (planner_->getProblemDefinition()->hasExactSolution()) {
+          solutionCosts_.emplace_back(planner_->getProblemDefinition()->getSolutionPath()->cost(
+              context_->getOptimizationObjective()));
+        } else {
+          solutionCosts_.emplace_back(std::numeric_limits<double>::infinity());
         }
       }
 

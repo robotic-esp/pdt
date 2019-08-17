@@ -93,6 +93,9 @@ class ExperimentReport {
   SuccessPlotter successPlotter_;
   OverviewPlotter overviewPlotter_;
 
+  // Colors.
+  std::map<std::string, std::array<int, 3>> espColors_{};
+
   const std::shared_ptr<const Configuration> config_;
   const Statistics& stats_;
 

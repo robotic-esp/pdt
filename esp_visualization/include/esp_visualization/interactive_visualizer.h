@@ -147,6 +147,9 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
 
   // The tikz visualizer.
   TikzVisualizer tikzVisualizer_;
+
+  // The configuration.
+  std::shared_ptr<const Configuration> config_;
 };
 
 }  // namespace ompltools
