@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
   // Print some basic info about this experiment.
   std::cout << "\nExecuting " << config->get<std::size_t>("Experiment/numRuns") << " runs of "
             << config->get<std::string>("Experiment/context") << " with "
-            << ompl::RNG::getSeed() << " as the seed and a maximum runtime of " << config->get<double>("Experiment/maxTime") << " seconds.\n";
+            << ompl::RNG::getSeed() << " as the seed and a maximum runtime of " << context->getTargetDuration() << " seconds.\n";
 
   // Setup the results table.
   std::cout << '\n';
