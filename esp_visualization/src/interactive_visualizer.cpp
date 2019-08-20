@@ -454,6 +454,15 @@ void InteractiveVisualizer::visit(const FlankingGap& context) const {
   drawBoundary(context);
 }
 
+void InteractiveVisualizer::visit(const FourRooms& context) const {
+  // Draw the start states.
+  drawPoints(context.getStartStates(), green, 9.0);
+  // Draw the goal states.
+  drawPoints(context.getGoalStates(), red, 9.0);
+  // Draw the boundaries.
+  drawBoundary(context);
+}
+
 void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
   // Draw the start states.
   drawPoints(context.getStartStates(), green, 9.0);

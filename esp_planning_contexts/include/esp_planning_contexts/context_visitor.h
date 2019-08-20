@@ -45,6 +45,7 @@ class CentreSquare;
 class DividingWalls;
 class DoubleEnclosure;
 class FlankingGap;
+class FourRooms;
 class GoalEnclosure;
 class ObstacleFree;
 class RandomRectangles;
@@ -64,6 +65,7 @@ class ContextVisitor {
   virtual void visit(const DividingWalls &context) const = 0;
   virtual void visit(const DoubleEnclosure &context) const = 0;
   virtual void visit(const FlankingGap &context) const = 0;
+  virtual void visit(const FourRooms &context) const = 0;
   virtual void visit(const GoalEnclosure &context) const = 0;
   virtual void visit(const ObstacleFree &context) const = 0;
   virtual void visit(const RandomRectangles &context) const = 0;

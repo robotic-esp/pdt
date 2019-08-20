@@ -51,6 +51,17 @@
             "gapOffset": 0.1,
             "gapWidth": 0.01
         },
+        "FourRooms": {
+            "type": "FourRooms",
+            "start": [0.5, -0.5],
+            "goal": [0.5, 0.5],
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 2,
+            "collisionCheckResolution": 0.001,
+            "wallThickness": 0.5,
+            "gapWidth": 0.1
+        },
         "GoalEnclosure": {
             "type": "GoalEnclosure",
             "start": [-0.5, 0.0],

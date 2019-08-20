@@ -32,48 +32,61 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Jonathan Gammell, Marlin Strub
 
 #pragma once
 
-#include "nlohmann/json.hpp"
+#include "esp_configuration/configuration.h"
+#include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/context_validity_checker.h"
 
 namespace esp {
 
 namespace ompltools {
 
-enum class CONTEXT_TYPE {
-  CENTRE_SQUARE,
-  DIVIDING_WALLS,
-  DOUBLE_ENCLOSURE,
-  FLANKING_GAP,
-  FOUR_ROOMS,
-  GOAL_ENCLOSURE,
-  OBSTACLE_FREE,
-  RANDOM_RECTANGLES,
-  RANDOM_RECTANGLES_MULTI_START_GOAL,
-  REPEATING_RECTANGLES,
-  SPIRAL,
-  START_ENCLOSURE,
-  WALL_GAP,
-};
+/** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
+ * a multiple homotopy-class experiment that scales to N dimensions. */
+class FourRooms : public BaseContext {
+ public:
+  // An odd number of gaps results in a straight line solution.
+  FourRooms(const std::shared_ptr<const Configuration>& config, const std::string& name);
 
-NLOHMANN_JSON_SERIALIZE_ENUM(CONTEXT_TYPE,
-                             {
-                                 {CONTEXT_TYPE::CENTRE_SQUARE, "CentreSquare"},
-                                 {CONTEXT_TYPE::DIVIDING_WALLS, "DividingWalls"},
-                                 {CONTEXT_TYPE::DOUBLE_ENCLOSURE, "DoubleEnclosure"},
-                                 {CONTEXT_TYPE::FLANKING_GAP, "FlankingGap"},
-                                 {CONTEXT_TYPE::FOUR_ROOMS, "FourRooms"},
-                                 {CONTEXT_TYPE::GOAL_ENCLOSURE, "GoalEnclosure"},
-                                 {CONTEXT_TYPE::OBSTACLE_FREE, "ObstacleFree"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES, "RandomRectangles"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES_MULTI_START_GOAL, "MultiStartGoal"},
-                                 {CONTEXT_TYPE::REPEATING_RECTANGLES, "RepeatingRectangles"},
-                                 {CONTEXT_TYPE::SPIRAL, "Spiral"},
-                                 {CONTEXT_TYPE::START_ENCLOSURE, "StartEnclosure"},
-                                 {CONTEXT_TYPE::WALL_GAP, "WallGap"},
-                             })
+  /** \brief This problem could knows its optimum, but doesn't at the moment */
+  virtual bool knowsOptimum() const override;
+
+  /** \brief As the optimum isn't implemented, throw. */
+  virtual ompl::base::Cost computeOptimum() const override;
+
+  /** \brief Set the optimization target as the specified cost. */
+  virtual void setTarget(double targetSpecifier) override;
+
+  /** \brief Derived class specific information to include in the title line. */
+  virtual std::string lineInfo() const override;
+
+  /** \brief Derived class specific information to include at the end. */
+  virtual std::string paraInfo() const override;
+
+  // Accept a context visitor.
+  virtual void accept(const ContextVisitor& visitor) const override;
+
+ protected:
+  // Create the obstacles.
+  void createObstacles();
+  
+  // Create the obstacles.
+  void createAntiObstacles();
+  
+  // Direct access to obstacle information.
+  double wallThickness_;
+  double gapWidth_;
+
+  // The validity checker.
+  std::shared_ptr<ContextValidityChecker> validityChecker_{};
+
+  // The start and goal positions.
+  std::vector<double> startPos_;
+  std::vector<double> goalPos_;
+};
 
 }  // namespace ompltools
 

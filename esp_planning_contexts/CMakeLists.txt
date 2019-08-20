@@ -15,6 +15,7 @@ add_library(esp_planning_contexts
   src/dividing_walls.cpp
   src/double_enclosure.cpp
   src/flanking_gap.cpp
+  src/four_rooms.cpp
   src/goal_enclosure.cpp
   src/obstacle_free.cpp
   src/random_rectangles.cpp

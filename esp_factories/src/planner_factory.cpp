@@ -174,7 +174,6 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::TBDstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->newProblemDefinition());
       planner->setName(plannerName);
-      planner->setComputeBackwardSearchHeuristic(config_->get<bool>(parentKey + "/backwardHeuristic"));
       planner->setRepairBackwardSearch(config_->get<bool>(parentKey + "/repairBackwardSearch"));
       planner->setBatchSize(config_->get<std::size_t>(parentKey + "/batchSize"));
       return {planner, PLANNER_TYPE::TBDSTAR};
