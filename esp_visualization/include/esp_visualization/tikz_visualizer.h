@@ -103,6 +103,8 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
   void drawStartStates(const BaseContext& context) const;
   void drawGoalStates(const BaseContext& context) const;
   void drawVertex(const ompl::base::PlannerDataVertex& vertex) const;
+  void drawVertex(const ompl::base::RealVectorStateSpace::StateType* state,
+                  const std::string& options) const;
   void drawEdge(const ompl::base::PlannerDataVertex& parent,
                 const ompl::base::PlannerDataVertex& child) const;
   void drawEdge(const ompl::base::RealVectorStateSpace::StateType* parent,
@@ -116,6 +118,8 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
       const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData) const;
   void drawBITstarSpecificVisualizations(
       const std::shared_ptr<const BITstarData>& bitstarData) const;
+  void drawTBDstarSpecificVisualizations(
+      const std::shared_ptr<const TBDstarData>& tbdstarData) const;
 
   // Planner and context to be visualized.
   std::shared_ptr<BaseContext> context_;

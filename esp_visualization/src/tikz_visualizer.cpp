@@ -445,6 +445,11 @@ void TikzVisualizer::drawPlannerSpecificVisualizations(
           std::dynamic_pointer_cast<const BITstarData>(plannerSpecificData));
       break;
     }
+    case PLANNER_TYPE::TBDSTAR: {
+      drawTBDstarSpecificVisualizations(
+          std::dynamic_pointer_cast<const TBDstarData>(plannerSpecificData));
+      break;
+    }
     default: { return; }
   }
 }
@@ -470,6 +475,49 @@ void TikzVisualizer::drawBITstarSpecificVisualizations(
   }
 }
 
+void TikzVisualizer::drawTBDstarSpecificVisualizations(
+    const std::shared_ptr<const TBDstarData>& tbdstarData) const {
+  // Draw the forward queue.
+  for (const auto& edge : tbdstarData->getForwardQueue()) {
+    drawEdge(edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+             edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+             "esplightblue, dash pattern=on 0.02mm off 0.03mm, line width = 0.02mm");
+  }
+
+  // Draw the top edge in the queue.
+  auto nextEdge = tbdstarData->getNextEdge();
+  if (nextEdge.first && nextEdge.second) {
+    drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
+             nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(),
+             "espred, line width = 0.1mm");
+  }
+
+  // Draw the backward queue.
+  for (const auto& vertex : tbdstarData->getBackwardQueue()) {
+    drawVertex(vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+               "fill = espgray, inner sep = 0mm, circle, minimum size = 0.2mm");
+  }
+
+  // Draw the backward search tree.
+  for (const auto& vertex : tbdstarData->getVerticesInBackwardSearchTree()) {
+    // Add the edge to the parent.
+    if (vertex->hasBackwardParent()) {
+      auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto parent = vertex->getBackwardParent()
+                        ->getState()
+                        ->as<ompl::base::RealVectorStateSpace::StateType>();
+      drawEdge(parent, state, "espgray, line width = 0.02mm");
+    }
+  }
+
+  // Draw the next vertex in the queue.
+  auto nextVertex = tbdstarData->getNextVertex();
+  if (nextVertex) {
+    drawVertex(nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+               "fill = espred, inner sep = 0mm, circle, minimum size = 0.3mm");
+  }
+}
+
 void TikzVisualizer::drawVertex(const ompl::base::PlannerDataVertex& vertex) const {
   auto node = std::make_shared<TikzNode>();
   node->setOptions("fill = espblue, inner sep = 0mm, circle, minimum size = 0.1mm");
@@ -477,6 +525,16 @@ void TikzVisualizer::drawVertex(const ompl::base::PlannerDataVertex& vertex) con
   double y = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](1u);
   node->setPosition(x, y);
   node->setName("vertex"s + std::to_string(vertex.getTag()));
+  picture_.addNode(node);
+}
+
+void TikzVisualizer::drawVertex(const ompl::base::RealVectorStateSpace::StateType* state,
+                                const std::string& options) const {
+  auto node = std::make_shared<TikzNode>();
+  node->setOptions(options);
+  double x = state->operator[](0u);
+  double y = state->operator[](1u);
+  node->setPosition(x, y);
   picture_.addNode(node);
 }
 
