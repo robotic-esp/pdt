@@ -106,6 +106,15 @@ int main(int argc, char **argv) {
       esp::ompltools::TimeCostLogger logger(context->getTargetDuration(),
                                             config->get<std::size_t>("Experiment/logFrequency"));
 
+      // The following results in more consistent measurements. I don't understand how. It seems to
+      // be connected to creating a separate thread.
+      {
+        auto [reconciler, reconcilerType] = plannerFactory.create("RRTConnect");
+        (void)reconcilerType;
+        auto hotpath = std::async(std::launch::async, [&reconciler]() { reconciler->solve(0.0); });
+        hotpath.get();
+      }
+
       // Allocate the planner.
       auto [planner, plannerType] = plannerFactory.create(plannerName);
 
