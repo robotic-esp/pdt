@@ -48,7 +48,7 @@
             },
             "addIntermediateStates": false
         },
-        "RRTsharp": {
+        "RRT#": {
             "type": "RRTsharp",
             "useKNearest": false,
             "rewireFactor": 1.1,
@@ -64,7 +64,7 @@
             },
             "enableSampleRejection": true
         },
-        "RRTstar": {
+        "RRT*": {
             "type": "RRTstar",
             "useKNearest": false,
             "rewireFactor": 1.1,

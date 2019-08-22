@@ -1,22 +1,19 @@
 {
     "Experiment": {
         "executable": "visualization",
-        "planner": "ABIT*",
-        "seed": 18439086589462989744,
+        "planner": "RRTConnect",
         "context": "WallGap",
         "useOnlyThisConfig": false
     },
     "Planners": {
-        "TBDstar": {
+        "TBD*": {
             "type": "TBDstar",
             "batchSize": 100,
-            "backwardHeuristic": true,
             "repairBackwardSearch": true
         },
-        "TBDstarLight": {
+        "TBD* Light": {
             "type": "TBDstar",
             "batchSize": 100,
-            "backwardHeuristic": true,
             "repairBackwardSearch": false
         }
     },
