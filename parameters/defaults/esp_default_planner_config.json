@@ -11,8 +11,8 @@
             "dropSamplesOnPrune": false,
             "stopOnSolutionImprovement": false,
             "initialInflation": 1000000,
-            "inflationParameter": 0.0,
-            "truncationParameter": 0.0
+            "inflationParameter": 10.0,
+            "truncationParameter": 5.0
         },
         "BIT*": {
             "type": "BITstar",

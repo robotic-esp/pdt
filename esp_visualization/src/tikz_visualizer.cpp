@@ -152,6 +152,12 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
   // Log the duration to the frame times file.
   logToFrameTimes(pngPath, iterationTime);
 
+  // Export the config if it doesn't already exist.
+  auto configPath = texPath.parent_path().parent_path() / "config.json";
+  if (!std::experimental::filesystem::exists(configPath)) {
+    config_->dumpAccessed(configPath.string());
+  }
+
   // Clear the picture.
   picture_.clear();
 }
@@ -215,6 +221,7 @@ std::experimental::filesystem::path TikzVisualizer::compile(
   // available with all major tex distributions.
   auto cmd = "cd \""s + standalonePath.parent_path().string() +
              "\" && lualatex --shell-escape > /dev/null \""s +
+             // "\" && lualatex --shell-escape \""s +
              (currentPath / standalonePath).string() + "\" && cd \""s + currentPath.string() + '\"';
   int retval = std::system(cmd.c_str());
   retval = std::system(cmd.c_str());
