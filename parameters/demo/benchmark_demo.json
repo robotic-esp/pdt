@@ -1,0 +1,22 @@
+{
+    "Experiment": {
+        "executable": "benchmark",
+        "planners": [
+            "RRTConnect",
+            "RRT*",
+            "BIT*"
+        ],
+        "context": "WallGap",
+        "numRuns": 100,
+        "logFrequency": 10000,
+        "loadDefaultContextConfig": true,
+        "loadDefaultPlannerConfig": true
+    },
+    "Contexts": {
+        "WallGap": {
+            "type": "WallGap",
+            "maxTime": 1,
+            "gapWidth": 0.04
+        }
+    }
+}
