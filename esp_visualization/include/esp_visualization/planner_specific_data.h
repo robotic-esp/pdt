@@ -73,15 +73,18 @@ class BITstarData : public PlannerSpecificData {
   // Getters.
   std::vector<BITstarEdge> getEdgeQueue() const;
   std::pair<const ompl::base::State*, const ompl::base::State*> getNextEdge() const;
+  ompl::base::Cost getNextEdgeValueInQueue() const;
 
   // Setters.
   void setEdgeQueue(const std::vector<BITstarEdge>& edges);
   void setNextEdge(const std::pair<const ompl::base::State*, const ompl::base::State*>& edge);
+  void setNextEdgeValueInQueue(const ompl::base::Cost& cost);
 
  private:
   std::vector<BITstarEdge> edgeQueue_{};
   ompl::base::State* parentStateNextEdge_{};
   ompl::base::State* childStateNextEdge_{};
+  ompl::base::Cost nextEdgeValueInQueue_{std::numeric_limits<double>::signaling_NaN()};
 };
 
 class TBDstarData : public PlannerSpecificData {

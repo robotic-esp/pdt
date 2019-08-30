@@ -48,6 +48,10 @@ std::pair<const ompl::base::State*, const ompl::base::State*> BITstarData::getNe
   return std::make_pair(parentStateNextEdge_, childStateNextEdge_);
 }
 
+ompl::base::Cost BITstarData::getNextEdgeValueInQueue() const {
+  return nextEdgeValueInQueue_;
+}
+
 void BITstarData::setEdgeQueue(const std::vector<BITstarEdge>& edges) {
   edgeQueue_ = edges;
 }
@@ -59,6 +63,10 @@ void BITstarData::setNextEdge(
   }
   spaceInfo_->copyState(parentStateNextEdge_, edge.first);
   spaceInfo_->copyState(childStateNextEdge_, edge.second);
+}
+
+void BITstarData::setNextEdgeValueInQueue(const ompl::base::Cost& cost) {
+  nextEdgeValueInQueue_ = cost;
 }
 
 std::vector<ompl::geometric::tbdstar::Edge> TBDstarData::getForwardQueue() const {
@@ -110,7 +118,8 @@ void TBDstarData::setVerticesInBackwardSearchTree(
   // We need to create a deep copy here.
   verticesInBackwardSearchTree_.reserve(vertices.size());
   for (const auto& vertex : vertices) {
-    verticesInBackwardSearchTree_.emplace_back(std::make_shared<ompl::geometric::tbdstar::Vertex>(*vertex));
+    verticesInBackwardSearchTree_.emplace_back(
+        std::make_shared<ompl::geometric::tbdstar::Vertex>(*vertex));
   }
 }
 

@@ -456,47 +456,53 @@ void TikzVisualizer::drawPlannerSpecificVisualizations(
 
 void TikzVisualizer::drawBITstarSpecificVisualizations(
     const std::shared_ptr<const BITstarData>& bitstarData) const {
-  // Draw the edge queue.
-  auto edgeQueue = bitstarData->getEdgeQueue();
-  for (const auto& edge : edgeQueue) {
-    auto parent = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-    auto child = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-    drawEdge(parent, child, "esplightblue, dash pattern=on 0.02mm off 0.03mm, line width = 0.02mm");
-  }
+  // // Draw the edge queue.
+  // auto edgeQueue = bitstarData->getEdgeQueue();
+  // for (const auto& edge : edgeQueue) {
+  //   auto parent = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+  //   auto child = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+  //   drawEdge(parent, child, "esplightblue, dash pattern=on 0.02mm off 0.03mm, line width = 0.02mm");
+  // }
 
-  // Draw the next edge.
-  auto nextEdgeStates = bitstarData->getNextEdge();
+  // // Draw the next edge.
+  // auto nextEdgeStates = bitstarData->getNextEdge();
 
-  // If there are no more edges in the queue, this will return nullptrs.
-  if (nextEdgeStates.first != nullptr && nextEdgeStates.second != nullptr) {
-    auto parent = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
-    auto child = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-    drawEdge(parent, child, "espred, line width = 0.1mm");
+  // // If there are no more edges in the queue, this will return nullptrs.
+  // if (nextEdgeStates.first != nullptr && nextEdgeStates.second != nullptr) {
+  //   auto parent = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+  //   auto child = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+  //   drawEdge(parent, child, "espred, line width = 0.1mm");
+  // }
+
+  // Draw the ellipse.
+  auto nextEdgeQueueValue = bitstarData->getNextEdgeValueInQueue();
+  if (!std::isnan(nextEdgeQueueValue.value()) && !std::isinf(nextEdgeQueueValue.value())) {
+    drawEllipse(nextEdgeQueueValue.value());
   }
 }
 
 void TikzVisualizer::drawTBDstarSpecificVisualizations(
     const std::shared_ptr<const TBDstarData>& tbdstarData) const {
-  // Draw the forward queue.
-  for (const auto& edge : tbdstarData->getForwardQueue()) {
-    drawEdge(edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-             edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-             "esplightblue, dash pattern=on 0.02mm off 0.03mm, line width = 0.02mm");
-  }
+  // // Draw the forward queue.
+  // for (const auto& edge : tbdstarData->getForwardQueue()) {
+  //   drawEdge(edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+  //            edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+  //            "esplightblue, dash pattern=on 0.02mm off 0.03mm, line width = 0.02mm");
+  // }
 
-  // Draw the top edge in the queue.
-  auto nextEdge = tbdstarData->getNextEdge();
-  if (nextEdge.first && nextEdge.second) {
-    drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
-             nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(),
-             "espred, line width = 0.1mm");
-  }
+  // // Draw the top edge in the queue.
+  // auto nextEdge = tbdstarData->getNextEdge();
+  // if (nextEdge.first && nextEdge.second) {
+  //   drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
+  //            nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(),
+  //            "espred, line width = 0.1mm");
+  // }
 
-  // Draw the backward queue.
-  for (const auto& vertex : tbdstarData->getBackwardQueue()) {
-    drawVertex(vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-               "fill = espgray, inner sep = 0mm, circle, minimum size = 0.2mm");
-  }
+  // // Draw the backward queue.
+  // for (const auto& vertex : tbdstarData->getBackwardQueue()) {
+  //   drawVertex(vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+  //              "fill = espgray, inner sep = 0mm, circle, minimum size = 0.2mm");
+  // }
 
   // Draw the backward search tree.
   for (const auto& vertex : tbdstarData->getVerticesInBackwardSearchTree()) {
@@ -506,16 +512,16 @@ void TikzVisualizer::drawTBDstarSpecificVisualizations(
       auto parent = vertex->getBackwardParent()
                         ->getState()
                         ->as<ompl::base::RealVectorStateSpace::StateType>();
-      drawEdge(parent, state, "espgray, line width = 0.02mm");
+      drawEdge(parent, state, "espgray!30, line width = 0.02mm");
     }
   }
 
-  // Draw the next vertex in the queue.
-  auto nextVertex = tbdstarData->getNextVertex();
-  if (nextVertex) {
-    drawVertex(nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-               "fill = espred, inner sep = 0mm, circle, minimum size = 0.3mm");
-  }
+  // // Draw the next vertex in the queue.
+  // auto nextVertex = tbdstarData->getNextVertex();
+  // if (nextVertex) {
+  //   drawVertex(nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+  //              "fill = espred, inner sep = 0mm, circle, minimum size = 0.3mm");
+  // }
 }
 
 void TikzVisualizer::drawVertex(const ompl::base::PlannerDataVertex& vertex) const {
@@ -571,6 +577,27 @@ void TikzVisualizer::drawSolution(const ompl::base::PathPtr path) const {
       drawEdge(parent, child, "espyellow, line width = 0.1mm");
     }
   }
+}
+
+void TikzVisualizer::drawEllipse(double cost) const {
+  // Get the context name.
+  auto contextName = config_->get<std::string>("Experiment/context");
+  auto start = config_->get<std::vector<double>>("Contexts/"s + contextName + "/start");
+  auto goal = config_->get<std::vector<double>>("Contexts/"s + contextName + "/goal");
+  auto length =
+      std::sqrt(std::pow(start.at(0u) - goal.at(0u), 2) + std::pow(start.at(1u) - goal.at(1u), 2));
+
+  // Compute the semi major-axis.
+  auto semiMajorAxis = cost / 2.0;
+  auto semiMinorAxis = std::sqrt(std::pow((cost / 2.0), 2) - std::pow((length / 2.0), 2));
+
+  // Get midpoint of start and goal.
+  auto draw = std::make_shared<TikzDraw>();
+  draw->setFromPosition((start.at(0u) + goal.at(0u)) / 2.0, (start.at(1u) + goal.at(1u)) / 2.0);
+  draw->setToPosition(std::to_string(semiMajorAxis) + " and "s + std::to_string(semiMinorAxis));
+  draw->setConnection("ellipse");
+  draw->setOptions("densely dashed, thin, espgray");
+  picture_.addDraw(draw);
 }
 
 }  // namespace ompltools

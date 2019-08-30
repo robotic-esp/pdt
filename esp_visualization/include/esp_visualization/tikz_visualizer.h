@@ -111,6 +111,7 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
                 const ompl::base::RealVectorStateSpace::StateType* child,
                 const std::string& options) const;
   void drawSolution(const ompl::base::PathPtr path) const;
+  void drawEllipse(double cost) const;
   void drawRectangle(double midX, double midY, double widthX, double widthY,
                      const std::string& name, const std::string& lineColor,
                      const std::string& fillColor) const;

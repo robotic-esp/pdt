@@ -246,6 +246,10 @@ void BaseVisualizer::createData() {
           // Store the BIT* next edge.
           bitstarData->setNextEdge(planner_->as<ompl::geometric::BITstar>()->getNextEdgeInQueue());
 
+          // Store the BIT* next edge queue value.
+          bitstarData->setNextEdgeValueInQueue(
+              planner_->as<ompl::geometric::BITstar>()->getNextEdgeValueInQueue());
+
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
           plannerSpecificData_.emplace_back(bitstarData);
