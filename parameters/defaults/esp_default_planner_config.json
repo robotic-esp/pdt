@@ -3,7 +3,7 @@
         "ABIT*": {
             "type": "SBITstar",
             "useKNearest": false,
-            "rewireFactor": 1.1,
+            "rewireFactor": 1.001,
             "samplesPerBatch": 100,
             "enablePruning": false,
             "pruningThreshold": 0.1,
@@ -17,7 +17,7 @@
         "BIT*": {
             "type": "BITstar",
             "useKNearest": false,
-            "rewireFactor": 1.1,
+            "rewireFactor": 1.001,
             "samplesPerBatch": 100,
             "enablePruning": false,
             "pruningThreshold": 0.1,
@@ -28,7 +28,7 @@
         "BITstarRegression": {
             "type": "BITstarRegression",
             "useKNearest": false,
-            "rewireFactor": 1.1,
+            "rewireFactor": 1.001,
             "samplesPerBatch": 100,
             "enablePruning": false,
             "pruningThreshold": 0.1,
@@ -52,7 +52,7 @@
         "RRT#": {
             "type": "RRTsharp",
             "useKNearest": false,
-            "rewireFactor": 1.1,
+            "rewireFactor": 1.001,
             "goalBias": 0.05,
             "variant": 0,
             "epsilon": 0.0,
@@ -69,7 +69,7 @@
         "RRT*": {
             "type": "RRTstar",
             "useKNearest": false,
-            "rewireFactor": 1.1,
+            "rewireFactor": 1.001,
             "goalBias": 0.05,
             "maxEdgeLength": {
                 "2d": 0.3,

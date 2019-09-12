@@ -176,6 +176,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setName(plannerName);
       planner->setRepairBackwardSearch(config_->get<bool>(parentKey + "/repairBackwardSearch"));
       planner->setBatchSize(config_->get<std::size_t>(parentKey + "/batchSize"));
+      planner->setRewireFactor(config_->get<std::size_t>(parentKey + "/rewireFactor"));
       return {planner, PLANNER_TYPE::TBDSTAR};
     }
     default: {
