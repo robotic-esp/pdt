@@ -50,11 +50,12 @@ namespace esp {
 namespace ompltools {
 
 BaseVisualizer::BaseVisualizer(
-    const std::shared_ptr<BaseContext> &context,
+    const std::shared_ptr<Configuration> &config, const std::shared_ptr<BaseContext> &context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
     context_(context),
     planner_(plannerPair.first),
     plannerType_(plannerPair.second),
+    config_(config),
     dataThreadPromise_(),
     dataThreadStopSignal_(dataThreadPromise_.get_future()) {
   dataThread_ = std::thread(&BaseVisualizer::createData, this);
@@ -190,6 +191,18 @@ void BaseVisualizer::createData() {
     auto setupStartTime = time::Clock::now();
     planner_->setup();
     setupDuration_ = time::Clock::now() - setupStartTime;
+
+    if (config_->contains("Experiment/seed")) {
+      if (plannerType_ == esp::ompltools::PLANNER_TYPE::BITSTAR) {
+        planner_->as<ompl::geometric::BITstar>()->setLocalSeed(
+            config_->get<std::size_t>("Experiment/seed"));
+      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::TBDSTAR) {
+        planner_->as<ompl::geometric::TBDstar>()->setLocalSeed(
+            config_->get<std::size_t>("Experiment/seed"));
+      }
+    } else {
+      throw std::runtime_error("Unknown seed.");
+    }
   }
 
   while (dataThreadStopSignal_.wait_for(std::chrono::nanoseconds(1)) ==

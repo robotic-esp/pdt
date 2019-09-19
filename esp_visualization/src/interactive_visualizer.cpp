@@ -50,7 +50,7 @@ namespace ompltools {
 InteractiveVisualizer::InteractiveVisualizer(
     const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
-    BaseVisualizer(context, plannerPair),
+    BaseVisualizer(config, context, plannerPair),
     tikzVisualizer_(config, context, plannerPair) {
   if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
     OMPL_ERROR("Visualizer only tested for real vector state spaces.");
@@ -242,7 +242,7 @@ void InteractiveVisualizer::run() {
         exporting_ = false;
       } else {
         OMPL_WARN("Exporting iteration %zu of %zu.", static_cast<unsigned>(displayIteration_),
-                    static_cast<unsigned>(iterationToPlayTo_));
+                  static_cast<unsigned>(iterationToPlayTo_));
         if (optionDrawPlannerSpecificData) {
           tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
                                  getSolutionPath(displayIteration_),
