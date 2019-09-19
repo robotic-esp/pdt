@@ -300,7 +300,7 @@ std::pair<const std::string, const std::string> Configuration::split(
   return std::make_pair(name.substr(0, pos), name.substr(pos + 1));
 }
 
-void Configuration::registerAsExperiment() const {
+void Configuration::registerAsExperiment() {
   // Check the status of the working directory.
   if (Version::GIT_STATUS == std::string("DIRTY")) {
     OMPL_WARN("Working directory is dirty.");
@@ -350,7 +350,7 @@ void Configuration::registerAsExperiment() const {
   handleSeedSpecification();
 }
 
-void Configuration::handleSeedSpecification() const {
+void Configuration::handleSeedSpecification() {
   if (parameters_["Experiment"].contains("seed")) {
     auto seed = parameters_["Experiment"]["seed"].get<unsigned long>();
     ompl::RNG::setSeed(seed);
@@ -359,6 +359,7 @@ void Configuration::handleSeedSpecification() const {
   } else {
     auto seed = ompl::RNG::getSeed();
     OMPL_INFORM("Seed is %lu", seed);
+    parameters_["Experiment"]["seed"] = seed;
     accessedParameters_["Experiment"]["seed"] = seed;
   }
 }

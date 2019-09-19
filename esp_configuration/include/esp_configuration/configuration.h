@@ -77,7 +77,7 @@ class Configuration {
 
   // This adds to or creates an "Experiment" entry in the accessed parameters with various
   // information about the state of the working directory and the OMPL seed.
-  void registerAsExperiment() const;
+  void registerAsExperiment();
 
   // Dump the parameters.
   void dumpAll(std::ostream& out = std::cout) const;
@@ -115,7 +115,7 @@ class Configuration {
 
   // If any config file specifies the seed, we need to set it in OMPL, otherwise we store OMPL's
   // seed.
-  void handleSeedSpecification() const;
+  void handleSeedSpecification();
 
   std::string executable_{};
 
