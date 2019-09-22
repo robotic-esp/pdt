@@ -36,6 +36,7 @@
 
 #include "esp_factories/planner_factory.h"
 
+#include <ompl/geometric/planners/aibitstar/AIBITstar.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
@@ -71,6 +72,13 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
   const auto type = config_->get<PLANNER_TYPE>(parentKey + "/type");
   // BIT*
   switch (type) {
+    case PLANNER_TYPE::AIBITSTAR: {
+      // Allocate and configure an AI-BIT* planner.
+      auto planner = std::make_shared<ompl::geometric::AIBITstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setName(plannerName);
+      return {planner, PLANNER_TYPE::AIBITSTAR};
+    }
     case PLANNER_TYPE::BITSTAR: {
       // Allocate and configure a BIT* planner.
       auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
