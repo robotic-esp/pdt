@@ -12,26 +12,26 @@
         "espdarkred": [ 145, 0, 33 ]
     },
     "PlannerPlotColors": {
-        "ABIT*": "espgreen",
-        "BIT*": "espblue",
+        "ABITstar": "espgreen",
+        "AIBITstar": "espgreen",
+        "BITstar": "espblue",
         "BITstarRegression": "esplightblue",
-        "TBD*": "espgreen",
         "TBD* Light": "esplightblue",
         "LBTRRT" : "esppurple",
         "RRTConnect": "espblack",
-        "RRT#": "espyellow",
-        "RRT*": "espred"
+        "RRTsharp": "espyellow",
+        "RRTstar": "espred"
     },
     "PlotPlannerNames": {
-        "ABIT*": "ABIT*",
-        "BIT*": "BIT*",
+        "ABITstar": "ABIT*",
+        "AIBITstar": "AIBIT*",
+        "BITstar": "BIT*",
         "BITstarRegression": "BIT* Reg",
-        "TBD*": "TBD*",
         "TBD* Light": "TBD* Light",
         "LBTRRT": "LBT-RRT",
         "RRTConnect": "RRT-Connect",
-        "RRT#": "RRT$^{\\#}$",
-        "RRT*": "RRT*"
+        "RRTsharp": "RRT$^{\\#}$",
+        "RRTstar": "RRT*"
     },
     "SuccessPlots": {
         "xlog": true,

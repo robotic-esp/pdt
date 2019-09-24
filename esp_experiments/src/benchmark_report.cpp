@@ -55,6 +55,7 @@ int main(int argc, char** argv) {
   // Get the statistics.
   esp::ompltools::Statistics stats(config, true);
 
+  // Create the report.
   esp::ompltools::ExperimentReport report(config, stats);
   report.generateReport();
   report.compileReport();

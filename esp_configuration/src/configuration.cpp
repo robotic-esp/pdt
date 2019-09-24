@@ -40,9 +40,9 @@
 #include <iostream>
 #include <string>
 
+#include <boost/program_options.hpp>
 #include <ompl/util/Console.h>
 #include <ompl/util/RandomNumbers.h>
-#include <boost/program_options.hpp>
 
 #include "esp_configuration/directory.h"
 #include "esp_configuration/version.h"
@@ -66,7 +66,8 @@ void Configuration::load(int argc, char **argv) {
   // Declare the available options.
   po::options_description availableOptions("Configuration options");
   availableOptions.add_options()("help,h", "Display available options.")(
-      "config-patch,c", po::value<std::string>(), "Path to the configuration patch file.");
+      "config-patch,c", po::value<std::string>(), "Path to the configuration patch file.")(
+      "generate-report,r", "Generate a benchmark report.");
 
   // Parse the command line arguments to see which options were invoked.
   po::variables_map invokedOptions;
@@ -328,6 +329,19 @@ void Configuration::registerAsExperiment() {
         if (executable != executable_) {
           OMPL_ERROR("Config specifies executable '%s'. You are executing '%s'.",
                      executable.c_str(), executable_.c_str());
+        }
+      }
+
+      // Handle executable specific configuration.
+      if (executable == "benchmark"s) {
+        if (parameters_["Experiment"].contains("report")) {
+          if (!parameters_["Experiment"]["report"].contains("automatic")) {
+            parameters_["Experiment"]["report"]["automatic"] = false;
+            parameters_["Experiment"]["report"]["verboseCompilation"] = false;
+          }
+        } else {
+          parameters_["Experiment"]["report"]["automatic"] = false;
+          parameters_["Experiment"]["report"]["verboseCompilation"] = false;
         }
       }
     }

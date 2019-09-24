@@ -416,11 +416,14 @@ fs::path ExperimentReport::compileReport() const {
   auto reportPath =
       fs::path(config_->get<std::string>("Experiment/results")).parent_path() / "report.tex";
   auto currentPath = fs::current_path();
-  auto cmd = "cd \""s + reportPath.parent_path().string() + "\" && lualatex \""s +
-             reportPath.string() + "\" && cd \""s + currentPath.string() + '\"';
+  auto cmd =
+      "cd \""s + reportPath.parent_path().string() + "\" && lualatex \""s + reportPath.string() + "\""s;
+  if (!config_->get<bool>("Experiment/report/verboseCompilation")) {
+    cmd += " > /dev/null";
+  }
+  cmd += " && cd \""s + currentPath.string() + '\"';
   int retval = std::system(cmd.c_str());
-  retval = std::system(cmd.c_str());
-  (void)retval;
+  (void)retval;  // Get rid of warning for unused variable.
   return fs::path(reportPath).replace_extension(".pdf");
 }
 

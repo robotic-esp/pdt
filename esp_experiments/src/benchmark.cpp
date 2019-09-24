@@ -51,6 +51,8 @@
 #include "esp_factories/planner_factory.h"
 #include "esp_performance_loggers/performance_loggers.h"
 #include "esp_planning_contexts/all_contexts.h"
+#include "esp_statistics/statistics.h"
+#include "esp_tikz/experiment_report.h"
 #include "esp_time/time.h"
 #include "esp_utilities/get_best_cost.h"
 
@@ -196,6 +198,17 @@ int main(int argc, char **argv) {
             << "\nWrote results to:\t" << results.getFilePath() << "\nWrote config to:\t"
             << fs::current_path() / configPath << "\nWrote log to:\t\t"
             << fs::current_path() / logPath << "\n\n";
+
+  // If we're automatically generating the report, now is the time to do so.
+  if (config->get<bool>("Experiment/report/automatic")) {
+    // Generate the statistic.
+    esp::ompltools::Statistics stats(config, true);
+
+    // Generate the report.
+    esp::ompltools::ExperimentReport report(config, stats);
+    report.generateReport();
+    report.compileReport();
+  }
 
   return 0;
 }
