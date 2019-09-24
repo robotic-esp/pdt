@@ -118,19 +118,19 @@ void Configuration::load(int argc, char **argv) {
   // Set the appropriate log level.
   if (parameters_.count("Log") != 0) {
     auto level = parameters_["Log"]["level"];
-    if (level == std::string("dev2")) {
+    if (level == "dev2"s) {
       ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV2);
-    } else if (level == std::string("dev1")) {
+    } else if (level == "dev1"s) {
       ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV1);
-    } else if (level == std::string("debug")) {
+    } else if (level == "debug"s) {
       ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEBUG);
-    } else if (level == std::string("info")) {
+    } else if (level == "info"s) {
       ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
-    } else if (level == std::string("warn")) {
+    } else if (level == "warn"s) {
       ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
-    } else if (level == std::string("error")) {
+    } else if (level == "error"s) {
       ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_ERROR);
-    } else if (level == std::string("none")) {
+    } else if (level == "none"s) {
       ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_NONE);
     } else {
       OMPL_WARN("Config specifies invalid log level. Setting the log level to LOG_WARN");
@@ -277,7 +277,7 @@ void Configuration::loadDefaultConfigs(bool loadDefaultContextConfigs,
   } else {
     // Cannot find default config at default location.
     OMPL_ERROR("Default config directory does not exist at '%s'.", defaultConfigDirectory.c_str());
-   throw std::ios_base::failure("Configuration failure.");
+    throw std::ios_base::failure("Configuration failure.");
   }
 }
 
@@ -302,7 +302,7 @@ std::pair<const std::string, const std::string> Configuration::split(
 
 void Configuration::registerAsExperiment() {
   // Check the status of the working directory.
-  if (Version::GIT_STATUS == std::string("DIRTY")) {
+  if (Version::GIT_STATUS == "DIRTY"s) {
     OMPL_WARN("Working directory is dirty.");
   }
 
@@ -312,7 +312,7 @@ void Configuration::registerAsExperiment() {
     if (parameters_["Experiment"].contains("version")) {
       if (parameters_["Experiment"]["version"].contains("commit")) {
         auto commitHash = parameters_["Experiment"]["version"]["commit"].get<std::string>();
-        if (commitHash != std::string("any")) {
+        if (commitHash != "any"s) {
           if (commitHash != Version::GIT_SHA1) {
             OMPL_ERROR("Config specifies commit %s. You are currently on %s.", commitHash.c_str(),
                        Version::GIT_SHA1.c_str());
@@ -324,7 +324,7 @@ void Configuration::registerAsExperiment() {
     // Check this is the correct executable.
     if (parameters_["Experiment"].contains("executable")) {
       auto executable = parameters_["Experiment"]["executable"].get<std::string>();
-      if (executable != std::string("any")) {
+      if (executable != "any"s) {
         if (executable != executable_) {
           OMPL_ERROR("Config specifies executable '%s'. You are executing '%s'.",
                      executable.c_str(), executable_.c_str());
