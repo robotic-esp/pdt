@@ -37,6 +37,8 @@
 #pragma once
 
 #include <ompl/base/SpaceInformation.h>
+#include <ompl/geometric/planners/aibitstar/AIBITstar.h>
+#include <ompl/geometric/planners/aibitstar/Edge.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/tbdstar/TBDstar.h>
 #include <ompl/geometric/planners/tbdstar/datastructures/Edge.h>
@@ -103,14 +105,17 @@ class TBDstarData : public PlannerSpecificData {
   std::pair<const ompl::base::State*, const ompl::base::State*> getNextEdge() const;
   std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>> getBackwardQueue() const;
   std::shared_ptr<ompl::geometric::tbdstar::Vertex> getNextVertex() const;
-  std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>> getVerticesInBackwardSearchTree() const;
+  std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>> getVerticesInBackwardSearchTree()
+      const;
 
   // Setters.
   void setForwardQueue(const std::vector<ompl::geometric::tbdstar::Edge>& edges);
   void setNextEdge(const std::pair<const ompl::base::State*, const ompl::base::State*>& edge);
-  void setBackwardQueue(const std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>& vertices);
+  void setBackwardQueue(
+      const std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>& vertices);
   void setNextVertex(const std::shared_ptr<ompl::geometric::tbdstar::Vertex>& vertex);
-  void setVerticesInBackwardSearchTree(const std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>& vertices);
+  void setVerticesInBackwardSearchTree(
+      const std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>& vertices);
 
  private:
   std::vector<ompl::geometric::tbdstar::Edge> forwardQueue_{};
@@ -119,6 +124,32 @@ class TBDstarData : public PlannerSpecificData {
   ompl::base::State* parentStateNextEdge_{};
   ompl::base::State* childStateNextEdge_{};
   std::shared_ptr<ompl::geometric::tbdstar::Vertex> nextVertex_{};
+};
+
+class AIBITstarData : public PlannerSpecificData {
+ public:
+  AIBITstarData(const ompl::base::SpaceInformationPtr& spaceInfo) :
+      PlannerSpecificData(spaceInfo) {}
+  // Getters
+  std::vector<ompl::geometric::aibitstar::Edge> getReverseTree() const;
+  std::vector<ompl::geometric::aibitstar::Edge> getForwardQueue() const;
+  std::vector<ompl::geometric::aibitstar::Edge> getReverseQueue() const;
+  ompl::geometric::aibitstar::Edge getNextForwardEdge() const;
+  ompl::geometric::aibitstar::Edge getNextReverseEdge() const;
+
+  // Setters
+  void setReverseTree(const std::vector<ompl::geometric::aibitstar::Edge>& tree);
+  void setForwardQueue(const std::vector<ompl::geometric::aibitstar::Edge>& queue);
+  void setReverseQueue(const std::vector<ompl::geometric::aibitstar::Edge>& queue);
+  void setNextForwardEdge(const ompl::geometric::aibitstar::Edge& edge);
+  void setNextReverseEdge(const ompl::geometric::aibitstar::Edge& edge);
+
+ private:
+  std::vector<ompl::geometric::aibitstar::Edge> reverseTree_{};
+  std::vector<ompl::geometric::aibitstar::Edge> forwardQueue_{};
+  std::vector<ompl::geometric::aibitstar::Edge> reverseQueue_{};
+  ompl::geometric::aibitstar::Edge nextForwardEdge_{};
+  ompl::geometric::aibitstar::Edge nextReverseEdge_{};
 };
 
 }  // namespace ompltools

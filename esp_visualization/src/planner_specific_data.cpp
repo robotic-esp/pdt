@@ -123,6 +123,46 @@ void TBDstarData::setVerticesInBackwardSearchTree(
   }
 }
 
+std::vector<ompl::geometric::aibitstar::Edge> AIBITstarData::getReverseTree() const {
+  return reverseTree_;
+}
+
+std::vector<ompl::geometric::aibitstar::Edge> AIBITstarData::getForwardQueue() const {
+  return forwardQueue_;
+}
+
+std::vector<ompl::geometric::aibitstar::Edge> AIBITstarData::getReverseQueue() const {
+  return reverseQueue_;
+}
+
+ompl::geometric::aibitstar::Edge AIBITstarData::getNextForwardEdge() const {
+  return nextForwardEdge_;
+}
+
+ompl::geometric::aibitstar::Edge AIBITstarData::getNextReverseEdge() const {
+  return nextReverseEdge_;
+}
+
+void AIBITstarData::setReverseTree(const std::vector<ompl::geometric::aibitstar::Edge>& tree) {
+  reverseTree_ = tree;
+}
+
+void AIBITstarData::setForwardQueue(const std::vector<ompl::geometric::aibitstar::Edge>& queue) {
+  forwardQueue_ = queue;
+}
+
+void AIBITstarData::setReverseQueue(const std::vector<ompl::geometric::aibitstar::Edge>& queue) {
+  reverseQueue_ = queue;
+}
+
+void AIBITstarData::setNextForwardEdge(const ompl::geometric::aibitstar::Edge& edge) {
+  nextForwardEdge_ = edge;
+}
+
+void AIBITstarData::setNextReverseEdge(const ompl::geometric::aibitstar::Edge& edge) {
+  nextReverseEdge_ = edge;
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

@@ -77,6 +77,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::AIBITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->newProblemDefinition());
       planner->setName(plannerName);
+      planner->setNumSamplesPerBatch(config_->get<std::size_t>(parentKey + "/samplesPerBatch"));
+      planner->setRadiusFactor(config_->get<double>(parentKey + "/radiusFactor"));
       return {planner, PLANNER_TYPE::AIBITSTAR};
     }
     case PLANNER_TYPE::BITSTAR: {

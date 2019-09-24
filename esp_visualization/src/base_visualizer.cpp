@@ -197,8 +197,8 @@ void BaseVisualizer::createData() {
         planner_->as<ompl::geometric::BITstar>()->setLocalSeed(
             config_->get<std::size_t>("Experiment/seed"));
       } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::TBDSTAR) {
-        planner_->as<ompl::geometric::TBDstar>()->setLocalSeed(
-            config_->get<std::size_t>("Experiment/seed"));
+        // planner_->as<ompl::geometric::TBDstar>()->setLocalSeed(
+        // config_->get<std::size_t>("Experiment/seed"));
       }
     } else {
       throw std::runtime_error("Unknown seed.");
@@ -296,6 +296,42 @@ void BaseVisualizer::createData() {
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
           plannerSpecificData_.emplace_back(tbdstarData);
+          break;
+        }
+        case PLANNER_TYPE::AIBITSTAR: {
+          auto aibitstarData = std::make_shared<AIBITstarData>(context_->getSpaceInformation());
+
+          // Store the AIBIT* reverse tree.
+          aibitstarData->setReverseTree(
+              planner_->as<ompl::geometric::AIBITstar>()->getReverseTree());
+
+          // Store the AIBIT* forward queue.
+          aibitstarData->setForwardQueue(
+              planner_->as<ompl::geometric::AIBITstar>()->getForwardQueue());
+
+          // Store the AIBIT* reverse queue.
+          aibitstarData->setReverseQueue(
+              planner_->as<ompl::geometric::AIBITstar>()->getReverseQueue());
+
+          // Store the next forward edge.
+          try {
+            aibitstarData->setNextForwardEdge(
+                planner_->as<ompl::geometric::AIBITstar>()->getNextForwardEdge());
+          } catch (const std::out_of_range &e) {
+            // Throws if there is no forward edge. This is fine, the edge is default constructed.
+          }
+
+          // Store the next reverse edge.
+          try {
+            aibitstarData->setNextReverseEdge(
+                planner_->as<ompl::geometric::AIBITstar>()->getNextReverseEdge());
+          } catch (const std::out_of_range &e) {
+            // Throws if there is no forward edge. This is fine, the edge is default constructed.
+          }
+
+          // Store the data.
+          std::scoped_lock lock(plannerSpecificDataMutex_);
+          plannerSpecificData_.emplace_back(aibitstarData);
           break;
         }
         default:

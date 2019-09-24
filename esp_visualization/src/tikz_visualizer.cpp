@@ -100,9 +100,9 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
     auto vertex = plannerData.getVertex(i);
 
     // Draw if it is valid.
-    if (vertex != ompl::base::PlannerData::NO_VERTEX && vertex.getTag() != 0u &&
-        vertex.getTag() != 1u) {
-      drawVertex(vertex);
+    if (vertex != ompl::base::PlannerData::NO_VERTEX /* && vertex.getTag() != 0u &&
+                                                        vertex.getTag() != 1u */) {
+      drawVertex(vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>());
 
       // Get all outgoing edges of this vertex.
       std::vector<unsigned int> outgoingEdges{};
@@ -115,7 +115,9 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
 
         // Draw the edge if the child is valid.
         if (child != ompl::base::PlannerData::NO_VERTEX) {
-          drawEdge(vertex, child);
+          drawEdge(vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+                   child.getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+                   "espblue, line width = 0.05mm");
         }
       }
     }
@@ -468,7 +470,8 @@ void TikzVisualizer::drawBITstarSpecificVisualizations(
   // for (const auto& edge : edgeQueue) {
   //   auto parent = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
   //   auto child = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-  //   drawEdge(parent, child, "esplightblue, dash pattern=on 0.02mm off 0.03mm, line width = 0.02mm");
+  //   drawEdge(parent, child, "esplightblue, dash pattern=on 0.02mm off 0.03mm, line width =
+  //   0.02mm");
   // }
 
   // // Draw the next edge.
@@ -519,7 +522,7 @@ void TikzVisualizer::drawTBDstarSpecificVisualizations(
       auto parent = vertex->getBackwardParent()
                         ->getState()
                         ->as<ompl::base::RealVectorStateSpace::StateType>();
-      drawEdge(parent, state, "espgray!30, line width = 0.02mm");
+      drawEdge(parent, state, "espgray!50, line width = 0.02mm");
     }
   }
 
