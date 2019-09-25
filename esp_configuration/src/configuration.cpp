@@ -66,8 +66,7 @@ void Configuration::load(int argc, char **argv) {
   // Declare the available options.
   po::options_description availableOptions("Configuration options");
   availableOptions.add_options()("help,h", "Display available options.")(
-      "config-patch,c", po::value<std::string>(), "Path to the configuration patch file.")(
-      "generate-report,r", "Generate a benchmark report.");
+      "config-patch,c", po::value<std::string>(), "Path to the configuration patch file.");
 
   // Parse the command line arguments to see which options were invoked.
   po::variables_map invokedOptions;
