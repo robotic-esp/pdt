@@ -154,6 +154,14 @@ std::stringstream ExperimentReport::preamble() const {
     preamble << "\\usetikzlibrary{" << library << "}\n";
   }
 
+  // We activate externalization for the tikz figures.
+  preamble
+      << "\\immediate\\write18{mkdir -p tikz-externalized}\n"
+      << "\\tikzexternalize[prefix=tikz-externalized/]\n"
+      << "\\tikzset{external/system call/.add={}{; convert -density 150 -flatten \"\\image.pdf\" "
+         "\"\\image-150.png\"; convert -density 300 -flatten \"\\image.pdf\" \"\\image-300.png\"; "
+         "convert -density 600 -flatten \"\\image.pdf\" \"\\image-600.png\"}}\n";
+
   // Now we load the used pgf libraries.
   preamble << "% This report uses the following PGFPlots libraries:\n";
   for (const auto& library : pgfLibraries_) {
@@ -416,8 +424,8 @@ fs::path ExperimentReport::compileReport() const {
   auto reportPath =
       fs::path(config_->get<std::string>("Experiment/results")).parent_path() / "report.tex";
   auto currentPath = fs::current_path();
-  auto cmd =
-      "cd \""s + reportPath.parent_path().string() + "\" && lualatex \""s + reportPath.string() + "\""s;
+  auto cmd = "cd \""s + reportPath.parent_path().string() + "\" && lualatex -shell-escape \""s +
+             reportPath.string() + "\""s;
   if (!config_->get<bool>("Experiment/report/verboseCompilation")) {
     cmd += " > /dev/null";
   }
