@@ -16,7 +16,7 @@
         },
         "AIBITstar": {
             "type": "AIBITstar",
-            "samplesPerBatch": 1,
+            "samplesPerBatch": 100,
             "radiusFactor": 1.001
         },
         "BITstar": {
