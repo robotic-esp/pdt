@@ -157,11 +157,13 @@ T Configuration::get(const std::string& key, const json::json& parameters,
 
 template <typename T>
 void Configuration::add(const std::string& key, const T& value) {
-  // We allow overwriting the results field of the experiment. Conceptually this seems ok, but from
+  // We allow overwriting the results/name field of the experiment. Conceptually this seems ok, but from
   // a software architecture standpoint this hints at a flaw. Would it be cleaner to have an
   // "Accessed" element in parameters_ rather than having accessedParameters_?
   if (contains(key) && key == std::string("Experiment/results")) {
     parameters_["Experiment"].erase("results");
+  } else if (contains(key) && key == std::string("Experiment/name")) {
+    parameters_["Experiment"].erase("name");
   }
   // We should prevent overwriting any other parameter to ensure reproducibility.
   if (contains(key) && get<T>(key) != value) {
