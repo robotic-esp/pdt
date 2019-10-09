@@ -20,11 +20,6 @@ endif()
 # Put executables in bin directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 
-# Create a symlink of the parameters folder to the bin directory.
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${CMAKE_CURRENT_SOURCE_DIR}/parameters
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/parameters)
-
 # Display system info.
 message(STATUS "CMAKE_SYSTEM_NAME          = ${CMAKE_SYSTEM_NAME}"         )
 message(STATUS "CMAKE_CXX_COMPILER_ID      = ${CMAKE_CXX_COMPILER_ID}"     )
@@ -38,7 +33,6 @@ find_package(Threads REQUIRED)
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-# TODO: Put this in the correct subproject.
 # Find Boost.
 find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options thread)
 include_directories(${Boost_INCLUDE_DIR})
