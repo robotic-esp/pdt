@@ -431,6 +431,7 @@ fs::path ExperimentReport::compileReport() const {
   }
   cmd += " && cd \""s + currentPath.string() + '\"';
   int retval = std::system(cmd.c_str());
+  retval = std::system(cmd.c_str()); //  We compile the report twice to get the references right.
   (void)retval;  // Get rid of warning for unused variable.
   return fs::path(reportPath).replace_extension(".pdf");
 }
