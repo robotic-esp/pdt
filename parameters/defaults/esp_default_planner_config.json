@@ -14,6 +14,11 @@
             "inflationParameter": 10.0,
             "truncationParameter": 5.0
         },
+        "AIBITstar": {
+            "type": "AIBITstar",
+            "samplesPerBatch": 1,
+            "radiusFactor": 1.001
+        },
         "BITstar": {
             "type": "BITstar",
             "useKNearest": false,
