@@ -3,20 +3,34 @@
         "executable": "benchmark",
         "planners": [
             "RRTConnect",
-            "RRT*",
-            "BIT*"
+            "RRTstar",
+            "BITstar",
+            "ABITstar",
+            "AIBITstar"
         ],
         "context": "WallGap",
         "numRuns": 100,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
-        "loadDefaultPlannerConfig": true
+        "loadDefaultPlannerConfig": true,
+        "report": {
+            "automatic": true,
+            "verboseCompilation": false
+        }
     },
     "Contexts": {
         "WallGap": {
             "type": "WallGap",
-            "maxTime": 1,
-            "gapWidth": 0.04
+            "start": [-0.3, 0.0],
+            "goal": [0.3, 0.0],
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : 1,
+            "collisionCheckResolution": 0.00001,
+            "wallWidth": 0.8,
+            "wallThickness": 0.3,
+            "gapOffset": 0.1,
+            "gapWidth": 0.02
         }
     }
 }
