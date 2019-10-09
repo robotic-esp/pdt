@@ -40,9 +40,9 @@
 #include <iostream>
 #include <string>
 
-#include <boost/program_options.hpp>
 #include <ompl/util/Console.h>
 #include <ompl/util/RandomNumbers.h>
+#include <boost/program_options.hpp>
 
 #include "esp_configuration/directory.h"
 #include "esp_configuration/version.h"
@@ -342,6 +342,10 @@ void Configuration::registerAsExperiment() {
           parameters_["Experiment"]["report"]["automatic"] = false;
           parameters_["Experiment"]["report"]["verboseCompilation"] = false;
         }
+        accessedParameters_["Experiment"]["report"]["automatic"] =
+            parameters_["Experiment"]["report"]["automatic"];
+        accessedParameters_["Experiment"]["report"]["verboseCompilation"] =
+            parameters_["Experiment"]["report"]["verboseCompilation"];
       }
     }
   }
