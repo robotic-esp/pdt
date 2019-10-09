@@ -60,10 +60,6 @@ TikzVisualizer::TikzVisualizer(
     OMPL_ERROR("Tikz visualizer only tested for real vector state spaces.");
     throw std::runtime_error("Visualizer error.");
   }
-  if (context_->getDimensions() != 2u) {
-    OMPL_ERROR("Tikz visualizer can only handle two dimensional contexts.");
-    throw std::runtime_error("Visualizer error.");
-  }
   // Load colors from config.
   espColors_.emplace("espblack", config_->get<std::array<int, 3>>("Colors/espblack"));
   espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("Colors/espwhite"));
@@ -81,6 +77,10 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
                             const ompl::base::PathPtr path,
                             const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData,
                             double iterationTime, double totalTime, double solutionCost) {
+  if (context_->getDimensions() != 2u) {
+    OMPL_ERROR("Tikz visualizer can only handle two dimensional contexts.");
+    throw std::runtime_error("Visualizer error.");
+  }
   // Draw the obstacles.
   for (const auto& obstacle : context_->getObstacles()) {
     obstacle->accept(*this);
