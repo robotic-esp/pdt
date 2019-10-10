@@ -29,7 +29,7 @@ git fetch
 git checkout esp_ompl_tools
 mkdir build && cd build
 cmake ..
-make -j 8
+make -j 4
 sudo make install
 ```
 
