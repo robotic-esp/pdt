@@ -1,61 +1,47 @@
 # ESP OMPL TOOLS
 
-This repository contains our inhouse tools developed around OMPL.
-
-## Mission
-
-ESP's OMPL tools aim to facilitate scientifically sound path planning research.
-
-## Features
-
-- [x] Reproducible experiments
-- [x] Automatic report generation
-- [x] Interactive visualization of planner progress
-- [x] Videos of planner progress
-- [x] Easy to define experiments (obstacles and antiobstacles)
-- [x] Statistical analysis
-- [ ] Automatic stopping based on p-values
-- [ ] Guidance on number of runs
-- [ ] Reporting of p-values
-- [ ] Large automated runs
-- [ ] Physically founded generated experiments (remove bespoke problems from literature)
+This repository contains tools developed at ESP that aim to facilitate scientifically sound path planning research.
 
 ## Installation
 
 ### Dependencies
 
+First install the dependencies of the tools.
+
 #### OMPL
 
-We currently depend on our own version of OMPL, because SBIT* hasn't been published yet. This should work (its probably best to uninstall any other versions of OMPL first):
+First install the dependencies of [OMPL](http://ompl.kavrakilab.org/):
+
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install cmake
+sudo apt install libboost-all-dev
+sudo apt install libeigen3-dev
+sudo apt install libode-dev # optional
+```
+We want to test our own planners, which are developed in our private OMPL fork:
 
 ```bash
 git clone git@github.com:robotic-esp/ompl-private.git
 cd ompl-private
 git fetch
-git checkout marlin/abitstar
+git checkout esp_ompl_tools
 mkdir build && cd build
 cmake ..
-make
+make -j 8
 sudo make install
 ```
 
-Make sure you are on the `marlin/abitstar` branch.
+Make sure you are on the `esp_ompl_tools` branch. You can use `git branch` to check which branch you have checked out.
 
 #### Boost
 
-Our tools depend on the `thread` and `program_options` components of Boost:
+Our tools depend on the `thread` and `program_options` components of [Boost](https://www.boost.org/), which were installed as dependencies of OMPL above.
 
-```bash
-sudo apt update
-sudo apt install libboost-thread-dev libboost-program-options-dev
-```
+#### Pangolin
 
-But you can probably afford to install all boost libraries:
-
-```bash
-sudo apt update
-sudo apt install libboost-all-dev
-```
+Follow the installation guide of the [official repo](https://github.com/stevenlovegrove/Pangolin), it's well documented.
 
 #### FFmpeg
 
@@ -65,21 +51,15 @@ FFmpeg is only needed if you want to record videos. The code should compile with
 sudo apt install ffmpeg
 ```
 
-#### Pangolin
-
-I've had to adapt the default paths in which Pangolin looks for `ffmpeg`. I opened a PR ([#498](https://github.com/stevenlovegrove/Pangolin/pull/498)) on the official repo, but it hasn't been approved yet. My suggestion is to just clone the official repo and install that. If it doesn't work look at the PR above and implement the changes yourself (it's literally 10 lines of code that need to be changed). The official repo lives [here](https://github.com/stevenlovegrove/Pangolin), please follow its installation guide, it's well documented.
-
 #### LaTeX / LuaLaTeX
 
-The executable `benchmark_report` compiles a latex report of a benchmark. Initially this was done using `pdflatex`, which allocates a fixed amount of memory for each compilation. For very large experiments, `pdflatex` allocated too little memory, which resulted in an error. A quick fix was to compile the reports with `lualatex` instead. LuaLaTeX dynamically allocates as much memory as needed. The unfallible wisdom of the internet suggests that all major LaTeX distributions include LuaLaTeX, so I figured this is not too much of an additional dependency.
-
-You can run
+The automatic report generation relies on LuaLaTeX to dynamically allocate as much memory as needed. The infallible wisdom of the internet suggests that all major LaTeX distributions include LuaLaTeX, so I figured this is not too much of an additional dependency.
 
 ```bash
-which lualatex
+sudo apt install texlive-full
 ```
 
-to see wether you have it installed on your system.
+If running `which lualatex` echoes a path, you should be good to go, otherwise install lualatex.
 
 ### ESP OMPL TOOLS
 
@@ -95,55 +75,49 @@ make
 
 ## Reproducible research with ESP OMPL TOOLS
 
-Virtually all sampling-based planning algorithms can be configured by setting parameters (e.g., the connection radius for `RRT*`), or disabling parts of the algorithms (e.g, graph-pruning for `BIT*`). Planning contexts depend on parameters as well (e.g, the number of obstacles and the positions of the start and goal states). The result of an experiment, i.e., of a comparison of the performance of planners in a planning context, depends heavily on these parameters and to reproduce such a result all parameters must be known.
+Most sampling-based planning algorithms depend on random numbers and can be configured by parameters (e.g., the connection radius for `RRT*`). Planning contexts depend on parameters as well (e.g, the number and shape of obstacles, the positions of the start and goal states, and the collision detection resolution). The result of an experiment, i.e., of a comparison of the performance of planners in a planning context, depends on the random number seed and all parameters. To reproduce an experiment, the seed and all parameters must be identical.
 
 This is why our tools set all parameters explicitly and keep track of which parameters were set. But because explicitly specifying all parameters by hand for every experiment is tedious, the tools are shipped with a set of default parameters (you can inspect them in `esp_ompl_tools/parameters/defaults/`). The intended way to change a parameter is through a configuration patch. Parameters that are specified in such a patch can extend **and overwrite** the defaults.
 
-Regardless of whether a parameter was specified in the defaults or through a patch, all accessed parameters are exported at the end of an experiment. This allows to use the exported configuration as a patch for a new experiment, which ensures that the experiment is run with the exact set of parameters and therefore makes it reproducible. When using an exported parameter set of a previous experiment, no default parameters are loaded.
+Regardless of whether a parameter was specified in the defaults or through a patch, all accessed parameters are exported at the end of an experiment. This allows to use the exported configuration as a patch for a new experiment, which ensures that the experiment is run with the same random seed and set of parameters and therefore makes it reproducible.
+
+Note that it is unreasonable to expect the exact same results because they depend on many aspects we cannot control, e.g., the current memory layout of the underlying system.
 
 ## Running ESP OMPL TOOLS
 
 ### Testing the installation
 
-You can test your installation with the following commands. The first one runs a quick benchmark:
+You can test your installation by running two demos. The first one runs a quick benchmark:
 
 ```bash
 cd /path/to/esp_ompl_tools/build
-./bin/benchmark -c bin/parameters/executables/benchmark.json
+./bin/benchmark -c ../parameters/demo/benchmark_demo.json
 ```
 
-The above command has created the `build/benchmarks/<date-string>_<context-name>` directory and placed a `config.json` file, a `results.csv` file, and a `log.txt` file into it. You can generate a report by running:
-
-```bash
-./bin/benchmark_report -c benchmarks/<date-string>_<context-name>/config.json
-```
+The above command has created the `build/benchmarks/<date-string>_<context-name>` directory and placed a couple of files in it, including a report that summarizes the results of the benchmark.
 
 To test the visualization, you can run:
 
 ```bash
-./bin/visualization -c bin/parameters/executables/visualization.json
+./bin/visualization -c ../parameters/demo/visualization_demo.json
 ```
 
 Feel free to play around by substitution different contexts/planners into these `.json` files. Available options can be taken from the default config files in `esp_ompl_tools/parameters/defaults/`. The recommended way to change a default parameter is to **override** it by placing a parameter with the same name in the configuration provided with the `-c` option.
 
 ### Benchmark
 
-The tools include an executable called `benchmark`. This executable should be invoked as `benchmark -c path/to/benchmark.json`, where `path/to/benchmark.json` points to a configuration patch. The configuration patch has to specify a family of `"Experiment"` parameters, such as the planners, the planning context, and the number of runs per planner. You can find an example of a suitable configuration patch at `esp_ompl_tools/parameters/executables/benchmark.json`. Notice that you can specify two planners of the same type but different configurations by giving them different names.
+The tools include an executable called `benchmark`. This executable should be invoked as `benchmark -c path/to/benchmark.json`, where `path/to/benchmark.json` points to a configuration patch. The configuration patch has to specify a family of `"Experiment"` parameters, such as the planners, the planning context, and the number of runs per planner. You can find an example of a suitable configuration patch at `esp_ompl_tools/parameters/demos/benchmark_demo.json`. Notice that you can specify two planners of the same type but different configurations by giving them different names.
 
-All experiments get their own folders in `benchmarks/`. The naming convention for the folders is `<date-string>_<context-name>`. The corresponding folder contains three files when the experiment is finished:
+All experiments get their own folders in `benchmarks/`. The naming convention for the folders is `<date-string>_<context-name>`. The corresponding folder contains various files when the experiment is finished. The most important are
 - `config.json`: All accessed parameters for this experiment;
 - `results.csv`: The raw data of the experiment;
-- `log.txt`: Some additional information that is not required to reproduce the results of the experiment.
-
-### Benchmark report
-
-The `benchmark_report` generates a LaTeX document that presents some statistics and plots of an experiment. It should be invoked as `benchmark_report -c path/to/benchmarks/<date-string>_<context-name>/config.json`.
+- `report.pdf`: A summary of the results of the experiment.
 
 ### Visualization
 
 At ESP we design new planning algorithms. To facilitate this, it is often helpful to visualize process of planning and not just the result. The executable `visualization` does exactly this. It is again invoked with a configuration patch, which specifies which planner and which context is to be visualized. You can invoke it as `visualization -c path/to/visualization.json`.
 
-**Important implementation detail**: The `maxTime` parameter of all planning contexts is ignored and a planner is allowed to run indefinitely when visualized. The current implementation tries to buffer 5000 iterations ahead of the currently visualized iteration. It does not perform any checks on available memory.
+Implementation detail: The `maxTime` parameter of all planning contexts is ignored and a planner is allowed to run indefinitely when visualized. The current implementation tries to buffer iterations ahead of the currently visualized iteration. **It does not perform any checks on available memory, so keep your available memory in sight as your system might freeze.**
 
 The visualization is interactive. These are the five keys that are currently bound to some action:
 
@@ -154,6 +128,8 @@ The visualization is interactive. These are the five keys that are currently bou
 - ' ': Toggle tracking
 
 When tracking is on, the most recently computed iteration is visualized.
+
+# Miscellaneous
 
 ## Why OMPL?
 
@@ -204,3 +180,17 @@ sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regressi
 cd src
 sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regression|g' -e 's|BITstar|BITstarRegression|g' *.cpp
 ```
+
+## Features
+
+- [x] Reproducible experiments
+- [x] Automatic report generation
+- [x] Interactive visualization of planner progress
+- [x] Videos of planner progress
+- [x] Easy to define experiments (obstacles and antiobstacles)
+- [x] Statistical analysis
+- [ ] Automatic stopping based on p-values
+- [ ] Guidance on number of runs
+- [ ] Reporting of p-values
+- [ ] Large automated runs
+- [ ] Physically founded generated experiments (remove bespoke problems from literature)
