@@ -68,6 +68,9 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     case PLANNER_TYPE::BITSTARREGRESSION: {
       return planner->as<ompl::geometric::BITstarRegression>()->bestCost();
     }
+    case PLANNER_TYPE::INFORMEDRRTSTAR: {
+      return planner->as<ompl::geometric::InformedRRTstar>()->bestCost();
+    }
     case PLANNER_TYPE::RRTCONNECT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }

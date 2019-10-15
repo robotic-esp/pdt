@@ -117,6 +117,14 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
           config_->get<bool>(parentKey + "/stopOnSolutionImprovement"));
       return {planner, PLANNER_TYPE::BITSTARREGRESSION};
     }
+    case PLANNER_TYPE::INFORMEDRRTSTAR: {
+      auto planner =
+          std::make_shared<ompl::geometric::InformedRRTstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
+      planner->setNumSamplingAttempts(config_->get<std::size_t>(parentKey + "/numSamplingAttempts"));
+      return {planner, PLANNER_TYPE::INFORMEDRRTSTAR};
+    }
     case PLANNER_TYPE::RRTCONNECT: {
       // Allocate and configure an RRT-Connect planner.
       auto planner = std::make_shared<ompl::geometric::RRTConnect>(context_->getSpaceInformation());
