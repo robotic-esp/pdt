@@ -41,6 +41,11 @@
             "dropSamplesOnPrune": false,
             "stopOnSolutionImprovement": false
         },
+        "InformedRRTstar": {
+            "type": "InformedRRTstar",
+            "rewireFactor": 1.001,
+            "numSamplingAttempts": 1
+        },
         "RRTConnect": {
             "type": "RRTConnect",
             "useKNearest": false,
