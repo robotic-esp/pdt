@@ -170,7 +170,7 @@ std::string PgfAxis::string() const {
     stream << ",\n  ymax=" << options.ymax;
   }
   if (options.enlargeYLimits != "false"s) {
-    stream << ",\n  enlarge y limits=" << options.enlargeXLimits;
+    stream << ",\n  enlarge y limits=" << options.enlargeYLimits;
   }
   if (options.xbarInterval) {
     stream << ",\n  xbar interval";
