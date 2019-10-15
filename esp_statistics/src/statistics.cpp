@@ -585,6 +585,9 @@ fs::path Statistics::extractInitialSolutionDurationPdf(
     // std::lower_bound returns an iterator to the first element that is greater or equal to, or
     // end.
     auto lower = std::lower_bound(bins.begin(), bins.end(), duration);
+    if (lower == bins.end()) {
+      continue;
+    }
     if (lower != bins.begin()) {
       --lower;
     }
