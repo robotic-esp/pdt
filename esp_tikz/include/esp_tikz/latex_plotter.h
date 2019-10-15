@@ -53,10 +53,15 @@ class LatexPlotter {
   // Create the legend axis.
   std::shared_ptr<PgfAxis> createLegendAxis(const std::vector<std::string>& plannerNames) const;
 
-  // Align multiple axes.
+  // Align multiple axes' abszissen.
   template <typename... Axes>
-  void align(Axes... args) const;
-  void align(const std::vector<std::shared_ptr<PgfAxis>>& axes) const;
+  void alignAbszissen(Axes... args) const;
+  void alignAbszissen(const std::vector<std::shared_ptr<PgfAxis>>& axes) const;
+
+  // Align multiple axes' ordinates.
+  template <typename... Axes>
+  void alignOrdinates(Axes... args) const;
+  void alignOrdinates(const std::vector<std::shared_ptr<PgfAxis>>& axes) const;
 
   // Stack multiple axes.
   template <typename... Axes>
@@ -83,13 +88,23 @@ class LatexPlotter {
 };
 
 template <typename... Axes>
-void LatexPlotter::align(Axes... args) const {
+void LatexPlotter::alignAbszissen(Axes... args) const {
   // Collect the axes in a vector
   std::vector<std::shared_ptr<PgfAxis>> axes{};
   (axes.push_back(args), ...);
 
   // Align all axes.
-  align(axes);
+  alignAbszissen(axes);
+}
+
+template <typename... Axes>
+void LatexPlotter::alignOrdinates(Axes... args) const {
+  // Collect the axes in a vector
+  std::vector<std::shared_ptr<PgfAxis>> axes{};
+  (axes.push_back(args), ...);
+
+  // Align all axes.
+  alignOrdinates(axes);
 }
 
 template <typename... Axes>

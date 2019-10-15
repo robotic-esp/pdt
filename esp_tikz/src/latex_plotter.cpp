@@ -67,12 +67,22 @@ std::shared_ptr<PgfAxis> LatexPlotter::createLegendAxis(
   return legend;
 }
 
-void LatexPlotter::align(const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
+void LatexPlotter::alignAbszissen(const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
   // Align all pairs.
   for (auto a : axes) {
     for (auto b : axes) {
       a->expandRangeOfAbszisse(*b);
       b->expandRangeOfAbszisse(*a);
+    }
+  }
+}
+
+void LatexPlotter::alignOrdinates(const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
+  // Align all pairs.
+  for (auto a : axes) {
+    for (auto b : axes) {
+      a->expandRangeOfOrdinate(*b);
+      b->expandRangeOfOrdinate(*a);
     }
   }
 }
