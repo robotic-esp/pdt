@@ -144,6 +144,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setKNearest(config_->get<bool>(parentKey + "/useKNearest"));
       planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
       planner->setGoalBias(config_->get<double>(parentKey + "/goalBias"));
+      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
       planner->setSampleRejection(config_->get<bool>(parentKey + "/enableSampleRejection"));
       planner->setVariant(config_->get<std::size_t>(parentKey + "/variant"));
       planner->setInformedSampling(false);
@@ -157,6 +158,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setName(plannerName);
       planner->setKNearest(config_->get<bool>(parentKey + "/useKNearest"));
       planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
+      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
       planner->setGoalBias(config_->get<double>(parentKey + "/goalBias"));
       planner->setDelayCC(config_->get<bool>(parentKey + "/delayCollisionChecks"));
       planner->setTreePruning(false);
