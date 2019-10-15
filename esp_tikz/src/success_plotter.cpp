@@ -53,7 +53,7 @@ SuccessPlotter::SuccessPlotter(const std::shared_ptr<const Configuration>& confi
     LatexPlotter(config),
     stats_(stats) {
   // Determine the min and max durations to be plotted.
-  maxDurationToBePlotted_ = stats_.getMaxNonInfInitialSolutionDuration();
+  maxDurationToBePlotted_ = config_->get<double>("Contexts/"s + config_->get<std::string>("Experiment/context") + "/maxTime");
   minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 

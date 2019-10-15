@@ -158,9 +158,8 @@ std::stringstream ExperimentReport::preamble() const {
   preamble
       << "\\immediate\\write18{mkdir -p tikz-externalized}\n"
       << "\\tikzexternalize[prefix=tikz-externalized/]\n"
-      << "\\tikzset{external/system call/.add={}{; convert -density 150 -flatten \"\\image.pdf\" "
-         "\"\\image-150.png\"; convert -density 300 -flatten \"\\image.pdf\" \"\\image-300.png\"; "
-         "convert -density 600 -flatten \"\\image.pdf\" \"\\image-600.png\"}}\n";
+      << "\\tikzset{external/system call/.add={}{; convert -density 600 -flatten \"\\image.pdf\" "
+         "\"\\image-600.png\"}}\n";
 
   // Now we load the used pgf libraries.
   preamble << "% This report uses the following PGFPlots libraries:\n";
@@ -268,7 +267,7 @@ std::stringstream ExperimentReport::overview() const {
   medianCostEvolutionAxis->mergePlots(medianInitialSolutionAxis);
 
   // Align the success and median cost evolution axes.
-  latexPlotter_.align(successAxis, medianCostEvolutionAxis);
+  latexPlotter_.alignAbszissen(successAxis, medianCostEvolutionAxis);
 
   // Create the legend axis.
   auto legend =
@@ -295,7 +294,8 @@ std::stringstream ExperimentReport::overview() const {
     initialSolutionDurationPdfAxes.emplace_back(
         initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name));
   }
-  latexPlotter_.align(initialSolutionDurationPdfAxes);
+  latexPlotter_.alignAbszissen(initialSolutionDurationPdfAxes);
+  latexPlotter_.alignOrdinates(initialSolutionDurationPdfAxes);
   initialSolutionDurationPdfAxes.push_back(legend);
   latexPlotter_.stack(initialSolutionDurationPdfAxes);
 
@@ -324,7 +324,7 @@ std::stringstream ExperimentReport::individualResults() const {
     // Overlay the pdf with the cdf for the first initial durations plot.
     auto cdf = successPlotter_.createSuccessAxis(name);
     cdf->options.xmin = stats_.getMinInitialSolutionDuration(name);
-    cdf->options.xmax = stats_.getMaxNonInfInitialSolutionDuration(name);
+    cdf->options.xmax = config_->get<double>("Contexts/"s + config_->get<std::string>("Experiment/context") + "/maxTime");
     auto pdf = initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name);
     pdf->overlay(cdf.get());
     for (const auto& plot : pdf->getPlots()) {
@@ -351,9 +351,9 @@ std::stringstream ExperimentReport::individualResults() const {
 
     // Enlarge all x axis limits such that the earliest and latest initial solutions aren't glued to
     // the axis box.
-    pdf->options.enlargeXLimits = "true";
-    cdf->options.enlargeXLimits = "true";
-    scatter->options.enlargeXLimits = "true";
+    pdf->options.enlargeXLimits = "lower";
+    cdf->options.enlargeXLimits = "lower";
+    scatter->options.enlargeXLimits = "lower";
 
     // Create a picture out of the three initial solution axes.
     results << "\\begin{center}\n\\input{"
