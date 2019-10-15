@@ -62,32 +62,33 @@ InitialSolutionDurationPdfPlotter::InitialSolutionDurationPdfPlotter(
 
 std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfAxis()
     const {
-  auto axis = std::make_shared<PgfAxis>();
-  setInitialSolutionDurationPdfAxisOptions(axis);
+  axis_ = std::make_shared<PgfAxis>();
+  setInitialSolutionDurationPdfAxisOptions(axis_);
 
   for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
     auto plot = createInitialSolutionDurationPdfPlot(name);
     plot->options.fillOpacity = config_->get<double>("InitialSolutionPlots/combinedFillOpacity");
     plot->options.lineWidth = config_->get<double>("InitialSolutionPlots/lineWidth");
-    axis->addPlot(plot);
+    axis_->addPlot(plot);
   }
 
-  return axis;
+  return axis_;
 }
 
 std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfAxis(
     const std::string& plannerName) const {
-  auto axis = std::make_shared<PgfAxis>();
-  setInitialSolutionDurationPdfAxisOptions(axis);
-  axis->options.name = plannerName + "InitialSolutionDurationPdfAxis"s;
-  axis->addPlot(createInitialSolutionDurationPdfPlot(plannerName));
-  return axis;
+  axis_ = std::make_shared<PgfAxis>();
+  setInitialSolutionDurationPdfAxisOptions(axis_);
+  axis_->options.name = plannerName + "InitialSolutionDurationPdfAxis"s;
+  axis_->addPlot(createInitialSolutionDurationPdfPlot(plannerName));
+  return axis_;
 }
 
 fs::path InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  picture.addAxis(createInitialSolutionDurationPdfAxis());
+  axis_ = createInitialSolutionDurationPdfAxis();
+  picture.addAxis(axis_);
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
@@ -100,7 +101,8 @@ fs::path InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPict
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  picture.addAxis(createInitialSolutionDurationPdfAxis(plannerName));
+  axis_ = createInitialSolutionDurationPdfAxis(plannerName);
+  picture.addAxis(axis_);
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
@@ -124,6 +126,11 @@ std::shared_ptr<PgfPlot> InitialSolutionDurationPdfPlotter::createInitialSolutio
   table->prependRow({firstRow.at(0u), 0.0});
   table->appendRow({lastRow.at(0u), 0.0});
 
+  // This is a bit of a hack, but I don't see an elegant way of doing this given the class architecture.
+  if (!std::isfinite(axis_->options.ymax) || axis_->options.ymax < table->getMaxValueInCol(1u)) {
+    axis_->options.ymax = table->getMaxValueInCol(1u);
+  }
+
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
@@ -142,6 +149,7 @@ void InitialSolutionDurationPdfPlotter::setInitialSolutionDurationPdfAxisOptions
   axis->options.name = "InitialSolutionDurationPdfAxis"s;
   axis->options.xlog = config_->get<bool>("InitialSolutionPlots/xlog");
   axis->options.ymin = 0.0;
+  axis->options.enlargeYLimits = "upper";
   axis->options.xminorgrids = config_->get<bool>("InitialSolutionPlots/xminorgrids");
   axis->options.xmajorgrids = config_->get<bool>("InitialSolutionPlots/xmajorgrids");
   axis->options.yminorgrids = config_->get<bool>("InitialSolutionPlots/yminorgrids");

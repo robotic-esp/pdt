@@ -37,6 +37,7 @@
 #pragma once
 
 #include <experimental/filesystem>
+#include <limits>
 #include <memory>
 #include <string>
 
@@ -74,6 +75,7 @@ class InitialSolutionDurationPdfPlotter : public LatexPlotter {
 
   void setInitialSolutionDurationPdfAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
+  mutable std::shared_ptr<PgfAxis> axis_;
   const Statistics& stats_;
 };
 
