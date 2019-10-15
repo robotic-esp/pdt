@@ -79,6 +79,14 @@ class PgfTable : public PlottableInterface {
   std::size_t getNumRows() const;
   std::vector<double> getRow(std::size_t index) const;
 
+  // Get min/max values.
+  double getMaxValue() const;
+  double getMinValue() const;
+  double getMaxValueInRow(std::size_t index) const;
+  double getMinValueInRow(std::size_t index) const;
+  double getMaxValueInCol(std::size_t index) const;
+  double getMinValueInCol(std::size_t index) const;
+
   // Add a col. (Deprecated?)
   void addColumn(const std::deque<double>& column);
 

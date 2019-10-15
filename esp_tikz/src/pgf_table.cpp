@@ -229,6 +229,72 @@ std::vector<double> PgfTable::getRow(std::size_t index) const {
   return row;
 }
 
+double PgfTable::getMaxValue() const {
+  double max = std::numeric_limits<double>::lowest();
+  for (const auto col : data_) {
+    for (const auto value : col) {
+      if (value > max) {
+        max = value;
+      }
+    }
+  }
+  return max;
+}
+
+double PgfTable::getMinValue() const {
+  double min = std::numeric_limits<double>::max();
+  for (const auto col : data_) {
+    for (const auto value : col) {
+      if (value < min) {
+        min = value;
+      }
+    }
+  }
+  return min;
+}
+
+double PgfTable::getMaxValueInRow(std::size_t index) const {
+  auto row = getRow(index);
+  double max = std::numeric_limits<double>::lowest();
+  for (const auto value : row) {
+    if (value > max) {
+      max = value;
+    }
+  }
+  return max;
+}
+
+double PgfTable::getMinValueInRow(std::size_t index) const {
+  auto row = getRow(index);
+  double min = std::numeric_limits<double>::max();
+  for (const auto value : row) {
+    if (value < min) {
+      min = value;
+    }
+  }
+  return min;
+}
+
+double PgfTable::getMaxValueInCol(std::size_t index) const {
+  double max = std::numeric_limits<double>::lowest();
+  for (const auto value : data_.at(index)) {
+    if (value > max) {
+      max = value;
+    }
+  }
+  return max;
+}
+
+double PgfTable::getMinValueInCol(std::size_t index) const {
+  double min = std::numeric_limits<double>::max();
+  for (const auto value : data_.at(index)) {
+    if (value < min) {
+      min = value;
+    }
+  }
+  return min;
+}
+
 std::string PgfTable::string() const {
   // Perform some sanity checks.
   if (data_.size() < 2) {
