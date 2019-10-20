@@ -38,7 +38,10 @@
 
 #include <algorithm>
 
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
+
+#include "esp_common/objective_type.h"
 
 namespace esp {
 
@@ -52,6 +55,24 @@ BaseContext::BaseContext(const std::shared_ptr<const Configuration>& config,
             {-0.5 * config->get<double>("Contexts/" + name + "/boundarySideLengths"),
              0.5 * config->get<double>("Contexts/" + name + "/boundarySideLengths")}),
     targetDuration_(time::seconds(config->get<double>("Contexts/" + name + "/maxTime"))) {
+  // Get the optimization objective.
+  switch (config->get<OBJECTIVE_TYPE>("Contexts/" + name_ + "/objective")) {
+    case OBJECTIVE_TYPE::COSTMAP: {
+      throw std::runtime_error("CostMap objective is not yet implemented.");
+      break;
+    }
+    case OBJECTIVE_TYPE::PATHLENGTH: {
+      optimizationObjective_ =
+          std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
+      break;
+    }
+    case OBJECTIVE_TYPE::POTENTIALFIELD: {
+      throw std::runtime_error("PotentialField objective is not yet implemented.");
+      break;
+    }
+    default:
+      throw std::runtime_error("Unknown optimization objective.");
+  }
 }
 
 ompl::base::SpaceInformationPtr BaseContext::getSpaceInformation() const {
@@ -65,7 +86,7 @@ ompl::base::StateSpacePtr BaseContext::getStateSpace() const {
 ompl::base::ProblemDefinitionPtr BaseContext::newProblemDefinition() const {
   auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
 
-  // Store the optimization objective.
+  // Set the objective.
   problemDefinition->setOptimizationObjective(optimizationObjective_);
 
   // Set the goal and add start states.
@@ -163,27 +184,27 @@ void BaseContext::print(const bool verbose /* == false */) const {
   }
 }
 
-  void BaseContext::addStartState(const std::vector<double>& coordinates) {
-    if (coordinates.size() != dimensionality_) {
-      OMPL_ERROR("%s: Requested to add start state of wrong dimensionality.", name_.c_str());
-      throw std::runtime_error("Context error.");
-    }
-    startStates_.emplace_back(ompl::base::ScopedState<>(spaceInfo_));
-    for (std::size_t i = 0u; i < dimensionality_; ++i) {
-      startStates_.back()[i] = coordinates[i];
-    }
+void BaseContext::addStartState(const std::vector<double>& coordinates) {
+  if (coordinates.size() != dimensionality_) {
+    OMPL_ERROR("%s: Requested to add start state of wrong dimensionality.", name_.c_str());
+    throw std::runtime_error("Context error.");
   }
+  startStates_.emplace_back(ompl::base::ScopedState<>(spaceInfo_));
+  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+    startStates_.back()[i] = coordinates[i];
+  }
+}
 
-  void BaseContext::addGoalState(const std::vector<double>& coordinates) {
-    if (coordinates.size() != dimensionality_) {
-      OMPL_ERROR("%s: Requested to add goal state of wrong dimensionality.", name_.c_str());
-      throw std::runtime_error("Context error.");
-    }
-    goalStates_.emplace_back(ompl::base::ScopedState<>(spaceInfo_));
-    for (std::size_t i = 0u; i < dimensionality_; ++i) {
-      goalStates_.back()[i] = coordinates[i];
-    }
+void BaseContext::addGoalState(const std::vector<double>& coordinates) {
+  if (coordinates.size() != dimensionality_) {
+    OMPL_ERROR("%s: Requested to add goal state of wrong dimensionality.", name_.c_str());
+    throw std::runtime_error("Context error.");
   }
+  goalStates_.emplace_back(ompl::base::ScopedState<>(spaceInfo_));
+  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+    goalStates_.back()[i] = coordinates[i];
+  }
+}
 
 }  // namespace ompltools
 
