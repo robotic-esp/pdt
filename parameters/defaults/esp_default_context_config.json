@@ -2,6 +2,7 @@
     "Contexts": {
         "CentreSquare": {
             "type": "CentreSquare",
+            "objective": "PathLength",
             "start": [0.0, 0.0],
             "goal": [0.4, 0.4],
             "maxTime": 1,
@@ -12,6 +13,7 @@
         },
         "DividingWalls": {
             "type": "DividingWalls",
+            "objective": "PathLength",
             "start": [-0.45, 0.0],
             "goal": [0.45, 0.0],
             "maxTime": 1,
@@ -25,6 +27,7 @@
         },
         "DoubleEnclosure": {
             "type": "DoubleEnclosure",
+            "objective": "PathLength",
             "start": [-0.2, 0.0],
             "goal": [0.2, 0.0],
             "maxTime": 1,
@@ -40,6 +43,7 @@
         },
         "FlankingGap": {
             "type": "FlankingGap",
+            "objective": "PathLength",
             "start": [-0.2, 0.0],
             "goal": [0.2, 0.0],
             "maxTime": 1,
@@ -53,6 +57,7 @@
         },
         "FourRooms": {
             "type": "FourRooms",
+            "objective": "PathLength",
             "start": [0.25, -0.25],
             "goal": [0.25, 0.25],
             "maxTime": 1,
@@ -64,6 +69,7 @@
         },
         "GoalEnclosure": {
             "type": "GoalEnclosure",
+            "objective": "PathLength",
             "start": [-0.2, 0.0],
             "goal": [0.2, 0.0],
             "maxTime": 1,
@@ -76,6 +82,7 @@
         },
         "MultiStartGoal": {
             "type": "MultiStartGoal",
+            "objective": "PathLength",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 1,
@@ -88,6 +95,7 @@
         },
         "ObstacleFree": {
             "type": "ObstacleFree",
+            "objective": "PathLength",
             "start": [-0.2, 0.0],
             "goal": [0.2, 0.0],
             "maxTime": 1,
@@ -97,6 +105,7 @@
         },
         "RandomRectangles": {
             "type": "RandomRectangles",
+            "objective": "PathLength",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 1,
@@ -109,6 +118,7 @@
         },
         "RepeatingRectangles": {
             "type": "RepeatingRectangles",
+            "objective": "PathLength",
             "maxTime": 1,
             "dimensions": 2,
             "boundarySideLengths" : 1,
@@ -120,6 +130,7 @@
         },
         "StartEnclosure": {
             "type": "StartEnclosure",
+            "objective": "PathLength",
             "start": [-0.2, 0.0],
             "goal": [0.2, 0.0],
             "maxTime": 1,
@@ -132,6 +143,7 @@
         },
         "WallGap": {
             "type": "WallGap",
+            "objective": "PathLength",
             "start": [-0.2, 0.0],
             "goal": [0.2, 0.0],
             "maxTime": 1,
