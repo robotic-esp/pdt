@@ -140,7 +140,7 @@ T Configuration::get(const std::string& key, const json::json& parameters,
       registerAccess<T>(path + key, parameters[key].get<T>(), &accessedParameters_);
       return parameters[key].get<T>();
     } else {
-      auto msg = "Requested nonexisting parameter '"s + key + "'."s;
+      auto msg = "Requested nonexisting parameter '"s + path + key + "'."s;
       throw std::invalid_argument(msg);
     }
   } else {
@@ -149,7 +149,7 @@ T Configuration::get(const std::string& key, const json::json& parameters,
       auto nestedParameters = parameters[ns];
       return get<T>(rest, nestedParameters, path + ns + "/");
     } else {
-      auto msg = "Requested nonexisting parameter '"s + key + "'."s;
+      auto msg = "Requested nonexisting parameter '"s + path + key + "'."s;
       throw std::invalid_argument(msg);
     }
   }
