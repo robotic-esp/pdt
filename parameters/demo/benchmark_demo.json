@@ -20,6 +20,7 @@
     },
     "Contexts": {
         "WallGap": {
+            "objective": "PathLength",
             "type": "WallGap",
             "start": [-0.3, 0.0],
             "goal": [0.3, 0.0],

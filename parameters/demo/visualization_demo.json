@@ -21,6 +21,7 @@
         },
         "WallGap3D": {
             "type": "WallGap",
+            "objective": "PathLength",
             "start": [-0.75, 0.0, 0.0],
             "goal": [0.75, 0.0, 0.0],
             "maxTime": 0.1,

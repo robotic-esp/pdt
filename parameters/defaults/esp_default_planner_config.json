@@ -5,7 +5,7 @@
             "useKNearest": false,
             "rewireFactor": 1.001,
             "samplesPerBatch": 100,
-            "enablePruning": false,
+            "enablePruning": true,
             "pruningThreshold": 0.1,
             "useJustInTimeSampling": false,
             "dropSamplesOnPrune": false,
@@ -32,7 +32,7 @@
         },
         "BITstarRegression": {
             "type": "BITstarRegression",
-            "useKNearest": false,
+            "useKNearest": true,
             "rewireFactor": 1.001,
             "samplesPerBatch": 100,
             "enablePruning": false,
