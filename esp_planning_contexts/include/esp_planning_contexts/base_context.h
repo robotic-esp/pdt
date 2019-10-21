@@ -146,7 +146,7 @@ class BaseContext {
   /** \brief The space information for the experiment */
   ompl::base::SpaceInformationPtr spaceInfo_{};
   /** \brief The optimization objective */
-  ompl::base::OptimizationObjectivePtr optimizationObjective_{};
+  mutable ompl::base::OptimizationObjectivePtr optimizationObjective_{};
   /** \brief The runtime for the experiment */
   time::Duration targetDuration_{};
   /** \brief The start states */
@@ -159,6 +159,9 @@ class BaseContext {
   std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
   /** \brief The goal as a pointer*/
   ompl::base::GoalPtr goalPtr_{};
+
+  /** \brief The configuration. */
+  const std::shared_ptr<const Configuration> config_;
 };
 
 using BaseContextPtr = std::shared_ptr<BaseContext>;

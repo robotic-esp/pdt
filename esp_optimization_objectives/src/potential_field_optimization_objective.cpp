@@ -38,15 +38,79 @@
 
 #include <memory>
 
+#include <ompl/base/spaces/RealVectorStateSpace.h>
+
 namespace esp {
 
 namespace ompltools {
 
 PotentialFieldOptimizationObjective::PotentialFieldOptimizationObjective(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-    const std::shared_ptr<Configuration> config) :
-    ompl::base::OptimizationObjective(spaceInfo),
-    config_(config) {
+    const std::shared_ptr<const Configuration> config) :
+    ompl::base::StateCostIntegralObjective(spaceInfo, true),
+    config_(config),
+    spaceInfo_(spaceInfo) {
+  // Make sure this is the expexted state space type.
+  if (spaceInfo_->getStateSpace()->getType() !=
+      ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
+    throw std::runtime_error(
+        "Potential Field Optimization Objective only implemented for real vector state spaces.");
+  }
+
+  // Optimization objectives have descriptions. (...)
+  description_ = "Potential Field";
+
+  // Load the point sources as specified in the config.
+  for (const auto point :
+       config_->get<std::vector<std::vector<double>>>("Objectives/PotentialField/sources")) {
+    // allocate a state for each point source.
+    pointSources_.emplace_back(spaceInfo_->allocState());
+
+    // Ensure the point source has the correct dimension.
+    if (point.size() != spaceInfo_->getStateDimension()) {
+      std::cout << "point.size(): " << point.size() << ", dimensions: " << spaceInfo_->getStateDimension() << '\n';
+      throw std::runtime_error("Source in potential field objective has wrong dimensionality.");
+    }
+
+    // Fill the state with the values from the config.
+    for (std::size_t i = 0u; i < point.size(); ++i) {
+      pointSources_.back()->as<ompl::base::RealVectorStateSpace::StateType>()->values[i] = point[i];
+    }
+  }
+
+  // Set the default cost-to-go heuristic.
+  setCostToGoHeuristic(ompl::base::goalRegionCostToGo);
+}
+
+PotentialFieldOptimizationObjective::~PotentialFieldOptimizationObjective() {
+  // Free the point sources that were allocated in the constructor.
+  for (auto source : pointSources_) {
+    spaceInfo_->freeState(source);
+  }
+}
+
+ompl::base::Cost PotentialFieldOptimizationObjective::stateCost(
+    const ompl::base::State* state) const {
+  // Sum up all cost of all sources, inversely proportional to the squared distance, capped at 1000.
+  ompl::base::Cost totalCost = identityCost();
+  for (const auto source : pointSources_) {
+    totalCost = combineCosts(
+        totalCost, ompl::base::Cost(
+                       std::min(1.0 / std::pow(spaceInfo_->distance(source, state), 2.0), 1000.0)));
+  }
+  return totalCost;
+}
+
+ompl::base::Cost PotentialFieldOptimizationObjective::motionCostHeuristic(
+    const ompl::base::State* /* state1 */, const ompl::base::State* /* state2 */) const {
+  // double resolution = spaceInfo_->getStateValidityCheckingResolution();
+  // return combineCosts(ompl::base::Cost(stateCost(state1).value() * resolution),
+  //                     ompl::base::Cost(stateCost(state2).value() * resolution));
+  return identityCost();
+}
+
+void PotentialFieldOptimizationObjective::accept(const ObjectiveVisitor& visitor) const {
+  visitor.visit(*this);
 }
 
 }  // namespace ompltools

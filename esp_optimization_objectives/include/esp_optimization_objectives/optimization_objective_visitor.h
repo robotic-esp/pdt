@@ -36,38 +36,26 @@
 
 #pragma once
 
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/State.h>
-#include <ompl/base/objectives/StateCostIntegralObjective.h>
-
-#include "esp_configuration/configuration.h"
-#include "esp_optimization_objectives/base_optimization_objective.h"
-#include "esp_optimization_objectives/optimization_objective_visitor.h"
-
 namespace esp {
 
 namespace ompltools {
 
-// Obstacles are geometric primitives.
-class PotentialFieldOptimizationObjective : public ompl::base::StateCostIntegralObjective,
-                                            public BaseOptimizationObjective {
+// Forward declarations.
+class PotentialFieldOptimizationObjective;
+
+class ObjectiveVisitor {
  public:
-  PotentialFieldOptimizationObjective(
-      const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-      const std::shared_ptr<const Configuration> config);
-  virtual ~PotentialFieldOptimizationObjective();
+  ObjectiveVisitor() = default;
+  virtual ~ObjectiveVisitor() = default;
 
-  ompl::base::Cost stateCost(const ompl::base::State* state) const override;
+  // Any objective visitor must implement its actions on all objectives.
+  virtual void visit(const PotentialFieldOptimizationObjective& objective) const = 0;
 
-  ompl::base::Cost motionCostHeuristic(const ompl::base::State* state1,
-                                       const ompl::base::State* state2) const override;
-
-  void accept(const ObjectiveVisitor& visitor) const override;
-
- private:
-  const std::shared_ptr<const Configuration> config_;
-  std::vector<ompl::base::State*> pointSources_;
-  const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
+  // This is only needed until all objectives are implemented.
+  template <typename O>
+  void visit(const O& /* objective */) const {
+    OMPL_WARN("Objective visitor visits unknown objective.");
+  }
 };
 
 }  // namespace ompltools

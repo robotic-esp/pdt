@@ -33,6 +33,7 @@ target_link_libraries(esp_planning_contexts
   esp_common
   esp_configuration
   esp_obstacles
+  esp_optimization_objectives
   esp_time)
 
 # Specify the include directories exported by this library.

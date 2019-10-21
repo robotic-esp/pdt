@@ -42,6 +42,7 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
 #include "esp_common/objective_type.h"
+#include "esp_optimization_objectives/potential_field_optimization_objective.h"
 
 namespace esp {
 
@@ -54,25 +55,8 @@ BaseContext::BaseContext(const std::shared_ptr<const Configuration>& config,
     bounds_(dimensionality_,
             {-0.5 * config->get<double>("Contexts/" + name + "/boundarySideLengths"),
              0.5 * config->get<double>("Contexts/" + name + "/boundarySideLengths")}),
-    targetDuration_(time::seconds(config->get<double>("Contexts/" + name + "/maxTime"))) {
-  // Get the optimization objective.
-  switch (config->get<OBJECTIVE_TYPE>("Contexts/" + name_ + "/objective")) {
-    case OBJECTIVE_TYPE::COSTMAP: {
-      throw std::runtime_error("CostMap objective is not yet implemented.");
-      break;
-    }
-    case OBJECTIVE_TYPE::PATHLENGTH: {
-      optimizationObjective_ =
-          std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
-      break;
-    }
-    case OBJECTIVE_TYPE::POTENTIALFIELD: {
-      throw std::runtime_error("PotentialField objective is not yet implemented.");
-      break;
-    }
-    default:
-      throw std::runtime_error("Unknown optimization objective.");
-  }
+    targetDuration_(time::seconds(config->get<double>("Contexts/" + name + "/maxTime"))),
+    config_(config) {
 }
 
 ompl::base::SpaceInformationPtr BaseContext::getSpaceInformation() const {
@@ -85,6 +69,26 @@ ompl::base::StateSpacePtr BaseContext::getStateSpace() const {
 
 ompl::base::ProblemDefinitionPtr BaseContext::newProblemDefinition() const {
   auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+
+  // Get the optimization objective.
+  switch (config_->get<OBJECTIVE_TYPE>("Contexts/" + name_ + "/objective")) {
+    case OBJECTIVE_TYPE::COSTMAP: {
+      throw std::runtime_error("CostMap objective is not yet implemented.");
+      break;
+    }
+    case OBJECTIVE_TYPE::PATHLENGTH: {
+      optimizationObjective_ =
+          std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
+      break;
+    }
+    case OBJECTIVE_TYPE::POTENTIALFIELD: {
+      optimizationObjective_ =
+          std::make_shared<PotentialFieldOptimizationObjective>(spaceInfo_, config_);
+      break;
+    }
+    default:
+      throw std::runtime_error("Unknown optimization objective.");
+  }
 
   // Set the objective.
   problemDefinition->setOptimizationObjective(optimizationObjective_);

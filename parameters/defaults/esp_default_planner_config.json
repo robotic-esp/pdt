@@ -24,7 +24,7 @@
             "useKNearest": false,
             "rewireFactor": 1.001,
             "samplesPerBatch": 100,
-            "enablePruning": false,
+            "enablePruning": true,
             "pruningThreshold": 0.1,
             "useJustInTimeSampling": false,
             "dropSamplesOnPrune": false,

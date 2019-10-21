@@ -147,6 +147,7 @@ void InteractiveVisualizer::run() {
   // Tickboxes.
   pangolin::Var<bool> optionDrawContext(optionsName + ".Context", true, true);
   pangolin::Var<bool> optionDrawObstacles(optionsName + ".Obstacles", true, true);
+  pangolin::Var<bool> optionDrawObjective(optionsName + ".Objective", true, true);
   pangolin::Var<bool> optionDrawVertices(optionsName + ".Vertices", true, true);
   pangolin::Var<bool> optionDrawEdges(optionsName + ".Edges", true, true);
   pangolin::Var<bool> optionDrawPlannerSpecificData(optionsName + ".Planner Specific", true, true);
@@ -268,9 +269,18 @@ void InteractiveVisualizer::run() {
     // Clear the viewport.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Only draw obstacles if context is drawn.
+    // Only draw obstacles and objective if context is drawn.
     if (!optionDrawContext) {
       optionDrawObstacles = false;
+      optionDrawObjective = false;
+    }
+
+    // Draw the objective.
+    if (optionDrawObjective) {
+      if (auto objective = std::dynamic_pointer_cast<BaseOptimizationObjective>(
+              context_->getOptimizationObjective())) {
+        objective->accept(*this);
+      }
     }
 
     // Draw the obstacles.
@@ -696,6 +706,85 @@ void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) 
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
   drawRectangle(antiObstacle.getAnchorCoordinates(), antiObstacle.getWidths(), white, white);
+}
+
+void InteractiveVisualizer::visit(const PotentialFieldOptimizationObjective& objective) const {
+  if (context_->getDimensions() == 2u) {
+    // Get the widths of the context.
+    const double minX = context_->getBoundaries().at(0u).first;
+    const double maxX = context_->getBoundaries().at(0u).second;
+    const double minY = context_->getBoundaries().at(1u).first;
+    const double maxY = context_->getBoundaries().at(1u).second;
+    const double widthX = maxX - minX;
+    const double widthY = maxY - minY;
+
+    // Define the number of points per axis.
+    constexpr std::size_t numPointsPerAxis{40u};
+
+    // Compute the resulting step sizes.
+    const double stepX = widthX / (numPointsPerAxis);
+    const double stepY = widthY / (numPointsPerAxis);
+
+    // Prepare a state to probe the cost at the discretized locations.
+    auto costState =
+        context_->getStateSpace()->allocState()->as<ompl::base::RealVectorStateSpace::StateType>();
+
+    // Determine the min and max costs if not already determined.
+    if (minOptimizationCost_ == std::numeric_limits<double>::max()) {
+      for (std::size_t i = 0u; i < numPointsPerAxis; ++i) {
+        costState->operator[](0u) = minX + stepX / 2.0 + i * stepX;
+        for (std::size_t j = 0u; j < numPointsPerAxis; ++j) {
+          costState->operator[](1u) = minY + stepY / 2.0 + j * stepY;
+
+          // Compute the cost at this state.
+          auto cost = objective.stateCost(costState);
+          if (objective.isCostBetterThan(cost, ompl::base::Cost(minOptimizationCost_))) {
+            minOptimizationCost_ = cost.value();
+          }
+          if (objective.isCostBetterThan(ompl::base::Cost(maxOptimizationCost_), cost)) {
+            maxOptimizationCost_ = cost.value();
+          }
+        }
+      }
+    }
+
+    // Iterate over the grid to visualize the resulting cost.
+    for (std::size_t i = 0u; i < numPointsPerAxis; ++i) {
+      double x = minX + stepX / 2.0 + i * stepX;
+      costState->operator[](0u) = x;
+      for (std::size_t j = 0u; j < numPointsPerAxis; ++j) {
+        double y = minY + stepY / 2.0 + j * stepY;
+        costState->operator[](1u) = y;
+
+        // Compute the cost at this state.
+        auto cost = objective.stateCost(costState).value();
+
+        // Compute the color for this cost.
+        auto color = interpolateColors(
+            green, red,
+            (cost - minOptimizationCost_) / (maxOptimizationCost_ - minOptimizationCost_));
+
+        // Draw the rectangle.
+        drawRectangle2D(std::vector<double>{x, y}, std::vector<double>{stepX, stepY}, color.data(),
+                        color.data());
+      }
+    }
+
+    context_->getStateSpace()->freeState(costState);
+  } else {
+    throw std::runtime_error(
+        "PotentialFieldOptimizationObjective not yet implemented for 3D contexts.");
+  }
+}
+
+std::array<float, 4u> InteractiveVisualizer::interpolateColors(const float* color1,
+                                                               const float* color2,
+                                                               double t) const {
+  std::array<float, 4u> color;
+  for (std::size_t i = 0u; i < 4u; ++i) {
+    color[i] = color1[i] + (color2[i] - color1[i]) * std::pow(t, 0.25);
+  }
+  return color;
 }
 
 void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iteration) const {

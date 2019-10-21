@@ -38,10 +38,12 @@
 
 #include <pangolin/pangolin.h>
 
-#include "esp_configuration/configuration.h"
 #include "esp_common/context_type.h"
 #include "esp_common/planner_type.h"
+#include "esp_configuration/configuration.h"
 #include "esp_obstacles/obstacle_visitor.h"
+#include "esp_optimization_objectives/optimization_objective_visitor.h"
+#include "esp_optimization_objectives/potential_field_optimization_objective.h"
 #include "esp_planning_contexts/all_contexts.h"
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_visualization/base_visualizer.h"
@@ -51,7 +53,10 @@ namespace esp {
 
 namespace ompltools {
 
-class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, public ObstacleVisitor {
+class InteractiveVisualizer : public BaseVisualizer,
+                              public ContextVisitor,
+                              public ObstacleVisitor,
+                              public ObjectiveVisitor {
  public:
   InteractiveVisualizer(
       const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
@@ -134,6 +139,15 @@ class InteractiveVisualizer : public BaseVisualizer, public ContextVisitor, publ
   // Implement visualizations of obstacles.
   void visit(const Hyperrectangle<BaseObstacle>& obstacle) const override;
   void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;
+
+  // Implement visualizations of objectives.
+  void visit(const PotentialFieldOptimizationObjective& objective) const override;
+
+  // Objective coloring helpers.
+  mutable double minOptimizationCost_{std::numeric_limits<double>::max()};
+  mutable double maxOptimizationCost_{std::numeric_limits<double>::lowest()};
+  std::array<float, 4u> interpolateColors(const float* color1, const float* color2,
+                                          double step) const;
 
   // Helpers.
   std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>> getVerticesAndEdges2D(
