@@ -61,14 +61,18 @@ PotentialFieldOptimizationObjective::PotentialFieldOptimizationObjective(
   description_ = "Potential Field";
 
   // Load the point sources as specified in the config.
-  for (const auto point :
-       config_->get<std::vector<std::vector<double>>>("Objectives/PotentialField/sources")) {
+  for (const auto point : config_->get<std::vector<std::vector<double>>>(
+           "Objectives/" +
+           config_->get<std::string>("Contexts/" + config_->get<std::string>("Experiment/context") +
+                                     "/objective") +
+           "/sources")) {
     // allocate a state for each point source.
     pointSources_.emplace_back(spaceInfo_->allocState());
 
     // Ensure the point source has the correct dimension.
     if (point.size() != spaceInfo_->getStateDimension()) {
-      std::cout << "point.size(): " << point.size() << ", dimensions: " << spaceInfo_->getStateDimension() << '\n';
+      std::cout << "point.size(): " << point.size()
+                << ", dimensions: " << spaceInfo_->getStateDimension() << '\n';
       throw std::runtime_error("Source in potential field objective has wrong dimensionality.");
     }
 

@@ -71,7 +71,7 @@ ompl::base::ProblemDefinitionPtr BaseContext::newProblemDefinition() const {
   auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
 
   // Get the optimization objective.
-  switch (config_->get<OBJECTIVE_TYPE>("Contexts/" + name_ + "/objective")) {
+  switch (config_->get<OBJECTIVE_TYPE>("Objectives/" + config_->get<std::string>("Contexts/" + name_ + "/objective") + "/type")) {
     case OBJECTIVE_TYPE::COSTMAP: {
       throw std::runtime_error("CostMap objective is not yet implemented.");
       break;
