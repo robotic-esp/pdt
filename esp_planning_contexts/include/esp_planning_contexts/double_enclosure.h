@@ -39,7 +39,7 @@
 #include "esp_configuration/configuration.h"
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
-#include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/base_obstacle_context.h"
 #include "esp_planning_contexts/context_validity_checker.h"
 #include "esp_planning_contexts/context_visitor.h"
 
@@ -48,7 +48,7 @@ namespace esp {
 namespace ompltools {
 
 /** \brief An experiment with a singularly placed square obstacle*/
-class DoubleEnclosure : public BaseContext {
+class DoubleEnclosure : public BaseObstacleContext {
  public:
   DoubleEnclosure(const std::shared_ptr<const Configuration>& config, const std::string& name);
   virtual ~DoubleEnclosure() = default;

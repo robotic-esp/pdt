@@ -49,7 +49,7 @@ namespace ompltools {
 using namespace std::string_literals;
 
 TikzVisualizer::TikzVisualizer(
-    const std::shared_ptr<const Configuration>& config, const std::shared_ptr<BaseContext>& context,
+    const std::shared_ptr<const Configuration>& config, const std::shared_ptr<BaseObstacleContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE>& plannerPair) :
     config_(config),
     context_(context),
@@ -399,7 +399,7 @@ void TikzVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle)
                 antiObstacle.getWidths().at(1) + 1e-2, "antiObstacle", "none", "espwhite");
 }
 
-void TikzVisualizer::drawBoundary(const BaseContext& context) const {
+void TikzVisualizer::drawBoundary(const BaseObstacleContext& context) const {
   const auto boundaries = context.getBoundaries();
   double midX = (boundaries.at(0).first + boundaries.at(0).second) / 2.0;
   double midY = (boundaries.at(1).first + boundaries.at(1).second) / 2.0;
@@ -408,7 +408,7 @@ void TikzVisualizer::drawBoundary(const BaseContext& context) const {
   drawRectangle(midX, midY, widthX, widthY, "boundary", "espblack", "none");
 }
 
-void TikzVisualizer::drawStartStates(const BaseContext& context) const {
+void TikzVisualizer::drawStartStates(const BaseObstacleContext& context) const {
   std::size_t i = 0u;
   for (const auto& startState : context.getStartStates()) {
     auto start = std::make_shared<TikzNode>();
@@ -419,7 +419,7 @@ void TikzVisualizer::drawStartStates(const BaseContext& context) const {
   }
 }
 
-void TikzVisualizer::drawGoalStates(const BaseContext& context) const {
+void TikzVisualizer::drawGoalStates(const BaseObstacleContext& context) const {
   std::size_t i = context.getStartStates().size();
   for (const auto& goalState : context.getGoalStates()) {
     auto goal = std::make_shared<TikzNode>();

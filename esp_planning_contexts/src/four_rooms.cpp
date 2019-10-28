@@ -51,7 +51,7 @@ namespace esp {
 namespace ompltools {
 
 FourRooms::FourRooms(const std::shared_ptr<const Configuration>& config, const std::string& name) :
-    BaseContext(config, name),
+    BaseObstacleContext(config, name),
     wallThickness_(config->get<double>("Contexts/" + name + "/wallThickness")),
     gapWidth_(config->get<double>("Contexts/" + name + "/gapWidth")),
     startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
@@ -131,7 +131,7 @@ bool FourRooms::knowsOptimum() const {
 }
 
 ompl::base::Cost FourRooms::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown, though it could be", BaseContext::name_);
+  throw ompl::Exception("The global optimum is unknown, though it could be", BaseObstacleContext::name_);
 }
 
 void FourRooms::setTarget(double targetSpecifier) {

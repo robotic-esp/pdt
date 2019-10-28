@@ -51,7 +51,7 @@ namespace esp {
 namespace ompltools {
 
 WallGap::WallGap(const std::shared_ptr<const Configuration>& config, const std::string& name) :
-    BaseContext(config, name),
+    BaseObstacleContext(config, name),
     wallWidth_(config->get<double>("Contexts/" + name + "/wallWidth")),
     wallThickness_(config->get<double>("Contexts/" + name + "/wallThickness")),
     gapWidth_(config->get<double>("Contexts/" + name + "/gapWidth")),
@@ -133,7 +133,7 @@ bool WallGap::knowsOptimum() const {
 }
 
 ompl::base::Cost WallGap::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown, though it could be", BaseContext::name_);
+  throw ompl::Exception("The global optimum is unknown, though it could be", BaseObstacleContext::name_);
 }
 
 void WallGap::setTarget(double targetSpecifier) {

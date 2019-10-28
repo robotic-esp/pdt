@@ -48,7 +48,7 @@ namespace esp {
 namespace ompltools {
 
 InteractiveVisualizer::InteractiveVisualizer(
-    const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
+    const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseObstacleContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
     BaseVisualizer(config, context, plannerPair),
     tikzVisualizer_(config, context, plannerPair),
@@ -537,7 +537,7 @@ void InteractiveVisualizer::visit(const WallGap& context) const {
   drawBoundary(context);
 }
 
-void InteractiveVisualizer::drawBoundary(const BaseContext& context) const {
+void InteractiveVisualizer::drawBoundary(const BaseObstacleContext& context) const {
   glColor4fv(black);
   glLineWidth(3.0);
   if (context.getDimensions() == 2u) {

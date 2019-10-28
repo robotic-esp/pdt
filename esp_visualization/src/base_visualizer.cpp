@@ -50,7 +50,7 @@ namespace esp {
 namespace ompltools {
 
 BaseVisualizer::BaseVisualizer(
-    const std::shared_ptr<Configuration> &config, const std::shared_ptr<BaseContext> &context,
+    const std::shared_ptr<Configuration> &config, const std::shared_ptr<BaseObstacleContext> &context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
     context_(context),
     planner_(plannerPair.first),
@@ -66,7 +66,7 @@ BaseVisualizer::~BaseVisualizer() {
   dataThread_.join();
 }
 
-void BaseVisualizer::setContext(const std::shared_ptr<BaseContext> &context) {
+void BaseVisualizer::setContext(const std::shared_ptr<BaseObstacleContext> &context) {
   // Setting a new context means all the data is invalid.
   displayIteration_ = 0u;
 

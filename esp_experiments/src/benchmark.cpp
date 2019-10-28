@@ -77,8 +77,9 @@ int main(int argc, char **argv) {
 
   // Print some basic info about this experiment.
   std::cout << "\nExecuting " << config->get<std::size_t>("Experiment/numRuns") << " runs of "
-            << config->get<std::string>("Experiment/context") << " with "
-            << ompl::RNG::getSeed() << " as the seed and a maximum runtime of " << context->getTargetDuration() << " seconds.\n";
+            << config->get<std::string>("Experiment/context") << " with " << ompl::RNG::getSeed()
+            << " as the seed and a maximum runtime of " << context->getMaxSolveDuration()
+            << " seconds.\n";
 
   // Setup the results table.
   std::cout << '\n';
@@ -105,7 +106,7 @@ int main(int argc, char **argv) {
     std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << " | ";
     for (const auto &plannerName : config->get<std::vector<std::string>>("Experiment/planners")) {
       // Create the logger for this run.
-      esp::ompltools::TimeCostLogger logger(context->getTargetDuration(),
+      esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
                                             config->get<std::size_t>("Experiment/logFrequency"));
 
       // The following results in more consistent measurements. I don't understand how. It seems to
@@ -127,7 +128,7 @@ int main(int argc, char **argv) {
 
       // Compute the duration we have left for solving.
       const auto maxSolveDuration =
-          esp::ompltools::time::seconds(context->getTargetDuration() - setupDuration);
+          esp::ompltools::time::seconds(context->getMaxSolveDuration() - setupDuration);
       const std::chrono::microseconds idle(1000000u /
                                            config->get<std::size_t>("Experiment/logFrequency"));
 

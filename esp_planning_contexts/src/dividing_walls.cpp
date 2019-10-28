@@ -52,7 +52,7 @@ namespace ompltools {
 
 DividingWalls::DividingWalls(const std::shared_ptr<const Configuration>& config,
                            const std::string& name) :
-    BaseContext(config, name),
+    BaseObstacleContext(config, name),
     numWalls_(config->get<std::size_t>("Contexts/" + name + "/numWalls")),
     wallThicknesses_(config->get<std::vector<double>>("Contexts/" + name + "/wallThicknesses")),
     numGaps_(config->get<std::size_t>("Contexts/" + name + "/numGaps")),
@@ -130,7 +130,7 @@ bool DividingWalls::knowsOptimum() const {
 }
 
 ompl::base::Cost DividingWalls::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown, though it could be", BaseContext::name_);
+  throw ompl::Exception("The global optimum is unknown, though it could be", BaseObstacleContext::name_);
 }
 
 void DividingWalls::setTarget(double targetSpecifier) {

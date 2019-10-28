@@ -55,7 +55,7 @@ namespace ompltools {
 
 RepeatingRectangles::RepeatingRectangles(const std::shared_ptr<const Configuration>& config,
                                          const std::string& name) :
-    BaseContext(config, name),
+    BaseObstacleContext(config, name),
     numObsPerDim_(config->get<std::size_t>("Contexts/" + name + "/numObstaclesPerDim")),
     obsWidth_(config->get<double>("Contexts/" + name + "/obstacleWidth")),
     startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
@@ -126,7 +126,7 @@ bool RepeatingRectangles::knowsOptimum() const {
 }
 
 ompl::base::Cost RepeatingRectangles::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown.", BaseContext::name_);
+  throw ompl::Exception("The global optimum is unknown.", BaseObstacleContext::name_);
 }
 
 void RepeatingRectangles::setTarget(double targetSpecifier) {

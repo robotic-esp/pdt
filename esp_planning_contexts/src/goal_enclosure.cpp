@@ -55,7 +55,7 @@ namespace ompltools {
 
 GoalEnclosure::GoalEnclosure(const std::shared_ptr<const Configuration>& config,
                                  const std::string& name) :
-    BaseContext(config, name),
+    BaseObstacleContext(config, name),
     goalOutsideWidth_(config->get<double>("Contexts/" + name + "/goalOutsideWidth")),
     goalInsideWidth_(config->get<double>("Contexts/" + name + "/goalInsideWidth")),
     goalGapWidth_(config->get<double>("Contexts/" + name + "/goalGapWidth")),
@@ -130,7 +130,7 @@ bool GoalEnclosure::knowsOptimum() const {
 }
 
 ompl::base::Cost GoalEnclosure::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown, though it could be", BaseContext::name_);
+  throw ompl::Exception("The global optimum is unknown, though it could be", BaseObstacleContext::name_);
 }
 
 void GoalEnclosure::setTarget(double targetSpecifier) {

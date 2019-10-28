@@ -52,7 +52,7 @@ ContextFactory::ContextFactory(const std::shared_ptr<const Configuration>& confi
   }
 }
 
-std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextName) const {
+std::shared_ptr<BaseObstacleContext> ContextFactory::create(const std::string& contextName) const {
   const std::string parentKey{"Contexts/" + contextName};
   if (!config_->contains(parentKey)) {
     OMPL_ERROR("Configuration has no entry for requested context '%s'.", parentKey.c_str());

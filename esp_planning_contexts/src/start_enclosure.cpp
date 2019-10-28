@@ -55,7 +55,7 @@ namespace ompltools {
 
 StartEnclosure::StartEnclosure(const std::shared_ptr<const Configuration>& config,
                                  const std::string& name) :
-    BaseContext(config, name),
+    BaseObstacleContext(config, name),
     startOutsideWidth_(config->get<double>("Contexts/" + name + "/startOutsideWidth")),
     startInsideWidth_(config->get<double>("Contexts/" + name + "/startInsideWidth")),
     startGapWidth_(config->get<double>("Contexts/" + name + "/startGapWidth")),
@@ -130,7 +130,7 @@ bool StartEnclosure::knowsOptimum() const {
 }
 
 ompl::base::Cost StartEnclosure::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown, though it could be", BaseContext::name_);
+  throw ompl::Exception("The global optimum is unknown, though it could be", BaseObstacleContext::name_);
 }
 
 void StartEnclosure::setTarget(double targetSpecifier) {

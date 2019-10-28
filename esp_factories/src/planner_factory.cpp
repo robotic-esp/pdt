@@ -55,7 +55,7 @@ namespace esp {
 namespace ompltools {
 
 PlannerFactory::PlannerFactory(const std::shared_ptr<Configuration> &config,
-                               const std::shared_ptr<BaseContext> &context) :
+                               const std::shared_ptr<BaseObstacleContext> &context) :
     config_(config),
     context_(context) {
   if (config_->contains("Planners") == 0) {

@@ -57,7 +57,7 @@ namespace ompltools {
 class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
  public:
   TikzVisualizer(const std::shared_ptr<const Configuration>& config,
-                 const std::shared_ptr<BaseContext>& context,
+                 const std::shared_ptr<BaseObstacleContext>& context,
                  const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE>& plannerPair);
   ~TikzVisualizer() = default;
 
@@ -99,9 +99,9 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
   void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;
 
   // Helper functions.
-  void drawBoundary(const BaseContext& context) const;
-  void drawStartStates(const BaseContext& context) const;
-  void drawGoalStates(const BaseContext& context) const;
+  void drawBoundary(const BaseObstacleContext& context) const;
+  void drawStartStates(const BaseObstacleContext& context) const;
+  void drawGoalStates(const BaseObstacleContext& context) const;
   void drawVertex(const ompl::base::PlannerDataVertex& vertex) const;
   void drawVertex(const ompl::base::RealVectorStateSpace::StateType* state,
                   const std::string& options) const;
@@ -123,7 +123,7 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
       const std::shared_ptr<const TBDstarData>& tbdstarData) const;
 
   // Planner and context to be visualized.
-  std::shared_ptr<BaseContext> context_;
+  std::shared_ptr<BaseObstacleContext> context_;
   PLANNER_TYPE plannerType_{PLANNER_TYPE::INVALID};
   std::string name_{"invalid planner"};
 

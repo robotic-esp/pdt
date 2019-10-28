@@ -37,7 +37,7 @@
 #pragma once
 
 #include "esp_configuration/configuration.h"
-#include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/base_obstacle_context.h"
 #include "esp_planning_contexts/context_validity_checker.h"
 
 namespace esp {
@@ -46,7 +46,7 @@ namespace ompltools {
 
 /** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
  * a multiple homotopy-class experiment that scales to N dimensions. */
-class FlankingGap : public BaseContext {
+class FlankingGap : public BaseObstacleContext {
  public:
   // An odd number of gaps results in a straight line solution.
   FlankingGap(const std::shared_ptr<const Configuration>& config, const std::string& name);

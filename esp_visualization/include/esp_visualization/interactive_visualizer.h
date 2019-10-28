@@ -59,7 +59,7 @@ class InteractiveVisualizer : public BaseVisualizer,
                               public ObjectiveVisitor {
  public:
   InteractiveVisualizer(
-      const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
+      const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseObstacleContext>& context,
       const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
   ~InteractiveVisualizer() = default;
 
@@ -108,7 +108,7 @@ class InteractiveVisualizer : public BaseVisualizer,
                        const float* faceColor, const float* edgeColor) const;
   void drawRectangle3D(const std::vector<double>& midpoint, const std::vector<double>& widths,
                        const float* faceColor, const float* edgeColor) const;
-  void drawBoundary(const BaseContext& context) const;
+  void drawBoundary(const BaseObstacleContext& context) const;
   void drawPoints(const std::vector<Eigen::Vector2d>& points, const float* color, float size) const;
   void drawPoints(const std::vector<Eigen::Vector3d>& points, const float* color, float size) const;
   void drawPoints(const std::vector<ompl::base::ScopedState<>>& states, const float* color,

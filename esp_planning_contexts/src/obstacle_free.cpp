@@ -55,7 +55,7 @@ namespace ompltools {
 
 ObstacleFree::ObstacleFree(const std::shared_ptr<const Configuration>& config,
                            const std::string& name) :
-    BaseContext(config, name),
+    BaseObstacleContext(config, name),
     startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
     goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
   // Assert configuration sanity.

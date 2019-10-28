@@ -55,7 +55,7 @@ namespace ompltools {
 
 RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(const std::shared_ptr<const Configuration>& config,
                                    const std::string& name) :
-    BaseContext(config, name),
+    BaseObstacleContext(config, name),
     numRectangles_(config->get<std::size_t>("Contexts/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("Contexts/" + name + "/minSideLength")),
     maxSideLength_(config->get<double>("Contexts/" + name + "/maxSideLength")),
@@ -137,7 +137,7 @@ bool RandomRectanglesMultiStartGoal::knowsOptimum() const {
 }
 
 ompl::base::Cost RandomRectanglesMultiStartGoal::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown.", BaseContext::name_);
+  throw ompl::Exception("The global optimum is unknown.", BaseObstacleContext::name_);
 }
 
 void RandomRectanglesMultiStartGoal::setTarget(double targetSpecifier) {

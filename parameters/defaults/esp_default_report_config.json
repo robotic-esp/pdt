@@ -12,7 +12,7 @@
         "espdarkred": [ 145, 0, 33 ]
     },
     "PlannerPlotColors": {
-        "ABITstar": "espyellow",
+        "ABITstar": "esplightblue",
         "AIBITstar": "espgreen",
         "BITstar": "espblue",
         "BITstarRegression": "esplightblue",
@@ -25,7 +25,7 @@
     },
     "PlotPlannerNames": {
         "ABITstar": "ABIT*",
-        "AIBITstar": "AIBIT*",
+        "AIBITstar": "AI-BIT*",
         "BITstar": "BIT*",
         "BITstarRegression": "BIT* Reg",
         "InformedRRTstar": "Informed RRT*",

@@ -44,7 +44,7 @@
 #include "nlohmann/json.hpp"
 
 #include "esp_configuration/configuration.h"
-#include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/base_obstacle_context.h"
 
 namespace esp {
 
@@ -57,7 +57,7 @@ class ContextFactory {
   ~ContextFactory() = default;
 
   // Create a planner.
-  std::shared_ptr<BaseContext> create(const std::string &contextType) const;
+  std::shared_ptr<BaseObstacleContext> create(const std::string &contextType) const;
 
  private:
   const std::shared_ptr<const Configuration> config_;
