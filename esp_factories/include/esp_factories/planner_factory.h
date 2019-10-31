@@ -42,7 +42,7 @@
 #include <ompl/base/Planner.h>
 
 #include "esp_configuration/configuration.h"
-#include "esp_planning_contexts/base_obstacle_context.h"
+#include "esp_planning_contexts/base_context.h"
 
 #include "esp_common/planner_type.h"
 
@@ -54,7 +54,7 @@ namespace ompltools {
 class PlannerFactory {
  public:
   PlannerFactory(const std::shared_ptr<Configuration> &config,
-                 const std::shared_ptr<BaseObstacleContext> &context);
+                 const std::shared_ptr<BaseContext> &context);
   ~PlannerFactory() = default;
 
   // Create a planner.
@@ -63,7 +63,7 @@ class PlannerFactory {
 
  private:
   const std::shared_ptr<const Configuration> config_;
-  const std::shared_ptr<const BaseObstacleContext> context_;
+  const std::shared_ptr<const BaseContext> context_;
 };
 
 }  // namespace ompltools

@@ -36,38 +36,40 @@
 
 #include "esp_planning_contexts/start_enclosure.h"
 
-#include <cmath>
-#include <functional>
-#include <memory>
+#include <vector>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
-#include <ompl/base/goals/GoalStates.h>
-#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/base/spaces/RealVectorBounds.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
 
+#include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
+#include "esp_planning_contexts/context_validity_checker.h"
 
 namespace esp {
 
 namespace ompltools {
 
-StartEnclosure::StartEnclosure(const std::shared_ptr<const Configuration>& config,
-                                 const std::string& name) :
-    BaseObstacleContext(config, name),
+StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                               const std::shared_ptr<const Configuration>& config,
+                               const std::string& name) :
+    RealVectorGeometricContext(spaceInfo, config, name),
+    dimensionality_(spaceInfo_->getStateDimension()),
     startOutsideWidth_(config->get<double>("Contexts/" + name + "/startOutsideWidth")),
     startInsideWidth_(config->get<double>("Contexts/" + name + "/startInsideWidth")),
     startGapWidth_(config->get<double>("Contexts/" + name + "/startGapWidth")),
-    startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
-    goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
+    startState_(spaceInfo),
+    goalState_(spaceInfo) {
+  // Get the start and goal positions.
+  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+
   // Assert configuration sanity.
-  if (startPos_.size() != dimensionality_) {
+  if (config->get<std::vector<double>>("Contexts/" + name + "/start").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (goalPos_.size() != dimensionality_) {
+  if (config->get<std::vector<double>>("Contexts/" + name + "/goal").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
@@ -80,72 +82,58 @@ StartEnclosure::StartEnclosure(const std::shared_ptr<const Configuration>& confi
     OMPL_ERROR("%s: Start gap width is greater than start outside width.", name.c_str());
     throw std::runtime_error("Context error.");
   }
-  // Create a state space and set the bounds.
-  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
-  stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
 
-  // Create the space information class:
-  spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+  // Create the validity checker.
+  auto validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);
 
-  // Create the obstacles.
+  // Create the obstacles and add them to the validity checker.
   createObstacles();
-  createAntiObstacles();
+  validityChecker->addObstacles(obstacles_);
 
-  // Create the validity checker and add the obstacle.
-  validityChecker_ = std::make_shared<ContextValidityChecker>(spaceInfo_);
-  validityChecker_->addObstacles(obstacles_);
-  validityChecker_->addAntiObstacles(antiObstacles_);
+  // Create the anti obstacles and add them to the validity checker.
+  createAntiObstacles();
+  validityChecker->addAntiObstacles(antiObstacles_);
 
   // Set the validity checker and the check resolution.
-  spaceInfo_->setStateValidityChecker(
-      static_cast<ompl::base::StateValidityCheckerPtr>(validityChecker_));
+  spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
       config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();
 
-  // Allocate the optimization objective.
-  optimizationObjective_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
-
-  // Set the heuristic to the default.
-  optimizationObjective_->setCostToGoHeuristic(
-      std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
-
-  // Create a start state.
-  addStartState(startPos_);
-
-  // Create a goal state.
-  addGoalState(goalPos_);
-  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
-
-  // Specify the optimization target.
-  optimizationObjective_->setCostThreshold(computeMinPossibleCost());
+  // Fill the start and goal states' coordinates.
+  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+    startState_[i] = startPosition.at(i);
+    goalState_[i] = goalPosition.at(i);
+  }
 }
 
-bool StartEnclosure::knowsOptimum() const {
-  return false;
+ompl::base::ProblemDefinitionPtr StartEnclosure::instantiateNewProblemDefinition() const {
+  // Instantiate a new problem definition.
+  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+
+  // Set the objective.
+  problemDefinition->setOptimizationObjective(objective_);
+
+  // Set the start state in the problem definition.
+  problemDefinition->addStartState(startState_);
+
+  // Create a goal for the problem definition.
+  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goal->setState(goalState_);
+  problemDefinition->setGoal(goal);
+
+  // Return the new definition.
+  return problemDefinition;
 }
 
-ompl::base::Cost StartEnclosure::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown, though it could be", BaseObstacleContext::name_);
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> StartEnclosure::getStartState() const {
+  return startState_;
 }
 
-void StartEnclosure::setTarget(double targetSpecifier) {
-  optimizationObjective_->setCostThreshold(
-      ompl::base::Cost(targetSpecifier * this->computeOptimum().value()));
-}
-
-std::string StartEnclosure::lineInfo() const {
-  std::stringstream rval;
-
-  return rval.str();
-}
-
-std::string StartEnclosure::paraInfo() const {
-  return std::string();
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> StartEnclosure::getGoalState() const {
+  return goalState_;
 }
 
 void StartEnclosure::accept(const ContextVisitor& visitor) const {
@@ -153,37 +141,37 @@ void StartEnclosure::accept(const ContextVisitor& visitor) const {
 }
 
 void StartEnclosure::createObstacles() {
-  ompl::base::ScopedState<> startState(spaceInfo_);
+  ompl::base::ScopedState<> startOutsideAnchor(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    startState[i] = startPos_[i];
+    startOutsideAnchor[i] = config_->get<std::vector<double>>("Contexts/" + name_ + "/start").at(i);
   }
   std::vector<double> startWidths(dimensionality_, startOutsideWidth_);
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, startState, startWidths));
+      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, startOutsideAnchor, startWidths));
 }
 
 void StartEnclosure::createAntiObstacles() {
   // Create the inside.
-  ompl::base::ScopedState<> startState(spaceInfo_);
+  ompl::base::ScopedState<> startInsideAnchor(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    startState[i] = startPos_[i];
+    startInsideAnchor[i] = config_->get<std::vector<double>>("Contexts/" + name_ + "/start").at(i);
   }
   std::vector<double> startWidths(dimensionality_, startInsideWidth_);
-  antiObstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, startState, startWidths));
+  antiObstacles_.emplace_back(std::make_shared<Hyperrectangle<BaseAntiObstacle>>(
+      spaceInfo_, startInsideAnchor, startWidths));
 
   // Create the gap.
-  ompl::base::ScopedState<> startGapMidpoint(spaceInfo_);
-  startGapMidpoint[0u] =
-      startPos_[0u] - startInsideWidth_ / 2.0 - (startOutsideWidth_ - startInsideWidth_) / 4.0;
+  ompl::base::ScopedState<> startGapAnchor(spaceInfo_);
+  startGapAnchor[0u] = config_->get<std::vector<double>>("Contexts/" + name_ + "/start").at(0u) -
+                       startInsideWidth_ / 2.0 - (startOutsideWidth_ - startInsideWidth_) / 4.0;
   for (std::size_t i = 1u; i < dimensionality_; ++i) {
-    startGapMidpoint[i] = 0.0;
+    startGapAnchor[i] = 0.0;
   }
   std::vector<double> startGapWidths(dimensionality_, startGapWidth_);
   startGapWidths.at(0u) =
       (startOutsideWidth_ - startInsideWidth_) / 2.0 + std::numeric_limits<double>::epsilon();
   antiObstacles_.emplace_back(std::make_shared<Hyperrectangle<BaseAntiObstacle>>(
-      spaceInfo_, startGapMidpoint, startGapWidths));
+      spaceInfo_, startGapAnchor, startGapWidths));
 }
 
 }  // namespace ompltools

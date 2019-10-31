@@ -37,64 +37,57 @@
 #pragma once
 
 #include <memory>
-#include <string>
+#include <utility>
+#include <vector>
 
-#include <ompl/base/ProblemDefinition.h>
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
+#include <ompl/base/Cost.h>
+#include <ompl/base/StateSpace.h>
+#include <ompl/base/spaces/RealVectorBounds.h>
+#include <ompl/datastructures/NearestNeighborsGNAT.h>
+#include <ompl/util/Console.h>
+#include <ompl/util/Exception.h>
 
 #include "esp_configuration/configuration.h"
+#include "esp_obstacles/base_obstacle.h"
+#include "esp_planning_contexts/base_context.h"
 #include "esp_planning_contexts/context_visitor.h"
-#include "esp_planning_contexts/real_vector_geometric_context.h"
+#include "esp_time/time.h"
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief An experiment with a singularly placed square obstacle*/
-class GoalEnclosure : public RealVectorGeometricContext {
+/** \brief The base class for an experiment */
+class RealVectorGeometricContext : public BaseContext {
  public:
-  GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                const std::shared_ptr<const Configuration>& config, const std::string& name);
-  virtual ~GoalEnclosure() = default;
+  RealVectorGeometricContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                             const std::shared_ptr<const Configuration>& config,
+                             const std::string& name);
 
-  /** \brief Instantiate a problem definition for this context. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const override;
+  // Use default virtual destructor.
+  virtual ~RealVectorGeometricContext() = default;
 
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
+  /** \brief Get the state-space limit */
+  const ompl::base::RealVectorBounds& getBoundaries() const;
 
-  /** \brief Return a copy of the goal state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getGoalState() const;
+  // Get the obstacles.
+  std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const;
 
-  /** \brief Accept a context visitor. */
-  virtual void accept(const ContextVisitor& visitor) const override;
+  // Get the antiobstacles.
+  std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const;
+
+  // Accept a visitor.
+  virtual void accept(const ContextVisitor& visitor) const = 0;
 
  protected:
-  /** \brief Create the obstacles. */
-  void createObstacles();
+  /** \brief The state space bounds. */
+  ompl::base::RealVectorBounds bounds_;
 
-  /** \brief Create the anti obstacles. */
-  void createAntiObstacles();
+  /** \brief The obstacles. */
+  std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
 
-  /** \brief The dimensionality of the context. */
-  std::size_t dimensionality_{0u};
-
-  /** \brief The outside width of the goal enclosure. */
-  double goalOutsideWidth_{0.0};
-
-  /** \brief The inside width of the goal enclosure. */
-  double goalInsideWidth_{0.0};
-
-  /** \brief The gap width of the goal enclosure. */
-  double goalGapWidth_{0.0};
-
-  /** \brief The start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState_;
-
-  /** \brief The goal state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState_;
+  /** \brief The anti obstacles. */
+  std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
 };
 
 }  // namespace ompltools

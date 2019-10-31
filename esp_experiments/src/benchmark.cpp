@@ -154,8 +154,8 @@ int main(int argc, char **argv) {
       // Store the final cost.
       const auto problem = planner->getProblemDefinition();
       if (problem->hasExactSolution()) {
-        logger.addMeasurement(
-            totalDuration, problem->getSolutionPath()->cost(context->getOptimizationObjective()));
+        logger.addMeasurement(totalDuration,
+                              problem->getSolutionPath()->cost(context->getObjective()));
       } else {
         logger.addMeasurement(totalDuration,
                               ompl::base::Cost(std::numeric_limits<double>::infinity()));

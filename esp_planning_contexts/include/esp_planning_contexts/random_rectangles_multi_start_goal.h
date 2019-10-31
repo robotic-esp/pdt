@@ -36,62 +36,77 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <ompl/base/ScopedState.h>
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/util/RandomNumbers.h>
 
 #include "esp_configuration/configuration.h"
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_obstacles/hyperrectangle.h"
-#include "esp_planning_contexts/base_obstacle_context.h"
-#include "esp_planning_contexts/context_validity_checker_gnat.h"
 #include "esp_planning_contexts/context_visitor.h"
+#include "esp_planning_contexts/real_vector_geometric_context.h"
 
 namespace esp {
 
 namespace ompltools {
 
 /** \brief An experiment with a singularly placed square obstacle*/
-class RandomRectanglesMultiStartGoal : public BaseObstacleContext {
+class RandomRectanglesMultiStartGoal : public RealVectorGeometricContext {
  public:
-  /** \brief Constructor */
-  RandomRectanglesMultiStartGoal(const std::shared_ptr<const Configuration>& config, const std::string& name);
+  /** \brief The constructor. */
+  RandomRectanglesMultiStartGoal(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                                 const std::shared_ptr<const Configuration>& config,
+                                 const std::string& name);
+
+  /** \brief The destructor. */
   virtual ~RandomRectanglesMultiStartGoal() = default;
 
-  /** \brief Whether the problem has an exact expression for the optimum */
-  virtual bool knowsOptimum() const override;
+  /** \brief Instantiate a problem definition for this context. */
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
+      const override;
 
-  /** \brief This problem knows its optimum */
-  virtual ompl::base::Cost computeOptimum() const override;
+  /** \brief Return a copy of the start state. */
+  std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>> getStartStates() const;
 
-  /** \brief Set the target cost as the specified multiplier of the optimum. */
-  virtual void setTarget(double targetSpecifier) override;
+  /** \brief Return a copy of the goal state. */
+  std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>> getGoalStates() const;
 
-  /** \brief Derived class specific information to include in the title line. */
-  virtual std::string lineInfo() const override;
-
-  /** \brief Derived class specific information to include at the end. */
-  virtual std::string paraInfo() const override;
-
-  // Accept a context visitor.
+  /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
-  // Create the random obstacles.
+  /** \brief Create the obstacles. */
   void createObstacles();
-  
-  // The validity checker.
-  std::shared_ptr<ContextValidityCheckerGNAT> validityChecker_{};
 
-  // The random number generator.
-  ompl::RNG rng_{};
+  /** \brief The dimensionality of the underlying state space. */
+  std::size_t dimensionality_;
 
-  // Direct access to obstacle information.
+  /** \brief The number of hyper rectangles. */
   std::size_t numRectangles_{};
+
+  /** \brief The minimum side length of the hyper rectangles. */
   double minSideLength_{};
+
+  /** \brief The maximum side length of the hyper rectangles. */
   double maxSideLength_{};
 
-  // The numbers of start and goal positions.
+  /** \brief The number of start states. */
   std::size_t numStarts_{};
+
+  /** \brief The number of goal states. */
   std::size_t numGoals_{};
+
+  /** \brief The random number generator. */
+  ompl::RNG rng_{};
+
+  /** \brief The start states. */
+  std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>> startStates_{};
+
+  /** \brief The goal states. */
+  std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>> goalStates_{};
 };
 
 }  // namespace ompltools

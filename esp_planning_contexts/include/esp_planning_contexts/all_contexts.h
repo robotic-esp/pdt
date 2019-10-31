@@ -1,4 +1,4 @@
-#include "esp_planning_contexts/base_obstacle_context.h"
+#include "esp_planning_contexts/real_vector_geometric_context.h"
 #include "esp_planning_contexts/centre_square.h"
 #include "esp_planning_contexts/dividing_walls.h"
 #include "esp_planning_contexts/double_enclosure.h"

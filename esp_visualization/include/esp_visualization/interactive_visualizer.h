@@ -46,6 +46,7 @@
 #include "esp_optimization_objectives/potential_field_optimization_objective.h"
 #include "esp_planning_contexts/all_contexts.h"
 #include "esp_planning_contexts/context_visitor.h"
+#include "esp_planning_contexts/real_vector_geometric_context.h"
 #include "esp_visualization/base_visualizer.h"
 #include "esp_visualization/tikz_visualizer.h"
 
@@ -59,7 +60,8 @@ class InteractiveVisualizer : public BaseVisualizer,
                               public ObjectiveVisitor {
  public:
   InteractiveVisualizer(
-      const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseObstacleContext>& context,
+      const std::shared_ptr<Configuration>& config,
+      const std::shared_ptr<RealVectorGeometricContext>& context,
       const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
   ~InteractiveVisualizer() = default;
 
@@ -108,11 +110,16 @@ class InteractiveVisualizer : public BaseVisualizer,
                        const float* faceColor, const float* edgeColor) const;
   void drawRectangle3D(const std::vector<double>& midpoint, const std::vector<double>& widths,
                        const float* faceColor, const float* edgeColor) const;
-  void drawBoundary(const BaseObstacleContext& context) const;
+  void drawBoundary(const RealVectorGeometricContext& context) const;
+  void drawPoint(const Eigen::Vector2d& point, const float* color, float size) const;
+  void drawPoint(const Eigen::Vector3d& point, const float* color, float size) const;
+  void drawPoint(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state,
+                 const float* color, float size) const;
   void drawPoints(const std::vector<Eigen::Vector2d>& points, const float* color, float size) const;
   void drawPoints(const std::vector<Eigen::Vector3d>& points, const float* color, float size) const;
-  void drawPoints(const std::vector<ompl::base::ScopedState<>>& states, const float* color,
-                  float size) const;
+  void drawPoints(
+      const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states,
+      const float* color, float size) const;
   void drawLines(const std::vector<Eigen::Vector2d>& points, float width, const float* color,
                  float alpha = 1.0) const;
   void drawLines(const std::vector<Eigen::Vector3d>& points, float width, const float* color,

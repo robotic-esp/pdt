@@ -32,70 +32,39 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+/* Authors: Jonathan Gammell */
 
-#pragma once
-
-#include <memory>
-#include <string>
-
-#include <ompl/base/ProblemDefinition.h>
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
-
-#include "esp_configuration/configuration.h"
-#include "esp_planning_contexts/context_visitor.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief An experiment with a singularly placed square obstacle*/
-class GoalEnclosure : public RealVectorGeometricContext {
- public:
-  GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                const std::shared_ptr<const Configuration>& config, const std::string& name);
-  virtual ~GoalEnclosure() = default;
+RealVectorGeometricContext::RealVectorGeometricContext(
+    const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+    const std::shared_ptr<const Configuration>& config, const std::string& name) :
+    BaseContext(spaceInfo, config, name),
+    bounds_(getDimension()) {
+  // Fill the state space bounds.
+  double sideLengths = config->get<double>("Contexts/" + name + "/boundarySideLengths");
+  for (std::size_t dim = 0u; dim < getDimension(); ++dim) {
+    bounds_.low.at(dim) = -0.5 * sideLengths;
+    bounds_.high.at(dim) = 0.5 * sideLengths;
+  }
+}
 
-  /** \brief Instantiate a problem definition for this context. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const override;
+std::vector<std::shared_ptr<BaseObstacle>> RealVectorGeometricContext::getObstacles() const {
+  return obstacles_;
+}
 
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
+std::vector<std::shared_ptr<BaseAntiObstacle>> RealVectorGeometricContext::getAntiObstacles()
+    const {
+  return antiObstacles_;
+}
 
-  /** \brief Return a copy of the goal state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getGoalState() const;
-
-  /** \brief Accept a context visitor. */
-  virtual void accept(const ContextVisitor& visitor) const override;
-
- protected:
-  /** \brief Create the obstacles. */
-  void createObstacles();
-
-  /** \brief Create the anti obstacles. */
-  void createAntiObstacles();
-
-  /** \brief The dimensionality of the context. */
-  std::size_t dimensionality_{0u};
-
-  /** \brief The outside width of the goal enclosure. */
-  double goalOutsideWidth_{0.0};
-
-  /** \brief The inside width of the goal enclosure. */
-  double goalInsideWidth_{0.0};
-
-  /** \brief The gap width of the goal enclosure. */
-  double goalGapWidth_{0.0};
-
-  /** \brief The start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState_;
-
-  /** \brief The goal state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState_;
-};
+const ompl::base::RealVectorBounds& RealVectorGeometricContext::getBoundaries() const {
+  return bounds_;
+}
 
 }  // namespace ompltools
 

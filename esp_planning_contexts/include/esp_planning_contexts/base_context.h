@@ -32,14 +32,21 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+// Authors: Marlin Strub
 
 #pragma once
 
 #include <memory>
 #include <string>
 
+#include <ompl/base/OptimizationObjective.h>
+#include <ompl/base/ProblemDefinition.h>
+#include <ompl/base/ScopedState.h>
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/StateSpace.h>
+
 #include "esp_configuration/configuration.h"
+#include "esp_time/time.h"
 
 namespace esp {
 
@@ -48,14 +55,43 @@ namespace ompltools {
 /** \brief The base class for an experiment */
 class BaseContext {
  public:
-  BaseContext(const std::shared_ptr<const Configuration>& config, const std::string& name);
+  BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+              const std::shared_ptr<const Configuration>& config, const std::string& name);
 
-  /** \brief Returns the duration the planner has to solve the problem. */
-  double getTargetDuration();
+  /** \brief Returns the name of this context. */
+  std::string getName() const;
+
+  /** \brief Returns the space information. */
+  std::shared_ptr<ompl::base::SpaceInformation> getSpaceInformation() const;
+
+  /** \brief Returns the state space. */
+  std::shared_ptr<ompl::base::StateSpace> getStateSpace() const;
+
+  /** \brief Returns the dimension of the state space. */
+  std::size_t getDimension() const;
+
+  /** \brief Returns the optimization objective of this context. */
+  ompl::base::OptimizationObjectivePtr getObjective() const;
+
+  /** \brief Returns the maximum duration to solve this context. */
+  time::Duration getMaxSolveDuration() const;
+
+  /** \brief Return a newly generated problem definition */
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
+      const = 0;
 
  protected:
-  /** \brief The context name */
-  std::string name_{"Unnamed Context"};
+  /** \brief The space information associated with this context. */
+  ompl::base::SpaceInformationPtr spaceInfo_{};
+
+  /** \brief The name of the context. */
+  std::string name_{};
+
+  /** \brief The optimization objective. */
+  ompl::base::OptimizationObjectivePtr objective_{};
+
+  /** \brief The maximum duration to solve this context. */
+  time::Duration maxSolveDuration_{};
 
   /** \brief The configuration. */
   const std::shared_ptr<const Configuration> config_;

@@ -36,35 +36,34 @@
 
 #include "esp_planning_contexts/wall_gap.h"
 
-#include <cmath>
-#include <functional>
-#include <memory>
-
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
-#include <ompl/base/goals/GoalStates.h>
-#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
 
 namespace esp {
 
 namespace ompltools {
 
-WallGap::WallGap(const std::shared_ptr<const Configuration>& config, const std::string& name) :
-    BaseObstacleContext(config, name),
+WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                 const std::shared_ptr<const Configuration>& config, const std::string& name) :
+    RealVectorGeometricContext(spaceInfo, config, name),
+    dimensionality_(spaceInfo->getStateDimension()),
     wallWidth_(config->get<double>("Contexts/" + name + "/wallWidth")),
     wallThickness_(config->get<double>("Contexts/" + name + "/wallThickness")),
     gapWidth_(config->get<double>("Contexts/" + name + "/gapWidth")),
     gapOffset_(config->get<double>("Contexts/" + name + "/gapOffset")),
-    startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
-    goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
+    startState_(spaceInfo),
+    goalState_(spaceInfo) {
+  // Get the start and goal positions.
+  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+
   // Assert configuration sanity.
-  if (startPos_.size() != dimensionality_) {
+  if (config->get<std::vector<double>>("Contexts/" + name + "/start").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (goalPos_.size() != dimensionality_) {
+  if (config->get<std::vector<double>>("Contexts/" + name + "/goal").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
@@ -82,74 +81,57 @@ WallGap::WallGap(const std::shared_ptr<const Configuration>& config, const std::
     throw std::runtime_error("Context error.");
   }
 
-  // Create a state space and set the bounds.
-  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
-  stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
+  // Create the validity checker.
+  auto validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);
 
-  // Create the space information class:
-  spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-
-  // Create the validity checker and add the obstacle.
-  validityChecker_ = std::make_shared<ContextValidityChecker>(spaceInfo_);
-
-  // Create the obstacles and anti obstacles.
+  // Create the obstacles and add them to the validity checker.
   createObstacles();
-  createAntiObstacles();
+  validityChecker->addObstacles(obstacles_);
 
-  // Add them to the validity checker.
-  validityChecker_->addObstacles(obstacles_);
-  validityChecker_->addAntiObstacles(antiObstacles_);
+  // Create the anti obstacles and add them to the validity checker.
+  createAntiObstacles();
+  validityChecker->addAntiObstacles(antiObstacles_);
 
   // Set the validity checker and the check resolution.
-  spaceInfo_->setStateValidityChecker(validityChecker_);
+  spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
       config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();
 
-  // Allocate the optimization objective
-  optimizationObjective_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
-
-  // Set the heuristic to the default:
-  optimizationObjective_->setCostToGoHeuristic(
-      std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
-
-  // Create a start state.
-  addStartState(startPos_);
-
-  // Create a goal state.
-  addGoalState(goalPos_);
-  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
-
-  // Specify the optimization target.
-  optimizationObjective_->setCostThreshold(computeMinPossibleCost());
+  // Fill the start and goal states' coordinates.
+  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+    startState_[i] = startPosition.at(i);
+    goalState_[i] = goalPosition.at(i);
+  }
 }
 
-bool WallGap::knowsOptimum() const {
-  return false;
+ompl::base::ProblemDefinitionPtr WallGap::instantiateNewProblemDefinition() const {
+  // Instantiate a new problem definition.
+  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+
+  // Set the objective.
+  problemDefinition->setOptimizationObjective(objective_);
+
+  // Set the start state in the problem definition.
+  problemDefinition->addStartState(startState_);
+
+  // Create a goal for the problem definition.
+  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goal->setState(goalState_);
+  problemDefinition->setGoal(goal);
+
+  // Return the new definition.
+  return problemDefinition;
 }
 
-ompl::base::Cost WallGap::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown, though it could be", BaseObstacleContext::name_);
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> WallGap::getStartState() const {
+  return startState_;
 }
 
-void WallGap::setTarget(double targetSpecifier) {
-  optimizationObjective_->setCostThreshold(ompl::base::Cost(targetSpecifier));
-}
-
-std::string WallGap::lineInfo() const {
-  std::stringstream rval;
-
-  return rval.str();
-}
-
-std::string WallGap::paraInfo() const {
-  std::stringstream rval;
-  rval << lineInfo();
-  return rval.str();
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> WallGap::getGoalState() const {
+  return goalState_;
 }
 
 void WallGap::accept(const ContextVisitor& visitor) const {
@@ -157,13 +139,18 @@ void WallGap::accept(const ContextVisitor& visitor) const {
 }
 
 void WallGap::createObstacles() {
-  ompl::base::ScopedState<> midpoint(spaceInfo_);
-  // Set the obstacle midpoint in the middle of the state space.
+  // Get the state space bounds.
+  auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
+
+  // Create an anchor for the obstacle.
+  ompl::base::ScopedState<> anchor(spaceInfo_);
+
+  // Set the obstacle anchor in the middle of the state space.
   for (std::size_t j = 0u; j < dimensionality_; ++j) {
-    midpoint[j] = (bounds_.at(j).first + bounds_.at(j).second) / 2.0;
+    anchor[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
   }
   // Move it down in second dimension.
-  midpoint[1u] = midpoint[1u] - ((bounds_.at(1u).second - bounds_.at(1u).first) - wallWidth_) / 2.0;
+  anchor[1u] = anchor[1u] - ((bounds.high.at(1u) - bounds.low.at(1u)) - wallWidth_) / 2.0;
 
   // Create the widths of this wall.
   std::vector<double> widths(dimensionality_, 0.0);
@@ -176,33 +163,41 @@ void WallGap::createObstacles() {
 
   // The wall extends to the boundaries in all other dimensions.
   for (std::size_t j = 2u; j < dimensionality_; ++j) {
-    widths.at(j) = bounds_.at(j).second - bounds_.at(j).first;
+    widths.at(j) = bounds.high.at(j) - bounds.low.at(j);
   }
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths));
+      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths));
 }
 
 void WallGap::createAntiObstacles() {
-  ompl::base::ScopedState<> midpoint(spaceInfo_);
-  // Set the obstacle midpoint in the second dimension.
-  midpoint[1u] = gapOffset_ + gapWidth_ / 2.0;
-  // Set the obstacle midpoint in the remaining dimension.
+  // Get the state space bounds.
+  auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
+
+  // Create an anchor for the anti obstacle.
+  ompl::base::ScopedState<> anchor(spaceInfo_);
+
+  // Set the obstacle anchor in the second dimension.
+  anchor[1u] = gapOffset_ + gapWidth_ / 2.0;
+
+  // Set the obstacle anchor in the remaining dimension.
   for (std::size_t j = 0; j < dimensionality_; ++j) {
     if (j != 1u) {
-      midpoint[j] = (bounds_.at(j).first + bounds_.at(j).second) / 2.0;
+      anchor[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
     }
   }
+
   // Create the widths of gap.
   std::vector<double> widths(dimensionality_, 0.0);
+
   // Set the obstacle width in the first dimension.
   widths.at(0) = wallThickness_ + std::numeric_limits<double>::epsilon();
-  // widths.at(1) = gapWidth_;
+
   // The wall spans all other dimensions.
   for (std::size_t j = 1u; j < dimensionality_; ++j) {
     widths.at(j) = gapWidth_;
   }
   antiObstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, midpoint, widths));
+      std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, anchor, widths));
 }
 
 }  // namespace ompltools

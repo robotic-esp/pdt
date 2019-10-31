@@ -36,37 +36,36 @@
 
 #include "esp_planning_contexts/four_rooms.h"
 
-#include <cmath>
-#include <functional>
-#include <memory>
-
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
-#include <ompl/base/goals/GoalStates.h>
-#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
 
 namespace esp {
 
 namespace ompltools {
 
-FourRooms::FourRooms(const std::shared_ptr<const Configuration>& config, const std::string& name) :
-    BaseObstacleContext(config, name),
+FourRooms::FourRooms(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                     const std::shared_ptr<const Configuration>& config, const std::string& name) :
+    RealVectorGeometricContext(spaceInfo, config, name),
+    dimensionality_(spaceInfo_->getStateDimension()),
     wallThickness_(config->get<double>("Contexts/" + name + "/wallThickness")),
     gapWidth_(config->get<double>("Contexts/" + name + "/gapWidth")),
-    startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
-    goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
+    startState_(spaceInfo),
+    goalState_(spaceInfo) {
+  // Get the start and goal positions.
+  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+
   // Assert configuration sanity.
   if (dimensionality_ != 2u) {
     OMPL_ERROR("%s: Currently only implemented for two dimensional state spaces.", name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (startPos_.size() != dimensionality_) {
+  if (startPosition.size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (goalPos_.size() != dimensionality_) {
+  if (goalPosition.size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
@@ -80,74 +79,57 @@ FourRooms::FourRooms(const std::shared_ptr<const Configuration>& config, const s
     throw std::runtime_error("Context error.");
   }
 
-  // Create a state space and set the bounds.
-  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
-  stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
-
-  // Create the space information class:
-  spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-
   // Create the validity checker.
-  validityChecker_ = std::make_shared<ContextValidityChecker>(spaceInfo_);
+  auto validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);
 
-  // Create the obstacles and anti obstacles.
+  // Create the obstacles and add them to the validity checker.
   createObstacles();
-  createAntiObstacles();
+  validityChecker->addObstacles(obstacles_);
 
-  // Add them to the validity checker.
-  validityChecker_->addObstacles(obstacles_);
-  validityChecker_->addAntiObstacles(antiObstacles_);
+  // Create the anti obstacles and add them to the validity checker.
+  createAntiObstacles();
+  validityChecker->addAntiObstacles(antiObstacles_);
 
   // Set the validity checker and the check resolution.
-  spaceInfo_->setStateValidityChecker(validityChecker_);
+  spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
       config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();
 
-  // Allocate the optimization objective
-  optimizationObjective_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
-
-  // Set the heuristic to the default:
-  optimizationObjective_->setCostToGoHeuristic(
-      std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
-
-  // Create a start state.
-  addStartState(startPos_);
-
-  // Create a goal state.
-  addGoalState(goalPos_);
-  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
-
-  // Specify the optimization target.
-  optimizationObjective_->setCostThreshold(computeMinPossibleCost());
+  // Fill the start and goal states' coordinates.
+  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+    startState_[i] = startPosition.at(i);
+    goalState_[i] = goalPosition.at(i);
+  }
 }
 
-bool FourRooms::knowsOptimum() const {
-  return false;
+ompl::base::ProblemDefinitionPtr FourRooms::instantiateNewProblemDefinition() const {
+  // Instantiate a new problem definition.
+  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+
+  // Set the objective.
+  problemDefinition->setOptimizationObjective(objective_);
+
+  // Set the start state in the problem definition.
+  problemDefinition->addStartState(startState_);
+
+  // Create a goal for the problem definition.
+  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goal->setState(goalState_);
+  problemDefinition->setGoal(goal);
+
+  // Return the new definition.
+  return problemDefinition;
 }
 
-ompl::base::Cost FourRooms::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown, though it could be", BaseObstacleContext::name_);
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> FourRooms::getStartState() const {
+  return startState_;
 }
 
-void FourRooms::setTarget(double targetSpecifier) {
-  optimizationObjective_->setCostThreshold(ompl::base::Cost(targetSpecifier));
-}
-
-std::string FourRooms::lineInfo() const {
-  std::stringstream rval;
-
-  return rval.str();
-}
-
-std::string FourRooms::paraInfo() const {
-  std::stringstream rval;
-  rval << lineInfo();
-  return rval.str();
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> FourRooms::getGoalState() const {
+  return goalState_;
 }
 
 void FourRooms::accept(const ContextVisitor& visitor) const {
@@ -155,15 +137,18 @@ void FourRooms::accept(const ContextVisitor& visitor) const {
 }
 
 void FourRooms::createObstacles() {
+  // Get the state space bounds.
+  auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
+
   // Create the obstacle that divides the space parallel to the x axis.
   ompl::base::ScopedState<> midpointX(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    midpointX[i] = (bounds_.at(i).first + bounds_.at(i).second) / 2.0;
+    midpointX[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
 
   // Create the widths.
   std::vector<double> widthsX(dimensionality_, 0.0);
-  widthsX.at(0u) = bounds_.at(0u).second - bounds_.at(0u).first;
+  widthsX.at(0u) = bounds.high.at(0u) - bounds.low.at(0u);
   widthsX.at(1u) = wallThickness_;
 
   // Emplace this obstacle.
@@ -173,13 +158,13 @@ void FourRooms::createObstacles() {
   // Create the obstacle that divides the space parallel to the x axis.
   ompl::base::ScopedState<> midpointY(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    midpointY[i] = (bounds_.at(i).first + bounds_.at(i).second) / 2.0;
+    midpointY[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
 
   // Create the widths.
   std::vector<double> widthsY(dimensionality_, 0.0);
   widthsY.at(0u) = wallThickness_;
-  widthsY.at(1u) = bounds_.at(1u).second - bounds_.at(1u).first;
+  widthsY.at(1u) = bounds.high.at(1u) - bounds.low.at(1u);
 
   // Emplace this obstacle.
   obstacles_.emplace_back(
@@ -187,12 +172,15 @@ void FourRooms::createObstacles() {
 }
 
 void FourRooms::createAntiObstacles() {
+  // Get the state space bounds.
+  auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
+
   // Create the gap in the south.
   ompl::base::ScopedState<> midpointSouth(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    midpointSouth[i] = (bounds_.at(i).first + bounds_.at(i).second) / 2.0;
+    midpointSouth[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
-  midpointSouth[1u] = bounds_.at(1u).first + (gapWidth_ / 2.0);
+  midpointSouth[1u] = bounds.low.at(1u) + (gapWidth_ / 2.0);
 
   std::vector<double> widthsSouth(dimensionality_, 0.0);
   widthsSouth.at(0u) = wallThickness_ + std::numeric_limits<double>::epsilon();
@@ -204,9 +192,9 @@ void FourRooms::createAntiObstacles() {
   // Create the gap in the north.
   ompl::base::ScopedState<> midpointNorth(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    midpointNorth[i] = (bounds_.at(i).first + bounds_.at(i).second) / 2.0;
+    midpointNorth[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
-  midpointNorth[1u] = bounds_.at(1u).second - (gapWidth_ / 2.0);
+  midpointNorth[1u] = bounds.high.at(1u) - (gapWidth_ / 2.0);
 
   std::vector<double> widthsNorth(dimensionality_, 0.0);
   widthsNorth.at(0u) = wallThickness_ + std::numeric_limits<double>::epsilon();
@@ -218,9 +206,9 @@ void FourRooms::createAntiObstacles() {
   // Create the gap in the west.
   ompl::base::ScopedState<> midpointWest(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    midpointWest[i] = (bounds_.at(i).first + bounds_.at(i).second) / 2.0;
+    midpointWest[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
-  midpointWest[0u] = bounds_.at(0u).first + (gapWidth_ / 2.0);
+  midpointWest[0u] = bounds.low.at(0u) + (gapWidth_ / 2.0);
 
   std::vector<double> widthsWest(dimensionality_, 0.0);
   widthsWest.at(0u) = gapWidth_;

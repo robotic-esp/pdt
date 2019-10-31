@@ -49,7 +49,7 @@
 
 #include "esp_common/planner_type.h"
 #include "esp_configuration/configuration.h"
-#include "esp_planning_contexts/base_obstacle_context.h"
+#include "esp_planning_contexts/real_vector_geometric_context.h"
 #include "esp_time/time.h"
 #include "esp_visualization/planner_specific_data.h"
 
@@ -61,14 +61,14 @@ namespace ompltools {
 class BaseVisualizer {
  public:
   BaseVisualizer(const std::shared_ptr<Configuration> &config,
-                 const std::shared_ptr<BaseObstacleContext> &context,
+                 const std::shared_ptr<RealVectorGeometricContext> &context,
                  const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
   virtual ~BaseVisualizer();
 
  public:
   // Setters for context and planner. These are final because they need to be threadsafe, so
   // care has to be taken when implementing them.
-  virtual void setContext(const std::shared_ptr<BaseObstacleContext> &context) final;
+  virtual void setContext(const std::shared_ptr<RealVectorGeometricContext> &context) final;
   virtual void setPlanner(
       const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> &plannerPair) final;
 
@@ -82,7 +82,7 @@ class BaseVisualizer {
   time::Duration getTotalElapsedDuration(std::size_t iteration) const;
 
   // The current context.
-  std::shared_ptr<BaseObstacleContext> context_{};
+  std::shared_ptr<RealVectorGeometricContext> context_{};
 
   // The current planner.
   std::shared_ptr<ompl::base::Planner> planner_{};

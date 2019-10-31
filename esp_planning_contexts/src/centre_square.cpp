@@ -44,122 +44,102 @@
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/base/goals/GoalStates.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/base/spaces/RealVectorBounds.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
 
 #include "esp_obstacles/hyperrectangle.h"
+#include "esp_planning_contexts/context_validity_checker.h"
 
 namespace esp {
 
 namespace ompltools {
 
-CentreSquare::CentreSquare(const std::shared_ptr<const Configuration>& config,
+CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                           const std::shared_ptr<const Configuration>& config,
                            const std::string& name) :
-    BaseObstacleContext(config, name),
-    widths_(dimensionality_, config->get<double>("Contexts/" + name + "/obstacleWidth")),
-    startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
-    goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
+    RealVectorGeometricContext(spaceInfo, config, name),
+    startState_(spaceInfo),
+    goalState_(spaceInfo) {
+  // Get the start and goal positions.
+  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+
+  // Get the dimensionality of the problem.
+  auto dimensionality = spaceInfo_->getStateDimension();
+
+  // Get the obstacle widths.
+  std::vector<double> widths(dimensionality,
+                             config_->get<double>("Contexts/" + name + "/obstacleWidth"));
+
   // Assert configuration sanity.
-  if (startPos_.size() != dimensionality_) {
+  if (startPosition.size() != dimensionality) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (goalPos_.size() != dimensionality_) {
+  if (goalPosition.size() != dimensionality) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (widths_.at(0u) < 0.0) {
-    OMPL_ERROR("%s: Obstacle width must be positive.",
-               name.c_str());
+  if (widths.at(0u) < 0.0) {
+    OMPL_ERROR("%s: Obstacle width must be positive.", name.c_str());
     throw std::runtime_error("Context error.");
   }
-  // Create a state space and set the bounds.
-  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
-  stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
 
-  // Create the space information class:
-  spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+  // Fill the start and goal states' coordinates.
+  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+    startState_[i] = startPosition.at(i);
+    goalState_[i] = goalPosition.at(i);
+  }
+
+  // Compute the midpoint of the obstacle.
+  auto midpoint = std::make_unique<ompl::base::ScopedState<>>(spaceInfo_);
+  for (std::size_t i = 0u; i < dimensionality; ++i) {
+    (*midpoint)[i] = (startPosition.at(i) + goalPosition.at(i)) / 2.0;
+  }
 
   // Create the obstacle.
-  midpoint_ = std::make_unique<ompl::base::ScopedState<>>(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    (*midpoint_)[i] = (startPos_.at(i) + goalPos_.at(i)) / 2.0;
-  }
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, *midpoint_, widths_));
+      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, *midpoint, widths));
 
   // Create the validity checker and add the obstacle.
-  validityChecker_ = std::make_shared<ContextValidityChecker>(spaceInfo_);
-  validityChecker_->addObstacles(obstacles_);
+  auto validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);
+  validityChecker->addObstacles(obstacles_);
 
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(
-      static_cast<ompl::base::StateValidityCheckerPtr>(validityChecker_));
+      static_cast<ompl::base::StateValidityCheckerPtr>(validityChecker));
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config_->get<double>("Contexts/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();
-
-  // Allocate the optimization objective
-  optimizationObjective_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
-
-  // Set the heuristic to the default:
-  optimizationObjective_->setCostToGoHeuristic(
-      std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
-
-  // Create a start state.
-  addStartState(startPos_);
-
-  // Create a goal state.
-  addGoalState(goalPos_);
-  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
-
-  // Specify the optimization target.
-  optimizationObjective_->setCostThreshold(computeMinPossibleCost());
 }
 
-bool CentreSquare::knowsOptimum() const {
-  return true;
+ompl::base::ProblemDefinitionPtr CentreSquare::instantiateNewProblemDefinition() const {
+  // Instantiate a new problem definition.
+  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+
+  // Set the objective.
+  problemDefinition->setOptimizationObjective(objective_);
+
+  // Set the start state in the problem definition.
+  problemDefinition->addStartState(startState_);
+
+  // Create a goal for the problem definition.
+  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goal->setState(goalState_);
+  problemDefinition->setGoal(goal);
+
+  // Return the new definition.
+  return problemDefinition;
 }
 
-ompl::base::Cost CentreSquare::computeOptimum() const {
-  if (dimensionality_ != 2) {
-    OMPL_ERROR("Centre square only computes the optimum cost for 2d.");
-    throw std::runtime_error("Context error.");
-  }
-  ompl::base::Cost startToCorner(std::sqrt(
-      std::pow(std::abs(startStates_.front()[0u] - (*midpoint_)[0u]) - widths_[0] / 2.0, 2.0) -
-      std::pow(widths_[1] / 2.0, 2.0)));
-  ompl::base::Cost centreSquareEdge(widths_.at(0));
-  ompl::base::Cost goalToCorner(std::sqrt(
-      std::pow(std::abs(goalStates_.front()[0u] - (*midpoint_)[0u]) - widths_[0] / 2.0, 2.0) -
-      std::pow(widths_[1] / 2.0, 2.0)));
-
-  // Combine and return.
-  return optimizationObjective_->combineCosts(
-      optimizationObjective_->combineCosts(startToCorner, centreSquareEdge), goalToCorner);
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> CentreSquare::getStartState() const {
+  return startState_;
 }
 
-void CentreSquare::setTarget(double targetSpecifier) {
-  optimizationObjective_->setCostThreshold(
-      ompl::base::Cost(targetSpecifier * this->computeOptimum().value()));
-}
-
-std::string CentreSquare::lineInfo() const {
-  std::stringstream rval;
-
-  rval << "Obstacle width: " << widths_.at(0) << ".";
-
-  return rval.str();
-}
-
-std::string CentreSquare::paraInfo() const {
-  return std::string();
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> CentreSquare::getGoalState() const {
+  return goalState_;
 }
 
 void CentreSquare::accept(const ContextVisitor& visitor) const {

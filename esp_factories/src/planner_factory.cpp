@@ -55,7 +55,7 @@ namespace esp {
 namespace ompltools {
 
 PlannerFactory::PlannerFactory(const std::shared_ptr<Configuration> &config,
-                               const std::shared_ptr<BaseObstacleContext> &context) :
+                               const std::shared_ptr<BaseContext> &context) :
     config_(config),
     context_(context) {
   if (config_->contains("Planners") == 0) {
@@ -75,7 +75,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     case PLANNER_TYPE::AIBITSTAR: {
       // Allocate and configure an AI-BIT* planner.
       auto planner = std::make_shared<ompl::geometric::AIBITstar>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setNumSamplesPerBatch(config_->get<std::size_t>(parentKey + "/samplesPerBatch"));
       planner->setRadiusFactor(config_->get<double>(parentKey + "/radiusFactor"));
@@ -84,7 +84,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     case PLANNER_TYPE::BITSTAR: {
       // Allocate and configure a BIT* planner.
       auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setUseKNearest(config_->get<bool>(parentKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
@@ -104,7 +104,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       // Allocate and configure a BIT* Regression planner.
       auto planner =
           std::make_shared<ompl::geometric::BITstarRegression>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setUseKNearest(config_->get<bool>(parentKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
@@ -120,16 +120,17 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     case PLANNER_TYPE::INFORMEDRRTSTAR: {
       auto planner =
           std::make_shared<ompl::geometric::InformedRRTstar>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
-      planner->setNumSamplingAttempts(config_->get<std::size_t>(parentKey + "/numSamplingAttempts"));
+      planner->setNumSamplingAttempts(
+          config_->get<std::size_t>(parentKey + "/numSamplingAttempts"));
       return {planner, PLANNER_TYPE::INFORMEDRRTSTAR};
     }
     case PLANNER_TYPE::RRTCONNECT: {
       // Allocate and configure an RRT-Connect planner.
       auto planner = std::make_shared<ompl::geometric::RRTConnect>(context_->getSpaceInformation());
-      auto dimKey = std::to_string(context_->getDimensions()) + "d";
-      planner->setProblemDefinition(context_->newProblemDefinition());
+      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
       planner->setIntermediateStates(config_->get<bool>(parentKey + "/addIntermediateStates"));
@@ -138,8 +139,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     case PLANNER_TYPE::RRTSHARP: {
       // Allocate and configure an RRTSharp planner.
       auto planner = std::make_shared<ompl::geometric::RRTsharp>(context_->getSpaceInformation());
-      auto dimKey = std::to_string(context_->getDimensions()) + "d";
-      planner->setProblemDefinition(context_->newProblemDefinition());
+      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setKNearest(config_->get<bool>(parentKey + "/useKNearest"));
       planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
@@ -153,8 +154,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     case PLANNER_TYPE::RRTSTAR: {
       // Allocate and configure an RRTstar planner.
       auto planner = std::make_shared<ompl::geometric::RRTstar>(context_->getSpaceInformation());
-      auto dimKey = std::to_string(context_->getDimensions()) + "d";
-      planner->setProblemDefinition(context_->newProblemDefinition());
+      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setKNearest(config_->get<bool>(parentKey + "/useKNearest"));
       planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
@@ -172,7 +173,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     case PLANNER_TYPE::SBITSTAR: {
       // Allocate and configure an SBIT* planner.
       auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setUseKNearest(config_->get<bool>(parentKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
@@ -192,7 +193,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     case PLANNER_TYPE::TBDSTAR: {
       // Allocate and configure a TBD* planner.
       auto planner = std::make_shared<ompl::geometric::TBDstar>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->newProblemDefinition());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setRepairBackwardSearch(config_->get<bool>(parentKey + "/repairBackwardSearch"));
       planner->setBatchSize(config_->get<std::size_t>(parentKey + "/batchSize"));

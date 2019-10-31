@@ -9,7 +9,6 @@ include_directories(
 # Build the library.
 add_library(esp_planning_contexts
   src/base_context.cpp
-  src/base_obstacle_context.cpp
   src/context_validity_checker.cpp
   src/context_validity_checker_gnat.cpp
   src/centre_square.cpp
@@ -21,6 +20,7 @@ add_library(esp_planning_contexts
   src/obstacle_free.cpp
   src/random_rectangles.cpp
   src/random_rectangles_multi_start_goal.cpp
+  src/real_vector_geometric_context.cpp
   src/repeating_rectangles.cpp
   # src/spiral.cpp
   src/start_enclosure.cpp

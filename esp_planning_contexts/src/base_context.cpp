@@ -32,21 +32,72 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Marlin Strub
 
 #include "esp_planning_contexts/base_context.h"
 
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
-#include <string>
+#include "esp_common/objective_type.h"
+#include "esp_optimization_objectives/potential_field_optimization_objective.h"
 
 namespace esp {
 
 namespace ompltools {
 
-BaseContext::BaseContext(const std::shared_ptr<const Configuration>& config,
+BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                         const std::shared_ptr<const Configuration>& config,
                          const std::string& name) :
+    spaceInfo_(spaceInfo),
     name_(name),
+    maxSolveDuration_(time::seconds(config->get<double>("Contexts/" + name + "/maxTime"))),
     config_(config) {
+  // Get the optimization objective.
+  switch (config_->get<OBJECTIVE_TYPE>(
+      "Objectives/" + config_->get<std::string>("Contexts/" + name_ + "/objective") + "/type")) {
+    case OBJECTIVE_TYPE::COSTMAP: {
+      throw std::runtime_error("CostMap objective is not yet implemented.");
+      break;
+    }
+    case OBJECTIVE_TYPE::PATHLENGTH: {
+      objective_ = std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
+      break;
+    }
+    case OBJECTIVE_TYPE::POTENTIALFIELD: {
+      objective_ = std::make_shared<PotentialFieldOptimizationObjective>(spaceInfo_, config_);
+      break;
+    }
+    default:
+      throw std::runtime_error("Unknown optimization objective.");
+  }
+
+  // Set the default cost to go heuristic for the objective.
+  objective_->setCostToGoHeuristic(
+      std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
+}
+
+std::string BaseContext::getName() const {
+  return name_;
+}
+
+std::shared_ptr<ompl::base::SpaceInformation> BaseContext::getSpaceInformation() const {
+  return spaceInfo_;
+}
+
+std::shared_ptr<ompl::base::StateSpace> BaseContext::getStateSpace() const {
+  return spaceInfo_->getStateSpace();
+}
+
+std::size_t BaseContext::getDimension() const {
+  return spaceInfo_->getStateDimension();
+}
+
+ompl::base::OptimizationObjectivePtr BaseContext::getObjective() const {
+  return objective_;
+}
+
+time::Duration BaseContext::getMaxSolveDuration() const {
+  return maxSolveDuration_;
 }
 
 }  // namespace ompltools
