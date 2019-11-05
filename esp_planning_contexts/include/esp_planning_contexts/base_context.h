@@ -46,6 +46,7 @@
 #include <ompl/base/StateSpace.h>
 
 #include "esp_configuration/configuration.h"
+#include "esp_planning_contexts/context_visitor.h"
 #include "esp_time/time.h"
 
 namespace esp {
@@ -79,6 +80,9 @@ class BaseContext {
   /** \brief Return a newly generated problem definition */
   virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
       const = 0;
+
+  /** \brief Accepts a context visitor. */
+  virtual void accept(const ContextVisitor& visitor) const = 0;
 
  protected:
   /** \brief The space information associated with this context. */

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 project(esp_planning_contexts)
 
 # Include necessary header directories.
@@ -29,6 +29,8 @@ add_library(esp_planning_contexts
 
 # Link the library.
 target_link_libraries(esp_planning_contexts
+  PRIVATE # Libraries not exposed in API.
+  ${OpenRAVE_LIBRARIES}
   PUBLIC # Libraries exposed in API.
   ${OMPL_LIBRARIES}
   esp_common

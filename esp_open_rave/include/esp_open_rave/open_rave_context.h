@@ -36,46 +36,52 @@
 
 #pragma once
 
-#include "nlohmann/json.hpp"
+#include <memory>
+
+#include <ompl/base/ProblemDefinition.h>
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/spaces/RealVectorStateSpace.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include <openrave-core.h>
+#pragma GCC diagnostic pop
+
+#include "esp_configuration/configuration.h"
+#include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/context_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
-enum class CONTEXT_TYPE {
-  CENTRE_SQUARE,
-  DIVIDING_WALLS,
-  DOUBLE_ENCLOSURE,
-  FLANKING_GAP,
-  FOUR_ROOMS,
-  GOAL_ENCLOSURE,
-  OBSTACLE_FREE,
-  OPEN_RAVE,
-  RANDOM_RECTANGLES,
-  RANDOM_RECTANGLES_MULTI_START_GOAL,
-  REPEATING_RECTANGLES,
-  SPIRAL,
-  START_ENCLOSURE,
-  WALL_GAP,
-};
+/** \brief A planning context to plugin to the OpenRave simulator. */
+class OpenRave : public BaseContext {
+ public:
+  OpenRave(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+           const std::shared_ptr<const Configuration>& config, const std::string& name);
+  virtual ~OpenRave();
 
-NLOHMANN_JSON_SERIALIZE_ENUM(CONTEXT_TYPE,
-                             {
-                                 {CONTEXT_TYPE::CENTRE_SQUARE, "CentreSquare"},
-                                 {CONTEXT_TYPE::DIVIDING_WALLS, "DividingWalls"},
-                                 {CONTEXT_TYPE::DOUBLE_ENCLOSURE, "DoubleEnclosure"},
-                                 {CONTEXT_TYPE::FLANKING_GAP, "FlankingGap"},
-                                 {CONTEXT_TYPE::FOUR_ROOMS, "FourRooms"},
-                                 {CONTEXT_TYPE::GOAL_ENCLOSURE, "GoalEnclosure"},
-                                 {CONTEXT_TYPE::OBSTACLE_FREE, "ObstacleFree"},
-                                 {CONTEXT_TYPE::OPEN_RAVE, "OpenRave"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES, "RandomRectangles"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES_MULTI_START_GOAL, "MultiStartGoal"},
-                                 {CONTEXT_TYPE::REPEATING_RECTANGLES, "RepeatingRectangles"},
-                                 {CONTEXT_TYPE::SPIRAL, "Spiral"},
-                                 {CONTEXT_TYPE::START_ENCLOSURE, "StartEnclosure"},
-                                 {CONTEXT_TYPE::WALL_GAP, "WallGap"},
-                             })
+  /** \brief Instantiate a problem definition for this context. */
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
+      const override;
+
+  /** \brief Return a copy of the start state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
+
+  /** \brief Return a copy of the goal state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getGoalState() const;
+
+  /** \brief Accepts a context visitor. */
+  virtual void accept(const ContextVisitor& visitor) const override;
+
+ private:
+  /** \brief The start state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState_;
+
+  /** \brief The goal state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState_;
+};
 
 }  // namespace ompltools
 

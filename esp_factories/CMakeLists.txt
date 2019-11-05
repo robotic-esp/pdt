@@ -20,6 +20,7 @@ target_link_libraries(esp_factories
   ${OMPL_LIBRARIES}
   esp_common
   esp_configuration
+  esp_open_rave
   esp_planning_contexts)
 
 # Specify the include directories exported by this library.

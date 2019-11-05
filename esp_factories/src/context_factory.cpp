@@ -72,9 +72,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<CentreSquare>(createRealVectorSpaceInfo(parentKey), config_,
                                               contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a CentreSquare context. Check the spelling of the parameters in the "
-            "context factory and the json file.");
+        throw std::runtime_error("Error allocating a CentreSquare context.");
       }
     }
     case CONTEXT_TYPE::DIVIDING_WALLS: {
@@ -82,9 +80,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<DividingWalls>(createRealVectorSpaceInfo(parentKey), config_,
                                                contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a DividingWall context. Check the spelling of the parameters in the "
-            "context factory and the json file.");
+        throw std::runtime_error("Error allocating a DividingWall context.");
       }
     }
     case CONTEXT_TYPE::DOUBLE_ENCLOSURE: {
@@ -92,9 +88,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<DoubleEnclosure>(createRealVectorSpaceInfo(parentKey), config_,
                                                  contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a DoubleEnclosure context.");
       }
     }
     case CONTEXT_TYPE::FLANKING_GAP: {
@@ -102,9 +96,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<FlankingGap>(createRealVectorSpaceInfo(parentKey), config_,
                                              contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a FlankingGap context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a FlankingGap context.");
       }
     }
     case CONTEXT_TYPE::FOUR_ROOMS: {
@@ -112,9 +104,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<FourRooms>(createRealVectorSpaceInfo(parentKey), config_,
                                            contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a FlankingGap context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a FlankingGap context.");
       }
     }
     case CONTEXT_TYPE::GOAL_ENCLOSURE: {
@@ -122,9 +112,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<GoalEnclosure>(createRealVectorSpaceInfo(parentKey), config_,
                                                contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a GoalEnclosure context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a GoalEnclosure context.");
       }
     }
     case CONTEXT_TYPE::OBSTACLE_FREE: {
@@ -132,9 +120,21 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<ObstacleFree>(createRealVectorSpaceInfo(parentKey), config_,
                                               contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a ObstacleFree context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a ObstacleFree context.");
+      }
+    }
+    case CONTEXT_TYPE::OPEN_RAVE: {
+      try {
+        // Allocate a real vector state space.
+        // The state space bounds are set in the context.
+        auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(
+            config_->get<std::size_t>(parentKey + "/dimensions"));
+
+        // Allocate the state information for this space.
+        auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+        return std::make_shared<OpenRave>(spaceInfo, config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating a OpenRave context.");
       }
     }
     case CONTEXT_TYPE::RANDOM_RECTANGLES: {
@@ -142,9 +142,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<RandomRectangles>(createRealVectorSpaceInfo(parentKey), config_,
                                                   contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a RandomRectangles context. Check the spelling of the parameters in "
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a RandomRectangles context.");
       }
     }
     case CONTEXT_TYPE::RANDOM_RECTANGLES_MULTI_START_GOAL: {
@@ -152,9 +150,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<RandomRectanglesMultiStartGoal>(
             createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a RandomRectanglesMultiStartGoal context. Check the spelling of the "
-            "parameters in the context factory and the json file.");
+        throw std::runtime_error("Error allocating a RandomRectanglesMultiStartGoal context.");
       }
     }
     case CONTEXT_TYPE::REPEATING_RECTANGLES: {
@@ -162,9 +158,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<RepeatingRectangles>(createRealVectorSpaceInfo(parentKey), config_,
                                                      contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a RepeatingRectangles context. Check the spelling of the "
-            "parameters in the context factory and the json file.");
+        throw std::runtime_error("Error allocating a RepeatingRectangles context.");
       }
     }
     case CONTEXT_TYPE::START_ENCLOSURE: {
@@ -172,9 +166,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<StartEnclosure>(createRealVectorSpaceInfo(parentKey), config_,
                                                 contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a StartEnclosure context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a StartEnclosure context.");
       }
     }
     case CONTEXT_TYPE::WALL_GAP: {
@@ -182,9 +174,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<WallGap>(createRealVectorSpaceInfo(parentKey), config_,
                                          contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a WallGap context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a WallGap context.");
       }
     }
     default: {

@@ -67,6 +67,17 @@
             "wallThickness": 0.1,
             "gapWidth": 0.1
         },
+        "OpenRave": {
+            "type": "OpenRave",
+            "objective": "PathLength",
+            "start": [-0.1, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "goal": [-1.2, 0.0, 0.0, 0.0, 0.0, 0.0],
+            "maxTime": 1,
+            "dimension": 10,
+            "environment": "/home/marlin/code/openrave/src/data/wamtest1.env.xml",
+            "robot": "BarrettWAM",
+            "collisionCheckResolution": 0.001
+        },
         "GoalEnclosure": {
             "type": "GoalEnclosure",
             "objective": "PathLength",

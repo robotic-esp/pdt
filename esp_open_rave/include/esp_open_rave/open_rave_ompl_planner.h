@@ -36,46 +36,19 @@
 
 #pragma once
 
-#include "nlohmann/json.hpp"
+#include <openrave-core.h>
+#include <openrave/planner.h>
 
 namespace esp {
 
 namespace ompltools {
 
-enum class CONTEXT_TYPE {
-  CENTRE_SQUARE,
-  DIVIDING_WALLS,
-  DOUBLE_ENCLOSURE,
-  FLANKING_GAP,
-  FOUR_ROOMS,
-  GOAL_ENCLOSURE,
-  OBSTACLE_FREE,
-  OPEN_RAVE,
-  RANDOM_RECTANGLES,
-  RANDOM_RECTANGLES_MULTI_START_GOAL,
-  REPEATING_RECTANGLES,
-  SPIRAL,
-  START_ENCLOSURE,
-  WALL_GAP,
-};
+class OpenRaveOmplPlanner : public OpenRAVE::PlannerBase {
+public:
+  OpenRaveOmplPlanner(OpenRAVE::EnvironmentBasePtr environment);
+  virtual ~OpenRaveOmplPlanner() = default;
 
-NLOHMANN_JSON_SERIALIZE_ENUM(CONTEXT_TYPE,
-                             {
-                                 {CONTEXT_TYPE::CENTRE_SQUARE, "CentreSquare"},
-                                 {CONTEXT_TYPE::DIVIDING_WALLS, "DividingWalls"},
-                                 {CONTEXT_TYPE::DOUBLE_ENCLOSURE, "DoubleEnclosure"},
-                                 {CONTEXT_TYPE::FLANKING_GAP, "FlankingGap"},
-                                 {CONTEXT_TYPE::FOUR_ROOMS, "FourRooms"},
-                                 {CONTEXT_TYPE::GOAL_ENCLOSURE, "GoalEnclosure"},
-                                 {CONTEXT_TYPE::OBSTACLE_FREE, "ObstacleFree"},
-                                 {CONTEXT_TYPE::OPEN_RAVE, "OpenRave"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES, "RandomRectangles"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES_MULTI_START_GOAL, "MultiStartGoal"},
-                                 {CONTEXT_TYPE::REPEATING_RECTANGLES, "RepeatingRectangles"},
-                                 {CONTEXT_TYPE::SPIRAL, "Spiral"},
-                                 {CONTEXT_TYPE::START_ENCLOSURE, "StartEnclosure"},
-                                 {CONTEXT_TYPE::WALL_GAP, "WallGap"},
-                             })
+};
 
 }  // namespace ompltools
 

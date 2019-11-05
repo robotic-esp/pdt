@@ -34,48 +34,46 @@
 
 // Authors: Marlin Strub
 
-#pragma once
+#include "esp_open_rave/open_rave_validity_checker.h"
 
-#include "nlohmann/json.hpp"
+using namespace std::string_literals;
 
 namespace esp {
 
 namespace ompltools {
 
-enum class CONTEXT_TYPE {
-  CENTRE_SQUARE,
-  DIVIDING_WALLS,
-  DOUBLE_ENCLOSURE,
-  FLANKING_GAP,
-  FOUR_ROOMS,
-  GOAL_ENCLOSURE,
-  OBSTACLE_FREE,
-  OPEN_RAVE,
-  RANDOM_RECTANGLES,
-  RANDOM_RECTANGLES_MULTI_START_GOAL,
-  REPEATING_RECTANGLES,
-  SPIRAL,
-  START_ENCLOSURE,
-  WALL_GAP,
-};
+OpenRaveValidityChecker::OpenRaveValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
+                                                 const OpenRAVE::EnvironmentBasePtr& environment,
+                                                 const OpenRAVE::RobotBasePtr& robot) :
+    ompl::base::StateValidityChecker(spaceInfo),
+    environment_(environment),
+    robot_(robot),
+    raveState_(robot->GetDOF()),
+    stateSpace_(spaceInfo->getStateSpace()) {
+}
 
-NLOHMANN_JSON_SERIALIZE_ENUM(CONTEXT_TYPE,
-                             {
-                                 {CONTEXT_TYPE::CENTRE_SQUARE, "CentreSquare"},
-                                 {CONTEXT_TYPE::DIVIDING_WALLS, "DividingWalls"},
-                                 {CONTEXT_TYPE::DOUBLE_ENCLOSURE, "DoubleEnclosure"},
-                                 {CONTEXT_TYPE::FLANKING_GAP, "FlankingGap"},
-                                 {CONTEXT_TYPE::FOUR_ROOMS, "FourRooms"},
-                                 {CONTEXT_TYPE::GOAL_ENCLOSURE, "GoalEnclosure"},
-                                 {CONTEXT_TYPE::OBSTACLE_FREE, "ObstacleFree"},
-                                 {CONTEXT_TYPE::OPEN_RAVE, "OpenRave"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES, "RandomRectangles"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES_MULTI_START_GOAL, "MultiStartGoal"},
-                                 {CONTEXT_TYPE::REPEATING_RECTANGLES, "RepeatingRectangles"},
-                                 {CONTEXT_TYPE::SPIRAL, "Spiral"},
-                                 {CONTEXT_TYPE::START_ENCLOSURE, "StartEnclosure"},
-                                 {CONTEXT_TYPE::WALL_GAP, "WallGap"},
-                             })
+bool OpenRaveValidityChecker::isValid(const ompl::base::State* state) const {
+  // Check the states is within the bounds of the state space.
+  if (!stateSpace_->satisfiesBounds(state)) {
+    return false;
+  }
+
+  // Fill the rave state with the ompl state values.
+  auto realVectorState = state->as<ompl::base::RealVectorStateSpace::StateType>();
+  for (std::size_t i = 0u; i < stateSpace_->getDimension(); ++i) {
+    raveState_[i] = realVectorState->operator[](i);
+  }
+
+  // Set the robot to the requested state.
+  robot_->SetActiveDOFValues(raveState_);
+
+  // Check for collisions.
+  if (environment_->CheckCollision(robot_) || robot_->CheckSelfCollision()) {
+    return false;
+  } else {
+    return true;
+  }
+}
 
 }  // namespace ompltools
 

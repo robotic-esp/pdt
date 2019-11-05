@@ -12,12 +12,15 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Append the path to find installed third-party libraries.
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 # Build in release if no build type is specified.
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-# Put executables in bin directory.
+# Put executables in a bin directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 
 # Display system info.
@@ -29,13 +32,17 @@ message(STATUS "Configuring for ${CMAKE_BUILD_TYPE} mode:")
 # Find Threads.
 find_package(Threads REQUIRED)
 
+# Find Boost.
+find_package(Boost 1.58 REQUIRED COMPONENTS program_options thread)
+include_directories(${Boost_INCLUDE_DIR})
+
 # Find Eigen.
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-# Find Boost.
-find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options thread)
-include_directories(${Boost_INCLUDE_DIR})
+# Find OpenRAVE.
+find_package(OpenRAVE REQUIRED)
+include_directories(${OpenRAVE_INCLUDE_DIRS})
 
 # Find OMPL.
 find_package(ompl REQUIRED)
@@ -57,6 +64,7 @@ add_subdirectory(esp_configuration)
 add_subdirectory(esp_experiments)
 add_subdirectory(esp_factories)
 add_subdirectory(esp_obstacles)
+add_subdirectory(esp_open_rave)
 add_subdirectory(esp_optimization_objectives)
 add_subdirectory(esp_performance_loggers)
 add_subdirectory(esp_planning_contexts)
