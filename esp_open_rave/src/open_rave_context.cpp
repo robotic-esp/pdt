@@ -36,8 +36,6 @@
 
 #include "esp_open_rave/open_rave_context.h"
 
-#include <dbg.h>
-
 #include <algorithm>
 
 #include <boost/smart_ptr.hpp>
@@ -77,8 +75,6 @@ OpenRave::OpenRave(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInf
 
   // Load the robot.
   auto robot = environment->GetRobot(config_->get<std::string>("Contexts/" + name + "/robot"));
-
-  dbg(robot->GetDOF());
 
   if (static_cast<std::size_t>(robot->GetDOF()) != spaceInfo->getStateDimension()) {
     throw std::runtime_error(

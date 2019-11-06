@@ -75,6 +75,10 @@ bool OpenRaveValidityChecker::isValid(const ompl::base::State* state) const {
   }
 }
 
+OpenRAVE::EnvironmentBasePtr OpenRaveValidityChecker::getOpenRaveEnvironment() const {
+  return environment_;
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

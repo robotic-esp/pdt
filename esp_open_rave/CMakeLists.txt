@@ -27,3 +27,15 @@ target_link_libraries(esp_open_rave
 # Specify the include directories exported by this library.
 target_include_directories(esp_open_rave PUBLIC
   ${PROJECT_SOURCE_DIR}/include)
+
+add_executable(open_rave_gui
+  src/open_rave_gui.cpp)
+
+target_link_libraries(open_rave_gui
+  ${OpenRAVE_LIBRARIES}
+  ${OpenRAVE_CORE_LIBRARIES}
+  ${OMPL_LIBRARIES}
+  esp_configuration
+  esp_factories
+  esp_planning_contexts
+  esp_open_rave)

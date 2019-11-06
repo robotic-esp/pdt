@@ -40,6 +40,7 @@
 
 #include "esp_common/context_type.h"
 #include "esp_planning_contexts/all_contexts.h"
+#include "esp_open_rave/open_rave_context.h"
 
 namespace esp {
 

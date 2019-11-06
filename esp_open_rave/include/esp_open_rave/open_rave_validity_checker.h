@@ -68,6 +68,9 @@ class OpenRaveValidityChecker : public ompl::base::StateValidityChecker {
   /** \brief Check if a state is valid. */
   virtual bool isValid(const ompl::base::State* state) const override;
 
+  /** \brief Returns a pointer to the rave environment. */
+  OpenRAVE::EnvironmentBasePtr getOpenRaveEnvironment() const;
+
  private:
   /** \brief The rave environment. */
   OpenRAVE::EnvironmentBasePtr environment_;
