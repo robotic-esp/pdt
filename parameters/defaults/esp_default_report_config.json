@@ -4,12 +4,18 @@
         "espwhite": [ 255, 255, 255 ],
         "espgray": [ 120, 120, 120 ],
         "espblue": [ 11, 93, 174 ],
-        "espred": [ 206, 62, 21 ],
+        "esplightblue": [ 59, 175, 236 ],
+        "espdarkblue": [ 6, 26, 64 ],
+        "espred": [ 145, 0, 33 ],
+        "esplightred": [ 206, 62, 21 ],
+        "espdarkred": [ 61, 19, 8 ],
         "espyellow": [ 232, 163, 26 ],
         "espgreen": [ 100, 161, 27 ],
+        "esplightgreen": [ 149, 198, 35 ],
+        "espdarkgreen": [ 49, 92, 43 ],
         "esppurple": [ 106, 20, 125 ],
-        "esplightblue": [ 59, 175, 236 ],
-        "espdarkred": [ 145, 0, 33 ]
+        "esplightpurple": [ 197, 137, 232 ],
+        "espdarkpurple": [ 50, 14, 59 ]
     },
     "PlannerPlotColors": {
         "ABITstar": "esplightblue",

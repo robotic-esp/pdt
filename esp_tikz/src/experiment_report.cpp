@@ -82,17 +82,23 @@ ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
     }
   }
 
-  // Load the from the config.
+  // Load the colors from the config.
   espColors_.emplace("espblack", config_->get<std::array<int, 3>>("Colors/espblack"));
   espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("Colors/espwhite"));
   espColors_.emplace("espgray", config_->get<std::array<int, 3>>("Colors/espgray"));
   espColors_.emplace("espblue", config_->get<std::array<int, 3>>("Colors/espblue"));
+  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("Colors/esplightblue"));
+  espColors_.emplace("espdarkblue", config_->get<std::array<int, 3>>("Colors/espdarkblue"));
   espColors_.emplace("espred", config_->get<std::array<int, 3>>("Colors/espred"));
+  espColors_.emplace("esplightred", config_->get<std::array<int, 3>>("Colors/esplightred"));
+  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("Colors/espdarkred"));
   espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("Colors/espyellow"));
   espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("Colors/espgreen"));
+  espColors_.emplace("esplightgreen", config_->get<std::array<int, 3>>("Colors/esplightgreen"));
+  espColors_.emplace("espdarkgreen", config_->get<std::array<int, 3>>("Colors/espdarkgreen"));
   espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("Colors/esppurple"));
-  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("Colors/esplightblue"));
-  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("Colors/espdarkred"));
+  espColors_.emplace("esplightpurple", config_->get<std::array<int, 3>>("Colors/esplightpurple"));
+  espColors_.emplace("espdarkpurple", config_->get<std::array<int, 3>>("Colors/espdarkpurple"));
 }
 
 fs::path ExperimentReport::generateReport() {
