@@ -39,8 +39,6 @@
 #include <thread>
 #include <vector>
 
-#include <dbg.h>
-
 #include <ompl/geometric/PathGeometric.h>
 
 #pragma GCC diagnostic push
