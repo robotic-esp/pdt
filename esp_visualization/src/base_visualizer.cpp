@@ -39,7 +39,7 @@
 #include <chrono>
 #include <exception>
 
-#include <ompl/base/PlannerTerminationCondition.h>
+#include <ompl/base/terminationconditions/IterationTerminationCondition.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/tbdstar/TBDstar.h>
 
