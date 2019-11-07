@@ -14,18 +14,20 @@
     "PlannerPlotColors": {
         "ABITstar": "esplightblue",
         "AIBITstar": "espgreen",
+        "AIBITstarNC": "espdarkgreen",
         "BITstar": "espblue",
         "BITstarRegression": "esplightblue",
         "InformedRRTstar": "esppurple",
-        "TBDstar": "espyellow",
+        "TBDstar": "esplightgreen",
         "LBTRRT" : "esppurple",
         "RRTConnect": "espblack",
-        "RRTsharp": "espyellow",
+        "RRTsharp": "esplightred",
         "RRTstar": "espred"
     },
     "PlotPlannerNames": {
         "ABITstar": "ABIT*",
         "AIBITstar": "AI-BIT*",
+        "AIBITstarNC": "AI-BIT* NC",
         "BITstar": "BIT*",
         "BITstarRegression": "BIT* Reg",
         "InformedRRTstar": "Informed RRT*",

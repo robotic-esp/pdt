@@ -17,7 +17,8 @@
         "AIBITstar": {
             "type": "AIBITstar",
             "samplesPerBatch": 100,
-            "radiusFactor": 1.001
+            "radiusFactor": 1.001,
+            "collisionDetectionOnReverseSearch": true
         },
         "BITstar": {
             "type": "BITstar",
