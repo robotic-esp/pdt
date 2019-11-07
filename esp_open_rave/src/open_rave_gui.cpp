@@ -88,9 +88,6 @@ void plan(std::shared_ptr<esp::ompltools::Configuration> config,
 
   auto bounds = context->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
 
-  dbg(bounds.low);
-  dbg(bounds.high);
-
   // Get the robot.
   auto robot =
       environment->GetRobot(config->get<std::string>("Contexts/" + context->getName() + "/robot"));
