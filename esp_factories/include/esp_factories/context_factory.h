@@ -36,12 +36,9 @@
 
 #pragma once
 
-#include <fstream>
-#include <iostream>
+#include <memory>
 
-#include <ompl/base/Planner.h>
-
-#include "nlohmann/json.hpp"
+#include <ompl/base/SpaceInformation.h>
 
 #include "esp_configuration/configuration.h"
 #include "esp_planning_contexts/base_context.h"
@@ -50,16 +47,21 @@ namespace esp {
 
 namespace ompltools {
 
-// A class to create planners from config files.
+/** A class to create planning contexts from config files. */
 class ContextFactory {
  public:
   ContextFactory(const std::shared_ptr<const Configuration> &config);
   ~ContextFactory() = default;
 
-  // Create a planner.
-  std::shared_ptr<BaseContext> create(const std::string &contextType) const;
+  /** \brief Creates a context. */
+  std::shared_ptr<BaseContext> create(const std::string &contextName) const;
 
  private:
+  /** \brief Create a space info with a real vector state space. */
+  std::shared_ptr<ompl::base::SpaceInformation> createRealVectorSpaceInfo(
+      const std::string &parentKey) const;
+
+  /** \brief The configuration which specifies the context properties. */
   const std::shared_ptr<const Configuration> config_;
 };
 

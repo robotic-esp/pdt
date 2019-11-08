@@ -36,9 +36,16 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
+#include <ompl/base/ProblemDefinition.h>
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/spaces/RealVectorStateSpace.h>
+
 #include "esp_configuration/configuration.h"
-#include "esp_planning_contexts/base_context.h"
 #include "esp_planning_contexts/context_validity_checker.h"
+#include "esp_planning_contexts/real_vector_geometric_context.h"
 
 namespace esp {
 
@@ -46,48 +53,52 @@ namespace ompltools {
 
 /** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
  * a multiple homotopy-class experiment that scales to N dimensions. */
-class WallGap : public BaseContext {
+class WallGap : public RealVectorGeometricContext {
  public:
-  // An odd number of gaps results in a straight line solution.
-  WallGap(const std::shared_ptr<const Configuration>& config, const std::string& name);
+  WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+          const std::shared_ptr<const Configuration>& config, const std::string& name);
+  virtual ~WallGap() = default;
 
-  /** \brief This problem could knows its optimum, but doesn't at the moment */
-  virtual bool knowsOptimum() const override;
+  /** \brief Instantiate a problem definition for this context. */
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
+      const override;
 
-  /** \brief As the optimum isn't implemented, throw. */
-  virtual ompl::base::Cost computeOptimum() const override;
+  /** \brief Return a copy of the start state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
 
-  /** \brief Set the optimization target as the specified cost. */
-  virtual void setTarget(double targetSpecifier) override;
+  /** \brief Return a copy of the goal state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getGoalState() const;
 
-  /** \brief Derived class specific information to include in the title line. */
-  virtual std::string lineInfo() const override;
-
-  /** \brief Derived class specific information to include at the end. */
-  virtual std::string paraInfo() const override;
-
-  // Accept a context visitor.
+  /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
-  // Create the obstacles.
+  /** \brief Create the obstacles. */
   void createObstacles();
-  
-  // Create the obstacles.
+
+  /** \brief Create the anti obstacles. */
   void createAntiObstacles();
-  
-  // Direct access to obstacle information.
+
+  /** \brief The dimensionality of the underlying state space. */
+  std::size_t dimensionality_;
+
+  /** \brief The wall width. */
   double wallWidth_;
+
+  /** \brief The wall thickness. */
   double wallThickness_;
+
+  /** \brief The gap width. */
   double gapWidth_;
+
+  /** \brief The gap offset. */
   double gapOffset_;
 
-  // The validity checker.
-  std::shared_ptr<ContextValidityChecker> validityChecker_{};
+  /** \brief The start state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState_;
 
-  // The start and goal positions.
-  std::vector<double> startPos_;
-  std::vector<double> goalPos_;
+  /** \brief The goal state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState_;
 };
 
 }  // namespace ompltools

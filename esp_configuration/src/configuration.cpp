@@ -250,7 +250,8 @@ void Configuration::loadDefaultConfigs(bool loadDefaultContextConfigs,
       }
       std::ifstream configFile(directoryEntry.path().string());
       if (configFile.fail()) {
-        OMPL_ERROR("File '%s' exists but cannot be opened.", directoryEntry.path().string());
+        OMPL_ERROR("File '%s' exists but cannot be opened.",
+                   directoryEntry.path().string().c_str());
         throw std::ios_base::failure("Configuration error.");
       }
       json::json config;
@@ -266,7 +267,7 @@ void Configuration::loadDefaultConfigs(bool loadDefaultContextConfigs,
       for (const auto &entry : config.items()) {
         if (parameters_.contains(entry.key())) {
           OMPL_ERROR("The parameter '%s' is defined multiple times in the default configs",
-                     entry.key());
+                     entry.key().c_str());
           throw std::ios_base::failure("Configuration failure.");
         }
       }

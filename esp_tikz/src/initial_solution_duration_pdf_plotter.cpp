@@ -79,7 +79,7 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutio
     const std::string& plannerName) const {
   axis_ = std::make_shared<PgfAxis>();
   setInitialSolutionDurationPdfAxisOptions(axis_);
-  axis_->options.name = plannerName + "InitialSolutionDurationPdfAxis"s;
+  axis_->options.name = plannerName + "ISDPA"s;
   axis_->addPlot(createInitialSolutionDurationPdfPlot(plannerName));
   return axis_;
 }

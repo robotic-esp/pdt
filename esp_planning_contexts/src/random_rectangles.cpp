@@ -36,38 +36,40 @@
 
 #include "esp_planning_contexts/random_rectangles.h"
 
-#include <cmath>
-#include <functional>
-#include <memory>
+#include <vector>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
-#include <ompl/base/goals/GoalStates.h>
-#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/base/spaces/RealVectorBounds.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
 
+#include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
+#include "esp_planning_contexts/context_validity_checker_gnat.h"
 
 namespace esp {
 
 namespace ompltools {
 
-RandomRectangles::RandomRectangles(const std::shared_ptr<const Configuration>& config,
+RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                                   const std::shared_ptr<const Configuration>& config,
                                    const std::string& name) :
-    BaseContext(config, name),
+    RealVectorGeometricContext(spaceInfo, config, name),
+    dimensionality_(spaceInfo_->getStateDimension()),
     numRectangles_(config->get<std::size_t>("Contexts/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("Contexts/" + name + "/minSideLength")),
     maxSideLength_(config->get<double>("Contexts/" + name + "/maxSideLength")),
-    startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
-    goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
+    startState_(spaceInfo),
+    goalState_(spaceInfo) {
+  // Get the start and goal positions.
+  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+
   // Assert configuration sanity.
-  if (startPos_.size() != dimensionality_) {
+  if (startPosition.size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (goalPos_.size() != dimensionality_) {
+  if (goalPosition.size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
@@ -77,70 +79,53 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<const Configuration>& c
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  // Create a state space and set the bounds.
-  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
-  stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
+  // Create the validity checker.
+  auto validityChecker = std::make_shared<ContextValidityCheckerGNAT>(spaceInfo_);
 
-  // Create the space information class:
-  spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+  // Fill the start and goal states' coordinates.
+  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+    startState_[i] = startPosition.at(i);
+    goalState_[i] = goalPosition.at(i);
+  }
 
-  // Create a start state.
-  addStartState(startPos_);
-
-  // Create a goal state.
-  addGoalState(goalPos_);
-  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
-
-  // Create the obstacles.
+  // Create the obstacles and add them to the validity checker.
   createObstacles();
-
-  // Create the validity checker and add the obstacle.
-  validityChecker_ = std::make_shared<ContextValidityCheckerGNAT>(spaceInfo_);
-  validityChecker_->addObstacles(obstacles_);
+  validityChecker->addObstacles(obstacles_);
 
   // Set the validity checker and the check resolution.
-  spaceInfo_->setStateValidityChecker(
-      static_cast<ompl::base::StateValidityCheckerPtr>(validityChecker_));
+  spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
       config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();
-
-  // Allocate the optimization objective
-  optimizationObjective_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
-
-  // Set the heuristic to the default:
-  optimizationObjective_->setCostToGoHeuristic(
-      std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
-
-  // Specify the optimization target.
-  optimizationObjective_->setCostThreshold(computeMinPossibleCost());
 }
 
-bool RandomRectangles::knowsOptimum() const {
-  return false;
+ompl::base::ProblemDefinitionPtr RandomRectangles::instantiateNewProblemDefinition() const {
+  // Instantiate a new problem definition.
+  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+
+  // Set the objective.
+  problemDefinition->setOptimizationObjective(objective_);
+
+  // Set the start state in the problem definition.
+  problemDefinition->addStartState(startState_);
+
+  // Create a goal for the problem definition.
+  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goal->setState(goalState_);
+  problemDefinition->setGoal(goal);
+
+  // Return the new definition.
+  return problemDefinition;
 }
 
-ompl::base::Cost RandomRectangles::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown.", BaseContext::name_);
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RandomRectangles::getStartState() const {
+  return startState_;
 }
 
-void RandomRectangles::setTarget(double targetSpecifier) {
-  optimizationObjective_->setCostThreshold(
-      ompl::base::Cost(targetSpecifier * this->computeOptimum().value()));
-}
-
-std::string RandomRectangles::lineInfo() const {
-  std::stringstream rval;
-
-  return rval.str();
-}
-
-std::string RandomRectangles::paraInfo() const {
-  return std::string();
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RandomRectangles::getGoalState() const {
+  return goalState_;
 }
 
 void RandomRectangles::accept(const ContextVisitor& visitor) const {
@@ -150,18 +135,19 @@ void RandomRectangles::accept(const ContextVisitor& visitor) const {
 void RandomRectangles::createObstacles() {
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
-    // Create a random midpoint (uniform).
-    ompl::base::ScopedState<> midpoint(spaceInfo_);
-    midpoint.random();
+    // Create a random anchor (uniform).
+    ompl::base::ScopedState<> anchor(spaceInfo_);
+    anchor.random();
+
     // Create random widths (uniform).
     std::vector<double> widths(dimensionality_, 0.0);
     for (std::size_t j = 0; j < dimensionality_; ++j) {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
-    auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths);
+    auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths);
+
     // Add this to the obstacles if it doesn't invalidate the start or goal state.
-    if (!obstacle->invalidates(startStates_.back().get()) &&
-        !obstacle->invalidates(goalStates_.back().get())) {
+    if (!obstacle->invalidates(startState_) && !obstacle->invalidates(goalState_)) {
       obstacles_.emplace_back(obstacle);
     } else {
       --i;

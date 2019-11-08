@@ -78,8 +78,16 @@ bool BaseObstacle::invalidates(const ompl::base::State* state) const {
   return isInside(state);
 }
 
+bool BaseObstacle::invalidates(const ompl::base::ScopedState<> state) const {
+  return invalidates(state.get());
+}
+
 bool BaseAntiObstacle::validates(const ompl::base::State* state) const {
   return isInside(state);
+}
+
+bool BaseAntiObstacle::validates(const ompl::base::ScopedState<> state) const {
+  return validates(state.get());
 }
 
 }  // namespace ompltools

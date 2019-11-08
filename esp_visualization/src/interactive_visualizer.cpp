@@ -48,7 +48,8 @@ namespace esp {
 namespace ompltools {
 
 InteractiveVisualizer::InteractiveVisualizer(
-    const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
+    const std::shared_ptr<Configuration>& config,
+    const std::shared_ptr<RealVectorGeometricContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
     BaseVisualizer(config, context, plannerPair),
     tikzVisualizer_(config, context, plannerPair),
@@ -84,16 +85,16 @@ void InteractiveVisualizer::run() {
   // We can also set an aspect ratio such that even if the window gets
   // rescaled the drawings in the viewport do not get distorted.
   auto bounds = context_->getBoundaries();
-  if (bounds.size() == 2u) {
+  if (context_->getDimension() == 2u) {
     contextView.SetBounds(
         pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5), pangolin::Attach::Pix(205),
         pangolin::Attach::ReversePix(5),
-        (bounds.at(0).second - bounds.at(0).first) / (bounds.at(1).second - bounds.at(1).first));
+        (bounds.high.at(0) - bounds.low.at(0)) / (bounds.high.at(1) - bounds.low.at(1)));
   } else {
     contextView.SetBounds(
         pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5), pangolin::Attach::Pix(205),
         pangolin::Attach::ReversePix(5),
-        -(bounds.at(0).second - bounds.at(0).first) / (bounds.at(1).second - bounds.at(1).first));
+        -(bounds.high.at(0) - bounds.low.at(0)) / (bounds.high.at(1) - bounds.low.at(1)));
   }
   plotView.SetBounds(0.0, pangolin::Attach::Pix(200), pangolin::Attach::Pix(200), 1.0);
   pangolin::Plotter plotter(&costLog_, 0.0, 1.0, 0.0, 5.0);
@@ -109,7 +110,7 @@ void InteractiveVisualizer::run() {
   pangolin::Handler3D handler(renderState);
 
   // Get the bounds of the context to setup a correct renderstate.
-  if (context_->getDimensions() == 2u) {
+  if (context_->getDimension() == 2u) {
     // glShadeModel(GL_FLAT);
     // glEnable(GL_LINE_SMOOTH);
     // glEnable(GL_BLEND);
@@ -118,14 +119,14 @@ void InteractiveVisualizer::run() {
     // glDisable(GL_DEPTH_TEST);
     // glDisable(GL_LIGHTING);
     renderState.SetProjectionMatrix(pangolin::ProjectionMatrixOrthographic(
-        bounds.at(0).first,   // The left boundary of the problem
-        bounds.at(0).second,  // The right boundary of the problem
-        bounds.at(1).first,   // The bottom boundary of the porblem
-        bounds.at(1).second,  // The top boundary of the problem
-        -1.0f,                // Shouldn't have to change this in 2D
-        1.0f                  // Shouldn't have to change this in 2D
+        bounds.low.at(0),   // The left boundary of the problem
+        bounds.high.at(0),  // The right boundary of the problem
+        bounds.low.at(1),   // The bottom boundary of the porblem
+        bounds.high.at(1),  // The top boundary of the problem
+        -1.0f,              // Shouldn't have to change this in 2D
+        1.0f                // Shouldn't have to change this in 2D
         ));
-  } else if (context_->getDimensions() == 3u) {
+  } else if (context_->getDimension() == 3u) {
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -174,8 +175,8 @@ void InteractiveVisualizer::run() {
   // This sets the color used when clearing the screen.
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
-  maxCost_ = context_->computeMinPossibleCost().value();
-  minCost_ = context_->computeMinPossibleCost().value();
+  maxCost_ = 0.1;
+  minCost_ = 0.0;
   while (!pangolin::ShouldQuit()) {
     // Register input.
     if (pangolin::Pushed(optionScreenshot)) {
@@ -277,8 +278,8 @@ void InteractiveVisualizer::run() {
 
     // Draw the objective.
     if (optionDrawObjective) {
-      if (auto objective = std::dynamic_pointer_cast<BaseOptimizationObjective>(
-              context_->getOptimizationObjective())) {
+      if (auto objective =
+              std::dynamic_pointer_cast<BaseOptimizationObjective>(context_->getObjective())) {
         objective->accept(*this);
       }
     }
@@ -388,11 +389,11 @@ void InteractiveVisualizer::updateCostLog() {
 }
 
 void InteractiveVisualizer::drawVerticesAndEdges(std::size_t iteration) {
-  if (context_->getDimensions() == 2u) {
+  if (context_->getDimension() == 2u) {
     auto [vertices, edges] = getVerticesAndEdges2D(iteration);
     drawPoints(vertices, blue, 2.0);
     drawLines(edges, 3.0, gray);
-  } else if (context_->getDimensions() == 3u) {
+  } else if (context_->getDimension() == 3u) {
     auto [vertices, edges] = getVerticesAndEdges3D(iteration);
     drawPoints(vertices, blue, 2.0);
     drawLines(edges, 3.0, gray, 0.8);
@@ -400,30 +401,30 @@ void InteractiveVisualizer::drawVerticesAndEdges(std::size_t iteration) {
 }
 
 void InteractiveVisualizer::drawVertices(std::size_t iteration) {
-  if (context_->getDimensions() == 2u) {
+  if (context_->getDimension() == 2u) {
     auto vertices = getVertices2D(iteration);
     drawPoints(vertices, blue, 2.0);
-  } else if (context_->getDimensions() == 3u) {
+  } else if (context_->getDimension() == 3u) {
     auto vertices = getVertices3D(iteration);
     drawPoints(vertices, blue, 2.0);
   }
 }
 
 void InteractiveVisualizer::drawEdges(std::size_t iteration) {
-  if (context_->getDimensions() == 2u) {
+  if (context_->getDimension() == 2u) {
     auto edges = getEdges2D(iteration);
     drawLines(edges, 3.0, gray);
-  } else if (context_->getDimensions() == 3u) {
+  } else if (context_->getDimension() == 3u) {
     auto edges = getEdges3D(iteration);
     drawLines(edges, 3.0, gray, 0.8);
   }
 }
 
 void InteractiveVisualizer::drawSolution(std::size_t iteration) {
-  if (context_->getDimensions() == 2u) {
+  if (context_->getDimension() == 2u) {
     auto path = getPath2D(iteration);
     drawPath(path, 3.0, purple);
-  } else if (context_->getDimensions() == 3u) {
+  } else if (context_->getDimension() == 3u) {
     auto path = getPath3D(iteration);
     drawPath(path, 3.0, purple, 1.0);
   }
@@ -431,72 +432,72 @@ void InteractiveVisualizer::drawSolution(std::size_t iteration) {
 
 void InteractiveVisualizer::visit(const CentreSquare& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const DividingWalls& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const DoubleEnclosure& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const FlankingGap& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const FourRooms& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const ObstacleFree& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const RandomRectangles& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -512,65 +513,65 @@ void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& context)
 
 void InteractiveVisualizer::visit(const RepeatingRectangles& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const StartEnclosure& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const WallGap& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoint(context.getStartState(), green, 9.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 9.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
-void InteractiveVisualizer::drawBoundary(const BaseContext& context) const {
+void InteractiveVisualizer::drawBoundary(const RealVectorGeometricContext& context) const {
   glColor4fv(black);
   glLineWidth(3.0);
-  if (context.getDimensions() == 2u) {
+  if (context.getDimension() == 2u) {
     auto bounds = context.getBoundaries();
-    pangolin::glDrawRectPerimeter(bounds.at(0).first, bounds.at(1).first, bounds.at(0).second,
-                                  bounds.at(1).second);
-  } else if (context.getDimensions() == 3u) {
+    pangolin::glDrawRectPerimeter(bounds.low.at(0), bounds.low.at(1), bounds.high.at(0),
+                                  bounds.high.at(1));
+  } else if (context.getDimension() == 3u) {
     auto bounds = context.getBoundaries();
     std::vector<Eigen::Vector3d> points{
-        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).first},
-        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).second},
-        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).first},
-        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).first},
-        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).first},
-        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).first},
-        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).second},
-        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).first},
-        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).second},
-        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).second},
-        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).second},
-        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).second},
-        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).second},
-        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).second},
-        {bounds.at(0).first, bounds.at(1).first, bounds.at(2).second},
-        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).second},
-        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).first},
-        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).second},
-        {bounds.at(0).first, bounds.at(1).second, bounds.at(2).first},
-        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).first},
-        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).first},
-        {bounds.at(0).second, bounds.at(1).second, bounds.at(2).first},
-        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).first},
-        {bounds.at(0).second, bounds.at(1).first, bounds.at(2).second},
+        {bounds.low.at(0), bounds.low.at(1), bounds.low.at(2)},
+        {bounds.low.at(0), bounds.low.at(1), bounds.high.at(2)},
+        {bounds.low.at(0), bounds.low.at(1), bounds.low.at(2)},
+        {bounds.low.at(0), bounds.high.at(1), bounds.low.at(2)},
+        {bounds.low.at(0), bounds.low.at(1), bounds.low.at(2)},
+        {bounds.high.at(0), bounds.low.at(1), bounds.low.at(2)},
+        {bounds.high.at(0), bounds.high.at(1), bounds.high.at(2)},
+        {bounds.high.at(0), bounds.high.at(1), bounds.low.at(2)},
+        {bounds.high.at(0), bounds.high.at(1), bounds.high.at(2)},
+        {bounds.high.at(0), bounds.low.at(1), bounds.high.at(2)},
+        {bounds.high.at(0), bounds.high.at(1), bounds.high.at(2)},
+        {bounds.low.at(0), bounds.high.at(1), bounds.high.at(2)},
+        {bounds.low.at(0), bounds.low.at(1), bounds.high.at(2)},
+        {bounds.low.at(0), bounds.high.at(1), bounds.high.at(2)},
+        {bounds.low.at(0), bounds.low.at(1), bounds.high.at(2)},
+        {bounds.high.at(0), bounds.low.at(1), bounds.high.at(2)},
+        {bounds.low.at(0), bounds.high.at(1), bounds.low.at(2)},
+        {bounds.low.at(0), bounds.high.at(1), bounds.high.at(2)},
+        {bounds.low.at(0), bounds.high.at(1), bounds.low.at(2)},
+        {bounds.high.at(0), bounds.high.at(1), bounds.low.at(2)},
+        {bounds.high.at(0), bounds.low.at(1), bounds.low.at(2)},
+        {bounds.high.at(0), bounds.high.at(1), bounds.low.at(2)},
+        {bounds.high.at(0), bounds.low.at(1), bounds.low.at(2)},
+        {bounds.high.at(0), bounds.low.at(1), bounds.high.at(2)},
     };
     pangolin::glDrawLines(points);
   }
@@ -638,6 +639,31 @@ void InteractiveVisualizer::drawRectangle3D(const std::vector<double>& midpoint,
   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
+void InteractiveVisualizer::drawPoint(const Eigen::Vector2d& point, const float* color,
+                                      float size) const {
+  glColor4fv(color);
+  pangolin::glDrawCircle(point[0], point[1], size / 1000.0);
+}
+
+void InteractiveVisualizer::drawPoint(const Eigen::Vector3d& point, const float* color,
+                                      float size) const {
+  std::vector<Eigen::Vector3d> points;
+  points.emplace_back(point);
+  drawPoints(points, color, size);
+}
+
+void InteractiveVisualizer::drawPoint(
+    const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state, const float* color,
+    float size) const {
+  if (state.getSpace()->getDimension() == 2u) {
+    drawPoint(Eigen::Vector2d(state[0u], state[1u]), color, size);
+  } else if (state.getSpace()->getDimension() == 3u) {
+    drawPoint(Eigen::Vector3d(state[0u], state[1u], state[2u]), color, size);
+  } else {
+    throw std::runtime_error("Can only visualize 2d and 3d states.");
+  }
+}
+
 void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector2d>& points,
                                        const float* color, float size) const {
   glColor4fv(color);
@@ -653,8 +679,9 @@ void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector3d>& point
   pangolin::glDrawPoints(points);
 }
 
-void InteractiveVisualizer::drawPoints(const std::vector<ompl::base::ScopedState<>>& states,
-                                       const float* color, float size) const {
+void InteractiveVisualizer::drawPoints(
+    const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states,
+    const float* color, float size) const {
   if (states.front().getSpace()->getDimension() == 2u) {
     std::vector<Eigen::Vector2d> points;
     for (const auto& state : states) {
@@ -709,12 +736,12 @@ void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiOb
 }
 
 void InteractiveVisualizer::visit(const PotentialFieldOptimizationObjective& objective) const {
-  if (context_->getDimensions() == 2u) {
+  if (context_->getDimension() == 2u) {
     // Get the widths of the context.
-    const double minX = context_->getBoundaries().at(0u).first;
-    const double maxX = context_->getBoundaries().at(0u).second;
-    const double minY = context_->getBoundaries().at(1u).first;
-    const double maxY = context_->getBoundaries().at(1u).second;
+    const double minX = context_->getBoundaries().low.at(0u);
+    const double maxX = context_->getBoundaries().high.at(0u);
+    const double minY = context_->getBoundaries().low.at(1u);
+    const double maxY = context_->getBoundaries().high.at(1u);
     const double widthX = maxX - minX;
     const double widthY = maxY - minY;
 
@@ -811,7 +838,7 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
   // Get the BIT* specific data.
   auto bitstarData =
       std::dynamic_pointer_cast<const BITstarData>(getPlannerSpecificData(iteration));
-  if (context_->getDimensions() == 2u) {
+  if (context_->getDimension() == 2u) {
     // Get the edge queue.
     auto edgeQueue = bitstarData->getEdgeQueue();
     std::vector<Eigen::Vector2d> edges{};
@@ -839,7 +866,7 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
 
     // Draw the next edge.
     drawLines(nextEdge, 3.0, red);
-  } else if (context_->getDimensions() == 3u) {
+  } else if (context_->getDimension() == 3u) {
     // Get the edge queue.
     auto edgeQueue = bitstarData->getEdgeQueue();
     std::vector<Eigen::Vector3d> edges{};
@@ -878,7 +905,7 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
   // Get the TBD* specific data.
   auto tbdstarData =
       std::dynamic_pointer_cast<const TBDstarData>(getPlannerSpecificData(iteration));
-  if (context_->getDimensions() == 2u) {
+  if (context_->getDimension() == 2u) {
     // Get the edge queue.
     auto forwardQueue = tbdstarData->getForwardQueue();
     std::vector<Eigen::Vector2d> forwardQueueEdges;
@@ -942,7 +969,7 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
                                           Eigen::Vector2d((*childState)[0u], (*childState)[1u])};
     // Draw the next edge.
     drawLines(nextEdge, 3.0, red);
-  } else if (context_->getDimensions() == 3u) {
+  } else if (context_->getDimension() == 3u) {
     // Get the edge queue.
     auto edgeQueue = tbdstarData->getForwardQueue();
     std::vector<Eigen::Vector3d> edges{};
@@ -979,7 +1006,7 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
   // Get the AIBIT* specific data.
   auto aibitstarData =
       std::dynamic_pointer_cast<const AIBITstarData>(getPlannerSpecificData(iteration));
-  if (context_->getDimensions() == 2u) {
+  if (context_->getDimension() == 2u) {
     // Get the forward queue.
     auto forwardQueue = aibitstarData->getForwardQueue();
     std::vector<Eigen::Vector2d> forwardQueueEdges;

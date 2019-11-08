@@ -93,6 +93,9 @@ class BaseObstacle : public GeometricShape {
 
   // Return whether this obstacle invalidates a state.
   virtual bool invalidates(const ompl::base::State* state) const final;
+
+  // Return whether this obstacle invalidates a state.
+  virtual bool invalidates(const ompl::base::ScopedState<> state) const final;
 };
 
 class BaseAntiObstacle : public GeometricShape {
@@ -102,6 +105,9 @@ class BaseAntiObstacle : public GeometricShape {
 
   // Return whether this antiobstacle validates a state.
   virtual bool validates(const ompl::base::State* state) const final;
+
+  // Return whether this antiobstacle validates a state.
+  virtual bool validates(const ompl::base::ScopedState<> state) const final;
 };
 
 }  // namespace ompltools

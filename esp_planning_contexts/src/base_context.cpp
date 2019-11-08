@@ -32,14 +32,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+// Authors: Marlin Strub
 
 #include "esp_planning_contexts/base_context.h"
 
-#include <algorithm>
-
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
 
 #include "esp_common/objective_type.h"
 #include "esp_optimization_objectives/potential_field_optimization_objective.h"
@@ -48,166 +45,59 @@ namespace esp {
 
 namespace ompltools {
 
-BaseContext::BaseContext(const std::shared_ptr<const Configuration>& config,
+BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                         const std::shared_ptr<const Configuration>& config,
                          const std::string& name) :
+    spaceInfo_(spaceInfo),
     name_(name),
-    dimensionality_(config->get<std::size_t>("Contexts/" + name + "/dimensions")),
-    bounds_(dimensionality_,
-            {-0.5 * config->get<double>("Contexts/" + name + "/boundarySideLengths"),
-             0.5 * config->get<double>("Contexts/" + name + "/boundarySideLengths")}),
-    targetDuration_(time::seconds(config->get<double>("Contexts/" + name + "/maxTime"))),
+    maxSolveDuration_(time::seconds(config->get<double>("Contexts/" + name + "/maxTime"))),
     config_(config) {
-}
-
-ompl::base::SpaceInformationPtr BaseContext::getSpaceInformation() const {
-  return spaceInfo_;
-}
-
-ompl::base::StateSpacePtr BaseContext::getStateSpace() const {
-  return spaceInfo_->getStateSpace();
-}
-
-ompl::base::ProblemDefinitionPtr BaseContext::newProblemDefinition() const {
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
   // Get the optimization objective.
-  switch (config_->get<OBJECTIVE_TYPE>("Objectives/" + config_->get<std::string>("Contexts/" + name_ + "/objective") + "/type")) {
+  switch (config_->get<OBJECTIVE_TYPE>(
+      "Objectives/" + config_->get<std::string>("Contexts/" + name_ + "/objective") + "/type")) {
     case OBJECTIVE_TYPE::COSTMAP: {
       throw std::runtime_error("CostMap objective is not yet implemented.");
       break;
     }
     case OBJECTIVE_TYPE::PATHLENGTH: {
-      optimizationObjective_ =
-          std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
+      objective_ = std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
       break;
     }
     case OBJECTIVE_TYPE::POTENTIALFIELD: {
-      optimizationObjective_ =
-          std::make_shared<PotentialFieldOptimizationObjective>(spaceInfo_, config_);
+      objective_ = std::make_shared<PotentialFieldOptimizationObjective>(spaceInfo_, config_);
       break;
     }
     default:
       throw std::runtime_error("Unknown optimization objective.");
   }
 
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(optimizationObjective_);
-
-  // Set the goal and add start states.
-  problemDefinition->setGoal(goalPtr_);
-  for (const auto& start : startStates_) {
-    problemDefinition->addStartState(start);
-  }
-
-  return problemDefinition;
-}
-
-ompl::base::OptimizationObjectivePtr BaseContext::getOptimizationObjective() const {
-  return optimizationObjective_;
-}
-
-time::Duration BaseContext::getTargetDuration() const {
-  return targetDuration_;
-}
-
-ompl::base::GoalPtr BaseContext::getGoalPtr() const {
-  return goalPtr_;
-}
-
-std::vector<ompl::base::ScopedState<>> BaseContext::getStartStates() const {
-  return startStates_;
-}
-
-std::vector<ompl::base::ScopedState<>> BaseContext::getGoalStates() const {
-  return goalStates_;
+  // Set the default cost to go heuristic for the objective.
+  objective_->setCostToGoHeuristic(
+      std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 }
 
 std::string BaseContext::getName() const {
   return name_;
 }
 
-void BaseContext::setName(const std::string& name) {
-  name_ = name;
+std::shared_ptr<ompl::base::SpaceInformation> BaseContext::getSpaceInformation() const {
+  return spaceInfo_;
 }
 
-std::vector<std::pair<double, double>> BaseContext::getBoundaries() const {
-  return bounds_;
+std::shared_ptr<ompl::base::StateSpace> BaseContext::getStateSpace() const {
+  return spaceInfo_->getStateSpace();
 }
 
-unsigned int BaseContext::getDimensions() const {
-  return dimensionality_;
+std::size_t BaseContext::getDimension() const {
+  return spaceInfo_->getStateDimension();
 }
 
-ompl::base::Cost BaseContext::computeMinPossibleCost() const {
-  // Return the minimum of each start to the goal
-  ompl::base::Cost minCost = optimizationObjective_->infiniteCost();
-
-  // Iterate over the list of starts:
-  for (unsigned int i = 0u; i < startStates_.size(); ++i) {
-    // Store the best cost to go from this start
-    minCost = optimizationObjective_->betterCost(
-        minCost, ompl::base::goalRegionCostToGo(startStates_.at(i).get(), goalPtr_.get()));
-  }
-
-  return minCost;
+ompl::base::OptimizationObjectivePtr BaseContext::getObjective() const {
+  return objective_;
 }
 
-std::vector<std::shared_ptr<BaseObstacle>> BaseContext::getObstacles() const {
-  return obstacles_;
-}
-
-std::vector<std::shared_ptr<BaseAntiObstacle>> BaseContext::getAntiObstacles() const {
-  return antiObstacles_;
-}
-
-void BaseContext::print(const bool verbose /* == false */) const {
-  std::cout << name_ << " in R^" << dimensionality_
-            << ". runtime: " << time::seconds(targetDuration_)
-            << ". target: " << optimizationObjective_->getCostThreshold();
-  if (this->knowsOptimum()) {
-    std::cout << " (opt: " << this->computeOptimum() << ")";
-  }
-  // No else
-  std::cout << ". map: (" << bounds_.at(0u).first << ", " << bounds_.at(0u).second << "). "
-            << this->lineInfo() << std::endl;
-
-  if (verbose == true) {
-    std::cout << "starts =" << std::endl;
-    for (unsigned int i = 0u; i < startStates_.size(); ++i) {
-      std::cout << "    [" << startStates_.at(i)[0u] << ", " << startStates_.at(i)[1u] << ", ..."
-                << startStates_.at(i)[dimensionality_ - 1u] << "]" << std::endl;
-    }
-
-    std::cout << "goals =" << std::endl;
-    for (unsigned int i = 0u; i < goalStates_.size(); ++i) {
-      std::cout << "    [" << goalStates_.at(i)[0u] << ", " << goalStates_.at(i)[1u] << ", ..."
-                << goalStates_.at(i)[dimensionality_ - 1u] << "]" << std::endl;
-    }
-
-    std::cout << this->paraInfo();
-  }
-}
-
-void BaseContext::addStartState(const std::vector<double>& coordinates) {
-  if (coordinates.size() != dimensionality_) {
-    OMPL_ERROR("%s: Requested to add start state of wrong dimensionality.", name_.c_str());
-    throw std::runtime_error("Context error.");
-  }
-  startStates_.emplace_back(ompl::base::ScopedState<>(spaceInfo_));
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    startStates_.back()[i] = coordinates[i];
-  }
-}
-
-void BaseContext::addGoalState(const std::vector<double>& coordinates) {
-  if (coordinates.size() != dimensionality_) {
-    OMPL_ERROR("%s: Requested to add goal state of wrong dimensionality.", name_.c_str());
-    throw std::runtime_error("Context error.");
-  }
-  goalStates_.emplace_back(ompl::base::ScopedState<>(spaceInfo_));
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    goalStates_.back()[i] = coordinates[i];
-  }
+time::Duration BaseContext::getMaxSolveDuration() const {
+  return maxSolveDuration_;
 }
 
 }  // namespace ompltools

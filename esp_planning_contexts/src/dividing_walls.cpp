@@ -36,36 +36,39 @@
 
 #include "esp_planning_contexts/dividing_walls.h"
 
-#include <cmath>
-#include <functional>
-#include <memory>
-
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
-#include <ompl/base/goals/GoalStates.h>
-#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
+
+#include "esp_obstacles/base_obstacle.h"
+#include "esp_obstacles/hyperrectangle.h"
+#include "esp_planning_contexts/context_validity_checker.h"
 
 namespace esp {
 
 namespace ompltools {
 
-DividingWalls::DividingWalls(const std::shared_ptr<const Configuration>& config,
-                           const std::string& name) :
-    BaseContext(config, name),
+DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                             const std::shared_ptr<const Configuration>& config,
+                             const std::string& name) :
+    RealVectorGeometricContext(spaceInfo, config, name),
+    dimensionality_(spaceInfo->getStateDimension()),
     numWalls_(config->get<std::size_t>("Contexts/" + name + "/numWalls")),
     wallThicknesses_(config->get<std::vector<double>>("Contexts/" + name + "/wallThicknesses")),
     numGaps_(config->get<std::size_t>("Contexts/" + name + "/numGaps")),
     gapWidths_(config->get<std::vector<double>>("Contexts/" + name + "/gapWidths")),
-    startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
-    goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
+    startState_(spaceInfo),
+    goalState_(spaceInfo) {
+  // Get the start and goal positions.
+  auto startPosition = config->get<std::vector<double>>("Contexts/" + name + "/start");
+  auto goalPosition = config->get<std::vector<double>>("Contexts/" + name + "/goal");
+
   // Assert configuration sanity.
-  if (startPos_.size() != dimensionality_) {
+  if (startPosition.size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (goalPos_.size() != dimensionality_) {
+  if (goalPosition.size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
@@ -79,80 +82,57 @@ DividingWalls::DividingWalls(const std::shared_ptr<const Configuration>& config,
     throw std::runtime_error("Context error.");
   }
 
-  // Create a state space and set the bounds.
-  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
-  stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
+  // Create the validity checker.
+  auto validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);
 
-  // Create the space information class:
-  spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-
-  // Create the validity checker and add the obstacle.
-  validityChecker_ = std::make_shared<ContextValidityChecker>(spaceInfo_);
-
-  // Create the obstacles and anti obstacles.
+  // Create the obstacles and add them to the validity checker.
   createObstacles();
-  createAntiObstacles();
+  validityChecker->addObstacles(obstacles_);
 
-  // Add them to the validity checker.
-  validityChecker_->addObstacles(obstacles_);
-  validityChecker_->addAntiObstacles(antiObstacles_);
+  // Create the anti obstacles and add them to the validity checker.
+  createAntiObstacles();
+  validityChecker->addAntiObstacles(antiObstacles_);
 
   // Set the validity checker and the check resolution.
-  spaceInfo_->setStateValidityChecker(validityChecker_);
+  spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
       config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();
 
-  // Allocate the optimization objective
-  optimizationObjective_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
-
-  // Set the heuristic to the default:
-  optimizationObjective_->setCostToGoHeuristic(
-      std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
-
-  // Create a start state.
-  addStartState(startPos_);
-
-  // Create a goal state.
-  addGoalState(goalPos_);
-  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
-
-  // Specify the optimization target.
-  optimizationObjective_->setCostThreshold(computeMinPossibleCost());
-}
-
-bool DividingWalls::knowsOptimum() const {
-  return false;
-}
-
-ompl::base::Cost DividingWalls::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown, though it could be", BaseContext::name_);
-}
-
-void DividingWalls::setTarget(double targetSpecifier) {
-  optimizationObjective_->setCostThreshold(ompl::base::Cost(targetSpecifier));
-}
-
-std::string DividingWalls::lineInfo() const {
-  std::stringstream rval;
-
-  for (unsigned w = 0u; w < numWalls_; ++w) {
-    rval << " gap_width/obs_width: " << gapWidths_.at(w) << "/" << wallThicknesses_.at(w) << " = "
-         << gapWidths_.at(w) / wallThicknesses_.at(w);
+  // Fill the start and goal states' coordinates.
+  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+    startState_[i] = startPosition.at(i);
+    goalState_[i] = goalPosition.at(i);
   }
-  rval << ".";
-
-  return rval.str();
 }
 
-std::string DividingWalls::paraInfo() const {
-  std::stringstream rval;
-  rval << lineInfo();
-  return rval.str();
+ompl::base::ProblemDefinitionPtr DividingWalls::instantiateNewProblemDefinition() const {
+  // Instantiate a new problem definition.
+  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+
+  // Set the objective.
+  problemDefinition->setOptimizationObjective(objective_);
+
+  // Set the start state in the problem definition.
+  problemDefinition->addStartState(startState_);
+
+  // Create a goal for the problem definition.
+  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goal->setState(goalState_);
+  problemDefinition->setGoal(goal);
+
+  // Return the new definition.
+  return problemDefinition;
+}
+
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> DividingWalls::getStartState() const {
+  return startState_;
+}
+
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> DividingWalls::getGoalState() const {
+  return goalState_;
 }
 
 void DividingWalls::accept(const ContextVisitor& visitor) const {
@@ -160,15 +140,17 @@ void DividingWalls::accept(const ContextVisitor& visitor) const {
 }
 
 void DividingWalls::createObstacles() {
+  // Create the walls.
   for (std::size_t i = 0; i < numWalls_; ++i) {
     // Create an obstacle midpoint for this wall.
     ompl::base::ScopedState<> midpoint(spaceInfo_);
+
     // Set the obstacle midpoint in the first dimension.
-    midpoint[0u] = ((i + 1u) * (bounds_.at(0u).second - bounds_.at(0u).first) / (numWalls_ + 1u)) +
-                   bounds_.at(0u).first;
+    midpoint[0u] = ((i + 1u) * (bounds_.high.at(0u) - bounds_.low.at(0u)) / (numWalls_ + 1u)) +
+                   bounds_.low.at(0u);
     // Set the obstacle midpoint in the remaining dimension.
     for (std::size_t j = 1; j < dimensionality_; ++j) {
-      midpoint[j] = (bounds_.at(j).first + bounds_.at(j).second) / 2.0;
+      midpoint[j] = (bounds_.low.at(j) + bounds_.high.at(j)) / 2.0;
     }
     // Create the widths of this wall.
     std::vector<double> widths(dimensionality_, 0.0);
@@ -176,37 +158,46 @@ void DividingWalls::createObstacles() {
     widths.at(0) = wallThicknesses_.at(i);
     // The wall spans all other dimensions.
     for (std::size_t j = 1; j < dimensionality_; ++j) {
-      widths.at(j) = bounds_.at(j).second - bounds_.at(j).first;
+      widths.at(j) = bounds_.high.at(j) - bounds_.low.at(j);
     }
+
+    // Add this wall to the obstacles.
     obstacles_.emplace_back(
         std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths));
   }
 }
 
 void DividingWalls::createAntiObstacles() {
-  // Compute midpoints for obstacles.
+  // Create the gaps in the walls.
   for (std::size_t i = 0; i < numGaps_; ++i) {
     // Create an obstacle midpoint for this gap.
     ompl::base::ScopedState<> midpoint(spaceInfo_);
+
     // Set the obstacle midpoint in the second dimension.
-    midpoint[1u] = (i + 1u) * (bounds_.at(1u).second - bounds_.at(1u).first) / (numGaps_ + 1u) +
-                   bounds_.at(1).first;
+    midpoint[1u] =
+        (i + 1u) * (bounds_.high.at(1u) - bounds_.low.at(1u)) / (numGaps_ + 1u) + bounds_.low.at(1);
+
     // Set the obstacle midpoint in the remaining dimension.
     for (std::size_t j = 0; j < dimensionality_; ++j) {
       if (j != 1u) {
-        midpoint[j] = (bounds_.at(j).first + bounds_.at(j).second) / 2.0;
+        midpoint[j] = (bounds_.low.at(j) + bounds_.high.at(j)) / 2.0;
       }
     }
+
     // Create the widths of this wall.
     std::vector<double> widths(dimensionality_, 0.0);
+
     // Set the obstacle width in the first dimension.
     widths.at(1) = gapWidths_.at(i);
+
     // The wall spans all other dimensions.
     for (std::size_t j = 0; j < dimensionality_; ++j) {
       if (j != 1) {
-        widths.at(j) = (bounds_.at(j).second - bounds_.at(j).first);
+        widths.at(j) = (bounds_.high.at(j) - bounds_.low.at(j));
       }
     }
+
+    // Add this gap to the anti obstacles.
     antiObstacles_.emplace_back(
         std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, midpoint, widths));
   }

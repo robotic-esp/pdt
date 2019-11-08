@@ -36,112 +36,101 @@
 
 #include "esp_planning_contexts/repeating_rectangles.h"
 
-#include <cmath>
-#include <functional>
-#include <memory>
-
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
-#include <ompl/base/goals/GoalStates.h>
-#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/base/spaces/RealVectorBounds.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
 
+#include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
+#include "esp_planning_contexts/context_validity_checker_gnat.h"
 
 namespace esp {
 
 namespace ompltools {
 
-RepeatingRectangles::RepeatingRectangles(const std::shared_ptr<const Configuration>& config,
-                                         const std::string& name) :
-    BaseContext(config, name),
+RepeatingRectangles::RepeatingRectangles(
+    const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+    const std::shared_ptr<const Configuration>& config, const std::string& name) :
+    RealVectorGeometricContext(spaceInfo, config, name),
+    dimensionality_(spaceInfo->getStateDimension()),
     numObsPerDim_(config->get<std::size_t>("Contexts/" + name + "/numObstaclesPerDim")),
     obsWidth_(config->get<double>("Contexts/" + name + "/obstacleWidth")),
-    startPos_(config->get<std::vector<double>>("Contexts/" + name + "/start")),
-    goalPos_(config->get<std::vector<double>>("Contexts/" + name + "/goal")) {
+    startState_(spaceInfo),
+    goalState_(spaceInfo) {
+  // Get the start and goal positions.
+  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+
   // Assert configuration sanity.
-  if (startPos_.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
+  if (startPosition.size() != dimensionality_) {
+    OMPL_ERROR(
+        "%s: Dimensionality of problem (%zu) and of start specification (%zu) does not match.",
+        name.c_str(), dimensionality_, startPosition.size());
     throw std::runtime_error("Context error.");
   }
-  if (goalPos_.size() != dimensionality_) {
+  if (goalPosition.size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
+
+  // Get the state space bounds.
+  auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
   for (std::size_t i = 1u; i < dimensionality_; ++i) {
-    if ((bounds_.at(i).second - bounds_.at(i).first) !=
-        bounds_.at(0u).second - bounds_.at(0u).first) {
+    if ((bounds.high.at(i) - bounds.low.at(i)) != bounds.high.at(0u) - bounds.low.at(0u)) {
       OMPL_ERROR("%s: Repeating rectangles assumes a (hyper)square.");
       throw std::runtime_error("Context error.");
     }
   }
-  // Create a state space and set the bounds.
-  auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
-  stateSpace->setBounds(bounds_.at(0u).first, bounds_.at(0u).second);
 
-  // Create the space information class:
-  spaceInfo_ = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+  // Create the validity checker.
+  auto validityChecker = std::make_shared<ContextValidityCheckerGNAT>(spaceInfo_);
 
-  // Create the obstacles.
+  // Create the obstacles and add them to the validity checker.
   createObstacles();
-
-  // Create the validity checker and add the obstacle.
-  validityChecker_ = std::make_shared<ContextValidityCheckerGNAT>(spaceInfo_);
-  validityChecker_->addObstacles(obstacles_);
+  validityChecker->addObstacles(obstacles_);
 
   // Set the validity checker and the check resolution.
-  spaceInfo_->setStateValidityChecker(
-      static_cast<ompl::base::StateValidityCheckerPtr>(validityChecker_));
+  spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
       config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();
 
-  // Allocate the optimization objective
-  optimizationObjective_ =
-      std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
-
-  // Set the heuristic to the default:
-  optimizationObjective_->setCostToGoHeuristic(
-      std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
-
-  // Create a start state.
-  addStartState(startPos_);
-
-  // Create a goal state.
-  addGoalState(goalPos_);
-  goalPtr_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goalPtr_->as<ompl::base::GoalState>()->setState(goalStates_.back());
-
-  // Specify the optimization target.
-  optimizationObjective_->setCostThreshold(computeMinPossibleCost());
+  // Fill the start and goal states' coordinates.
+  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+    startState_[i] = startPosition.at(i);
+    goalState_[i] = goalPosition.at(i);
+  }
 }
 
-bool RepeatingRectangles::knowsOptimum() const {
-  return false;
+ompl::base::ProblemDefinitionPtr RepeatingRectangles::instantiateNewProblemDefinition() const {
+  // Instantiate a new problem definition.
+  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+
+  // Set the objective.
+  problemDefinition->setOptimizationObjective(objective_);
+
+  // Set the start state in the problem definition.
+  problemDefinition->addStartState(startState_);
+
+  // Create a goal for the problem definition.
+  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goal->setState(goalState_);
+  problemDefinition->setGoal(goal);
+
+  // Return the new definition.
+  return problemDefinition;
 }
 
-ompl::base::Cost RepeatingRectangles::computeOptimum() const {
-  throw ompl::Exception("The global optimum is unknown.", BaseContext::name_);
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RepeatingRectangles::getStartState()
+    const {
+  return startState_;
 }
 
-void RepeatingRectangles::setTarget(double targetSpecifier) {
-  optimizationObjective_->setCostThreshold(
-      ompl::base::Cost(targetSpecifier * this->computeOptimum().value()));
-}
-
-std::string RepeatingRectangles::lineInfo() const {
-  std::stringstream rval;
-
-  return rval.str();
-}
-
-std::string RepeatingRectangles::paraInfo() const {
-  return std::string();
+ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RepeatingRectangles::getGoalState()
+    const {
+  return goalState_;
 }
 
 void RepeatingRectangles::accept(const ContextVisitor& visitor) const {
@@ -152,9 +141,9 @@ void RepeatingRectangles::createObstacles() {
   // Let's try to keep this general for any number of dimensions.
 
   // Generate evenly spaced coordinates.
+  auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
   for (std::size_t i = 1u; i < dimensionality_; ++i) {
-    if ((bounds_.at(i).second - bounds_.at(i).first) !=
-        bounds_.at(0u).second - bounds_.at(0u).first) {
+    if ((bounds.high.at(i) - bounds.low.at(i)) != bounds.high.at(0u) - bounds.low.at(0u)) {
       OMPL_ERROR("%s: Repeating rectangles assumes a (hyper)square.");
       throw std::runtime_error("Context error.");
     }
@@ -163,8 +152,8 @@ void RepeatingRectangles::createObstacles() {
   coordinates.reserve(numObsPerDim_ * dimensionality_);
   for (std::size_t i = 0u; i < numObsPerDim_; ++i) {
     coordinates.emplace_back(
-        ((i + 1u) * (bounds_.at(0).second - bounds_.at(0).first) / (numObsPerDim_ + 1u)) +
-        bounds_.at(0u).first);
+        ((i + 1u) * (bounds.high.at(0) - bounds.low.at(0)) / (numObsPerDim_ + 1u)) +
+        bounds.low.at(0u));
   }
   // Let d be the dimensionality. We need all combinations of d elements from the above coordinates
   // with replacement. The easiest way I know how to do this is to add each element d times to the
