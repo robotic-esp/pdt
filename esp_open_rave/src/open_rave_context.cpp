@@ -76,28 +76,18 @@ OpenRave::OpenRave(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInf
   // Load the robot.
   auto robot = environment->GetRobot(config_->get<std::string>("Contexts/" + name + "/robot"));
 
-  if (static_cast<std::size_t>(robot->GetDOF()) != spaceInfo->getStateDimension()) {
-    throw std::runtime_error(
-        "The degrees of freedom of the robot and the dimensionality of the state space do not "
-        "match.");
-  }
+  // Set the active dimensions.
+  robot->SetActiveDOFs(config_->get<std::vector<int>>("Contexts/" + name + "/activeDofIndices"));
 
   // Get the upper and lower bounds for each dimension.
   std::vector<double> lowerBounds, upperBounds;
-  robot->GetDOFLimits(lowerBounds, upperBounds);
+  robot->GetActiveDOFLimits(lowerBounds, upperBounds);
 
   // Set the bounds of the state space.
-  ompl::base::RealVectorBounds bounds(robot->GetDOF());
+  ompl::base::RealVectorBounds bounds(robot->GetActiveDOF());
   bounds.low = lowerBounds;
   bounds.high = upperBounds;
   spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->setBounds(bounds);
-
-  // Set all dimensions as active.
-  std::vector<int> activeDimensions(robot->GetDOF());
-  std::iota(activeDimensions.begin(), activeDimensions.end(), 0);
-  robot->SetActiveDOFs(activeDimensions);
-
-  OMPL_WARN("Dimensions: %zu", robot->GetDOF());
 
   // Create the validity checker.
   auto validityChecker = std::make_shared<OpenRaveValidityChecker>(spaceInfo_, environment, robot);

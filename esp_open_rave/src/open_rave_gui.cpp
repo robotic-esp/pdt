@@ -86,13 +86,11 @@ void plan(std::shared_ptr<esp::ompltools::Configuration> config,
                          context->getSpaceInformation()->getStateValidityChecker())
                          ->getOpenRaveEnvironment();
 
-  auto bounds = context->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
-
   // Get the robot.
   auto robot =
       environment->GetRobot(config->get<std::string>("Contexts/" + context->getName() + "/robot"));
-  robot->SetActiveDOFValues(
-      config->get<std::vector<double>>("Contexts/" + context->getName() + "/start"));
+  robot->SetActiveDOFs(
+      config->get<std::vector<int>>("Contexts/" + context->getName() + "/activeDofIndices"));
 
   // Create the vector to hold the current state.
   std::vector<double> openRaveState =
@@ -138,6 +136,15 @@ int main(int argc, char** argv) {
       environment->GetRobot(config->get<std::string>("Contexts/" + context->getName() + "/robot"));
   robot->SetActiveDOFValues(
       config->get<std::vector<double>>("Contexts/" + context->getName() + "/start"));
+
+  std::vector<double> lower, upper;
+  robot->GetActiveDOFLimits(lower, upper);
+
+  std::cout << "Limits:\n";
+  for (std::size_t i = 0u; i < lower.size(); ++i) {
+    std::cout << '\t' << i << ": [ " << lower[i] << ", " << upper[i] << " ]\n";
+  }
+  std::cout << '\n';
 
   // Create the viewer.
   auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtcoin");
