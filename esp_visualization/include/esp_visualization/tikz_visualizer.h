@@ -87,6 +87,7 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
   void visit(const FlankingGap& context) const override;
   void visit(const FourRooms& context) const override;
   void visit(const GoalEnclosure& context) const override;
+  void visit(const NarrowPassage& context) const override;
   void visit(const ObstacleFree& context) const override;
   void visit(const RandomRectangles& context) const override;
   void visit(const RandomRectanglesMultiStartGoal& context) const override;

@@ -47,6 +47,7 @@ class DoubleEnclosure;
 class FlankingGap;
 class FourRooms;
 class GoalEnclosure;
+class NarrowPassage;
 class ObstacleFree;
 class RandomRectangles;
 class RandomRectanglesMultiStartGoal;
@@ -67,6 +68,7 @@ class ContextVisitor {
   virtual void visit(const FlankingGap &context) const = 0;
   virtual void visit(const FourRooms &context) const = 0;
   virtual void visit(const GoalEnclosure &context) const = 0;
+  virtual void visit(const NarrowPassage &context) const = 0;
   virtual void visit(const ObstacleFree &context) const = 0;
   virtual void visit(const RandomRectangles &context) const = 0;
   virtual void visit(const RandomRectanglesMultiStartGoal &context) const = 0;
@@ -78,7 +80,7 @@ class ContextVisitor {
   // This is only needed until all other contexts are implemented.
   // ADL should resolve to the above methods.
   template <typename C>
-  void visit(const C& /* context */) const {
+  void visit(const C & /* context */) const {
     OMPL_WARN("Context visitor visits unknown context.");
   }
 };

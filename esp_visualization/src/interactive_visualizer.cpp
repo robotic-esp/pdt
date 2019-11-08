@@ -514,6 +514,15 @@ void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
   drawBoundary(context);
 }
 
+void InteractiveVisualizer::visit(const NarrowPassage& context) const {
+  // Draw the start states.
+  drawPoint(context.getStartState(), green, 9.0);
+  // Draw the goal states.
+  drawPoint(context.getGoalState(), red, 9.0);
+  // Draw the boundaries.
+  drawBoundary(context);
+}
+
 void InteractiveVisualizer::visit(const ObstacleFree& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 9.0);

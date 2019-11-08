@@ -129,6 +129,14 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
             "the context factory and the json file.");
       }
     }
+    case CONTEXT_TYPE::NARROW_PASSAGE: {
+      try {
+        return std::make_shared<NarrowPassage>(createRealVectorSpaceInfo(parentKey), config_,
+                                               contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating a NarrowPassage context.");
+      }
+    }
     case CONTEXT_TYPE::OBSTACLE_FREE: {
       try {
         return std::make_shared<ObstacleFree>(createRealVectorSpaceInfo(parentKey), config_,

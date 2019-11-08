@@ -322,6 +322,17 @@ void TikzVisualizer::visit(const GoalEnclosure& context) const {
   drawGoalState(context.getGoalState());
 }
 
+void TikzVisualizer::visit(const NarrowPassage& context) const {
+  // Draw the boundary.
+  drawBoundary(context);
+
+  // Draw the start states.
+  drawStartState(context.getStartState());
+
+  // Draw the goal states.
+  drawGoalState(context.getGoalState());
+}
+
 void TikzVisualizer::visit(const ObstacleFree& context) const {
   // Draw the boundary.
   drawBoundary(context);
