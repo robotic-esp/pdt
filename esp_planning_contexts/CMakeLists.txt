@@ -17,6 +17,7 @@ add_library(esp_planning_contexts
   src/flanking_gap.cpp
   src/four_rooms.cpp
   src/goal_enclosure.cpp
+  src/narrow_passage.cpp
   src/obstacle_free.cpp
   src/random_rectangles.cpp
   src/random_rectangles_multi_start_goal.cpp
