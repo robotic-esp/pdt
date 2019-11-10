@@ -64,6 +64,9 @@ bool OpenRaveValidityChecker::isValid(const ompl::base::State* state) const {
     raveState_[i] = realVectorState->operator[](i);
   }
 
+  // Lock the environment mutex.
+  OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
+
   // Set the robot to the requested state.
   robot_->SetActiveDOFValues(raveState_);
 
