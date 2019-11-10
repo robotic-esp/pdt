@@ -55,7 +55,7 @@
 #include "esp_configuration/configuration.h"
 #include "esp_factories/context_factory.h"
 #include "esp_factories/planner_factory.h"
-#include "esp_open_rave/open_rave_context.h"
+#include "esp_open_rave/open_rave_base_context.h"
 #include "esp_open_rave/open_rave_validity_checker.h"
 #include "esp_planning_contexts/all_contexts.h"
 

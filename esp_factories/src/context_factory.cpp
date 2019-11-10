@@ -39,7 +39,7 @@
 #include "nlohmann/json.hpp"
 
 #include "esp_common/context_type.h"
-#include "esp_open_rave/open_rave_context.h"
+#include "esp_open_rave/open_rave_base_context.h"
 #include "esp_planning_contexts/all_contexts.h"
 
 namespace esp {

@@ -9,7 +9,7 @@ include_directories(
 
 # Add the library as an interface.
 add_library(esp_open_rave
-  src/open_rave_context.cpp
+  src/open_rave_base_context.cpp
   src/open_rave_validity_checker.cpp)
 
 message(STATUS "OpenRAVE_LIBRARIES: ${OpenRAVE_LIBRARIES}")
