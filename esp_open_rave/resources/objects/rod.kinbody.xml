@@ -1,0 +1,8 @@
+<kinbody name="rod">
+  <body type="static">
+    <geom type="box">
+      <extents>0.05 0.05 0.7</extents>
+      <diffuseColor>1 .2 .2</diffuseColor>
+    </geom>
+  </body>
+</kinbody>
