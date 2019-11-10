@@ -1,5 +1,19 @@
 {
     "Contexts": {
+        "Bookshelf": {
+            "type": "OpenRave",
+            "objective": "PathLength",
+            "start": [1.1, 0.8, 2.2, 1.8, -0.6, -1.4, -0.2,
+                      -1.1, 0.8, -2.2, 1.8, 0.6, -1.4, 0.2],
+            "goal": [2.6, -1.2, 0.3, 1.8, 0.5, -0.7, 0.0,
+                      -2.6, -1.2, -0.3, 1.8, -0.5, -0.7, 0.0],
+            "maxTime": 100,
+            "dimensions": 14,
+            "activeDofIndices": [0, 1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16, 17],
+            "environment": "/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/bookshelf.env.xml",
+            "robot": "BarrettWAM-dual",
+            "collisionCheckResolution": 0.01
+        },
         "CentreSquare": {
             "type": "CentreSquare",
             "objective": "PathLength",
@@ -66,17 +80,6 @@
             "collisionCheckResolution": 0.001,
             "wallThickness": 0.1,
             "gapWidth": 0.1
-        },
-        "OpenRave": {
-            "type": "OpenRave",
-            "objective": "PathLength",
-            "start": [-0.1, 0.0, 0.0, 0.0, 0.0, 0.0],
-            "goal": [-1.2, 0.0, 0.0, 0.0, 0.0, 0.0],
-            "maxTime": 1,
-            "dimension": 10,
-            "environment": "/home/marlin/code/openrave/src/data/wamtest1.env.xml",
-            "robot": "BarrettWAM",
-            "collisionCheckResolution": 0.001
         },
         "GoalEnclosure": {
             "type": "GoalEnclosure",

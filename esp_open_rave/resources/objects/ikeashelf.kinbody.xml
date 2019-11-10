@@ -27,21 +27,21 @@
       <extents>0.14 0.01 0.53</extents>
       <diffusecolor>0.2 0.5 1.0</diffusecolor>
     </Geom>
-    <Geom type="box">
-      <Translation>0 0.39 0.53</Translation>
-      <extents>0.14 0.01 0.53</extents>
-      <diffusecolor>0.2 0.5 1.0</diffusecolor>
-    </Geom>
+    <!-- <Geom type="box"> -->
+    <!--   <Translation>0 0.39 0.53</Translation> -->
+    <!--   <extents>0.14 0.01 0.53</extents> -->
+    <!--   <diffusecolor>0.2 0.5 1.0</diffusecolor> -->
+    <!-- </Geom> -->
     <Geom type="box">
       <Translation>0 0.0 0.53</Translation>
       <extents>0.14 0.01 0.53</extents>
       <diffusecolor>0.2 0.5 1.0</diffusecolor>
     </Geom>
-    <Geom type="box">
-      <Translation>0 -0.39 0.53</Translation>
-      <extents>0.14 0.01 0.53</extents>
-      <diffusecolor>0.2 0.5 1.0</diffusecolor>
-    </Geom>
+    <!-- <Geom type="box"> -->
+    <!--   <Translation>0 -0.39 0.53</Translation> -->
+    <!--   <extents>0.14 0.01 0.53</extents> -->
+    <!--   <diffusecolor>0.2 0.5 1.0</diffusecolor> -->
+    <!-- </Geom> -->
     <Geom type="box">
       <Translation>0 -0.79 0.53</Translation>
       <extents>0.14 0.01 0.53</extents>
