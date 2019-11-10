@@ -68,18 +68,8 @@ void plan(std::shared_ptr<esp::ompltools::Configuration> config,
   auto [planner, plannerType] = plannerFactory.create("ABITstar");
   (void)plannerType;
 
+  // Setup the planner.
   planner->setup();
-  planner->solve(20.0);
-
-  // Get the solution of the planner.
-  auto solution =
-      planner->getProblemDefinition()->getSolutionPath()->as<ompl::geometric::PathGeometric>();
-
-  // Interpolate ("approx to collision checking resolution").
-  solution->interpolate();
-
-  // Get the solution states.
-  auto solutionStates = solution->getStates();
 
   // Get the environment.
   auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveValidityChecker>(
@@ -89,30 +79,52 @@ void plan(std::shared_ptr<esp::ompltools::Configuration> config,
   // Get the robot.
   auto robot =
       environment->GetRobot(config->get<std::string>("Contexts/" + context->getName() + "/robot"));
-  robot->SetActiveDOFs(
-      config->get<std::vector<int>>("Contexts/" + context->getName() + "/activeDofIndices"));
 
   // Create the vector to hold the current state.
   std::vector<double> openRaveState =
       config->get<std::vector<double>>("Contexts/" + context->getName() + "/start");
 
-  {
-    OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
-    robot->SetActiveDOFValues(openRaveState);
-  }
-
+  double totalSolveDuration = 0.0;
+  // Work it.
   while (true) {
-    for (const auto solutionState : solutionStates) {
-      for (std::size_t i = 0u; i < openRaveState.size(); ++i) {
-        openRaveState[i] =
-            solutionState->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](i);
+    // Work on the problem.
+    planner->solve(10.0);
+
+    // Update the total solve duration.
+    totalSolveDuration += 10.0;
+
+    // Check if the planner found a solution yet.
+    if (planner->getProblemDefinition()->hasExactSolution()) {
+      // Get the solution of the planner.
+      auto solution =
+          planner->getProblemDefinition()->getSolutionPath()->as<ompl::geometric::PathGeometric>();
+
+      // Report the cost of the solution.
+      std::cout << "[ " << totalSolveDuration << "s ] Planner found a solution of cost "
+                << solution->cost(planner->getProblemDefinition()->getOptimizationObjective())
+                << '\n';
+
+      // Interpolate ("approx to collision checking resolution").
+      solution->interpolate();
+
+      // Get the solution states.
+      auto solutionStates = solution->getStates();
+
+      // Visualize the solution.
+      for (const auto solutionState : solutionStates) {
+        for (std::size_t i = 0u; i < openRaveState.size(); ++i) {
+          openRaveState[i] =
+              solutionState->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](i);
+        }
+        OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
+        robot->SetActiveDOFValues(openRaveState);
+        if (environment->CheckCollision(robot) || robot->CheckSelfCollision()) {
+          OMPL_ERROR("Solution path contains collision.");
+        }
+        std::this_thread::sleep_for(0.02s);
       }
-      OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
-      robot->SetActiveDOFValues(openRaveState);
-      if (environment->CheckCollision(robot) || robot->CheckSelfCollision()) {
-        OMPL_ERROR("Solution path contains collision.");
-      }
-      std::this_thread::sleep_for(0.01s);
+    } else {
+      std::cout << "[ " << totalSolveDuration << "s ] Planner did not find a solution yet.\n";
     }
   }
 }
@@ -147,7 +159,7 @@ int main(int argc, char** argv) {
   std::cout << '\n';
 
   // Create the viewer.
-  auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtcoin");
+  auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtosg");
 
   auto planThread = std::thread(&plan, config, context);
 
