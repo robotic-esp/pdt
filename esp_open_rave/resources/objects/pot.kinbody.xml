@@ -1,0 +1,8 @@
+<kinbody name="bin">
+  <body name="bin" type="static">
+    <geom type="trimesh" modifiable="false" renderScale="0.1">
+      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/objects/pot.iv</data>
+      <render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/objects/pot.iv</render>
+    </geom>
+  </body>
+</kinbody>

@@ -38,51 +38,50 @@
 
 #include <memory>
 
+#include <ompl/base/ProblemDefinition.h>
 #include <ompl/base/SpaceInformation.h>
-#include <ompl/base/State.h>
-#include <ompl/base/StateValidityChecker.h>
+#include <ompl/base/spaces/SE3StateSpace.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <openrave-core.h>
 #pragma GCC diagnostic pop
 
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_obstacles/hyperrectangle.h"
-#include "esp_obstacles/obstacle_visitor.h"
+#include "esp_configuration/configuration.h"
+#include "esp_open_rave/open_rave_base_context.h"
+#include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/context_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class OpenRaveValidityChecker : public ompl::base::StateValidityChecker {
+/** \brief A planning context to plugin to the OpenRave simulator. */
+class OpenRaveSE3 : public OpenRaveBaseContext {
  public:
-  /** \brief The constructor. */
-  OpenRaveValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
-                          const OpenRAVE::EnvironmentBasePtr& environment,
-                          const OpenRAVE::RobotBasePtr& robot);
+  OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                const std::shared_ptr<const Configuration>& config, const std::string& name);
+  virtual ~OpenRaveSE3();
 
-  /** \brief The destructor. */
-  virtual ~OpenRaveValidityChecker() = default;
+  /** \brief Instantiate a problem definition for this context. */
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
+      const override;
 
-  /** \brief Check if a state is valid. */
-  virtual bool isValid(const ompl::base::State* state) const override;
+  /** \brief Return a copy of the start state. */
+  ompl::base::ScopedState<ompl::base::SE3StateSpace> getStartState() const;
 
-  /** \brief Returns a pointer to the rave environment. */
-  OpenRAVE::EnvironmentBasePtr getOpenRaveEnvironment() const;
+  /** \brief Return a copy of the goal state. */
+  ompl::base::ScopedState<ompl::base::SE3StateSpace> getGoalState() const;
+
+  /** \brief Accepts a context visitor. */
+  virtual void accept(const ContextVisitor& visitor) const override final;
 
  private:
-  /** \brief The rave environment. */
-  OpenRAVE::EnvironmentBasePtr environment_;
+  /** \brief The start state. */
+  ompl::base::ScopedState<ompl::base::SE3StateSpace> startState_;
 
-  /** \brief The rave robot. */
-  OpenRAVE::RobotBasePtr robot_;
-
-  /** \brief The state in a format that rave can check. */
-  mutable std::vector<double> raveState_;
-
-  /** \brief The state space we are checking states of. */
-  const std::shared_ptr<const ompl::base::StateSpace> stateSpace_;
+  /** \brief The goal state. */
+  ompl::base::ScopedState<ompl::base::SE3StateSpace> goalState_;
 };
 
 }  // namespace ompltools

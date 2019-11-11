@@ -34,38 +34,57 @@
 
 // Authors: Marlin Strub
 
-#pragma once
+#include "esp_open_rave/open_rave_se3_validity_checker.h"
 
-#include <memory>
+#include <ompl/base/spaces/SE3StateSpace.h>
 
-#include <ompl/base/ProblemDefinition.h>
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#include <openrave-core.h>
-#pragma GCC diagnostic pop
-
-#include "esp_configuration/configuration.h"
-#include "esp_planning_contexts/base_context.h"
-#include "esp_planning_contexts/context_visitor.h"
+using namespace std::string_literals;
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief A planning context to plugin to the OpenRave simulator. */
-class OpenRaveBaseContext : public BaseContext {
- public:
-  OpenRaveBaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-           const std::shared_ptr<const Configuration>& config, const std::string& name);
-  virtual ~OpenRaveBaseContext() = default;
+OpenRaveMoverValidityChecker::OpenRaveMoverValidityChecker(
+    const ompl::base::SpaceInformationPtr& spaceInfo,
+    const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot) :
+    ompl::base::StateValidityChecker(spaceInfo),
+    environment_(environment),
+    robot_(robot),
+    raveState_(),
+    stateSpace_(spaceInfo->getStateSpace()) {
+}
 
-  /** \brief Accepts a context visitor. */
-  virtual void accept(const ContextVisitor& visitor) const override = 0;
+bool OpenRaveMoverValidityChecker::isValid(const ompl::base::State* state) const {
+  // Check the states is within the bounds of the state space.
+  if (!stateSpace_->satisfiesBounds(state)) {
+    return false;
+  }
 
-};
+  // Fill the rave state with the ompl state values.
+  auto se3State = state->as<ompl::base::SE3StateSpace::StateType>();
+  raveState_.trans.Set3(se3State->getX(), se3State->getY(), se3State->getZ());
+  raveState_.rot.x = se3State->rotation().x;
+  raveState_.rot.y = se3State->rotation().y;
+  raveState_.rot.z = se3State->rotation().z;
+  raveState_.rot.w = se3State->rotation().w;
+
+  // Lock the environment mutex.
+  OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
+
+  // Set the robot to the requested state.
+  robot_->SetTransform(raveState_);
+
+  // Check for collisions.
+  if (environment_->CheckCollision(robot_)) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+OpenRAVE::EnvironmentBasePtr OpenRaveMoverValidityChecker::getOpenRaveEnvironment() const {
+  return environment_;
+}
 
 }  // namespace ompltools
 

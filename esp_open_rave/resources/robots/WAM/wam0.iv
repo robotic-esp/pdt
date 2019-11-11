@@ -8,7 +8,8 @@ Separator {
             units METERS
     }
     Material {
-        diffuseColor    1.0 1.0 1.0
+        diffuseColor    0.0 0.0 0.0
+        ambientColor    0.1 0.1 0.1
     }
     Separator {
         Normal {

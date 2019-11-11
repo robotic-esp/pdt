@@ -39,7 +39,8 @@
 #include "nlohmann/json.hpp"
 
 #include "esp_common/context_type.h"
-#include "esp_open_rave/open_rave_base_context.h"
+#include "esp_open_rave/open_rave_manipulator.h"
+#include "esp_open_rave/open_rave_se3.h"
 #include "esp_planning_contexts/all_contexts.h"
 
 namespace esp {
@@ -132,7 +133,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         throw std::runtime_error("Error allocating a ObstacleFree context.");
       }
     }
-    case CONTEXT_TYPE::OPEN_RAVE: {
+    case CONTEXT_TYPE::OPEN_RAVE_MANIPULATOR: {
       try {
         // Allocate a real vector state space.
         // The state space bounds are set in the context.
@@ -141,9 +142,22 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
 
         // Allocate the state information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<OpenRave>(spaceInfo, config_, contextName);
+        return std::make_shared<OpenRaveManipulator>(spaceInfo, config_, contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error("Error allocating a OpenRave context.");
+        throw std::runtime_error("Error allocating a OpenRaveManipulator context.");
+      }
+    }
+    case CONTEXT_TYPE::OPEN_RAVE_SE3: {
+      try {
+        // Allocate a real vector state space.
+        // The state space bounds are set in the context.
+        auto stateSpace = std::make_shared<ompl::base::SE3StateSpace>();
+
+        // Allocate the state information for this space.
+        auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+        return std::make_shared<OpenRaveSE3>(spaceInfo, config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating a OpenRaveMover context.");
       }
     }
     case CONTEXT_TYPE::RANDOM_RECTANGLES: {

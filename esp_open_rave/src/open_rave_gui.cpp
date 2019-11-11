@@ -56,14 +56,18 @@
 #include "esp_factories/context_factory.h"
 #include "esp_factories/planner_factory.h"
 #include "esp_open_rave/open_rave_base_context.h"
-#include "esp_open_rave/open_rave_validity_checker.h"
+#include "esp_open_rave/open_rave_manipulator.h"
+#include "esp_open_rave/open_rave_manipulator_validity_checker.h"
+#include "esp_open_rave/open_rave_se3.h"
+#include "esp_open_rave/open_rave_se3_validity_checker.h"
 #include "esp_planning_contexts/all_contexts.h"
+#include "esp_planning_contexts/context_visitor.h"
 
 using namespace std::string_literals;
 using namespace std::chrono_literals;
 
-void plan(std::shared_ptr<esp::ompltools::Configuration> config,
-          std::shared_ptr<esp::ompltools::BaseContext> context) {
+void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
+                     std::shared_ptr<esp::ompltools::OpenRaveManipulator> context) {
   esp::ompltools::PlannerFactory plannerFactory(config, context);
   auto [planner, plannerType] = plannerFactory.create("ABITstar");
   (void)plannerType;
@@ -72,7 +76,7 @@ void plan(std::shared_ptr<esp::ompltools::Configuration> config,
   planner->setup();
 
   // Get the environment.
-  auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveValidityChecker>(
+  auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveManipulatorValidityChecker>(
                          context->getSpaceInformation()->getStateValidityChecker())
                          ->getOpenRaveEnvironment();
 
@@ -118,9 +122,72 @@ void plan(std::shared_ptr<esp::ompltools::Configuration> config,
         }
         OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
         robot->SetActiveDOFValues(openRaveState);
-        if (environment->CheckCollision(robot) || robot->CheckSelfCollision()) {
-          OMPL_ERROR("Solution path contains collision.");
-        }
+        std::this_thread::sleep_for(0.02s);
+      }
+    } else {
+      std::cout << "[ " << totalSolveDuration << "s ] Planner did not find a solution yet.\n";
+    }
+  }
+}
+
+void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
+               std::shared_ptr<esp::ompltools::OpenRaveSE3> context) {
+  esp::ompltools::PlannerFactory plannerFactory(config, context);
+  auto [planner, plannerType] = plannerFactory.create("ABITstar");
+  (void)plannerType;
+
+  // Setup the planner.
+  planner->setup();
+
+  // Get the environment.
+  auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveMoverValidityChecker>(
+                         context->getSpaceInformation()->getStateValidityChecker())
+                         ->getOpenRaveEnvironment();
+
+  // Get the robot.
+  auto robot =
+      environment->GetRobot(config->get<std::string>("Contexts/" + context->getName() + "/robot"));
+
+  // Create the vector to hold the current state.
+  OpenRAVE::Transform raveState;
+
+  double totalSolveDuration = 0.0;
+  // Work it.
+  while (true) {
+    // Work on the problem.
+    planner->solve(10.0);
+
+    // Update the total solve duration.
+    totalSolveDuration += 10.0;
+
+    // Check if the planner found a solution yet.
+    if (planner->getProblemDefinition()->hasExactSolution()) {
+      // Get the solution of the planner.
+      auto solution =
+          planner->getProblemDefinition()->getSolutionPath()->as<ompl::geometric::PathGeometric>();
+
+      // Report the cost of the solution.
+      std::cout << "[ " << totalSolveDuration << "s ] Planner found a solution of cost "
+                << solution->cost(planner->getProblemDefinition()->getOptimizationObjective())
+                << '\n';
+
+      // Interpolate ("approx to collision checking resolution").
+      solution->interpolate();
+
+      // Get the solution states.
+      auto solutionStates = solution->getStates();
+
+      // Visualize the solution.
+      for (const auto solutionState : solutionStates) {
+        auto se3State = solutionState->as<ompl::base::SE3StateSpace::StateType>();
+        raveState.trans.Set3(se3State->getX(), se3State->getY(), se3State->getZ());
+        raveState.rot.x = se3State->rotation().x;
+        raveState.rot.y = se3State->rotation().y;
+        raveState.rot.z = se3State->rotation().z;
+        raveState.rot.w = se3State->rotation().w;
+
+        OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
+        robot->SetTransform(raveState);
         std::this_thread::sleep_for(0.02s);
       }
     } else {
@@ -138,38 +205,49 @@ int main(int argc, char** argv) {
   auto contextFactory = std::make_shared<esp::ompltools::ContextFactory>(config);
   auto context = contextFactory->create(config->get<std::string>("Experiment/context"));
 
-  // Get the environment.
-  auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveValidityChecker>(
-                         context->getSpaceInformation()->getStateValidityChecker())
-                         ->getOpenRaveEnvironment();
+  if (std::dynamic_pointer_cast<esp::ompltools::OpenRaveManipulator>(context)) {
+    // Get the environment.
+    auto environment =
+        std::dynamic_pointer_cast<esp::ompltools::OpenRaveManipulatorValidityChecker>(
+            context->getSpaceInformation()->getStateValidityChecker())
+            ->getOpenRaveEnvironment();
 
-  // Set some joint values of the robot.
-  auto robot =
-      environment->GetRobot(config->get<std::string>("Contexts/" + context->getName() + "/robot"));
-  robot->SetActiveDOFValues(
-      config->get<std::vector<double>>("Contexts/" + context->getName() + "/start"));
+    // Create the viewer.
+    auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtosg");
 
-  std::vector<double> lower, upper;
-  robot->GetActiveDOFLimits(lower, upper);
+    auto planThread =
+        std::thread(&planManipulator, config,
+                    std::dynamic_pointer_cast<esp::ompltools::OpenRaveManipulator>(context));
 
-  std::cout << "Limits:\n";
-  for (std::size_t i = 0u; i < lower.size(); ++i) {
-    std::cout << '\t' << i << ": [ " << lower[i] << ", " << upper[i] << " ]\n";
+    viewer->main(true);
+
+    while (!planThread.joinable()) {
+      std::this_thread::sleep_for(0.5s);
+    }
+
+    planThread.join();
+  } else if (std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3>(context)) {
+    // Get the environment.
+    auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveMoverValidityChecker>(
+                           context->getSpaceInformation()->getStateValidityChecker())
+                           ->getOpenRaveEnvironment();
+
+    // Create the viewer.
+    auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtosg");
+
+    auto planThread = std::thread(
+        &planMover, config, std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3>(context));
+
+    viewer->main(true);
+
+    while (!planThread.joinable()) {
+      std::this_thread::sleep_for(0.5s);
+    }
+
+    planThread.join();
+  } else {
+    throw std::runtime_error("Cannot process non-openrave context.");
   }
-  std::cout << '\n';
-
-  // Create the viewer.
-  auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtosg");
-
-  auto planThread = std::thread(&plan, config, context);
-
-  viewer->main(true);
-
-  while (!planThread.joinable()) {
-    std::this_thread::sleep_for(0.5s);
-  }
-
-  planThread.join();
 
   return 0;
 }

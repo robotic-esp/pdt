@@ -49,6 +49,8 @@ class FourRooms;
 class GoalEnclosure;
 class NarrowPassage;
 class ObstacleFree;
+class OpenRaveManipulator;
+class OpenRaveSE3;
 class RandomRectangles;
 class RandomRectanglesMultiStartGoal;
 class RepeatingRectangles;

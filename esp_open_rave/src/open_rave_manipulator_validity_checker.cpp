@@ -34,38 +34,53 @@
 
 // Authors: Marlin Strub
 
-#pragma once
+#include "esp_open_rave/open_rave_manipulator_validity_checker.h"
 
-#include <memory>
-
-#include <ompl/base/ProblemDefinition.h>
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#include <openrave-core.h>
-#pragma GCC diagnostic pop
-
-#include "esp_configuration/configuration.h"
-#include "esp_planning_contexts/base_context.h"
-#include "esp_planning_contexts/context_visitor.h"
+using namespace std::string_literals;
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief A planning context to plugin to the OpenRave simulator. */
-class OpenRaveBaseContext : public BaseContext {
- public:
-  OpenRaveBaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-           const std::shared_ptr<const Configuration>& config, const std::string& name);
-  virtual ~OpenRaveBaseContext() = default;
+OpenRaveManipulatorValidityChecker::OpenRaveManipulatorValidityChecker(
+    const ompl::base::SpaceInformationPtr& spaceInfo,
+    const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot) :
+    ompl::base::StateValidityChecker(spaceInfo),
+    environment_(environment),
+    robot_(robot),
+    raveState_(robot->GetDOF()),
+    stateSpace_(spaceInfo->getStateSpace()) {
+}
 
-  /** \brief Accepts a context visitor. */
-  virtual void accept(const ContextVisitor& visitor) const override = 0;
+bool OpenRaveManipulatorValidityChecker::isValid(const ompl::base::State* state) const {
+  // Check the states is within the bounds of the state space.
+  if (!stateSpace_->satisfiesBounds(state)) {
+    return false;
+  }
 
-};
+  // Fill the rave state with the ompl state values.
+  auto realVectorState = state->as<ompl::base::RealVectorStateSpace::StateType>();
+  for (std::size_t i = 0u; i < stateSpace_->getDimension(); ++i) {
+    raveState_[i] = realVectorState->operator[](i);
+  }
+
+  // Lock the environment mutex.
+  OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
+
+  // Set the robot to the requested state.
+  robot_->SetActiveDOFValues(raveState_);
+
+  // Check for collisions.
+  if (environment_->CheckCollision(robot_) || robot_->CheckSelfCollision()) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+OpenRAVE::EnvironmentBasePtr OpenRaveManipulatorValidityChecker::getOpenRaveEnvironment() const {
+  return environment_;
+}
 
 }  // namespace ompltools
 

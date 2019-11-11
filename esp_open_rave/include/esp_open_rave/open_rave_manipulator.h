@@ -34,53 +34,55 @@
 
 // Authors: Marlin Strub
 
-#include "esp_open_rave/open_rave_validity_checker.h"
+#pragma once
 
-using namespace std::string_literals;
+#include <memory>
+
+#include <ompl/base/ProblemDefinition.h>
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/spaces/RealVectorStateSpace.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include <openrave-core.h>
+#pragma GCC diagnostic pop
+
+#include "esp_configuration/configuration.h"
+#include "esp_open_rave/open_rave_base_context.h"
+#include "esp_planning_contexts/base_context.h"
+#include "esp_planning_contexts/context_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
-OpenRaveValidityChecker::OpenRaveValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
-                                                 const OpenRAVE::EnvironmentBasePtr& environment,
-                                                 const OpenRAVE::RobotBasePtr& robot) :
-    ompl::base::StateValidityChecker(spaceInfo),
-    environment_(environment),
-    robot_(robot),
-    raveState_(robot->GetDOF()),
-    stateSpace_(spaceInfo->getStateSpace()) {
-}
+/** \brief A planning context to plugin to the OpenRave simulator. */
+class OpenRaveManipulator : public OpenRaveBaseContext {
+ public:
+  OpenRaveManipulator(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                      const std::shared_ptr<const Configuration>& config, const std::string& name);
+  virtual ~OpenRaveManipulator();
 
-bool OpenRaveValidityChecker::isValid(const ompl::base::State* state) const {
-  // Check the states is within the bounds of the state space.
-  if (!stateSpace_->satisfiesBounds(state)) {
-    return false;
-  }
+  /** \brief Instantiate a problem definition for this context. */
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
+      const override;
 
-  // Fill the rave state with the ompl state values.
-  auto realVectorState = state->as<ompl::base::RealVectorStateSpace::StateType>();
-  for (std::size_t i = 0u; i < stateSpace_->getDimension(); ++i) {
-    raveState_[i] = realVectorState->operator[](i);
-  }
+  /** \brief Return a copy of the start state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
 
-  // Lock the environment mutex.
-  OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
+  /** \brief Return a copy of the goal state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getGoalState() const;
 
-  // Set the robot to the requested state.
-  robot_->SetActiveDOFValues(raveState_);
+  /** \brief Accepts a context visitor. */
+  virtual void accept(const ContextVisitor& visitor) const override final;
 
-  // Check for collisions.
-  if (environment_->CheckCollision(robot_) || robot_->CheckSelfCollision()) {
-    return false;
-  } else {
-    return true;
-  }
-}
+ private:
+  /** \brief The start state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState_;
 
-OpenRAVE::EnvironmentBasePtr OpenRaveValidityChecker::getOpenRaveEnvironment() const {
-  return environment_;
-}
+  /** \brief The goal state. */
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState_;
+};
 
 }  // namespace ompltools
 

@@ -2,7 +2,7 @@
   <body type="static">
     <geom type="box">
       <extents>0.05 0.05 0.7</extents>
-      <diffuseColor>1 .2 .2</diffuseColor>
+      <diffuseColor>0.2 0.5 1.0</diffuseColor>
     </geom>
   </body>
 </kinbody>

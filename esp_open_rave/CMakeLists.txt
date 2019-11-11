@@ -10,9 +10,10 @@ include_directories(
 # Add the library as an interface.
 add_library(esp_open_rave
   src/open_rave_base_context.cpp
-  src/open_rave_validity_checker.cpp)
-
-message(STATUS "OpenRAVE_LIBRARIES: ${OpenRAVE_LIBRARIES}")
+  src/open_rave_manipulator.cpp
+  src/open_rave_manipulator_validity_checker.cpp
+  src/open_rave_se3.cpp
+  src/open_rave_se3_validity_checker.cpp)
 
 # Link the library.
 target_link_libraries(esp_open_rave

@@ -46,7 +46,7 @@
 
 #include <openrave/environment.h>
 
-#include "esp_open_rave/open_rave_validity_checker.h"
+#include "esp_open_rave/open_rave_manipulator_validity_checker.h"
 
 using namespace std::string_literals;
 
@@ -54,92 +54,10 @@ namespace esp {
 
 namespace ompltools {
 
-OpenRave::OpenRave(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                   const std::shared_ptr<const Configuration>& config, const std::string& name) :
-    BaseContext(spaceInfo, config, name),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
-  // Get the start and goal positions.
-  auto startPosition = config->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config->get<std::vector<double>>("Contexts/" + name + "/goal");
-
-  // Initialize rave.
-  OpenRAVE::RaveInitialize(true /* TODO: this loads all plugins, is this necessary? */,
-                           OpenRAVE::Level_Warn);
-
-  // Create a rave environment.
-  auto environment = OpenRAVE::RaveCreateEnvironment();
-
-  // Load the specified environment.
-  environment->Load(config_->get<std::string>("Contexts/" + name + "/environment"));
-
-  // Load the robot.
-  auto robot = environment->GetRobot(config_->get<std::string>("Contexts/" + name + "/robot"));
-
-  // Set the active dimensions.
-  robot->SetActiveDOFs(config_->get<std::vector<int>>("Contexts/" + name + "/activeDofIndices"));
-
-  // Get the upper and lower bounds for each dimension.
-  std::vector<double> lowerBounds, upperBounds;
-  robot->GetActiveDOFLimits(lowerBounds, upperBounds);
-
-  // Set the bounds of the state space.
-  ompl::base::RealVectorBounds bounds(robot->GetActiveDOF());
-  bounds.low = lowerBounds;
-  bounds.high = upperBounds;
-  spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->setBounds(bounds);
-
-  // Create the validity checker.
-  auto validityChecker = std::make_shared<OpenRaveValidityChecker>(spaceInfo_, environment, robot);
-
-  // Set the validity checker and check resolution.
-  spaceInfo_->setStateValidityChecker(validityChecker);
-  spaceInfo_->setStateValidityCheckingResolution(
-      config_->get<double>("Contexts/" + name + "/collisionCheckResolution"));
-
-  // Setup the space info.
-  spaceInfo_->setup();
-
-  // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
-  }
-}
-
-OpenRave::~OpenRave() {
-  OpenRAVE::RaveDestroy();
-}
-
-ompl::base::ProblemDefinitionPtr OpenRave::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
-
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
-
-  // Return the new definition.
-  return problemDefinition;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> OpenRave::getStartState() const {
-  return startState_;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> OpenRave::getGoalState() const {
-  return goalState_;
-}
-
-void OpenRave::accept(const ContextVisitor& visitor) const {
-  visitor.visit(*this);
+OpenRaveBaseContext::OpenRaveBaseContext(
+    const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+    const std::shared_ptr<const Configuration>& config, const std::string& name) :
+    BaseContext(spaceInfo, config, name) {
 }
 
 }  // namespace ompltools

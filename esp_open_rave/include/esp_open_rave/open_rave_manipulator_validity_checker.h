@@ -38,33 +38,51 @@
 
 #include <memory>
 
-#include <ompl/base/ProblemDefinition.h>
 #include <ompl/base/SpaceInformation.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
+#include <ompl/base/State.h>
+#include <ompl/base/StateValidityChecker.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <openrave-core.h>
 #pragma GCC diagnostic pop
 
-#include "esp_configuration/configuration.h"
-#include "esp_planning_contexts/base_context.h"
-#include "esp_planning_contexts/context_visitor.h"
+#include "esp_obstacles/base_obstacle.h"
+#include "esp_obstacles/hyperrectangle.h"
+#include "esp_obstacles/obstacle_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief A planning context to plugin to the OpenRave simulator. */
-class OpenRaveBaseContext : public BaseContext {
+class OpenRaveManipulatorValidityChecker : public ompl::base::StateValidityChecker {
  public:
-  OpenRaveBaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-           const std::shared_ptr<const Configuration>& config, const std::string& name);
-  virtual ~OpenRaveBaseContext() = default;
+  /** \brief The constructor. */
+  OpenRaveManipulatorValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
+                          const OpenRAVE::EnvironmentBasePtr& environment,
+                          const OpenRAVE::RobotBasePtr& robot);
 
-  /** \brief Accepts a context visitor. */
-  virtual void accept(const ContextVisitor& visitor) const override = 0;
+  /** \brief The destructor. */
+  virtual ~OpenRaveManipulatorValidityChecker() = default;
 
+  /** \brief Check if a state is valid. */
+  virtual bool isValid(const ompl::base::State* state) const override;
+
+  /** \brief Returns a pointer to the rave environment. */
+  OpenRAVE::EnvironmentBasePtr getOpenRaveEnvironment() const;
+
+ private:
+  /** \brief The rave environment. */
+  OpenRAVE::EnvironmentBasePtr environment_;
+
+  /** \brief The rave robot. */
+  OpenRAVE::RobotBasePtr robot_;
+
+  /** \brief The state in a format that rave can check. */
+  mutable std::vector<double> raveState_;
+
+  /** \brief The state space we are checking states of. */
+  const std::shared_ptr<const ompl::base::StateSpace> stateSpace_;
 };
 
 }  // namespace ompltools
