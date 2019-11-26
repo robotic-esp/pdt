@@ -34,8 +34,6 @@
 
 // Authors: Marlin Strub
 
-#include <dbg.h>
-
 #include <chrono>
 #include <memory>
 #include <thread>
@@ -207,12 +205,10 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
 }
 
 int main(int argc, char** argv) {
-  dbg("starting");
   // Instantiate the config.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
   config->registerAsExperiment();
 
-  dbg("creating context");
   // Create the context.
   auto contextFactory = std::make_shared<esp::ompltools::ContextFactory>(config);
   auto context = contextFactory->create(config->get<std::string>("Experiment/context"));
@@ -224,7 +220,6 @@ int main(int argc, char** argv) {
             context->getSpaceInformation()->getStateValidityChecker())
             ->getOpenRaveEnvironment();
 
-    dbg("Manipulator context");
     // Create the viewer.
     auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtosg");
 
@@ -240,7 +235,6 @@ int main(int argc, char** argv) {
 
     planThread.join();
   } else if (std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3>(context)) {
-    dbg("SE3 context");
     // Get the environment.
     auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3ValidityChecker>(
                            context->getSpaceInformation()->getStateValidityChecker())
