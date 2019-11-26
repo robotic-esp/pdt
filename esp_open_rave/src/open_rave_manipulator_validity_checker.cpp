@@ -75,6 +75,29 @@ bool OpenRaveManipulatorValidityChecker::isValid(const ompl::base::State* state)
   }
 }
 
+double OpenRaveManipulatorValidityChecker::clearance(const ompl::base::State* state) const {
+  // Fill the rave state with the ompl state values.
+  auto realVectorState = state->as<ompl::base::RealVectorStateSpace::StateType>();
+  for (std::size_t i = 0u; i < stateSpace_->getDimension(); ++i) {
+    raveState_[i] = realVectorState->operator[](i);
+  }
+
+  // Lock the environment mutex.
+  OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
+
+  // Set the robot to the requested state.
+  robot_->SetActiveDOFValues(raveState_);
+
+  // Set the option to measure distance.
+  environment_->GetCollisionChecker()->SetCollisionOptions(OpenRAVE::CO_Distance);
+
+  // Compute the distance.
+  environment_->CheckCollision(robot_, collisionReport_);
+
+  // Report the distance.
+  return collisionReport_->minDistance;
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

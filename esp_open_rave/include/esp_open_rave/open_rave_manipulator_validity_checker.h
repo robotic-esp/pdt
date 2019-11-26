@@ -68,6 +68,9 @@ class OpenRaveManipulatorValidityChecker : public OpenRaveBaseValidityChecker {
   /** \brief Check if a state is valid. */
   virtual bool isValid(const ompl::base::State* state) const override;
 
+  /** \brief Returns the clearance of a state. */
+  virtual double clearance(const ompl::base::State* state) const override;
+
  private:
   /** \brief The state in a format that rave can check. */
   mutable std::vector<double> raveState_;
