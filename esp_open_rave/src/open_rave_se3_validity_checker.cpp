@@ -72,6 +72,9 @@ bool OpenRaveSE3ValidityChecker::isValid(const ompl::base::State* state) const {
   // Set the robot to the requested state.
   robot_->SetTransform(raveState_);
 
+  // Set the option to measure distance.
+  environment_->GetCollisionChecker()->SetCollisionOptions(OpenRAVE::CO_Contacts);
+
   // Check for collisions.
   if (environment_->CheckCollision(robot_)) {
     return false;
@@ -94,6 +97,9 @@ double OpenRaveSE3ValidityChecker::clearance(const ompl::base::State* state) con
 
   // Set the robot to the requested state.
   robot_->SetTransform(raveState_);
+
+  // Set the option to measure distance.
+  environment_->GetCollisionChecker()->SetCollisionOptions(OpenRAVE::CO_Distance);
 
   // Compute the distance.
   environment_->CheckCollision(robot_, collisionReport_);

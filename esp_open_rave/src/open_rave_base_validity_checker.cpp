@@ -48,7 +48,6 @@ OpenRaveBaseValidityChecker::OpenRaveBaseValidityChecker(
     robot_(robot),
     stateSpace_(spaceInfo->getStateSpace()),
     collisionReport_(boost::make_shared<OpenRAVE::CollisionReport>()) {
-  environment_->GetCollisionChecker()->SetCollisionOptions(OpenRAVE::CO_Distance);
 }
 
 OpenRAVE::EnvironmentBasePtr OpenRaveBaseValidityChecker::getOpenRaveEnvironment() const {

@@ -76,7 +76,6 @@ class OpenRaveSE3ValidityChecker : public OpenRaveBaseValidityChecker {
 private:
   /** \brief The state in a format that rave can check. */
   mutable OpenRAVE::Transform raveState_;
-
 };
 
 }  // namespace ompltools

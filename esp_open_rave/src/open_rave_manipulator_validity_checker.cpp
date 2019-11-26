@@ -67,6 +67,9 @@ bool OpenRaveManipulatorValidityChecker::isValid(const ompl::base::State* state)
   // Set the robot to the requested state.
   robot_->SetActiveDOFValues(raveState_);
 
+  // Set the option to measure distance.
+  environment_->GetCollisionChecker()->SetCollisionOptions(OpenRAVE::CO_Contacts);
+
   // Check for collisions.
   if (environment_->CheckCollision(robot_) || robot_->CheckSelfCollision()) {
     return false;
