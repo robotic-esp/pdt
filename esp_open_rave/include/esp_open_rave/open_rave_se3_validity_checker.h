@@ -38,9 +38,10 @@
 
 #include <memory>
 
+#include <boost/shared_ptr.hpp>
+
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/State.h>
-#include <ompl/base/StateValidityChecker.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -50,39 +51,32 @@
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_obstacles/obstacle_visitor.h"
+#include "esp_open_rave/open_rave_base_validity_checker.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class OpenRaveMoverValidityChecker : public ompl::base::StateValidityChecker {
+class OpenRaveSE3ValidityChecker : public OpenRaveBaseValidityChecker {
  public:
   /** \brief The constructor. */
-  OpenRaveMoverValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
-                          const OpenRAVE::EnvironmentBasePtr& environment,
-                          const OpenRAVE::RobotBasePtr& robot);
+  OpenRaveSE3ValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
+                             const OpenRAVE::EnvironmentBasePtr& environment,
+                             const OpenRAVE::RobotBasePtr& robot);
 
   /** \brief The destructor. */
-  virtual ~OpenRaveMoverValidityChecker() = default;
+  virtual ~OpenRaveSE3ValidityChecker() = default;
 
   /** \brief Check if a state is valid. */
   virtual bool isValid(const ompl::base::State* state) const override;
 
-  /** \brief Returns a pointer to the rave environment. */
-  OpenRAVE::EnvironmentBasePtr getOpenRaveEnvironment() const;
+  /** \brief Returns the clearance of a state. */
+  virtual double clearance(const ompl::base::State* state) const override;
 
- private:
-  /** \brief The rave environment. */
-  OpenRAVE::EnvironmentBasePtr environment_;
-
-  /** \brief The rave robot. */
-  OpenRAVE::RobotBasePtr robot_;
-
+private:
   /** \brief The state in a format that rave can check. */
   mutable OpenRAVE::Transform raveState_;
 
-  /** \brief The state space we are checking states of. */
-  const std::shared_ptr<const ompl::base::StateSpace> stateSpace_;
 };
 
 }  // namespace ompltools

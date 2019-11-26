@@ -34,6 +34,8 @@
 
 // Authors: Marlin Strub
 
+#include <dbg.h>
+
 #include <chrono>
 #include <memory>
 #include <thread>
@@ -69,7 +71,8 @@ using namespace std::chrono_literals;
 void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
                      std::shared_ptr<esp::ompltools::OpenRaveManipulator> context) {
   esp::ompltools::PlannerFactory plannerFactory(config, context);
-  auto [planner, plannerType] = plannerFactory.create("ABITstar");
+  auto [planner, plannerType] =
+      plannerFactory.create(config->get<std::string>("Experiment/planner"));
   (void)plannerType;
 
   // Setup the planner.
@@ -92,10 +95,10 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
   // Work it.
   while (true) {
     // Work on the problem.
-    planner->solve(10.0);
+    planner->solve(config->get<double>("Experiment/visualizationInterval"));
 
     // Update the total solve duration.
-    totalSolveDuration += 10.0;
+    totalSolveDuration += config->get<double>("Experiment/visualizationInterval");
 
     // Check if the planner found a solution yet.
     if (planner->getProblemDefinition()->hasExactSolution()) {
@@ -104,7 +107,8 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
           planner->getProblemDefinition()->getSolutionPath()->as<ompl::geometric::PathGeometric>();
 
       // Report the cost of the solution.
-      std::cout << "[ " << totalSolveDuration << "s ] Planner found a solution of cost "
+      std::cout << "[ " << totalSolveDuration << "s ] "
+                << config->get<std::string>("Experiment/planner") << " found a solution of cost "
                 << solution->cost(planner->getProblemDefinition()->getOptimizationObjective())
                 << '\n';
 
@@ -122,10 +126,12 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
         }
         OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
         robot->SetActiveDOFValues(openRaveState);
-        std::this_thread::sleep_for(0.02s);
+        std::this_thread::sleep_for(0.05s);
       }
     } else {
-      std::cout << "[ " << totalSolveDuration << "s ] Planner did not find a solution yet.\n";
+      std::cout << "[ " << totalSolveDuration << "s ] "
+                << config->get<std::string>("Experiment/planner")
+                << " did not find a solution yet.\n";
     }
   }
 }
@@ -133,14 +139,15 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
 void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
                std::shared_ptr<esp::ompltools::OpenRaveSE3> context) {
   esp::ompltools::PlannerFactory plannerFactory(config, context);
-  auto [planner, plannerType] = plannerFactory.create("ABITstar");
+  auto [planner, plannerType] =
+      plannerFactory.create(config->get<std::string>("Experiment/planner"));
   (void)plannerType;
 
   // Setup the planner.
   planner->setup();
 
   // Get the environment.
-  auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveMoverValidityChecker>(
+  auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3ValidityChecker>(
                          context->getSpaceInformation()->getStateValidityChecker())
                          ->getOpenRaveEnvironment();
 
@@ -155,10 +162,10 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
   // Work it.
   while (true) {
     // Work on the problem.
-    planner->solve(10.0);
+    planner->solve(config->get<double>("Experiment/visualizationInterval"));
 
     // Update the total solve duration.
-    totalSolveDuration += 10.0;
+    totalSolveDuration += config->get<double>("Experiment/visualizationInterval");
 
     // Check if the planner found a solution yet.
     if (planner->getProblemDefinition()->hasExactSolution()) {
@@ -167,7 +174,8 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
           planner->getProblemDefinition()->getSolutionPath()->as<ompl::geometric::PathGeometric>();
 
       // Report the cost of the solution.
-      std::cout << "[ " << totalSolveDuration << "s ] Planner found a solution of cost "
+      std::cout << "[ " << totalSolveDuration << "s ] "
+                << config->get<std::string>("Experiment/planner") << " found a solution of cost "
                 << solution->cost(planner->getProblemDefinition()->getOptimizationObjective())
                 << '\n';
 
@@ -188,19 +196,23 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
 
         OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
         robot->SetTransform(raveState);
-        std::this_thread::sleep_for(0.02s);
+        std::this_thread::sleep_for(0.05s);
       }
     } else {
-      std::cout << "[ " << totalSolveDuration << "s ] Planner did not find a solution yet.\n";
+      std::cout << "[ " << totalSolveDuration << "s ] "
+                << config->get<std::string>("Experiment/planner")
+                << " did not find a solution yet.\n";
     }
   }
 }
 
 int main(int argc, char** argv) {
+  dbg("starting");
   // Instantiate the config.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
   config->registerAsExperiment();
 
+  dbg("creating context");
   // Create the context.
   auto contextFactory = std::make_shared<esp::ompltools::ContextFactory>(config);
   auto context = contextFactory->create(config->get<std::string>("Experiment/context"));
@@ -212,6 +224,7 @@ int main(int argc, char** argv) {
             context->getSpaceInformation()->getStateValidityChecker())
             ->getOpenRaveEnvironment();
 
+    dbg("Manipulator context");
     // Create the viewer.
     auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtosg");
 
@@ -227,16 +240,17 @@ int main(int argc, char** argv) {
 
     planThread.join();
   } else if (std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3>(context)) {
+    dbg("SE3 context");
     // Get the environment.
-    auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveMoverValidityChecker>(
+    auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3ValidityChecker>(
                            context->getSpaceInformation()->getStateValidityChecker())
                            ->getOpenRaveEnvironment();
 
     // Create the viewer.
     auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtosg");
 
-    auto planThread = std::thread(
-        &planMover, config, std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3>(context));
+    auto planThread = std::thread(&planMover, config,
+                                  std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3>(context));
 
     viewer->main(true);
 

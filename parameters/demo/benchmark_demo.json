@@ -9,7 +9,7 @@
             "AIBITstar"
         ],
         "context": "WallGap",
-        "numRuns": 500,
+        "numRuns": 50,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true,

@@ -34,46 +34,58 @@
 
 // Authors: Marlin Strub
 
-#include "esp_open_rave/open_rave_manipulator_validity_checker.h"
+#pragma once
 
-using namespace std::string_literals;
+#include <memory>
+
+#include <boost/smart_ptr.hpp>
+
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/State.h>
+#include <ompl/base/StateValidityChecker.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include <openrave-core.h>
+#pragma GCC diagnostic pop
+
+#include "esp_obstacles/base_obstacle.h"
+#include "esp_obstacles/hyperrectangle.h"
+#include "esp_obstacles/obstacle_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
-OpenRaveManipulatorValidityChecker::OpenRaveManipulatorValidityChecker(
-    const ompl::base::SpaceInformationPtr& spaceInfo,
-    const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot) :
-    OpenRaveBaseValidityChecker(spaceInfo, environment, robot),
-    raveState_(robot->GetDOF()) {
-}
+class OpenRaveBaseValidityChecker : public ompl::base::StateValidityChecker {
+ public:
+  /** \brief The constructor. */
+  OpenRaveBaseValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
+                              const OpenRAVE::EnvironmentBasePtr& environment,
+                              const OpenRAVE::RobotBasePtr& robot);
 
-bool OpenRaveManipulatorValidityChecker::isValid(const ompl::base::State* state) const {
-  // Check the states is within the bounds of the state space.
-  if (!stateSpace_->satisfiesBounds(state)) {
-    return false;
-  }
+  /** \brief The destructor. */
+  virtual ~OpenRaveBaseValidityChecker() = default;
 
-  // Fill the rave state with the ompl state values.
-  auto realVectorState = state->as<ompl::base::RealVectorStateSpace::StateType>();
-  for (std::size_t i = 0u; i < stateSpace_->getDimension(); ++i) {
-    raveState_[i] = realVectorState->operator[](i);
-  }
+  /** \brief Check if a state is valid. */
+  virtual bool isValid(const ompl::base::State* state) const override = 0;
 
-  // Lock the environment mutex.
-  OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
+  /** \brief Returns a pointer to the rave environment. */
+  virtual OpenRAVE::EnvironmentBasePtr getOpenRaveEnvironment() const;
 
-  // Set the robot to the requested state.
-  robot_->SetActiveDOFValues(raveState_);
+ protected:
+  /** \brief The rave environment. */
+  OpenRAVE::EnvironmentBasePtr environment_;
 
-  // Check for collisions.
-  if (environment_->CheckCollision(robot_) || robot_->CheckSelfCollision()) {
-    return false;
-  } else {
-    return true;
-  }
-}
+  /** \brief The rave robot. */
+  OpenRAVE::RobotBasePtr robot_;
+
+  /** \brief The state space we are checking states of. */
+  const std::shared_ptr<const ompl::base::StateSpace> stateSpace_;
+
+  /** \brief The collision check report to store the clearance of a state. */
+  mutable boost::shared_ptr<OpenRAVE::CollisionReport> collisionReport_;
+};
 
 }  // namespace ompltools
 

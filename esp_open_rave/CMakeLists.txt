@@ -10,6 +10,7 @@ include_directories(
 # Add the library as an interface.
 add_library(esp_open_rave
   src/open_rave_base_context.cpp
+  src/open_rave_base_validity_checker.cpp
   src/open_rave_manipulator.cpp
   src/open_rave_manipulator_validity_checker.cpp
   src/open_rave_se3.cpp
@@ -29,6 +30,7 @@ target_link_libraries(esp_open_rave
 target_include_directories(esp_open_rave PUBLIC
   ${PROJECT_SOURCE_DIR}/include)
 
+# Add the gui executable.
 add_executable(open_rave_gui
   src/open_rave_gui.cpp)
 

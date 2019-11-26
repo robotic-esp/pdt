@@ -34,72 +34,25 @@
 
 // Authors: Marlin Strub
 
-#include "esp_open_rave/open_rave_se3_validity_checker.h"
-
-#include <ompl/base/spaces/SE3StateSpace.h>
-
-using namespace std::string_literals;
+#include "esp_open_rave/open_rave_base_validity_checker.h"
 
 namespace esp {
 
 namespace ompltools {
 
-OpenRaveSE3ValidityChecker::OpenRaveSE3ValidityChecker(
+OpenRaveBaseValidityChecker::OpenRaveBaseValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo,
     const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot) :
-    OpenRaveBaseValidityChecker(spaceInfo, environment, robot),
-    raveState_() {
-  raveState_.identity();
+    ompl::base::StateValidityChecker(spaceInfo),
+    environment_(environment),
+    robot_(robot),
+    stateSpace_(spaceInfo->getStateSpace()),
+    collisionReport_(boost::make_shared<OpenRAVE::CollisionReport>()) {
+  environment_->GetCollisionChecker()->SetCollisionOptions(OpenRAVE::CO_Distance);
 }
 
-bool OpenRaveSE3ValidityChecker::isValid(const ompl::base::State* state) const {
-  // Check the states is within the bounds of the state space.
-  if (!stateSpace_->satisfiesBounds(state)) {
-    return false;
-  }
-
-  // Fill the rave state with the ompl state values.
-  auto se3State = state->as<ompl::base::SE3StateSpace::StateType>();
-  raveState_.trans.Set3(se3State->getX(), se3State->getY(), se3State->getZ());
-  raveState_.rot.x = se3State->rotation().x;
-  raveState_.rot.y = se3State->rotation().y;
-  raveState_.rot.z = se3State->rotation().z;
-  raveState_.rot.w = se3State->rotation().w;
-
-  // Lock the environment mutex.
-  OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
-
-  // Set the robot to the requested state.
-  robot_->SetTransform(raveState_);
-
-  // Check for collisions.
-  if (environment_->CheckCollision(robot_)) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
-double OpenRaveSE3ValidityChecker::clearance(const ompl::base::State* state) const {
-  // Fill the rave state with the ompl state values.
-  auto se3State = state->as<ompl::base::SE3StateSpace::StateType>();
-  raveState_.trans.Set3(se3State->getX(), se3State->getY(), se3State->getZ());
-  raveState_.rot.x = se3State->rotation().x;
-  raveState_.rot.y = se3State->rotation().y;
-  raveState_.rot.z = se3State->rotation().z;
-  raveState_.rot.w = se3State->rotation().w;
-
-  // Lock the environment mutex.
-  OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
-
-  // Set the robot to the requested state.
-  robot_->SetTransform(raveState_);
-
-  // Compute the distance.
-  environment_->CheckCollision(robot_, collisionReport_);
-
-  // Report the distance.
-  return collisionReport_->minDistance;
+OpenRAVE::EnvironmentBasePtr OpenRaveBaseValidityChecker::getOpenRaveEnvironment() const {
+  return environment_;
 }
 
 }  // namespace ompltools

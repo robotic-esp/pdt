@@ -99,7 +99,7 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
 
   // Create the validity checker.
   auto validityChecker =
-      std::make_shared<OpenRaveMoverValidityChecker>(spaceInfo_, environment, robot);
+      std::make_shared<OpenRaveSE3ValidityChecker>(spaceInfo_, environment, robot);
 
   OpenRAVE::Transform raveState;
   raveState.identity();

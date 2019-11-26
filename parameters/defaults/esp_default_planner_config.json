@@ -16,7 +16,7 @@
         },
         "AIBITstar": {
             "type": "AIBITstar",
-            "samplesPerBatch": 100,
+            "samplesPerBatch": 1000,
             "radiusFactor": 1.001,
             "collisionDetectionOnReverseSearch": true
         },
