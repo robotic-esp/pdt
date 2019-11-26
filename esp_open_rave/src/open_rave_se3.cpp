@@ -55,8 +55,8 @@ namespace esp {
 namespace ompltools {
 
 OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                             const std::shared_ptr<const Configuration>& config,
-                             const std::string& name) :
+                         const std::shared_ptr<const Configuration>& config,
+                         const std::string& name) :
     OpenRaveBaseContext(spaceInfo, config, name),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
@@ -81,6 +81,11 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
 
   // Create a rave environment.
   auto environment = OpenRAVE::RaveCreateEnvironment();
+
+  // Create a collision checker.
+  OpenRAVE::CollisionCheckerBasePtr collisionChecker = OpenRAVE::RaveCreateCollisionChecker(
+      environment, config->get<std::string>("Contexts/" + name + "/collisionChecker"));
+  environment->SetCollisionChecker(collisionChecker);
 
   // Load the specified environment.
   environment->Load(config_->get<std::string>("Contexts/" + name + "/environment"));

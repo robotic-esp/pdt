@@ -76,6 +76,11 @@ OpenRaveManipulator::OpenRaveManipulator(
   // Create a rave environment.
   auto environment = OpenRAVE::RaveCreateEnvironment();
 
+  // Create a collision checker.
+  OpenRAVE::CollisionCheckerBasePtr collisionChecker = OpenRAVE::RaveCreateCollisionChecker(
+      environment, config->get<std::string>("Contexts/" + name + "/collisionChecker"));
+  environment->SetCollisionChecker(collisionChecker);
+
   // Load the specified environment.
   environment->Load(config_->get<std::string>("Contexts/" + name + "/environment"));
 
