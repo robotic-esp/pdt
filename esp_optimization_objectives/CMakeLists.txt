@@ -10,6 +10,7 @@ include_directories(
 # Build the library.
 add_library(esp_optimization_objectives
   src/potential_field_optimization_objective.cpp
+  src/max_min_clearance_optimization_objective.cpp
   )
 
 # Link the library.

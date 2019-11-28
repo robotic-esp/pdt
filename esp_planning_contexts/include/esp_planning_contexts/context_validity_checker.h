@@ -59,6 +59,9 @@ class ContextValidityChecker : public ompl::base::StateValidityChecker {
   // Check if a state is valid.
   virtual bool isValid(const ompl::base::State* state) const override;
 
+  // Return the minimum distance of a point to any obstacle.
+  virtual double clearance(const ompl::base::State* state) const override;
+
   // Add obstacles.
   virtual void addObstacle(const std::shared_ptr<BaseObstacle>& obstacle);
   virtual void addObstacles(const std::vector<std::shared_ptr<BaseObstacle>>& obstacles);

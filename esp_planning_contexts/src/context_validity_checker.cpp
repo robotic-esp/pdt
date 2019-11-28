@@ -69,6 +69,16 @@ bool ContextValidityChecker::isValid(const ompl::base::State* state) const {
   return true;
 }
 
+double ContextValidityChecker::clearance(const ompl::base::State* state) const {
+  // Compute the distance to all obstacles and take the minimum.
+  double minDistance = std::numeric_limits<double>::infinity();
+  for (const auto& obstacle : obstacles_) {
+    double distance = obstacle->clearance(state);
+    minDistance = distance < minDistance ? distance : minDistance;
+  }
+  return minDistance;
+}
+
 void ContextValidityChecker::addObstacle(const std::shared_ptr<BaseObstacle>& obstacle) {
   obstacles_.emplace_back(obstacle);
 }
@@ -91,8 +101,7 @@ std::vector<std::shared_ptr<BaseObstacle>> ContextValidityChecker::getObstacles(
   return obstacles_;
 }
 
-std::vector<std::shared_ptr<BaseAntiObstacle>> ContextValidityChecker::getAntiObstacles()
-    const {
+std::vector<std::shared_ptr<BaseAntiObstacle>> ContextValidityChecker::getAntiObstacles() const {
   return antiObstacles_;
 }
 

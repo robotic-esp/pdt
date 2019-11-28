@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+/* Authors: Marlin Strub */
 
 #pragma once
 
@@ -67,6 +67,9 @@ class Hyperrectangle : public T {
 
   /** \brief The measure of this hyperrectangle. */
   virtual double computeMeasure() const override;
+
+  // Compute the clearance of a state to this hyperrectangle.
+  virtual double clearance(const ompl::base::State* state) const override;
 
   // Compute the largest diameter of this hyperrectangle.
   virtual double computeMinCircumscribingRadius() const override;
@@ -144,6 +147,27 @@ double Hyperrectangle<T>::computeMeasure() const {
     measure = measure * widths_.at(i);
   }
   return measure;
+}
+
+template <typename T>
+double Hyperrectangle<T>::clearance(const ompl::base::State* state) const {
+  // Cast the state to the correct type.
+  auto rstate = state->as<ompl::base::RealVectorStateSpace::StateType>();
+
+  // Compute the sum of squares.
+  double sumOfSquares = 0.0;
+  for (std::size_t dim = 0u; dim < spaceInfo_->getStateDimension(); ++dim) {
+    double delta = std::max(
+        std::abs(
+            rstate->operator[](dim) -
+            T::getState()->template as<ompl::base::RealVectorStateSpace::StateType>()->operator[](
+                dim)) -
+            widths_.at(dim) / 2.0,
+        0.0);
+    sumOfSquares += delta * delta;
+  }
+
+  return std::sqrt(sumOfSquares);
 }
 
 template <typename T>

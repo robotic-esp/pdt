@@ -149,6 +149,7 @@ class InteractiveVisualizer : public BaseVisualizer,
 
   // Implement visualizations of objectives.
   void visit(const PotentialFieldOptimizationObjective& objective) const override;
+  void visit(const MaxMinClearanceOptimizationObjective& objective) const override;
 
   // Objective coloring helpers.
   mutable double minOptimizationCost_{std::numeric_limits<double>::max()};

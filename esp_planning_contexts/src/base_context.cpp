@@ -36,9 +36,11 @@
 
 #include "esp_planning_contexts/base_context.h"
 
+#include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
 #include "esp_common/objective_type.h"
+#include "esp_optimization_objectives/max_min_clearance_optimization_objective.h"
 #include "esp_optimization_objectives/potential_field_optimization_objective.h"
 
 namespace esp {
@@ -57,6 +59,10 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
       "Objectives/" + config_->get<std::string>("Contexts/" + name_ + "/objective") + "/type")) {
     case OBJECTIVE_TYPE::COSTMAP: {
       throw std::runtime_error("CostMap objective is not yet implemented.");
+      break;
+    }
+    case OBJECTIVE_TYPE::MAXMINCLEARANCE: {
+      objective_ = std::make_shared<MaxMinClearanceOptimizationObjective>(spaceInfo_);
       break;
     }
     case OBJECTIVE_TYPE::PATHLENGTH: {

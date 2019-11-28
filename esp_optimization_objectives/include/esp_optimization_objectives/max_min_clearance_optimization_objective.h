@@ -36,28 +36,48 @@
 
 #pragma once
 
+#include <ompl/base/OptimizationObjective.h>
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/State.h>
+
+#include "esp_optimization_objectives/base_optimization_objective.h"
+#include "esp_optimization_objectives/optimization_objective_visitor.h"
+
 namespace esp {
 
 namespace ompltools {
 
-// Forward declarations.
-class PotentialFieldOptimizationObjective;
-class MaxMinClearanceOptimizationObjective;
-
-class ObjectiveVisitor {
+// Obstacles are geometric primitives.
+class MaxMinClearanceOptimizationObjective : public ompl::base::OptimizationObjective,
+                                             public BaseOptimizationObjective {
  public:
-  ObjectiveVisitor() = default;
-  virtual ~ObjectiveVisitor() = default;
+  MaxMinClearanceOptimizationObjective(
+      const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo);
+  virtual ~MaxMinClearanceOptimizationObjective();
 
-  // Any objective visitor must implement its actions on all objectives.
-  virtual void visit(const PotentialFieldOptimizationObjective& objective) const = 0;
-  virtual void visit(const MaxMinClearanceOptimizationObjective& objective) const = 0;
+  ompl::base::Cost stateCost(const ompl::base::State* state) const override;
 
-  // This is only needed until all objectives are implemented.
-  template <typename O>
-  void visit(const O& /* objective */) const {
-    OMPL_WARN("Objective visitor visits unknown objective.");
-  }
+  bool isCostBetterThan(ompl::base::Cost cost1, ompl::base::Cost cost2) const override;
+
+  ompl::base::Cost identityCost() const override;
+
+  ompl::base::Cost infiniteCost() const override;
+
+  ompl::base::Cost combineCosts(ompl::base::Cost cost1, ompl::base::Cost cost2) const override;
+
+  ompl::base::Cost motionCost(const ompl::base::State* state1,
+                              const ompl::base::State* state2) const override;
+
+  ompl::base::Cost motionCostHeuristic(const ompl::base::State* state1,
+                                       const ompl::base::State* state2) const override;
+
+  bool isSatisfied(ompl::base::Cost cost) const override;
+
+  void accept(const ObjectiveVisitor& visitor) const override;
+
+ private:
+  ompl::base::State* testState_;
+  const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
 };
 
 }  // namespace ompltools

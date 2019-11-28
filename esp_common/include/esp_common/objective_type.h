@@ -44,6 +44,7 @@ namespace ompltools {
 
 enum class OBJECTIVE_TYPE {
   COSTMAP,
+  MAXMINCLEARANCE,
   PATHLENGTH,
   POTENTIALFIELD,
   INVALID
@@ -51,6 +52,7 @@ enum class OBJECTIVE_TYPE {
 
 NLOHMANN_JSON_SERIALIZE_ENUM(OBJECTIVE_TYPE, {
                                                {OBJECTIVE_TYPE::COSTMAP, "CostMap"},
+                                               {OBJECTIVE_TYPE::MAXMINCLEARANCE, "MaxMinClearance"},
                                                {OBJECTIVE_TYPE::PATHLENGTH, "PathLength"},
                                                {OBJECTIVE_TYPE::POTENTIALFIELD, "PotentialField"},
                                                {OBJECTIVE_TYPE::INVALID, "invalid"},
