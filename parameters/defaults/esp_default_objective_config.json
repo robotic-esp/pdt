@@ -3,6 +3,9 @@
         "MaxMinClearance": {
             "type": "MaxMinClearance"
         },
+        "ReciprocalClearance": {
+            "type": "ReciprocalClearance"
+        },
         "PathLength": {
             "type": "PathLength"
         },

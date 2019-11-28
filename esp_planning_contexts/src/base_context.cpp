@@ -41,6 +41,7 @@
 
 #include "esp_common/objective_type.h"
 #include "esp_optimization_objectives/max_min_clearance_optimization_objective.h"
+#include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
 #include "esp_optimization_objectives/potential_field_optimization_objective.h"
 
 namespace esp {
@@ -63,6 +64,10 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
     }
     case OBJECTIVE_TYPE::MAXMINCLEARANCE: {
       objective_ = std::make_shared<MaxMinClearanceOptimizationObjective>(spaceInfo_);
+      break;
+    }
+    case OBJECTIVE_TYPE::RECIPROCALCLEARANCE: {
+      objective_ = std::make_shared<ReciprocalClearanceOptimizationObjective>(spaceInfo_);
       break;
     }
     case OBJECTIVE_TYPE::PATHLENGTH: {

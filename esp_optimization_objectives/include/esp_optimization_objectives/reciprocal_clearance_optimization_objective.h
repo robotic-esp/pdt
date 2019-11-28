@@ -36,30 +36,32 @@
 
 #pragma once
 
-#include "nlohmann/json.hpp"
+#include <ompl/base/objectives/StateCostIntegralObjective.h>
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/State.h>
+
+#include "esp_optimization_objectives/base_optimization_objective.h"
+#include "esp_optimization_objectives/optimization_objective_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
-enum class OBJECTIVE_TYPE {
-  COSTMAP,
-  MAXMINCLEARANCE,
-  RECIPROCALCLEARANCE,
-  PATHLENGTH,
-  POTENTIALFIELD,
-  INVALID
-};
+// Obstacles are geometric primitives.
+class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostIntegralObjective,
+                                                 public BaseOptimizationObjective {
+ public:
+  ReciprocalClearanceOptimizationObjective(
+      const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo);
+  virtual ~ReciprocalClearanceOptimizationObjective() = default;
 
-NLOHMANN_JSON_SERIALIZE_ENUM(OBJECTIVE_TYPE,
-                             {
-                                 {OBJECTIVE_TYPE::COSTMAP, "CostMap"},
-                                 {OBJECTIVE_TYPE::MAXMINCLEARANCE, "MaxMinClearance"},
-                                 {OBJECTIVE_TYPE::RECIPROCALCLEARANCE, "ReciprocalClearance"},
-                                 {OBJECTIVE_TYPE::PATHLENGTH, "PathLength"},
-                                 {OBJECTIVE_TYPE::POTENTIALFIELD, "PotentialField"},
-                                 {OBJECTIVE_TYPE::INVALID, "invalid"},
-                             })
+  ompl::base::Cost stateCost(const ompl::base::State* state) const override;
+
+  void accept(const ObjectiveVisitor& visitor) const override;
+
+ private:
+  const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
+};
 
 }  // namespace ompltools
 

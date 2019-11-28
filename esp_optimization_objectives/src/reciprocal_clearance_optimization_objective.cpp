@@ -34,32 +34,41 @@
 
 // Authors: Marlin Strub
 
-#pragma once
+#include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
 
-#include "nlohmann/json.hpp"
+#include <memory>
+
+#include <ompl/base/spaces/RealVectorStateSpace.h>
 
 namespace esp {
 
 namespace ompltools {
 
-enum class OBJECTIVE_TYPE {
-  COSTMAP,
-  MAXMINCLEARANCE,
-  RECIPROCALCLEARANCE,
-  PATHLENGTH,
-  POTENTIALFIELD,
-  INVALID
-};
+ReciprocalClearanceOptimizationObjective::ReciprocalClearanceOptimizationObjective(
+    const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo) :
+    ompl::base::StateCostIntegralObjective(spaceInfo, true),
+    spaceInfo_(spaceInfo) {
+  // Optimization objectives have descriptions. (...)
+  description_ = "Reciprocal Clearance";
 
-NLOHMANN_JSON_SERIALIZE_ENUM(OBJECTIVE_TYPE,
-                             {
-                                 {OBJECTIVE_TYPE::COSTMAP, "CostMap"},
-                                 {OBJECTIVE_TYPE::MAXMINCLEARANCE, "MaxMinClearance"},
-                                 {OBJECTIVE_TYPE::RECIPROCALCLEARANCE, "ReciprocalClearance"},
-                                 {OBJECTIVE_TYPE::PATHLENGTH, "PathLength"},
-                                 {OBJECTIVE_TYPE::POTENTIALFIELD, "PotentialField"},
-                                 {OBJECTIVE_TYPE::INVALID, "invalid"},
-                             })
+  // // There is no good cost to go heuristic for this objective.
+  // setCostToGoHeuristic(
+  //     [this](const ompl::base::State*, const ompl::base::Goal*) { return identityCost(); });
+}
+
+ompl::base::Cost ReciprocalClearanceOptimizationObjective::stateCost(
+    const ompl::base::State* state) const {
+  auto clearance = spaceInfo_->getStateValidityChecker()->clearance(state);
+  if (clearance > 0.0) {
+    return ompl::base::Cost(1.0 / clearance);
+  } else {
+    return infiniteCost();
+  }
+}
+
+void ReciprocalClearanceOptimizationObjective::accept(const ObjectiveVisitor& visitor) const {
+  visitor.visit(*this);
+}
 
 }  // namespace ompltools
 
