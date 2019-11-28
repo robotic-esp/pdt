@@ -44,17 +44,22 @@ namespace ompltools {
 
 enum class OBJECTIVE_TYPE {
   COSTMAP,
+  MAXMINCLEARANCE,
+  RECIPROCALCLEARANCE,
   PATHLENGTH,
   POTENTIALFIELD,
   INVALID
 };
 
-NLOHMANN_JSON_SERIALIZE_ENUM(OBJECTIVE_TYPE, {
-                                               {OBJECTIVE_TYPE::COSTMAP, "CostMap"},
-                                               {OBJECTIVE_TYPE::PATHLENGTH, "PathLength"},
-                                               {OBJECTIVE_TYPE::POTENTIALFIELD, "PotentialField"},
-                                               {OBJECTIVE_TYPE::INVALID, "invalid"},
-                                           })
+NLOHMANN_JSON_SERIALIZE_ENUM(OBJECTIVE_TYPE,
+                             {
+                                 {OBJECTIVE_TYPE::COSTMAP, "CostMap"},
+                                 {OBJECTIVE_TYPE::MAXMINCLEARANCE, "MaxMinClearance"},
+                                 {OBJECTIVE_TYPE::RECIPROCALCLEARANCE, "ReciprocalClearance"},
+                                 {OBJECTIVE_TYPE::PATHLENGTH, "PathLength"},
+                                 {OBJECTIVE_TYPE::POTENTIALFIELD, "PotentialField"},
+                                 {OBJECTIVE_TYPE::INVALID, "invalid"},
+                             })
 
 }  // namespace ompltools
 

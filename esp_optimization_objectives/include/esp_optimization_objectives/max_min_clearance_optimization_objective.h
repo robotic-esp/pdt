@@ -36,47 +36,48 @@
 
 #pragma once
 
-#include <memory>
-#include <utility>
-
+#include <ompl/base/OptimizationObjective.h>
 #include <ompl/base/SpaceInformation.h>
-#include <ompl/base/StateValidityChecker.h>
-#include <ompl/datastructures/NearestNeighborsGNAT.h>
+#include <ompl/base/State.h>
 
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_obstacles/hyperrectangle.h"
-#include "esp_obstacles/obstacle_visitor.h"
+#include "esp_optimization_objectives/base_optimization_objective.h"
+#include "esp_optimization_objectives/optimization_objective_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class ContextValidityChecker : public ompl::base::StateValidityChecker {
+// Obstacles are geometric primitives.
+class MaxMinClearanceOptimizationObjective : public ompl::base::OptimizationObjective,
+                                             public BaseOptimizationObjective {
  public:
-  ContextValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo);
-  virtual ~ContextValidityChecker() = default;
+  MaxMinClearanceOptimizationObjective(
+      const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo);
+  virtual ~MaxMinClearanceOptimizationObjective();
 
-  // Check if a state is valid.
-  virtual bool isValid(const ompl::base::State* state) const override;
+  ompl::base::Cost stateCost(const ompl::base::State* state) const override;
 
-  // Return the minimum distance of a point to any obstacle.
-  virtual double clearance(const ompl::base::State* state) const override;
+  bool isCostBetterThan(ompl::base::Cost cost1, ompl::base::Cost cost2) const override;
 
-  // Add obstacles.
-  virtual void addObstacle(const std::shared_ptr<BaseObstacle>& obstacle);
-  virtual void addObstacles(const std::vector<std::shared_ptr<BaseObstacle>>& obstacles);
+  ompl::base::Cost identityCost() const override;
 
-  // Add antiobstacles.
-  virtual void addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti);
-  virtual void addAntiObstacles(const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis);
+  ompl::base::Cost infiniteCost() const override;
 
-  // Make obstacles accessible.
-  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const;
-  virtual std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const;
+  ompl::base::Cost combineCosts(ompl::base::Cost cost1, ompl::base::Cost cost2) const override;
 
- protected:
-  std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
-  std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
+  ompl::base::Cost motionCost(const ompl::base::State* state1,
+                              const ompl::base::State* state2) const override;
+
+  ompl::base::Cost motionCostHeuristic(const ompl::base::State* state1,
+                                       const ompl::base::State* state2) const override;
+
+  bool isSatisfied(ompl::base::Cost cost) const override;
+
+  void accept(const ObjectiveVisitor& visitor) const override;
+
+ private:
+  ompl::base::State* testState_;
+  const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
 };
 
 }  // namespace ompltools

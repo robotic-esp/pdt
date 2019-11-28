@@ -34,50 +34,41 @@
 
 // Authors: Marlin Strub
 
-#pragma once
+#include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
 
 #include <memory>
-#include <utility>
 
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/StateValidityChecker.h>
-#include <ompl/datastructures/NearestNeighborsGNAT.h>
-
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_obstacles/hyperrectangle.h"
-#include "esp_obstacles/obstacle_visitor.h"
+#include <ompl/base/spaces/RealVectorStateSpace.h>
 
 namespace esp {
 
 namespace ompltools {
 
-class ContextValidityChecker : public ompl::base::StateValidityChecker {
- public:
-  ContextValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo);
-  virtual ~ContextValidityChecker() = default;
+ReciprocalClearanceOptimizationObjective::ReciprocalClearanceOptimizationObjective(
+    const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo) :
+    ompl::base::StateCostIntegralObjective(spaceInfo, true),
+    spaceInfo_(spaceInfo) {
+  // Optimization objectives have descriptions. (...)
+  description_ = "Reciprocal Clearance";
 
-  // Check if a state is valid.
-  virtual bool isValid(const ompl::base::State* state) const override;
+  // // There is no good cost to go heuristic for this objective.
+  // setCostToGoHeuristic(
+  //     [this](const ompl::base::State*, const ompl::base::Goal*) { return identityCost(); });
+}
 
-  // Return the minimum distance of a point to any obstacle.
-  virtual double clearance(const ompl::base::State* state) const override;
+ompl::base::Cost ReciprocalClearanceOptimizationObjective::stateCost(
+    const ompl::base::State* state) const {
+  auto clearance = spaceInfo_->getStateValidityChecker()->clearance(state);
+  if (clearance > 0.0) {
+    return ompl::base::Cost(1.0 / clearance);
+  } else {
+    return infiniteCost();
+  }
+}
 
-  // Add obstacles.
-  virtual void addObstacle(const std::shared_ptr<BaseObstacle>& obstacle);
-  virtual void addObstacles(const std::vector<std::shared_ptr<BaseObstacle>>& obstacles);
-
-  // Add antiobstacles.
-  virtual void addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti);
-  virtual void addAntiObstacles(const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis);
-
-  // Make obstacles accessible.
-  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const;
-  virtual std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const;
-
- protected:
-  std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
-  std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
-};
+void ReciprocalClearanceOptimizationObjective::accept(const ObjectiveVisitor& visitor) const {
+  visitor.visit(*this);
+}
 
 }  // namespace ompltools
 

@@ -72,6 +72,9 @@ class GeometricShape {
   // The radius of the smallest circumscribing hypersphere with center at the anchor.
   virtual double computeMinCircumscribingRadius() const = 0;
 
+  // The clearance from a state to this obstacle.
+  virtual double clearance(const ompl::base::State* state) const = 0;
+
   // Accept a visitor.
   virtual void accept(const ObstacleVisitor& visitor) const = 0;
 

@@ -82,8 +82,8 @@ PotentialFieldOptimizationObjective::PotentialFieldOptimizationObjective(
     }
   }
 
-  // Set the default cost-to-go heuristic.
-  setCostToGoHeuristic(ompl::base::goalRegionCostToGo);
+  // // There is no good cost-to-go heuristic for this objective.
+  // setCostToGoHeuristic(ompl::base::goalRegionCostToGo);
 }
 
 PotentialFieldOptimizationObjective::~PotentialFieldOptimizationObjective() {

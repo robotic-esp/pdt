@@ -36,9 +36,12 @@
 
 #include "esp_planning_contexts/base_context.h"
 
+#include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
 #include "esp_common/objective_type.h"
+#include "esp_optimization_objectives/max_min_clearance_optimization_objective.h"
+#include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
 #include "esp_optimization_objectives/potential_field_optimization_objective.h"
 
 namespace esp {
@@ -59,12 +62,24 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
       throw std::runtime_error("CostMap objective is not yet implemented.");
       break;
     }
+    case OBJECTIVE_TYPE::MAXMINCLEARANCE: {
+      objective_ = std::make_shared<MaxMinClearanceOptimizationObjective>(spaceInfo_);
+      break;
+    }
+    case OBJECTIVE_TYPE::RECIPROCALCLEARANCE: {
+      objective_ = std::make_shared<ReciprocalClearanceOptimizationObjective>(spaceInfo_);
+      break;
+    }
     case OBJECTIVE_TYPE::PATHLENGTH: {
       objective_ = std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
       break;
     }
     case OBJECTIVE_TYPE::POTENTIALFIELD: {
       objective_ = std::make_shared<PotentialFieldOptimizationObjective>(spaceInfo_, config_);
+      break;
+    }
+    case OBJECTIVE_TYPE::INVALID: {
+      throw std::runtime_error("Invalid optimization objective.");
       break;
     }
     default:

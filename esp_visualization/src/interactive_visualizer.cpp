@@ -813,6 +813,14 @@ void InteractiveVisualizer::visit(const PotentialFieldOptimizationObjective& obj
   }
 }
 
+void InteractiveVisualizer::visit(
+    const MaxMinClearanceOptimizationObjective& /* objective */) const {
+}
+
+void InteractiveVisualizer::visit(
+    const ReciprocalClearanceOptimizationObjective& /* objective */) const {
+}
+
 std::array<float, 4u> InteractiveVisualizer::interpolateColors(const float* color1,
                                                                const float* color2,
                                                                double t) const {

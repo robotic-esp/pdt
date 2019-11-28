@@ -44,6 +44,7 @@
 #include "esp_obstacles/obstacle_visitor.h"
 #include "esp_optimization_objectives/optimization_objective_visitor.h"
 #include "esp_optimization_objectives/potential_field_optimization_objective.h"
+#include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
 #include "esp_planning_contexts/all_contexts.h"
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
@@ -150,6 +151,8 @@ class InteractiveVisualizer : public BaseVisualizer,
 
   // Implement visualizations of objectives.
   void visit(const PotentialFieldOptimizationObjective& objective) const override;
+  void visit(const ReciprocalClearanceOptimizationObjective& objective) const override;
+  void visit(const MaxMinClearanceOptimizationObjective& objective) const override;
 
   // Objective coloring helpers.
   mutable double minOptimizationCost_{std::numeric_limits<double>::max()};
