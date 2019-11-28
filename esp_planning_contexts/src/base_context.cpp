@@ -78,6 +78,10 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
       objective_ = std::make_shared<PotentialFieldOptimizationObjective>(spaceInfo_, config_);
       break;
     }
+    case OBJECTIVE_TYPE::INVALID: {
+      throw std::runtime_error("Invalid optimization objective.");
+      break;
+    }
     default:
       throw std::runtime_error("Unknown optimization objective.");
   }
