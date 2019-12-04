@@ -141,10 +141,15 @@ When tracking is on, the most recently computed iteration is visualized.
 - Possible integration in core OMPL
 
 ## Backlog
-- [ ] Implement feature to record/play at constant 'iteration per second' rate
-- [ ] Implement feature to export every iteration as png
-- [ ] Improve quality of recorded videos
-- [ ] Implement "pageing" mechanism for planner visualization
+
+### ESP OMPL TOOLS
+
+- [ ] Improve visualization tool.
+
+### OMPL
+
+- [ ] Add method to scale costs. When the objective is a minimization (e.g., of path length) scaling a cost means multiplying it with the scaling factor, but when the objective is a maximization (e.g., of minimum clearance) scaling a cost means dividing it by the scaling factor.
+- [ ] Add a method to generate (possibly inadmissible) estimates of motion and state costs.
 
 ## How to create maps from `.png`s
 
@@ -161,7 +166,7 @@ To create a map from a `.png` follow these steps:
    7. Save as `.bmp`
    8. Open `.bmp` in MATLAB
    9. Export to a csv file `csvwrite('filename.csv', bmpFileName)`
-   10. Use the csvObstacle class
+   10. Use the csvObstacle class (currently not implemented)
 
 ## Create a regression class of BIT*
 
