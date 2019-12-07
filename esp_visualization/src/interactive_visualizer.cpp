@@ -860,10 +860,10 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
     auto edgeQueue = bitstarData->getEdgeQueue();
     std::vector<Eigen::Vector2d> edges{};
     for (const auto& edge : edgeQueue) {
-      auto parentState = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector2d((*parentState)[0u], (*parentState)[1u]));
-      auto childState = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector2d((*childState)[0u], (*childState)[1u]));
+      auto sourceState = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector2d((*sourceState)[0u], (*sourceState)[1u]));
+      auto targetState = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector2d((*targetState)[0u], (*targetState)[1u]));
     }
 
     // Draw the edge queue.
@@ -876,10 +876,10 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
     if (nextEdgeStates.first == nullptr || nextEdgeStates.second == nullptr) {
       return;
     }
-    auto parentState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
-    auto childState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-    std::vector<Eigen::Vector2d> nextEdge{Eigen::Vector2d((*parentState)[0u], (*parentState)[1u]),
-                                          Eigen::Vector2d((*childState)[0u], (*childState)[1u])};
+    auto sourceState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto targetState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    std::vector<Eigen::Vector2d> nextEdge{Eigen::Vector2d((*sourceState)[0u], (*sourceState)[1u]),
+                                          Eigen::Vector2d((*targetState)[0u], (*targetState)[1u])};
 
     // Draw the next edge.
     drawLines(nextEdge, 3.0, red);
@@ -888,10 +888,10 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
     auto edgeQueue = bitstarData->getEdgeQueue();
     std::vector<Eigen::Vector3d> edges{};
     for (const auto& edge : edgeQueue) {
-      auto parentState = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector3d((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]));
-      auto childState = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector3d((*childState)[0u], (*childState)[1u], (*childState)[2u]));
+      auto sourceState = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector3d((*sourceState)[0u], (*sourceState)[1u], (*sourceState)[2u]));
+      auto targetState = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector3d((*targetState)[0u], (*targetState)[1u], (*targetState)[2u]));
     }
 
     // Draw the edge queue.
@@ -904,11 +904,11 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
     if (nextEdgeStates.first == nullptr || nextEdgeStates.second == nullptr) {
       return;
     }
-    auto parentState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
-    auto childState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto sourceState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto targetState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
     std::vector<Eigen::Vector3d> nextEdge{
-        Eigen::Vector3d((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]),
-        Eigen::Vector3d((*childState)[0u], (*childState)[1u], (*childState)[2u])};
+        Eigen::Vector3d((*sourceState)[0u], (*sourceState)[1u], (*sourceState)[2u]),
+        Eigen::Vector3d((*targetState)[0u], (*targetState)[1u], (*targetState)[2u])};
 
     // Draw the next edge.
     drawLines(nextEdge, 3.0, red);
@@ -928,12 +928,12 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
     std::vector<Eigen::Vector2d> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
     for (const auto& edge : forwardQueue) {
-      auto parentState =
+      auto sourceState =
           edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
-      auto childState =
+      forwardQueueEdges.emplace_back((*sourceState)[0u], (*sourceState)[1u]);
+      auto targetState =
           edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*childState)[0u], (*childState)[1u]);
+      forwardQueueEdges.emplace_back((*targetState)[0u], (*targetState)[1u]);
     }
 
     drawLines(forwardQueueEdges, 1.5, lightblue);
@@ -980,10 +980,10 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
     if (!nextEdgeStates.first || !nextEdgeStates.second) {
       return;
     }
-    auto parentState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
-    auto childState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-    std::vector<Eigen::Vector2d> nextEdge{Eigen::Vector2d((*parentState)[0u], (*parentState)[1u]),
-                                          Eigen::Vector2d((*childState)[0u], (*childState)[1u])};
+    auto sourceState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto targetState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    std::vector<Eigen::Vector2d> nextEdge{Eigen::Vector2d((*sourceState)[0u], (*sourceState)[1u]),
+                                          Eigen::Vector2d((*targetState)[0u], (*targetState)[1u])};
     // Draw the next edge.
     drawLines(nextEdge, 3.0, red);
   } else if (context_->getDimension() == 3u) {
@@ -991,12 +991,12 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
     auto edgeQueue = tbdstarData->getForwardQueue();
     std::vector<Eigen::Vector3d> edges{};
     for (const auto& edge : edgeQueue) {
-      auto parentState =
+      auto sourceState =
           edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector3d((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]));
-      auto childState =
+      edges.push_back(Eigen::Vector3d((*sourceState)[0u], (*sourceState)[1u], (*sourceState)[2u]));
+      auto targetState =
           edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector3d((*childState)[0u], (*childState)[1u], (*childState)[2u]));
+      edges.push_back(Eigen::Vector3d((*targetState)[0u], (*targetState)[1u], (*targetState)[2u]));
     }
 
     // Draw the edge queue.
@@ -1009,11 +1009,11 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
     if (!nextEdgeStates.first || !nextEdgeStates.second) {
       return;
     }
-    auto parentState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
-    auto childState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto sourceState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto targetState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
     std::vector<Eigen::Vector3d> nextEdgeVector{
-        Eigen::Vector3d((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]),
-        Eigen::Vector3d((*childState)[0u], (*childState)[1u], (*childState)[2u])};
+        Eigen::Vector3d((*sourceState)[0u], (*sourceState)[1u], (*sourceState)[2u]),
+        Eigen::Vector3d((*targetState)[0u], (*targetState)[1u], (*targetState)[2u])};
     // Draw the next edge.
     drawLines(nextEdgeVector, 3.0, red);
   }
@@ -1029,10 +1029,10 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     std::vector<Eigen::Vector2d> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
     for (const auto& edge : forwardQueue) {
-      auto parentState = edge.parent->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
-      auto childState = edge.child->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*childState)[0u], (*childState)[1u]);
+      auto sourceState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      forwardQueueEdges.emplace_back((*sourceState)[0u], (*sourceState)[1u]);
+      auto targetState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      forwardQueueEdges.emplace_back((*targetState)[0u], (*targetState)[1u]);
     }
 
     // Draw the forward queue.
@@ -1043,10 +1043,10 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     std::vector<Eigen::Vector2d> reverseQueueEdges;
     forwardQueueEdges.reserve(2u * reverseQueue.size());
     for (const auto& edge : reverseQueue) {
-      auto parentState = edge.parent->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
-      auto childState = edge.child->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseQueueEdges.emplace_back((*childState)[0u], (*childState)[1u]);
+      auto sourceState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseQueueEdges.emplace_back((*sourceState)[0u], (*sourceState)[1u]);
+      auto targetState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseQueueEdges.emplace_back((*targetState)[0u], (*targetState)[1u]);
     }
 
     // Draw the reverse queue.
@@ -1057,10 +1057,10 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     std::vector<Eigen::Vector2d> reverseTreeEdges;
     reverseTreeEdges.reserve(2u * reverseTree.size());
     for (const auto& edge : reverseTree) {
-      auto parentState = edge.parent->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseTreeEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
-      auto childState = edge.child->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseTreeEdges.emplace_back((*childState)[0u], (*childState)[1u]);
+      auto sourceState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseTreeEdges.emplace_back((*sourceState)[0u], (*sourceState)[1u]);
+      auto targetState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseTreeEdges.emplace_back((*targetState)[0u], (*targetState)[1u]);
     }
 
     // Draw the reverse tree.
@@ -1070,14 +1070,14 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     auto nextForwardEdge = aibitstarData->getNextForwardEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
-    if (nextForwardEdge.parent && nextForwardEdge.child) {
+    if (nextForwardEdge.source && nextForwardEdge.target) {
       std::vector<Eigen::Vector2d> nextEdge;
-      auto parentState =
-          nextForwardEdge.parent->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      auto childState =
-          nextForwardEdge.child->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      nextEdge.emplace_back(parentState->operator[](0), parentState->operator[](1));
-      nextEdge.emplace_back(childState->operator[](0), childState->operator[](1));
+      auto sourceState =
+          nextForwardEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto targetState =
+          nextForwardEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      nextEdge.emplace_back(sourceState->operator[](0), sourceState->operator[](1));
+      nextEdge.emplace_back(targetState->operator[](0), targetState->operator[](1));
       // Draw the next edge.
       drawLines(nextEdge, 3.0, red);
     }
@@ -1086,14 +1086,14 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     auto nextReverseEdge = aibitstarData->getNextReverseEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
-    if (nextReverseEdge.parent && nextReverseEdge.child) {
+    if (nextReverseEdge.source && nextReverseEdge.target) {
       std::vector<Eigen::Vector2d> nextEdge;
-      auto parentState =
-          nextReverseEdge.parent->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      auto childState =
-          nextReverseEdge.child->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      nextEdge.emplace_back(parentState->operator[](0), parentState->operator[](1));
-      nextEdge.emplace_back(childState->operator[](0), childState->operator[](1));
+      auto sourceState =
+          nextReverseEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto targetState =
+          nextReverseEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      nextEdge.emplace_back(sourceState->operator[](0), sourceState->operator[](1));
+      nextEdge.emplace_back(targetState->operator[](0), targetState->operator[](1));
       // Draw the next edge.
       drawLines(nextEdge, 3.0, darkred);
     }
@@ -1125,9 +1125,9 @@ InteractiveVisualizer::getVerticesAndEdges2D(std::size_t iteration) const {
           edges.emplace_back(vertexState->values[0], vertexState->values[1]);
 
           // Add the child.
-          const auto* childState =
+          const auto* targetState =
               static_cast<const ompl::base::RealVectorStateSpace::StateType*>(child.getState());
-          edges.emplace_back(childState->values[0], childState->values[1]);
+          edges.emplace_back(targetState->values[0], targetState->values[1]);
         }
       }
     }
@@ -1161,9 +1161,9 @@ InteractiveVisualizer::getVerticesAndEdges3D(std::size_t iteration) const {
                              vertexState->values[2]);
 
           // Add the child.
-          const auto* childState =
+          const auto* targetState =
               static_cast<const ompl::base::RealVectorStateSpace::StateType*>(child.getState());
-          edges.emplace_back(childState->values[0], childState->values[1], childState->values[2]);
+          edges.emplace_back(targetState->values[0], targetState->values[1], targetState->values[2]);
         }
       }
     }
@@ -1210,7 +1210,7 @@ std::vector<Eigen::Vector2d> InteractiveVisualizer::getEdges2D(std::size_t itera
     auto parent = currentPlannerData->getVertex(i);
     // Check the vertex is valid.
     if (parent != ompl::base::PlannerData::NO_VERTEX) {
-      const auto* parentState =
+      const auto* sourceState =
           static_cast<const ompl::base::RealVectorStateSpace::StateType*>(parent.getState());
 
       // Get the outgoing edges of this vertex.
@@ -1221,12 +1221,12 @@ std::vector<Eigen::Vector2d> InteractiveVisualizer::getEdges2D(std::size_t itera
         auto child = currentPlannerData->getVertex(outgoingEdges.at(j));
         if (child != ompl::base::PlannerData::NO_VERTEX) {
           // Add the parent.
-          edges.emplace_back(parentState->values[0], parentState->values[1]);
+          edges.emplace_back(sourceState->values[0], sourceState->values[1]);
 
           // Add the child.
-          const auto* childState =
+          const auto* targetState =
               static_cast<const ompl::base::RealVectorStateSpace::StateType*>(child.getState());
-          edges.emplace_back(childState->values[0], childState->values[1]);
+          edges.emplace_back(targetState->values[0], targetState->values[1]);
         }
       }
     }
@@ -1241,7 +1241,7 @@ std::vector<Eigen::Vector3d> InteractiveVisualizer::getEdges3D(std::size_t itera
     auto parent = currentPlannerData->getVertex(i);
     // Check the vertex is valid.
     if (parent != ompl::base::PlannerData::NO_VERTEX) {
-      const auto* parentState =
+      const auto* sourceState =
           static_cast<const ompl::base::RealVectorStateSpace::StateType*>(parent.getState());
 
       // Get the outgoing edges of this vertex.
@@ -1252,13 +1252,13 @@ std::vector<Eigen::Vector3d> InteractiveVisualizer::getEdges3D(std::size_t itera
         auto child = currentPlannerData->getVertex(outgoingEdges.at(j));
         if (child != ompl::base::PlannerData::NO_VERTEX) {
           // Add the parent.
-          edges.emplace_back(parentState->values[0], parentState->values[1],
-                             parentState->values[2]);
+          edges.emplace_back(sourceState->values[0], sourceState->values[1],
+                             sourceState->values[2]);
 
           // Add the child.
-          const auto* childState =
+          const auto* targetState =
               static_cast<const ompl::base::RealVectorStateSpace::StateType*>(child.getState());
-          edges.emplace_back(childState->values[0], childState->values[1], childState->values[2]);
+          edges.emplace_back(targetState->values[0], targetState->values[1], targetState->values[2]);
         }
       }
     }

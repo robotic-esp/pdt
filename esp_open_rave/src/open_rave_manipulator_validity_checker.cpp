@@ -44,9 +44,20 @@ namespace ompltools {
 
 OpenRaveManipulatorValidityChecker::OpenRaveManipulatorValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo,
-    const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot) :
-    OpenRaveBaseValidityChecker(spaceInfo, environment, robot),
+    const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot,
+    const std::shared_ptr<const Configuration>& config) :
+    OpenRaveBaseValidityChecker(spaceInfo, environment, robot, config),
     raveState_(robot->GetDOF()) {
+  // Get the upper and lower bounds for each dimension.
+  robot->GetActiveDOFLimits(raveLowerBounds_, raveUpperBounds_);
+  assert(raveLowerBounds_.size() == raveUpperBounds_.size());
+
+  // Compute the scale for the bounds.
+  raveStateScales_.reserve(raveLowerBounds_.size());
+  for (std::size_t i = 0u; i < raveLowerBounds_.size(); ++i) {
+    assert(raveUpperBounds_[i] > raveLowerBounds_[i]);
+    raveStateScales_.emplace_back(raveUpperBounds_[i] - raveLowerBounds_[i]);
+  }
 }
 
 bool OpenRaveManipulatorValidityChecker::isValid(const ompl::base::State* state) const {
@@ -58,7 +69,7 @@ bool OpenRaveManipulatorValidityChecker::isValid(const ompl::base::State* state)
   // Fill the rave state with the ompl state values.
   auto realVectorState = state->as<ompl::base::RealVectorStateSpace::StateType>();
   for (std::size_t i = 0u; i < stateSpace_->getDimension(); ++i) {
-    raveState_[i] = realVectorState->operator[](i);
+    raveState_[i] = raveLowerBounds_[i] + (raveStateScales_[i] * realVectorState->operator[](i));
   }
 
   // Lock the environment mutex.
@@ -82,7 +93,7 @@ double OpenRaveManipulatorValidityChecker::clearance(const ompl::base::State* st
   // Fill the rave state with the ompl state values.
   auto realVectorState = state->as<ompl::base::RealVectorStateSpace::StateType>();
   for (std::size_t i = 0u; i < stateSpace_->getDimension(); ++i) {
-    raveState_[i] = realVectorState->operator[](i);
+    raveState_[i] = raveLowerBounds_[i] + (raveStateScales_[i] * realVectorState->operator[](i));
   }
 
   // Lock the environment mutex.

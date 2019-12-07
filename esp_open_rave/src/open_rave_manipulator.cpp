@@ -60,16 +60,6 @@ OpenRaveManipulator::OpenRaveManipulator(
     OpenRaveBaseContext(spaceInfo, config, name),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
-  // Get the start and goal positions.
-  auto startPosition = config->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config->get<std::vector<double>>("Contexts/" + name + "/goal");
-
-  // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
-  }
-
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
 
@@ -90,19 +80,12 @@ OpenRaveManipulator::OpenRaveManipulator(
   // Set the active dimensions.
   robot->SetActiveDOFs(config_->get<std::vector<int>>("Contexts/" + name + "/activeDofIndices"));
 
-  // Get the upper and lower bounds for each dimension.
-  std::vector<double> lowerBounds, upperBounds;
-  robot->GetActiveDOFLimits(lowerBounds, upperBounds);
-
   // Set the bounds of the state space.
-  ompl::base::RealVectorBounds bounds(robot->GetActiveDOF());
-  bounds.low = lowerBounds;
-  bounds.high = upperBounds;
-  spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->setBounds(bounds);
+  spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->setBounds(0.0, 1.0);
 
   // Create the validity checker.
   auto validityChecker =
-      std::make_shared<OpenRaveManipulatorValidityChecker>(spaceInfo_, environment, robot);
+      std::make_shared<OpenRaveManipulatorValidityChecker>(spaceInfo_, environment, robot, config_);
 
   // Set the validity checker and check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
@@ -111,6 +94,28 @@ OpenRaveManipulator::OpenRaveManipulator(
 
   // Setup the space info.
   spaceInfo_->setup();
+
+  // Get the start and goal positions.
+  auto startPosition = config->get<std::vector<double>>("Contexts/" + name + "/start");
+  auto goalPosition = config->get<std::vector<double>>("Contexts/" + name + "/goal");
+
+  // Get the upper and lower bounds of the state dimensions.
+  std::vector<double> raveLowerBounds, raveUpperBounds, raveStateScales;
+  robot->GetActiveDOFLimits(raveLowerBounds, raveUpperBounds);
+  assert(raveLowerBounds.size() == raveUpperBounds.size());
+
+  // Compute the scale for the bounds.
+  raveStateScales.reserve(raveLowerBounds.size());
+  for (std::size_t i = 0u; i < raveLowerBounds.size(); ++i) {
+    assert(raveUpperBounds[i] > raveLowerBounds[i]);
+    raveStateScales.emplace_back(raveUpperBounds[i] - raveLowerBounds[i]);
+  }
+
+  // Fill the start and goal states' coordinates.
+  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+    startState_[i] = (startPosition.at(i) - raveLowerBounds.at(i)) / raveStateScales.at(i);
+    goalState_[i] = (goalPosition.at(i) - raveLowerBounds.at(i)) / raveStateScales.at(i);
+  }
 }
 
 OpenRaveManipulator::~OpenRaveManipulator() {

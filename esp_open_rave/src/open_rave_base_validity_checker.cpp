@@ -42,12 +42,14 @@ namespace ompltools {
 
 OpenRaveBaseValidityChecker::OpenRaveBaseValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo,
-    const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot) :
+    const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot,
+    const std::shared_ptr<const Configuration>& config) :
     ompl::base::StateValidityChecker(spaceInfo),
     environment_(environment),
     robot_(robot),
     stateSpace_(spaceInfo->getStateSpace()),
-    collisionReport_(boost::make_shared<OpenRAVE::CollisionReport>()) {
+    collisionReport_(boost::make_shared<OpenRAVE::CollisionReport>()),
+    config_(config) {
 }
 
 OpenRAVE::EnvironmentBasePtr OpenRaveBaseValidityChecker::getOpenRaveEnvironment() const {

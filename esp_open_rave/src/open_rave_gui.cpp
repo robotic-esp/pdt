@@ -85,6 +85,14 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
   auto robot =
       environment->GetRobot(config->get<std::string>("Contexts/" + context->getName() + "/robot"));
 
+  // Get the conversion factors for ompl states to rave states.
+  std::vector<double> raveLowerBounds, raveUpperBounds, raveStateScales;
+  robot->GetActiveDOFLimits(raveLowerBounds, raveUpperBounds);
+  raveStateScales.reserve(raveLowerBounds.size());
+  for (std::size_t i = 0u; i < raveLowerBounds.size(); ++i) {
+    raveStateScales.emplace_back(raveUpperBounds[i] - raveLowerBounds[i]);
+  }
+
   // Create the vector to hold the current state.
   std::vector<double> openRaveState =
       config->get<std::vector<double>>("Contexts/" + context->getName() + "/start");
@@ -120,7 +128,9 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
       for (const auto solutionState : solutionStates) {
         for (std::size_t i = 0u; i < openRaveState.size(); ++i) {
           openRaveState[i] =
-              solutionState->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](i);
+              raveLowerBounds[i] +
+              (raveStateScales[i] *
+               solutionState->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](i));
         }
         OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
         robot->SetActiveDOFValues(openRaveState);
@@ -152,6 +162,17 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
   // Get the robot.
   auto robot =
       environment->GetRobot(config->get<std::string>("Contexts/" + context->getName() + "/robot"));
+
+  // Get the conversion factors for ompl states to rave states.
+  auto raveLowerBounds =
+      config->get<std::vector<double>>("Contexts/"s + context->getName() + "/lowerBounds"s);
+  auto raveUpperBounds =
+      config->get<std::vector<double>>("Contexts/"s + context->getName() + "/upperBounds"s);
+  std::vector<double> raveStateScales;
+  raveStateScales.reserve(raveLowerBounds.size());
+  for (std::size_t i = 0u; i < raveLowerBounds.size(); ++i) {
+    raveStateScales.emplace_back(raveUpperBounds[i] - raveLowerBounds[i]);
+  }
 
   // Create the vector to hold the current state.
   OpenRAVE::Transform raveState;
@@ -186,7 +207,9 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
       // Visualize the solution.
       for (const auto solutionState : solutionStates) {
         auto se3State = solutionState->as<ompl::base::SE3StateSpace::StateType>();
-        raveState.trans.Set3(se3State->getX(), se3State->getY(), se3State->getZ());
+        raveState.trans.Set3(raveLowerBounds[0] + (raveStateScales[0] * se3State->getX()),
+                             raveLowerBounds[1] + (raveStateScales[1] * se3State->getY()),
+                             raveLowerBounds[2] + (raveStateScales[2] * se3State->getZ()));
         raveState.rot.x = se3State->rotation().x;
         raveState.rot.y = se3State->rotation().y;
         raveState.rot.z = se3State->rotation().z;

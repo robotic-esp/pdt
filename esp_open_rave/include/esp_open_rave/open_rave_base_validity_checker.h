@@ -49,6 +49,7 @@
 #include <openrave-core.h>
 #pragma GCC diagnostic pop
 
+#include "esp_configuration/configuration.h"
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_obstacles/obstacle_visitor.h"
@@ -62,7 +63,8 @@ class OpenRaveBaseValidityChecker : public ompl::base::StateValidityChecker {
   /** \brief The constructor. */
   OpenRaveBaseValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
                               const OpenRAVE::EnvironmentBasePtr& environment,
-                              const OpenRAVE::RobotBasePtr& robot);
+                              const OpenRAVE::RobotBasePtr& robot,
+                              const std::shared_ptr<const Configuration>& config);
 
   /** \brief The destructor. */
   virtual ~OpenRaveBaseValidityChecker() = default;
@@ -85,6 +87,9 @@ class OpenRaveBaseValidityChecker : public ompl::base::StateValidityChecker {
 
   /** \brief The collision check report to store the clearance of a state. */
   mutable boost::shared_ptr<OpenRAVE::CollisionReport> collisionReport_;
+
+  /** \brief The configuration. */
+  const std::shared_ptr<const Configuration> config_;
 };
 
 }  // namespace ompltools

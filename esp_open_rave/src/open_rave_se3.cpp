@@ -64,13 +64,29 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
   auto startPosition = config->get<std::vector<double>>("Contexts/" + name + "/start");
   auto goalPosition = config->get<std::vector<double>>("Contexts/" + name + "/goal");
 
-  startState_.get()->setXYZ(startPosition.at(0u), startPosition.at(1u), startPosition.at(2u));
+  // Get the upper and lower bounds and the state scales.
+  auto raveLowerBounds = config_->get<std::vector<double>>("Contexts/"s + name + "/lowerBounds"s);
+  auto raveUpperBounds = config_->get<std::vector<double>>("Contexts/"s + name + "/upperBounds"s);
+  assert(raveLowerBounds.size() == raveUpperBounds.size());
+  std::vector<double> raveStateScales;
+  raveStateScales.reserve(raveLowerBounds.size());
+  for (std::size_t i = 0u; i < raveLowerBounds.size(); ++i) {
+    assert(raveUpperBounds[i] > raveLowerBounds[i]);
+    raveStateScales.emplace_back(raveUpperBounds[i] - raveLowerBounds[i]);
+  }
+
+  startState_.get()->setXYZ(
+      (startPosition.at(0u) - raveLowerBounds.at(0u)) / raveStateScales.at(0u),
+      (startPosition.at(1u) - raveLowerBounds.at(1u)) / raveStateScales.at(1u),
+      (startPosition.at(2u) - raveLowerBounds.at(2u)) / raveStateScales.at(2u));
   startState_.get()->rotation().x = startPosition.at(3u);
   startState_.get()->rotation().y = startPosition.at(4u);
   startState_.get()->rotation().z = startPosition.at(5u);
   startState_.get()->rotation().w = startPosition.at(6u);
 
-  goalState_.get()->setXYZ(goalPosition.at(0u), goalPosition.at(1u), goalPosition.at(2u));
+  goalState_.get()->setXYZ((goalPosition.at(0u) - raveLowerBounds.at(0u)) / raveStateScales.at(0u),
+                           (goalPosition.at(1u) - raveLowerBounds.at(1u)) / raveStateScales.at(1u),
+                           (goalPosition.at(2u) - raveLowerBounds.at(2u)) / raveStateScales.at(2u));
   goalState_.get()->rotation().x = goalPosition.at(3u);
   goalState_.get()->rotation().y = goalPosition.at(4u);
   goalState_.get()->rotation().z = goalPosition.at(5u);
@@ -98,13 +114,13 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
 
   auto se3space = spaceInfo_->getStateSpace()->as<ompl::base::SE3StateSpace>();
   ompl::base::RealVectorBounds bounds(3u);
-  bounds.low = config_->get<std::vector<double>>("Contexts/" + name + "/lowerBounds");
-  bounds.high = config_->get<std::vector<double>>("Contexts/" + name + "/upperBounds");
+  bounds.setLow(0.0);
+  bounds.setHigh(1.0);
   se3space->setBounds(bounds);
 
   // Create the validity checker.
   auto validityChecker =
-      std::make_shared<OpenRaveSE3ValidityChecker>(spaceInfo_, environment, robot);
+      std::make_shared<OpenRaveSE3ValidityChecker>(spaceInfo_, environment, robot, config_);
 
   OpenRAVE::Transform raveState;
   raveState.identity();

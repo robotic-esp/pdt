@@ -48,6 +48,7 @@
 #include <openrave-core.h>
 #pragma GCC diagnostic pop
 
+#include "esp_configuration/configuration.h"
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_obstacles/obstacle_visitor.h"
@@ -62,7 +63,8 @@ class OpenRaveSE3ValidityChecker : public OpenRaveBaseValidityChecker {
   /** \brief The constructor. */
   OpenRaveSE3ValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
                              const OpenRAVE::EnvironmentBasePtr& environment,
-                             const OpenRAVE::RobotBasePtr& robot);
+                             const OpenRAVE::RobotBasePtr& robot,
+                             const std::shared_ptr<const Configuration>& config);
 
   /** \brief The destructor. */
   virtual ~OpenRaveSE3ValidityChecker() = default;
@@ -73,9 +75,18 @@ class OpenRaveSE3ValidityChecker : public OpenRaveBaseValidityChecker {
   /** \brief Returns the clearance of a state. */
   virtual double clearance(const ompl::base::State* state) const override;
 
-private:
+ private:
   /** \brief The state in a format that rave can check. */
   mutable OpenRAVE::Transform raveState_;
+
+  /** \brief The lower bound of the rave state. This is needed as the asao-planners require [0, 1]^n spaces. */
+  std::vector<double> raveLowerBounds_;
+
+  /** \brief The upper bound of the rave state. This is needed as the asao-planners require [0, 1]^n spaces. */
+  std::vector<double> raveUpperBounds_;
+
+  /** \brief The scaling factors to convert an OMPL state dimension to a RAVE state. */
+  std::vector<double> raveStateScales_;
 };
 
 }  // namespace ompltools
