@@ -85,10 +85,6 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
     default:
       throw std::runtime_error("Unknown optimization objective.");
   }
-
-  // Set the default cost to go heuristic for the objective.
-  objective_->setCostToGoHeuristic(
-      std::bind(&ompl::base::goalRegionCostToGo, std::placeholders::_1, std::placeholders::_2));
 }
 
 std::string BaseContext::getName() const {
