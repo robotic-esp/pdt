@@ -56,7 +56,7 @@ sudo apt install ffmpeg
 The automatic report generation relies on LuaLaTeX to dynamically allocate as much memory as needed. The infallible wisdom of the internet suggests that all major LaTeX distributions include LuaLaTeX, so I figured this is not too much of an additional dependency.
 
 ```bash
-sudo apt install texlive-full
+sudo apt install texlive-luatex
 ```
 
 If running `which lualatex` echoes a path, you should be good to go, otherwise install lualatex.
