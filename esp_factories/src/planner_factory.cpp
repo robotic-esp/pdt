@@ -202,7 +202,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       return {planner, PLANNER_TYPE::TBDSTAR};
     }
     default: {
-      OMPL_ERROR("Planner factory recieved request to create planner of unknown type '%s'.",
+      OMPL_ERROR("Planner factory received request to create planner of unknown type '%s'.",
                  config_->get<std::string>("Planner/" + plannerName + "/type"));
       throw std::runtime_error("Planner factory error.");
       return {std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation()),
