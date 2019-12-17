@@ -50,10 +50,6 @@ ReciprocalClearanceOptimizationObjective::ReciprocalClearanceOptimizationObjecti
     spaceInfo_(spaceInfo) {
   // Optimization objectives have descriptions. (...)
   description_ = "Reciprocal Clearance";
-
-  // // There is no good cost to go heuristic for this objective.
-  // setCostToGoHeuristic(
-  //     [this](const ompl::base::State*, const ompl::base::Goal*) { return identityCost(); });
 }
 
 ompl::base::Cost ReciprocalClearanceOptimizationObjective::stateCost(
