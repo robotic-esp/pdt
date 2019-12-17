@@ -56,7 +56,7 @@ OpenRaveSE3ValidityChecker::OpenRaveSE3ValidityChecker(
       config_->get<std::vector<double>>("Contexts/"s + contextName + "/lowerBounds"s);
   raveUpperBounds_ =
       config_->get<std::vector<double>>("Contexts/"s + contextName + "/upperBounds"s);
-  assert(raveLowerBounds.size() == raveUpperBounds.size());
+  assert(raveLowerBounds_.size() == raveUpperBounds_.size());
   raveStateScales_.reserve(raveLowerBounds_.size());
   for (std::size_t i = 0u; i < raveLowerBounds_.size(); ++i) {
     assert(raveUpperBounds_[i] > raveLowerBounds_[i]);
