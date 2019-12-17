@@ -430,7 +430,7 @@ fs::path ExperimentReport::compileReport() const {
   auto reportPath =
       fs::path(config_->get<std::string>("Experiment/results")).parent_path() / "report.tex";
   auto currentPath = fs::current_path();
-  auto cmd = "cd \""s + reportPath.parent_path().string() + "\" && lualatex -shell-escape \""s +
+  auto cmd = "cd \""s + reportPath.parent_path().string() + "\" && lualatex --interaction=nonstopmode --shell-escape \""s +
              reportPath.string() + "\""s;
   if (!config_->get<bool>("Experiment/report/verboseCompilation")) {
     cmd += " > /dev/null";
