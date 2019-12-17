@@ -395,6 +395,7 @@ std::stringstream ExperimentReport::individualResults() const {
 
 std::stringstream ExperimentReport::appendix() const {
   std::stringstream appendix;
+  appendix << "\n\\pagebreak\n";
   appendix << "\\begin{appendices}\n";
   // At the configuration section.
   appendix << "\\section{Configuration}\\label{sec:configuration}\n";
