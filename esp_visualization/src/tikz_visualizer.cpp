@@ -223,8 +223,8 @@ std::experimental::filesystem::path TikzVisualizer::compile(
   // these plots can be quite large, pdflatex has run into memory issues. Lualatex should be
   // available with all major tex distributions.
   auto cmd = "cd \""s + standalonePath.parent_path().string() +
-             "\" && lualatex --shell-escape > /dev/null \""s +
-             // "\" && lualatex --shell-escape \""s +
+             "\" && lualatex --interaction=nonstopmode --shell-escape > /dev/null \""s +
+             // "\" && lualatex --interaction=nonstopmode --shell-escape \""s +
              (currentPath / standalonePath).string() + "\" && cd \""s + currentPath.string() + '\"';
   int retval = std::system(cmd.c_str());
   retval = std::system(cmd.c_str());

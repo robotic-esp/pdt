@@ -42,6 +42,7 @@ namespace ompltools {
 
 // Forward declarations.
 class PotentialFieldOptimizationObjective;
+class ReciprocalClearanceOptimizationObjective;
 class MaxMinClearanceOptimizationObjective;
 
 class ObjectiveVisitor {
@@ -51,6 +52,7 @@ class ObjectiveVisitor {
 
   // Any objective visitor must implement its actions on all objectives.
   virtual void visit(const PotentialFieldOptimizationObjective& objective) const = 0;
+  virtual void visit(const ReciprocalClearanceOptimizationObjective& objective) const = 0;
   virtual void visit(const MaxMinClearanceOptimizationObjective& objective) const = 0;
 
   // This is only needed until all objectives are implemented.

@@ -207,6 +207,7 @@ void BaseVisualizer::createData() {
 
   while (dataThreadStopSignal_.wait_for(std::chrono::nanoseconds(1)) ==
          std::future_status::timeout) {
+
     // Create a new iteration if we we're viewing one thats uncomfortably close.
     if (displayIteration_ + iterationBuffer_ > largestIteration_) {
       // Create a termination condition that stops the planner after one iteration.

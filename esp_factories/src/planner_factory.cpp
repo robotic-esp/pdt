@@ -81,8 +81,6 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setName(plannerName);
       planner->setNumSamplesPerBatch(config_->get<std::size_t>(parentKey + "/samplesPerBatch"));
       planner->setRadiusFactor(config_->get<double>(parentKey + "/radiusFactor"));
-      planner->enableCollisionDetectionOnReverseSearch(
-          config_->get<bool>(parentKey + "/collisionDetectionOnReverseSearch"));
       return {planner, PLANNER_TYPE::AIBITSTAR};
     }
     case PLANNER_TYPE::BITSTAR: {
