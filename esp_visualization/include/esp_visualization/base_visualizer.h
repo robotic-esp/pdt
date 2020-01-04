@@ -113,7 +113,7 @@ class BaseVisualizer {
   const std::shared_ptr<const Configuration> config_;
 
   // This is how many iterations we'll create ahead of the viewed iteration.
-  static constexpr std::size_t iterationBuffer_{1000u};
+  std::size_t iterationBuffer_{1000u};
 
   // The planner data, indexed by the iteration.
   std::vector<std::shared_ptr<ompl::base::PlannerData>> plannerData_{};
