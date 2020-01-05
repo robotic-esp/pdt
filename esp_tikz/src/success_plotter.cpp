@@ -53,7 +53,7 @@ SuccessPlotter::SuccessPlotter(const std::shared_ptr<const Configuration>& confi
     LatexPlotter(config),
     stats_(stats) {
   // Determine the min and max durations to be plotted.
-  maxDurationToBePlotted_ = config_->get<double>("context/"s + config_->get<std::string>("Experiment/context") + "/maxTime");
+  maxDurationToBePlotted_ = config_->get<double>("context/"s + config_->get<std::string>("experiment/context") + "/maxTime");
   minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 
@@ -62,7 +62,7 @@ std::shared_ptr<PgfAxis> SuccessPlotter::createSuccessAxis() const {
   setSuccessAxisOptions(axis);
 
   // Fill the axis with the success plots of all planners.
-  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
+  for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     axis->addPlot(createSuccessPlot(name));
   }
 
@@ -82,7 +82,7 @@ fs::path SuccessPlotter::createSuccessPicture() const {
   picture.addAxis(createSuccessAxis());
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/all_planners_success_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -94,7 +94,7 @@ fs::path SuccessPlotter::createSuccessPicture(const std::string& plannerName) co
   picture.addAxis(createSuccessAxis(plannerName));
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/"s + plannerName + "_success_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

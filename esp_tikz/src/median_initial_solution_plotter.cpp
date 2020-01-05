@@ -88,7 +88,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionPlotter::createMedianInitialSoluti
   setMedianInitialSolutionAxisOptions(axis);
 
   // Add the initial solution plots.
-  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
+  for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     axis->addPlot(createMedianInitialSolutionPlot(name));
     axis->addPlot(createMedianInitialSolutionDurationCIPlot(name));
     axis->addPlot(createMedianInitialSolutionCostCIPlot(name));
@@ -116,7 +116,7 @@ fs::path MedianInitialSolutionPlotter::createMedianInitialSolutionPicture() cons
   picture.addAxis(createMedianInitialSolutionAxis());
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/all_planners_median_initial_solution_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -129,7 +129,7 @@ fs::path MedianInitialSolutionPlotter::createMedianInitialSolutionPicture(
   picture.addAxis(createMedianInitialSolutionAxis(plannerName));
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/"s + plannerName + "_median_initial_solution_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

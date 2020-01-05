@@ -99,7 +99,7 @@ std::shared_ptr<PgfAxis> TikzPicture::generateLegendAxis() const {
   auto legendAxis = std::make_shared<PgfAxis>();
 
   // Make sure the names are alphabetic.
-  auto plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
+  auto plannerNames = config_->get<std::vector<std::string>>("experiment/planners");
   std::sort(plannerNames.begin(), plannerNames.end());
   for (const auto& name : plannerNames) {
     std::string imageOptions{config_->get<std::string>("planner/"s + name + "/report/color"s) +

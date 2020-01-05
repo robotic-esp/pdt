@@ -125,14 +125,14 @@ std::size_t PlannerResults::numMeasuredRuns() const {
 
 Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceComputation) :
     config_(config),
-    statisticsDirectory_(fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+    statisticsDirectory_(fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                          "statistics/"),
     forceComputation_(forceComputation) {
   // Create the statistics directory.
   fs::create_directories(statisticsDirectory_);
 
   // Get the results path.
-  fs::path resultsPath = config_->get<std::string>("Experiment/results");
+  fs::path resultsPath = config_->get<std::string>("experiment/results");
 
   // Open the results file.
   std::ifstream filestream(resultsPath.string());
@@ -300,11 +300,11 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
   }
 
   // Compute the default binning durations for the medians.
-  auto contextName = config_->get<std::string>("Experiment/context");
+  auto contextName = config_->get<std::string>("experiment/context");
   std::size_t numMeasurements =
       std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
-                config_->get<double>("Experiment/logFrequency"));
-  double medianBinSize = 1.0 / config_->get<double>("Experiment/logFrequency");
+                config_->get<double>("experiment/logFrequency"));
+  double medianBinSize = 1.0 / config_->get<double>("experiment/logFrequency");
   defaultMedianBinDurations_.reserve(numMeasurements);
   for (std::size_t i = 0u; i < numMeasurements; ++i) {
     defaultMedianBinDurations_.emplace_back(static_cast<double>(i + 1u) * medianBinSize);
@@ -653,7 +653,7 @@ fs::path Statistics::extractInitialSolutions(const std::string& plannerName) con
 std::string Statistics::createHeader(const std::string& statisticType,
                                      const std::string& plannerName) const {
   std::stringstream stream;
-  stream << "# Experiment: " << config_->get<std::string>("Experiment/name") << '\n';
+  stream << "# Experiment: " << config_->get<std::string>("experiment/name") << '\n';
   stream << "# Planner: " << plannerName << '\n';
   stream << "# Statistic: " << statisticType << '\n';
   return stream.str();

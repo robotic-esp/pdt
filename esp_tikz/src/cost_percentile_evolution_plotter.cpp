@@ -56,10 +56,10 @@ CostPercentileEvolutionPlotter::CostPercentileEvolutionPlotter(
     LatexPlotter(config),
     stats_(stats) {
   // Compute the duration bin size.
-  auto contextName = config_->get<std::string>("Experiment/context");
+  auto contextName = config_->get<std::string>("experiment/context");
   std::size_t numBins = std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
-                                  config_->get<double>("Experiment/logFrequency"));
-  double binSize = 1.0 / config_->get<double>("Experiment/logFrequency");
+                                  config_->get<double>("experiment/logFrequency"));
+  double binSize = 1.0 / config_->get<double>("experiment/logFrequency");
   binnedDurations_.reserve(numBins);
   for (std::size_t i = 0u; i < numBins; ++i) {
     binnedDurations_.emplace_back(static_cast<double>(i + 1u) * binSize);
@@ -90,7 +90,7 @@ fs::path CostPercentileEvolutionPlotter::createCostPercentileEvolutionPicture(
   picture.addAxis(createCostPercentileEvolutionAxis(plannerName));
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/"s + plannerName + "_cost_percentile_evolution_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

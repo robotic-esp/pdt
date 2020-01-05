@@ -63,7 +63,7 @@ PotentialFieldOptimizationObjective::PotentialFieldOptimizationObjective(
   // Load the point sources as specified in the config.
   for (const auto point : config_->get<std::vector<std::vector<double>>>(
            "objective/" +
-           config_->get<std::string>("context/" + config_->get<std::string>("Experiment/context") +
+           config_->get<std::string>("context/" + config_->get<std::string>("experiment/context") +
                                      "/objective") +
            "/sources")) {
     // allocate a state for each point source.

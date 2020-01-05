@@ -65,7 +65,7 @@ std::shared_ptr<PgfAxis> InitialSolutionScatterPlotter::createInitialSolutionSca
   auto axis = std::make_shared<PgfAxis>();
   setInitialSolutionScatterAxisOptions(axis);
 
-  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
+  for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     auto plot = createInitialSolutionScatterPlot(name);
     plot->options.fillOpacity = config_->get<double>("initialSolutionScatterPlots/combinedFillOpacity");
     plot->options.lineWidth = config_->get<double>("initialSolutionScatterPlots/lineWidth");
@@ -90,7 +90,7 @@ fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture() co
   picture.addAxis(createInitialSolutionScatterAxis());
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/all_planners_initial_solution_pdf_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -103,7 +103,7 @@ fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture(
   picture.addAxis(createInitialSolutionScatterAxis(plannerName));
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/"s + plannerName + "_initial_solution_pdf_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

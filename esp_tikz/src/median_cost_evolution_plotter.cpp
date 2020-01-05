@@ -54,10 +54,10 @@ MedianCostEvolutionPlotter::MedianCostEvolutionPlotter(
     LatexPlotter(config),
     stats_(stats) {
   // Compute the duration bin size.
-  auto contextName = config_->get<std::string>("Experiment/context");
+  auto contextName = config_->get<std::string>("experiment/context");
   std::size_t numBins = std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
-                                  config_->get<double>("Experiment/logFrequency"));
-  double binSize = 1.0 / config_->get<double>("Experiment/logFrequency");
+                                  config_->get<double>("experiment/logFrequency"));
+  double binSize = 1.0 / config_->get<double>("experiment/logFrequency");
   binnedDurations_.reserve(numBins);
   for (std::size_t i = 0u; i < numBins; ++i) {
     binnedDurations_.emplace_back(static_cast<double>(i + 1u) * binSize);
@@ -98,7 +98,7 @@ std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAx
   setMedianCostAxisOptions(axis);
 
   // Fill the axis with the median cost plots of all planners.
-  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
+  for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     if (config_->get<bool>("planner/"s + name + "/isAnytime"s)) {
       // First the lower and upper confidence bounds, if desired.
       if (config_->get<bool>("medianCostPlots/plotConfidenceIntervalInAllPlots")) {
@@ -138,7 +138,7 @@ fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture() const {
   picture.addAxis(axis);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/all_planners_median_cost_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -152,7 +152,7 @@ fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture(
   picture.addAxis(axis);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/"s + plannerName + "_median_cost_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

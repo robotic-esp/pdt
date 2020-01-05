@@ -70,20 +70,20 @@ int main(int argc, char **argv) {
 
   // Create the context for this experiment.
   esp::ompltools::ContextFactory contextFactory(config);
-  auto context = contextFactory.create(config->get<std::string>("Experiment/context"));
+  auto context = contextFactory.create(config->get<std::string>("experiment/context"));
 
   // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
 
   // Print some basic info about this experiment.
-  std::cout << "\nExecuting " << config->get<std::size_t>("Experiment/numRuns") << " runs of "
-            << config->get<std::string>("Experiment/context") << " with " << ompl::RNG::getSeed()
+  std::cout << "\nExecuting " << config->get<std::size_t>("experiment/numRuns") << " runs of "
+            << config->get<std::string>("experiment/context") << " with " << ompl::RNG::getSeed()
             << " as the seed and a maximum runtime of " << context->getMaxSolveDuration()
             << " seconds.\n";
 
   // Setup the results table.
   std::cout << '\n';
-  for (const auto &plannerName : config->get<std::vector<std::string>>("Experiment/planners")) {
+  for (const auto &plannerName : config->get<std::vector<std::string>>("experiment/planners")) {
     std::cout << std::setw(7) << std::setfill(' ') << ' ' << std::setw(21) << std::setfill(' ')
               << std::left << std::string(plannerName);
   }
@@ -91,10 +91,10 @@ int main(int argc, char **argv) {
 
   // Create a name for this experiment.
   std::string experimentName = experimentStartTimeString + '_' + context->getName();
-  config->add<std::string>("Experiment/name", experimentName);
+  config->add<std::string>("experiment/name", experimentName);
 
   // Create the directory for the results of this experiment to live in.
-  fs::path experimentDirectory(config->get<std::string>("Experiment/executable") + "s/"s +
+  fs::path experimentDirectory(config->get<std::string>("experiment/executable") + "s/"s +
                                experimentName);
 
   // Create the performance log.
@@ -102,12 +102,12 @@ int main(int argc, char **argv) {
                                                                     "results.csv"s);
 
   // May the best planner win.
-  for (std::size_t i = 0; i < config->get<std::size_t>("Experiment/numRuns"); ++i) {
+  for (std::size_t i = 0; i < config->get<std::size_t>("experiment/numRuns"); ++i) {
     std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << " | ";
-    for (const auto &plannerName : config->get<std::vector<std::string>>("Experiment/planners")) {
+    for (const auto &plannerName : config->get<std::vector<std::string>>("experiment/planners")) {
       // Create the logger for this run.
       esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
-                                            config->get<std::size_t>("Experiment/logFrequency"));
+                                            config->get<std::size_t>("experiment/logFrequency"));
 
       // The following results in more consistent measurements. I don't fully understand why, but it seems to
       // be connected to creating a separate thread.
@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
       const auto maxSolveDuration =
           esp::ompltools::time::seconds(context->getMaxSolveDuration() - setupDuration);
       const std::chrono::microseconds idle(1000000u /
-                                           config->get<std::size_t>("Experiment/logFrequency"));
+                                           config->get<std::size_t>("experiment/logFrequency"));
 
       // Solve the problem on a separate thread.
       esp::ompltools::time::Clock::time_point addMeasurementStart;
@@ -189,7 +189,7 @@ int main(int argc, char **argv) {
 
   // Dump the accessed parameters next to the results file.
   auto configPath = experimentDirectory / "config.json"s;
-  config->add<std::string>("Experiment/results", results.getFilePath());
+  config->add<std::string>("experiment/results", results.getFilePath());
   config->dumpAccessed(fs::current_path().string() + '/' + configPath.string());
   OMPL_INFORM("Wrote configuration to '%s'", configPath.c_str());
 
@@ -201,7 +201,7 @@ int main(int argc, char **argv) {
             << fs::current_path() / logPath << "\n\n";
 
   // If we're automatically generating the report, now is the time to do so.
-  if (config->get<bool>("Experiment/report/automatic")) {
+  if (config->get<bool>("experiment/report/automatic")) {
     // Generate the statistic.
     esp::ompltools::Statistics stats(config, true);
 

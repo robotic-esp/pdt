@@ -65,7 +65,7 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutio
   axis_ = std::make_shared<PgfAxis>();
   setInitialSolutionDurationPdfAxisOptions(axis_);
 
-  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
+  for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     auto plot = createInitialSolutionDurationPdfPlot(name);
     plot->options.fillOpacity = config_->get<double>("initialSolutionPlots/combinedFillOpacity");
     plot->options.lineWidth = config_->get<double>("initialSolutionPlots/lineWidth");
@@ -91,7 +91,7 @@ fs::path InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPict
   picture.addAxis(axis_);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/all_planners_initial_solution_pdf_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -105,7 +105,7 @@ fs::path InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPict
   picture.addAxis(axis_);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/"s + plannerName + "_initial_solution_pdf_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

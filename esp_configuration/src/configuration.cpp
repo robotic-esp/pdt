@@ -96,16 +96,16 @@ void Configuration::load(int argc, char **argv) {
       bool loadDefaultPlannerConfigs{true};
       bool loadDefaultContextConfigs{true};
       bool loadDefaultObjectiveConfigs{true};
-      if (patch.contains("Experiment")) {
-        if (patch["Experiment"].contains("loadDefaultPlannerConfig")) {
-          loadDefaultPlannerConfigs = patch["Experiment"]["loadDefaultPlannerConfig"].get<bool>();
+      if (patch.contains("experiment")) {
+        if (patch["experiment"].contains("loadDefaultPlannerConfig")) {
+          loadDefaultPlannerConfigs = patch["experiment"]["loadDefaultPlannerConfig"].get<bool>();
         }
-        if (patch["Experiment"].contains("loadDefaultContextConfig")) {
-          loadDefaultContextConfigs = patch["Experiment"]["loadDefaultContextConfig"].get<bool>();
+        if (patch["experiment"].contains("loadDefaultContextConfig")) {
+          loadDefaultContextConfigs = patch["experiment"]["loadDefaultContextConfig"].get<bool>();
         }
-        if (patch["Experiment"].contains("loadDefaultObjectiveConfig")) {
+        if (patch["experiment"].contains("loadDefaultObjectiveConfig")) {
           loadDefaultObjectiveConfigs =
-              patch["Experiment"]["loadDefaultObjectiveConfig"].get<bool>();
+              patch["experiment"]["loadDefaultObjectiveConfig"].get<bool>();
         }
       }
       // Load the default config.
@@ -561,11 +561,11 @@ void Configuration::registerAsExperiment() {
   }
 
   // Make sure we're executing the right executable.
-  if (parameters_.contains("Experiment")) {
+  if (parameters_.contains("experiment")) {
     // Check we're on the same commit.
-    if (parameters_["Experiment"].contains("version")) {
-      if (parameters_["Experiment"]["version"].contains("commit")) {
-        auto commitHash = parameters_["Experiment"]["version"]["commit"].get<std::string>();
+    if (parameters_["experiment"].contains("version")) {
+      if (parameters_["experiment"]["version"].contains("commit")) {
+        auto commitHash = parameters_["experiment"]["version"]["commit"].get<std::string>();
         if (commitHash != "any"s) {
           if (commitHash != Version::GIT_SHA1) {
             OMPL_ERROR("Config specifies commit %s. You are currently on %s.", commitHash.c_str(),
@@ -576,8 +576,8 @@ void Configuration::registerAsExperiment() {
     }
 
     // Check this is the correct executable.
-    if (parameters_["Experiment"].contains("executable")) {
-      auto executable = parameters_["Experiment"]["executable"].get<std::string>();
+    if (parameters_["experiment"].contains("executable")) {
+      auto executable = parameters_["experiment"]["executable"].get<std::string>();
       if (executable != "any"s) {
         if (executable != executable_) {
           OMPL_ERROR("Config specifies executable '%s'. You are executing '%s'.",
@@ -587,23 +587,23 @@ void Configuration::registerAsExperiment() {
 
       // Handle executable specific configuration.
       if (executable == "benchmark"s) {
-        if (parameters_["Experiment"].contains("report")) {
-          if (!parameters_["Experiment"]["report"].contains("automatic")) {
-            parameters_["Experiment"]["report"]["automatic"] = false;
-            parameters_["Experiment"]["report"]["verboseCompilation"] = false;
+        if (parameters_["experiment"].contains("report")) {
+          if (!parameters_["experiment"]["report"].contains("automatic")) {
+            parameters_["experiment"]["report"]["automatic"] = false;
+            parameters_["experiment"]["report"]["verboseCompilation"] = false;
           }
         } else {
-          parameters_["Experiment"]["report"]["automatic"] = false;
-          parameters_["Experiment"]["report"]["verboseCompilation"] = false;
+          parameters_["experiment"]["report"]["automatic"] = false;
+          parameters_["experiment"]["report"]["verboseCompilation"] = false;
         }
-        accessedParameters_["Experiment"]["report"]["automatic"] =
-            parameters_["Experiment"]["report"]["automatic"];
-        accessedParameters_["Experiment"]["report"]["verboseCompilation"] =
-            parameters_["Experiment"]["report"]["verboseCompilation"];
+        accessedParameters_["experiment"]["report"]["automatic"] =
+            parameters_["experiment"]["report"]["automatic"];
+        accessedParameters_["experiment"]["report"]["verboseCompilation"] =
+            parameters_["experiment"]["report"]["verboseCompilation"];
       }
-      if (parameters_["Experiment"]["report"].contains("config")) {
+      if (parameters_["experiment"]["report"].contains("config")) {
         OMPL_INFORM("Loading custom report config.");
-        loadReportConfig(parameters_["Experiment"]["report"]["config"].get<std::string>());
+        loadReportConfig(parameters_["experiment"]["report"]["config"].get<std::string>());
       } else {
         OMPL_INFORM("Loading default report config.");
         loadReportConfig(Directory::SOURCE / "parameters/defaults/esp_default_report_config.json");
@@ -612,33 +612,33 @@ void Configuration::registerAsExperiment() {
   }
 
   // Store the executable name.
-  accessedParameters_["Experiment"]["executable"] = executable_;
+  accessedParameters_["experiment"]["executable"] = executable_;
 
   // Store the current version.
-  accessedParameters_["Experiment"]["version"]["commit"] = Version::GIT_SHA1;
-  accessedParameters_["Experiment"]["version"]["branch"] = Version::GIT_REFSPEC;
-  accessedParameters_["Experiment"]["version"]["status"] = Version::GIT_STATUS;
+  accessedParameters_["experiment"]["version"]["commit"] = Version::GIT_SHA1;
+  accessedParameters_["experiment"]["version"]["branch"] = Version::GIT_REFSPEC;
+  accessedParameters_["experiment"]["version"]["status"] = Version::GIT_STATUS;
 
   // This ensures we don't load any additional context or planner config when rerunning this
   // experiment.
-  accessedParameters_["Experiment"]["loadDefaultContextConfig"] = false;
-  accessedParameters_["Experiment"]["loadDefaultPlannerConfig"] = false;
+  accessedParameters_["experiment"]["loadDefaultContextConfig"] = false;
+  accessedParameters_["experiment"]["loadDefaultPlannerConfig"] = false;
 
   // Handle seed specifications.
   handleSeedSpecification();
 }
 
 void Configuration::handleSeedSpecification() {
-  if (parameters_["Experiment"].contains("seed")) {
-    auto seed = parameters_["Experiment"]["seed"].get<unsigned long>();
+  if (parameters_["experiment"].contains("seed")) {
+    auto seed = parameters_["experiment"]["seed"].get<unsigned long>();
     ompl::RNG::setSeed(seed);
     OMPL_WARN("Configuration set seed to be %lu", seed);
-    accessedParameters_["Experiment"]["seed"] = seed;
+    accessedParameters_["experiment"]["seed"] = seed;
   } else {
     auto seed = ompl::RNG::getSeed();
     OMPL_INFORM("Seed is %lu", seed);
-    parameters_["Experiment"]["seed"] = seed;
-    accessedParameters_["Experiment"]["seed"] = seed;
+    parameters_["experiment"]["seed"] = seed;
+    accessedParameters_["experiment"]["seed"] = seed;
   }
 }
 

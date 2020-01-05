@@ -142,9 +142,9 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
 
   // Export to a file.
   std::stringstream texFilename;
-  texFilename << config_->get<std::string>("Experiment/context") << '_'
-              << config_->get<std::string>("Experiment/planner") << '_'
-              << std::to_string(config_->get<std::size_t>("Experiment/seed")) << "/tikzpictures/"
+  texFilename << config_->get<std::string>("experiment/context") << '_'
+              << config_->get<std::string>("experiment/planner") << '_'
+              << std::to_string(config_->get<std::size_t>("experiment/seed")) << "/tikzpictures/"
               << std::setfill('0') << std::setw(6) << iteration << ".tex";
   std::experimental::filesystem::path texPath(texFilename.str());
   picture_.write(texPath);
@@ -602,7 +602,7 @@ void TikzVisualizer::drawSolution(const ompl::base::PathPtr path) const {
 
 void TikzVisualizer::drawEllipse(double cost) const {
   // Get the context name.
-  auto contextName = config_->get<std::string>("Experiment/context");
+  auto contextName = config_->get<std::string>("experiment/context");
   auto start = config_->get<std::vector<double>>("context/"s + contextName + "/start");
   auto goal = config_->get<std::vector<double>>("context/"s + contextName + "/goal");
   auto length =
