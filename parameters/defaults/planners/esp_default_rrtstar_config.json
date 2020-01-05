@@ -1,0 +1,27 @@
+{
+    "planner": {
+        "esp_default_rrtstar": {
+            "type": "RRTstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espred",
+                "name": "RRT*"
+            },
+            "options": {
+                "useKNearest": false,
+                "rewireFactor": 1.001,
+                "goalBias": 0.05,
+                "maxEdgeLength": {
+                    "2d": 0.3,
+                    "4d": 0.5,
+                    "6d": 0.9,
+                    "8d": 1.25,
+                    "12d": 2.0,
+                    "16d": 3.0
+                },
+                "delayCollisionChecks": true,
+                "useAdmissibleCostToCome": true
+            }
+        }
+    }
+}

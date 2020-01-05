@@ -302,7 +302,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
   // Compute the default binning durations for the medians.
   auto contextName = config_->get<std::string>("Experiment/context");
   std::size_t numMeasurements =
-      std::ceil(config_->get<double>("Contexts/" + contextName + "/maxTime") *
+      std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
                 config_->get<double>("Experiment/logFrequency"));
   double medianBinSize = 1.0 / config_->get<double>("Experiment/logFrequency");
   defaultMedianBinDurations_.reserve(numMeasurements);
@@ -312,7 +312,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
 
   // Compute the default binning durations for the initial solution pdf.
   double initDurationNumBins =
-      config_->get<std::size_t>("Statistics/InitialSolutions/numDurationBins");
+      config_->get<std::size_t>("statistics/initialSolutions/numDurationBins");
   double minExp = std::log10(minInitialSolutionDuration_);
   double maxExp = std::log10(maxNonInfInitialSolutionDuration_);
   double binExpStep = (maxExp - minExp) / initDurationNumBins;
@@ -324,7 +324,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
 
 fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t confidence,
                                     const std::vector<double>& binDurations) const {
-  if (plannerName == "RRTConnect") {
+  if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "This method extracts median costs over time for anytime planners. '" + plannerName +
                "' is not an anytime planner."s;
     throw std::runtime_error(msg);
@@ -400,7 +400,7 @@ fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t 
 fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
                                             std::set<double> percentiles,
                                             const std::vector<double>& binDurations) const {
-  if (plannerName == "RRTConnect") {
+  if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "This method extracts cost percentiles over time for anytime planners. '" +
                plannerName + "' is not an anytime planner."s;
     throw std::runtime_error(msg);
@@ -801,6 +801,10 @@ double Statistics::getMedianInitialSolutionCost(const std::string& plannerName) 
 
 std::vector<double> Statistics::getDefaultBinDurations() const {
   return defaultMedianBinDurations_;
+}
+
+std::shared_ptr<Configuration> Statistics::getConfig() const {
+  return config_;
 }
 
 std::vector<double> Statistics::getMedianCosts(const PlannerResults& results,

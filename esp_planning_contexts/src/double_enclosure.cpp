@@ -54,17 +54,17 @@ DoubleEnclosure::DoubleEnclosure(const std::shared_ptr<ompl::base::SpaceInformat
                                  const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo_->getStateDimension()),
-    startOutsideWidth_(config->get<double>("Contexts/" + name + "/startOutsideWidth")),
-    startInsideWidth_(config->get<double>("Contexts/" + name + "/startInsideWidth")),
-    startGapWidth_(config->get<double>("Contexts/" + name + "/startGapWidth")),
-    goalOutsideWidth_(config->get<double>("Contexts/" + name + "/goalOutsideWidth")),
-    goalInsideWidth_(config->get<double>("Contexts/" + name + "/goalInsideWidth")),
-    goalGapWidth_(config->get<double>("Contexts/" + name + "/goalGapWidth")),
+    startOutsideWidth_(config->get<double>("context/" + name + "/startOutsideWidth")),
+    startInsideWidth_(config->get<double>("context/" + name + "/startInsideWidth")),
+    startGapWidth_(config->get<double>("context/" + name + "/startGapWidth")),
+    goalOutsideWidth_(config->get<double>("context/" + name + "/goalOutsideWidth")),
+    goalInsideWidth_(config->get<double>("context/" + name + "/goalInsideWidth")),
+    goalGapWidth_(config->get<double>("context/" + name + "/goalGapWidth")),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
   if (startPosition.size() != dimensionality_) {
@@ -108,7 +108,7 @@ DoubleEnclosure::DoubleEnclosure(const std::shared_ptr<ompl::base::SpaceInformat
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();
@@ -155,7 +155,7 @@ void DoubleEnclosure::createObstacles() {
   // Create the anchor for the start enclosure obstacle.
   ompl::base::ScopedState<> startAnchor(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    startAnchor[i] = config_->get<std::vector<double>>("Contexts/" + name_ + "/start").at(i);
+    startAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
 
   // Get the widths of the start enclosure.
@@ -168,7 +168,7 @@ void DoubleEnclosure::createObstacles() {
   // Create the anchor for the goal enclosure obstacle.
   ompl::base::ScopedState<> goalAnchor(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    goalAnchor[i] = config_->get<std::vector<double>>("Contexts/" + name_ + "/goal").at(i);
+    goalAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(i);
   }
 
   // Get the widths of the goal enclosure.
@@ -183,7 +183,7 @@ void DoubleEnclosure::createAntiObstacles() {
   // Create the anchor for the start enclosure anti obstacle.
   ompl::base::ScopedState<> startAnchor(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    startAnchor[i] = config_->get<std::vector<double>>("Contexts/" + name_ + "/start").at(i);
+    startAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
 
   // Get the widths of the start enclosure anti obstacle.
@@ -196,7 +196,7 @@ void DoubleEnclosure::createAntiObstacles() {
   // Create the anchor for the goal enclosure anti obstacle.
   ompl::base::ScopedState<> goalAnchor(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    goalAnchor[i] = config_->get<std::vector<double>>("Contexts/" + name_ + "/goal").at(i);
+    goalAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(i);
   }
 
   // Get the widhts of the goal enclosre anti obstacle.
@@ -208,7 +208,7 @@ void DoubleEnclosure::createAntiObstacles() {
 
   // Create the start gap.
   ompl::base::ScopedState<> startGapMidpoint(spaceInfo_);
-  startGapMidpoint[0u] = config_->get<std::vector<double>>("Contexts/" + name_ + "/start").at(0u) -
+  startGapMidpoint[0u] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(0u) -
                          startInsideWidth_ / 2.0 - (startOutsideWidth_ - startInsideWidth_) / 4.0;
   for (std::size_t i = 1u; i < dimensionality_; ++i) {
     startGapMidpoint[i] = 0.0;
@@ -220,7 +220,7 @@ void DoubleEnclosure::createAntiObstacles() {
 
   // Create the goal gap.
   ompl::base::ScopedState<> goalGapMidpoint(spaceInfo_);
-  goalGapMidpoint[0u] = config_->get<std::vector<double>>("Contexts/" + name_ + "/goal").at(0u) +
+  goalGapMidpoint[0u] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(0u) +
                         goalInsideWidth_ / 2.0 + (goalOutsideWidth_ - goalInsideWidth_) / 4.0;
   for (std::size_t i = 1u; i < dimensionality_; ++i) {
     goalGapMidpoint[i] = 0.0;

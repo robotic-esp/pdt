@@ -124,6 +124,7 @@ class Statistics {
   double getMedianInitialSolutionCost(const std::string& plannerName) const;
 
   std::vector<double> getDefaultBinDurations() const;
+  std::shared_ptr<Configuration> getConfig() const;
 
  private:
   // The identifying header line that starts each file produced by this class.

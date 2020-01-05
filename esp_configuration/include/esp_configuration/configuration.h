@@ -105,7 +105,10 @@ class Configuration {
 
   // Helper to load the default config from the default path.
   void loadDefaultConfigs(bool loadDefaultContextConfigs = true,
-                          bool loadDefaultPlannerConfigs = true);
+                          bool loadDefaultPlannerConfigs = true,
+                          bool loadDefaultObjectiveConfigs = true);
+
+  void loadReportConfig(const std::experimental::filesystem::path& path);
 
   // Check if the name is nested, i.e., contains a '/'.
   bool isNestedKey(const std::string& name) const;

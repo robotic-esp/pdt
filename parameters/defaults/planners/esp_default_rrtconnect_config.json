@@ -1,0 +1,24 @@
+{
+    "planner": {
+        "esp_default_rrtconnect": {
+            "type": "RRTConnect",
+            "isAnytime": false,
+            "report": {
+                "color": "espblack",
+                "name": "RRT-Connect"
+            },
+            "options": {
+                "useKNearest": false,
+                "maxEdgeLength": {
+                    "2d": 0.3,
+                    "4d": 0.5,
+                    "6d": 0.9,
+                    "8d": 1.25,
+                    "12d": 2.0,
+                    "16d": 3.0
+                },
+                "addIntermediateStates": false
+            }
+        }
+    }
+}

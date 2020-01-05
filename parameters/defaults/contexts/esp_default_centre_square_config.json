@@ -1,0 +1,15 @@
+{
+    "context": {
+        "esp_default_centre_square": {
+            "type": "CentreSquare",
+            "objective": "esp_default_path_length",
+            "start": [0.0, 0.0],
+            "goal": [0.4, 0.4],
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 1,
+            "collisionCheckResolution": 0.001,
+            "obstacleWidth": 0.2
+        }
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "planner": {
+        "esp_default_rrt": {
+            "type": "RRT",
+            "isAnytime": false,
+            "report": {
+                "color": "espgray",
+                "name": "RRT"
+            },
+            "options": {
+                "TODO: fill these options": true
+            }
+        }
+    }
+}

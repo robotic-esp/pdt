@@ -67,8 +67,8 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutio
 
   for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
     auto plot = createInitialSolutionDurationPdfPlot(name);
-    plot->options.fillOpacity = config_->get<double>("InitialSolutionPlots/combinedFillOpacity");
-    plot->options.lineWidth = config_->get<double>("InitialSolutionPlots/lineWidth");
+    plot->options.fillOpacity = config_->get<double>("initialSolutionPlots/combinedFillOpacity");
+    plot->options.lineWidth = config_->get<double>("initialSolutionPlots/lineWidth");
     axis_->addPlot(plot);
   }
 
@@ -136,24 +136,24 @@ std::shared_ptr<PgfPlot> InitialSolutionDurationPdfPlotter::createInitialSolutio
   plot->options.markSize = 0.0;
   plot->options.lineWidth = 0.0;
   plot->options.namePath = plannerName + "InitialSolutionDurationPdf"s;
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
-  plot->options.fill = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
+  plot->options.fill = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
 
   return plot;
 }
 
 void InitialSolutionDurationPdfPlotter::setInitialSolutionDurationPdfAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
-  axis->options.height = config_->get<std::string>("InitialSolutionPlots/axisHeight");
-  axis->options.width = config_->get<std::string>("InitialSolutionPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("initialSolutionPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("initialSolutionPlots/axisWidth");
   axis->options.name = "InitialSolutionDurationPdfAxis"s;
-  axis->options.xlog = config_->get<bool>("InitialSolutionPlots/xlog");
+  axis->options.xlog = config_->get<bool>("initialSolutionPlots/xlog");
   axis->options.ymin = 0.0;
   axis->options.enlargeYLimits = "upper";
-  axis->options.xminorgrids = config_->get<bool>("InitialSolutionPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("InitialSolutionPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("InitialSolutionPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("InitialSolutionPlots/ymajorgrids");
+  axis->options.xminorgrids = config_->get<bool>("initialSolutionPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("initialSolutionPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("initialSolutionPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("initialSolutionPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]";
   axis->options.ylabel = "Counts";
   axis->options.ylabelAbsolute = true;

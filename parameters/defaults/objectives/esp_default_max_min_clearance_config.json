@@ -1,0 +1,7 @@
+{
+    "objective": {
+        "esp_default_max_min_clearance": {
+            "type": "MaxMinClearance"
+        }
+    }
+}

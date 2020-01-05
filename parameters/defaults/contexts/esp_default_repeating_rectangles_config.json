@@ -1,0 +1,16 @@
+{
+    "context": {
+        "esp_default_repeating_rectangles": {
+            "type": "RepeatingRectangles",
+            "objective": "esp_default_path_length",
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 1,
+            "start": [-0.25, 0.0],
+            "goal": [0.25, 0.0],
+            "collisionCheckResolution": 0.001,
+            "numObstaclesPerDim": 49,
+            "obstacleWidth": 0.01
+        }
+    }
+}

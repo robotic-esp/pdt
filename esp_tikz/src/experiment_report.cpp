@@ -76,29 +76,29 @@ ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
   // Get the plot planner names.
   for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
     try {
-      plotPlannerNames_[name] = config_->get<std::string>("PlotPlannerNames/" + name);
+      plotPlannerNames_[name] = config_->get<std::string>("planner/" + name + "/report/name");
     } catch (const std::invalid_argument& e) {
       plotPlannerNames_[name] = name;
     }
   }
 
   // Load the colors from the config.
-  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("Colors/espblack"));
-  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("Colors/espwhite"));
-  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("Colors/espgray"));
-  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("Colors/espblue"));
-  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("Colors/esplightblue"));
-  espColors_.emplace("espdarkblue", config_->get<std::array<int, 3>>("Colors/espdarkblue"));
-  espColors_.emplace("espred", config_->get<std::array<int, 3>>("Colors/espred"));
-  espColors_.emplace("esplightred", config_->get<std::array<int, 3>>("Colors/esplightred"));
-  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("Colors/espdarkred"));
-  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("Colors/espyellow"));
-  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("Colors/espgreen"));
-  espColors_.emplace("esplightgreen", config_->get<std::array<int, 3>>("Colors/esplightgreen"));
-  espColors_.emplace("espdarkgreen", config_->get<std::array<int, 3>>("Colors/espdarkgreen"));
-  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("Colors/esppurple"));
-  espColors_.emplace("esplightpurple", config_->get<std::array<int, 3>>("Colors/esplightpurple"));
-  espColors_.emplace("espdarkpurple", config_->get<std::array<int, 3>>("Colors/espdarkpurple"));
+  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("colors/espblack"));
+  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("colors/espwhite"));
+  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("colors/espgray"));
+  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("colors/espblue"));
+  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("colors/esplightblue"));
+  espColors_.emplace("espdarkblue", config_->get<std::array<int, 3>>("colors/espdarkblue"));
+  espColors_.emplace("espred", config_->get<std::array<int, 3>>("colors/espred"));
+  espColors_.emplace("esplightred", config_->get<std::array<int, 3>>("colors/esplightred"));
+  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("colors/espdarkred"));
+  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("colors/espyellow"));
+  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("colors/espgreen"));
+  espColors_.emplace("esplightgreen", config_->get<std::array<int, 3>>("colors/esplightgreen"));
+  espColors_.emplace("espdarkgreen", config_->get<std::array<int, 3>>("colors/espdarkgreen"));
+  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("colors/esppurple"));
+  espColors_.emplace("esplightpurple", config_->get<std::array<int, 3>>("colors/esplightpurple"));
+  espColors_.emplace("espdarkpurple", config_->get<std::array<int, 3>>("colors/espdarkpurple"));
 }
 
 fs::path ExperimentReport::generateReport() {
@@ -287,7 +287,7 @@ std::stringstream ExperimentReport::overview() const {
       << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
       << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
          "at any given time. (Bottom) Median cost evolution and median of initial solution with "
-      << config_->get<std::size_t>("MedianInitialSolutionPlots/confidence")
+      << config_->get<std::size_t>("medianInitialSolutionPlots/confidence")
       << "\\% confidence intervals.}\n\\end{center}\n";
 
   // Create the initial solution overview section.
@@ -330,7 +330,7 @@ std::stringstream ExperimentReport::individualResults() const {
     // Overlay the pdf with the cdf for the first initial durations plot.
     auto cdf = successPlotter_.createSuccessAxis(name);
     cdf->options.xmin = stats_.getMinInitialSolutionDuration(name);
-    cdf->options.xmax = config_->get<double>("Contexts/"s + config_->get<std::string>("Experiment/context") + "/maxTime");
+    cdf->options.xmax = config_->get<double>("context/"s + config_->get<std::string>("Experiment/context") + "/maxTime");
     auto pdf = initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name);
     pdf->overlay(cdf.get());
     for (const auto& plot : pdf->getPlots()) {
@@ -367,11 +367,11 @@ std::stringstream ExperimentReport::individualResults() const {
             << "}\n\\captionof{figure}{\\footnotesize (Top) Sample pdf and cdf of "
             << plotPlannerNames_.at(name) << ". (Bottom) All initial solutions of "
             << plotPlannerNames_.at(name) << " and their median with "
-            << config_->get<std::size_t>("MedianInitialSolutionPlots/confidence")
+            << config_->get<std::size_t>("medianInitialSolutionPlots/confidence")
             << "\\% confidence intervals.}\n\\end{center}\n";
 
     // Show the cost evolution plots for anytime planners.
-    if (name != "RRTConnect") {
+    if (config_->get<bool>("planner/"s + name + "/isAnytime"s)) {
       // Cost evolution plots.
       auto medianEvolution = medianCostEvolutionPlotter_.createMedianCostEvolutionAxis(name);
       auto percentileEvolution =
@@ -384,7 +384,7 @@ std::stringstream ExperimentReport::individualResults() const {
               << latexPlotter_.createPicture(medianEvolution, percentileEvolution).string()
               << "}\n\\captionof{figure}{\\footnotesize (Top) Median cost evolution of "
               << plotPlannerNames_.at(name) << " with "
-              << config_->get<std::size_t>("MedianCostPlots/confidence")
+              << config_->get<std::size_t>("medianCostPlots/confidence")
               << "\\% confidence interval. (Bottom) Seven percentiles of the cost evolution of "
               << plotPlannerNames_.at(name) << ".}\\end{center}\n";
     }
@@ -408,7 +408,7 @@ std::stringstream ExperimentReport::appendix() const {
   appendix << "\\subsection{" << config_->get<std::string>("Experiment/context")
            << "}\\label{sec:context-configuration}\n";
   appendix << "\\begin{lstlisting}\n"
-           << config_->dump("Contexts/" + config_->get<std::string>("Experiment/context"))
+           << config_->dump("context/" + config_->get<std::string>("Experiment/context"))
            << "\\end{lstlisting}\n";
 
   // Report the configuration of all planners.
@@ -416,7 +416,7 @@ std::stringstream ExperimentReport::appendix() const {
     appendix << "\\subsection{" << plotPlannerNames_.at(plannerName)
              << "}\\label{sec:" << plannerName << "-configuration}\n";
     appendix << "\\begin{lstlisting}\n"
-             << config_->dump("Planners/" + plannerName) << "\\end{lstlisting}\n";
+             << config_->dump("planner/" + plannerName) << "\\end{lstlisting}\n";
   }
 
   appendix << "\\end{appendices}\n";

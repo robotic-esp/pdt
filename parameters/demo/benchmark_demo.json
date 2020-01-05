@@ -2,25 +2,25 @@
     "Experiment": {
         "executable": "benchmark",
         "planners": [
-            "RRTConnect",
-            "RRTstar",
-            "BITstar",
-            "ABITstar",
-            "AIBITstar"
+            "esp_default_rrtconnect",
+            "esp_default_rrtstar",
+            "esp_default_bitstar",
+            "esp_default_abitstar",
+            "esp_default_aibitstar"
         ],
         "context": "WallGap",
-        "numRuns": 500,
+        "numRuns": 100,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true,
         "report": {
             "automatic": true,
-            "verboseCompilation": false
+            "verboseCompilation": true
         }
     },
-    "Contexts": {
+    "context": {
         "WallGap": {
-            "objective": "PathLength",
+            "objective": "esp_default_path_length",
             "type": "WallGap",
             "start": [-0.3, 0.0],
             "goal": [0.3, 0.0],

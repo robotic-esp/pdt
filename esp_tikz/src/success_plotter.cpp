@@ -53,7 +53,7 @@ SuccessPlotter::SuccessPlotter(const std::shared_ptr<const Configuration>& confi
     LatexPlotter(config),
     stats_(stats) {
   // Determine the min and max durations to be plotted.
-  maxDurationToBePlotted_ = config_->get<double>("Contexts/"s + config_->get<std::string>("Experiment/context") + "/maxTime");
+  maxDurationToBePlotted_ = config_->get<double>("context/"s + config_->get<std::string>("Experiment/context") + "/maxTime");
   minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 
@@ -102,19 +102,19 @@ fs::path SuccessPlotter::createSuccessPicture(const std::string& plannerName) co
 
 void SuccessPlotter::setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const {
   axis->options.name = "SuccessAxis";
-  axis->options.width = config_->get<std::string>("SuccessPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("SuccessPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("successPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("successPlots/axisHeight");
   axis->options.xmin = minDurationToBePlotted_;
   axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymin = 0;
   axis->options.ymax = 100;
-  axis->options.xlog = config_->get<bool>("SuccessPlots/xlog");
-  axis->options.xminorgrids = config_->get<bool>("SuccessPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("SuccessPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("SuccessPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("SuccessPlots/ymajorgrids");
+  axis->options.xlog = config_->get<bool>("successPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("successPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("successPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("successPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("successPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]"s;
-  axis->options.ytick = config_->get<std::string>("SuccessPlots/ytick");
+  axis->options.ytick = config_->get<std::string>("successPlots/ytick");
   axis->options.ylabel = "Success [\\%]"s;
   axis->options.ylabelAbsolute = true;
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
@@ -141,9 +141,9 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessPlot(const std::string& pl
   auto plot = std::make_shared<PgfPlot>(table);
 
   // Add the appropriate options.
-  plot->options.markSize = config_->get<double>("SuccessPlots/markSize");
-  plot->options.lineWidth = config_->get<double>("SuccessPlots/lineWidth");
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.markSize = config_->get<double>("successPlots/markSize");
+  plot->options.lineWidth = config_->get<double>("successPlots/lineWidth");
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "Success"s;
 
   return plot;

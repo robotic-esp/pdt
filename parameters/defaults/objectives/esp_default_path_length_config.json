@@ -1,0 +1,7 @@
+{
+    "objective": {
+        "esp_default_path_length": {
+            "type": "PathLength"
+        }
+    }
+}

@@ -59,15 +59,15 @@ CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& 
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Get the dimensionality of the problem.
   auto dimensionality = spaceInfo_->getStateDimension();
 
   // Get the obstacle widths.
   std::vector<double> widths(dimensionality,
-                             config_->get<double>("Contexts/" + name + "/obstacleWidth"));
+                             config_->get<double>("context/" + name + "/obstacleWidth"));
 
   // Assert configuration sanity.
   if (startPosition.size() != dimensionality) {
@@ -109,7 +109,7 @@ CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& 
   spaceInfo_->setStateValidityChecker(
       static_cast<ompl::base::StateValidityCheckerPtr>(validityChecker));
   spaceInfo_->setStateValidityCheckingResolution(
-      config_->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config_->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();

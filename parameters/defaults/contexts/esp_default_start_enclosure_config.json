@@ -1,0 +1,17 @@
+{
+    "context": {
+        "esp_default_start_enclosure": {
+            "type": "StartEnclosure",
+            "objective": "esp_default_path_length",
+            "start": [-0.2, 0.0],
+            "goal": [0.2, 0.0],
+            "maxTime": 1,
+            "dimensions": 2,
+            "boundarySideLengths" : 1,
+            "collisionCheckResolution": 0.001,
+            "startOutsideWidth": 0.25,
+            "startInsideWidth": 0.2,
+            "startGapWidth": 0.2
+        }
+    }
+}

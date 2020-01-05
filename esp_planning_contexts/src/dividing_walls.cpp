@@ -52,15 +52,15 @@ DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>
                              const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo->getStateDimension()),
-    numWalls_(config->get<std::size_t>("Contexts/" + name + "/numWalls")),
-    wallThicknesses_(config->get<std::vector<double>>("Contexts/" + name + "/wallThicknesses")),
-    numGaps_(config->get<std::size_t>("Contexts/" + name + "/numGaps")),
-    gapWidths_(config->get<std::vector<double>>("Contexts/" + name + "/gapWidths")),
+    numWalls_(config->get<std::size_t>("context/" + name + "/numWalls")),
+    wallThicknesses_(config->get<std::vector<double>>("context/" + name + "/wallThicknesses")),
+    numGaps_(config->get<std::size_t>("context/" + name + "/numGaps")),
+    gapWidths_(config->get<std::vector<double>>("context/" + name + "/gapWidths")),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
   if (startPosition.size() != dimensionality_) {
@@ -96,7 +96,7 @@ DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();

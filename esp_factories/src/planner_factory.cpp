@@ -60,18 +60,19 @@ PlannerFactory::PlannerFactory(const std::shared_ptr<Configuration> &config,
                                const std::shared_ptr<BaseContext> &context) :
     config_(config),
     context_(context) {
-  if (config_->contains("Planners") == 0) {
+  if (config_->contains("planner") == 0) {
     throw std::runtime_error("Configuration does not contain planner data.");
   }
 }
 
 std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::create(
     const std::string &plannerName) const {
-  const std::string parentKey{"Planners/" + plannerName};
+  const std::string parentKey{"planner/" + plannerName};
   if (!config_->contains(parentKey)) {
-    OMPL_ERROR("Configuration has no entry for requested planner '%s'.", parentKey.c_str());
+    throw std::invalid_argument("Requested unknown planner '"s + plannerName + "'."s);
   }
   const auto type = config_->get<PLANNER_TYPE>(parentKey + "/type");
+  const auto optionsKey = parentKey + "/options"s;
   // BIT*
   switch (type) {
     case PLANNER_TYPE::AIBITSTAR: {
@@ -79,8 +80,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::AIBITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setNumSamplesPerBatch(config_->get<std::size_t>(parentKey + "/samplesPerBatch"));
-      planner->setRadiusFactor(config_->get<double>(parentKey + "/radiusFactor"));
+      planner->setNumSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
+      planner->setRadiusFactor(config_->get<double>(optionsKey + "/radiusFactor"));
       return {planner, PLANNER_TYPE::AIBITSTAR};
     }
     case PLANNER_TYPE::BITSTAR: {
@@ -88,15 +89,15 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setUseKNearest(config_->get<bool>(parentKey + "/useKNearest"));
-      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
-      planner->setSamplesPerBatch(config_->get<std::size_t>(parentKey + "/samplesPerBatch"));
-      planner->setPruning(config_->get<bool>(parentKey + "/enablePruning"));
-      planner->setPruneThresholdFraction(config_->get<double>(parentKey + "/pruningThreshold"));
-      planner->setDropSamplesOnPrune(config_->get<bool>(parentKey + "/dropSamplesOnPrune"));
-      planner->setJustInTimeSampling(config_->get<bool>(parentKey + "/useJustInTimeSampling"));
+      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
+      planner->setSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
+      planner->setPruning(config_->get<bool>(optionsKey + "/enablePruning"));
+      planner->setPruneThresholdFraction(config_->get<double>(optionsKey + "/pruningThreshold"));
+      planner->setDropSamplesOnPrune(config_->get<bool>(optionsKey + "/dropSamplesOnPrune"));
+      planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
       planner->setStopOnSolnImprovement(
-          config_->get<bool>(parentKey + "/stopOnSolutionImprovement"));
+          config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
       planner->setInitialInflationFactor(1.0);
       planner->setInflationFactorParameter(0.0);
       planner->setTruncationFactorParameter(0.0);
@@ -108,24 +109,24 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
           std::make_shared<ompl::geometric::BITstarRegression>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setUseKNearest(config_->get<bool>(parentKey + "/useKNearest"));
-      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
-      planner->setSamplesPerBatch(config_->get<std::size_t>(parentKey + "/samplesPerBatch"));
-      planner->setPruning(config_->get<bool>(parentKey + "/enablePruning"));
-      planner->setPruneThresholdFraction(config_->get<double>(parentKey + "/pruningThreshold"));
-      planner->setDropSamplesOnPrune(config_->get<bool>(parentKey + "/dropSamplesOnPrune"));
-      planner->setJustInTimeSampling(config_->get<bool>(parentKey + "/useJustInTimeSampling"));
+      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
+      planner->setSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
+      planner->setPruning(config_->get<bool>(optionsKey + "/enablePruning"));
+      planner->setPruneThresholdFraction(config_->get<double>(optionsKey + "/pruningThreshold"));
+      planner->setDropSamplesOnPrune(config_->get<bool>(optionsKey + "/dropSamplesOnPrune"));
+      planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
       planner->setStopOnSolnImprovement(
-          config_->get<bool>(parentKey + "/stopOnSolutionImprovement"));
+          config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
       return {planner, PLANNER_TYPE::BITSTARREGRESSION};
     }
     case PLANNER_TYPE::INFORMEDRRTSTAR: {
       auto planner =
           std::make_shared<ompl::geometric::InformedRRTstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
-      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
       planner->setNumSamplingAttempts(
-          config_->get<std::size_t>(parentKey + "/numSamplingAttempts"));
+          config_->get<std::size_t>(optionsKey + "/numSamplingAttempts"));
       return {planner, PLANNER_TYPE::INFORMEDRRTSTAR};
     }
     case PLANNER_TYPE::RRTCONNECT: {
@@ -134,8 +135,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
-      planner->setIntermediateStates(config_->get<bool>(parentKey + "/addIntermediateStates"));
+      planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
+      planner->setIntermediateStates(config_->get<bool>(optionsKey + "/addIntermediateStates"));
       return {planner, PLANNER_TYPE::RRTCONNECT};
     }
     case PLANNER_TYPE::RRTSHARP: {
@@ -144,12 +145,12 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setKNearest(config_->get<bool>(parentKey + "/useKNearest"));
-      planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
-      planner->setGoalBias(config_->get<double>(parentKey + "/goalBias"));
-      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
-      planner->setSampleRejection(config_->get<bool>(parentKey + "/enableSampleRejection"));
-      planner->setVariant(config_->get<std::size_t>(parentKey + "/variant"));
+      planner->setKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
+      planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
+      planner->setSampleRejection(config_->get<bool>(optionsKey + "/enableSampleRejection"));
+      planner->setVariant(config_->get<std::size_t>(optionsKey + "/variant"));
       planner->setInformedSampling(false);
       return {planner, PLANNER_TYPE::RRTSHARP};
     }
@@ -159,11 +160,11 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setKNearest(config_->get<bool>(parentKey + "/useKNearest"));
-      planner->setRange(config_->get<double>(parentKey + "/maxEdgeLength/" + dimKey));
-      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
-      planner->setGoalBias(config_->get<double>(parentKey + "/goalBias"));
-      planner->setDelayCC(config_->get<bool>(parentKey + "/delayCollisionChecks"));
+      planner->setKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
+      planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
+      planner->setDelayCC(config_->get<bool>(optionsKey + "/delayCollisionChecks"));
       planner->setTreePruning(false);
       planner->setPruneThreshold(1.0);
       planner->setPrunedMeasure(false);
@@ -177,19 +178,19 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setUseKNearest(config_->get<bool>(parentKey + "/useKNearest"));
-      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
-      planner->setSamplesPerBatch(config_->get<std::size_t>(parentKey + "/samplesPerBatch"));
-      planner->setPruning(config_->get<bool>(parentKey + "/enablePruning"));
-      planner->setPruneThresholdFraction(config_->get<double>(parentKey + "/pruningThreshold"));
-      planner->setDropSamplesOnPrune(config_->get<bool>(parentKey + "/dropSamplesOnPrune"));
-      planner->setJustInTimeSampling(config_->get<bool>(parentKey + "/useJustInTimeSampling"));
+      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
+      planner->setSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
+      planner->setPruning(config_->get<bool>(optionsKey + "/enablePruning"));
+      planner->setPruneThresholdFraction(config_->get<double>(optionsKey + "/pruningThreshold"));
+      planner->setDropSamplesOnPrune(config_->get<bool>(optionsKey + "/dropSamplesOnPrune"));
+      planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
       planner->setStopOnSolnImprovement(
-          config_->get<bool>(parentKey + "/stopOnSolutionImprovement"));
-      planner->setInitialInflationFactor(config_->get<double>(parentKey + "/initialInflation"));
-      planner->setInflationFactorParameter(config_->get<double>(parentKey + "/inflationParameter"));
+          config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
+      planner->setInitialInflationFactor(config_->get<double>(optionsKey + "/initialInflation"));
+      planner->setInflationFactorParameter(config_->get<double>(optionsKey + "/inflationParameter"));
       planner->setTruncationFactorParameter(
-          config_->get<double>(parentKey + "/truncationParameter"));
+          config_->get<double>(optionsKey + "/truncationParameter"));
       return {planner, PLANNER_TYPE::SBITSTAR};
     }
     case PLANNER_TYPE::TBDSTAR: {
@@ -197,9 +198,9 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::TBDstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setRepairBackwardSearch(config_->get<bool>(parentKey + "/repairBackwardSearch"));
-      planner->setBatchSize(config_->get<std::size_t>(parentKey + "/batchSize"));
-      planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
+      planner->setRepairBackwardSearch(config_->get<bool>(optionsKey + "/repairBackwardSearch"));
+      planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
       return {planner, PLANNER_TYPE::TBDSTAR};
     }
     default: { throw std::runtime_error("Planner '"s + plannerName + "' is of unknown type."s); }
