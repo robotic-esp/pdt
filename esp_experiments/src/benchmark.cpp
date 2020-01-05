@@ -202,6 +202,7 @@ int main(int argc, char **argv) {
 
   // If we're automatically generating the report, now is the time to do so.
   if (config->get<bool>("experiment/report/automatic")) {
+    std::cout << "Compiling report. This may take a couple of minutes.\n";
     // Generate the statistic.
     esp::ompltools::Statistics stats(config, true);
 
