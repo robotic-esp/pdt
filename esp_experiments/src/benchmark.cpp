@@ -44,6 +44,8 @@
 
 #include <experimental/filesystem>
 
+#include <ompl/base/PlannerTerminationCondition.h>
+#include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/util/Console.h>
 
 #include "esp_configuration/configuration.h"
@@ -109,12 +111,15 @@ int main(int argc, char **argv) {
       esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
                                             config->get<std::size_t>("experiment/logFrequency"));
 
-      // The following results in more consistent measurements. I don't fully understand why, but it seems to
-      // be connected to creating a separate thread.
+      // The following results in more consistent measurements. I don't fully understand why, but it
+      // seems to be connected to creating a separate thread.
       {
-        auto [reconciler, reconcilerType] = plannerFactory.create("defaultRRTConnect");
-        (void)reconcilerType;
-        auto hotpath = std::async(std::launch::async, [&reconciler]() { reconciler->solve(0.0); });
+        auto reconciler =
+            std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
+        reconciler->setProblemDefinition(context->instantiateNewProblemDefinition());
+        auto hotpath = std::async(std::launch::async, [&reconciler]() {
+          reconciler->solve(ompl::base::timedPlannerTerminationCondition(0.0));
+        });
         hotpath.get();
       }
 
