@@ -1,11 +1,11 @@
 {
     "context": {
-        "esp_default_four_rooms": {
+        "defaultFourRooms": {
             "type": "FourRooms",
-            "objective": "esp_default_path_length",
+            "objective": "defaultPathLength",
             "start": [0.25, -0.25],
             "goal": [0.25, 0.25],
-            "maxTime": 1,
+            "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : 1,
             "collisionCheckResolution": 0.001,

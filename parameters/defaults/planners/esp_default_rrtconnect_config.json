@@ -1,6 +1,6 @@
 {
     "planner": {
-        "esp_default_rrtconnect": {
+        "defaultRRTConnect": {
             "type": "RRTConnect",
             "isAnytime": false,
             "report": {

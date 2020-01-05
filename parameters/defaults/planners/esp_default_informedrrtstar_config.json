@@ -1,6 +1,6 @@
 {
     "planner": {
-        "esp_default_informedrrtstar": {
+        "defaultInformedRRTstar": {
             "type": "InformedRRTstar",
             "isAnytime": true,
             "report": {

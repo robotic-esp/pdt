@@ -1,6 +1,6 @@
 {
     "objective": {
-        "esp_default_potential_field": {
+        "defaultPotentialField": {
             "type": "PotentialField",
             "sources": [
                 [-0.3, 0.2],

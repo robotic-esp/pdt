@@ -1,6 +1,6 @@
 {
     "planner": {
-        "esp_default_aibitstar": {
+        "defaultAIBITstar": {
             "type": "AIBITstar",
             "isAnytime": true,
             "report": {

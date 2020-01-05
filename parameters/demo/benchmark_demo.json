@@ -2,17 +2,18 @@
     "experiment": {
         "executable": "benchmark",
         "planners": [
-            "esp_default_rrtconnect",
-            "esp_default_rrtstar",
-            "esp_default_bitstar",
-            "esp_default_abitstar",
-            "esp_default_aibitstar"
+            "defaultRRTConnect",
+            "defaultRRTstar",
+            "defaultBITstar",
+            "defaultABITstar",
+            "defaultAIBITstar"
         ],
-        "context": "esp_default_wall_gap",
+        "context": "defaultWallGap",
         "numRuns": 100,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true,
+        "loadDefaultObjectiveConfig": true,
         "report": {
             "automatic": true,
             "verboseCompilation": false

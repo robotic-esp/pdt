@@ -1,9 +1,9 @@
 {
     "context": {
-        "esp_default_multi_start_goal": {
+        "defaultMultiStartGoal": {
             "type": "MultiStartGoal",
-            "objective": "esp_default_path_length",
-            "maxTime": 1,
+            "objective": "defaultPathLength",
+            "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : 1,
             "numStarts": 1,

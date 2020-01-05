@@ -1,9 +1,9 @@
 {
     "context": {
-        "esp_default_repeating_rectangles": {
+        "defaultRepeatingRectangles": {
             "type": "RepeatingRectangles",
-            "objective": "esp_default_path_length",
-            "maxTime": 1,
+            "objective": "defaultPathLength",
+            "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : 1,
             "start": [-0.25, 0.0],

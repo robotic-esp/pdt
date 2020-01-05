@@ -1,6 +1,6 @@
 {
     "planner": {
-        "esp_default_abitstar": {
+        "defaultABITstar": {
             "type": "SBITstar",
             "isAnytime": true,
             "report": {

@@ -1,6 +1,6 @@
 {
     "objective": {
-        "esp_default_reciprocal_clearance": {
+        "defaultReciprocalClearance": {
             "type": "ReciprocalClearance"
         }
     }

@@ -1,6 +1,6 @@
 {
     "objective": {
-        "esp_default_path_length": {
+        "defaultPathLength": {
             "type": "PathLength"
         }
     }

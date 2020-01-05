@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
       // The following results in more consistent measurements. I don't fully understand why, but it seems to
       // be connected to creating a separate thread.
       {
-        auto [reconciler, reconcilerType] = plannerFactory.create("esp_default_rrtconnect");
+        auto [reconciler, reconcilerType] = plannerFactory.create("defaultRRTConnect");
         (void)reconcilerType;
         auto hotpath = std::async(std::launch::async, [&reconciler]() { reconciler->solve(0.0); });
         hotpath.get();

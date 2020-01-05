@@ -1,6 +1,6 @@
 {
     "planner": {
-        "esp_default_rrtsharp": {
+        "defaultRRTsharp": {
             "type": "RRTsharp",
             "isAnytime": true,
             "report": {

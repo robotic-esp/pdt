@@ -1,6 +1,6 @@
 {
     "planner": {
-        "esp_default_rrtstar": {
+        "defaultRRTstar": {
             "type": "RRTstar",
             "isAnytime": true,
             "report": {

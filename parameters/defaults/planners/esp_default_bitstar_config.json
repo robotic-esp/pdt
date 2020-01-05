@@ -1,6 +1,6 @@
 {
     "planner": {
-        "esp_default_bitstar": {
+        "defaultBITstar": {
             "type": "BITstar",
             "isAnytime": true,
             "report": {

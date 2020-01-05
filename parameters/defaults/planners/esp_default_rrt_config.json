@@ -1,6 +1,6 @@
 {
     "planner": {
-        "esp_default_rrt": {
+        "defaultRRT": {
             "type": "RRT",
             "isAnytime": false,
             "report": {
