@@ -84,7 +84,9 @@ int main(int argc, char **argv) {
       << "The experiment should be done by "
       << esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
              std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
-             context->getMaxSolveDuration()))
+             config->get<std::size_t>("Experiment/numRuns") *
+                 config->get<std::vector<std::string>>("Experiment/planners").size() *
+                 context->getMaxSolveDuration()))
       << ".\n";
 
   // Setup the results table.
