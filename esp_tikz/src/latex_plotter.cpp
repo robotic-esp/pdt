@@ -172,7 +172,7 @@ fs::path LatexPlotter::compileStandalonePdf(const fs::path& tikzPicture) const {
   // these plots can be quite large, pdflatex has run into memory issues. Lualatex should be
   // available with all major tex distributions.
   auto currentPath = fs::current_path();
-  auto cmd = "cd \""s + path.parent_path().string() + "\" && lualatex \""s + path.string() +
+  auto cmd = "cd \""s + path.parent_path().string() + "\" && lualatex --interaction=nonstopmode --shell-escape \""s + path.string() +
              "\" && cd \""s + currentPath.string() + '\"';
   int retval = std::system(cmd.c_str());
   (void)retval;

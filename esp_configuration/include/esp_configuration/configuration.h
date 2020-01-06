@@ -192,7 +192,7 @@ void Configuration::registerAccess(const std::string& key, const T& value,
                                    json::json* accessedParameters) const {
   if (!isNestedKey(key)) {
     if (accessedParameters->contains(key) && (*accessedParameters)[key] != value) {
-      OMPL_ERROR("Value of parameter being accessed has changed.");
+      OMPL_ERROR("Value of parameter '%s' being accessed has changed.", key.c_str());
       throw std::runtime_error("Reproducibility error.");
     }
     (*accessedParameters)[key] = value;

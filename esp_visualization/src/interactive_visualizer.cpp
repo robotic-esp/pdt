@@ -153,6 +153,7 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionDrawEdges(optionsName + ".Edges", true, true);
   pangolin::Var<bool> optionDrawPlannerSpecificData(optionsName + ".Planner Specific", true, true);
   pangolin::Var<bool> optionDrawSolution(optionsName + ".Solution", true, true);
+  pangolin::Var<bool> optionDrawStateIds(optionsName + ".State IDs", false, true);
   pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
   // Buttons.
   pangolin::Var<bool> optionScreenshot(optionsName + ".Screenshot", false, false);
@@ -325,6 +326,11 @@ void InteractiveVisualizer::run() {
       context_->accept(*this);
     }
 
+    // Draw the state ids.
+    if (optionDrawStateIds) {
+      drawStateIds(displayIteration_);
+    }
+
     // Set the correct view of the plot.
     plotter.SetView(pangolin::XYRangef(0, 1.06 * static_cast<float>(largestPlottedIteration_),
                                        0.98 * minCost_, 1.02 * maxCost_));
@@ -427,6 +433,30 @@ void InteractiveVisualizer::drawSolution(std::size_t iteration) {
   } else if (context_->getDimension() == 3u) {
     auto path = getPath3D(iteration);
     drawPath(path, 3.0, purple, 1.0);
+  }
+}
+
+void InteractiveVisualizer::drawStateIds(std::size_t iteration) {
+  // We must enable alpha blending for text rendering to work with pangolin.
+  GLboolean glBlendEnabled{false};
+  glGetBooleanv(GL_BLEND, &glBlendEnabled);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  const auto& plannerData = getPlannerData(iteration);
+  for (std::size_t i = 0u; i < plannerData->numVertices(); ++i) {
+    auto vertex = plannerData->getVertex(i);
+    if (vertex != ompl::base::PlannerData::NO_VERTEX) {
+      auto vertexState = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      glColor3f(1.0, 0.2, 0.4);
+      pangolin::GlText txt = pangolin::GlFont::I().Text(std::to_string(vertex.getTag()).c_str());
+      txt.Draw(vertexState->values[0], vertexState->values[1]);
+    }
+  }
+
+  if (!glBlendEnabled) {
+    glDisable(GL_BLEND);
   }
 }
 

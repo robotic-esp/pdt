@@ -54,6 +54,8 @@ namespace esp {
 
 namespace ompltools {
 
+using namespace std::string_literals;
+
 PlannerFactory::PlannerFactory(const std::shared_ptr<Configuration> &config,
                                const std::shared_ptr<BaseContext> &context) :
     config_(config),
@@ -201,13 +203,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setRewireFactor(config_->get<double>(parentKey + "/rewireFactor"));
       return {planner, PLANNER_TYPE::TBDSTAR};
     }
-    default: {
-      OMPL_ERROR("Planner factory recieved request to create planner of unknown type '%s'.",
-                 config_->get<std::string>("Planner/" + plannerName + "/type"));
-      throw std::runtime_error("Planner factory error.");
-      return {std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation()),
-              PLANNER_TYPE::BITSTAR};
-    }
+    default: { throw std::runtime_error("Planner '"s + plannerName + "' is of unknown type."s); }
   }
 }
 

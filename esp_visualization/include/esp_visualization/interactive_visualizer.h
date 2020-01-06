@@ -97,6 +97,7 @@ class InteractiveVisualizer : public BaseVisualizer,
   void drawVertices(std::size_t iteration);
   void drawEdges(std::size_t iteration);
   void drawSolution(std::size_t iteration);
+  void drawStateIds(std::size_t iteration);
 
   // Planner specific visualizations.
   void drawPlannerSpecificVisualizations(std::size_t iteration) const;

@@ -76,10 +76,16 @@ int main(int argc, char **argv) {
   esp::ompltools::PlannerFactory plannerFactory(config, context);
 
   // Print some basic info about this experiment.
-  std::cout << "\nExecuting " << config->get<std::size_t>("Experiment/numRuns") << " runs of "
-            << config->get<std::string>("Experiment/context") << " with " << ompl::RNG::getSeed()
-            << " as the seed and a maximum runtime of " << context->getMaxSolveDuration()
-            << " seconds.\n";
+  std::cout
+      << "\nExecuting " << config->get<std::size_t>("Experiment/numRuns") << " runs of "
+      << config->get<std::string>("Experiment/context") << " with " << ompl::RNG::getSeed()
+      << " as the seed and a maximum runtime of " << context->getMaxSolveDuration().count()
+      << " seconds per planner.\n"
+      << "The experiment should be done by "
+      << esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
+             std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
+             context->getMaxSolveDuration()))
+      << ".\n";
 
   // Setup the results table.
   std::cout << '\n';

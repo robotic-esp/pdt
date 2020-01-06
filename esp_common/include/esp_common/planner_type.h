@@ -43,6 +43,7 @@ namespace esp {
 namespace ompltools {
 
 enum class PLANNER_TYPE {
+  INVALID,
   AIBITSTAR,
   BITSTAR,
   BITSTARREGRESSION,
@@ -53,10 +54,10 @@ enum class PLANNER_TYPE {
   RRTSTAR,
   SBITSTAR,
   TBDSTAR,
-  INVALID,
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
+                                               {PLANNER_TYPE::INVALID, "invalid"},
                                                {PLANNER_TYPE::AIBITSTAR, "AIBITstar"},
                                                {PLANNER_TYPE::BITSTAR, "BITstar"},
                                                {PLANNER_TYPE::BITSTARREGRESSION, "BITstarRegression"},
@@ -67,7 +68,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
                                                {PLANNER_TYPE::RRTSTAR, "RRTstar"},
                                                {PLANNER_TYPE::SBITSTAR, "SBITstar"},
                                                {PLANNER_TYPE::TBDSTAR, "TBDstar"},
-                                               {PLANNER_TYPE::INVALID, "invalid"},
                                            })
 
 }  // namespace ompltools
