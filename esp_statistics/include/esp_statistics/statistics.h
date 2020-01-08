@@ -132,6 +132,11 @@ class Statistics {
 
   // Get the median confidence interval.
   struct ConfidenceInterval {
+    // The lower and upper bounds are zero-based indices. If I have 10 measurements in a sorted
+    // vector, e.g.,
+    //   v = { 0.1 0.3 0.4 0.5 0.8 0.9 1.1 1.3 1.7 1.9 },
+    // then lower and upper bound indices of 1 and 8, respectively, mean that the median is with
+    // <probability> certainty between v[1] and v[8].
     std::size_t lower{0u}, upper{0u};
     float probability{0.0f};
   };

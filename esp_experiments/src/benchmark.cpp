@@ -44,6 +44,8 @@
 
 #include <experimental/filesystem>
 
+#include <ompl/base/PlannerTerminationCondition.h>
+#include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/util/Console.h>
 
 #include "esp_configuration/configuration.h"
@@ -76,10 +78,18 @@ int main(int argc, char **argv) {
   esp::ompltools::PlannerFactory plannerFactory(config, context);
 
   // Print some basic info about this experiment.
-  std::cout << "\nExecuting " << config->get<std::size_t>("experiment/numRuns") << " runs of "
-            << config->get<std::string>("experiment/context") << " with " << ompl::RNG::getSeed()
-            << " as the seed and a maximum runtime of " << context->getMaxSolveDuration()
-            << " seconds.\n";
+  std::cout
+      << "\nExecuting " << config->get<std::size_t>("Experiment/numRuns") << " runs of "
+      << config->get<std::string>("Experiment/context") << " with " << ompl::RNG::getSeed()
+      << " as the seed and a maximum runtime of " << context->getMaxSolveDuration().count()
+      << " seconds per planner.\n"
+      << "This benchmark should be done by "
+      << esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
+             std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
+             config->get<std::size_t>("Experiment/numRuns") *
+                 config->get<std::vector<std::string>>("Experiment/planners").size() *
+                 context->getMaxSolveDuration()))
+      << ".\n";
 
   // Setup the results table.
   std::cout << '\n';
@@ -109,12 +119,15 @@ int main(int argc, char **argv) {
       esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
                                             config->get<std::size_t>("experiment/logFrequency"));
 
-      // The following results in more consistent measurements. I don't fully understand why, but it seems to
-      // be connected to creating a separate thread.
+      // The following results in more consistent measurements. I don't fully understand why, but it
+      // seems to be connected to creating a separate thread.
       {
-        auto [reconciler, reconcilerType] = plannerFactory.create("defaultRRTConnect");
-        (void)reconcilerType;
-        auto hotpath = std::async(std::launch::async, [&reconciler]() { reconciler->solve(0.0); });
+        auto reconciler =
+            std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
+        reconciler->setProblemDefinition(context->instantiateNewProblemDefinition());
+        auto hotpath = std::async(std::launch::async, [&reconciler]() {
+          reconciler->solve(ompl::base::timedPlannerTerminationCondition(0.0));
+        });
         hotpath.get();
       }
 
