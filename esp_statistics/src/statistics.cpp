@@ -661,6 +661,8 @@ std::string Statistics::createHeader(const std::string& statisticType,
 
 Statistics::ConfidenceInterval Statistics::getMedianConfidenceInterval(
     std::size_t confidence) const {
+  // The lower and upper bounds in the below are off-by-one, because they are used as zero-based
+  // indices. See comment in Statistics::ConfidenceInterval class.
   static const std::map<std::size_t, std::map<std::size_t, ConfidenceInterval>>
       medianConfidenceIntervals = {
           {10u, {{95u, {1u, 8u, 0.9511}}, {99u, {0u, 9u, 0.9910}}}},
