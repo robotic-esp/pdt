@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
       << config->get<std::string>("Experiment/context") << " with " << ompl::RNG::getSeed()
       << " as the seed and a maximum runtime of " << context->getMaxSolveDuration().count()
       << " seconds per planner.\n"
-      << "The experiment should be done by "
+      << "This benchmark should be done by "
       << esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
              std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
              config->get<std::size_t>("Experiment/numRuns") *
