@@ -103,6 +103,32 @@ void Configuration::load(int argc, char **argv) {
           loadDefaultContextConfigs = patch["Experiment"]["loadDefaultContextConfig"].get<bool>();
         }
       }
+
+      // Set the appropriate log level.
+      if (patch.count("Log") != 0) {
+        auto level = patch["Log"]["level"];
+        if (level == "dev2"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV2);
+        } else if (level == "dev1"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV1);
+        } else if (level == "debug"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEBUG);
+        } else if (level == "info"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
+        } else if (level == "warn"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+        } else if (level == "error"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_ERROR);
+        } else if (level == "none"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_NONE);
+        } else {
+          OMPL_WARN("Config specifies invalid OMPL log level. Setting the log level to LOG_WARN");
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+        }
+      } else {
+        ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+      }
+
       // Load the default config.
       loadDefaultConfigs(loadDefaultContextConfigs, loadDefaultPlannerConfigs);
       // Merge the patch, possibly overriding default values.
@@ -113,31 +139,6 @@ void Configuration::load(int argc, char **argv) {
       OMPL_ERROR("Cannot find provided configuration file at %s", patchConfig.c_str());
       throw std::ios_base::failure("Cannot find patch config file.");
     }
-  }
-
-  // Set the appropriate log level.
-  if (parameters_.count("Log") != 0) {
-    auto level = parameters_["Log"]["level"];
-    if (level == "dev2"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV2);
-    } else if (level == "dev1"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV1);
-    } else if (level == "debug"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEBUG);
-    } else if (level == "info"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
-    } else if (level == "warn"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
-    } else if (level == "error"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_ERROR);
-    } else if (level == "none"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_NONE);
-    } else {
-      OMPL_WARN("Config specifies invalid log level. Setting the log level to LOG_WARN");
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
-    }
-  } else {
-    ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
   }
 }
 
