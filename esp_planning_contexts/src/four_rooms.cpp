@@ -47,13 +47,13 @@ FourRooms::FourRooms(const std::shared_ptr<ompl::base::SpaceInformation>& spaceI
                      const std::shared_ptr<const Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo_->getStateDimension()),
-    wallThickness_(config->get<double>("Contexts/" + name + "/wallThickness")),
-    gapWidth_(config->get<double>("Contexts/" + name + "/gapWidth")),
+    wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
+    gapWidth_(config->get<double>("context/" + name + "/gapWidth")),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
   if (dimensionality_ != 2u) {
@@ -93,7 +93,7 @@ FourRooms::FourRooms(const std::shared_ptr<ompl::base::SpaceInformation>& spaceI
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();

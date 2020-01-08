@@ -81,7 +81,7 @@ fs::path OverviewPlotter::createCombinedPicture() const {
   picture.addAxis(medianCostAxis);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/all_planners_combined_success_median_cost_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -109,7 +109,7 @@ fs::path OverviewPlotter::createCombinedPicture(const std::string& plannerName) 
   picture.addAxis(medianCostAxis);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/"s + plannerName + "_combined_success_median_cost_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

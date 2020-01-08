@@ -1,0 +1,7 @@
+{
+    "objective": {
+        "defaultMaxMinClearance": {
+            "type": "MaxMinClearance"
+        }
+    }
+}

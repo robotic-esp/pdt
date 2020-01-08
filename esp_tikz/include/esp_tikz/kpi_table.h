@@ -52,9 +52,9 @@ class KpiTable : public TabularX {
   ~KpiTable() = default;
 
   void addKpi(const std::string& plannerName, const std::string& plannerPlotName);
-  
+
   std::string string() const;
-  
+
  private:
   std::vector<std::string> plannerNames_{};
   const std::shared_ptr<const Configuration> config_;

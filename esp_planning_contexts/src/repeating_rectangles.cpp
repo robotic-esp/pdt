@@ -52,13 +52,13 @@ RepeatingRectangles::RepeatingRectangles(
     const std::shared_ptr<const Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo->getStateDimension()),
-    numObsPerDim_(config->get<std::size_t>("Contexts/" + name + "/numObstaclesPerDim")),
-    obsWidth_(config->get<double>("Contexts/" + name + "/obstacleWidth")),
+    numObsPerDim_(config->get<std::size_t>("context/" + name + "/numObstaclesPerDim")),
+    obsWidth_(config->get<double>("context/" + name + "/obstacleWidth")),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
   if (startPosition.size() != dimensionality_) {
@@ -92,7 +92,7 @@ RepeatingRectangles::RepeatingRectangles(
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();

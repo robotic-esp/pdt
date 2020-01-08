@@ -1,0 +1,16 @@
+{
+    "context": {
+        "defaultFourRooms": {
+            "type": "FourRooms",
+            "objective": "defaultPathLength",
+            "start": [0.25, -0.25],
+            "goal": [0.25, 0.25],
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : 1,
+            "collisionCheckResolution": 0.001,
+            "wallThickness": 0.1,
+            "gapWidth": 0.1
+        }
+    }
+}

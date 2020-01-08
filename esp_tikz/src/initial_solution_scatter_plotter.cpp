@@ -65,10 +65,10 @@ std::shared_ptr<PgfAxis> InitialSolutionScatterPlotter::createInitialSolutionSca
   auto axis = std::make_shared<PgfAxis>();
   setInitialSolutionScatterAxisOptions(axis);
 
-  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
+  for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     auto plot = createInitialSolutionScatterPlot(name);
-    plot->options.fillOpacity = config_->get<double>("InitialSolutionScatterPlots/combinedFillOpacity");
-    plot->options.lineWidth = config_->get<double>("InitialSolutionScatterPlots/lineWidth");
+    plot->options.fillOpacity = config_->get<double>("initialSolutionScatterPlots/combinedFillOpacity");
+    plot->options.lineWidth = config_->get<double>("initialSolutionScatterPlots/lineWidth");
     axis->addPlot(plot);
   }
 
@@ -90,7 +90,7 @@ fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture() co
   picture.addAxis(createInitialSolutionScatterAxis());
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/all_planners_initial_solution_pdf_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -103,7 +103,7 @@ fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture(
   picture.addAxis(createInitialSolutionScatterAxis(plannerName));
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/"s + plannerName + "_initial_solution_pdf_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;
@@ -120,27 +120,27 @@ std::shared_ptr<PgfPlot> InitialSolutionScatterPlotter::createInitialSolutionSca
 
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(table);
-  plot->options.markSize = config_->get<double>("InitialSolutionScatterPlots/markSize");
+  plot->options.markSize = config_->get<double>("initialSolutionScatterPlots/markSize");
   plot->options.mark = "x";
   plot->options.lineWidth = 0.1;
   plot->options.constPlot = false;
   plot->options.onlyMarks = true;
   plot->options.namePath = plannerName + "InitialSolutionScatterPlotlineWidth"s;
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
 
   return plot;
 }
 
 void InitialSolutionScatterPlotter::setInitialSolutionScatterAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
-  axis->options.height = config_->get<std::string>("InitialSolutionScatterPlots/axisHeight");
-  axis->options.width = config_->get<std::string>("InitialSolutionScatterPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("initialSolutionScatterPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("initialSolutionScatterPlots/axisWidth");
   axis->options.name = "InitialSolutionScatterAxis"s;
-  axis->options.xlog = config_->get<bool>("InitialSolutionScatterPlots/xlog");
-  axis->options.xminorgrids = config_->get<bool>("InitialSolutionScatterPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("InitialSolutionScatterPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("InitialSolutionScatterPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("InitialSolutionScatterPlots/ymajorgrids");
+  axis->options.xlog = config_->get<bool>("initialSolutionScatterPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("initialSolutionScatterPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("initialSolutionScatterPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("initialSolutionScatterPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("initialSolutionScatterPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]";
   axis->options.ylabel = "Cost";
   axis->options.ylabelAbsolute = true;

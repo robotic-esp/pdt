@@ -44,6 +44,8 @@
 
 #include <experimental/filesystem>
 
+#include <ompl/base/PlannerTerminationCondition.h>
+#include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/util/Console.h>
 
 #include "esp_configuration/configuration.h"
@@ -70,7 +72,7 @@ int main(int argc, char **argv) {
 
   // Create the context for this experiment.
   esp::ompltools::ContextFactory contextFactory(config);
-  auto context = contextFactory.create(config->get<std::string>("Experiment/context"));
+  auto context = contextFactory.create(config->get<std::string>("experiment/context"));
 
   // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
@@ -81,7 +83,7 @@ int main(int argc, char **argv) {
       << config->get<std::string>("Experiment/context") << " with " << ompl::RNG::getSeed()
       << " as the seed and a maximum runtime of " << context->getMaxSolveDuration().count()
       << " seconds per planner.\n"
-      << "The experiment should be done by "
+      << "This benchmark should be done by "
       << esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
              std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
              config->get<std::size_t>("Experiment/numRuns") *
@@ -91,7 +93,7 @@ int main(int argc, char **argv) {
 
   // Setup the results table.
   std::cout << '\n';
-  for (const auto &plannerName : config->get<std::vector<std::string>>("Experiment/planners")) {
+  for (const auto &plannerName : config->get<std::vector<std::string>>("experiment/planners")) {
     std::cout << std::setw(7) << std::setfill(' ') << ' ' << std::setw(21) << std::setfill(' ')
               << std::left << std::string(plannerName);
   }
@@ -99,10 +101,10 @@ int main(int argc, char **argv) {
 
   // Create a name for this experiment.
   std::string experimentName = experimentStartTimeString + '_' + context->getName();
-  config->add<std::string>("Experiment/name", experimentName);
+  config->add<std::string>("experiment/name", experimentName);
 
   // Create the directory for the results of this experiment to live in.
-  fs::path experimentDirectory(config->get<std::string>("Experiment/executable") + "s/"s +
+  fs::path experimentDirectory(config->get<std::string>("experiment/executable") + "s/"s +
                                experimentName);
 
   // Create the performance log.
@@ -110,19 +112,22 @@ int main(int argc, char **argv) {
                                                                     "results.csv"s);
 
   // May the best planner win.
-  for (std::size_t i = 0; i < config->get<std::size_t>("Experiment/numRuns"); ++i) {
+  for (std::size_t i = 0; i < config->get<std::size_t>("experiment/numRuns"); ++i) {
     std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << " | ";
-    for (const auto &plannerName : config->get<std::vector<std::string>>("Experiment/planners")) {
+    for (const auto &plannerName : config->get<std::vector<std::string>>("experiment/planners")) {
       // Create the logger for this run.
       esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
-                                            config->get<std::size_t>("Experiment/logFrequency"));
+                                            config->get<std::size_t>("experiment/logFrequency"));
 
-      // The following results in more consistent measurements. I don't understand how. It seems to
-      // be connected to creating a separate thread.
+      // The following results in more consistent measurements. I don't fully understand why, but it
+      // seems to be connected to creating a separate thread.
       {
-        auto [reconciler, reconcilerType] = plannerFactory.create("RRTConnect");
-        (void)reconcilerType;
-        auto hotpath = std::async(std::launch::async, [&reconciler]() { reconciler->solve(0.0); });
+        auto reconciler =
+            std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
+        reconciler->setProblemDefinition(context->instantiateNewProblemDefinition());
+        auto hotpath = std::async(std::launch::async, [&reconciler]() {
+          reconciler->solve(ompl::base::timedPlannerTerminationCondition(0.0));
+        });
         hotpath.get();
       }
 
@@ -138,7 +143,7 @@ int main(int argc, char **argv) {
       const auto maxSolveDuration =
           esp::ompltools::time::seconds(context->getMaxSolveDuration() - setupDuration);
       const std::chrono::microseconds idle(1000000u /
-                                           config->get<std::size_t>("Experiment/logFrequency"));
+                                           config->get<std::size_t>("experiment/logFrequency"));
 
       // Solve the problem on a separate thread.
       esp::ompltools::time::Clock::time_point addMeasurementStart;
@@ -197,7 +202,7 @@ int main(int argc, char **argv) {
 
   // Dump the accessed parameters next to the results file.
   auto configPath = experimentDirectory / "config.json"s;
-  config->add<std::string>("Experiment/results", results.getFilePath());
+  config->add<std::string>("experiment/results", results.getFilePath());
   config->dumpAccessed(fs::current_path().string() + '/' + configPath.string());
   OMPL_INFORM("Wrote configuration to '%s'", configPath.c_str());
 
@@ -209,7 +214,8 @@ int main(int argc, char **argv) {
             << fs::current_path() / logPath << "\n\n";
 
   // If we're automatically generating the report, now is the time to do so.
-  if (config->get<bool>("Experiment/report/automatic")) {
+  if (config->get<bool>("experiment/report/automatic")) {
+    std::cout << "Compiling report. This may take a couple of minutes.\n";
     // Generate the statistic.
     esp::ompltools::Statistics stats(config, true);
 

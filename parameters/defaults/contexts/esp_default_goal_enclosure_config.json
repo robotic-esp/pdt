@@ -1,0 +1,17 @@
+{
+    "context": {
+        "defaultGoalEnclosure": {
+            "type": "GoalEnclosure",
+            "objective": "defaultPathLength",
+            "start": [-0.2, 0.0],
+            "goal": [0.2, 0.0],
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : 1,
+            "collisionCheckResolution": 0.001,
+            "goalOutsideWidth": 0.25,
+            "goalInsideWidth": 0.2,
+            "goalGapWidth": 0.2
+        }
+    }
+}

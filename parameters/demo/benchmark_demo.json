@@ -1,37 +1,22 @@
 {
-    "Experiment": {
+    "experiment": {
         "executable": "benchmark",
         "planners": [
-            "RRTConnect",
-            "RRTstar",
-            "BITstar",
-            "ABITstar",
-            "AIBITstar"
+            "defaultRRTConnect",
+            "defaultRRTstar",
+            "defaultBITstar",
+            "defaultABITstar",
+            "defaultAIBITstar"
         ],
-        "context": "WallGap",
-        "numRuns": 500,
+        "context": "defaultWallGap",
+        "numRuns": 100,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true,
+        "loadDefaultObjectiveConfig": true,
         "report": {
             "automatic": true,
             "verboseCompilation": false
-        }
-    },
-    "Contexts": {
-        "WallGap": {
-            "objective": "PathLength",
-            "type": "WallGap",
-            "start": [-0.3, 0.0],
-            "goal": [0.3, 0.0],
-            "maxTime": 0.1,
-            "dimensions": 2,
-            "boundarySideLengths" : 1,
-            "collisionCheckResolution": 0.00001,
-            "wallWidth": 0.8,
-            "wallThickness": 0.3,
-            "gapOffset": 0.1,
-            "gapWidth": 0.02
         }
     }
 }

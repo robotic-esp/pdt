@@ -125,14 +125,14 @@ std::size_t PlannerResults::numMeasuredRuns() const {
 
 Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceComputation) :
     config_(config),
-    statisticsDirectory_(fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+    statisticsDirectory_(fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                          "statistics/"),
     forceComputation_(forceComputation) {
   // Create the statistics directory.
   fs::create_directories(statisticsDirectory_);
 
   // Get the results path.
-  fs::path resultsPath = config_->get<std::string>("Experiment/results");
+  fs::path resultsPath = config_->get<std::string>("experiment/results");
 
   // Open the results file.
   std::ifstream filestream(resultsPath.string());
@@ -300,11 +300,11 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
   }
 
   // Compute the default binning durations for the medians.
-  auto contextName = config_->get<std::string>("Experiment/context");
+  auto contextName = config_->get<std::string>("experiment/context");
   std::size_t numMeasurements =
-      std::ceil(config_->get<double>("Contexts/" + contextName + "/maxTime") *
-                config_->get<double>("Experiment/logFrequency"));
-  double medianBinSize = 1.0 / config_->get<double>("Experiment/logFrequency");
+      std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
+                config_->get<double>("experiment/logFrequency"));
+  double medianBinSize = 1.0 / config_->get<double>("experiment/logFrequency");
   defaultMedianBinDurations_.reserve(numMeasurements);
   for (std::size_t i = 0u; i < numMeasurements; ++i) {
     defaultMedianBinDurations_.emplace_back(static_cast<double>(i + 1u) * medianBinSize);
@@ -312,7 +312,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
 
   // Compute the default binning durations for the initial solution pdf.
   double initDurationNumBins =
-      config_->get<std::size_t>("Statistics/InitialSolutions/numDurationBins");
+      config_->get<std::size_t>("statistics/initialSolutions/numDurationBins");
   double minExp = std::log10(minInitialSolutionDuration_);
   double maxExp = std::log10(maxNonInfInitialSolutionDuration_);
   double binExpStep = (maxExp - minExp) / initDurationNumBins;
@@ -324,7 +324,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
 
 fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t confidence,
                                     const std::vector<double>& binDurations) const {
-  if (plannerName == "RRTConnect") {
+  if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "This method extracts median costs over time for anytime planners. '" + plannerName +
                "' is not an anytime planner."s;
     throw std::runtime_error(msg);
@@ -400,7 +400,7 @@ fs::path Statistics::extractMedians(const std::string& plannerName, std::size_t 
 fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
                                             std::set<double> percentiles,
                                             const std::vector<double>& binDurations) const {
-  if (plannerName == "RRTConnect") {
+  if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "This method extracts cost percentiles over time for anytime planners. '" +
                plannerName + "' is not an anytime planner."s;
     throw std::runtime_error(msg);
@@ -653,7 +653,7 @@ fs::path Statistics::extractInitialSolutions(const std::string& plannerName) con
 std::string Statistics::createHeader(const std::string& statisticType,
                                      const std::string& plannerName) const {
   std::stringstream stream;
-  stream << "# Experiment: " << config_->get<std::string>("Experiment/name") << '\n';
+  stream << "# Experiment: " << config_->get<std::string>("experiment/name") << '\n';
   stream << "# Planner: " << plannerName << '\n';
   stream << "# Statistic: " << statisticType << '\n';
   return stream.str();
@@ -661,6 +661,8 @@ std::string Statistics::createHeader(const std::string& statisticType,
 
 Statistics::ConfidenceInterval Statistics::getMedianConfidenceInterval(
     std::size_t confidence) const {
+  // The lower and upper bounds in the below are off-by-one, because they are used as zero-based
+  // indices. See comment in Statistics::ConfidenceInterval class.
   static const std::map<std::size_t, std::map<std::size_t, ConfidenceInterval>>
       medianConfidenceIntervals = {
           {10u, {{95u, {1u, 8u, 0.9511}}, {99u, {0u, 9u, 0.9910}}}},
@@ -801,6 +803,10 @@ double Statistics::getMedianInitialSolutionCost(const std::string& plannerName) 
 
 std::vector<double> Statistics::getDefaultBinDurations() const {
   return defaultMedianBinDurations_;
+}
+
+std::shared_ptr<Configuration> Statistics::getConfig() const {
+  return config_;
 }
 
 std::vector<double> Statistics::getMedianCosts(const PlannerResults& results,

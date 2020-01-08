@@ -1,0 +1,17 @@
+{
+    "context": {
+        "defaultMultiStartGoal": {
+            "type": "MultiStartGoal",
+            "objective": "defaultPathLength",
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : 1,
+            "numStarts": 1,
+            "numGoals": 3,
+            "collisionCheckResolution": 0.001,
+            "numObstacles": 50,
+            "maxSideLength": 0.2,
+            "minSideLength": 0.05
+        }
+    }
+}

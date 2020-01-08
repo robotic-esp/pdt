@@ -95,16 +95,48 @@ void Configuration::load(int argc, char **argv) {
       file >> patch;
       bool loadDefaultPlannerConfigs{true};
       bool loadDefaultContextConfigs{true};
-      if (patch.contains("Experiment")) {
-        if (patch["Experiment"].contains("loadDefaultPlannerConfig")) {
-          loadDefaultPlannerConfigs = patch["Experiment"]["loadDefaultPlannerConfig"].get<bool>();
+      bool loadDefaultObjectiveConfigs{true};
+      if (patch.contains("experiment")) {
+        if (patch["experiment"].contains("loadDefaultPlannerConfig")) {
+          loadDefaultPlannerConfigs = patch["experiment"]["loadDefaultPlannerConfig"].get<bool>();
         }
-        if (patch["Experiment"].contains("loadDefaultContextConfig")) {
-          loadDefaultContextConfigs = patch["Experiment"]["loadDefaultContextConfig"].get<bool>();
+        if (patch["experiment"].contains("loadDefaultContextConfig")) {
+          loadDefaultContextConfigs = patch["experiment"]["loadDefaultContextConfig"].get<bool>();
+        }
+        if (patch["experiment"].contains("loadDefaultObjectiveConfig")) {
+          loadDefaultObjectiveConfigs =
+              patch["experiment"]["loadDefaultObjectiveConfig"].get<bool>();
         }
       }
+
+      // Set the appropriate log level.
+      if (patch.count("Log") != 0) {
+        auto level = patch["Log"]["level"];
+        if (level == "dev2"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV2);
+        } else if (level == "dev1"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV1);
+        } else if (level == "debug"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEBUG);
+        } else if (level == "info"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
+        } else if (level == "warn"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+        } else if (level == "error"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_ERROR);
+        } else if (level == "none"s) {
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_NONE);
+        } else {
+          OMPL_WARN("Config specifies invalid OMPL log level. Setting the log level to LOG_WARN");
+          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+        }
+      } else {
+        ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+      }
+
       // Load the default config.
-      loadDefaultConfigs(loadDefaultContextConfigs, loadDefaultPlannerConfigs);
+      loadDefaultConfigs(loadDefaultContextConfigs, loadDefaultPlannerConfigs,
+                         loadDefaultObjectiveConfigs);
       // Merge the patch, possibly overriding default values.
       parameters_.merge_patch(patch);
       OMPL_INFORM("Loaded configuration patch from %s", patchConfig.c_str());
@@ -113,31 +145,6 @@ void Configuration::load(int argc, char **argv) {
       OMPL_ERROR("Cannot find provided configuration file at %s", patchConfig.c_str());
       throw std::ios_base::failure("Cannot find patch config file.");
     }
-  }
-
-  // Set the appropriate log level.
-  if (parameters_.count("Log") != 0) {
-    auto level = parameters_["Log"]["level"];
-    if (level == "dev2"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV2);
-    } else if (level == "dev1"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV1);
-    } else if (level == "debug"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEBUG);
-    } else if (level == "info"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
-    } else if (level == "warn"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
-    } else if (level == "error"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_ERROR);
-    } else if (level == "none"s) {
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_NONE);
-    } else {
-      OMPL_WARN("Config specifies invalid log level. Setting the log level to LOG_WARN");
-      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
-    }
-  } else {
-    ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
   }
 }
 
@@ -238,47 +245,294 @@ void Configuration::dumpAccessed(const std::string &filename) const {
 }
 
 void Configuration::loadDefaultConfigs(bool loadDefaultContextConfigs,
-                                       bool loadDefaultPlannerConfigs) {
-  fs::path defaultConfigDirectory(Directory::SOURCE / "parameters/defaults/");
-  if (fs::exists(defaultConfigDirectory)) {
-    // Load all files in this directory as patches.
-    for (auto &directoryEntry : fs::directory_iterator(defaultConfigDirectory)) {
-      if (!fs::exists(directoryEntry.path())) {
-        OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
-                  defaultConfigDirectory.c_str(), directoryEntry.path().c_str());
-        continue;
-      }
-      std::ifstream configFile(directoryEntry.path().string());
-      if (configFile.fail()) {
-        OMPL_ERROR("File '%s' exists but cannot be opened.",
-                   directoryEntry.path().string().c_str());
-        throw std::ios_base::failure("Configuration error.");
-      }
-      json::json config;
-      configFile >> config;
-      // Skip the context and planner configs if desired.
-      if ((config.contains("Contexts") && !loadDefaultContextConfigs) ||
-          (config.contains("Planners") && !loadDefaultPlannerConfigs)) {
-        OMPL_INFORM("Skipped configuration from '%s'.", directoryEntry.path().c_str());
-        continue;
-      }
+                                       bool loadDefaultPlannerConfigs,
+                                       bool loadDefaultObjectiveConfigs) {
+  // Load the default planner configs.
+  if (loadDefaultPlannerConfigs) {
+    fs::path defaultPlannerConfigDirectory(Directory::SOURCE / "parameters/defaults/planners/");
+    if (fs::exists(defaultPlannerConfigDirectory)) {
+      // Load all files in this directory as patches.
+      for (auto &directoryEntry : fs::directory_iterator(defaultPlannerConfigDirectory)) {
+        // Make sure the file exists.
+        if (!fs::exists(directoryEntry.path())) {
+          OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
+                    defaultPlannerConfigDirectory.c_str(), directoryEntry.path().c_str());
+          continue;
+        }
 
-      // Check that the default configs don't specify the same parameter twice.
-      for (const auto &entry : config.items()) {
-        if (parameters_.contains(entry.key())) {
-          OMPL_ERROR("The parameter '%s' is defined multiple times in the default configs",
-                     entry.key().c_str());
-          throw std::ios_base::failure("Configuration failure.");
+        // Make sure the file can be opened.
+        std::ifstream configFile(directoryEntry.path().string());
+        if (configFile.fail()) {
+          OMPL_ERROR("File '%s' exists but cannot be opened.",
+                     directoryEntry.path().string().c_str());
+          throw std::ios_base::failure("Configuration error.");
+        }
+
+        // Load the file into a temporary config.
+        json::json config;
+        configFile >> config;
+
+        // Make sure the config is a sane planner configuration.
+        if (!config.contains("planner")) {
+          throw std::invalid_argument("Default planner configuration at '"s +
+                                      directoryEntry.path().string() +
+                                      "' is not a valid planner configuration. Valid planner "
+                                      "configurations must be encapsulated in a 'planner' key."s);
+        }
+
+        if (config.size() > 1) {
+          throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
+                                      "' must only contain one planner configuration."s);
+        }
+        if (!config.front().front().contains("type")) {
+          throw std::invalid_argument(directoryEntry.path().string() +
+                                      ": Planner configurations must specify the type of a planner "
+                                      "in a field named \"type\"."s);
+        }
+        if (!config.front().front().contains("isAnytime")) {
+          throw std::invalid_argument(directoryEntry.path().string() +
+                                      ": Planner configurations must specify whether a planner is "
+                                      "anytime in a field named \"isAnytime\"."s);
+        }
+        if (!config.front().front().contains("report")) {
+          throw std::invalid_argument(
+              directoryEntry.path().string() +
+              ": Planner configurations must specify the color and name to be used in the report in a field named \"report\"."s);
+        }
+        if (!config.front().front()["report"].contains("color")) {
+          throw std::invalid_argument(
+              directoryEntry.path().string() +
+              ": Planner configurations must specify the color to be used in the report in a field "
+              "named \"color\" under the \"report\" field."s);
+        }
+        if (!config.front().front()["report"].contains("name")) {
+          throw std::invalid_argument(
+              directoryEntry.path().string() +
+              ": Planner configurations must specify the name to be used in the report in a field named \"name\" under the \"report\" field."s);
+        }
+
+        // Check that the default configs don't specify the same parameter twice.
+        for (const auto &entry : config.front().items()) {
+          if (parameters_["planner"].contains(entry.key())) {
+            throw std::invalid_argument(directoryEntry.path().string() +
+                                        ": Overwrites existing config for planner '"s +
+                                        entry.key().c_str() + "'."s);
+          }
+        }
+        parameters_.merge_patch(config);
+        OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
+        // No need to close config, std::ifstreams are closed on destruction.
+      }
+    } else {
+      // Cannot find default planner config at default location.
+      auto msg = "Default planner config directory does not exist at '"s +
+                 defaultPlannerConfigDirectory.string() + "'."s;
+      throw std::ios_base::failure(msg.c_str());
+    }
+    OMPL_INFORM("Loaded default planner configs.");
+  } else {
+    OMPL_INFORM("Not loading default planner configs.");
+  }
+
+  // Load the default context configs.
+  if (loadDefaultContextConfigs) {
+    fs::path defaultContextConfigDirectory(Directory::SOURCE / "parameters/defaults/contexts/");
+    if (fs::exists(defaultContextConfigDirectory)) {
+      // Load all files in this directory as patches.
+      for (auto &directoryEntry : fs::directory_iterator(defaultContextConfigDirectory)) {
+        // Make sure the file exists.
+        if (!fs::exists(directoryEntry.path())) {
+          OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
+                    defaultContextConfigDirectory.c_str(), directoryEntry.path().c_str());
+          continue;
+        }
+
+        // Make sure the file can be opened.
+        std::ifstream configFile(directoryEntry.path().string());
+        if (configFile.fail()) {
+          OMPL_ERROR("File '%s' exists but cannot be opened.",
+                     directoryEntry.path().string().c_str());
+          throw std::ios_base::failure("Configuration error.");
+        }
+
+        // Load the file into a temporary config.
+        json::json config;
+        configFile >> config;
+
+        // Make sure the config is a sane planner configuration.
+        if (!config.contains("context")) {
+          throw std::invalid_argument("Default context configuration at '"s +
+                                      directoryEntry.path().string() +
+                                      "' is not a valid context configuration. Valid context "
+                                      "configurations must be encapsulated in a 'context' key."s);
+        }
+        if (config.size() > 1) {
+          throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
+                                      "' must only contain one context configuration."s);
+        }
+        if (!config.front().front().contains("type")) {
+          throw std::invalid_argument(
+              directoryEntry.path().string() +
+              ": Context configurations must specify the type of the context in a field named "
+              "\"type\".");
+        }
+        if (!config.front().front().contains("objective")) {
+          throw std::invalid_argument(directoryEntry.path().string() +
+                                      ": Context configurations must specify the optimization "
+                                      "objective of the context in a "
+                                      "field named \"objective\".");
+        }
+        if (!config.front().front().contains("dimensions")) {
+          throw std::invalid_argument(
+              directoryEntry.path().string() +
+              ": Context configurations must specify the dimensions of the context in a "
+              "field named \"dimensions\".");
+        }
+        if (!config.front().front().contains("collisionCheckResolution")) {
+          throw std::invalid_argument(
+              directoryEntry.path().string() +
+              ": Context configurations must specify the collision check resolution of the context "
+              "in a field named \"collisionCheckResolution\".");
+        }
+
+        // Check that the default configs don't specify the same parameter twice.
+        for (const auto &entry : config.front().items()) {
+          if (parameters_["context"].contains(entry.key())) {
+            throw std::invalid_argument(directoryEntry.path().string() +
+                                        ": Overwrites existing config for context '"s +
+                                        entry.key().c_str() + "'."s);
+          }
+        }
+        parameters_.merge_patch(config);
+        OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
+        // No need to close config, std::ifstreams are closed on destruction.
+      }
+    } else {
+      // Cannot find default context config at default location.
+      auto msg = "Default context config directory does not exist at '"s +
+                 defaultContextConfigDirectory.string() + "'."s;
+      throw std::ios_base::failure(msg.c_str());
+    }
+    OMPL_INFORM("Loaded default context configs.");
+  } else {
+    OMPL_INFORM("Not loading default context configs.");
+  }
+
+  // Load the default objective configs.
+  if (loadDefaultObjectiveConfigs) {
+    fs::path defaultObjectiveConfigDirectory(Directory::SOURCE / "parameters/defaults/objectives/");
+    if (fs::exists(defaultObjectiveConfigDirectory)) {
+      // Load all files in this directory as patches.
+      for (auto &directoryEntry : fs::directory_iterator(defaultObjectiveConfigDirectory)) {
+        // Make sure the file exists.
+        if (!fs::exists(directoryEntry.path())) {
+          OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
+                    defaultObjectiveConfigDirectory.c_str(), directoryEntry.path().c_str());
+          continue;
+        }
+
+        // Make sure the file can be opened.
+        std::ifstream configFile(directoryEntry.path().string());
+        if (configFile.fail()) {
+          OMPL_ERROR("File '%s' exists but cannot be opened.",
+                     directoryEntry.path().string().c_str());
+          throw std::ios_base::failure("Configuration error.");
+        }
+
+        // Load the file into a temporary config.
+        json::json config;
+        configFile >> config;
+
+        // Make sure the config is a sane planner configuration.
+        if (!config.contains("objective")) {
+          throw std::invalid_argument("Default objective configuration at '"s +
+                                      directoryEntry.path().string() +
+                                      "' is not a valid objective configuration. Valid objective "
+                                      "configurations must be encapsulated in a 'objective' key."s);
+        }
+        if (config.size() > 1) {
+          throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
+                                      "' must only contain one objective configuration."s);
+        }
+        if (!config.front().front().contains("type")) {
+          throw std::invalid_argument(
+              directoryEntry.path().string() +
+              ": Objective configurations must specify the type of the context in a field named "
+              "\"type\".");
+        }
+
+        // Check that the default configs don't specify the same parameter twice.
+        for (const auto &entry : config.front().items()) {
+          if (parameters_["objective"].contains(entry.key())) {
+            throw std::invalid_argument(directoryEntry.path().string() +
+                                        ": Overwrites existing config for objective '"s +
+                                        entry.key().c_str() + "'."s);
+          }
+        }
+        parameters_.merge_patch(config);
+        OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
+        // No need to close config, std::ifstreams are closed on destruction.
+      }
+    } else {
+      // Cannot find default objective config at default location.
+      auto msg = "Default objective config directory does not exist at '"s +
+                 defaultObjectiveConfigDirectory.string() + "'."s;
+      throw std::ios_base::failure(msg.c_str());
+    }
+    OMPL_INFORM("Loaded default objective configs.");
+  } else {
+    OMPL_INFORM("Not loading default objective configs.");
+  }
+}
+
+void Configuration::loadReportConfig(const std::experimental::filesystem::path &path) {
+  if (fs::exists(path)) {
+    // Make sure the file can be opened.
+    std::ifstream configFile(path.string());
+    if (configFile.fail()) {
+      OMPL_ERROR("File '%s' exists but cannot be opened.", path.string().c_str());
+      throw std::ios_base::failure("Configuration error.");
+    }
+
+    // Load the file into a temporary config.
+    json::json config;
+    configFile >> config;
+
+    // Make sure the config is a sane report configuration.
+    const std::vector<std::string> necessaryKeys = {"colors",
+                                                    "successPlots",
+                                                    "medianCostPlots",
+                                                    "medianInitialSolutionPlots",
+                                                    "initialSolutionScatterPlots",
+                                                    "initialSolutionPlots",
+                                                    "costPercentileEvolutionPlots",
+                                                    "statistics"};
+    const std::vector<std::string> necessarySubkeys = {"axisWidth",   "axisHeight",  "xminorgrids",
+                                                       "xmajorgrids", "yminorgrids", "ymajorgrids",
+                                                       "xlog",        "markSize"};
+    for (const auto &key : necessaryKeys) {
+      if (!config.contains(key)) {
+        throw std::invalid_argument(
+            "Report configuration at '"s + path.string() +
+            "' is not a valid report configuration. Valid report configurations must contain a '"s +
+            key + "' key."s);
+      } else if (key != "colors"s && key != "statistics"s) {
+        for (const auto &subKey : necessarySubkeys) {
+          if (!config[key].contains(subKey)) {
+            throw std::invalid_argument(
+                "Report configuration at '"s + path.string() +
+                "' is not a valid report configuration. Valid report configurations must contain a '"s +
+                key + "' key with a '" + subKey + "' subkey."s);
+          }
         }
       }
-      parameters_.merge_patch(config);
-      OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
-      // No need to close config, std::ifstreams are closed on destruction.
     }
+
+    parameters_.merge_patch(config);
+    OMPL_INFORM("Loaded configuration from '%s'", path.c_str());
+    // No need to close config, std::ifstreams are closed on destruction.
   } else {
-    // Cannot find default config at default location.
-    OMPL_ERROR("Default config directory does not exist at '%s'.", defaultConfigDirectory.c_str());
-    throw std::ios_base::failure("Configuration failure.");
+    throw std::invalid_argument("Could not load report config from '"s + path.string() + "'."s);
   }
 }
 
@@ -308,11 +562,11 @@ void Configuration::registerAsExperiment() {
   }
 
   // Make sure we're executing the right executable.
-  if (parameters_.contains("Experiment")) {
+  if (parameters_.contains("experiment")) {
     // Check we're on the same commit.
-    if (parameters_["Experiment"].contains("version")) {
-      if (parameters_["Experiment"]["version"].contains("commit")) {
-        auto commitHash = parameters_["Experiment"]["version"]["commit"].get<std::string>();
+    if (parameters_["experiment"].contains("version")) {
+      if (parameters_["experiment"]["version"].contains("commit")) {
+        auto commitHash = parameters_["experiment"]["version"]["commit"].get<std::string>();
         if (commitHash != "any"s) {
           if (commitHash != Version::GIT_SHA1) {
             OMPL_ERROR("Config specifies commit %s. You are currently on %s.", commitHash.c_str(),
@@ -323,8 +577,8 @@ void Configuration::registerAsExperiment() {
     }
 
     // Check this is the correct executable.
-    if (parameters_["Experiment"].contains("executable")) {
-      auto executable = parameters_["Experiment"]["executable"].get<std::string>();
+    if (parameters_["experiment"].contains("executable")) {
+      auto executable = parameters_["experiment"]["executable"].get<std::string>();
       if (executable != "any"s) {
         if (executable != executable_) {
           OMPL_ERROR("Config specifies executable '%s'. You are executing '%s'.",
@@ -334,51 +588,58 @@ void Configuration::registerAsExperiment() {
 
       // Handle executable specific configuration.
       if (executable == "benchmark"s) {
-        if (parameters_["Experiment"].contains("report")) {
-          if (!parameters_["Experiment"]["report"].contains("automatic")) {
-            parameters_["Experiment"]["report"]["automatic"] = false;
-            parameters_["Experiment"]["report"]["verboseCompilation"] = false;
+        if (parameters_["experiment"].contains("report")) {
+          if (!parameters_["experiment"]["report"].contains("automatic")) {
+            parameters_["experiment"]["report"]["automatic"] = false;
+            parameters_["experiment"]["report"]["verboseCompilation"] = false;
           }
         } else {
-          parameters_["Experiment"]["report"]["automatic"] = false;
-          parameters_["Experiment"]["report"]["verboseCompilation"] = false;
+          parameters_["experiment"]["report"]["automatic"] = false;
+          parameters_["experiment"]["report"]["verboseCompilation"] = false;
         }
-        accessedParameters_["Experiment"]["report"]["automatic"] =
-            parameters_["Experiment"]["report"]["automatic"];
-        accessedParameters_["Experiment"]["report"]["verboseCompilation"] =
-            parameters_["Experiment"]["report"]["verboseCompilation"];
+        accessedParameters_["experiment"]["report"]["automatic"] =
+            parameters_["experiment"]["report"]["automatic"];
+        accessedParameters_["experiment"]["report"]["verboseCompilation"] =
+            parameters_["experiment"]["report"]["verboseCompilation"];
+      }
+      if (parameters_["experiment"]["report"].contains("config")) {
+        OMPL_INFORM("Loading custom report config.");
+        loadReportConfig(parameters_["experiment"]["report"]["config"].get<std::string>());
+      } else {
+        OMPL_INFORM("Loading default report config.");
+        loadReportConfig(Directory::SOURCE / "parameters/defaults/esp_default_report_config.json");
       }
     }
   }
 
   // Store the executable name.
-  accessedParameters_["Experiment"]["executable"] = executable_;
+  accessedParameters_["experiment"]["executable"] = executable_;
 
   // Store the current version.
-  accessedParameters_["Experiment"]["version"]["commit"] = Version::GIT_SHA1;
-  accessedParameters_["Experiment"]["version"]["branch"] = Version::GIT_REFSPEC;
-  accessedParameters_["Experiment"]["version"]["status"] = Version::GIT_STATUS;
+  accessedParameters_["experiment"]["version"]["commit"] = Version::GIT_SHA1;
+  accessedParameters_["experiment"]["version"]["branch"] = Version::GIT_REFSPEC;
+  accessedParameters_["experiment"]["version"]["status"] = Version::GIT_STATUS;
 
   // This ensures we don't load any additional context or planner config when rerunning this
   // experiment.
-  accessedParameters_["Experiment"]["loadDefaultContextConfig"] = false;
-  accessedParameters_["Experiment"]["loadDefaultPlannerConfig"] = false;
+  accessedParameters_["experiment"]["loadDefaultContextConfig"] = false;
+  accessedParameters_["experiment"]["loadDefaultPlannerConfig"] = false;
 
   // Handle seed specifications.
   handleSeedSpecification();
 }
 
 void Configuration::handleSeedSpecification() {
-  if (parameters_["Experiment"].contains("seed")) {
-    auto seed = parameters_["Experiment"]["seed"].get<unsigned long>();
+  if (parameters_["experiment"].contains("seed")) {
+    auto seed = parameters_["experiment"]["seed"].get<unsigned long>();
     ompl::RNG::setSeed(seed);
     OMPL_WARN("Configuration set seed to be %lu", seed);
-    accessedParameters_["Experiment"]["seed"] = seed;
+    accessedParameters_["experiment"]["seed"] = seed;
   } else {
     auto seed = ompl::RNG::getSeed();
     OMPL_INFORM("Seed is %lu", seed);
-    parameters_["Experiment"]["seed"] = seed;
-    accessedParameters_["Experiment"]["seed"] = seed;
+    parameters_["experiment"]["seed"] = seed;
+    accessedParameters_["experiment"]["seed"] = seed;
   }
 }
 

@@ -55,11 +55,11 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
     const std::shared_ptr<const Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo_->getStateDimension()),
-    numRectangles_(config->get<std::size_t>("Contexts/" + name + "/numObstacles")),
-    minSideLength_(config->get<double>("Contexts/" + name + "/minSideLength")),
-    maxSideLength_(config->get<double>("Contexts/" + name + "/maxSideLength")),
-    numStarts_(config->get<std::size_t>("Contexts/" + name + "/numStarts")),
-    numGoals_(config->get<std::size_t>("Contexts/" + name + "/numGoals")) {
+    numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
+    minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
+    maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
+    numStarts_(config->get<std::size_t>("context/" + name + "/numStarts")),
+    numGoals_(config->get<std::size_t>("context/" + name + "/numGoals")) {
   // Assert configuration sanity.
   if (numStarts_ == 0u) {
     OMPL_ERROR("%s: Must at least have one start.", name.c_str());
@@ -97,7 +97,7 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();

@@ -1,5 +1,5 @@
 {
-    "Colors": {
+    "colors": {
         "espblack": [ 0, 0, 0 ],
         "espwhite": [ 255, 255, 255 ],
         "espgray": [ 120, 120, 120 ],
@@ -17,31 +17,7 @@
         "esplightpurple": [ 197, 137, 232 ],
         "espdarkpurple": [ 50, 14, 59 ]
     },
-    "PlannerPlotColors": {
-        "ABITstar": "esplightblue",
-        "AIBITstar": "espgreen",
-        "BITstar": "espblue",
-        "BITstarRegression": "esplightblue",
-        "InformedRRTstar": "esppurple",
-        "TBD* Light": "esplightblue",
-        "LBTRRT" : "esppurple",
-        "RRTConnect": "espblack",
-        "RRTsharp": "espyellow",
-        "RRTstar": "espred"
-    },
-    "PlotPlannerNames": {
-        "ABITstar": "ABIT*",
-        "AIBITstar": "AI-BIT*",
-        "BITstar": "BIT*",
-        "BITstarRegression": "BIT* Reg",
-        "InformedRRTstar": "Informed RRT*",
-        "TBD* Light": "TBD* Light",
-        "LBTRRT": "LBT-RRT",
-        "RRTConnect": "RRT-Connect",
-        "RRTsharp": "RRT$^{\\#}$",
-        "RRTstar": "RRT*"
-    },
-    "SuccessPlots": {
+    "successPlots": {
         "xlog": true,
         "markSize": 0.0,
         "lineWidth": 1.5,
@@ -53,12 +29,12 @@
         "ymajorgrids": true,
         "ytick": "0,25,50,75,100"
     },
-    "MedianCostPlots": {
+    "medianCostPlots": {
         "xlog": true,
         "markSize": 0.5,
         "lineWidth": 1.5,
         "confidence": 99,
-        "plotConfidenceIntervalInAllPlots": false,
+        "plotConfidenceIntervalInAllPlots": true,
         "confidenceIntervalLineWidth": 0.5,
         "confidenceIntervalDrawOpacity": 0.2,
         "confidenceIntervalFillOpacity": 0.1,
@@ -69,7 +45,7 @@
         "yminorgrids": false,
         "ymajorgrids": true
     },
-    "MedianInitialSolutionPlots": {
+    "medianInitialSolutionPlots": {
         "xlog": true,
         "markSize": 0.5,
         "lineWidth": 0.5,
@@ -81,7 +57,7 @@
         "yminorgrids": false,
         "ymajorgrids": true
     },
-    "InitialSolutionScatterPlots": {
+    "initialSolutionScatterPlots": {
         "xlog": true,
         "markSize": 2.0,
         "axisWidth": "\\textwidth",
@@ -91,7 +67,7 @@
         "yminorgrids": false,
         "ymajorgrids": true
     },
-    "InitialSolutionPlots": {
+    "initialSolutionPlots": {
         "xlog": true,
         "markSize": 0.0,
         "lineWidth": 1.0,
@@ -103,7 +79,7 @@
         "yminorgrids": false,
         "ymajorgrids": true
     },
-    "CostPercentileEvolutionPlots": {
+    "costPercentileEvolutionPlots": {
         "xlog": true,
         "markSize": 0.0,
         "lineWidth": 1.0,
@@ -115,11 +91,8 @@
         "yminorgrids": false,
         "ymajorgrids": true
     },
-    "Statistics": {
-        "Medians": {
-            "binFrequency": "logFrequency"
-        },
-        "InitialSolutions": {
+    "statistics": {
+        "initialSolutions": {
             "numDurationBins": 100
         }
     }

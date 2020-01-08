@@ -53,11 +53,11 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
                          const std::string& name) :
     spaceInfo_(spaceInfo),
     name_(name),
-    maxSolveDuration_(time::seconds(config->get<double>("Contexts/" + name + "/maxTime"))),
+    maxSolveDuration_(time::seconds(config->get<double>("context/" + name + "/maxTime"))),
     config_(config) {
   // Get the optimization objective.
   switch (config_->get<OBJECTIVE_TYPE>(
-      "Objectives/" + config_->get<std::string>("Contexts/" + name_ + "/objective") + "/type")) {
+      "objective/" + config_->get<std::string>("context/" + name_ + "/objective") + "/type")) {
     case OBJECTIVE_TYPE::COSTMAP: {
       throw std::runtime_error("CostMap objective is not yet implemented.");
       break;

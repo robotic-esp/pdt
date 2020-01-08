@@ -54,10 +54,10 @@ MedianCostEvolutionPlotter::MedianCostEvolutionPlotter(
     LatexPlotter(config),
     stats_(stats) {
   // Compute the duration bin size.
-  auto contextName = config_->get<std::string>("Experiment/context");
-  std::size_t numBins = std::ceil(config_->get<double>("Contexts/" + contextName + "/maxTime") *
-                                  config_->get<double>("Experiment/logFrequency"));
-  double binSize = 1.0 / config_->get<double>("Experiment/logFrequency");
+  auto contextName = config_->get<std::string>("experiment/context");
+  std::size_t numBins = std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
+                                  config_->get<double>("experiment/logFrequency"));
+  double binSize = 1.0 / config_->get<double>("experiment/logFrequency");
   binnedDurations_.reserve(numBins);
   for (std::size_t i = 0u; i < numBins; ++i) {
     binnedDurations_.emplace_back(static_cast<double>(i + 1u) * binSize);
@@ -98,10 +98,10 @@ std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAx
   setMedianCostAxisOptions(axis);
 
   // Fill the axis with the median cost plots of all planners.
-  for (const auto& name : config_->get<std::vector<std::string>>("Experiment/planners")) {
-    if (name != "RRTConnect"s) {
+  for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
+    if (config_->get<bool>("planner/"s + name + "/isAnytime"s)) {
       // First the lower and upper confidence bounds, if desired.
-      if (config_->get<bool>("MedianCostPlots/plotConfidenceIntervalInAllPlots")) {
+      if (config_->get<bool>("medianCostPlots/plotConfidenceIntervalInAllPlots")) {
         axis->addPlot(createMedianCostEvolutionUpperCIPlot(name));
         axis->addPlot(createMedianCostEvolutionLowerCIPlot(name));
         axis->addPlot(createMedianCostEvolutionFillCIPlot(name));
@@ -138,7 +138,7 @@ fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture() const {
   picture.addAxis(axis);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/all_planners_median_cost_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -152,22 +152,22 @@ fs::path MedianCostEvolutionPlotter::createMedianCostEvolutionPicture(
   picture.addAxis(axis);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/"s + plannerName + "_median_cost_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;
 }
 
 void MedianCostEvolutionPlotter::setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const {
-  axis->options.width = config_->get<std::string>("MedianCostPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("MedianCostPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("medianCostPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("medianCostPlots/axisHeight");
   axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
-  axis->options.xlog = config_->get<bool>("MedianCostPlots/xlog");
-  axis->options.xminorgrids = config_->get<bool>("MedianCostPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("MedianCostPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("MedianCostPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("MedianCostPlots/ymajorgrids");
+  axis->options.xlog = config_->get<bool>("medianCostPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("medianCostPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("medianCostPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("medianCostPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("medianCostPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]"s;
   axis->options.ylabel = "Cost"s;
   axis->options.ylabelAbsolute = true;
@@ -177,7 +177,7 @@ void MedianCostEvolutionPlotter::setMedianCostAxisOptions(std::shared_ptr<PgfAxi
 std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionPlot(
     const std::string& plannerName) const {
   // This cannot be applied to planners that aren't anytime.
-  if (plannerName == "RRTConnect"s) {
+  if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg =
         "Cannot create median cost evolution plot of nonanytime planner '"s + plannerName + "'."s;
     throw std::invalid_argument(msg);
@@ -190,8 +190,8 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionPl
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("MedianCostPlots/lineWidth");
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.lineWidth = config_->get<double>("medianCostPlots/lineWidth");
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolution"s;
 
   return plot;
@@ -200,7 +200,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionPl
 std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUpperCIPlot(
     const std::string& plannerName) const {
   // This cannot be applied to planners that aren't anytime.
-  if (plannerName == "RRTConnect"s) {
+  if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "Cannot create median cost upper CI evolution plot of nonanytime planner '"s +
                plannerName + "'."s;
     throw std::invalid_argument(msg);
@@ -216,11 +216,11 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUp
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("MedianCostPlots/confidenceIntervalLineWidth");
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.lineWidth = config_->get<double>("medianCostPlots/confidenceIntervalLineWidth");
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolutionUpperConfidence"s;
-  plot->options.drawOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity = config_->get<double>("medianCostPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity = config_->get<double>("medianCostPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -228,7 +228,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUp
 std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionLowerCIPlot(
     const std::string& plannerName) const {
   // This cannot be applied to planners that aren't anytime.
-  if (plannerName == "RRTConnect"s) {
+  if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "Cannot create median cost lower CI evolution plot of nonanytime planner '"s +
                plannerName + "'."s;
     throw std::invalid_argument(msg);
@@ -241,11 +241,11 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionLo
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("MedianCostPlots/confidenceIntervalLineWidth");
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.lineWidth = config_->get<double>("medianCostPlots/confidenceIntervalLineWidth");
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolutionLowerConfidence"s;
-  plot->options.drawOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity = config_->get<double>("medianCostPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity = config_->get<double>("medianCostPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -259,8 +259,8 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionFi
 
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(fillBetween);
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
-  plot->options.fillOpacity = config_->get<double>("MedianCostPlots/confidenceIntervalFillOpacity");
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
+  plot->options.fillOpacity = config_->get<double>("medianCostPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
 
   return plot;

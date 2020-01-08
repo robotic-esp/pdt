@@ -54,22 +54,22 @@ GoalEnclosure::GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>
                              const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo_->getStateDimension()),
-    goalOutsideWidth_(config->get<double>("Contexts/" + name + "/goalOutsideWidth")),
-    goalInsideWidth_(config->get<double>("Contexts/" + name + "/goalInsideWidth")),
-    goalGapWidth_(config->get<double>("Contexts/" + name + "/goalGapWidth")),
+    goalOutsideWidth_(config->get<double>("context/" + name + "/goalOutsideWidth")),
+    goalInsideWidth_(config->get<double>("context/" + name + "/goalInsideWidth")),
+    goalGapWidth_(config->get<double>("context/" + name + "/goalGapWidth")),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
-  if (config->get<std::vector<double>>("Contexts/" + name + "/start").size() != dimensionality_) {
+  if (config->get<std::vector<double>>("context/" + name + "/start").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (config->get<std::vector<double>>("Contexts/" + name + "/goal").size() != dimensionality_) {
+  if (config->get<std::vector<double>>("context/" + name + "/goal").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
@@ -97,7 +97,7 @@ GoalEnclosure::GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();
@@ -143,7 +143,7 @@ void GoalEnclosure::accept(const ContextVisitor& visitor) const {
 void GoalEnclosure::createObstacles() {
   ompl::base::ScopedState<> goalAnchor(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    goalAnchor[i] = config_->get<std::vector<double>>("Contexts/" + name_ + "/goal").at(i);
+    goalAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(i);
   }
   std::vector<double> goalWidths(dimensionality_, goalOutsideWidth_);
   obstacles_.emplace_back(
@@ -154,7 +154,7 @@ void GoalEnclosure::createAntiObstacles() {
   // Create the inside.
   ompl::base::ScopedState<> goalState(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    goalState[i] = config_->get<std::vector<double>>("Contexts/" + name_ + "/goal").at(i);
+    goalState[i] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(i);
   }
   std::vector<double> goalWidths(dimensionality_, goalInsideWidth_);
   antiObstacles_.emplace_back(
@@ -162,7 +162,7 @@ void GoalEnclosure::createAntiObstacles() {
 
   // Create the gap.
   ompl::base::ScopedState<> goalGapMidpoint(spaceInfo_);
-  goalGapMidpoint[0u] = config_->get<std::vector<double>>("Contexts/" + name_ + "/goal").at(0u) +
+  goalGapMidpoint[0u] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(0u) +
                         goalInsideWidth_ / 2.0 + (goalOutsideWidth_ - goalInsideWidth_) / 4.0;
   for (std::size_t i = 1u; i < dimensionality_; ++i) {
     goalGapMidpoint[i] = 0.0;

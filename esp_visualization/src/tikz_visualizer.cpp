@@ -62,16 +62,16 @@ TikzVisualizer::TikzVisualizer(
     throw std::runtime_error("Visualizer error.");
   }
   // Load colors from config.
-  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("Colors/espblack"));
-  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("Colors/espwhite"));
-  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("Colors/espgray"));
-  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("Colors/espblue"));
-  espColors_.emplace("espred", config_->get<std::array<int, 3>>("Colors/espred"));
-  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("Colors/espyellow"));
-  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("Colors/espgreen"));
-  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("Colors/esppurple"));
-  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("Colors/esplightblue"));
-  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("Colors/espdarkred"));
+  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("colors/espblack"));
+  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("colors/espwhite"));
+  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("colors/espgray"));
+  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("colors/espblue"));
+  espColors_.emplace("espred", config_->get<std::array<int, 3>>("colors/espred"));
+  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("colors/espyellow"));
+  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("colors/espgreen"));
+  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("colors/esppurple"));
+  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("colors/esplightblue"));
+  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("colors/espdarkred"));
 }
 
 void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::size_t iteration,
@@ -142,9 +142,9 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
 
   // Export to a file.
   std::stringstream texFilename;
-  texFilename << config_->get<std::string>("Experiment/context") << '_'
-              << config_->get<std::string>("Experiment/planner") << '_'
-              << std::to_string(config_->get<std::size_t>("Experiment/seed")) << "/tikzpictures/"
+  texFilename << config_->get<std::string>("experiment/context") << '_'
+              << config_->get<std::string>("experiment/planner") << '_'
+              << std::to_string(config_->get<std::size_t>("experiment/seed")) << "/tikzpictures/"
               << std::setfill('0') << std::setw(6) << iteration << ".tex";
   std::experimental::filesystem::path texPath(texFilename.str());
   picture_.write(texPath);
@@ -602,9 +602,9 @@ void TikzVisualizer::drawSolution(const ompl::base::PathPtr path) const {
 
 void TikzVisualizer::drawEllipse(double cost) const {
   // Get the context name.
-  auto contextName = config_->get<std::string>("Experiment/context");
-  auto start = config_->get<std::vector<double>>("Contexts/"s + contextName + "/start");
-  auto goal = config_->get<std::vector<double>>("Contexts/"s + contextName + "/goal");
+  auto contextName = config_->get<std::string>("experiment/context");
+  auto start = config_->get<std::vector<double>>("context/"s + contextName + "/start");
+  auto goal = config_->get<std::vector<double>>("context/"s + contextName + "/goal");
   auto length =
       std::sqrt(std::pow(start.at(0u) - goal.at(0u), 2) + std::pow(start.at(1u) - goal.at(1u), 2));
 

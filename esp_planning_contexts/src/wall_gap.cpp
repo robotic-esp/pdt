@@ -47,23 +47,23 @@ WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                  const std::shared_ptr<const Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo->getStateDimension()),
-    wallWidth_(config->get<double>("Contexts/" + name + "/wallWidth")),
-    wallThickness_(config->get<double>("Contexts/" + name + "/wallThickness")),
-    gapWidth_(config->get<double>("Contexts/" + name + "/gapWidth")),
-    gapOffset_(config->get<double>("Contexts/" + name + "/gapOffset")),
+    wallWidth_(config->get<double>("context/" + name + "/wallWidth")),
+    wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
+    gapWidth_(config->get<double>("context/" + name + "/gapWidth")),
+    gapOffset_(config->get<double>("context/" + name + "/gapOffset")),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
-  if (config->get<std::vector<double>>("Contexts/" + name + "/start").size() != dimensionality_) {
+  if (config->get<std::vector<double>>("context/" + name + "/start").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (config->get<std::vector<double>>("Contexts/" + name + "/goal").size() != dimensionality_) {
+  if (config->get<std::vector<double>>("context/" + name + "/goal").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
@@ -95,7 +95,7 @@ WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();

@@ -45,9 +45,11 @@ namespace esp {
 
 namespace ompltools {
 
+using namespace std::string_literals;
+
 ContextFactory::ContextFactory(const std::shared_ptr<const Configuration>& config) :
     config_(config) {
-  if (config_->contains("Contexts") == 0) {
+  if (config_->contains("context") == 0) {
     OMPL_ERROR("Configuration does not contain context data.");
     throw std::runtime_error("Context factory error.");
   }
@@ -55,11 +57,11 @@ ContextFactory::ContextFactory(const std::shared_ptr<const Configuration>& confi
 
 std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextName) const {
   // Generate the parent key for convenient lookups in the config.
-  const std::string parentKey{"Contexts/" + contextName};
+  const std::string parentKey{"context/" + contextName};
 
   // Ensure the config contains parameters for the parent key.
   if (!config_->contains(parentKey)) {
-    OMPL_ERROR("Configuration has no entry for requested context '%s'.", parentKey.c_str());
+    throw std::invalid_argument("Requested unknown context '"s + contextName + "'."s);
   }
 
   // Get the type of the context.
@@ -188,10 +190,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
       }
     }
     default: {
-      OMPL_ERROR("Context '%s' has unknown type.", contextName.c_str());
-      throw std::runtime_error("Requested to create context of unknown type at factory.");
-      return std::make_shared<CentreSquare>(createRealVectorSpaceInfo(parentKey), config_,
-                                            contextName);
+      throw std::invalid_argument("Context '"s + contextName + "' is of unknown type."s);
     }
   }
 }

@@ -1,0 +1,17 @@
+{
+    "planner": {
+        "defaultAIBITstar": {
+            "type": "AIBITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espgreen",
+                "name": "AI-BIT*"
+            },
+            "options": {
+                "samplesPerBatch": 100,
+                "radiusFactor": 1.001,
+                "collisionDetectionOnReverseSearch": true
+            }
+        }
+    }
+}
