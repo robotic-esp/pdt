@@ -42,6 +42,7 @@
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
+#include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
@@ -127,6 +128,17 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setNumSamplingAttempts(
           config_->get<std::size_t>(optionsKey + "/numSamplingAttempts"));
       return {planner, PLANNER_TYPE::INFORMEDRRTSTAR};
+    }
+    case PLANNER_TYPE::RRT: {
+      // Allocate and configure an RRT planner.
+      auto planner = std::make_shared<ompl::geometric::RRT>(context_->getSpaceInformation());
+      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
+      planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
+      planner->setIntermediateStates(config_->get<bool>(optionsKey + "/addIntermediateStates"));
+      return {planner, PLANNER_TYPE::RRT};
     }
     case PLANNER_TYPE::RRTCONNECT: {
       // Allocate and configure an RRT-Connect planner.
