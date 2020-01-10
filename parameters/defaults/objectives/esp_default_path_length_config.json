@@ -1,0 +1,7 @@
+{
+    "objective": {
+        "defaultPathLength": {
+            "type": "PathLength"
+        }
+    }
+}

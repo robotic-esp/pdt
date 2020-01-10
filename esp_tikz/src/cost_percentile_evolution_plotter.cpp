@@ -56,10 +56,10 @@ CostPercentileEvolutionPlotter::CostPercentileEvolutionPlotter(
     LatexPlotter(config),
     stats_(stats) {
   // Compute the duration bin size.
-  auto contextName = config_->get<std::string>("Experiment/context");
-  std::size_t numBins = std::ceil(config_->get<double>("Contexts/" + contextName + "/maxTime") *
-                                  config_->get<double>("Experiment/logFrequency"));
-  double binSize = 1.0 / config_->get<double>("Experiment/logFrequency");
+  auto contextName = config_->get<std::string>("experiment/context");
+  std::size_t numBins = std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
+                                  config_->get<double>("experiment/logFrequency"));
+  double binSize = 1.0 / config_->get<double>("experiment/logFrequency");
   binnedDurations_.reserve(numBins);
   for (std::size_t i = 0u; i < numBins; ++i) {
     binnedDurations_.emplace_back(static_cast<double>(i + 1u) * binSize);
@@ -90,7 +90,7 @@ fs::path CostPercentileEvolutionPlotter::createCostPercentileEvolutionPicture(
   picture.addAxis(createCostPercentileEvolutionAxis(plannerName));
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("Experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
                      fs::path("tikz/"s + plannerName + "_cost_percentile_evolution_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;
@@ -98,15 +98,15 @@ fs::path CostPercentileEvolutionPlotter::createCostPercentileEvolutionPicture(
 
 void CostPercentileEvolutionPlotter::setCostPercentileEvolutionAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
-  axis->options.width = config_->get<std::string>("CostPercentileEvolutionPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("CostPercentileEvolutionPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("costPercentileEvolutionPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("costPercentileEvolutionPlots/axisHeight");
   axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
-  axis->options.xlog = config_->get<bool>("CostPercentileEvolutionPlots/xlog");
-  axis->options.xminorgrids = config_->get<bool>("CostPercentileEvolutionPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("CostPercentileEvolutionPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("CostPercentileEvolutionPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("CostPercentileEvolutionPlots/ymajorgrids");
+  axis->options.xlog = config_->get<bool>("costPercentileEvolutionPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("costPercentileEvolutionPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("costPercentileEvolutionPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("costPercentileEvolutionPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("costPercentileEvolutionPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]"s;
   axis->options.ylabel = "Cost"s;
   axis->options.ylabelAbsolute = true;
@@ -117,7 +117,7 @@ void CostPercentileEvolutionPlotter::setCostPercentileEvolutionAxisOptions(
 std::shared_ptr<PgfPlot> CostPercentileEvolutionPlotter::createCostPercentileEvolutionPlot(
     const std::string& plannerName, double percentile) const {
   // This cannot be applied to planners that aren't anytime.
-  if (plannerName == "RRTConnect"s) {
+  if (!stats_.getConfig()->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "Cannot create cost percentile evolution plot of nonanytime planner '"s +
                plannerName + "'."s;
     throw std::invalid_argument(msg);
@@ -133,7 +133,7 @@ std::shared_ptr<PgfPlot> CostPercentileEvolutionPlotter::createCostPercentileEvo
   auto plot = std::make_shared<PgfPlot>(table);
   // Common plot options.
   plot->options.markSize = 0.0;
-  plot->options.color = config_->get<std::string>("PlannerPlotColors/" + plannerName);
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + percentileName.str() + "CostEvolution"s;
 
   // Plot options that depend on the percentile.

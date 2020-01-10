@@ -65,7 +65,7 @@ void KpiTable::addKpi(const std::string& plannerName, const std::string& planner
   auto initMinCost = stats_.getMinInitialSolutionCost(plannerName);
   auto initMedCost = stats_.getMedianInitialSolutionCost(plannerName);
   auto initMaxCost = stats_.getMaxInitialSolutionCost(plannerName);
-  if (plannerName != "RRTConnect") {
+  if (config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto finalMinCost = stats_.getMinFinalCost(plannerName);
     auto finalMedCost = stats_.getMedianFinalCost(plannerName);
     auto finalMaxCost = stats_.getMaxFinalCost(plannerName);

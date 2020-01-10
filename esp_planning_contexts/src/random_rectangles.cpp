@@ -54,14 +54,14 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
                                    const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo_->getStateDimension()),
-    numRectangles_(config->get<std::size_t>("Contexts/" + name + "/numObstacles")),
-    minSideLength_(config->get<double>("Contexts/" + name + "/minSideLength")),
-    maxSideLength_(config->get<double>("Contexts/" + name + "/maxSideLength")),
+    numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
+    minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
+    maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
   if (startPosition.size() != dimensionality_) {
@@ -95,7 +95,7 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();

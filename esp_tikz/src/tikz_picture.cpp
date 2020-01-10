@@ -53,16 +53,16 @@ std::string TikzPictureOptions::string() const {
 
 TikzPicture::TikzPicture(const std::shared_ptr<const Configuration>& config) : config_(config) {
   // Load colors from config.
-  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("Colors/espblack"));
-  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("Colors/espwhite"));
-  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("Colors/espgray"));
-  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("Colors/espblue"));
-  espColors_.emplace("espred", config_->get<std::array<int, 3>>("Colors/espred"));
-  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("Colors/espyellow"));
-  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("Colors/espgreen"));
-  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("Colors/esppurple"));
-  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("Colors/esplightblue"));
-  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("Colors/espdarkred"));
+  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("colors/espblack"));
+  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("colors/espwhite"));
+  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("colors/espgray"));
+  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("colors/espblue"));
+  espColors_.emplace("espred", config_->get<std::array<int, 3>>("colors/espred"));
+  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("colors/espyellow"));
+  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("colors/espgreen"));
+  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("colors/esppurple"));
+  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("colors/esplightblue"));
+  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("colors/espdarkred"));
 }
 
 void TikzPicture::clear() {
@@ -99,12 +99,12 @@ std::shared_ptr<PgfAxis> TikzPicture::generateLegendAxis() const {
   auto legendAxis = std::make_shared<PgfAxis>();
 
   // Make sure the names are alphabetic.
-  auto plannerNames = config_->get<std::vector<std::string>>("Experiment/planners");
+  auto plannerNames = config_->get<std::vector<std::string>>("experiment/planners");
   std::sort(plannerNames.begin(), plannerNames.end());
   for (const auto& name : plannerNames) {
-    std::string imageOptions{config_->get<std::string>("PlannerPlotColors/" + name) +
+    std::string imageOptions{config_->get<std::string>("planner/"s + name + "/report/color"s) +
                              ", line width = 1.0pt, mark size=1.0pt, mark=square*"};
-    legendAxis->addLegendEntry(config_->get<std::string>("PlannerPlotNames/" + name), imageOptions);
+    legendAxis->addLegendEntry(config_->get<std::string>("planner/"s + name + "/report/name"s), imageOptions);
   }
   return legendAxis;
 }
@@ -114,19 +114,13 @@ std::string TikzPicture::string() const {
     return {};
   }
   std::ostringstream stream{};
-  // Make sure the colors are defined.
-  // for (const auto& [name, values] : espColors_) {
-  //   stream << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
-  //          << values[2u] << "}\n";
-  // }
-
   // Write the picture.
   stream << "\\begin{tikzpicture} [" << options_.string() << "\n]\n";
 
   if (clip_ != ""s) {
     stream << clip_ << '\n';
   }
-  
+
   for (const auto& axis : axes_) {
     stream << axis->string() << '\n';
   }

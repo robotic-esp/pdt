@@ -46,7 +46,7 @@ RealVectorGeometricContext::RealVectorGeometricContext(
     BaseContext(spaceInfo, config, name),
     bounds_(getDimension()) {
   // Fill the state space bounds.
-  double sideLengths = config->get<double>("Contexts/" + name + "/boundarySideLengths");
+  double sideLengths = config->get<double>("context/" + name + "/boundarySideLengths");
   for (std::size_t dim = 0u; dim < getDimension(); ++dim) {
     bounds_.low.at(dim) = -0.5 * sideLengths;
     bounds_.high.at(dim) = 0.5 * sideLengths;

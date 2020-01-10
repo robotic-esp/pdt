@@ -60,9 +60,9 @@ std::shared_ptr<PgfAxis> LatexPlotter::createLegendAxis(
   legend->options.legendStyle =
       "anchor=south, legend cell align=left, legend columns=-1, at={(axis cs:5, 6)}";
   for (const auto& name : plannerNames) {
-    std::string imageOptions{config_->get<std::string>("PlannerPlotColors/" + name) +
+    std::string imageOptions{config_->get<std::string>("planner/"s + name + "/report/color"s) +
                              ", line width = 1.0pt, mark size=1.0pt, mark=square*"};
-    legend->addLegendEntry(config_->get<std::string>("PlotPlannerNames/" + name), imageOptions);
+    legend->addLegendEntry(config_->get<std::string>("planner/" + name + "/report/name"), imageOptions);
   }
   return legend;
 }
@@ -127,7 +127,7 @@ std::experimental::filesystem::path LatexPlotter::createPicture(
   auto picture = collect(axes);
 
   // Create the name of this picture.
-  auto path = std::experimental::filesystem::path(config_->get<std::string>("Experiment/results"))
+  auto path = std::experimental::filesystem::path(config_->get<std::string>("experiment/results"))
                   .parent_path() /
               std::experimental::filesystem::path("tikz/");
   for (const auto& axis : picture->getAxes()) {

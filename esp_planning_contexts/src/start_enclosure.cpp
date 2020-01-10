@@ -54,22 +54,22 @@ StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformatio
                                const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo_->getStateDimension()),
-    startOutsideWidth_(config->get<double>("Contexts/" + name + "/startOutsideWidth")),
-    startInsideWidth_(config->get<double>("Contexts/" + name + "/startInsideWidth")),
-    startGapWidth_(config->get<double>("Contexts/" + name + "/startGapWidth")),
+    startOutsideWidth_(config->get<double>("context/" + name + "/startOutsideWidth")),
+    startInsideWidth_(config->get<double>("context/" + name + "/startInsideWidth")),
+    startGapWidth_(config->get<double>("context/" + name + "/startGapWidth")),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
-  if (config->get<std::vector<double>>("Contexts/" + name + "/start").size() != dimensionality_) {
+  if (config->get<std::vector<double>>("context/" + name + "/start").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (config->get<std::vector<double>>("Contexts/" + name + "/goal").size() != dimensionality_) {
+  if (config->get<std::vector<double>>("context/" + name + "/goal").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
@@ -97,7 +97,7 @@ StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformatio
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();
@@ -143,7 +143,7 @@ void StartEnclosure::accept(const ContextVisitor& visitor) const {
 void StartEnclosure::createObstacles() {
   ompl::base::ScopedState<> startOutsideAnchor(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    startOutsideAnchor[i] = config_->get<std::vector<double>>("Contexts/" + name_ + "/start").at(i);
+    startOutsideAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
   std::vector<double> startWidths(dimensionality_, startOutsideWidth_);
   obstacles_.emplace_back(
@@ -154,7 +154,7 @@ void StartEnclosure::createAntiObstacles() {
   // Create the inside.
   ompl::base::ScopedState<> startInsideAnchor(spaceInfo_);
   for (std::size_t i = 0u; i < dimensionality_; ++i) {
-    startInsideAnchor[i] = config_->get<std::vector<double>>("Contexts/" + name_ + "/start").at(i);
+    startInsideAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
   std::vector<double> startWidths(dimensionality_, startInsideWidth_);
   antiObstacles_.emplace_back(std::make_shared<Hyperrectangle<BaseAntiObstacle>>(
@@ -162,7 +162,7 @@ void StartEnclosure::createAntiObstacles() {
 
   // Create the gap.
   ompl::base::ScopedState<> startGapAnchor(spaceInfo_);
-  startGapAnchor[0u] = config_->get<std::vector<double>>("Contexts/" + name_ + "/start").at(0u) -
+  startGapAnchor[0u] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(0u) -
                        startInsideWidth_ / 2.0 - (startOutsideWidth_ - startInsideWidth_) / 4.0;
   for (std::size_t i = 1u; i < dimensionality_; ++i) {
     startGapAnchor[i] = 0.0;

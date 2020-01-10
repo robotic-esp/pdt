@@ -75,7 +75,7 @@ class Configuration {
   template <typename T>
   void add(const std::string& key, const T& value);
 
-  // This adds to or creates an "Experiment" entry in the accessed parameters with various
+  // This adds to or creates an "experiment" entry in the accessed parameters with various
   // information about the state of the working directory and the OMPL seed.
   void registerAsExperiment();
 
@@ -105,7 +105,10 @@ class Configuration {
 
   // Helper to load the default config from the default path.
   void loadDefaultConfigs(bool loadDefaultContextConfigs = true,
-                          bool loadDefaultPlannerConfigs = true);
+                          bool loadDefaultPlannerConfigs = true,
+                          bool loadDefaultObjectiveConfigs = true);
+
+  void loadReportConfig(const std::experimental::filesystem::path& path);
 
   // Check if the name is nested, i.e., contains a '/'.
   bool isNestedKey(const std::string& name) const;
@@ -160,10 +163,10 @@ void Configuration::add(const std::string& key, const T& value) {
   // We allow overwriting the results/name field of the experiment. Conceptually this seems ok, but from
   // a software architecture standpoint this hints at a flaw. Would it be cleaner to have an
   // "Accessed" element in parameters_ rather than having accessedParameters_?
-  if (contains(key) && key == std::string("Experiment/results")) {
-    parameters_["Experiment"].erase("results");
-  } else if (contains(key) && key == std::string("Experiment/name")) {
-    parameters_["Experiment"].erase("name");
+  if (contains(key) && key == std::string("experiment/results")) {
+    parameters_["experiment"].erase("results");
+  } else if (contains(key) && key == std::string("experiment/name")) {
+    parameters_["experiment"].erase("name");
   }
   // We should prevent overwriting any other parameter to ensure reproducibility.
   if (contains(key) && get<T>(key) != value) {

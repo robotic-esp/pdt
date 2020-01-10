@@ -1,0 +1,16 @@
+{
+    "planner": {
+        "defaultInformedRRTstar": {
+            "type": "InformedRRTstar",
+            "isAnytime": true,
+            "report": {
+                "color": "esppurple",
+                "name": "Informed RRT*"
+            },
+            "options": {
+                "rewireFactor": 1.001,
+                "numSamplingAttempts": 1
+            }
+        }
+    }
+}

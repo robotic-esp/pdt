@@ -1,0 +1,22 @@
+{
+    "planner": {
+        "defaultBITstar": {
+            "type": "BITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espblue",
+                "name": "BIT*"
+            },
+            "options": {
+                "useKNearest": false,
+                "rewireFactor": 1.001,
+                "samplesPerBatch": 100,
+                "enablePruning": true,
+                "pruningThreshold": 0.1,
+                "useJustInTimeSampling": false,
+                "dropSamplesOnPrune": false,
+                "stopOnSolutionImprovement": false
+            }
+        }
+    }
+}

@@ -54,16 +54,16 @@ int main(int argc, char** argv) {
 
   auto contextFactory = std::make_shared<esp::ompltools::ContextFactory>(config);
   auto context = std::dynamic_pointer_cast<esp::ompltools::RealVectorGeometricContext>(
-      contextFactory->create(config->get<std::string>("Experiment/context")));
+      contextFactory->create(config->get<std::string>("experiment/context")));
 
   if (!context) {
-    auto msg = "Can not visualize '"s + config->get<std::string>("Experiment/context") + "'."s;
+    auto msg = "Can not visualize '"s + config->get<std::string>("experiment/context") + "'."s;
     throw std::invalid_argument(msg);
   }
 
   auto plannerFactory = std::make_shared<esp::ompltools::PlannerFactory>(config, context);
   auto [planner, plannerType] =
-      plannerFactory->create(config->get<std::string>("Experiment/planner"));
+      plannerFactory->create(config->get<std::string>("experiment/planner"));
 
   // Get the experiment config.
   config->dumpAccessed();

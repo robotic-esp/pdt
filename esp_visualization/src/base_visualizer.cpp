@@ -192,13 +192,13 @@ void BaseVisualizer::createData() {
     planner_->setup();
     setupDuration_ = time::Clock::now() - setupStartTime;
 
-    if (config_->contains("Experiment/seed")) {
+    if (config_->contains("experiment/seed")) {
       if (plannerType_ == esp::ompltools::PLANNER_TYPE::BITSTAR) {
         planner_->as<ompl::geometric::BITstar>()->setLocalSeed(
-            config_->get<std::size_t>("Experiment/seed"));
+            config_->get<std::size_t>("experiment/seed"));
       } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::TBDSTAR) {
         // planner_->as<ompl::geometric::TBDstar>()->setLocalSeed(
-        // config_->get<std::size_t>("Experiment/seed"));
+        // config_->get<std::size_t>("experiment/seed"));
       }
     } else {
       throw std::runtime_error("Unknown seed.");

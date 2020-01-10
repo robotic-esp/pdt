@@ -1,37 +1,8 @@
 {
-    "Experiment": {
+    "experiment": {
         "executable": "visualization",
-        "planner": "ABITstar",
-        "context": "WallGap",
+        "planner": "defaultAIBITstar",
+        "context": "defaultWallGap",
         "useOnlyThisConfig": false
-    },
-    "Contexts": {
-        "WallGap": {
-            "type": "WallGap",
-            "start": [-0.75, 0.0],
-            "goal": [0.75, 0.0],
-            "maxTime": 0.1,
-            "dimensions": 2,
-            "boundarySideLengths" : 2,
-            "collisionCheckResolution": 0.0001,
-            "wallWidth": 1.7,
-            "wallThickness": 0.5,
-            "gapOffset": 0.1,
-            "gapWidth": 0.05
-        },
-        "WallGap3D": {
-            "type": "WallGap",
-            "objective": "PathLength",
-            "start": [-0.75, 0.0, 0.0],
-            "goal": [0.75, 0.0, 0.0],
-            "maxTime": 0.1,
-            "dimensions": 3,
-            "boundarySideLengths" : 2,
-            "collisionCheckResolution": 0.0001,
-            "wallWidth": 1.7,
-            "wallThickness": 0.5,
-            "gapOffset": 0.1,
-            "gapWidth": 0.05
-        }
     }
 }
