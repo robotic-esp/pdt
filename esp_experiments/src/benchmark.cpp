@@ -78,18 +78,19 @@ int main(int argc, char **argv) {
   esp::ompltools::PlannerFactory plannerFactory(config, context);
 
   // Print some basic info about this experiment.
+  auto estimatedRuntime = config->get<std::size_t>("experiment/numRuns") *
+                          config->get<std::vector<std::string>>("experiment/planners").size() *
+                          context->getMaxSolveDuration();
   std::cout
-      << "\nExecuting " << config->get<std::size_t>("Experiment/numRuns") << " runs of "
-      << config->get<std::string>("Experiment/context") << " with " << ompl::RNG::getSeed()
+      << "\nExecuting " << config->get<std::size_t>("experiment/numRuns") << " runs of "
+      << config->get<std::string>("experiment/context") << " with " << ompl::RNG::getSeed()
       << " as the seed and a maximum runtime of " << context->getMaxSolveDuration().count()
       << " seconds per planner.\n"
       << "This benchmark should be done by "
       << esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
              std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
-             config->get<std::size_t>("Experiment/numRuns") *
-                 config->get<std::vector<std::string>>("Experiment/planners").size() *
-                 context->getMaxSolveDuration()))
-      << ".\n";
+             estimatedRuntime))
+      << "(runtime <= " << esp::ompltools::time::toDurationString(estimatedRuntime) << ").\n";
 
   // Setup the results table.
   std::cout << '\n';
