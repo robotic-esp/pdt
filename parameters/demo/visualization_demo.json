@@ -1,8 +1,8 @@
 {
     "experiment": {
         "executable": "visualization",
-        "planner": "esp_default_aibitstar",
-        "context": "esp_default_wall_gap",
+        "planner": "defaultAIBITstar",
+        "context": "defaultWallGap",
         "useOnlyThisConfig": false
     }
 }
