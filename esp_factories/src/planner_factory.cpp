@@ -41,8 +41,8 @@
 #include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
-#include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
+#include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
@@ -82,6 +82,11 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setName(plannerName);
       planner->setNumSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
       planner->setRadiusFactor(config_->get<double>(optionsKey + "/radiusFactor"));
+      planner->setRepairFactor(config_->get<double>(optionsKey + "/repairFactor"));
+      planner->enableRepairingReverseTree(
+          config_->get<bool>(optionsKey + "/repairReverseSearchTreeUponCollisionDetection"));
+      planner->enableCollisionDetectionInReverseSearch(
+          config_->get<bool>(optionsKey + "/collisionDetectionOnReverseSearch"));
       return {planner, PLANNER_TYPE::AIBITSTAR};
     }
     case PLANNER_TYPE::BITSTAR: {
@@ -199,7 +204,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setStopOnSolnImprovement(
           config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
       planner->setInitialInflationFactor(config_->get<double>(optionsKey + "/initialInflation"));
-      planner->setInflationFactorParameter(config_->get<double>(optionsKey + "/inflationParameter"));
+      planner->setInflationFactorParameter(
+          config_->get<double>(optionsKey + "/inflationParameter"));
       planner->setTruncationFactorParameter(
           config_->get<double>(optionsKey + "/truncationParameter"));
       return {planner, PLANNER_TYPE::SBITSTAR};
