@@ -70,7 +70,7 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
                      std::shared_ptr<esp::ompltools::OpenRaveManipulator> context) {
   esp::ompltools::PlannerFactory plannerFactory(config, context);
   auto [planner, plannerType] =
-      plannerFactory.create(config->get<std::string>("Experiment/planner"));
+      plannerFactory.create(config->get<std::string>("experiment/planner"));
   (void)plannerType;
 
   // Setup the planner.
@@ -83,7 +83,7 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Get the robot.
   auto robot =
-      environment->GetRobot(config->get<std::string>("Contexts/" + context->getName() + "/robot"));
+      environment->GetRobot(config->get<std::string>("context/" + context->getName() + "/robot"));
 
   // Get the conversion factors for ompl states to rave states.
   std::vector<double> raveLowerBounds, raveUpperBounds, raveStateScales;
@@ -95,16 +95,16 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Create the vector to hold the current state.
   std::vector<double> openRaveState =
-      config->get<std::vector<double>>("Contexts/" + context->getName() + "/start");
+      config->get<std::vector<double>>("context/" + context->getName() + "/start");
 
   double totalSolveDuration = 0.0;
   // Work it.
   while (true) {
     // Work on the problem.
-    planner->solve(config->get<double>("Experiment/visualizationInterval"));
+    planner->solve(config->get<double>("experiment/visualizationInterval"));
 
     // Update the total solve duration.
-    totalSolveDuration += config->get<double>("Experiment/visualizationInterval");
+    totalSolveDuration += config->get<double>("experiment/visualizationInterval");
 
     // Check if the planner found a solution yet.
     if (planner->getProblemDefinition()->hasExactSolution()) {
@@ -114,7 +114,7 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
 
       // Report the cost of the solution.
       std::cout << "[ " << totalSolveDuration << "s ] "
-                << config->get<std::string>("Experiment/planner") << " found a solution of cost "
+                << config->get<std::string>("experiment/planner") << " found a solution of cost "
                 << solution->cost(planner->getProblemDefinition()->getOptimizationObjective())
                 << '\n';
 
@@ -134,11 +134,11 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
         }
         OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
         robot->SetActiveDOFValues(openRaveState);
-        std::this_thread::sleep_for(0.05s);
+        std::this_thread::sleep_for(0.01s);
       }
     } else {
       std::cout << "[ " << totalSolveDuration << "s ] "
-                << config->get<std::string>("Experiment/planner")
+                << config->get<std::string>("experiment/planner")
                 << " did not find a solution yet.\n";
     }
   }
@@ -148,7 +148,7 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
                std::shared_ptr<esp::ompltools::OpenRaveSE3> context) {
   esp::ompltools::PlannerFactory plannerFactory(config, context);
   auto [planner, plannerType] =
-      plannerFactory.create(config->get<std::string>("Experiment/planner"));
+      plannerFactory.create(config->get<std::string>("experiment/planner"));
   (void)plannerType;
 
   // Setup the planner.
@@ -161,13 +161,13 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Get the robot.
   auto robot =
-      environment->GetRobot(config->get<std::string>("Contexts/" + context->getName() + "/robot"));
+      environment->GetRobot(config->get<std::string>("context/" + context->getName() + "/robot"));
 
   // Get the conversion factors for ompl states to rave states.
   auto raveLowerBounds =
-      config->get<std::vector<double>>("Contexts/"s + context->getName() + "/lowerBounds"s);
+      config->get<std::vector<double>>("context/"s + context->getName() + "/lowerBounds"s);
   auto raveUpperBounds =
-      config->get<std::vector<double>>("Contexts/"s + context->getName() + "/upperBounds"s);
+      config->get<std::vector<double>>("context/"s + context->getName() + "/upperBounds"s);
   std::vector<double> raveStateScales;
   raveStateScales.reserve(raveLowerBounds.size());
   for (std::size_t i = 0u; i < raveLowerBounds.size(); ++i) {
@@ -181,10 +181,10 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
   // Work it.
   while (true) {
     // Work on the problem.
-    planner->solve(config->get<double>("Experiment/visualizationInterval"));
+    planner->solve(config->get<double>("experiment/visualizationInterval"));
 
     // Update the total solve duration.
-    totalSolveDuration += config->get<double>("Experiment/visualizationInterval");
+    totalSolveDuration += config->get<double>("experiment/visualizationInterval");
 
     // Check if the planner found a solution yet.
     if (planner->getProblemDefinition()->hasExactSolution()) {
@@ -194,7 +194,7 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
 
       // Report the cost of the solution.
       std::cout << "[ " << totalSolveDuration << "s ] "
-                << config->get<std::string>("Experiment/planner") << " found a solution of cost "
+                << config->get<std::string>("experiment/planner") << " found a solution of cost "
                 << solution->cost(planner->getProblemDefinition()->getOptimizationObjective())
                 << '\n';
 
@@ -217,11 +217,11 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
 
         OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
         robot->SetTransform(raveState);
-        std::this_thread::sleep_for(0.05s);
+        std::this_thread::sleep_for(0.01s);
       }
     } else {
       std::cout << "[ " << totalSolveDuration << "s ] "
-                << config->get<std::string>("Experiment/planner")
+                << config->get<std::string>("experiment/planner")
                 << " did not find a solution yet.\n";
     }
   }
@@ -234,7 +234,7 @@ int main(int argc, char** argv) {
 
   // Create the context.
   auto contextFactory = std::make_shared<esp::ompltools::ContextFactory>(config);
-  auto context = contextFactory->create(config->get<std::string>("Experiment/context"));
+  auto context = contextFactory->create(config->get<std::string>("experiment/context"));
 
   if (std::dynamic_pointer_cast<esp::ompltools::OpenRaveManipulator>(context)) {
     // Get the environment.

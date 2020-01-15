@@ -61,12 +61,12 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
 
   // Get the upper and lower bounds and the state scales.
-  auto raveLowerBounds = config_->get<std::vector<double>>("Contexts/"s + name + "/lowerBounds"s);
-  auto raveUpperBounds = config_->get<std::vector<double>>("Contexts/"s + name + "/upperBounds"s);
+  auto raveLowerBounds = config_->get<std::vector<double>>("context/"s + name + "/lowerBounds"s);
+  auto raveUpperBounds = config_->get<std::vector<double>>("context/"s + name + "/upperBounds"s);
   assert(raveLowerBounds.size() == raveUpperBounds.size());
   std::vector<double> raveStateScales;
   raveStateScales.reserve(raveLowerBounds.size());
@@ -100,14 +100,14 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
 
   // Create a collision checker.
   OpenRAVE::CollisionCheckerBasePtr collisionChecker = OpenRAVE::RaveCreateCollisionChecker(
-      environment, config->get<std::string>("Contexts/" + name + "/collisionChecker"));
+      environment, config->get<std::string>("context/" + name + "/collisionChecker"));
   environment->SetCollisionChecker(collisionChecker);
 
   // Load the specified environment.
-  environment->Load(config_->get<std::string>("Contexts/" + name + "/environment"));
+  environment->Load(config_->get<std::string>("context/" + name + "/environment"));
 
   // Load the robot.
-  auto robot = environment->GetRobot(config_->get<std::string>("Contexts/" + name + "/robot"));
+  auto robot = environment->GetRobot(config_->get<std::string>("context/" + name + "/robot"));
 
   // In this context, there are no active dimensions.
   robot->SetActiveDOFs({});
@@ -128,7 +128,7 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
   // Set the validity checker and check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config_->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config_->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Setup the space info.
   spaceInfo_->setup();

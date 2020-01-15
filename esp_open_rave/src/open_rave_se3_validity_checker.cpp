@@ -51,11 +51,11 @@ OpenRaveSE3ValidityChecker::OpenRaveSE3ValidityChecker(
     OpenRaveBaseValidityChecker(spaceInfo, environment, robot, config),
     raveState_() {
   raveState_.identity();
-  const auto contextName = config_->get<std::string>("Experiment/context");
+  const auto contextName = config_->get<std::string>("experiment/context");
   raveLowerBounds_ =
-      config_->get<std::vector<double>>("Contexts/"s + contextName + "/lowerBounds"s);
+      config_->get<std::vector<double>>("context/"s + contextName + "/lowerBounds"s);
   raveUpperBounds_ =
-      config_->get<std::vector<double>>("Contexts/"s + contextName + "/upperBounds"s);
+      config_->get<std::vector<double>>("context/"s + contextName + "/upperBounds"s);
   assert(raveLowerBounds_.size() == raveUpperBounds_.size());
   raveStateScales_.reserve(raveLowerBounds_.size());
   for (std::size_t i = 0u; i < raveLowerBounds_.size(); ++i) {

@@ -68,17 +68,17 @@ OpenRaveManipulator::OpenRaveManipulator(
 
   // Create a collision checker.
   OpenRAVE::CollisionCheckerBasePtr collisionChecker = OpenRAVE::RaveCreateCollisionChecker(
-      environment, config->get<std::string>("Contexts/" + name + "/collisionChecker"));
+      environment, config->get<std::string>("context/" + name + "/collisionChecker"));
   environment->SetCollisionChecker(collisionChecker);
 
   // Load the specified environment.
-  environment->Load(config_->get<std::string>("Contexts/" + name + "/environment"));
+  environment->Load(config_->get<std::string>("context/" + name + "/environment"));
 
   // Load the robot.
-  auto robot = environment->GetRobot(config_->get<std::string>("Contexts/" + name + "/robot"));
+  auto robot = environment->GetRobot(config_->get<std::string>("context/" + name + "/robot"));
 
   // Set the active dimensions.
-  robot->SetActiveDOFs(config_->get<std::vector<int>>("Contexts/" + name + "/activeDofIndices"));
+  robot->SetActiveDOFs(config_->get<std::vector<int>>("context/" + name + "/activeDofIndices"));
 
   // Set the bounds of the state space.
   spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->setBounds(0.0, 1.0);
@@ -90,14 +90,14 @@ OpenRaveManipulator::OpenRaveManipulator(
   // Set the validity checker and check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config_->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config_->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Setup the space info.
   spaceInfo_->setup();
 
   // Get the start and goal positions.
-  auto startPosition = config->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
 
   // Get the upper and lower bounds of the state dimensions.
   std::vector<double> raveLowerBounds, raveUpperBounds, raveStateScales;
