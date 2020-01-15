@@ -102,9 +102,21 @@ std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAx
     if (config_->get<bool>("planner/"s + name + "/isAnytime"s)) {
       // First the lower and upper confidence bounds, if desired.
       if (config_->get<bool>("medianCostPlots/plotConfidenceIntervalInAllPlots")) {
-        axis->addPlot(createMedianCostEvolutionUpperCIPlot(name));
-        axis->addPlot(createMedianCostEvolutionLowerCIPlot(name));
-        axis->addPlot(createMedianCostEvolutionFillCIPlot(name));
+        std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
+        bool successCI = true;
+        try {
+          upperCI = createMedianCostEvolutionUpperCIPlot(name);
+          lowerCI = createMedianCostEvolutionLowerCIPlot(name);
+          fillCI = createMedianCostEvolutionFillCIPlot(name);
+        } catch (const std::runtime_error& e) {
+          // If the above methods throw, the corresponding plots should not be added.
+          successCI = false;
+        }
+        if (successCI) {
+          axis->addPlot(upperCI);
+          axis->addPlot(lowerCI);
+          axis->addPlot(fillCI);
+        }
       }
 
       // Then the median cost evolution.
@@ -122,9 +134,21 @@ std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAx
   setMedianCostAxisOptions(axis);
 
   // Add all the the median cost evolution plots.
-  axis->addPlot(createMedianCostEvolutionUpperCIPlot(plannerName));
-  axis->addPlot(createMedianCostEvolutionLowerCIPlot(plannerName));
-  axis->addPlot(createMedianCostEvolutionFillCIPlot(plannerName));
+  std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
+  bool successCI = true;
+  try {
+    upperCI = createMedianCostEvolutionUpperCIPlot(plannerName);
+    lowerCI = createMedianCostEvolutionLowerCIPlot(plannerName);
+    fillCI = createMedianCostEvolutionFillCIPlot(plannerName);
+  } catch (const std::runtime_error& e) {
+    // If the above methods throw, the corresponding plots should not be added.
+    successCI = false;
+  }
+  if (successCI) {
+    axis->addPlot(upperCI);
+    axis->addPlot(lowerCI);
+    axis->addPlot(fillCI);
+  }
   axis->addPlot(createMedianCostEvolutionPlot(plannerName));
   axis->options.name = plannerName + "MedianCostAxis";
 
@@ -187,6 +211,10 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionPl
   auto table =
       std::make_shared<PgfTable>(stats_.extractMedians(plannerName), "durations", "median costs");
 
+  // Remove all nans from the table.
+  table->removeRowIfDomainIsNan();
+  table->removeRowIfCodomainIsNan();
+
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
@@ -209,6 +237,14 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUp
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(stats_.extractMedians(plannerName), "durations",
                                           "upper confidence bound");
+
+  // Remove all nans from the table.
+  table->removeRowIfDomainIsNan();
+  table->removeRowIfCodomainIsNan();
+
+  if (table->empty()) {
+    throw std::runtime_error("Cannot create UpperCI plot of '"s + plannerName + "'.");
+  }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
   table->replaceInCodomain(std::numeric_limits<double>::infinity(), 3 * stats_.getMaxNonInfCost());
@@ -237,6 +273,14 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionLo
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(stats_.extractMedians(plannerName), "durations",
                                           "lower confidence bound");
+
+  // Remove all nans from the table.
+  table->removeRowIfDomainIsNan();
+  table->removeRowIfCodomainIsNan();
+
+  if (table->empty()) {
+    throw std::runtime_error("Cannot create LowerCI plot of '"s + plannerName + "'.");
+  }
 
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);

@@ -61,6 +61,9 @@ class PgfTable : public PlottableInterface {
 
   void setCleanData(bool cleanData);
 
+  // Check if the table empty.
+  bool empty() const;
+
   // Add numbers.
   void prependRow(const std::vector<double>& row);
   void appendRow(const std::vector<double>& row);
@@ -74,6 +77,8 @@ class PgfTable : public PlottableInterface {
   // Remove numbers.
   void removeRowIfDomainEquals(double number);
   void removeRowIfCodomainEquals(double number);
+  void removeRowIfDomainIsNan();
+  void removeRowIfCodomainIsNan();
 
   // Get rows.
   std::size_t getNumRows() const;
