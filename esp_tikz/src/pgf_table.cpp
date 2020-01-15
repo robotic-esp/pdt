@@ -37,6 +37,7 @@
 #include "esp_tikz/pgf_table.h"
 
 #include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <sstream>
 
@@ -150,6 +151,20 @@ void PgfTable::setCleanData(bool cleanData) {
   cleanData_ = cleanData;
 }
 
+bool PgfTable::empty() const {
+  if (data_.empty()) {
+    return true;
+  }
+
+  for (const auto& col : data_) {
+    if (!col.empty()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 void PgfTable::replaceInDomain(double number, double replacement) {
   std::replace(data_.at(0u).begin(), data_.at(0u).end(), number, replacement);
 }
@@ -196,11 +211,31 @@ void PgfTable::prependRow(const std::vector<double>& row) {
   }
 }
 
-void PgfTable::removeRowIfDomainEquals(double number) {
-  while (std::find(data_.at(0u).begin(), data_.at(0u).end(), number) != data_.at(0u).end()) {
-    auto itDomain = std::find(data_.at(0u).begin(), data_.at(0u).end(), number);
+void PgfTable::removeRowIfDomainIsNan() {
+  // Create a helper function to find nans.
+  auto findNan = [](auto begin, auto end) {
+    return std::find_if(begin, end, [](auto number) { return std::isnan(number); });
+  };
+
+  while (findNan(data_.at(0u).begin(), data_.at(0u).end()) != data_.at(0u).end()) {
+    auto itDomain = findNan(data_.at(0u).begin(), data_.at(0u).end());
     auto dist = std::distance(data_.at(0u).begin(), itDomain);
     auto itCodomain = data_.at(1u).begin() + dist;
+    data_.at(0u).erase(itDomain);
+    data_.at(1u).erase(itCodomain);
+  }
+}
+
+void PgfTable::removeRowIfCodomainIsNan() {
+  // Create a helper function to find nans.
+  auto findNan = [](auto begin, auto end) {
+    return std::find_if(begin, end, [](auto number) { return std::isnan(number); });
+  };
+
+  while (findNan(data_.at(1u).begin(), data_.at(1u).end()) != data_.at(1u).end()) {
+    auto itCodomain = findNan(data_.at(1u).begin(), data_.at(1u).end());
+    auto dist = std::distance(data_.at(1u).begin(), itCodomain);
+    auto itDomain = data_.at(0u).begin() + dist;
     data_.at(0u).erase(itDomain);
     data_.at(1u).erase(itCodomain);
   }
@@ -211,6 +246,16 @@ void PgfTable::removeRowIfCodomainEquals(double number) {
     auto itCodomain = std::find(data_.at(1u).begin(), data_.at(1u).end(), number);
     auto dist = std::distance(data_.at(1u).begin(), itCodomain);
     auto itDomain = data_.at(0u).begin() + dist;
+    data_.at(0u).erase(itDomain);
+    data_.at(1u).erase(itCodomain);
+  }
+}
+
+void PgfTable::removeRowIfDomainEquals(double number) {
+  while (std::find(data_.at(0u).begin(), data_.at(0u).end(), number) != data_.at(0u).end()) {
+    auto itDomain = std::find(data_.at(0u).begin(), data_.at(0u).end(), number);
+    auto dist = std::distance(data_.at(0u).begin(), itDomain);
+    auto itCodomain = data_.at(1u).begin() + dist;
     data_.at(0u).erase(itDomain);
     data_.at(1u).erase(itCodomain);
   }
@@ -305,15 +350,24 @@ std::string PgfTable::string() const {
     auto msg = "Pgf Table columns have different sizes."s;
     throw std::invalid_argument(msg);
   }
-  // No output if the table is empty.
+  // We need to return an empty table if the table is empty.
   if (data_.at(0u).empty() || data_.at(1u).empty()) {
-    return {};
+    std::ostringstream stream{};
+    stream << "table [\n";
+    if (!options.rowSep.empty()) {
+      stream << "  row sep=" << options.rowSep << ",\n";
+    }
+    stream << "  col sep=" << options.colSep << "\n]{};\n";
+    return stream.str();
   }
 
   // We clean the table here. Values that are sandwiched are omitted.
   std::ostringstream stream{};
-  stream << "table [\n"
-         << "  row sep=" << options.rowSep << ",\n  col sep=" << options.colSep << "\n]{\n";
+  stream << "table [\n";
+  if (!options.rowSep.empty()) {
+    stream << "  row sep=" << options.rowSep << ",\n";
+  }
+  stream << "  col sep=" << options.colSep << "\n]{\n";
   if (cleanData_) {
     double lowX = data_.at(0u).at(0);
     double lowY = data_.at(1u).at(0);

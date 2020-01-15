@@ -48,22 +48,22 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
                              const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo->getStateDimension()),
-    wallThickness_(config->get<double>("Contexts/" + name + "/wallThickness")),
-    passageWidth_(config->get<double>("Contexts/" + name + "/passageWidth")),
-    passageOffset_(config->get<double>("Contexts/" + name + "/passageOffset")),
+    wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
+    passageWidth_(config->get<double>("context/" + name + "/passageWidth")),
+    passageOffset_(config->get<double>("context/" + name + "/passageOffset")),
     startState_(spaceInfo),
     goalState_(spaceInfo) {
   // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("Contexts/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("Contexts/" + name + "/goal");
+  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
-  if (config->get<std::vector<double>>("Contexts/" + name + "/start").size() != dimensionality_) {
+  if (config->get<std::vector<double>>("context/" + name + "/start").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (config->get<std::vector<double>>("Contexts/" + name + "/goal").size() != dimensionality_) {
+  if (config->get<std::vector<double>>("context/" + name + "/goal").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
@@ -94,7 +94,7 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
-      config->get<double>("Contexts/" + name + "/collisionCheckResolution"));
+      config->get<double>("context/" + name + "/collisionCheckResolution"));
 
   // Set up the space info.
   spaceInfo_->setup();

@@ -110,8 +110,8 @@ void Configuration::load(int argc, char **argv) {
       }
 
       // Set the appropriate log level.
-      if (patch.count("Log") != 0) {
-        auto level = patch["Log"]["level"];
+      if (patch.count("log") != 0) {
+        auto level = patch["log"]["level"];
         if (level == "dev2"s) {
           ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV2);
         } else if (level == "dev1"s) {

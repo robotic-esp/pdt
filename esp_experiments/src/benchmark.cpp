@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
       << esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
              std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
              estimatedRuntime))
-      << "(runtime <= " << esp::ompltools::time::toDurationString(estimatedRuntime) << ").\n";
+      << " (runtime <= " << esp::ompltools::time::toDurationString(estimatedRuntime) << ").\n";
 
   // Setup the results table.
   std::cout << '\n';
@@ -111,6 +111,9 @@ int main(int argc, char **argv) {
   // Create the performance log.
   esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(experimentDirectory /
                                                                     "results.csv"s);
+
+  // Add the result path to the experiment.
+  config->add<std::string>("experiment/results", results.getFilePath());
 
   // May the best planner win.
   for (std::size_t i = 0; i < config->get<std::size_t>("experiment/numRuns"); ++i) {
@@ -188,6 +191,20 @@ int main(int argc, char **argv) {
   auto experimentEndTimeString = esp::ompltools::time::toDateString(experimentEndTime);
   esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
 
+  // Report success.
+  std::cout << "\n\nExperiment ran for:\t" << (experimentEndTime - experimentStartTime) << "\t\t("
+            << experimentStartTimeString << " -- " << experimentEndTimeString << ")\n\n";
+
+  // Generate the report.
+  std::cout << "Compiling report. This may take a couple of minutes.\n";
+  // Generate the statistic.
+  esp::ompltools::Statistics stats(config, true);
+
+  // Generate the report.
+  esp::ompltools::ExperimentReport report(config, stats);
+  report.generateReport();
+  auto reportPath = report.compileReport();
+
   // Log some info to a log file.
   auto logPath = experimentDirectory / "log.txt"s;
   ompl::msg::OutputHandlerFile log(logPath.c_str());
@@ -203,28 +220,12 @@ int main(int argc, char **argv) {
 
   // Dump the accessed parameters next to the results file.
   auto configPath = experimentDirectory / "config.json"s;
-  config->add<std::string>("experiment/results", results.getFilePath());
   config->dumpAccessed(fs::current_path().string() + '/' + configPath.string());
-  OMPL_INFORM("Wrote configuration to '%s'", configPath.c_str());
 
-  // Report success.
-  std::cout << "\n\nExperiment ran for:\t" << (experimentEndTime - experimentStartTime) << "\t\t("
-            << experimentStartTimeString << " -- " << experimentEndTimeString << ")\n"
-            << "\nWrote results to:\t" << results.getFilePath() << "\nWrote config to:\t"
+  std::cout << "\nWrote results to:\t" << results.getFilePath() << "\nWrote config to:\t"
             << fs::current_path() / configPath << "\nWrote log to:\t\t"
-            << fs::current_path() / logPath << "\n\n";
-
-  // If we're automatically generating the report, now is the time to do so.
-  if (config->get<bool>("experiment/report/automatic")) {
-    std::cout << "Compiling report. This may take a couple of minutes.\n";
-    // Generate the statistic.
-    esp::ompltools::Statistics stats(config, true);
-
-    // Generate the report.
-    esp::ompltools::ExperimentReport report(config, stats);
-    report.generateReport();
-    report.compileReport();
-  }
+            << fs::current_path() / logPath << "\nWrote report to:\t"
+            << reportPath << "\n\n";
 
   return 0;
 }
