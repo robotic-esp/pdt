@@ -244,7 +244,7 @@ int main(int argc, char** argv) {
             ->getOpenRaveEnvironment();
 
     // Create the viewer.
-    auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtosg");
+    auto viewer = OpenRAVE::RaveCreateViewer(environment, config->get<std::string>("experiment/viewer"));
 
     auto planThread =
         std::thread(&planManipulator, config,
@@ -264,7 +264,7 @@ int main(int argc, char** argv) {
                            ->getOpenRaveEnvironment();
 
     // Create the viewer.
-    auto viewer = OpenRAVE::RaveCreateViewer(environment, "qtosg");
+    auto viewer = OpenRAVE::RaveCreateViewer(environment, config->get<std::string>("experiment/viewer"));
 
     auto planThread = std::thread(&planMover, config,
                                   std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3>(context));
