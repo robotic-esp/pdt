@@ -80,16 +80,18 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
     OMPL_WARN("%s: Passage offset is 0, straight-line connection is valid.");
   }
 
+  // Fill the start and goal states' coordinates.
+  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+    startState_[i] = startPosition.at(i);
+    goalState_[i] = goalPosition.at(i);
+  }
+
   // Create the validity checker.
   auto validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);
 
   // Create the obstacles and add them to the validity checker.
   createObstacles();
   validityChecker->addObstacles(obstacles_);
-
-  // Create the anti obstacles and add them to the validity checker.
-  createAntiObstacles();
-  validityChecker->addAntiObstacles(antiObstacles_);
 
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
@@ -98,12 +100,6 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
 
   // Set up the space info.
   spaceInfo_->setup();
-
-  // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
-  }
 }
 
 ompl::base::ProblemDefinitionPtr NarrowPassage::instantiateNewProblemDefinition() const {
@@ -141,55 +137,54 @@ void NarrowPassage::createObstacles() {
   // Get the state space bounds.
   auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
 
-  // Create an anchor for the obstacle.
-  ompl::base::ScopedState<> anchor(spaceInfo_);
-
-  // Set the obstacle anchor in the middle of the state space.
+  // Get the midpoint between the start and goal positions.
+  ompl::base::ScopedState<> midpoint(spaceInfo_);
   for (std::size_t j = 0u; j < dimensionality_; ++j) {
-    anchor[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
+    midpoint[j] = (startState_[j] + goalState_[j]) / 2.0;
   }
 
-  // Create the widths of this wall.
-  std::vector<double> widths(dimensionality_, 0.0);
+  // Create an anchor point for the lower obstacle.
+  ompl::base::ScopedState<> lowerAnchor(midpoint);
+  lowerAnchor[1] = (midpoint[1] + passageOffset_ - (passageWidth_ / 2.0) + bounds.low[1]) / 2.0;
 
-  // Set the thickness of the wall.
-  widths.at(0) = wallThickness_;
+  // Create the widths of the lower wall.
+  std::vector<double> lowerWidths(dimensionality_, 0.0);
+
+  // Set the thickness of the lower wall.
+  lowerWidths.at(0) = wallThickness_;
+
+  // Set the height of the lower wall.
+  lowerWidths.at(1) = midpoint[1] + passageOffset_ - (passageWidth_ / 2.0) - bounds.low[1];
 
   // The wall extends to the boundaries in all other dimensions.
-  for (std::size_t j = 1u; j < dimensionality_; ++j) {
-    widths.at(j) = bounds.high.at(j) - bounds.low.at(j);
+  for (std::size_t j = 2u; j < dimensionality_; ++j) {
+    lowerWidths.at(j) = bounds.high.at(j) - bounds.low.at(j);
   }
+
+  // Create an anchor point for the upper obstacle.
+  ompl::base::ScopedState<> upperAnchor(midpoint);
+  upperAnchor[1] =
+      midpoint[1] + passageOffset_ + (bounds.high[1] - bounds.low[1] - lowerWidths.at(1)) / 2.0;
+
+  // Create the widths of the upper wall.
+  std::vector<double> upperWidths(dimensionality_, 0.0);
+
+  // Set the thickness of the upper wall.
+  upperWidths.at(0) = wallThickness_;
+
+  // Set the height of the upper wall.
+  upperWidths.at(1) = bounds.high.at(1) - bounds.low.at(1) - lowerWidths.at(1) - passageWidth_;
+
+  // The wall extends to the boundaries in all other dimensions.
+  for (std::size_t j = 2u; j < dimensionality_; ++j) {
+    upperWidths.at(j) = bounds.high.at(j) - bounds.low.at(j);
+  }
+
+  // Add both obstacles.
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths));
-}
-
-void NarrowPassage::createAntiObstacles() {
-  // Get the state space bounds.
-  auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
-
-  // Create an anchor for the anti obstacle.
-  ompl::base::ScopedState<> anchor(spaceInfo_);
-
-  // Set the obstacle anchor in the middle of the state space.
-  for (std::size_t j = 0; j < dimensionality_; ++j) {
-    anchor[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
-  }
-
-  // Move the obstacle anchor in the second dimension.
-  anchor[1u] = passageOffset_ + passageWidth_ / 2.0;
-
-  // Create the widths of passage.
-  std::vector<double> widths(dimensionality_, 0.0);
-
-  // Set the obstacle width in the first dimension.
-  widths.at(0) = wallThickness_ + std::numeric_limits<double>::epsilon();
-
-  // The widht of the passage in all other dimensions is the passage width.
-  for (std::size_t j = 1u; j < dimensionality_; ++j) {
-    widths.at(j) = passageWidth_;
-  }
-  antiObstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, anchor, widths));
+      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, lowerAnchor, lowerWidths));
+  obstacles_.emplace_back(
+      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, upperAnchor, upperWidths));
 }
 
 }  // namespace ompltools
