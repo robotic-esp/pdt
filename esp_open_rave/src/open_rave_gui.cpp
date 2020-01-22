@@ -134,7 +134,7 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
         }
         OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
         robot->SetActiveDOFValues(openRaveState);
-        std::this_thread::sleep_for(0.01s);
+        std::this_thread::sleep_for(0.1s);
       }
     } else {
       std::cout << "[ " << totalSolveDuration << "s ] "
