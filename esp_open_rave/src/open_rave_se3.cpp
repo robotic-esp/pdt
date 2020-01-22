@@ -101,6 +101,10 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
   // Create a collision checker.
   OpenRAVE::CollisionCheckerBasePtr collisionChecker = OpenRAVE::RaveCreateCollisionChecker(
       environment, config->get<std::string>("context/" + name + "/collisionChecker"));
+  const auto boundingVolumeHierarchyRepresentation = config->get<std::string>("context/" + name + "/boundingVolumeHierarchyRepresentation");
+  std::string input = "SetBVHRepresentation " + boundingVolumeHierarchyRepresentation;
+  std::string output = "";
+  collisionChecker->SendCommand(output, input);
   environment->SetCollisionChecker(collisionChecker);
 
   // Load the specified environment.
