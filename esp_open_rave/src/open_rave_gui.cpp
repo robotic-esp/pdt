@@ -58,6 +58,8 @@
 #include "esp_open_rave/open_rave_base_context.h"
 #include "esp_open_rave/open_rave_manipulator.h"
 #include "esp_open_rave/open_rave_manipulator_validity_checker.h"
+#include "esp_open_rave/open_rave_r3.h"
+#include "esp_open_rave/open_rave_r3_validity_checker.h"
 #include "esp_open_rave/open_rave_se3.h"
 #include "esp_open_rave/open_rave_se3_validity_checker.h"
 #include "esp_planning_contexts/all_contexts.h"
@@ -227,6 +229,85 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
   }
 }
 
+void planR3(std::shared_ptr<esp::ompltools::Configuration> config,
+            std::shared_ptr<esp::ompltools::OpenRaveR3> context) {
+  esp::ompltools::PlannerFactory plannerFactory(config, context);
+  auto [planner, plannerType] =
+      plannerFactory.create(config->get<std::string>("experiment/planner"));
+  (void)plannerType;
+
+  // Setup the planner.
+  planner->setup();
+
+  // Get the environment.
+  auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveR3ValidityChecker>(
+                         context->getSpaceInformation()->getStateValidityChecker())
+                         ->getOpenRaveEnvironment();
+
+  // Get the robot.
+  auto robot =
+      environment->GetRobot(config->get<std::string>("context/" + context->getName() + "/robot"));
+
+  // Get the conversion factors for ompl states to rave states.
+  auto raveLowerBounds =
+      config->get<std::vector<double>>("context/"s + context->getName() + "/lowerBounds"s);
+  auto raveUpperBounds =
+      config->get<std::vector<double>>("context/"s + context->getName() + "/upperBounds"s);
+  std::vector<double> raveStateScales;
+  raveStateScales.reserve(raveLowerBounds.size());
+  for (std::size_t i = 0u; i < raveLowerBounds.size(); ++i) {
+    raveStateScales.emplace_back(raveUpperBounds[i] - raveLowerBounds[i]);
+  }
+
+  // Create the vector to hold the current state.
+  OpenRAVE::Transform raveState;
+  raveState.identity();
+
+  double totalSolveDuration = 0.0;
+  // Work it.
+  while (true) {
+    // Work on the problem.
+    planner->solve(config->get<double>("experiment/visualizationInterval"));
+
+    // Update the total solve duration.
+    totalSolveDuration += config->get<double>("experiment/visualizationInterval");
+
+    // Check if the planner found a solution yet.
+    if (planner->getProblemDefinition()->hasExactSolution()) {
+      // Get the solution of the planner.
+      auto solution =
+          planner->getProblemDefinition()->getSolutionPath()->as<ompl::geometric::PathGeometric>();
+
+      // Report the cost of the solution.
+      std::cout << "[ " << totalSolveDuration << "s ] "
+                << config->get<std::string>("experiment/planner") << " found a solution of cost "
+                << solution->cost(planner->getProblemDefinition()->getOptimizationObjective())
+                << '\n';
+
+      // Interpolate ("approx to collision checking resolution").
+      solution->interpolate();
+
+      // Get the solution states.
+      auto solutionStates = solution->getStates();
+
+      // Visualize the solution.
+      for (const auto solutionState : solutionStates) {
+        auto r3State = solutionState->as<ompl::base::RealVectorStateSpace::StateType>();
+        raveState.trans.Set3(raveLowerBounds[0u] + (raveStateScales[0u] * (*r3State)[0u]),
+                             raveLowerBounds[1u] + (raveStateScales[1u] * (*r3State)[1u]),
+                             raveLowerBounds[2u] + (raveStateScales[2u] * (*r3State)[2u]));
+
+        OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());
+        robot->SetTransform(raveState);
+        std::this_thread::sleep_for(0.01s);
+      }
+    } else {
+      std::cout << "[ " << totalSolveDuration << "s ] "
+                << config->get<std::string>("experiment/planner")
+                << " did not find a solution yet.\n";
+    }
+  }
+}
 int main(int argc, char** argv) {
   // Instantiate the config.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
@@ -244,7 +325,8 @@ int main(int argc, char** argv) {
             ->getOpenRaveEnvironment();
 
     // Create the viewer.
-    auto viewer = OpenRAVE::RaveCreateViewer(environment, config->get<std::string>("experiment/viewer"));
+    auto viewer =
+        OpenRAVE::RaveCreateViewer(environment, config->get<std::string>("experiment/viewer"));
 
     auto planThread =
         std::thread(&planManipulator, config,
@@ -264,10 +346,31 @@ int main(int argc, char** argv) {
                            ->getOpenRaveEnvironment();
 
     // Create the viewer.
-    auto viewer = OpenRAVE::RaveCreateViewer(environment, config->get<std::string>("experiment/viewer"));
+    auto viewer =
+        OpenRAVE::RaveCreateViewer(environment, config->get<std::string>("experiment/viewer"));
 
     auto planThread = std::thread(&planMover, config,
                                   std::dynamic_pointer_cast<esp::ompltools::OpenRaveSE3>(context));
+
+    viewer->main(true);
+
+    while (!planThread.joinable()) {
+      std::this_thread::sleep_for(0.5s);
+    }
+
+    planThread.join();
+  } else if (std::dynamic_pointer_cast<esp::ompltools::OpenRaveR3>(context)) {
+    // Get the environment.
+    auto environment = std::dynamic_pointer_cast<esp::ompltools::OpenRaveR3ValidityChecker>(
+                           context->getSpaceInformation()->getStateValidityChecker())
+                           ->getOpenRaveEnvironment();
+
+    // Create the viewer.
+    auto viewer =
+        OpenRAVE::RaveCreateViewer(environment, config->get<std::string>("experiment/viewer"));
+
+    auto planThread = std::thread(&planR3, config,
+                                  std::dynamic_pointer_cast<esp::ompltools::OpenRaveR3>(context));
 
     viewer->main(true);
 

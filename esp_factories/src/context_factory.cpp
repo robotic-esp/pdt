@@ -40,6 +40,7 @@
 
 #include "esp_common/context_type.h"
 #include "esp_open_rave/open_rave_manipulator.h"
+#include "esp_open_rave/open_rave_r3.h"
 #include "esp_open_rave/open_rave_se3.h"
 #include "esp_planning_contexts/all_contexts.h"
 
@@ -149,6 +150,19 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         throw std::runtime_error("Error allocating a OpenRaveManipulator context.");
       }
     }
+    case CONTEXT_TYPE::OPEN_RAVE_R3: {
+      try {
+        // Allocate a real vector state space.
+        // The state space bounds are set in the context.
+        auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(3u);
+
+        // Allocate the state information for this space.
+        auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+        return std::make_shared<OpenRaveR3>(spaceInfo, config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating a OpenRaveMover context.");
+      }
+    }
     case CONTEXT_TYPE::OPEN_RAVE_SE3: {
       try {
         // Allocate a real vector state space.
@@ -202,9 +216,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         throw std::runtime_error("Error allocating a WallGap context.");
       }
     }
-    default: {
-      throw std::invalid_argument("Context '"s + contextName + "' is of unknown type."s);
-    }
+    default: { throw std::invalid_argument("Context '"s + contextName + "' is of unknown type."s); }
   }
 }
 

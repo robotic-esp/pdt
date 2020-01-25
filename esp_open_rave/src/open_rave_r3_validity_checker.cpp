@@ -34,9 +34,9 @@
 
 // Authors: Marlin Strub
 
-#include "esp_open_rave/open_rave_se3_validity_checker.h"
+#include "esp_open_rave/open_rave_r3_validity_checker.h"
 
-#include <ompl/base/spaces/SE3StateSpace.h>
+#include <ompl/base/spaces/RealVectorStateSpace.h>
 
 using namespace std::string_literals;
 
@@ -44,7 +44,7 @@ namespace esp {
 
 namespace ompltools {
 
-OpenRaveSE3ValidityChecker::OpenRaveSE3ValidityChecker(
+OpenRaveR3ValidityChecker::OpenRaveR3ValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo,
     const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot,
     const std::shared_ptr<const Configuration>& config) :
@@ -62,21 +62,17 @@ OpenRaveSE3ValidityChecker::OpenRaveSE3ValidityChecker(
   }
 }
 
-bool OpenRaveSE3ValidityChecker::isValid(const ompl::base::State* state) const {
+bool OpenRaveR3ValidityChecker::isValid(const ompl::base::State* state) const {
   // Check the states is within the bounds of the state space.
   if (!stateSpace_->satisfiesBounds(state)) {
     return false;
   }
 
   // Fill the rave state with the ompl state values.
-  auto se3State = state->as<ompl::base::SE3StateSpace::StateType>();
-  raveState_.trans.Set3(raveLowerBounds_[0] + (raveStateScales_[0] * se3State->getX()),
-                        raveLowerBounds_[1] + (raveStateScales_[1] * se3State->getY()),
-                        raveLowerBounds_[2] + (raveStateScales_[2] * se3State->getZ()));
-  raveState_.rot.x = se3State->rotation().x;
-  raveState_.rot.y = se3State->rotation().y;
-  raveState_.rot.z = se3State->rotation().z;
-  raveState_.rot.w = se3State->rotation().w;
+  auto r3State = state->as<ompl::base::RealVectorStateSpace::StateType>();
+  raveState_.trans.Set3(raveLowerBounds_[0u] + (raveStateScales_[0u] * (*r3State)[0u]),
+                        raveLowerBounds_[1u] + (raveStateScales_[1u] * (*r3State)[1u]),
+                        raveLowerBounds_[2u] + (raveStateScales_[2u] * (*r3State)[2u]));
 
   // Lock the environment mutex.
   OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
@@ -91,16 +87,12 @@ bool OpenRaveSE3ValidityChecker::isValid(const ompl::base::State* state) const {
   return !environment_->CheckCollision(robot_);
 }
 
-double OpenRaveSE3ValidityChecker::clearance(const ompl::base::State* state) const {
+double OpenRaveR3ValidityChecker::clearance(const ompl::base::State* state) const {
   // Fill the rave state with the ompl state values.
-  auto se3State = state->as<ompl::base::SE3StateSpace::StateType>();
-  raveState_.trans.Set3(raveLowerBounds_[0] + (raveStateScales_[0] * se3State->getX()),
-                        raveLowerBounds_[1] + (raveStateScales_[1] * se3State->getY()),
-                        raveLowerBounds_[2] + (raveStateScales_[2] * se3State->getZ()));
-  raveState_.rot.x = se3State->rotation().x;
-  raveState_.rot.y = se3State->rotation().y;
-  raveState_.rot.z = se3State->rotation().z;
-  raveState_.rot.w = se3State->rotation().w;
+  auto r3State = state->as<ompl::base::RealVectorStateSpace::StateType>();
+  raveState_.trans.Set3(raveLowerBounds_[0u] + (raveStateScales_[0u] * (*r3State)[0u]),
+                        raveLowerBounds_[1u] + (raveStateScales_[1u] * (*r3State)[1u]),
+                        raveLowerBounds_[2u] + (raveStateScales_[2u] * (*r3State)[2u]));
 
   // Lock the environment mutex.
   OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());

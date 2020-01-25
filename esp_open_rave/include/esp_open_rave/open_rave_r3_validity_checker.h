@@ -36,52 +36,60 @@
 
 #pragma once
 
-#include "nlohmann/json.hpp"
+#include <memory>
+
+#include <boost/shared_ptr.hpp>
+
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/State.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include <openrave-core.h>
+#pragma GCC diagnostic pop
+
+#include "esp_configuration/configuration.h"
+#include "esp_obstacles/base_obstacle.h"
+#include "esp_obstacles/hyperrectangle.h"
+#include "esp_obstacles/obstacle_visitor.h"
+#include "esp_open_rave/open_rave_base_validity_checker.h"
 
 namespace esp {
 
 namespace ompltools {
 
-enum class CONTEXT_TYPE {
-  CENTRE_SQUARE,
-  DIVIDING_WALLS,
-  DOUBLE_ENCLOSURE,
-  FLANKING_GAP,
-  FOUR_ROOMS,
-  GOAL_ENCLOSURE,
-  NARROW_PASSAGE,
-  OBSTACLE_FREE,
-  OPEN_RAVE_MANIPULATOR,
-  OPEN_RAVE_R3,
-  OPEN_RAVE_SE3,
-  RANDOM_RECTANGLES,
-  RANDOM_RECTANGLES_MULTI_START_GOAL,
-  REPEATING_RECTANGLES,
-  SPIRAL,
-  START_ENCLOSURE,
-  WALL_GAP,
-};
+class OpenRaveR3ValidityChecker : public OpenRaveBaseValidityChecker {
+ public:
+  /** \brief The constructor. */
+  OpenRaveR3ValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
+                            const OpenRAVE::EnvironmentBasePtr& environment,
+                            const OpenRAVE::RobotBasePtr& robot,
+                            const std::shared_ptr<const Configuration>& config);
 
-NLOHMANN_JSON_SERIALIZE_ENUM(CONTEXT_TYPE,
-                             {
-                                 {CONTEXT_TYPE::CENTRE_SQUARE, "CentreSquare"},
-                                 {CONTEXT_TYPE::DIVIDING_WALLS, "DividingWalls"},
-                                 {CONTEXT_TYPE::DOUBLE_ENCLOSURE, "DoubleEnclosure"},
-                                 {CONTEXT_TYPE::FLANKING_GAP, "FlankingGap"},
-                                 {CONTEXT_TYPE::FOUR_ROOMS, "FourRooms"},
-                                 {CONTEXT_TYPE::GOAL_ENCLOSURE, "GoalEnclosure"},
-                                 {CONTEXT_TYPE::NARROW_PASSAGE, "NarrowPassage"},
-                                 {CONTEXT_TYPE::OBSTACLE_FREE, "ObstacleFree"},
-                                 {CONTEXT_TYPE::OPEN_RAVE_MANIPULATOR, "OpenRaveManipulator"},
-                                 {CONTEXT_TYPE::OPEN_RAVE_R3, "OpenRaveR3"},
-                                 {CONTEXT_TYPE::OPEN_RAVE_SE3, "OpenRaveSE3"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES, "RandomRectangles"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES_MULTI_START_GOAL, "MultiStartGoal"},
-                                 {CONTEXT_TYPE::REPEATING_RECTANGLES, "RepeatingRectangles"},
-                                 {CONTEXT_TYPE::SPIRAL, "Spiral"},
-                                 {CONTEXT_TYPE::START_ENCLOSURE, "StartEnclosure"},
-                                 {CONTEXT_TYPE::WALL_GAP, "WallGap"},
-                             })
+  /** \brief The destructor. */
+  virtual ~OpenRaveR3ValidityChecker() = default;
+
+  /** \brief Check if a state is valid. */
+  virtual bool isValid(const ompl::base::State* state) const override;
+
+  /** \brief Returns the clearance of a state. */
+  virtual double clearance(const ompl::base::State* state) const override;
+
+ private:
+  /** \brief The state in a format that rave can check. */
+  mutable OpenRAVE::Transform raveState_;
+
+  /** \brief The lower bound of the rave state. This is needed as the asao-planners require [0, 1]^n
+   * spaces. */
+  std::vector<double> raveLowerBounds_;
+
+  /** \brief The upper bound of the rave state. This is needed as the asao-planners require [0, 1]^n
+   * spaces. */
+  std::vector<double> raveUpperBounds_;
+
+  /** \brief The scaling factors to convert an OMPL state dimension to a RAVE state. */
+  std::vector<double> raveStateScales_;
+};
 
 }  // namespace ompltools
 
