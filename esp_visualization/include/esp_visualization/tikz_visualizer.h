@@ -117,8 +117,7 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
   void drawSolution(const ompl::base::PathPtr path) const;
   void drawEllipse(double cost) const;
   void drawRectangle(double midX, double midY, double widthX, double widthY,
-                     const std::string& name, const std::string& lineColor,
-                     const std::string& fillColor) const;
+                     const std::string& lineColor, const std::string& fillColor) const;
   void drawPlannerSpecificVisualizations(
       const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData) const;
   void drawBITstarSpecificVisualizations(

@@ -45,7 +45,7 @@ namespace ompltools {
 using namespace std::string_literals;
 
 void TikzNode::setPosition(double x, double y) {
-  at_ = std::to_string(x) + "cm, " + std::to_string(y) + "cm";
+  at_ = std::to_string(x) + ", " + std::to_string(y);
 }
 
 void TikzNode::setPosition(const std::string& position) {
