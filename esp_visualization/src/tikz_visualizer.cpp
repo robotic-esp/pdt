@@ -401,14 +401,14 @@ void TikzVisualizer::visit(const WallGap& context) const {
 
 void TikzVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
   drawRectangle(obstacle.getAnchorCoordinates().at(0), obstacle.getAnchorCoordinates().at(1),
-                obstacle.getWidths().at(0), obstacle.getWidths().at(1), "obstacle", "none",
+                obstacle.getWidths().at(0), obstacle.getWidths().at(1), "none",
                 "espblack");
 }
 
 void TikzVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
   drawRectangle(antiObstacle.getAnchorCoordinates().at(0),
                 antiObstacle.getAnchorCoordinates().at(1), antiObstacle.getWidths().at(0) + 1e-2,
-                antiObstacle.getWidths().at(1) + 1e-2, "antiObstacle", "none", "espwhite");
+                antiObstacle.getWidths().at(1) + 1e-2, "none", "espwhite");
 }
 
 void TikzVisualizer::drawBoundary(const RealVectorGeometricContext& context) const {
@@ -417,7 +417,7 @@ void TikzVisualizer::drawBoundary(const RealVectorGeometricContext& context) con
   double midY = (boundaries.low.at(1u) + boundaries.high.at(1u)) / 2.0;
   double widthX = boundaries.high.at(0u) - boundaries.low.at(0u);
   double widthY = boundaries.high.at(1u) - boundaries.low.at(1u);
-  drawRectangle(midX, midY, widthX, widthY, "boundary", "espblack", "none");
+  drawRectangle(midX, midY, widthX, widthY, "espblack", "none");
 }
 
 void TikzVisualizer::drawStartState(
@@ -453,15 +453,14 @@ void TikzVisualizer::drawGoalStates(
 }
 
 void TikzVisualizer::drawRectangle(double midX, double midY, double widthX, double widthY,
-                                   const std::string& name, const std::string& lineColor,
-                                   const std::string& fillColor) const {
-  auto rectangle = std::make_shared<TikzNode>();
-  rectangle->setOptions("draw = "s + lineColor + ", fill = "s + fillColor +
-                        ", inner sep = 0mm, minimum width = "s + std::to_string(widthX) + "cm"s +
-                        ", minimum height = "s + std::to_string(widthY) + "cm"s);
-  rectangle->setPosition(midX, midY);
-  rectangle->setName(name);
-  picture_.addNode(rectangle);
+                                   const std::string& lineColor, const std::string& fillColor) const {
+  auto rectangle = std::make_shared<TikzDraw>();
+  rectangle->setFromPosition(midX - widthX / 2.0, midY - widthY / 2.0);
+  rectangle->setToPosition(midX + widthX / 2.0, midY + widthY / 2.0);
+  rectangle->setConnection("rectangle");
+  rectangle->setOptions("draw = "s + lineColor + ", fill = "s + fillColor);
+
+  picture_.addDraw(rectangle);
 }
 
 void TikzVisualizer::drawPlannerSpecificVisualizations(

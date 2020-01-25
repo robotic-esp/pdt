@@ -61,6 +61,9 @@ sudo apt install texlive-luatex
 
 If running `which lualatex` echoes a path, you should be good to go, otherwise install lualatex.
 
+The reporting tool loads the whole `result.csv` into memory. This file can be quite large, depending on `logFrequency`, `maxTime`, and the number of planners. If your system runs out of memory, ensure you have swap turned on ([see, e.g., here on how to do it](https://tecadmin.net/enable-swap-on-ubuntu/)), or rerun experiment with a lower `logFrequency`, a lower `maxTime`, or fewer planners.
+
+
 ### ESP OMPL TOOLS
 
 This project includes two header-only libraries (N. Lohmann's [JSON](https://github.com/nlohmann/json) and A. Fallah's [CSV-parser](https://github.com/AriaFallah/csv-parser)) as submodules (which is why we need to clone recursively).
