@@ -1,0 +1,17 @@
+{
+    "planner": {
+        "defaultTBDstar": {
+            "type": "TBDstar",
+            "isAnytime": true,
+            "report": {
+                "color": "esplightgreen",
+                "name": "AI-BIT*"
+            },
+            "options": {
+                "rewireFactor": 1.001,
+                "batchSize": 100,
+                "repairBackwardSearch": true
+            }
+        }
+    }
+}
