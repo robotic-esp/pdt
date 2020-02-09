@@ -47,32 +47,45 @@ namespace esp {
 
 namespace ompltools {
 
-// Obstacles are geometric primitives.
 class MaxMinClearanceOptimizationObjective : public ompl::base::OptimizationObjective,
                                              public BaseOptimizationObjective {
  public:
+  // The constructor.
   MaxMinClearanceOptimizationObjective(
       const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo);
+
+  // The destructor.
   virtual ~MaxMinClearanceOptimizationObjective();
 
+  // The state cost is the clearance of a state.
   ompl::base::Cost stateCost(const ompl::base::State* state) const override;
 
+  // States with large clearance are better than states with low clearance.
   bool isCostBetterThan(ompl::base::Cost cost1, ompl::base::Cost cost2) const override;
 
+  // In OMPL, the identity is under addition: Any cost will retain its value when combined with the
+  // identity cost. For this objective the identity cost must by infinity, as combining costs means
+  // taking the lower of the two.
   ompl::base::Cost identityCost() const override;
 
+  // Infinite cost is zero, as the cost is the state clearance.
   ompl::base::Cost infiniteCost() const override;
 
+  // Combining cost means returning the cost which corresponds to the lower clearance.
   ompl::base::Cost combineCosts(ompl::base::Cost cost1, ompl::base::Cost cost2) const override;
 
+  // The motion cost is the state cost of the state closest to an obstacle.
   ompl::base::Cost motionCost(const ompl::base::State* state1,
                               const ompl::base::State* state2) const override;
 
+  // There is no good motion cost heuristic for this objective.
   ompl::base::Cost motionCostHeuristic(const ompl::base::State* state1,
                                        const ompl::base::State* state2) const override;
 
+  // This method can usually be used to terminate a planner.
   bool isSatisfied(ompl::base::Cost cost) const override;
 
+  // This method makes this objective visitable.
   void accept(const ObjectiveVisitor& visitor) const override;
 
  private:
