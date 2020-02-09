@@ -82,11 +82,7 @@ bool OpenRaveManipulatorValidityChecker::isValid(const ompl::base::State* state)
   environment_->GetCollisionChecker()->SetCollisionOptions(OpenRAVE::CO_Contacts);
 
   // Check for collisions.
-  if (environment_->CheckCollision(robot_) || robot_->CheckSelfCollision()) {
-    return false;
-  } else {
-    return true;
-  }
+  return !(environment_->CheckCollision(robot_) || robot_->CheckSelfCollision());
 }
 
 double OpenRaveManipulatorValidityChecker::clearance(const ompl::base::State* state) const {
