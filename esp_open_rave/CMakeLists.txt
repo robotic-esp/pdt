@@ -14,7 +14,9 @@ add_library(esp_open_rave
   src/open_rave_manipulator.cpp
   src/open_rave_manipulator_validity_checker.cpp
   src/open_rave_r3.cpp
+  src/open_rave_r3xso2.cpp
   src/open_rave_r3_validity_checker.cpp
+  src/open_rave_r3xso2_validity_checker.cpp
   src/open_rave_se3.cpp
   src/open_rave_se3_validity_checker.cpp)
 

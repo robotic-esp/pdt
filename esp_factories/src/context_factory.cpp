@@ -36,11 +36,16 @@
 
 #include "esp_factories/context_factory.h"
 
+#include <ompl/base/StateSpace.h>
+#include <ompl/base/spaces/RealVectorStateSpace.h>
+#include <ompl/base/spaces/SO2StateSpace.h>
+
 #include "nlohmann/json.hpp"
 
 #include "esp_common/context_type.h"
 #include "esp_open_rave/open_rave_manipulator.h"
 #include "esp_open_rave/open_rave_r3.h"
+#include "esp_open_rave/open_rave_r3xso2.h"
 #include "esp_open_rave/open_rave_se3.h"
 #include "esp_planning_contexts/all_contexts.h"
 
@@ -161,6 +166,27 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<OpenRaveR3>(spaceInfo, config_, contextName);
       } catch (const json::detail::type_error& e) {
         throw std::runtime_error("Error allocating a OpenRaveMover context.");
+      }
+    }
+    case CONTEXT_TYPE::OPEN_RAVE_R3XSO2: {
+      try {
+        // Allocate the R3 component of the state space.
+        // The space bounds are set in the context.
+        auto r3StateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(3u);
+
+        // Allocate the O2 component of the state space.
+        auto so2StateSpace = std::make_shared<ompl::base::SO2StateSpace>();
+
+        // Allocate the compound state space.
+        auto stateSpace = std::make_shared<ompl::base::CompoundStateSpace>(
+            std::vector<ompl::base::StateSpacePtr>({r3StateSpace, so2StateSpace}),
+            std::vector<double>({1.0, 1.0}));
+
+        // Allocate the space information for this space.
+        auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+        return std::make_shared<OpenRaveR3xSO2>(spaceInfo, config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating an OpenRaveR3XO2 context.");
       }
     }
     case CONTEXT_TYPE::OPEN_RAVE_SE3: {
