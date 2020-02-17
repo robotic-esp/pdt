@@ -299,7 +299,7 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(tbdstarData);
           break;
         }
-        case PLANNER_TYPE::AIBITSTAR: {
+        case PLANNER_TYPE::AEITSTAR: {
           auto aibitstarData = std::make_shared<AIBITstarData>(context_->getSpaceInformation());
 
           // Store the AIBIT* reverse tree.

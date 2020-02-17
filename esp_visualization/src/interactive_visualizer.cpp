@@ -872,7 +872,7 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iterat
       drawTBDstarSpecificVisualizations(iteration);
       return;
     }
-    case PLANNER_TYPE::AIBITSTAR: {
+    case PLANNER_TYPE::AEITSTAR: {
       drawAIBITstarSpecificVisualizations(iteration);
       return;
     }

@@ -60,7 +60,7 @@ namespace utilities {
 
 ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE plannerType) {
   switch (plannerType) {
-    case PLANNER_TYPE::AIBITSTAR: {
+    case PLANNER_TYPE::AEITSTAR: {
       return planner->as<ompl::geometric::AIBITstar>()->bestCost();
     }
     case PLANNER_TYPE::AITSTAR: {

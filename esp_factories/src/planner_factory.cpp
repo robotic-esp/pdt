@@ -75,7 +75,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
   const auto optionsKey = parentKey + "/options"s;
   // BIT*
   switch (type) {
-    case PLANNER_TYPE::AIBITSTAR: {
+    case PLANNER_TYPE::AEITSTAR: {
       // Allocate and configure an AI-BIT* planner.
       auto planner = std::make_shared<ompl::geometric::AIBITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
@@ -87,7 +87,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
           config_->get<bool>(optionsKey + "/repairReverseSearchTreeUponCollisionDetection"));
       planner->enableCollisionDetectionInReverseSearch(
           config_->get<bool>(optionsKey + "/collisionDetectionOnReverseSearch"));
-      return {planner, PLANNER_TYPE::AIBITSTAR};
+      return {planner, PLANNER_TYPE::AEITSTAR};
     }
     case PLANNER_TYPE::BITSTAR: {
       // Allocate and configure a BIT* planner.
