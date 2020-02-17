@@ -46,7 +46,7 @@
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
-#include <ompl/geometric/planners/tbdstar/TBDstar.h>
+#include <ompl/geometric/planners/aitstar/AITstar.h>
 
 #include "nlohmann/json.hpp"
 
@@ -210,15 +210,15 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
           config_->get<double>(optionsKey + "/truncationParameter"));
       return {planner, PLANNER_TYPE::SBITSTAR};
     }
-    case PLANNER_TYPE::TBDSTAR: {
+    case PLANNER_TYPE::AITSTAR: {
       // Allocate and configure a TBD* planner.
-      auto planner = std::make_shared<ompl::geometric::TBDstar>(context_->getSpaceInformation());
+      auto planner = std::make_shared<ompl::geometric::AITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setRepairBackwardSearch(config_->get<bool>(optionsKey + "/repairBackwardSearch"));
       planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
-      return {planner, PLANNER_TYPE::TBDSTAR};
+      return {planner, PLANNER_TYPE::AITSTAR};
     }
     default: { throw std::runtime_error("Planner '"s + plannerName + "' is of unknown type."s); }
   }
