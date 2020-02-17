@@ -63,6 +63,9 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     case PLANNER_TYPE::AIBITSTAR: {
       return planner->as<ompl::geometric::AIBITstar>()->bestCost();
     }
+    case PLANNER_TYPE::AITSTAR: {
+      return planner->as<ompl::geometric::TBDstar>()->bestCost();
+    }
     case PLANNER_TYPE::BITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
     }
@@ -86,9 +89,6 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     }
     case PLANNER_TYPE::SBITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
-    }
-    case PLANNER_TYPE::TBDSTAR: {
-      return planner->as<ompl::geometric::TBDstar>()->bestCost();
     }
     default: {
       throw std::runtime_error("Received request to get best cost of unknown planner type.");
