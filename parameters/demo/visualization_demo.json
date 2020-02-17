@@ -1,7 +1,7 @@
 {
     "experiment": {
         "executable": "visualization",
-        "planner": "defaultAIBITstar",
+        "planner": "defaultAEITstar",
         "context": "defaultWallGap",
         "useOnlyThisConfig": false
     }

@@ -39,7 +39,8 @@
 #include <limits>
 #include <string>
 
-#include <ompl/geometric/planners/aibitstar/AIBITstar.h>
+#include <ompl/geometric/planners/aeitstar/AEITstar.h>
+#include <ompl/geometric/planners/aitstar/AITstar.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
@@ -48,7 +49,6 @@
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
-#include <ompl/geometric/planners/tbdstar/TBDstar.h>
 
 #include "esp_common/planner_type.h"
 
@@ -61,10 +61,10 @@ namespace utilities {
 ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE plannerType) {
   switch (plannerType) {
     case PLANNER_TYPE::AEITSTAR: {
-      return planner->as<ompl::geometric::AIBITstar>()->bestCost();
+      return planner->as<ompl::geometric::AEITstar>()->bestCost();
     }
     case PLANNER_TYPE::AITSTAR: {
-      return planner->as<ompl::geometric::TBDstar>()->bestCost();
+      return planner->as<ompl::geometric::AITstar>()->bestCost();
     }
     case PLANNER_TYPE::BITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();

@@ -36,7 +36,8 @@
 
 #include "esp_factories/planner_factory.h"
 
-#include <ompl/geometric/planners/aibitstar/AIBITstar.h>
+#include <ompl/geometric/planners/aeitstar/AEITstar.h>
+#include <ompl/geometric/planners/aitstar/AITstar.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
@@ -46,7 +47,6 @@
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
-#include <ompl/geometric/planners/aitstar/AITstar.h>
 
 #include "nlohmann/json.hpp"
 
@@ -76,8 +76,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
   // BIT*
   switch (type) {
     case PLANNER_TYPE::AEITSTAR: {
-      // Allocate and configure an AI-BIT* planner.
-      auto planner = std::make_shared<ompl::geometric::AIBITstar>(context_->getSpaceInformation());
+      // Allocate and configure an AEIT* planner.
+      auto planner = std::make_shared<ompl::geometric::AEITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setNumSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));

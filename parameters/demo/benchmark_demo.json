@@ -6,7 +6,7 @@
             "defaultRRTstar",
             "defaultBITstar",
             "defaultABITstar",
-            "defaultAIBITstar"
+            "defaultAEITstar"
         ],
         "context": "defaultWallGap",
         "numRuns": 100,

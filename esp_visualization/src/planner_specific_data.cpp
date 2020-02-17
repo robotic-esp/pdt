@@ -69,29 +69,29 @@ void BITstarData::setNextEdgeValueInQueue(const ompl::base::Cost& cost) {
   nextEdgeValueInQueue_ = cost;
 }
 
-std::vector<ompl::geometric::tbdstar::Edge> TBDstarData::getForwardQueue() const {
+std::vector<ompl::geometric::aitstar::Edge> AITstarData::getForwardQueue() const {
   return forwardQueue_;
 }
 
-std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>> TBDstarData::getBackwardQueue()
+std::vector<std::shared_ptr<ompl::geometric::aitstar::Vertex>> AITstarData::getBackwardQueue()
     const {
   return backwardQueue_;
 }
 
-std::shared_ptr<ompl::geometric::tbdstar::Vertex> TBDstarData::getNextVertex() const {
+std::shared_ptr<ompl::geometric::aitstar::Vertex> AITstarData::getNextVertex() const {
   return nextVertex_;
 }
 
-std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>
-TBDstarData::getVerticesInBackwardSearchTree() const {
+std::vector<std::shared_ptr<ompl::geometric::aitstar::Vertex>>
+AITstarData::getVerticesInBackwardSearchTree() const {
   return verticesInBackwardSearchTree_;
 }
 
-std::pair<const ompl::base::State*, const ompl::base::State*> TBDstarData::getNextEdge() const {
+std::pair<const ompl::base::State*, const ompl::base::State*> AITstarData::getNextEdge() const {
   return std::make_pair(parentStateNextEdge_, childStateNextEdge_);
 }
 
-void TBDstarData::setNextEdge(
+void AITstarData::setNextEdge(
     const std::pair<const ompl::base::State*, const ompl::base::State*>& edge) {
   if (edge.first == nullptr || edge.second == nullptr) {
     return;
@@ -100,66 +100,66 @@ void TBDstarData::setNextEdge(
   spaceInfo_->copyState(childStateNextEdge_, edge.second);
 }
 
-void TBDstarData::setForwardQueue(const std::vector<ompl::geometric::tbdstar::Edge>& queue) {
+void AITstarData::setForwardQueue(const std::vector<ompl::geometric::aitstar::Edge>& queue) {
   forwardQueue_ = queue;
 }
 
-void TBDstarData::setBackwardQueue(
-    const std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>& queue) {
+void AITstarData::setBackwardQueue(
+    const std::vector<std::shared_ptr<ompl::geometric::aitstar::Vertex>>& queue) {
   backwardQueue_ = queue;
 }
 
-void TBDstarData::setNextVertex(const std::shared_ptr<ompl::geometric::tbdstar::Vertex>& vertex) {
+void AITstarData::setNextVertex(const std::shared_ptr<ompl::geometric::aitstar::Vertex>& vertex) {
   nextVertex_ = vertex;
 }
 
-void TBDstarData::setVerticesInBackwardSearchTree(
-    const std::vector<std::shared_ptr<ompl::geometric::tbdstar::Vertex>>& vertices) {
+void AITstarData::setVerticesInBackwardSearchTree(
+    const std::vector<std::shared_ptr<ompl::geometric::aitstar::Vertex>>& vertices) {
   // We need to create a deep copy here.
   verticesInBackwardSearchTree_.reserve(vertices.size());
   for (const auto& vertex : vertices) {
     verticesInBackwardSearchTree_.emplace_back(
-        std::make_shared<ompl::geometric::tbdstar::Vertex>(*vertex));
+        std::make_shared<ompl::geometric::aitstar::Vertex>(*vertex));
   }
 }
 
-std::vector<ompl::geometric::aibitstar::Edge> AIBITstarData::getReverseTree() const {
+std::vector<ompl::geometric::aeitstar::Edge> AEITstarData::getReverseTree() const {
   return reverseTree_;
 }
 
-std::vector<ompl::geometric::aibitstar::Edge> AIBITstarData::getForwardQueue() const {
+std::vector<ompl::geometric::aeitstar::Edge> AEITstarData::getForwardQueue() const {
   return forwardQueue_;
 }
 
-std::vector<ompl::geometric::aibitstar::Edge> AIBITstarData::getReverseQueue() const {
+std::vector<ompl::geometric::aeitstar::Edge> AEITstarData::getReverseQueue() const {
   return reverseQueue_;
 }
 
-ompl::geometric::aibitstar::Edge AIBITstarData::getNextForwardEdge() const {
+ompl::geometric::aeitstar::Edge AEITstarData::getNextForwardEdge() const {
   return nextForwardEdge_;
 }
 
-ompl::geometric::aibitstar::Edge AIBITstarData::getNextReverseEdge() const {
+ompl::geometric::aeitstar::Edge AEITstarData::getNextReverseEdge() const {
   return nextReverseEdge_;
 }
 
-void AIBITstarData::setReverseTree(const std::vector<ompl::geometric::aibitstar::Edge>& tree) {
+void AEITstarData::setReverseTree(const std::vector<ompl::geometric::aeitstar::Edge>& tree) {
   reverseTree_ = tree;
 }
 
-void AIBITstarData::setForwardQueue(const std::vector<ompl::geometric::aibitstar::Edge>& queue) {
+void AEITstarData::setForwardQueue(const std::vector<ompl::geometric::aeitstar::Edge>& queue) {
   forwardQueue_ = queue;
 }
 
-void AIBITstarData::setReverseQueue(const std::vector<ompl::geometric::aibitstar::Edge>& queue) {
+void AEITstarData::setReverseQueue(const std::vector<ompl::geometric::aeitstar::Edge>& queue) {
   reverseQueue_ = queue;
 }
 
-void AIBITstarData::setNextForwardEdge(const ompl::geometric::aibitstar::Edge& edge) {
+void AEITstarData::setNextForwardEdge(const ompl::geometric::aeitstar::Edge& edge) {
   nextForwardEdge_ = edge;
 }
 
-void AIBITstarData::setNextReverseEdge(const ompl::geometric::aibitstar::Edge& edge) {
+void AEITstarData::setNextReverseEdge(const ompl::geometric::aeitstar::Edge& edge) {
   nextReverseEdge_ = edge;
 }
 

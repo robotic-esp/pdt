@@ -1,11 +1,11 @@
 {
     "planner": {
-        "defaultTBDstar": {
-            "type": "TBDstar",
+        "defaultAITstar": {
+            "type": "AITstar",
             "isAnytime": true,
             "report": {
                 "color": "esplightgreen",
-                "name": "AI-BIT*"
+                "name": "AIT*"
             },
             "options": {
                 "rewireFactor": 1.001,

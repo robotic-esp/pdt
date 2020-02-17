@@ -868,12 +868,12 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iterat
       drawBITstarSpecificVisualizations(iteration);
       return;
     }
-    case PLANNER_TYPE::TBDSTAR: {
-      drawTBDstarSpecificVisualizations(iteration);
+    case PLANNER_TYPE::AITSTAR: {
+      drawAITstarSpecificVisualizations(iteration);
       return;
     }
     case PLANNER_TYPE::AEITSTAR: {
-      drawAIBITstarSpecificVisualizations(iteration);
+      drawAEITstarSpecificVisualizations(iteration);
       return;
     }
     default:
@@ -948,13 +948,13 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
   }
 }
 
-void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iteration) const {
+void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iteration) const {
   // Get the TBD* specific data.
-  auto tbdstarData =
-      std::dynamic_pointer_cast<const TBDstarData>(getPlannerSpecificData(iteration));
+  auto aitstarData =
+      std::dynamic_pointer_cast<const AITstarData>(getPlannerSpecificData(iteration));
   if (context_->getDimension() == 2u) {
     // Get the edge queue.
-    auto forwardQueue = tbdstarData->getForwardQueue();
+    auto forwardQueue = aitstarData->getForwardQueue();
     std::vector<Eigen::Vector2d> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
     for (const auto& edge : forwardQueue) {
@@ -969,7 +969,7 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
     drawLines(forwardQueueEdges, 1.5, lightblue);
 
     // Get the vertex queue.
-    auto backwardQueue = tbdstarData->getBackwardQueue();
+    auto backwardQueue = aitstarData->getBackwardQueue();
     std::vector<Eigen::Vector2d> backwardQueueVertices{};
     for (const auto& vertex : backwardQueue) {
       auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
@@ -979,7 +979,7 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
     drawPoints(backwardQueueVertices, yellow, 10.0);
 
     // Get the next vertex in the queue.
-    auto nextVertex = tbdstarData->getNextVertex();
+    auto nextVertex = aitstarData->getNextVertex();
     if (nextVertex) {
       auto state = nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       drawPoints(std::vector<Eigen::Vector2d>{Eigen::Vector2d((*state)[0u], (*state)[1u])}, red,
@@ -987,7 +987,7 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
     }
 
     // Draw the backward search tree.
-    auto backwardSearchTree = tbdstarData->getVerticesInBackwardSearchTree();
+    auto backwardSearchTree = aitstarData->getVerticesInBackwardSearchTree();
     std::vector<Eigen::Vector2d> backwardSearchTreeEdges;
     for (const auto& vertex : backwardSearchTree) {
       // Add the edge to the parent.
@@ -1004,7 +1004,7 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
     drawLines(backwardSearchTreeEdges, 1.0, yellow);
 
     // Get the next edge in the queue.
-    auto nextEdgeStates = tbdstarData->getNextEdge();
+    auto nextEdgeStates = aitstarData->getNextEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (!nextEdgeStates.first || !nextEdgeStates.second) {
@@ -1018,7 +1018,7 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
     drawLines(nextEdge, 3.0, red);
   } else if (context_->getDimension() == 3u) {
     // Get the edge queue.
-    auto edgeQueue = tbdstarData->getForwardQueue();
+    auto edgeQueue = aitstarData->getForwardQueue();
     std::vector<Eigen::Vector3d> edges{};
     for (const auto& edge : edgeQueue) {
       auto sourceState =
@@ -1033,7 +1033,7 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
     drawLines(edges, 1.5, lightblue);
 
     // Get the next edge in the queue.
-    auto nextEdgeStates = tbdstarData->getNextEdge();
+    auto nextEdgeStates = aitstarData->getNextEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (!nextEdgeStates.first || !nextEdgeStates.second) {
@@ -1049,13 +1049,13 @@ void InteractiveVisualizer::drawTBDstarSpecificVisualizations(std::size_t iterat
   }
 }
 
-void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iteration) const {
+void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t iteration) const {
   // Get the AIBIT* specific data.
-  auto aibitstarData =
-      std::dynamic_pointer_cast<const AIBITstarData>(getPlannerSpecificData(iteration));
+  auto aeitstarData =
+      std::dynamic_pointer_cast<const AEITstarData>(getPlannerSpecificData(iteration));
   if (context_->getDimension() == 2u) {
     // Get the forward queue.
-    auto forwardQueue = aibitstarData->getForwardQueue();
+    auto forwardQueue = aeitstarData->getForwardQueue();
     std::vector<Eigen::Vector2d> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
     for (const auto& edge : forwardQueue) {
@@ -1069,7 +1069,7 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     drawLines(forwardQueueEdges, 1.5, lightblue);
 
     // Get the reverse queue.
-    auto reverseQueue = aibitstarData->getReverseQueue();
+    auto reverseQueue = aeitstarData->getReverseQueue();
     std::vector<Eigen::Vector2d> reverseQueueEdges;
     forwardQueueEdges.reserve(2u * reverseQueue.size());
     for (const auto& edge : reverseQueue) {
@@ -1083,7 +1083,7 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     drawLines(reverseQueueEdges, 1.5, yellow);
 
     // Get the reverse tree.
-    auto reverseTree = aibitstarData->getReverseTree();
+    auto reverseTree = aeitstarData->getReverseTree();
     std::vector<Eigen::Vector2d> reverseTreeEdges;
     reverseTreeEdges.reserve(2u * reverseTree.size());
     for (const auto& edge : reverseTree) {
@@ -1097,7 +1097,7 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     drawLines(reverseTreeEdges, 2.0, blue);
 
     // Get the next edge in the forward queue.
-    auto nextForwardEdge = aibitstarData->getNextForwardEdge();
+    auto nextForwardEdge = aeitstarData->getNextForwardEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (nextForwardEdge.source && nextForwardEdge.target) {
@@ -1113,7 +1113,7 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     }
 
     // Get the next edge in the reverse queue.
-    auto nextReverseEdge = aibitstarData->getNextReverseEdge();
+    auto nextReverseEdge = aeitstarData->getNextReverseEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (nextReverseEdge.source && nextReverseEdge.target) {

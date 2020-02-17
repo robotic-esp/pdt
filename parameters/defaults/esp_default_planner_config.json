@@ -14,8 +14,8 @@
             "inflationParameter": 10.0,
             "truncationParameter": 5.0
         },
-        "AIBITstar": {
-            "type": "AIBITstar",
+        "AEITstar": {
+            "type": "AEITstar",
             "samplesPerBatch": 1000,
             "radiusFactor": 1.001,
             "collisionDetectionOnReverseSearch": true
