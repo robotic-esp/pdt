@@ -464,9 +464,9 @@ void TikzVisualizer::drawPlannerSpecificVisualizations(
           std::dynamic_pointer_cast<const BITstarData>(plannerSpecificData));
       break;
     }
-    case PLANNER_TYPE::TBDSTAR: {
-      drawTBDstarSpecificVisualizations(
-          std::dynamic_pointer_cast<const TBDstarData>(plannerSpecificData));
+    case PLANNER_TYPE::AITSTAR: {
+      drawAITstarSpecificVisualizations(
+          std::dynamic_pointer_cast<const AITstarData>(plannerSpecificData));
       break;
     }
     default: { return; }
@@ -501,17 +501,17 @@ void TikzVisualizer::drawBITstarSpecificVisualizations(
   }
 }
 
-void TikzVisualizer::drawTBDstarSpecificVisualizations(
-    const std::shared_ptr<const TBDstarData>& tbdstarData) const {
+void TikzVisualizer::drawAITstarSpecificVisualizations(
+    const std::shared_ptr<const AITstarData>& aitstarData) const {
   // // Draw the forward queue.
-  // for (const auto& edge : tbdstarData->getForwardQueue()) {
+  // for (const auto& edge : aitstarData->getForwardQueue()) {
   //   drawEdge(edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
   //            edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
   //            "esplightblue, dash pattern=on 0.02mm off 0.03mm, line width = 0.02mm");
   // }
 
   // // Draw the top edge in the queue.
-  // auto nextEdge = tbdstarData->getNextEdge();
+  // auto nextEdge = aitstarData->getNextEdge();
   // if (nextEdge.first && nextEdge.second) {
   //   drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
   //            nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(),
@@ -519,13 +519,13 @@ void TikzVisualizer::drawTBDstarSpecificVisualizations(
   // }
 
   // // Draw the backward queue.
-  // for (const auto& vertex : tbdstarData->getBackwardQueue()) {
+  // for (const auto& vertex : aitstarData->getBackwardQueue()) {
   //   drawVertex(vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
   //              "fill = espgray, inner sep = 0mm, circle, minimum size = 0.2mm");
   // }
 
   // Draw the backward search tree.
-  for (const auto& vertex : tbdstarData->getVerticesInBackwardSearchTree()) {
+  for (const auto& vertex : aitstarData->getVerticesInBackwardSearchTree()) {
     // Add the edge to the parent.
     if (vertex->hasBackwardParent()) {
       auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
@@ -537,7 +537,7 @@ void TikzVisualizer::drawTBDstarSpecificVisualizations(
   }
 
   // // Draw the next vertex in the queue.
-  // auto nextVertex = tbdstarData->getNextVertex();
+  // auto nextVertex = aitstarData->getNextVertex();
   // if (nextVertex) {
   //   drawVertex(nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
   //              "fill = espred, inner sep = 0mm, circle, minimum size = 0.3mm");

@@ -41,7 +41,7 @@
 
 #include <ompl/base/terminationconditions/IterationTerminationCondition.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
-#include <ompl/geometric/planners/tbdstar/TBDstar.h>
+#include <ompl/geometric/planners/aitstar/AITstar.h>
 
 #include "esp_time/time.h"
 
@@ -196,8 +196,8 @@ void BaseVisualizer::createData() {
       if (plannerType_ == esp::ompltools::PLANNER_TYPE::BITSTAR) {
         planner_->as<ompl::geometric::BITstar>()->setLocalSeed(
             config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::TBDSTAR) {
-        // planner_->as<ompl::geometric::TBDstar>()->setLocalSeed(
+      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::AITSTAR) {
+        // planner_->as<ompl::geometric::AITstar>()->setLocalSeed(
         // config_->get<std::size_t>("experiment/seed"));
       }
     } else {
@@ -269,34 +269,34 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(bitstarData);
           break;
         }
-        case PLANNER_TYPE::TBDSTAR: {
-          auto tbdstarData = std::make_shared<TBDstarData>(context_->getSpaceInformation());
+        case PLANNER_TYPE::AITSTAR: {
+          auto aitstarData = std::make_shared<AITstarData>(context_->getSpaceInformation());
 
           // Store the TBD* forward queue.
-          tbdstarData->setForwardQueue(planner_->as<ompl::geometric::TBDstar>()->getEdgesInQueue());
+          aitstarData->setForwardQueue(planner_->as<ompl::geometric::AITstar>()->getEdgesInQueue());
 
           // Store the TBD* backward queue.
-          tbdstarData->setBackwardQueue(
-              planner_->as<ompl::geometric::TBDstar>()->getVerticesInQueue());
+          aitstarData->setBackwardQueue(
+              planner_->as<ompl::geometric::AITstar>()->getVerticesInQueue());
 
           // Store the next edge.
-          const auto &edge = planner_->as<ompl::geometric::TBDstar>()->getNextEdgeInQueue();
+          const auto &edge = planner_->as<ompl::geometric::AITstar>()->getNextEdgeInQueue();
           if (edge.getParent() && edge.getChild()) {
-            tbdstarData->setNextEdge(
+            aitstarData->setNextEdge(
                 std::make_pair(edge.getParent()->getState(), edge.getChild()->getState()));
           }
 
           // Store the next vertex.
-          tbdstarData->setNextVertex(
-              planner_->as<ompl::geometric::TBDstar>()->getNextVertexInQueue());
+          aitstarData->setNextVertex(
+              planner_->as<ompl::geometric::AITstar>()->getNextVertexInQueue());
 
           // Store the backward search tree.
-          tbdstarData->setVerticesInBackwardSearchTree(
-              planner_->as<ompl::geometric::TBDstar>()->getVerticesInBackwardSearchTree());
+          aitstarData->setVerticesInBackwardSearchTree(
+              planner_->as<ompl::geometric::AITstar>()->getVerticesInBackwardSearchTree());
 
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
-          plannerSpecificData_.emplace_back(tbdstarData);
+          plannerSpecificData_.emplace_back(aitstarData);
           break;
         }
         case PLANNER_TYPE::AIBITSTAR: {
