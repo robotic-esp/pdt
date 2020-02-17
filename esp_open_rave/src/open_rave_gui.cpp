@@ -384,7 +384,7 @@ void planR3xSO2(std::shared_ptr<esp::ompltools::Configuration> config,
         // Fill the SO2 part of the state
         auto so2State = solutionState->as<ompl::base::CompoundStateSpace::StateType>()
                             ->as<ompl::base::SO2StateSpace::StateType>(1u);
-        raveState.rot.Set4(0.0, 0.0, std::sin(so2State->value / 2.0),
+        raveState.rot.Set4(std::sin(so2State->value / 2.0), 0.0, 0.0,
                            std::cos(so2State->value / 2.0));
 
         OpenRAVE::EnvironmentMutex::scoped_lock lock(environment->GetMutex());

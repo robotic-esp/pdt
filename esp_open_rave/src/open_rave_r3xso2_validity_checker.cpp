@@ -79,7 +79,7 @@ bool OpenRaveR3xSO2ValidityChecker::isValid(const ompl::base::State* state) cons
   // Fill the SO2 part of the state
   auto so2State = state->as<ompl::base::CompoundStateSpace::StateType>()
                       ->as<ompl::base::SO2StateSpace::StateType>(1u);
-  raveState_.rot.Set4(0.0, 0.0, std::sin(so2State->value / 2.0), std::cos(so2State->value / 2.0));
+  raveState_.rot.Set4(std::sin(so2State->value / 2.0), 0.0, 0.0, std::cos(so2State->value / 2.0));
 
   // Lock the environment mutex.
   OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
@@ -105,7 +105,7 @@ double OpenRaveR3xSO2ValidityChecker::clearance(const ompl::base::State* state) 
   // Fill the SO2 part of the state
   auto so2State = state->as<ompl::base::CompoundStateSpace::StateType>()
                       ->as<ompl::base::SO2StateSpace::StateType>(1u);
-  raveState_.rot.Set4(0.0, 0.0, std::sin(so2State->value / 2.0), std::cos(so2State->value / 2.0));
+  raveState_.rot.Set4(std::sin(so2State->value / 2.0), 0.0, 0.0, std::cos(so2State->value / 2.0));
 
   // Lock the environment mutex.
   OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());

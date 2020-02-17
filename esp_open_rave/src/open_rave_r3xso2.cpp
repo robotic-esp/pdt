@@ -87,13 +87,13 @@ OpenRaveR3xSO2::OpenRaveR3xSO2(const std::shared_ptr<ompl::base::SpaceInformatio
   startState_->as<ompl::base::SO2StateSpace::StateType>(1u)->value = startPosition.at(3u);
 
   // Set the goal position.
-  startState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[0] =
+  goalState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[0] =
       (goalPosition.at(0u) - raveLowerBounds.at(0u)) / raveStateScales.at(0u);
-  startState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[1] =
+  goalState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[1] =
       (goalPosition.at(1u) - raveLowerBounds.at(1u)) / raveStateScales.at(1u);
-  startState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[2] =
+  goalState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[2] =
       (goalPosition.at(2u) - raveLowerBounds.at(2u)) / raveStateScales.at(2u);
-  startState_->as<ompl::base::SO2StateSpace::StateType>(1u)->value = goalPosition.at(3u);
+  goalState_->as<ompl::base::SO2StateSpace::StateType>(1u)->value = goalPosition.at(3u);
 
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
@@ -131,9 +131,6 @@ OpenRaveR3xSO2::OpenRaveR3xSO2(const std::shared_ptr<ompl::base::SpaceInformatio
   // Create the validity checker.
   auto validityChecker =
       std::make_shared<OpenRaveR3xSO2ValidityChecker>(spaceInfo_, environment, robot, config_);
-
-  OpenRAVE::Transform raveState;
-  raveState.identity();
 
   // Set the validity checker and check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
