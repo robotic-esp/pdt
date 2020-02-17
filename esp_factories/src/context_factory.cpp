@@ -180,7 +180,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         // Allocate the compound state space.
         auto stateSpace = std::make_shared<ompl::base::CompoundStateSpace>(
             std::vector<ompl::base::StateSpacePtr>({r3StateSpace, so2StateSpace}),
-            std::vector<double>({1.0, 1.0}));
+            std::vector<double>({1.0, 0.01}));
 
         // Allocate the space information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
