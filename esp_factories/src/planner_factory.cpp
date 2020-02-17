@@ -189,7 +189,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setInformedSampling(false);
       return {planner, PLANNER_TYPE::RRTSTAR};
     }
-    case PLANNER_TYPE::SBITSTAR: {
+    case PLANNER_TYPE::ABITSTAR: {
       // Allocate and configure an SBIT* planner.
       auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
@@ -208,7 +208,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
           config_->get<double>(optionsKey + "/inflationParameter"));
       planner->setTruncationFactorParameter(
           config_->get<double>(optionsKey + "/truncationParameter"));
-      return {planner, PLANNER_TYPE::SBITSTAR};
+      return {planner, PLANNER_TYPE::ABITSTAR};
     }
     case PLANNER_TYPE::AITSTAR: {
       // Allocate and configure a TBD* planner.

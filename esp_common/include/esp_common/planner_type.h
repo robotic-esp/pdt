@@ -44,6 +44,7 @@ namespace ompltools {
 
 enum class PLANNER_TYPE {
   INVALID,
+  ABITSTAR,
   AITSTAR,
   AEITSTAR,
   BITSTAR,
@@ -54,11 +55,11 @@ enum class PLANNER_TYPE {
   RRTCONNECT,
   RRTSHARP,
   RRTSTAR,
-  SBITSTAR,
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
                                                {PLANNER_TYPE::INVALID, "invalid"},
+                                               {PLANNER_TYPE::ABITSTAR, "SBITstar"},
                                                {PLANNER_TYPE::AITSTAR, "AITstar"},
                                                {PLANNER_TYPE::AEITSTAR, "AEITstar"},
                                                {PLANNER_TYPE::BITSTAR, "BITstar"},
@@ -69,7 +70,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
                                                {PLANNER_TYPE::RRTCONNECT, "RRTConnect"},
                                                {PLANNER_TYPE::RRTSHARP, "RRTsharp"},
                                                {PLANNER_TYPE::RRTSTAR, "RRTstar"},
-                                               {PLANNER_TYPE::SBITSTAR, "SBITstar"},
                                            })
 
 }  // namespace ompltools

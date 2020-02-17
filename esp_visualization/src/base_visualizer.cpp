@@ -249,7 +249,7 @@ void BaseVisualizer::createData() {
       // Store the planner specific data.
       switch (plannerType_) {
         case PLANNER_TYPE::BITSTAR:
-        case PLANNER_TYPE::SBITSTAR: {
+        case PLANNER_TYPE::ABITSTAR: {
           auto bitstarData = std::make_shared<BITstarData>(context_->getSpaceInformation());
 
           // Store the BIT* edge queue.

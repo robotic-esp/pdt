@@ -87,7 +87,7 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     case PLANNER_TYPE::RRTSTAR: {
       return planner->as<ompl::geometric::RRTstar>()->bestCost();
     }
-    case PLANNER_TYPE::SBITSTAR: {
+    case PLANNER_TYPE::ABITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
     }
     default: {
