@@ -1,0 +1,17 @@
+{
+    "planner": {
+        "defaultAITstar": {
+            "type": "AITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "esplightgreen",
+                "name": "AIT*"
+            },
+            "options": {
+                "rewireFactor": 1.001,
+                "batchSize": 100,
+                "repairBackwardSearch": true
+            }
+        }
+    }
+}
