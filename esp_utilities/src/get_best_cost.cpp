@@ -92,7 +92,6 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     }
     default: {
       throw std::runtime_error("Received request to get best cost of unknown planner type.");
-      return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
   }
 }
