@@ -37,6 +37,8 @@
 #include "esp_factories/planner_factory.h"
 
 #include <ompl/geometric/planners/aibitstar/AIBITstar.h>
+#include <ompl/geometric/planners/aitstar/AITstar.h>
+#include <ompl/geometric/planners/bitstar/ABITstar.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
@@ -92,6 +94,9 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     case PLANNER_TYPE::BITSTAR: {
       // Allocate and configure a BIT* planner.
       auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
+    case PLANNER_TYPE::ABITSTAR: {
+      // Allocate and configure an SBIT* planner.
+      auto planner = std::make_shared<ompl::geometric::ABITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
@@ -103,15 +108,16 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
       planner->setStopOnSolnImprovement(
           config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
-      planner->setInitialInflationFactor(1.0);
-      planner->setInflationFactorParameter(0.0);
-      planner->setTruncationFactorParameter(0.0);
-      return {planner, PLANNER_TYPE::BITSTAR};
+      planner->setInitialInflationFactor(config_->get<double>(optionsKey + "/initialInflation"));
+      planner->setInflationFactorParameter(
+          config_->get<double>(optionsKey + "/inflationParameter"));
+      planner->setTruncationFactorParameter(
+          config_->get<double>(optionsKey + "/truncationParameter"));
+      return {planner, PLANNER_TYPE::ABITSTAR};
     }
-    case PLANNER_TYPE::BITSTARREGRESSION: {
-      // Allocate and configure a BIT* Regression planner.
-      auto planner =
-          std::make_shared<ompl::geometric::BITstarRegression>(context_->getSpaceInformation());
+    case PLANNER_TYPE::BITSTAR: {
+      // Allocate and configure a BIT* planner.
+      auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
@@ -123,7 +129,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
       planner->setStopOnSolnImprovement(
           config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
-      return {planner, PLANNER_TYPE::BITSTARREGRESSION};
+      return {planner, PLANNER_TYPE::BITSTAR};
     }
     case PLANNER_TYPE::INFORMEDRRTSTAR: {
       auto planner =

@@ -855,7 +855,7 @@ std::array<float, 4u> InteractiveVisualizer::interpolateColors(const float* colo
 void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iteration) const {
   switch (plannerType_) {
     case PLANNER_TYPE::BITSTAR:
-    case PLANNER_TYPE::SBITSTAR: {
+    case PLANNER_TYPE::ABITSTAR: {
       drawBITstarSpecificVisualizations(iteration);
       return;
     }

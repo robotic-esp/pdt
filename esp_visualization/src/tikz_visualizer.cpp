@@ -459,7 +459,7 @@ void TikzVisualizer::drawPlannerSpecificVisualizations(
   }
   switch (plannerType_) {
     case PLANNER_TYPE::BITSTAR:
-    case PLANNER_TYPE::SBITSTAR: {
+    case PLANNER_TYPE::ABITSTAR: {
       drawBITstarSpecificVisualizations(
           std::dynamic_pointer_cast<const BITstarData>(plannerSpecificData));
       break;
