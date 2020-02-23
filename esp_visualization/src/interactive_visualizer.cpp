@@ -1050,7 +1050,7 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
 }
 
 void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t iteration) const {
-  // Get the AIBIT* specific data.
+  // Get the AEIT* specific data.
   auto aeitstarData =
       std::dynamic_pointer_cast<const AEITstarData>(getPlannerSpecificData(iteration));
   if (context_->getDimension() == 2u) {
@@ -1059,10 +1059,10 @@ void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t itera
     std::vector<Eigen::Vector2d> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
     for (const auto& edge : forwardQueue) {
-      auto sourceState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*sourceState)[0u], (*sourceState)[1u]);
-      auto targetState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*targetState)[0u], (*targetState)[1u]);
+      auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      forwardQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
+      auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      forwardQueueEdges.emplace_back((*childState)[0u], (*childState)[1u]);
     }
 
     // Draw the forward queue.
@@ -1073,10 +1073,10 @@ void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t itera
     std::vector<Eigen::Vector2d> reverseQueueEdges;
     forwardQueueEdges.reserve(2u * reverseQueue.size());
     for (const auto& edge : reverseQueue) {
-      auto sourceState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseQueueEdges.emplace_back((*sourceState)[0u], (*sourceState)[1u]);
-      auto targetState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseQueueEdges.emplace_back((*targetState)[0u], (*targetState)[1u]);
+      auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
+      auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseQueueEdges.emplace_back((*childState)[0u], (*childState)[1u]);
     }
 
     // Draw the reverse queue.
@@ -1087,10 +1087,10 @@ void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t itera
     std::vector<Eigen::Vector2d> reverseTreeEdges;
     reverseTreeEdges.reserve(2u * reverseTree.size());
     for (const auto& edge : reverseTree) {
-      auto sourceState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseTreeEdges.emplace_back((*sourceState)[0u], (*sourceState)[1u]);
-      auto targetState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseTreeEdges.emplace_back((*targetState)[0u], (*targetState)[1u]);
+      auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseTreeEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
+      auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseTreeEdges.emplace_back((*childState)[0u], (*childState)[1u]);
     }
 
     // Draw the reverse tree.
@@ -1102,12 +1102,12 @@ void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t itera
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (nextForwardEdge.source && nextForwardEdge.target) {
       std::vector<Eigen::Vector2d> nextEdge;
-      auto sourceState =
+      auto parentState =
           nextForwardEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      auto targetState =
+      auto childState =
           nextForwardEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      nextEdge.emplace_back(sourceState->operator[](0), sourceState->operator[](1));
-      nextEdge.emplace_back(targetState->operator[](0), targetState->operator[](1));
+      nextEdge.emplace_back(parentState->operator[](0), parentState->operator[](1));
+      nextEdge.emplace_back(childState->operator[](0), childState->operator[](1));
       // Draw the next edge.
       drawLines(nextEdge, 3.0, red);
     }
@@ -1118,12 +1118,12 @@ void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t itera
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (nextReverseEdge.source && nextReverseEdge.target) {
       std::vector<Eigen::Vector2d> nextEdge;
-      auto sourceState =
+      auto parentState =
           nextReverseEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      auto targetState =
+      auto childState =
           nextReverseEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      nextEdge.emplace_back(sourceState->operator[](0), sourceState->operator[](1));
-      nextEdge.emplace_back(targetState->operator[](0), targetState->operator[](1));
+      nextEdge.emplace_back(parentState->operator[](0), parentState->operator[](1));
+      nextEdge.emplace_back(childState->operator[](0), childState->operator[](1));
       // Draw the next edge.
       drawLines(nextEdge, 3.0, darkred);
     }

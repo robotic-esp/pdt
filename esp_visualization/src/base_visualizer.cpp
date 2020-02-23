@@ -40,8 +40,9 @@
 #include <exception>
 
 #include <ompl/base/terminationconditions/IterationTerminationCondition.h>
-#include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/aitstar/AITstar.h>
+#include <ompl/geometric/planners/bitstar/ABITstar.h>
+#include <ompl/geometric/planners/bitstar/BITstar.h>
 
 #include "esp_time/time.h"
 
@@ -50,7 +51,8 @@ namespace esp {
 namespace ompltools {
 
 BaseVisualizer::BaseVisualizer(
-    const std::shared_ptr<Configuration> &config, const std::shared_ptr<RealVectorGeometricContext> &context,
+    const std::shared_ptr<Configuration> &config,
+    const std::shared_ptr<RealVectorGeometricContext> &context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
     context_(context),
     planner_(plannerPair.first),
@@ -196,6 +198,9 @@ void BaseVisualizer::createData() {
       if (plannerType_ == esp::ompltools::PLANNER_TYPE::BITSTAR) {
         planner_->as<ompl::geometric::BITstar>()->setLocalSeed(
             config_->get<std::size_t>("experiment/seed"));
+      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::ABITSTAR) {
+        planner_->as<ompl::geometric::ABITstar>()->setLocalSeed(
+            config_->get<std::size_t>("experiment/seed"));
       } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::AITSTAR) {
         // planner_->as<ompl::geometric::AITstar>()->setLocalSeed(
         // config_->get<std::size_t>("experiment/seed"));
@@ -207,7 +212,6 @@ void BaseVisualizer::createData() {
 
   while (dataThreadStopSignal_.wait_for(std::chrono::nanoseconds(1)) ==
          std::future_status::timeout) {
-
     // Create a new iteration if we we're viewing one thats uncomfortably close.
     if (displayIteration_ + iterationBuffer_ > largestIteration_) {
       // Create a termination condition that stops the planner after one iteration.
@@ -239,8 +243,8 @@ void BaseVisualizer::createData() {
       {  // Store the solution cost.
         std::scoped_lock lock(solutionCostsMutex_);
         if (planner_->getProblemDefinition()->hasExactSolution()) {
-          solutionCosts_.emplace_back(planner_->getProblemDefinition()->getSolutionPath()->cost(
-              context_->getObjective()));
+          solutionCosts_.emplace_back(
+              planner_->getProblemDefinition()->getSolutionPath()->cost(context_->getObjective()));
         } else {
           solutionCosts_.emplace_back(std::numeric_limits<double>::infinity());
         }
@@ -302,15 +306,14 @@ void BaseVisualizer::createData() {
         case PLANNER_TYPE::AEITSTAR: {
           auto aeitstarData = std::make_shared<AEITstarData>(context_->getSpaceInformation());
 
-          // Store the AIBIT* reverse tree.
-          aeitstarData->setReverseTree(
-              planner_->as<ompl::geometric::AEITstar>()->getReverseTree());
+          // Store the AEIT* reverse tree.
+          aeitstarData->setReverseTree(planner_->as<ompl::geometric::AEITstar>()->getReverseTree());
 
-          // Store the AIBIT* forward queue.
+          // Store the AEIT* forward queue.
           aeitstarData->setForwardQueue(
               planner_->as<ompl::geometric::AEITstar>()->getForwardQueue());
 
-          // Store the AIBIT* reverse queue.
+          // Store the AEIT* reverse queue.
           aeitstarData->setReverseQueue(
               planner_->as<ompl::geometric::AEITstar>()->getReverseQueue());
 

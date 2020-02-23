@@ -38,8 +38,8 @@
 
 #include <ompl/geometric/planners/aeitstar/AEITstar.h>
 #include <ompl/geometric/planners/aitstar/AITstar.h>
+#include <ompl/geometric/planners/bitstar/ABITstar.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
-#include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -75,8 +75,29 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
   const auto optionsKey = parentKey + "/options"s;
   // BIT*
   switch (type) {
+    case PLANNER_TYPE::ABITSTAR: {
+      // Allocate and configure an SBIT* planner.
+      auto planner = std::make_shared<ompl::geometric::ABITstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
+      planner->setSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
+      planner->setPruning(config_->get<bool>(optionsKey + "/enablePruning"));
+      planner->setPruneThresholdFraction(config_->get<double>(optionsKey + "/pruningThreshold"));
+      planner->setDropSamplesOnPrune(config_->get<bool>(optionsKey + "/dropSamplesOnPrune"));
+      planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
+      planner->setStopOnSolnImprovement(
+          config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
+      planner->setInitialInflationFactor(config_->get<double>(optionsKey + "/initialInflation"));
+      planner->setInflationFactorParameter(
+          config_->get<double>(optionsKey + "/inflationParameter"));
+      planner->setTruncationFactorParameter(
+          config_->get<double>(optionsKey + "/truncationParameter"));
+      return {planner, PLANNER_TYPE::ABITSTAR};
+    }
     case PLANNER_TYPE::AEITSTAR: {
-      // Allocate and configure an AEIT* planner.
+      // Allocate and configure an AI-BIT* planner.
       auto planner = std::make_shared<ompl::geometric::AEITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
@@ -88,6 +109,16 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->enableCollisionDetectionInReverseSearch(
           config_->get<bool>(optionsKey + "/collisionDetectionOnReverseSearch"));
       return {planner, PLANNER_TYPE::AEITSTAR};
+    }
+    case PLANNER_TYPE::AITSTAR: {
+      // Allocate and configure a TBD* planner.
+      auto planner = std::make_shared<ompl::geometric::AITstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      planner->setRepairBackwardSearch(config_->get<bool>(optionsKey + "/repairBackwardSearch"));
+      planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
+      return {planner, PLANNER_TYPE::AITSTAR};
     }
     case PLANNER_TYPE::BITSTAR: {
       // Allocate and configure a BIT* planner.
@@ -103,27 +134,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
       planner->setStopOnSolnImprovement(
           config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
-      planner->setInitialInflationFactor(1.0);
-      planner->setInflationFactorParameter(0.0);
-      planner->setTruncationFactorParameter(0.0);
       return {planner, PLANNER_TYPE::BITSTAR};
-    }
-    case PLANNER_TYPE::BITSTARREGRESSION: {
-      // Allocate and configure a BIT* Regression planner.
-      auto planner =
-          std::make_shared<ompl::geometric::BITstarRegression>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
-      planner->setName(plannerName);
-      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
-      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
-      planner->setSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
-      planner->setPruning(config_->get<bool>(optionsKey + "/enablePruning"));
-      planner->setPruneThresholdFraction(config_->get<double>(optionsKey + "/pruningThreshold"));
-      planner->setDropSamplesOnPrune(config_->get<bool>(optionsKey + "/dropSamplesOnPrune"));
-      planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
-      planner->setStopOnSolnImprovement(
-          config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
-      return {planner, PLANNER_TYPE::BITSTARREGRESSION};
     }
     case PLANNER_TYPE::INFORMEDRRTSTAR: {
       auto planner =
@@ -188,37 +199,6 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setNewStateRejection(false);
       planner->setInformedSampling(false);
       return {planner, PLANNER_TYPE::RRTSTAR};
-    }
-    case PLANNER_TYPE::ABITSTAR: {
-      // Allocate and configure an SBIT* planner.
-      auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
-      planner->setName(plannerName);
-      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
-      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
-      planner->setSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
-      planner->setPruning(config_->get<bool>(optionsKey + "/enablePruning"));
-      planner->setPruneThresholdFraction(config_->get<double>(optionsKey + "/pruningThreshold"));
-      planner->setDropSamplesOnPrune(config_->get<bool>(optionsKey + "/dropSamplesOnPrune"));
-      planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
-      planner->setStopOnSolnImprovement(
-          config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
-      planner->setInitialInflationFactor(config_->get<double>(optionsKey + "/initialInflation"));
-      planner->setInflationFactorParameter(
-          config_->get<double>(optionsKey + "/inflationParameter"));
-      planner->setTruncationFactorParameter(
-          config_->get<double>(optionsKey + "/truncationParameter"));
-      return {planner, PLANNER_TYPE::ABITSTAR};
-    }
-    case PLANNER_TYPE::AITSTAR: {
-      // Allocate and configure a TBD* planner.
-      auto planner = std::make_shared<ompl::geometric::AITstar>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
-      planner->setName(plannerName);
-      planner->setRepairBackwardSearch(config_->get<bool>(optionsKey + "/repairBackwardSearch"));
-      planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
-      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
-      return {planner, PLANNER_TYPE::AITSTAR};
     }
     default: { throw std::runtime_error("Planner '"s + plannerName + "' is of unknown type."s); }
   }

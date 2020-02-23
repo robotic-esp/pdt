@@ -39,10 +39,10 @@
 #include <limits>
 #include <string>
 
+#include <ompl/geometric/planners/bitstar/ABITstar.h>
 #include <ompl/geometric/planners/aeitstar/AEITstar.h>
 #include <ompl/geometric/planners/aitstar/AITstar.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
-#include <ompl/geometric/planners/bitstar_regression/BITstarRegression.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -60,17 +60,17 @@ namespace utilities {
 
 ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE plannerType) {
   switch (plannerType) {
-    case PLANNER_TYPE::AEITSTAR: {
-      return planner->as<ompl::geometric::AEITstar>()->bestCost();
+    case PLANNER_TYPE::ABITSTAR: {
+      return planner->as<ompl::geometric::ABITstar>()->bestCost();
     }
     case PLANNER_TYPE::AITSTAR: {
       return planner->as<ompl::geometric::AITstar>()->bestCost();
     }
+    case PLANNER_TYPE::AEITSTAR: {
+      return planner->as<ompl::geometric::AEITstar>()->bestCost();
+    }
     case PLANNER_TYPE::BITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
-    }
-    case PLANNER_TYPE::BITSTARREGRESSION: {
-      return planner->as<ompl::geometric::BITstarRegression>()->bestCost();
     }
     case PLANNER_TYPE::INFORMEDRRTSTAR: {
       return planner->as<ompl::geometric::InformedRRTstar>()->bestCost();
@@ -86,9 +86,6 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     }
     case PLANNER_TYPE::RRTSTAR: {
       return planner->as<ompl::geometric::RRTstar>()->bestCost();
-    }
-    case PLANNER_TYPE::ABITSTAR: {
-      return planner->as<ompl::geometric::BITstar>()->bestCost();
     }
     default: {
       throw std::runtime_error("Received request to get best cost of unknown planner type.");

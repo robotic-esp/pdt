@@ -1,7 +1,7 @@
 {
     "planner": {
         "defaultABITstar": {
-            "type": "SBITstar",
+            "type": "ABITstar",
             "isAnytime": true,
             "report": {
                 "color": "esplightblue",
