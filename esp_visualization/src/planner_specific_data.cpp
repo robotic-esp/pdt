@@ -123,43 +123,43 @@ void AITstarData::setVerticesInBackwardSearchTree(
   }
 }
 
-std::vector<ompl::geometric::aibitstar::Edge> AIBITstarData::getReverseTree() const {
+std::vector<ompl::geometric::aeitstar::Edge> AEITstarData::getReverseTree() const {
   return reverseTree_;
 }
 
-std::vector<ompl::geometric::aibitstar::Edge> AIBITstarData::getForwardQueue() const {
+std::vector<ompl::geometric::aeitstar::Edge> AEITstarData::getForwardQueue() const {
   return forwardQueue_;
 }
 
-std::vector<ompl::geometric::aibitstar::Edge> AIBITstarData::getReverseQueue() const {
+std::vector<ompl::geometric::aeitstar::Edge> AEITstarData::getReverseQueue() const {
   return reverseQueue_;
 }
 
-ompl::geometric::aibitstar::Edge AIBITstarData::getNextForwardEdge() const {
+ompl::geometric::aeitstar::Edge AEITstarData::getNextForwardEdge() const {
   return nextForwardEdge_;
 }
 
-ompl::geometric::aibitstar::Edge AIBITstarData::getNextReverseEdge() const {
+ompl::geometric::aeitstar::Edge AEITstarData::getNextReverseEdge() const {
   return nextReverseEdge_;
 }
 
-void AIBITstarData::setReverseTree(const std::vector<ompl::geometric::aibitstar::Edge>& tree) {
+void AEITstarData::setReverseTree(const std::vector<ompl::geometric::aeitstar::Edge>& tree) {
   reverseTree_ = tree;
 }
 
-void AIBITstarData::setForwardQueue(const std::vector<ompl::geometric::aibitstar::Edge>& queue) {
+void AEITstarData::setForwardQueue(const std::vector<ompl::geometric::aeitstar::Edge>& queue) {
   forwardQueue_ = queue;
 }
 
-void AIBITstarData::setReverseQueue(const std::vector<ompl::geometric::aibitstar::Edge>& queue) {
+void AEITstarData::setReverseQueue(const std::vector<ompl::geometric::aeitstar::Edge>& queue) {
   reverseQueue_ = queue;
 }
 
-void AIBITstarData::setNextForwardEdge(const ompl::geometric::aibitstar::Edge& edge) {
+void AEITstarData::setNextForwardEdge(const ompl::geometric::aeitstar::Edge& edge) {
   nextForwardEdge_ = edge;
 }
 
-void AIBITstarData::setNextReverseEdge(const ompl::geometric::aibitstar::Edge& edge) {
+void AEITstarData::setNextReverseEdge(const ompl::geometric::aeitstar::Edge& edge) {
   nextReverseEdge_ = edge;
 }
 

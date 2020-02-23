@@ -303,40 +303,40 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(aitstarData);
           break;
         }
-        case PLANNER_TYPE::AIBITSTAR: {
-          auto aibitstarData = std::make_shared<AIBITstarData>(context_->getSpaceInformation());
+        case PLANNER_TYPE::AEITSTAR: {
+          auto aeitstarData = std::make_shared<AEITstarData>(context_->getSpaceInformation());
 
-          // Store the AIBIT* reverse tree.
-          aibitstarData->setReverseTree(
-              planner_->as<ompl::geometric::AIBITstar>()->getReverseTree());
+          // Store the AEIT* reverse tree.
+          aeitstarData->setReverseTree(
+              planner_->as<ompl::geometric::AEITstar>()->getReverseTree());
 
-          // Store the AIBIT* forward queue.
-          aibitstarData->setForwardQueue(
-              planner_->as<ompl::geometric::AIBITstar>()->getForwardQueue());
+          // Store the AEIT* forward queue.
+          aeitstarData->setForwardQueue(
+              planner_->as<ompl::geometric::AEITstar>()->getForwardQueue());
 
-          // Store the AIBIT* reverse queue.
-          aibitstarData->setReverseQueue(
-              planner_->as<ompl::geometric::AIBITstar>()->getReverseQueue());
+          // Store the AEIT* reverse queue.
+          aeitstarData->setReverseQueue(
+              planner_->as<ompl::geometric::AEITstar>()->getReverseQueue());
 
           // Store the next forward edge.
           try {
-            aibitstarData->setNextForwardEdge(
-                planner_->as<ompl::geometric::AIBITstar>()->getNextForwardEdge());
+            aeitstarData->setNextForwardEdge(
+                planner_->as<ompl::geometric::AEITstar>()->getNextForwardEdge());
           } catch (const std::out_of_range &e) {
             // Throws if there is no forward edge. This is fine, the edge is default constructed.
           }
 
           // Store the next reverse edge.
           try {
-            aibitstarData->setNextReverseEdge(
-                planner_->as<ompl::geometric::AIBITstar>()->getNextReverseEdge());
+            aeitstarData->setNextReverseEdge(
+                planner_->as<ompl::geometric::AEITstar>()->getNextReverseEdge());
           } catch (const std::out_of_range &e) {
             // Throws if there is no forward edge. This is fine, the edge is default constructed.
           }
 
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
-          plannerSpecificData_.emplace_back(aibitstarData);
+          plannerSpecificData_.emplace_back(aeitstarData);
           break;
         }
         default:

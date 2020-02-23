@@ -863,8 +863,8 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iterat
       drawAITstarSpecificVisualizations(iteration);
       return;
     }
-    case PLANNER_TYPE::AIBITSTAR: {
-      drawAIBITstarSpecificVisualizations(iteration);
+    case PLANNER_TYPE::AEITSTAR: {
+      drawAEITstarSpecificVisualizations(iteration);
       return;
     }
     default:
@@ -1040,19 +1040,19 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
   }
 }
 
-void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iteration) const {
-  // Get the AIBIT* specific data.
-  auto aibitstarData =
-      std::dynamic_pointer_cast<const AIBITstarData>(getPlannerSpecificData(iteration));
+void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t iteration) const {
+  // Get the AEIT* specific data.
+  auto aeitstarData =
+      std::dynamic_pointer_cast<const AEITstarData>(getPlannerSpecificData(iteration));
   if (context_->getDimension() == 2u) {
     // Get the forward queue.
-    auto forwardQueue = aibitstarData->getForwardQueue();
+    auto forwardQueue = aeitstarData->getForwardQueue();
     std::vector<Eigen::Vector2d> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
     for (const auto& edge : forwardQueue) {
-      auto parentState = edge.parent->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       forwardQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
-      auto childState = edge.child->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       forwardQueueEdges.emplace_back((*childState)[0u], (*childState)[1u]);
     }
 
@@ -1060,13 +1060,13 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     drawLines(forwardQueueEdges, 1.5, lightblue);
 
     // Get the reverse queue.
-    auto reverseQueue = aibitstarData->getReverseQueue();
+    auto reverseQueue = aeitstarData->getReverseQueue();
     std::vector<Eigen::Vector2d> reverseQueueEdges;
     forwardQueueEdges.reserve(2u * reverseQueue.size());
     for (const auto& edge : reverseQueue) {
-      auto parentState = edge.parent->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       reverseQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
-      auto childState = edge.child->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       reverseQueueEdges.emplace_back((*childState)[0u], (*childState)[1u]);
     }
 
@@ -1074,13 +1074,13 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     drawLines(reverseQueueEdges, 1.5, yellow);
 
     // Get the reverse tree.
-    auto reverseTree = aibitstarData->getReverseTree();
+    auto reverseTree = aeitstarData->getReverseTree();
     std::vector<Eigen::Vector2d> reverseTreeEdges;
     reverseTreeEdges.reserve(2u * reverseTree.size());
     for (const auto& edge : reverseTree) {
-      auto parentState = edge.parent->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       reverseTreeEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
-      auto childState = edge.child->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       reverseTreeEdges.emplace_back((*childState)[0u], (*childState)[1u]);
     }
 
@@ -1088,15 +1088,15 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     drawLines(reverseTreeEdges, 2.0, blue);
 
     // Get the next edge in the forward queue.
-    auto nextForwardEdge = aibitstarData->getNextForwardEdge();
+    auto nextForwardEdge = aeitstarData->getNextForwardEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
-    if (nextForwardEdge.parent && nextForwardEdge.child) {
+    if (nextForwardEdge.source && nextForwardEdge.target) {
       std::vector<Eigen::Vector2d> nextEdge;
       auto parentState =
-          nextForwardEdge.parent->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+          nextForwardEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto childState =
-          nextForwardEdge.child->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+          nextForwardEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       nextEdge.emplace_back(parentState->operator[](0), parentState->operator[](1));
       nextEdge.emplace_back(childState->operator[](0), childState->operator[](1));
       // Draw the next edge.
@@ -1104,15 +1104,15 @@ void InteractiveVisualizer::drawAIBITstarSpecificVisualizations(std::size_t iter
     }
 
     // Get the next edge in the reverse queue.
-    auto nextReverseEdge = aibitstarData->getNextReverseEdge();
+    auto nextReverseEdge = aeitstarData->getNextReverseEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
-    if (nextReverseEdge.parent && nextReverseEdge.child) {
+    if (nextReverseEdge.source && nextReverseEdge.target) {
       std::vector<Eigen::Vector2d> nextEdge;
       auto parentState =
-          nextReverseEdge.parent->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+          nextReverseEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto childState =
-          nextReverseEdge.child->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+          nextReverseEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       nextEdge.emplace_back(parentState->operator[](0), parentState->operator[](1));
       nextEdge.emplace_back(childState->operator[](0), childState->operator[](1));
       // Draw the next edge.

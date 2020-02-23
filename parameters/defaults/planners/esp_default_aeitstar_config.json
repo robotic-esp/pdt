@@ -1,17 +1,17 @@
 {
     "planner": {
-        "defaultAIBITstar": {
-            "type": "AIBITstar",
+        "defaultAEITstar": {
+            "type": "AEITstar",
             "isAnytime": true,
             "report": {
                 "color": "espgreen",
-                "name": "AI-BIT*"
+                "name": "AEIT*"
             },
             "options": {
                 "samplesPerBatch": 100,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
-                "repairReverseSearchTreeUponCollisionDetection": true,
+                "repairReverseSearchTreeUponCollisionDetection": false,
                 "collisionDetectionOnReverseSearch": true
             }
         }
