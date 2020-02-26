@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Authors: Jonathan Gammell */
+/* Authors: Marlin Strub */
 
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 
@@ -46,10 +46,11 @@ RealVectorGeometricContext::RealVectorGeometricContext(
     BaseContext(spaceInfo, config, name),
     bounds_(getDimension()) {
   // Fill the state space bounds.
-  double sideLengths = config->get<double>("context/" + name + "/boundarySideLengths");
+  auto sideLengths = config->get<std::vector<double>>("context/" + name + "/boundarySideLengths");
+  assert(sideLengths.size() == getDimension());
   for (std::size_t dim = 0u; dim < getDimension(); ++dim) {
-    bounds_.low.at(dim) = -0.5 * sideLengths;
-    bounds_.high.at(dim) = 0.5 * sideLengths;
+    bounds_.low.at(dim) = -0.5 * sideLengths.at(dim);
+    bounds_.high.at(dim) = 0.5 * sideLengths.at(dim);
   }
 }
 
