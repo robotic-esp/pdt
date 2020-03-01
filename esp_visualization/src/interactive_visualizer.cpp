@@ -157,6 +157,7 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
   // Buttons.
   pangolin::Var<bool> optionScreenshot(optionsName + ".Screenshot", false, false);
+  pangolin::Var<bool> optionTikzshot(optionsName + ".TikZshot", false, false);
   pangolin::Var<double> optionSlowdown(optionsName + ".Replay Factor", 1, 1e-3, 1e2, true);
   pangolin::Var<bool> optionPlay(optionsName + ".Play", false, false);
   pangolin::Var<bool> optionRecord(optionsName + ".Record", false, false);
@@ -183,6 +184,22 @@ void InteractiveVisualizer::run() {
     if (pangolin::Pushed(optionScreenshot)) {
       contextView.SaveOnRender(std::to_string(screencaptureId_++) + '_' + context_->getName() +
                                '_' + planner_->getName());
+    }
+    if (pangolin::Pushed(optionTikzshot)) {
+      if (optionDrawPlannerSpecificData) {
+        tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                               getSolutionPath(displayIteration_),
+                               getPlannerSpecificData(displayIteration_),
+                               getIterationDuration(displayIteration_).count(),
+                               getTotalElapsedDuration(displayIteration_).count(),
+                               getSolutionCost(displayIteration_).value());
+      } else {
+        tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                               getSolutionPath(displayIteration_), nullptr,
+                               getIterationDuration(displayIteration_).count(),
+                               getTotalElapsedDuration(displayIteration_).count(),
+                               getSolutionCost(displayIteration_).value());
+      }
     }
     if (pangolin::Pushed(optionPlay)) {
       optionTrack = false;
