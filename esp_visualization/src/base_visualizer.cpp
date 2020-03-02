@@ -41,8 +41,8 @@
 
 #include <ompl/base/terminationconditions/IterationTerminationCondition.h>
 #include <ompl/geometric/planners/aitstar/AITstar.h>
-#include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/bitstar/ABITstar.h>
+#include <ompl/geometric/planners/bitstar/BITstar.h>
 
 #include "esp_time/time.h"
 
@@ -307,8 +307,7 @@ void BaseVisualizer::createData() {
           auto aeitstarData = std::make_shared<AEITstarData>(context_->getSpaceInformation());
 
           // Store the AEIT* reverse tree.
-          aeitstarData->setReverseTree(
-              planner_->as<ompl::geometric::AEITstar>()->getReverseTree());
+          aeitstarData->setReverseTree(planner_->as<ompl::geometric::AEITstar>()->getReverseTree());
 
           // Store the AEIT* forward queue.
           aeitstarData->setForwardQueue(

@@ -1,0 +1,20 @@
+{
+    "planner": {
+        "defaultFMTstar": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espdarkred",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 200,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        }
+    }
+}
