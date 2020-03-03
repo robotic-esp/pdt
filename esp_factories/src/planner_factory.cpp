@@ -36,7 +36,7 @@
 
 #include "esp_factories/planner_factory.h"
 
-#include <ompl/geometric/planners/aeitstar/AEITstar.h>
+#include <ompl/geometric/planners/eitstar/EITstar.h>
 #include <ompl/geometric/planners/aitstar/AITstar.h>
 #include <ompl/geometric/planners/bitstar/ABITstar.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
@@ -96,9 +96,9 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
           config_->get<double>(optionsKey + "/truncationParameter"));
       return {planner, PLANNER_TYPE::ABITSTAR};
     }
-    case PLANNER_TYPE::AEITSTAR: {
+    case PLANNER_TYPE::EITSTAR: {
       // Allocate and configure an AI-BIT* planner.
-      auto planner = std::make_shared<ompl::geometric::AEITstar>(context_->getSpaceInformation());
+      auto planner = std::make_shared<ompl::geometric::EITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setNumSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
@@ -108,7 +108,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
           config_->get<bool>(optionsKey + "/repairReverseSearchTreeUponCollisionDetection"));
       planner->enableCollisionDetectionInReverseSearch(
           config_->get<bool>(optionsKey + "/collisionDetectionOnReverseSearch"));
-      return {planner, PLANNER_TYPE::AEITSTAR};
+      return {planner, PLANNER_TYPE::EITSTAR};
     }
     case PLANNER_TYPE::AITSTAR: {
       // Allocate and configure a TBD* planner.

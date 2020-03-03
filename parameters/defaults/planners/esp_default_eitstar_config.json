@@ -1,15 +1,15 @@
 {
     "planner": {
-        "defaultAEITstar": {
-            "type": "AEITstar",
+        "defaultEITstar": {
+            "type": "EITstar",
             "isAnytime": true,
             "report": {
                 "color": "espgreen",
-                "name": "AEIT*"
+                "name": "EIT*"
             },
             "options": {
                 "samplesPerBatch": 100,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.3,
                 "repairFactor": 1.2,
                 "repairReverseSearchTreeUponCollisionDetection": false,
                 "collisionDetectionOnReverseSearch": true

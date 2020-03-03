@@ -204,8 +204,8 @@ void BaseVisualizer::createData() {
       } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::AITSTAR) {
         planner_->as<ompl::geometric::AITstar>()->setLocalSeed(
         config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::AEITSTAR) {
-        planner_->as<ompl::geometric::AEITstar>()->setLocalSeed(
+      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::EITSTAR) {
+        planner_->as<ompl::geometric::EITstar>()->setLocalSeed(
         config_->get<std::size_t>("experiment/seed"));
       }
     } else {
@@ -306,39 +306,39 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(aitstarData);
           break;
         }
-        case PLANNER_TYPE::AEITSTAR: {
-          auto aeitstarData = std::make_shared<AEITstarData>(context_->getSpaceInformation());
+        case PLANNER_TYPE::EITSTAR: {
+          auto eitstarData = std::make_shared<EITstarData>(context_->getSpaceInformation());
 
-          // Store the AEIT* reverse tree.
-          aeitstarData->setReverseTree(planner_->as<ompl::geometric::AEITstar>()->getReverseTree());
+          // Store the EIT* reverse tree.
+          eitstarData->setReverseTree(planner_->as<ompl::geometric::EITstar>()->getReverseTree());
 
-          // Store the AEIT* forward queue.
-          aeitstarData->setForwardQueue(
-              planner_->as<ompl::geometric::AEITstar>()->getForwardQueue());
+          // Store the EIT* forward queue.
+          eitstarData->setForwardQueue(
+              planner_->as<ompl::geometric::EITstar>()->getForwardQueue());
 
-          // Store the AEIT* reverse queue.
-          aeitstarData->setReverseQueue(
-              planner_->as<ompl::geometric::AEITstar>()->getReverseQueue());
+          // Store the EIT* reverse queue.
+          eitstarData->setReverseQueue(
+              planner_->as<ompl::geometric::EITstar>()->getReverseQueue());
 
           // Store the next forward edge.
           try {
-            aeitstarData->setNextForwardEdge(
-                planner_->as<ompl::geometric::AEITstar>()->getNextForwardEdge());
+            eitstarData->setNextForwardEdge(
+                planner_->as<ompl::geometric::EITstar>()->getNextForwardEdge());
           } catch (const std::out_of_range &e) {
             // Throws if there is no forward edge. This is fine, the edge is default constructed.
           }
 
           // Store the next reverse edge.
           try {
-            aeitstarData->setNextReverseEdge(
-                planner_->as<ompl::geometric::AEITstar>()->getNextReverseEdge());
+            eitstarData->setNextReverseEdge(
+                planner_->as<ompl::geometric::EITstar>()->getNextReverseEdge());
           } catch (const std::out_of_range &e) {
             // Throws if there is no forward edge. This is fine, the edge is default constructed.
           }
 
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
-          plannerSpecificData_.emplace_back(aeitstarData);
+          plannerSpecificData_.emplace_back(eitstarData);
           break;
         }
         default:

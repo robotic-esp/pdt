@@ -39,7 +39,7 @@
 #include <limits>
 #include <string>
 
-#include <ompl/geometric/planners/aeitstar/AEITstar.h>
+#include <ompl/geometric/planners/eitstar/EITstar.h>
 #include <ompl/geometric/planners/aitstar/AITstar.h>
 #include <ompl/geometric/planners/bitstar/ABITstar.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
@@ -66,8 +66,8 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     case PLANNER_TYPE::AITSTAR: {
       return planner->as<ompl::geometric::AITstar>()->bestCost();
     }
-    case PLANNER_TYPE::AEITSTAR: {
-      return planner->as<ompl::geometric::AEITstar>()->bestCost();
+    case PLANNER_TYPE::EITSTAR: {
+      return planner->as<ompl::geometric::EITstar>()->bestCost();
     }
     case PLANNER_TYPE::BITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
