@@ -37,8 +37,8 @@
 #pragma once
 
 #include <ompl/base/SpaceInformation.h>
-#include <ompl/geometric/planners/aeitstar/AEITstar.h>
-#include <ompl/geometric/planners/aeitstar/Edge.h>
+#include <ompl/geometric/planners/eitstar/EITstar.h>
+#include <ompl/geometric/planners/eitstar/Edge.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
 #include <ompl/geometric/planners/aitstar/AITstar.h>
 #include <ompl/geometric/planners/aitstar/datastructures/Edge.h>
@@ -126,30 +126,30 @@ class AITstarData : public PlannerSpecificData {
   std::shared_ptr<ompl::geometric::aitstar::Vertex> nextVertex_{};
 };
 
-class AEITstarData : public PlannerSpecificData {
+class EITstarData : public PlannerSpecificData {
  public:
-  AEITstarData(const ompl::base::SpaceInformationPtr& spaceInfo) :
+  EITstarData(const ompl::base::SpaceInformationPtr& spaceInfo) :
       PlannerSpecificData(spaceInfo) {}
   // Getters
-  std::vector<ompl::geometric::aeitstar::Edge> getReverseTree() const;
-  std::vector<ompl::geometric::aeitstar::Edge> getForwardQueue() const;
-  std::vector<ompl::geometric::aeitstar::Edge> getReverseQueue() const;
-  ompl::geometric::aeitstar::Edge getNextForwardEdge() const;
-  ompl::geometric::aeitstar::Edge getNextReverseEdge() const;
+  std::vector<ompl::geometric::eitstar::Edge> getReverseTree() const;
+  std::vector<ompl::geometric::eitstar::Edge> getForwardQueue() const;
+  std::vector<ompl::geometric::eitstar::Edge> getReverseQueue() const;
+  ompl::geometric::eitstar::Edge getNextForwardEdge() const;
+  ompl::geometric::eitstar::Edge getNextReverseEdge() const;
 
   // Setters
-  void setReverseTree(const std::vector<ompl::geometric::aeitstar::Edge>& tree);
-  void setForwardQueue(const std::vector<ompl::geometric::aeitstar::Edge>& queue);
-  void setReverseQueue(const std::vector<ompl::geometric::aeitstar::Edge>& queue);
-  void setNextForwardEdge(const ompl::geometric::aeitstar::Edge& edge);
-  void setNextReverseEdge(const ompl::geometric::aeitstar::Edge& edge);
+  void setReverseTree(const std::vector<ompl::geometric::eitstar::Edge>& tree);
+  void setForwardQueue(const std::vector<ompl::geometric::eitstar::Edge>& queue);
+  void setReverseQueue(const std::vector<ompl::geometric::eitstar::Edge>& queue);
+  void setNextForwardEdge(const ompl::geometric::eitstar::Edge& edge);
+  void setNextReverseEdge(const ompl::geometric::eitstar::Edge& edge);
 
  private:
-  std::vector<ompl::geometric::aeitstar::Edge> reverseTree_{};
-  std::vector<ompl::geometric::aeitstar::Edge> forwardQueue_{};
-  std::vector<ompl::geometric::aeitstar::Edge> reverseQueue_{};
-  ompl::geometric::aeitstar::Edge nextForwardEdge_{};
-  ompl::geometric::aeitstar::Edge nextReverseEdge_{};
+  std::vector<ompl::geometric::eitstar::Edge> reverseTree_{};
+  std::vector<ompl::geometric::eitstar::Edge> forwardQueue_{};
+  std::vector<ompl::geometric::eitstar::Edge> reverseQueue_{};
+  ompl::geometric::eitstar::Edge nextForwardEdge_{};
+  ompl::geometric::eitstar::Edge nextReverseEdge_{};
 };
 
 }  // namespace ompltools

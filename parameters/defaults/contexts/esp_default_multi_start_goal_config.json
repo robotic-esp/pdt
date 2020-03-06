@@ -5,7 +5,7 @@
             "objective": "defaultPathLength",
             "maxTime": 0.1,
             "dimensions": 2,
-            "boundarySideLengths" : 1,
+            "boundarySideLengths" : [ 1, 1 ],
             "numStarts": 1,
             "numGoals": 3,
             "collisionCheckResolution": 0.001,

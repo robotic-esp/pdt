@@ -157,6 +157,7 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
   // Buttons.
   pangolin::Var<bool> optionScreenshot(optionsName + ".Screenshot", false, false);
+  pangolin::Var<bool> optionTikzshot(optionsName + ".TikZshot", false, false);
   pangolin::Var<double> optionSlowdown(optionsName + ".Replay Factor", 1, 1e-3, 1e2, true);
   pangolin::Var<bool> optionPlay(optionsName + ".Play", false, false);
   pangolin::Var<bool> optionRecord(optionsName + ".Record", false, false);
@@ -183,6 +184,22 @@ void InteractiveVisualizer::run() {
     if (pangolin::Pushed(optionScreenshot)) {
       contextView.SaveOnRender(std::to_string(screencaptureId_++) + '_' + context_->getName() +
                                '_' + planner_->getName());
+    }
+    if (pangolin::Pushed(optionTikzshot)) {
+      if (optionDrawPlannerSpecificData) {
+        tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                               getSolutionPath(displayIteration_),
+                               getPlannerSpecificData(displayIteration_),
+                               getIterationDuration(displayIteration_).count(),
+                               getTotalElapsedDuration(displayIteration_).count(),
+                               getSolutionCost(displayIteration_).value());
+      } else {
+        tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                               getSolutionPath(displayIteration_), nullptr,
+                               getIterationDuration(displayIteration_).count(),
+                               getTotalElapsedDuration(displayIteration_).count(),
+                               getSolutionCost(displayIteration_).value());
+      }
     }
     if (pangolin::Pushed(optionPlay)) {
       optionTrack = false;
@@ -462,117 +479,117 @@ void InteractiveVisualizer::drawStateIds(std::size_t iteration) {
 
 void InteractiveVisualizer::visit(const CentreSquare& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const DividingWalls& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const DoubleEnclosure& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const FlankingGap& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const FourRooms& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const NarrowPassage& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const ObstacleFree& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const RandomRectangles& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const {
   // Draw the start states.
-  drawPoints(context.getStartStates(), green, 9.0);
+  drawPoints(context.getStartStates(), green, 4.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 9.0);
+  drawPoints(context.getGoalStates(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const RepeatingRectangles& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const StartEnclosure& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
 
 void InteractiveVisualizer::visit(const WallGap& context) const {
   // Draw the start states.
-  drawPoint(context.getStartState(), green, 9.0);
+  drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 9.0);
+  drawPoint(context.getGoalState(), red, 4.0);
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -872,8 +889,8 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iterat
       drawAITstarSpecificVisualizations(iteration);
       return;
     }
-    case PLANNER_TYPE::AEITSTAR: {
-      drawAEITstarSpecificVisualizations(iteration);
+    case PLANNER_TYPE::EITSTAR: {
+      drawEITstarSpecificVisualizations(iteration);
       return;
     }
     default:
@@ -976,14 +993,14 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
       backwardQueueVertices.emplace_back((*state)[0u], (*state)[1u]);
     }
 
-    drawPoints(backwardQueueVertices, yellow, 10.0);
+    drawPoints(backwardQueueVertices, yellow, 5.0);
 
     // Get the next vertex in the queue.
     auto nextVertex = aitstarData->getNextVertex();
     if (nextVertex) {
       auto state = nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       drawPoints(std::vector<Eigen::Vector2d>{Eigen::Vector2d((*state)[0u], (*state)[1u])}, red,
-                 25.0);
+                 10.0);
     }
 
     // Draw the backward search tree.
@@ -1001,7 +1018,7 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
       }
     }
 
-    drawLines(backwardSearchTreeEdges, 1.0, yellow);
+    drawLines(backwardSearchTreeEdges, 2.0, yellow);
 
     // Get the next edge in the queue.
     auto nextEdgeStates = aitstarData->getNextEdge();
@@ -1049,13 +1066,13 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
   }
 }
 
-void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t iteration) const {
-  // Get the AEIT* specific data.
-  auto aeitstarData =
-      std::dynamic_pointer_cast<const AEITstarData>(getPlannerSpecificData(iteration));
+void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iteration) const {
+  // Get the EIT* specific data.
+  auto eitstarData =
+      std::dynamic_pointer_cast<const EITstarData>(getPlannerSpecificData(iteration));
   if (context_->getDimension() == 2u) {
     // Get the forward queue.
-    auto forwardQueue = aeitstarData->getForwardQueue();
+    auto forwardQueue = eitstarData->getForwardQueue();
     std::vector<Eigen::Vector2d> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
     for (const auto& edge : forwardQueue) {
@@ -1069,7 +1086,7 @@ void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t itera
     drawLines(forwardQueueEdges, 1.5, lightblue);
 
     // Get the reverse queue.
-    auto reverseQueue = aeitstarData->getReverseQueue();
+    auto reverseQueue = eitstarData->getReverseQueue();
     std::vector<Eigen::Vector2d> reverseQueueEdges;
     forwardQueueEdges.reserve(2u * reverseQueue.size());
     for (const auto& edge : reverseQueue) {
@@ -1083,7 +1100,7 @@ void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t itera
     drawLines(reverseQueueEdges, 1.5, yellow);
 
     // Get the reverse tree.
-    auto reverseTree = aeitstarData->getReverseTree();
+    auto reverseTree = eitstarData->getReverseTree();
     std::vector<Eigen::Vector2d> reverseTreeEdges;
     reverseTreeEdges.reserve(2u * reverseTree.size());
     for (const auto& edge : reverseTree) {
@@ -1097,7 +1114,7 @@ void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t itera
     drawLines(reverseTreeEdges, 2.0, blue);
 
     // Get the next edge in the forward queue.
-    auto nextForwardEdge = aeitstarData->getNextForwardEdge();
+    auto nextForwardEdge = eitstarData->getNextForwardEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (nextForwardEdge.source && nextForwardEdge.target) {
@@ -1113,7 +1130,7 @@ void InteractiveVisualizer::drawAEITstarSpecificVisualizations(std::size_t itera
     }
 
     // Get the next edge in the reverse queue.
-    auto nextReverseEdge = aeitstarData->getNextReverseEdge();
+    auto nextReverseEdge = eitstarData->getNextReverseEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (nextReverseEdge.source && nextReverseEdge.target) {

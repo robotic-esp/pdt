@@ -3,9 +3,9 @@
         "defaultRandomRectangles": {
             "type": "RandomRectangles",
             "objective": "defaultPathLength",
-            "maxTime": 0.1,
+            "maxTime": 1.0,
             "dimensions": 2,
-            "boundarySideLengths" : 1,
+            "boundarySideLengths" : [ 1, 1 ],
             "start": [0.0, 0.0],
             "goal": [0.4, 0.4],
             "collisionCheckResolution": 0.001,

@@ -123,43 +123,43 @@ void AITstarData::setVerticesInBackwardSearchTree(
   }
 }
 
-std::vector<ompl::geometric::aeitstar::Edge> AEITstarData::getReverseTree() const {
+std::vector<ompl::geometric::eitstar::Edge> EITstarData::getReverseTree() const {
   return reverseTree_;
 }
 
-std::vector<ompl::geometric::aeitstar::Edge> AEITstarData::getForwardQueue() const {
+std::vector<ompl::geometric::eitstar::Edge> EITstarData::getForwardQueue() const {
   return forwardQueue_;
 }
 
-std::vector<ompl::geometric::aeitstar::Edge> AEITstarData::getReverseQueue() const {
+std::vector<ompl::geometric::eitstar::Edge> EITstarData::getReverseQueue() const {
   return reverseQueue_;
 }
 
-ompl::geometric::aeitstar::Edge AEITstarData::getNextForwardEdge() const {
+ompl::geometric::eitstar::Edge EITstarData::getNextForwardEdge() const {
   return nextForwardEdge_;
 }
 
-ompl::geometric::aeitstar::Edge AEITstarData::getNextReverseEdge() const {
+ompl::geometric::eitstar::Edge EITstarData::getNextReverseEdge() const {
   return nextReverseEdge_;
 }
 
-void AEITstarData::setReverseTree(const std::vector<ompl::geometric::aeitstar::Edge>& tree) {
+void EITstarData::setReverseTree(const std::vector<ompl::geometric::eitstar::Edge>& tree) {
   reverseTree_ = tree;
 }
 
-void AEITstarData::setForwardQueue(const std::vector<ompl::geometric::aeitstar::Edge>& queue) {
+void EITstarData::setForwardQueue(const std::vector<ompl::geometric::eitstar::Edge>& queue) {
   forwardQueue_ = queue;
 }
 
-void AEITstarData::setReverseQueue(const std::vector<ompl::geometric::aeitstar::Edge>& queue) {
+void EITstarData::setReverseQueue(const std::vector<ompl::geometric::eitstar::Edge>& queue) {
   reverseQueue_ = queue;
 }
 
-void AEITstarData::setNextForwardEdge(const ompl::geometric::aeitstar::Edge& edge) {
+void EITstarData::setNextForwardEdge(const ompl::geometric::eitstar::Edge& edge) {
   nextForwardEdge_ = edge;
 }
 
-void AEITstarData::setNextReverseEdge(const ompl::geometric::aeitstar::Edge& edge) {
+void EITstarData::setNextReverseEdge(const ompl::geometric::eitstar::Edge& edge) {
   nextReverseEdge_ = edge;
 }
 

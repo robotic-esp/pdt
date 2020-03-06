@@ -248,13 +248,20 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
 
 std::shared_ptr<ompl::base::SpaceInformation> ContextFactory::createRealVectorSpaceInfo(
     const std::string& parentKey) const {
+  assert(config_->get<std::vector<double>>(parentKey + "/boundarySideLengths").size() ==
+         config_->get<std::size_t>(parentKey + "/dimensions"));
   // Allocate a real vector state space.
   auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(
       config_->get<std::size_t>(parentKey + "/dimensions"));
 
   // Set the bounds.
-  stateSpace->setBounds(-0.5 * config_->get<double>(parentKey + "/boundarySideLengths"),
-                        0.5 * config_->get<double>(parentKey + "/boundarySideLengths"));
+  auto sideLengths = config_->get<std::vector<double>>(parentKey + "/boundarySideLengths");
+  ompl::base::RealVectorBounds bounds(config_->get<std::size_t>(parentKey + "/dimensions"));
+  for (std::size_t dim = 0u; dim < config_->get<std::size_t>(parentKey + "/dimensions"); ++dim) {
+    bounds.low.at(dim) = -0.5 * sideLengths.at(dim);
+    bounds.high.at(dim) = 0.5 * sideLengths.at(dim);
+  }
+  stateSpace->setBounds(bounds);
 
   // Allocate the state information for this space.
   return std::make_shared<ompl::base::SpaceInformation>(stateSpace);

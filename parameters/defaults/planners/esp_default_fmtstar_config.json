@@ -1,0 +1,132 @@
+{
+    "planner": {
+        "defaultFMTstar50": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espdarkred",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 50,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar100": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espdarkred",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 100,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar200": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espdarkred",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 200,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar500": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espdarkred",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 500,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar1000": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espdarkred",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 1000,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar2000": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espdarkred",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 2000,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar5000": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espdarkred",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 5000,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar10000": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espdarkred",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 10000,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        }
+    }
+}

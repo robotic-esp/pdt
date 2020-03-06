@@ -7,7 +7,7 @@
             "goal": [0.45, 0.0],
             "maxTime": 0.1,
             "dimensions": 2,
-            "boundarySideLengths" : 1,
+            "boundarySideLengths" : [ 1, 1 ],
             "collisionCheckResolution": 0.001,
             "numWalls": 3,
             "wallThicknesses": [0.05, 0.1, 0.05],
