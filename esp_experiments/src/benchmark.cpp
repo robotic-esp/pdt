@@ -128,6 +128,7 @@ int main(int argc, char **argv) {
       {
         auto reconciler =
             std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
+        reconciler->setName("ReconcilingPlanner");
         reconciler->setProblemDefinition(context->instantiateNewProblemDefinition());
         auto hotpath = std::async(std::launch::async, [&reconciler]() {
           reconciler->solve(ompl::base::timedPlannerTerminationCondition(0.0));
