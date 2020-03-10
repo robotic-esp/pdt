@@ -51,15 +51,6 @@ OpenRaveSE3ValidityChecker::OpenRaveSE3ValidityChecker(
     OpenRaveBaseValidityChecker(spaceInfo, environment, robot, config),
     raveState_() {
   raveState_.identity();
-  const auto contextName = config_->get<std::string>("experiment/context");
-  raveLowerBounds_ = config_->get<std::vector<double>>("context/"s + contextName + "/lowerBounds"s);
-  raveUpperBounds_ = config_->get<std::vector<double>>("context/"s + contextName + "/upperBounds"s);
-  assert(raveLowerBounds_.size() == raveUpperBounds_.size());
-  raveStateScales_.reserve(raveLowerBounds_.size());
-  for (std::size_t i = 0u; i < raveLowerBounds_.size(); ++i) {
-    assert(raveUpperBounds_[i] > raveLowerBounds_[i]);
-    raveStateScales_.emplace_back(raveUpperBounds_[i] - raveLowerBounds_[i]);
-  }
 }
 
 bool OpenRaveSE3ValidityChecker::isValid(const ompl::base::State* state) const {
@@ -70,9 +61,7 @@ bool OpenRaveSE3ValidityChecker::isValid(const ompl::base::State* state) const {
 
   // Fill the rave state with the ompl state values.
   auto se3State = state->as<ompl::base::SE3StateSpace::StateType>();
-  raveState_.trans.Set3(raveLowerBounds_[0] + (raveStateScales_[0] * se3State->getX()),
-                        raveLowerBounds_[1] + (raveStateScales_[1] * se3State->getY()),
-                        raveLowerBounds_[2] + (raveStateScales_[2] * se3State->getZ()));
+  raveState_.trans.Set3(se3State->getX(), se3State->getY(), se3State->getZ());
   raveState_.rot.x = se3State->rotation().x;
   raveState_.rot.y = se3State->rotation().y;
   raveState_.rot.z = se3State->rotation().z;
@@ -94,9 +83,7 @@ bool OpenRaveSE3ValidityChecker::isValid(const ompl::base::State* state) const {
 double OpenRaveSE3ValidityChecker::clearance(const ompl::base::State* state) const {
   // Fill the rave state with the ompl state values.
   auto se3State = state->as<ompl::base::SE3StateSpace::StateType>();
-  raveState_.trans.Set3(raveLowerBounds_[0] + (raveStateScales_[0] * se3State->getX()),
-                        raveLowerBounds_[1] + (raveStateScales_[1] * se3State->getY()),
-                        raveLowerBounds_[2] + (raveStateScales_[2] * se3State->getZ()));
+  raveState_.trans.Set3(se3State->getX(), se3State->getY(), se3State->getZ());
   raveState_.rot.x = se3State->rotation().x;
   raveState_.rot.y = se3State->rotation().y;
   raveState_.rot.z = se3State->rotation().z;

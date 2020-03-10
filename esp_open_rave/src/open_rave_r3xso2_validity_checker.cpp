@@ -52,15 +52,6 @@ OpenRaveR3xSO2ValidityChecker::OpenRaveR3xSO2ValidityChecker(
     OpenRaveBaseValidityChecker(spaceInfo, environment, robot, config),
     raveState_() {
   raveState_.identity();
-  const auto contextName = config_->get<std::string>("experiment/context");
-  raveLowerBounds_ = config_->get<std::vector<double>>("context/"s + contextName + "/lowerBounds"s);
-  raveUpperBounds_ = config_->get<std::vector<double>>("context/"s + contextName + "/upperBounds"s);
-  assert(raveLowerBounds_.size() == raveUpperBounds_.size());
-  raveStateScales_.reserve(raveLowerBounds_.size());
-  for (std::size_t i = 0u; i < raveLowerBounds_.size(); ++i) {
-    assert(raveUpperBounds_[i] > raveLowerBounds_[i]);
-    raveStateScales_.emplace_back(raveUpperBounds_[i] - raveLowerBounds_[i]);
-  }
 }
 
 bool OpenRaveR3xSO2ValidityChecker::isValid(const ompl::base::State* state) const {
@@ -72,9 +63,7 @@ bool OpenRaveR3xSO2ValidityChecker::isValid(const ompl::base::State* state) cons
   // Fill the R3 part of the state.
   auto r3State = state->as<ompl::base::CompoundStateSpace::StateType>()
                      ->as<ompl::base::RealVectorStateSpace::StateType>(0u);
-  raveState_.trans.Set3(raveLowerBounds_[0u] + (raveStateScales_[0u] * (*r3State)[0u]),
-                        raveLowerBounds_[1u] + (raveStateScales_[1u] * (*r3State)[1u]),
-                        raveLowerBounds_[2u] + (raveStateScales_[2u] * (*r3State)[2u]));
+  raveState_.trans.Set3((*r3State)[0u], (*r3State)[1u], (*r3State)[2u]);
 
   // Fill the SO2 part of the state
   auto so2State = state->as<ompl::base::CompoundStateSpace::StateType>()
@@ -98,9 +87,7 @@ double OpenRaveR3xSO2ValidityChecker::clearance(const ompl::base::State* state) 
   // Fill the R3 part of the state.
   auto r3State = state->as<ompl::base::CompoundStateSpace::StateType>()
                      ->as<ompl::base::RealVectorStateSpace::StateType>(0u);
-  raveState_.trans.Set3(raveLowerBounds_[0u] + (raveStateScales_[0u] * (*r3State)[0u]),
-                        raveLowerBounds_[1u] + (raveStateScales_[1u] * (*r3State)[1u]),
-                        raveLowerBounds_[2u] + (raveStateScales_[2u] * (*r3State)[2u]));
+  raveState_.trans.Set3((*r3State)[0u], (*r3State)[1u], (*r3State)[2u]);
 
   // Fill the SO2 part of the state
   auto so2State = state->as<ompl::base::CompoundStateSpace::StateType>()

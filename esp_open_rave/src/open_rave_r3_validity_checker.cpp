@@ -51,15 +51,6 @@ OpenRaveR3ValidityChecker::OpenRaveR3ValidityChecker(
     OpenRaveBaseValidityChecker(spaceInfo, environment, robot, config),
     raveState_() {
   raveState_.identity();
-  const auto contextName = config_->get<std::string>("experiment/context");
-  raveLowerBounds_ = config_->get<std::vector<double>>("context/"s + contextName + "/lowerBounds"s);
-  raveUpperBounds_ = config_->get<std::vector<double>>("context/"s + contextName + "/upperBounds"s);
-  assert(raveLowerBounds_.size() == raveUpperBounds_.size());
-  raveStateScales_.reserve(raveLowerBounds_.size());
-  for (std::size_t i = 0u; i < raveLowerBounds_.size(); ++i) {
-    assert(raveUpperBounds_[i] > raveLowerBounds_[i]);
-    raveStateScales_.emplace_back(raveUpperBounds_[i] - raveLowerBounds_[i]);
-  }
 }
 
 bool OpenRaveR3ValidityChecker::isValid(const ompl::base::State* state) const {
@@ -70,9 +61,7 @@ bool OpenRaveR3ValidityChecker::isValid(const ompl::base::State* state) const {
 
   // Fill the rave state with the ompl state values.
   auto r3State = state->as<ompl::base::RealVectorStateSpace::StateType>();
-  raveState_.trans.Set3(raveLowerBounds_[0u] + (raveStateScales_[0u] * (*r3State)[0u]),
-                        raveLowerBounds_[1u] + (raveStateScales_[1u] * (*r3State)[1u]),
-                        raveLowerBounds_[2u] + (raveStateScales_[2u] * (*r3State)[2u]));
+  raveState_.trans.Set3((*r3State)[0u], (*r3State)[1u], (*r3State)[2u]);
 
   // Lock the environment mutex.
   OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());
@@ -90,9 +79,7 @@ bool OpenRaveR3ValidityChecker::isValid(const ompl::base::State* state) const {
 double OpenRaveR3ValidityChecker::clearance(const ompl::base::State* state) const {
   // Fill the rave state with the ompl state values.
   auto r3State = state->as<ompl::base::RealVectorStateSpace::StateType>();
-  raveState_.trans.Set3(raveLowerBounds_[0u] + (raveStateScales_[0u] * (*r3State)[0u]),
-                        raveLowerBounds_[1u] + (raveStateScales_[1u] * (*r3State)[1u]),
-                        raveLowerBounds_[2u] + (raveStateScales_[2u] * (*r3State)[2u]));
+  raveState_.trans.Set3((*r3State)[0u], (*r3State)[1u], (*r3State)[2u]);
 
   // Lock the environment mutex.
   OpenRAVE::EnvironmentMutex::scoped_lock lock(environment_->GetMutex());

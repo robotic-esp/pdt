@@ -64,26 +64,15 @@ OpenRaveR3::OpenRaveR3(const std::shared_ptr<ompl::base::SpaceInformation>& spac
   auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");
   auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
 
-  // Get the upper and lower bounds and the state scales.
-  auto raveLowerBounds = config_->get<std::vector<double>>("context/"s + name + "/lowerBounds"s);
-  auto raveUpperBounds = config_->get<std::vector<double>>("context/"s + name + "/upperBounds"s);
-  assert(raveLowerBounds.size() == raveUpperBounds.size());
-  std::vector<double> raveStateScales;
-  raveStateScales.reserve(raveLowerBounds.size());
-  for (std::size_t i = 0u; i < raveLowerBounds.size(); ++i) {
-    assert(raveUpperBounds[i] > raveLowerBounds[i]);
-    raveStateScales.emplace_back(raveUpperBounds[i] - raveLowerBounds[i]);
-  }
-
   // Set the start position.
-  (*startState_)[0] = (startPosition.at(0u) - raveLowerBounds.at(0u)) / raveStateScales.at(0u);
-  (*startState_)[1] = (startPosition.at(1u) - raveLowerBounds.at(1u)) / raveStateScales.at(1u);
-  (*startState_)[2] = (startPosition.at(2u) - raveLowerBounds.at(2u)) / raveStateScales.at(2u);
+  (*startState_)[0] = startPosition.at(0u);
+  (*startState_)[1] = startPosition.at(1u);
+  (*startState_)[2] = startPosition.at(2u);
 
   // Set the goal position.
-  (*goalState_)[0] = (goalPosition.at(0u) - raveLowerBounds.at(0u)) / raveStateScales.at(0u);
-  (*goalState_)[1] = (goalPosition.at(1u) - raveLowerBounds.at(1u)) / raveStateScales.at(1u);
-  (*goalState_)[2] = (goalPosition.at(2u) - raveLowerBounds.at(2u)) / raveStateScales.at(2u);
+  (*goalState_)[0] = goalPosition.at(0u);
+  (*goalState_)[1] = goalPosition.at(1u);
+  (*goalState_)[2] = goalPosition.at(2u);
 
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
@@ -110,10 +99,11 @@ OpenRaveR3::OpenRaveR3(const std::shared_ptr<ompl::base::SpaceInformation>& spac
   // In this context, there are no active dimensions.
   robot->SetActiveDOFs({});
 
+  // Set the R3 bounds.
   auto r3space = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>();
   ompl::base::RealVectorBounds bounds(3u);
-  bounds.setLow(0.0);
-  bounds.setHigh(1.0);
+  bounds.high = config_->get<std::vector<double>>("context/"s + name + "/upperBounds"s);  // x y z
+  bounds.low = config_->get<std::vector<double>>("context/"s + name + "/lowerBounds"s);  // x y z
   r3space->setBounds(bounds);
 
   // Create the validity checker.
