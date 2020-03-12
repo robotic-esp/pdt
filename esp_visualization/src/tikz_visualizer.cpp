@@ -208,7 +208,7 @@ std::experimental::filesystem::path TikzVisualizer::compile(
   } else {
     standalone << "$\\infty$";
   }
-  standalone << ", Time: " << time << "\\\\\n\\resizebox*{10cm}{10cm}{%\n"
+  standalone << ", Time: " << time << "s\\\\\n\\resizebox*{10cm}{10cm}{%\n"
              << "\\noindent\\input{" << (currentPath / texPath).string() << "}%\n"
              << "}\n\\end{minipage}\n"
              << "\\end{document}";
