@@ -199,10 +199,6 @@ std::experimental::filesystem::path TikzVisualizer::compile(
   }
 
   standalone << "\n\\begin{document}\n"
-             << "\\setmainfont{FoundrySterling-Book.otf}[\n"
-             << "Path = /home/marlin/.local/share/fonts/,\n"
-             << "BoldFont = FoundrySterling-Demi.otf,\n"
-             << "ItalicFont = FoundrySterling-BookItalic.otf]\n"
              << "\\pagecolor{white}\n"
              << "\\begin{minipage}{10cm}\n"
              << "\n\\noindent\\Large\\vphantom{pP}" << name_
