@@ -201,7 +201,7 @@ std::experimental::filesystem::path TikzVisualizer::compile(
   standalone << "\n\\begin{document}\n"
              << "\\pagecolor{white}\n"
              << "\\begin{minipage}{10cm}\n"
-             << "\n\\noindent\\Large\\vphantom{pP}" << name_
+             << "\n\\noindent\\Large\\vphantom{pP}" << config_->get<std::string>("planner/" + name_ + "/report/name")
              << "\\vphantom{pP}\\quad\\small Cost: ";
   if (std::isfinite(cost)) {
     standalone << cost;
