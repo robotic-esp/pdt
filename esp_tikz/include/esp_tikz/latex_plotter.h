@@ -85,6 +85,7 @@ class LatexPlotter {
 
  protected:
   const std::shared_ptr<const Configuration> config_;
+  static std::size_t plotId_;
 };
 
 template <typename... Axes>

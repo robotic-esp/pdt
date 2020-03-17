@@ -101,9 +101,11 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
 
   // Helper functions.
   void drawBoundary(const RealVectorGeometricContext& context) const;
+  void drawStartVertex(const ompl::base::PlannerDataVertex& vertex) const;
   void drawStartState(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const;
   void drawStartStates(
       const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states) const;
+  void drawGoalVertex(const ompl::base::PlannerDataVertex& vertex) const;
   void drawGoalState(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const;
   void drawGoalStates(
       const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states) const;
@@ -111,14 +113,15 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
   void drawVertex(const ompl::base::RealVectorStateSpace::StateType* state,
                   const std::string& options) const;
   void drawEdge(const ompl::base::PlannerDataVertex& parent,
-                const ompl::base::PlannerDataVertex& child) const;
+                const ompl::base::PlannerDataVertex& child,
+                const std::string& options) const;
   void drawEdge(const ompl::base::RealVectorStateSpace::StateType* parent,
                 const ompl::base::RealVectorStateSpace::StateType* child,
                 const std::string& options) const;
   void drawSolution(const ompl::base::PathPtr path) const;
   void drawEllipse(double cost) const;
   void drawRectangle(double midX, double midY, double widthX, double widthY,
-                     const std::string& lineColor, const std::string& fillColor) const;
+                     const std::string& options) const;
   void drawPlannerSpecificVisualizations(
       const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData) const;
   void drawBITstarSpecificVisualizations(

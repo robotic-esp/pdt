@@ -45,6 +45,8 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
+std::size_t LatexPlotter::plotId_ = 0u;
+
 LatexPlotter::LatexPlotter(const std::shared_ptr<const Configuration>& config) : config_(config) {
 }
 
@@ -62,7 +64,8 @@ std::shared_ptr<PgfAxis> LatexPlotter::createLegendAxis(
   for (const auto& name : plannerNames) {
     std::string imageOptions{config_->get<std::string>("planner/"s + name + "/report/color"s) +
                              ", line width = 1.0pt, mark size=1.0pt, mark=square*"};
-    legend->addLegendEntry(config_->get<std::string>("planner/" + name + "/report/name"), imageOptions);
+    legend->addLegendEntry(config_->get<std::string>("planner/" + name + "/report/name"),
+                           imageOptions);
   }
   return legend;
 }
@@ -130,10 +133,7 @@ std::experimental::filesystem::path LatexPlotter::createPicture(
   auto path = std::experimental::filesystem::path(config_->get<std::string>("experiment/results"))
                   .parent_path() /
               std::experimental::filesystem::path("tikz/");
-  for (const auto& axis : picture->getAxes()) {
-    path += std::experimental::filesystem::path(axis->options.name + '_');
-  }
-  path += ".tikz";
+  path += "axes_collection_" + std::to_string(plotId_++) + ".tikz";
   picture->write(path);
   return path;
 }
@@ -172,7 +172,8 @@ fs::path LatexPlotter::compileStandalonePdf(const fs::path& tikzPicture) const {
   // these plots can be quite large, pdflatex has run into memory issues. Lualatex should be
   // available with all major tex distributions.
   auto currentPath = fs::current_path();
-  auto cmd = "cd \""s + path.parent_path().string() + "\" && lualatex --interaction=nonstopmode --shell-escape \""s + path.string() +
+  auto cmd = "cd \""s + path.parent_path().string() +
+             "\" && lualatex --interaction=nonstopmode --shell-escape \""s + path.string() +
              "\" && cd \""s + currentPath.string() + '\"';
   int retval = std::system(cmd.c_str());
   (void)retval;
