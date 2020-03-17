@@ -118,7 +118,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
         if (child != ompl::base::PlannerData::NO_VERTEX) {
           drawEdge(vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
                    child.getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-                   "espblue, line width = 0.05mm");
+                   "edge");
         }
       }
     }
@@ -139,6 +139,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
   picture_.setClipCommand("\\clip ("s + std::to_string(minX) + ", "s + std::to_string(minY) +
                           ") rectangle (" + std::to_string(maxX) + ", "s + std::to_string(maxY) +
                           ");");
+  picture_.setOptions(TikzPictureOptions({10, 10}));
 
   // Export to a file.
   std::stringstream texFilename;
@@ -181,6 +182,7 @@ std::experimental::filesystem::path TikzVisualizer::compile(
   standalone.precision(5);
   standalone << std::fixed;
 
+  // Load the required packages.
   standalone << "\\RequirePackage{shellesc}\n"
              << "\\RequirePackage{pdftexcmds}\n"
              << "\\makeatletter\n"
@@ -193,15 +195,30 @@ std::experimental::filesystem::path TikzVisualizer::compile(
              << "\\usepackage{fontspec}\n"
              << "\\usepackage{tikz}\n\n";
 
+  // Define the colors.
   for (const auto& [name, values] : espColors_) {
     standalone << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
                << values[2u] << "}\n";
   }
 
+  // Set the styles for the tikz elements.
+  standalone << "\n\\tikzset{\n"
+             << "  start/.style={fill = espgreen, circle, inner sep = 0pt, minimum width = 4pt},\n"
+             << "  goal/.style={fill = espred, circle, inner sep = 0pt, minimum width = 4pt},\n"
+             << "  vertex/.style={fill = espblue, circle, inner sep = 0pt, minimum width = 2pt},\n"
+             << "  edge/.style={espblue, thick},\n"
+             << "  solution/.style={espyellow, ultra thick},\n"
+             << "  boundary/.style={draw = black, fill = none},\n"
+             << "  obstacle/.style={draw = none, fill = black},\n"
+             << "  antiobstacle/.style={draw = white, fill = white}\n"
+             << "}\n";
+
+  // Create the document.
   standalone << "\n\\begin{document}\n"
              << "\\pagecolor{white}\n"
              << "\\begin{minipage}{10cm}\n"
-             << "\n\\noindent\\Large\\vphantom{pP}" << config_->get<std::string>("planner/" + name_ + "/report/name")
+             << "\n\\noindent\\Large\\vphantom{pP}"
+             << config_->get<std::string>("planner/" + name_ + "/report/name")
              << "\\vphantom{pP}\\quad\\small Cost: ";
   if (std::isfinite(cost)) {
     standalone << cost;
@@ -397,14 +414,14 @@ void TikzVisualizer::visit(const WallGap& context) const {
 
 void TikzVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
   drawRectangle(obstacle.getAnchorCoordinates().at(0), obstacle.getAnchorCoordinates().at(1),
-                obstacle.getWidths().at(0), obstacle.getWidths().at(1), "none",
-                "espblack");
+                obstacle.getWidths().at(0), obstacle.getWidths().at(1),
+                "obstacle");
 }
 
 void TikzVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
   drawRectangle(antiObstacle.getAnchorCoordinates().at(0),
                 antiObstacle.getAnchorCoordinates().at(1), antiObstacle.getWidths().at(0) + 1e-2,
-                antiObstacle.getWidths().at(1) + 1e-2, "none", "espwhite");
+                antiObstacle.getWidths().at(1) + 1e-2, "antiobstacle");
 }
 
 void TikzVisualizer::drawBoundary(const RealVectorGeometricContext& context) const {
@@ -413,13 +430,23 @@ void TikzVisualizer::drawBoundary(const RealVectorGeometricContext& context) con
   double midY = (boundaries.low.at(1u) + boundaries.high.at(1u)) / 2.0;
   double widthX = boundaries.high.at(0u) - boundaries.low.at(0u);
   double widthY = boundaries.high.at(1u) - boundaries.low.at(1u);
-  drawRectangle(midX, midY, widthX, widthY, "espblack", "none");
+  drawRectangle(midX, midY, widthX, widthY, "boundary");
+}
+
+void TikzVisualizer::drawStartVertex(const ompl::base::PlannerDataVertex& vertex) const {
+  auto start = std::make_shared<TikzNode>();
+  start->setOptions("start");
+  double x = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](0u);
+  double y = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](1u);
+  start->setPosition(x, y);
+  start->setName("vertex" + std::to_string(vertex.getTag()));
+  picture_.addNode(start);
 }
 
 void TikzVisualizer::drawStartState(
     const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const {
   auto start = std::make_shared<TikzNode>();
-  start->setOptions("fill = espgreen, inner sep = 0mm, circle, minimum size = 0.15mm");
+  start->setOptions("start");
   start->setPosition(state[0], state[1]);
   start->setName("start" + std::to_string(state[0]) + std::to_string(state[1]));
   picture_.addNode(start);
@@ -432,10 +459,20 @@ void TikzVisualizer::drawStartStates(
   }
 }
 
+void TikzVisualizer::drawGoalVertex(const ompl::base::PlannerDataVertex& vertex) const {
+  auto goal = std::make_shared<TikzNode>();
+  goal->setOptions("goal");
+  double x = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](0u);
+  double y = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](1u);
+  goal->setPosition(x, y);
+  goal->setName("vertex" + std::to_string(vertex.getTag()));
+  picture_.addNode(goal);
+}
+
 void TikzVisualizer::drawGoalState(
     const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const {
   auto goal = std::make_shared<TikzNode>();
-  goal->setOptions("fill = espred, inner sep = 0mm, circle, minimum size = 0.15mm");
+  goal->setOptions("goal");
   goal->setPosition(state[0], state[1]);
   goal->setName("goal" + std::to_string(state[0]) + std::to_string(state[1]));
   picture_.addNode(goal);
@@ -449,12 +486,12 @@ void TikzVisualizer::drawGoalStates(
 }
 
 void TikzVisualizer::drawRectangle(double midX, double midY, double widthX, double widthY,
-                                   const std::string& lineColor, const std::string& fillColor) const {
+                                   const std::string& options) const {
   auto rectangle = std::make_shared<TikzDraw>();
   rectangle->setFromPosition(midX - widthX / 2.0, midY - widthY / 2.0);
   rectangle->setToPosition(midX + widthX / 2.0, midY + widthY / 2.0);
   rectangle->setConnection("rectangle");
-  rectangle->setOptions("draw = "s + lineColor + ", fill = "s + fillColor);
+  rectangle->setOptions(options);
 
   picture_.addDraw(rectangle);
 }
@@ -553,7 +590,7 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
 
 void TikzVisualizer::drawVertex(const ompl::base::PlannerDataVertex& vertex) const {
   auto node = std::make_shared<TikzNode>();
-  node->setOptions("fill = espblue, inner sep = 0mm, circle, minimum size = 0.1mm");
+  node->setOptions("vertex");
   double x = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](0u);
   double y = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](1u);
   node->setPosition(x, y);
@@ -572,12 +609,13 @@ void TikzVisualizer::drawVertex(const ompl::base::RealVectorStateSpace::StateTyp
 }
 
 void TikzVisualizer::drawEdge(const ompl::base::PlannerDataVertex& parent,
-                              const ompl::base::PlannerDataVertex& child) const {
+                              const ompl::base::PlannerDataVertex& child,
+                              const std::string& options) const {
   auto draw = std::make_shared<TikzDraw>();
   draw->setFromPosition("vertex" + std::to_string(parent.getTag()) + ".center");
   draw->setToPosition("vertex" + std::to_string(child.getTag()) + ".center");
   draw->setConnection("--");
-  draw->setOptions("espblue, line width = 0.05mm");
+  draw->setOptions(options);
   picture_.addDraw(draw);
 }
 
@@ -601,7 +639,7 @@ void TikzVisualizer::drawSolution(const ompl::base::PathPtr path) const {
     for (std::size_t i = 1u; i < states.size(); ++i) {
       auto parent = states.at(i - 1u)->as<ompl::base::RealVectorStateSpace::StateType>();
       auto child = states.at(i)->as<ompl::base::RealVectorStateSpace::StateType>();
-      drawEdge(parent, child, "espyellow, line width = 0.1mm");
+      drawEdge(parent, child, "solution");
     }
   }
 }
