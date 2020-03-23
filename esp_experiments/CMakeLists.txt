@@ -22,6 +22,16 @@ target_link_libraries(benchmark_report PUBLIC
   esp_tikz
 )
 
+add_executable(collision_detection_test
+  src/collision_detection_test
+  )
+target_link_libraries(collision_detection_test PUBLIC
+  ${OMPL_LIBRARIES}
+  esp_configuration
+  esp_factories
+  esp_planning_contexts
+)
+
 add_executable(visualization
   src/visualization.cpp
   )
