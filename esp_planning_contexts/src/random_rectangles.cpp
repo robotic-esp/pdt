@@ -79,8 +79,6 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  // Create the validity checker.
-  auto validityChecker = std::make_shared<ContextValidityCheckerGNAT>(spaceInfo_);
 
   // Fill the start and goal states' coordinates.
   for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
@@ -90,6 +88,16 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
 
   // Create the obstacles and add them to the validity checker.
   createObstacles();
+
+  // Create the validity checker.
+  std::shared_ptr<ContextValidityChecker> validityChecker;
+  if (numRectangles_ < 500) {
+    validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);
+  } else {
+    validityChecker = std::make_shared<ContextValidityCheckerGNAT>(spaceInfo_);
+  }
+
+  // Add the obstacles to the validity checker.
   validityChecker->addObstacles(obstacles_);
 
   // Set the validity checker and the check resolution.
