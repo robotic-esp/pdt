@@ -8,7 +8,7 @@
             "boundarySideLengths" : [ 1, 1 ],
             "start": [-0.25, 0.0],
             "goal": [0.25, 0.0],
-            "collisionCheckResolution": 0.001,
+            "collisionCheckResolution": 0.0001,
             "numObstaclesPerDim": 49,
             "obstacleWidth": 0.01
         }

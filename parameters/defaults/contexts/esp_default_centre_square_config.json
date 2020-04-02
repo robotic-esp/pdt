@@ -8,7 +8,7 @@
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
-            "collisionCheckResolution": 0.001,
+            "collisionCheckResolution": 0.0001,
             "obstacleWidth": 0.2
         }
     }
