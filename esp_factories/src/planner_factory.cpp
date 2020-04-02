@@ -153,6 +153,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner =
           std::make_shared<ompl::geometric::InformedRRTstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
       planner->setNumSamplingAttempts(
           config_->get<std::size_t>(optionsKey + "/numSamplingAttempts"));
