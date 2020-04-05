@@ -12,7 +12,8 @@
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
                 "repairReverseSearchTreeUponCollisionDetection": false,
-                "collisionDetectionOnReverseSearch": true
+                "collisionDetectionOnReverseSearch": true,
+                "numInitialCollisionChecks": 10
             }
         }
     }
