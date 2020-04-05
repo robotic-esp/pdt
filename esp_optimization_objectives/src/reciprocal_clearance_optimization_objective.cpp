@@ -55,10 +55,14 @@ ReciprocalClearanceOptimizationObjective::ReciprocalClearanceOptimizationObjecti
 ompl::base::Cost ReciprocalClearanceOptimizationObjective::stateCost(
     const ompl::base::State* state) const {
   auto clearance = spaceInfo_->getStateValidityChecker()->clearance(state);
-  if (clearance > 0.0) {
+  if (clearance > 1e-6) {
     return ompl::base::Cost(1.0 / clearance);
   } else {
-    return infiniteCost();
+    // Returning a really (really) high number, like infinity, here is not a good idea. The problem
+    // is that this cost is sometimes used for further computation (such as for distance computation
+    // in a nearest neighbor struct in FMT*) and overflows/infs/nans can result in segfaults because
+    // these cases aren't handled propperly.
+    return ompl::base::Cost(1e6);
   }
 }
 
