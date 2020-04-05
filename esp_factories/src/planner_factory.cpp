@@ -36,10 +36,10 @@
 
 #include "esp_factories/planner_factory.h"
 
-#include <ompl/geometric/planners/eitstar/EITstar.h>
 #include <ompl/geometric/planners/aitstar/AITstar.h>
 #include <ompl/geometric/planners/bitstar/ABITstar.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/eitstar/EITstar.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -76,7 +76,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
   // BIT*
   switch (type) {
     case PLANNER_TYPE::ABITSTAR: {
-      // Allocate and configure an SBIT* planner.
+      // Allocate and configure an ABIT* planner.
       auto planner = std::make_shared<ompl::geometric::ABITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
@@ -97,11 +97,13 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       return {planner, PLANNER_TYPE::ABITSTAR};
     }
     case PLANNER_TYPE::EITSTAR: {
-      // Allocate and configure an AI-BIT* planner.
+      // Allocate and configure an EIT* planner.
       auto planner = std::make_shared<ompl::geometric::EITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setNumSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
+      planner->setInitialNumberOfSparseCollisionChecks(
+          config_->get<std::size_t>(optionsKey + "/numInitialCollisionChecks"));
       planner->setRadiusFactor(config_->get<double>(optionsKey + "/radiusFactor"));
       planner->setRepairFactor(config_->get<double>(optionsKey + "/repairFactor"));
       planner->enableRepairingReverseTree(
