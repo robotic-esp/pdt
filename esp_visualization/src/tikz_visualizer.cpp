@@ -207,8 +207,8 @@ std::experimental::filesystem::path TikzVisualizer::compile(
              << "  goal/.style={fill = espred, circle, inner sep = 0pt, minimum width = 4pt},\n"
              << "  vertex/.style={fill = espblue, circle, inner sep = 0pt, minimum width = 2pt},\n"
              << "  edge/.style={espblue, thick},\n"
-             << "  solution/.style={espyellow, ultra thick},\n"
-             << "  boundary/.style={draw = black, fill = none},\n"
+             << "  solution/.style={espyellow, line width = 2.0pt},\n"
+             << "  boundary/.style={draw = black, thick, fill = none},\n"
              << "  obstacle/.style={draw = none, fill = black},\n"
              << "  antiobstacle/.style={draw = white, fill = white}\n"
              << "}\n";
