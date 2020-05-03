@@ -528,21 +528,21 @@ void TikzVisualizer::drawBITstarSpecificVisualizations(
   //   0.02mm");
   // }
 
-  // // Draw the next edge.
-  // auto nextEdgeStates = bitstarData->getNextEdge();
+  // Draw the next edge.
+  auto nextEdgeStates = bitstarData->getNextEdge();
 
-  // // If there are no more edges in the queue, this will return nullptrs.
-  // if (nextEdgeStates.first != nullptr && nextEdgeStates.second != nullptr) {
-  //   auto parent = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
-  //   auto child = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-  //   drawEdge(parent, child, "espred, line width = 0.1mm");
-  // }
+  // If there are no more edges in the queue, this will return nullptrs.
+  if (nextEdgeStates.first != nullptr && nextEdgeStates.second != nullptr) {
+    auto parent = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
+    auto child = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
+    drawEdge(parent, child, "edge, espred");
+  }
 
   // Draw the ellipse.
-  auto nextEdgeQueueValue = bitstarData->getNextEdgeValueInQueue();
-  if (!std::isnan(nextEdgeQueueValue.value()) && !std::isinf(nextEdgeQueueValue.value())) {
-    drawEllipse(nextEdgeQueueValue.value());
-  }
+  // auto nextEdgeQueueValue = bitstarData->getNextEdgeValueInQueue();
+  // if (!std::isnan(nextEdgeQueueValue.value()) && !std::isinf(nextEdgeQueueValue.value())) {
+  //   drawEllipse(nextEdgeQueueValue.value());
+  // }
 }
 
 void TikzVisualizer::drawAITstarSpecificVisualizations(
