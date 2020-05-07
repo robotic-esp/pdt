@@ -36,7 +36,7 @@
         "confidence": 99,
         "plotConfidenceIntervalInAllPlots": true,
         "confidenceIntervalLineWidth": 0.5,
-        "confidenceIntervalDrawOpacity": 0.5,
+        "confidenceIntervalDrawOpacity": 0.1,
         "confidenceIntervalFillOpacity": 0.2,
         "axisWidth": "\\textwidth",
         "axisHeight": "0.3\\textwidth",
