@@ -180,6 +180,12 @@ void InteractiveVisualizer::run() {
   maxCost_ = 0.1;
   minCost_ = 0.0;
   while (!pangolin::ShouldQuit()) {
+    if (displayIteration_ != lastDisplayIteration_) {
+      std::cout << "Iteration: " << displayIteration_ << ", time: "
+                << getTotalElapsedDuration(displayIteration_).count()
+                << ", cost: " << getSolutionCost(displayIteration_).value() << '\n';
+      lastDisplayIteration_ = displayIteration_;
+    }
     // Register input.
     if (pangolin::Pushed(optionScreenshot)) {
       contextView.SaveOnRender(std::to_string(screencaptureId_++) + '_' + context_->getName() +

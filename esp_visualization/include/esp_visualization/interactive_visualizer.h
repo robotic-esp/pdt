@@ -72,6 +72,7 @@ class InteractiveVisualizer : public BaseVisualizer,
   // General helpers.
   void incrementIteration(std::size_t num = 1u);
   void decrementIteration(std::size_t num = 1u);
+  std::size_t lastDisplayIteration_{0u};
 
   // Play to view and record to view.
   bool playToIteration_{false};
