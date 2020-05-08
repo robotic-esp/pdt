@@ -181,7 +181,7 @@ void InteractiveVisualizer::run() {
   minCost_ = 0.0;
   while (!pangolin::ShouldQuit()) {
     if (displayIteration_ != lastDisplayIteration_) {
-      std::cout << "Iteration: " << displayIteration_ ", time: "
+      std::cout << "Iteration: " << displayIteration_ << ", time: "
                 << getTotalElapsedDuration(displayIteration_).count()
                 << ", cost: " << getSolutionCost(displayIteration_).value() << '\n';
       lastDisplayIteration_ = displayIteration_;
