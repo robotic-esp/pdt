@@ -3,14 +3,14 @@
         "defaultWallGap": {
             "type": "WallGap",
             "objective": "defaultPathLength",
-            "start": [-0.2, 0.0],
-            "goal": [0.2, 0.0],
-            "maxTime": 0.1,
+            "start": [-0.3, 0.0],
+            "goal": [0.3, 0.0],
+            "maxTime": 3.0,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
             "collisionCheckResolution": 0.001,
             "wallWidth": 0.8,
-            "wallThickness": 0.1,
+            "wallThickness": 0.2,
             "gapOffset": 0.1,
             "gapWidth": 0.01
         }
