@@ -90,9 +90,9 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setStopOnSolnImprovement(
           config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
       planner->setInitialInflationFactor(config_->get<double>(optionsKey + "/initialInflation"));
-      planner->setInflationFactorParameter(
+      planner->setInflationScalingParameter(
           config_->get<double>(optionsKey + "/inflationParameter"));
-      planner->setTruncationFactorParameter(
+      planner->setTruncationScalingParameter(
           config_->get<double>(optionsKey + "/truncationParameter"));
       return {planner, PLANNER_TYPE::ABITSTAR};
     }

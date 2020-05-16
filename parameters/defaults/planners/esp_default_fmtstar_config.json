@@ -96,6 +96,38 @@
                 "useMoreSamplesIfUnsuccessful": false
             }
         },
+        "defaultFMTstar3000": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espyellow",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 3000,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar4000": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espyellow",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 4000,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
         "defaultFMTstar5000": {
             "type": "FMTstar",
             "isAnytime": false,
@@ -112,6 +144,22 @@
                 "useMoreSamplesIfUnsuccessful": false
             }
         },
+        "defaultFMTstar7500": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espyellow",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 7500,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
         "defaultFMTstar10000": {
             "type": "FMTstar",
             "isAnytime": false,
@@ -121,6 +169,70 @@
             },
             "options": {
                 "numSamples": 10000,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar25000": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espyellow",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 25000,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar50000": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espyellow",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 50000,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar75000": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espyellow",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 75000,
+                "useKNearest": false,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar100000": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espyellow",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 100000,
                 "useKNearest": false,
                 "radiusFactor": 1.001,
                 "useCollisionDetectionCache": true,
