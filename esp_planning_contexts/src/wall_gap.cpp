@@ -88,10 +88,6 @@ WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
   createObstacles();
   validityChecker->addObstacles(obstacles_);
 
-  // Create the anti obstacles and add them to the validity checker.
-  createAntiObstacles();
-  validityChecker->addAntiObstacles(antiObstacles_);
-
   // Set the validity checker and the check resolution.
   spaceInfo_->setStateValidityChecker(validityChecker);
   spaceInfo_->setStateValidityCheckingResolution(
@@ -142,62 +138,62 @@ void WallGap::createObstacles() {
   // Get the state space bounds.
   auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
 
-  // Create an anchor for the obstacle.
-  ompl::base::ScopedState<> anchor(spaceInfo_);
+  // Create an anchor for the lower obstacle.
+  ompl::base::ScopedState<> anchor_low(spaceInfo_);
 
   // Set the obstacle anchor in the middle of the state space.
   for (std::size_t j = 0u; j < dimensionality_; ++j) {
-    anchor[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
+    anchor_low[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
   }
+
+  // Get the extent of the state space in the second dimension.
+  auto extent2d = (bounds.high.at(1u) - bounds.low.at(1u));
+
   // Move it down in second dimension.
-  anchor[1u] = anchor[1u] - ((bounds.high.at(1u) - bounds.low.at(1u)) - wallWidth_) / 2.0;
+  anchor_low[1u] = bounds.low.at(1u) + (extent2d / 2.0 + gapOffset_ - gapWidth_ / 2.0) / 2.0;
 
   // Create the widths of this wall.
-  std::vector<double> widths(dimensionality_, 0.0);
+  std::vector<double> widths_low(dimensionality_, 0.0);
 
   // Set the thickness of the wall.
-  widths.at(0) = wallThickness_;
+  widths_low.at(0) = wallThickness_;
 
   // Set the width.
-  widths.at(1) = wallWidth_;
+  widths_low.at(1) = extent2d / 2.0 + gapOffset_ - gapWidth_ / 2.0;
 
   // The wall extends to the boundaries in all other dimensions.
   for (std::size_t j = 2u; j < dimensionality_; ++j) {
-    widths.at(j) = bounds.high.at(j) - bounds.low.at(j);
+    widths_low.at(j) = bounds.high.at(j) - bounds.low.at(j);
   }
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths));
-}
+      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor_low, widths_low));
 
-void WallGap::createAntiObstacles() {
-  // Get the state space bounds.
-  auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
+  // Create an anchor for the upper obstacle.
+  ompl::base::ScopedState<> anchor_up(spaceInfo_);
 
-  // Create an anchor for the anti obstacle.
-  ompl::base::ScopedState<> anchor(spaceInfo_);
-
-  // Set the obstacle anchor in the second dimension.
-  anchor[1u] = gapOffset_ + gapWidth_ / 2.0;
-
-  // Set the obstacle anchor in the remaining dimension.
-  for (std::size_t j = 0; j < dimensionality_; ++j) {
-    if (j != 1u) {
-      anchor[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
-    }
+  // Set the obstacle anchor in the middle of the state space.
+  for (std::size_t j = 0u; j < dimensionality_; ++j) {
+    anchor_up[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
   }
 
-  // Create the widths of gap.
-  std::vector<double> widths(dimensionality_, 0.0);
+  // Move it up in second dimension.
+  anchor_up[1u] = bounds.low.at(1u) + extent2d / 4.0 + gapOffset_ / 2.0 + gapWidth_ / 4.0 + wallWidth_ / 2.0;
 
-  // Set the obstacle width in the first dimension.
-  widths.at(0) = wallThickness_ + std::numeric_limits<double>::epsilon();
+  // Create the widths of this wall.
+  std::vector<double> widths_up(dimensionality_, 0.0);
 
-  // The wall spans all other dimensions.
-  for (std::size_t j = 1u; j < dimensionality_; ++j) {
-    widths.at(j) = gapWidth_;
+  // Set the thickness of the wall.
+  widths_up.at(0) = wallThickness_;
+
+  // Set the width.
+  widths_up.at(1u) = wallWidth_ - (extent2d / 2.0 + gapOffset_ + gapWidth_ / 2.0);
+
+  // The wall extends to the boundaries in all other dimensions.
+  for (std::size_t j = 2u; j < dimensionality_; ++j) {
+    widths_up.at(j) = bounds.high.at(j) - bounds.low.at(j);
   }
-  antiObstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, anchor, widths));
+  obstacles_.emplace_back(
+      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor_up, widths_up));
 }
 
 }  // namespace ompltools
