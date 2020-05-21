@@ -5,14 +5,14 @@
             "objective": "defaultPathLength",
             "start": [-0.3, 0.0],
             "goal": [0.3, 0.0],
-            "maxTime": 3.0,
+            "maxTime": 5.0,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
             "collisionCheckResolution": 0.001,
             "wallWidth": 0.8,
             "wallThickness": 0.2,
             "gapOffset": 0.1,
-            "gapWidth": 0.01
+            "gapWidth": 0.04
         }
     }
 }
