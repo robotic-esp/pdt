@@ -10,7 +10,7 @@
             "options": {
                 "numSamples": 50,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -26,7 +26,7 @@
             "options": {
                 "numSamples": 100,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -42,7 +42,7 @@
             "options": {
                 "numSamples": 200,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -58,7 +58,23 @@
             "options": {
                 "numSamples": 500,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar750": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espyellow",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 500,
+                "useKNearest": false,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -74,7 +90,7 @@
             "options": {
                 "numSamples": 1000,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -90,7 +106,7 @@
             "options": {
                 "numSamples": 2000,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -106,7 +122,7 @@
             "options": {
                 "numSamples": 3000,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -122,7 +138,7 @@
             "options": {
                 "numSamples": 4000,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -138,7 +154,7 @@
             "options": {
                 "numSamples": 5000,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -154,7 +170,7 @@
             "options": {
                 "numSamples": 7500,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -170,7 +186,7 @@
             "options": {
                 "numSamples": 10000,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -186,7 +202,7 @@
             "options": {
                 "numSamples": 25000,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -202,7 +218,7 @@
             "options": {
                 "numSamples": 50000,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -218,7 +234,7 @@
             "options": {
                 "numSamples": 75000,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
@@ -234,7 +250,7 @@
             "options": {
                 "numSamples": 100000,
                 "useKNearest": false,
-                "radiusFactor": 1.001,
+                "radiusFactor": 1.1,
                 "useCollisionDetectionCache": true,
                 "useHeuristics": false,
                 "useMoreSamplesIfUnsuccessful": false
