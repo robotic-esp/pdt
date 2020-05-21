@@ -151,7 +151,7 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionDrawObjective(optionsName + ".Objective", true, true);
   pangolin::Var<bool> optionDrawVertices(optionsName + ".Vertices", true, true);
   pangolin::Var<bool> optionDrawEdges(optionsName + ".Edges", true, true);
-  pangolin::Var<bool> optionDrawPlannerSpecificData(optionsName + ".Planner Specific", true, true);
+  pangolin::Var<bool> optionDrawPlannerSpecificData(optionsName + ".Planner Specific", false, true);
   pangolin::Var<bool> optionDrawSolution(optionsName + ".Solution", true, true);
   pangolin::Var<bool> optionDrawStateIds(optionsName + ".State IDs", false, true);
   pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
