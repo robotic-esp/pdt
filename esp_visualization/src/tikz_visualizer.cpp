@@ -95,6 +95,9 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
   // Draw the context.
   context_->accept(*this);
 
+  // Draw the planner specific visualizations.
+  drawPlannerSpecificVisualizations(plannerSpecificData);
+
   // Draw the vertices and edges.
   for (std::size_t i = 0u; i < plannerData.numVertices(); ++i) {
     // Get the vertex.
@@ -123,9 +126,6 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
       }
     }
   }
-
-  // Draw the planner specific visualizations.
-  drawPlannerSpecificVisualizations(plannerSpecificData);
 
   // Draw the solution path.
   drawSolution(path);
