@@ -117,7 +117,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::AITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setRepairBackwardSearch(config_->get<bool>(optionsKey + "/repairBackwardSearch"));
+      planner->setRepairReverseSearch(config_->get<bool>(optionsKey + "/repairBackwardSearch"));
       planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
       return {planner, PLANNER_TYPE::AITSTAR};
