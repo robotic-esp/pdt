@@ -299,7 +299,7 @@ void BaseVisualizer::createData() {
 
           // Store the backward search tree.
           aitstarData->setVerticesInBackwardSearchTree(
-              planner_->as<ompl::geometric::AITstar>()->getVerticesInBackwardSearchTree());
+              planner_->as<ompl::geometric::AITstar>()->getVerticesInReverseSearchTree());
 
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);

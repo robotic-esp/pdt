@@ -151,7 +151,7 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionDrawObjective(optionsName + ".Objective", true, true);
   pangolin::Var<bool> optionDrawVertices(optionsName + ".Vertices", true, true);
   pangolin::Var<bool> optionDrawEdges(optionsName + ".Edges", true, true);
-  pangolin::Var<bool> optionDrawPlannerSpecificData(optionsName + ".Planner Specific", false, true);
+  pangolin::Var<bool> optionDrawPlannerSpecificData(optionsName + ".Planner Specific", true, true);
   pangolin::Var<bool> optionDrawSolution(optionsName + ".Solution", true, true);
   pangolin::Var<bool> optionDrawStateIds(optionsName + ".State IDs", false, true);
   pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
@@ -1014,9 +1014,9 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
     std::vector<Eigen::Vector2d> backwardSearchTreeEdges;
     for (const auto& vertex : backwardSearchTree) {
       // Add the edge to the parent.
-      if (vertex->hasBackwardParent()) {
+      if (vertex->hasReverseParent()) {
         auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-        auto parent = vertex->getBackwardParent()
+        auto parent = vertex->getReverseParent()
                           ->getState()
                           ->as<ompl::base::RealVectorStateSpace::StateType>();
         backwardSearchTreeEdges.emplace_back((*state)[0u], (*state)[1u]);
