@@ -39,9 +39,9 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/geometric/planners/eitstar/EITstar.h>
 #include <ompl/geometric/planners/eitstar/Edge.h>
-#include <ompl/geometric/planners/bitstar/BITstar.h>
-#include <ompl/geometric/planners/aitstar/AITstar.h>
-#include <ompl/geometric/planners/aitstar/datastructures/Edge.h>
+#include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/AITstar.h>
+#include <ompl/geometric/planners/informedtrees/aitstar/Edge.h>
 
 #include "esp_common/planner_type.h"
 

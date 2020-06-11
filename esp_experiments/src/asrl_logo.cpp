@@ -61,7 +61,7 @@
 //#include <ompl/geometric/SimpleSetup.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/goals/GoalState.h>
-#include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/BITstar.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 //#include <ompl/tools/benchmark/Benchmark.h>
 #include <ompl/util/Exception.h>

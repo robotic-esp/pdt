@@ -40,9 +40,9 @@
 #include <exception>
 
 #include <ompl/base/terminationconditions/IterationTerminationCondition.h>
-#include <ompl/geometric/planners/aitstar/AITstar.h>
-#include <ompl/geometric/planners/bitstar/ABITstar.h>
-#include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/AITstar.h>
+#include <ompl/geometric/planners/informedtrees/ABITstar.h>
+#include <ompl/geometric/planners/informedtrees/BITstar.h>
 
 #include "esp_time/time.h"
 
