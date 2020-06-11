@@ -37,7 +37,7 @@
 #include "esp_visualization/tikz_visualizer.h"
 
 #include <ompl/geometric/PathGeometric.h>
-#include <ompl/geometric/planners/bitstar/datastructures/Vertex.h>
+#include <ompl/geometric/planners/informedtrees/bitstar/Vertex.h>
 
 #include "esp_tikz/tikz_draw.h"
 #include "esp_tikz/tikz_node.h"

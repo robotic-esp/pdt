@@ -40,9 +40,9 @@
 #include <string>
 
 #include <ompl/geometric/planners/eitstar/EITstar.h>
-#include <ompl/geometric/planners/aitstar/AITstar.h>
-#include <ompl/geometric/planners/bitstar/ABITstar.h>
-#include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/AITstar.h>
+#include <ompl/geometric/planners/informedtrees/ABITstar.h>
+#include <ompl/geometric/planners/informedtrees/BITstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
 #include <ompl/geometric/planners/rrt/RRT.h>

@@ -36,9 +36,9 @@
 
 #include "esp_factories/planner_factory.h"
 
-#include <ompl/geometric/planners/aitstar/AITstar.h>
-#include <ompl/geometric/planners/bitstar/ABITstar.h>
-#include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/AITstar.h>
+#include <ompl/geometric/planners/informedtrees/ABITstar.h>
+#include <ompl/geometric/planners/informedtrees/BITstar.h>
 #include <ompl/geometric/planners/eitstar/EITstar.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
@@ -119,6 +119,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setName(plannerName);
       planner->setRepairReverseSearch(config_->get<bool>(optionsKey + "/repairBackwardSearch"));
       planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
+      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
       return {planner, PLANNER_TYPE::AITSTAR};
     }

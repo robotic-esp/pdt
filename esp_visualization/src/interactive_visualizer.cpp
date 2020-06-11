@@ -37,7 +37,7 @@
 #include "esp_visualization/interactive_visualizer.h"
 
 #include <ompl/geometric/PathGeometric.h>
-#include <ompl/geometric/planners/bitstar/datastructures/Vertex.h>
+#include <ompl/geometric/planners/informedtrees/bitstar/Vertex.h>
 
 #include <pangolin/display/display_internal.h>
 
