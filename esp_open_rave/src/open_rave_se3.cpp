@@ -40,8 +40,8 @@
 
 #include <boost/smart_ptr.hpp>
 
+#include <ompl/base/goals/GoalSpace.h>
 #include <ompl/base/goals/GoalState.h>
-#include <ompl/base/goals/GoalStates.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
 #include <openrave/environment.h>
@@ -58,23 +58,51 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
                          const std::shared_ptr<const Configuration>& config,
                          const std::string& name) :
     OpenRaveBaseContext(spaceInfo, config, name),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
-  // Get the start and goal positions.
+    startState_(spaceInfo) {
+  // Get the start position.
   auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
-
   startState_.get()->setXYZ(startPosition.at(0u), startPosition.at(1u), startPosition.at(2u));
   startState_.get()->rotation().x = startPosition.at(3u);
   startState_.get()->rotation().y = startPosition.at(4u);
   startState_.get()->rotation().z = startPosition.at(5u);
   startState_.get()->rotation().w = startPosition.at(6u);
 
-  goalState_.get()->setXYZ(goalPosition.at(0u), goalPosition.at(1u), goalPosition.at(2u));
-  goalState_.get()->rotation().x = goalPosition.at(3u);
-  goalState_.get()->rotation().y = goalPosition.at(4u);
-  goalState_.get()->rotation().z = goalPosition.at(5u);
-  goalState_.get()->rotation().w = goalPosition.at(6u);
+  // Get the goal
+  const auto goalType = config->get<std::string>("context/" + name + "/goalType");
+  if (goalType == "goalSpace"s) {
+    goalType_ = ompl::base::GoalType::GOAL_SAMPLEABLE_REGION;
+
+    // Get the goal bounds.
+    ompl::base::RealVectorBounds goalBounds(3u);
+    goalBounds.low = config->get<std::vector<double>>("context/" + name + "/goalLowerBounds");
+    goalBounds.high = config->get<std::vector<double>>("context/" + name + "/goalUpperBounds");
+
+    // Generate a goal space.
+    auto goalSpace = std::make_shared<ompl::base::SE3StateSpace>();
+
+    // Set the goal bounds.
+    goalSpace->setBounds(goalBounds);
+
+    // Let the goal know about the goal space.
+    goal_ = std::make_shared<ompl::base::GoalSpace>(spaceInfo);
+    goal_->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
+  } else if (goalType == "goalState"s) {
+    goalType_ = ompl::base::GoalType::GOAL_STATE;
+    // Get the goal position.
+    const auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
+
+    // Allocate a goal state and set the position.
+    auto goalState = spaceInfo->allocState()->as<ompl::base::SE3StateSpace::StateType>();
+    goalState->setXYZ(goalPosition.at(0u), goalPosition.at(1u), goalPosition.at(2u));
+    goalState->rotation().x = goalPosition.at(3u);
+    goalState->rotation().y = goalPosition.at(4u);
+    goalState->rotation().z = goalPosition.at(5u);
+    goalState->rotation().w = goalPosition.at(6u);
+
+    // Register the goal state with the goal.
+    goal_ = std::make_shared<ompl::base::GoalState>(spaceInfo);
+    goal_->as<ompl::base::GoalState>()->setState(goalState);
+  }
 
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
@@ -104,7 +132,7 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
   auto se3space = spaceInfo_->getStateSpace()->as<ompl::base::SE3StateSpace>();
   ompl::base::RealVectorBounds bounds(3u);
   bounds.high = config_->get<std::vector<double>>("context/"s + name + "/upperBounds"s);  // x y z
-  bounds.low = config_->get<std::vector<double>>("context/"s + name + "/lowerBounds"s);  // x y z
+  bounds.low = config_->get<std::vector<double>>("context/"s + name + "/lowerBounds"s);   // x y z
   se3space->setBounds(bounds);
 
   // Create the validity checker.
@@ -125,6 +153,9 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
 
 OpenRaveSE3::~OpenRaveSE3() {
   OpenRAVE::RaveDestroy();
+  if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
+    spaceInfo_->freeState(goal_->as<ompl::base::GoalState>()->getState());
+  }
 }
 
 ompl::base::ProblemDefinitionPtr OpenRaveSE3::instantiateNewProblemDefinition() const {
@@ -137,10 +168,8 @@ ompl::base::ProblemDefinitionPtr OpenRaveSE3::instantiateNewProblemDefinition() 
   // Set the start state in the problem definition.
   problemDefinition->addStartState(startState_);
 
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
+  // Set the goal in the definition.
+  problemDefinition->setGoal(goal_);
 
   // Return the new definition.
   return problemDefinition;
@@ -150,8 +179,8 @@ ompl::base::ScopedState<ompl::base::SE3StateSpace> OpenRaveSE3::getStartState() 
   return startState_;
 }
 
-ompl::base::ScopedState<ompl::base::SE3StateSpace> OpenRaveSE3::getGoalState() const {
-  return goalState_;
+std::shared_ptr<ompl::base::GoalSampleableRegion> OpenRaveSE3::getGoal() const {
+  return goal_;
 }
 
 void OpenRaveSE3::accept(const ContextVisitor& visitor) const {

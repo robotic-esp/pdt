@@ -38,8 +38,10 @@
 
 #include <memory>
 
+#include <ompl/base/GoalTypes.h>
 #include <ompl/base/ProblemDefinition.h>
 #include <ompl/base/SpaceInformation.h>
+#include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 
 #pragma GCC diagnostic push
@@ -60,7 +62,7 @@ namespace ompltools {
 class OpenRaveSE3 : public OpenRaveBaseContext {
  public:
   OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                const std::shared_ptr<const Configuration>& config, const std::string& name);
+              const std::shared_ptr<const Configuration>& config, const std::string& name);
   virtual ~OpenRaveSE3();
 
   /** \brief Instantiate a problem definition for this context. */
@@ -71,7 +73,7 @@ class OpenRaveSE3 : public OpenRaveBaseContext {
   ompl::base::ScopedState<ompl::base::SE3StateSpace> getStartState() const;
 
   /** \brief Return a copy of the goal state. */
-  ompl::base::ScopedState<ompl::base::SE3StateSpace> getGoalState() const;
+  std::shared_ptr<ompl::base::GoalSampleableRegion> getGoal() const;
 
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override final;
@@ -80,8 +82,14 @@ class OpenRaveSE3 : public OpenRaveBaseContext {
   /** \brief The start state. */
   ompl::base::ScopedState<ompl::base::SE3StateSpace> startState_;
 
-  /** \brief The goal state. */
-  ompl::base::ScopedState<ompl::base::SE3StateSpace> goalState_;
+  /** \brief The goal state(s). */
+  std::vector<ompl::base::ScopedState<ompl::base::SE3StateSpace>> goalStates_;
+
+  /** \brief The goal. */
+  std::shared_ptr<ompl::base::GoalSampleableRegion> goal_;
+
+  /** \brief The goal type. */
+  ompl::base::GoalType goalType_{ompl::base::GoalType::GOAL_SAMPLEABLE_REGION};
 };
 
 }  // namespace ompltools
