@@ -199,7 +199,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
         return std::make_shared<OpenRaveSE3>(spaceInfo, config_, contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error("Error allocating a OpenRaveMover context.");
+        throw std::runtime_error("Error allocating an OpenRaveSE3 context.");
       }
     }
     case CONTEXT_TYPE::RANDOM_RECTANGLES: {
