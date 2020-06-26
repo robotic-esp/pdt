@@ -11,7 +11,8 @@
                 "rewireFactor": 1.001,
                 "batchSize": 100,
                 "useKNearest": false,
-                "repairBackwardSearch": true
+                "repairBackwardSearch": true,
+                "trackApproximateSolutions": false
             }
         }
     }

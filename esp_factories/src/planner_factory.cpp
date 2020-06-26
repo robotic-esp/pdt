@@ -105,11 +105,9 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setInitialNumberOfSparseCollisionChecks(
           config_->get<std::size_t>(optionsKey + "/numInitialCollisionChecks"));
       planner->setRadiusFactor(config_->get<double>(optionsKey + "/radiusFactor"));
-      planner->setRepairFactor(config_->get<double>(optionsKey + "/repairFactor"));
-      planner->enableRepairingReverseTree(
-          config_->get<bool>(optionsKey + "/repairReverseSearchTreeUponCollisionDetection"));
       planner->enableCollisionDetectionInReverseSearch(
           config_->get<bool>(optionsKey + "/collisionDetectionOnReverseSearch"));
+      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       return {planner, PLANNER_TYPE::EITSTAR};
     }
     case PLANNER_TYPE::AITSTAR: {
@@ -121,6 +119,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
+      planner->trackApproximateSolutions(config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
       return {planner, PLANNER_TYPE::AITSTAR};
     }
     case PLANNER_TYPE::BITSTAR: {
