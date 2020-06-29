@@ -82,9 +82,6 @@ class OpenRaveSE3 : public OpenRaveBaseContext {
   /** \brief The start state. */
   ompl::base::ScopedState<ompl::base::SE3StateSpace> startState_;
 
-  /** \brief The goal state(s). */
-  std::vector<ompl::base::ScopedState<ompl::base::SE3StateSpace>> goalStates_;
-
   /** \brief The goal. */
   std::shared_ptr<ompl::base::GoalSampleableRegion> goal_;
 
