@@ -3,8 +3,10 @@
         "defaultCentreSquare": {
             "type": "CentreSquare",
             "objective": "defaultPathLength",
-            "start": [0.0, 0.0],
-            "goal": [0.4, 0.4],
+            "start": [-0.3, -0.3],
+            "goalType": "GoalSpace",
+            "goalUpperBounds": [0.5, 0.5],
+            "goalLowerBounds": [0.4, 0.4],
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
