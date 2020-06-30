@@ -101,6 +101,7 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
 
   // Helper functions.
   void drawBoundary(const RealVectorGeometricContext& context) const;
+  void drawGoal(const RealVectorGeometricContext& context) const;
   void drawStartVertex(const ompl::base::PlannerDataVertex& vertex) const;
   void drawStartState(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const;
   void drawStartStates(

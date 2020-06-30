@@ -56,20 +56,13 @@ DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>
     wallThicknesses_(config->get<std::vector<double>>("context/" + name + "/wallThicknesses")),
     numGaps_(config->get<std::size_t>("context/" + name + "/numGaps")),
     gapWidths_(config->get<std::vector<double>>("context/" + name + "/gapWidths")),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
+    startState_(spaceInfo) {
   // Get the start and goal positions.
   auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
   if (startPosition.size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
-  if (goalPosition.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
@@ -104,7 +97,6 @@ DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>
   // Fill the start and goal states' coordinates.
   for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
   }
 }
 
@@ -118,10 +110,8 @@ ompl::base::ProblemDefinitionPtr DividingWalls::instantiateNewProblemDefinition(
   // Set the start state in the problem definition.
   problemDefinition->addStartState(startState_);
 
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
+  // Set the goal for the problem definition.
+  problemDefinition->setGoal(goal_);
 
   // Return the new definition.
   return problemDefinition;
@@ -129,10 +119,6 @@ ompl::base::ProblemDefinitionPtr DividingWalls::instantiateNewProblemDefinition(
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> DividingWalls::getStartState() const {
   return startState_;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> DividingWalls::getGoalState() const {
-  return goalState_;
 }
 
 void DividingWalls::accept(const ContextVisitor& visitor) const {

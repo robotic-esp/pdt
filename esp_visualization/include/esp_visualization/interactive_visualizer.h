@@ -99,6 +99,7 @@ class InteractiveVisualizer : public BaseVisualizer,
   void drawEdges(std::size_t iteration);
   void drawSolution(std::size_t iteration);
   void drawStateIds(std::size_t iteration);
+  void drawGoal();
 
   // Planner specific visualizations.
   void drawPlannerSpecificVisualizations(std::size_t iteration) const;
@@ -113,6 +114,7 @@ class InteractiveVisualizer : public BaseVisualizer,
                        const float* faceColor, const float* edgeColor) const;
   void drawRectangle3D(const std::vector<double>& midpoint, const std::vector<double>& widths,
                        const float* faceColor, const float* edgeColor) const;
+  void drawGoal() const;
   void drawBoundary(const RealVectorGeometricContext& context) const;
   void drawPoint(const Eigen::Vector2d& point, const float* color, float size) const;
   void drawPoint(const Eigen::Vector3d& point, const float* color, float size) const;

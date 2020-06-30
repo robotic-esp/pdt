@@ -39,11 +39,15 @@
 #include <vector>
 
 #include <ompl/base/StateValidityChecker.h>
+#include <ompl/base/goals/GoalSpace.h>
 #include <ompl/base/goals/GoalState.h>
+#include <ompl/base/goals/GoalStates.h>
 
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/context_validity_checker_gnat.h"
+
+using namespace std::string_literals;
 
 namespace esp {
 
@@ -53,24 +57,16 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
                                    const std::shared_ptr<const Configuration>& config,
                                    const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    dimensionality_(spaceInfo_->getStateDimension()),
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
     maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
-  // Get the start and goal positions.
+    startState_(spaceInfo) {
+  // Get the start position.
   auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
   if (startPosition.size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
-  if (goalPosition.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
@@ -80,10 +76,9 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
     throw std::runtime_error("Context error.");
   }
 
-  // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  // Fill the start state's coordinates.
+  for (std::size_t i = 0u; i < dimensionality_; ++i) {
     startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
   }
 
   // Create the obstacles and add them to the validity checker.
@@ -119,10 +114,8 @@ ompl::base::ProblemDefinitionPtr RandomRectangles::instantiateNewProblemDefiniti
   // Set the start state in the problem definition.
   problemDefinition->addStartState(startState_);
 
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
+  // Set the goal for the problem definition.
+  problemDefinition->setGoal(goal_);
 
   // Return the new definition.
   return problemDefinition;
@@ -130,10 +123,6 @@ ompl::base::ProblemDefinitionPtr RandomRectangles::instantiateNewProblemDefiniti
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RandomRectangles::getStartState() const {
   return startState_;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RandomRectangles::getGoalState() const {
-  return goalState_;
 }
 
 void RandomRectangles::accept(const ContextVisitor& visitor) const {
@@ -155,8 +144,27 @@ void RandomRectangles::createObstacles() {
     auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths);
 
     // Add this to the obstacles if it doesn't invalidate the start or goal state.
-    if (!obstacle->invalidates(startState_) && !obstacle->invalidates(goalState_)) {
-      obstacles_.emplace_back(obstacle);
+    if (!obstacle->invalidates(startState_)) {
+      if (goal_->getType() == ompl::base::GoalType::GOAL_STATE) {
+        if (!obstacle->invalidates(goal_->as<ompl::base::GoalState>()->getState())) {
+          obstacles_.emplace_back(obstacle);
+        } else {
+          --i;
+        }
+      } else if (goal_->getType() == ompl::base::GoalType::GOAL_STATES) {
+        auto invalidates = false;
+        for (auto i = 0u; i < goal_->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
+          if (obstacle->invalidates(goal_->as<ompl::base::GoalStates>()->getState(i))) {
+            invalidates = true;
+            break;
+          }
+        }
+        if (!invalidates) {
+          obstacles_.emplace_back(obstacle);
+        } else {
+          --i;
+        }
+      }
     } else {
       --i;
     }

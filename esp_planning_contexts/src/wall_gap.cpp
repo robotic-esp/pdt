@@ -51,20 +51,13 @@ WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
     gapWidth_(config->get<double>("context/" + name + "/gapWidth")),
     gapOffset_(config->get<double>("context/" + name + "/gapOffset")),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
+    startState_(spaceInfo) {
   // Get the start and goal positions.
   auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
   if (config->get<std::vector<double>>("context/" + name + "/start").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
-  if (config->get<std::vector<double>>("context/" + name + "/goal").size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
@@ -99,7 +92,6 @@ WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
   // Fill the start and goal states' coordinates.
   for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
   }
 }
 
@@ -113,10 +105,8 @@ ompl::base::ProblemDefinitionPtr WallGap::instantiateNewProblemDefinition() cons
   // Set the start state in the problem definition.
   problemDefinition->addStartState(startState_);
 
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
+  // Set the goal for the problem definition.
+  problemDefinition->setGoal(goal_);
 
   // Return the new definition.
   return problemDefinition;
@@ -124,10 +114,6 @@ ompl::base::ProblemDefinitionPtr WallGap::instantiateNewProblemDefinition() cons
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> WallGap::getStartState() const {
   return startState_;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> WallGap::getGoalState() const {
-  return goalState_;
 }
 
 void WallGap::accept(const ContextVisitor& visitor) const {

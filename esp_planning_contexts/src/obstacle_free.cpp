@@ -55,11 +55,9 @@ ObstacleFree::ObstacleFree(const std::shared_ptr<ompl::base::SpaceInformation>& 
                            const std::shared_ptr<const Configuration>& config,
                            const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
+    startState_(spaceInfo) {
   // Get the start and goal positions.
   auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
   if (startPosition.size() != spaceInfo_->getStateDimension()) {
@@ -67,11 +65,7 @@ ObstacleFree::ObstacleFree(const std::shared_ptr<ompl::base::SpaceInformation>& 
                name.c_str());
     throw std::runtime_error("Context error.");
   }
-  if (goalPosition.size() != spaceInfo_->getStateDimension()) {
-    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
+
   // Create the validity checker without any obstacles and anti obstacles.
   auto validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);
 
@@ -86,7 +80,6 @@ ObstacleFree::ObstacleFree(const std::shared_ptr<ompl::base::SpaceInformation>& 
   // Fill the start and goal states' coordinates.
   for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
   }
 }
 
@@ -100,10 +93,8 @@ ompl::base::ProblemDefinitionPtr ObstacleFree::instantiateNewProblemDefinition()
   // Set the start state in the problem definition.
   problemDefinition->addStartState(startState_);
 
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
+  // Set the goal for the problem definition.
+  problemDefinition->setGoal(goal_);
 
   // Return the new definition.
   return problemDefinition;
@@ -111,10 +102,6 @@ ompl::base::ProblemDefinitionPtr ObstacleFree::instantiateNewProblemDefinition()
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> ObstacleFree::getStartState() const {
   return startState_;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> ObstacleFree::getGoalState() const {
-  return goalState_;
 }
 
 void ObstacleFree::accept(const ContextVisitor& visitor) const {

@@ -38,6 +38,7 @@
 
 #include <vector>
 
+#include <ompl/base/GoalTypes.h>
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/base/goals/GoalStates.h>
@@ -58,8 +59,7 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
     maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
-    numStarts_(config->get<std::size_t>("context/" + name + "/numStarts")),
-    numGoals_(config->get<std::size_t>("context/" + name + "/numGoals")) {
+    numStarts_(config->get<std::size_t>("context/" + name + "/numStarts")) {
   // Assert configuration sanity.
   if (numStarts_ == 0u) {
     OMPL_ERROR("%s: Must at least have one start.", name.c_str());
@@ -79,12 +79,6 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
   for (std::size_t i = 0u; i < numStarts_; ++i) {
     startStates_.emplace_back(spaceInfo_);
     startStates_.back().random();
-  }
-
-  // Create the goal states.
-  for (std::size_t i = 0u; i < numGoals_; ++i) {
-    goalStates_.emplace_back(spaceInfo_);
-    goalStates_.back().random();
   }
 
   // Create the validity checker.
@@ -117,17 +111,7 @@ ompl::base::ProblemDefinitionPtr RandomRectanglesMultiStartGoal::instantiateNewP
   }
 
   // Set the goal.
-  if (numGoals_ > 1u) {
-    auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
-    for (std::size_t i = 0u; i < numGoals_; ++i) {
-      goal->addState(goalStates_.at(i));
-    }
-    problemDefinition->setGoal(goal);
-  } else {
-    auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-    goal->setState(goalStates_.back());
-    problemDefinition->setGoal(goal);
-  }
+  problemDefinition->setGoal(goal_);
 
   return problemDefinition;
 }
@@ -135,11 +119,6 @@ ompl::base::ProblemDefinitionPtr RandomRectanglesMultiStartGoal::instantiateNewP
 std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>
 RandomRectanglesMultiStartGoal::getStartStates() const {
   return startStates_;
-}
-
-std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>
-RandomRectanglesMultiStartGoal::getGoalStates() const {
-  return goalStates_;
 }
 
 void RandomRectanglesMultiStartGoal::accept(const ContextVisitor& visitor) const {
@@ -166,11 +145,18 @@ void RandomRectanglesMultiStartGoal::createObstacles() {
         break;
       }
     }
-    if (!invalidates) {
-      for (const auto& goal : goalStates_) {
-        if (obstacle->invalidates(goal)) {
-          invalidates = true;
-          break;
+    if (!invalidates && (goal_->getType() == ompl::base::GoalType::GOAL_STATE ||
+                         goal_->getType() == ompl::base::GoalType::GOAL_STATES)) {
+      if (goal_->getType() == ompl::base::GoalType::GOAL_STATE) {
+        invalidates = obstacle->invalidates(goal_->as<ompl::base::GoalState>()->getState());
+        break;
+      }
+      if (goal_->getType() == ompl::base::GoalType::GOAL_STATES) {
+        for (auto i = 0u; i < goal_->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
+          if (obstacle->invalidates(goal_->as<ompl::base::GoalStates>()->getState(i))) {
+            invalidates = true;
+            break;
+          }
         }
       }
     }
