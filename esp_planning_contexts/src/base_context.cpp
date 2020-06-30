@@ -36,13 +36,19 @@
 
 #include "esp_planning_contexts/base_context.h"
 
+#include <ompl/base/goals/GoalSpace.h>
+#include <ompl/base/goals/GoalState.h>
+#include <ompl/base/goals/GoalStates.h>
 #include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
+#include "esp_common/goal_type.h"
 #include "esp_common/objective_type.h"
 #include "esp_optimization_objectives/max_min_clearance_optimization_objective.h"
 #include "esp_optimization_objectives/potential_field_optimization_objective.h"
 #include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
+
+using namespace std::string_literals;
 
 namespace esp {
 
@@ -52,6 +58,7 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
                          const std::shared_ptr<const Configuration>& config,
                          const std::string& name) :
     spaceInfo_(spaceInfo),
+    dimensionality_(spaceInfo_->getStateDimension()),
     name_(name),
     maxSolveDuration_(time::seconds(config->get<double>("context/" + name + "/maxTime"))),
     config_(config) {
@@ -95,6 +102,36 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
     default:
       throw std::runtime_error("Unknown optimization objective.");
   }
+
+  // Get the goal.
+  auto goalType = config_->get<std::string>("context/" + name_ + "/goalType");
+  if (goalType == "GoalState"s) {
+    goal_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  } else if (goalType == "GoalStates"s) {
+    goal_ = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
+  } else if (goalType == "GoalSpace"s) {
+    goal_ = std::make_shared<ompl::base::GoalSpace>(spaceInfo_);
+  } else {
+    throw std::runtime_error("Invalid goal type.");
+  }
+
+  // // Why doesn't this work?
+  // switch (config_->get<ompl::base::GoalType>("context/" + name_ + "/goalType")) {
+  //   case ompl::base::GoalType::GOAL_STATE: {
+  //     // Instantiate a goal of correct type.
+  //     goal_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  //     break;
+  //   }
+  //   case ompl::base::GoalType::GOAL_STATES: {
+  //     goal_ = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
+  //     break;
+  //   }
+  //   case ompl::base::GoalType::GOAL_SPACE: {
+  //     goal_ = std::make_shared<ompl::base::GoalSpace>(spaceInfo_);
+  //     break;
+  //   }
+  //   default: { throw std::runtime_error("Invalid goal type."); }
+  // }
 }
 
 std::string BaseContext::getName() const {
@@ -115,6 +152,10 @@ std::size_t BaseContext::getDimension() const {
 
 ompl::base::OptimizationObjectivePtr BaseContext::getObjective() const {
   return objective_;
+}
+
+std::shared_ptr<ompl::base::Goal> BaseContext::getGoal() const {
+  return goal_;
 }
 
 time::Duration BaseContext::getMaxSolveDuration() const {

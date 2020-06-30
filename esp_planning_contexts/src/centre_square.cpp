@@ -56,27 +56,17 @@ CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& 
                            const std::shared_ptr<const Configuration>& config,
                            const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
+    startState_(spaceInfo) {
   // Get the start and goal positions.
   auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
-
-  // Get the dimensionality of the problem.
-  auto dimensionality = spaceInfo_->getStateDimension();
 
   // Get the obstacle widths.
-  std::vector<double> widths(dimensionality,
+  std::vector<double> widths(dimensionality_,
                              config_->get<double>("context/" + name + "/obstacleWidth"));
 
   // Assert configuration sanity.
-  if (startPosition.size() != dimensionality) {
+  if (startPosition.size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
-  if (goalPosition.size() != dimensionality) {
-    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
     throw std::runtime_error("Context error.");
   }
@@ -88,13 +78,13 @@ CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& 
   // Fill the start and goal states' coordinates.
   for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
   }
 
   // Compute the midpoint of the obstacle.
+  auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
   auto midpoint = std::make_unique<ompl::base::ScopedState<>>(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality; ++i) {
-    (*midpoint)[i] = (startPosition.at(i) + goalPosition.at(i)) / 2.0;
+  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+    (*midpoint)[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
 
   // Create the obstacle.
@@ -125,10 +115,8 @@ ompl::base::ProblemDefinitionPtr CentreSquare::instantiateNewProblemDefinition()
   // Set the start state in the problem definition.
   problemDefinition->addStartState(startState_);
 
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
+  // Set the goal for the problem definition.
+  problemDefinition->setGoal(goal_);
 
   // Return the new definition.
   return problemDefinition;
@@ -136,10 +124,6 @@ ompl::base::ProblemDefinitionPtr CentreSquare::instantiateNewProblemDefinition()
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> CentreSquare::getStartState() const {
   return startState_;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> CentreSquare::getGoalState() const {
-  return goalState_;
 }
 
 void CentreSquare::accept(const ContextVisitor& visitor) const {

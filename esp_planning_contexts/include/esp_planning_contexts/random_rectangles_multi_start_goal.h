@@ -71,9 +71,6 @@ class RandomRectanglesMultiStartGoal : public RealVectorGeometricContext {
   /** \brief Return a copy of the start state. */
   std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>> getStartStates() const;
 
-  /** \brief Return a copy of the goal state. */
-  std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>> getGoalStates() const;
-
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
 
@@ -104,9 +101,6 @@ class RandomRectanglesMultiStartGoal : public RealVectorGeometricContext {
 
   /** \brief The start states. */
   std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>> startStates_{};
-
-  /** \brief The goal states. */
-  std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>> goalStates_{};
 };
 
 }  // namespace ompltools

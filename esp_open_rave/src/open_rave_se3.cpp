@@ -91,6 +91,12 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
     // Get the goal position.
     const auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
 
+    // Check dimensionality of the goal state position.
+    if (goalPosition.size() != 7u) {
+      OMPL_ERROR("%s: Goal state must be of the form [ x y z qx qy qz qw ].", name.c_str());
+      throw std::runtime_error("Context error.");
+    }
+
     // Allocate a goal state and set the position.
     auto goalState = spaceInfo->allocState()->as<ompl::base::SE3StateSpace::StateType>();
     goalState->setXYZ(goalPosition.at(0u), goalPosition.at(1u), goalPosition.at(2u));

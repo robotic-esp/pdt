@@ -39,6 +39,7 @@
 #include <memory>
 #include <string>
 
+#include <ompl/base/Goal.h>
 #include <ompl/base/OptimizationObjective.h>
 #include <ompl/base/ProblemDefinition.h>
 #include <ompl/base/ScopedState.h>
@@ -74,6 +75,8 @@ class BaseContext {
   /** \brief Returns the optimization objective of this context. */
   ompl::base::OptimizationObjectivePtr getObjective() const;
 
+  std::shared_ptr<ompl::base::Goal> getGoal() const;
+
   /** \brief Returns the maximum duration to solve this context. */
   time::Duration getMaxSolveDuration() const;
 
@@ -88,11 +91,17 @@ class BaseContext {
   /** \brief The space information associated with this context. */
   ompl::base::SpaceInformationPtr spaceInfo_{};
 
+  /** \brief The dimension of the state space. */
+  std::size_t dimensionality_;
+
   /** \brief The name of the context. */
   std::string name_{};
 
   /** \brief The optimization objective. */
   ompl::base::OptimizationObjectivePtr objective_{};
+
+  /** \brief The goal specification of the planning problem. */
+  std::shared_ptr<ompl::base::Goal> goal_{};
 
   /** \brief The maximum duration to solve this context. */
   time::Duration maxSolveDuration_{};

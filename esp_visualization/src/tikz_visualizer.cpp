@@ -36,6 +36,9 @@
 
 #include "esp_visualization/tikz_visualizer.h"
 
+#include <ompl/base/goals/GoalSpace.h>
+#include <ompl/base/goals/GoalState.h>
+#include <ompl/base/goals/GoalStates.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/planners/informedtrees/bitstar/Vertex.h>
 
@@ -120,8 +123,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
         // Draw the edge if the child is valid.
         if (child != ompl::base::PlannerData::NO_VERTEX) {
           drawEdge(vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-                   child.getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-                   "edge");
+                   child.getState()->as<ompl::base::RealVectorStateSpace::StateType>(), "edge");
         }
       }
     }
@@ -205,6 +207,7 @@ std::experimental::filesystem::path TikzVisualizer::compile(
   standalone << "\n\\tikzset{\n"
              << "  start/.style={fill = espgreen, circle, inner sep = 0pt, minimum width = 4pt},\n"
              << "  goal/.style={fill = espred, circle, inner sep = 0pt, minimum width = 4pt},\n"
+             << "  goal region/.style={fill = espred, inner sep = 0pt, opacity = 0.8},\n"
              << "  vertex/.style={fill = espblue, circle, inner sep = 0pt, minimum width = 2pt},\n"
              << "  edge/.style={espblue, thick},\n"
              << "  solution/.style={espyellow, line width = 2.0pt},\n"
@@ -277,7 +280,7 @@ void TikzVisualizer::visit(const CentreSquare& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const DividingWalls& context) const {
@@ -288,7 +291,7 @@ void TikzVisualizer::visit(const DividingWalls& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const DoubleEnclosure& context) const {
@@ -299,7 +302,7 @@ void TikzVisualizer::visit(const DoubleEnclosure& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const FlankingGap& context) const {
@@ -310,7 +313,7 @@ void TikzVisualizer::visit(const FlankingGap& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const FourRooms& context) const {
@@ -321,7 +324,7 @@ void TikzVisualizer::visit(const FourRooms& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const GoalEnclosure& context) const {
@@ -332,7 +335,7 @@ void TikzVisualizer::visit(const GoalEnclosure& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const NarrowPassage& context) const {
@@ -343,7 +346,7 @@ void TikzVisualizer::visit(const NarrowPassage& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const ObstacleFree& context) const {
@@ -354,7 +357,7 @@ void TikzVisualizer::visit(const ObstacleFree& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const RandomRectangles& context) const {
@@ -364,8 +367,8 @@ void TikzVisualizer::visit(const RandomRectangles& context) const {
   // Draw the start states.
   drawStartState(context.getStartState());
 
-  // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  // Draw the goal.
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const {
@@ -376,7 +379,7 @@ void TikzVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const 
   drawStartStates(context.getStartStates());
 
   // Draw the goal states.
-  drawGoalStates(context.getGoalStates());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const RepeatingRectangles& context) const {
@@ -387,7 +390,7 @@ void TikzVisualizer::visit(const RepeatingRectangles& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const StartEnclosure& context) const {
@@ -398,7 +401,7 @@ void TikzVisualizer::visit(const StartEnclosure& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const WallGap& context) const {
@@ -409,13 +412,12 @@ void TikzVisualizer::visit(const WallGap& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoalState(context.getGoalState());
+  drawGoal(context);
 }
 
 void TikzVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
   drawRectangle(obstacle.getAnchorCoordinates().at(0), obstacle.getAnchorCoordinates().at(1),
-                obstacle.getWidths().at(0), obstacle.getWidths().at(1),
-                "obstacle");
+                obstacle.getWidths().at(0), obstacle.getWidths().at(1), "obstacle");
 }
 
 void TikzVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
@@ -431,6 +433,47 @@ void TikzVisualizer::drawBoundary(const RealVectorGeometricContext& context) con
   double widthX = boundaries.high.at(0u) - boundaries.low.at(0u);
   double widthY = boundaries.high.at(1u) - boundaries.low.at(1u);
   drawRectangle(midX, midY, widthX, widthY, "boundary");
+}
+
+void TikzVisualizer::drawGoal(const RealVectorGeometricContext& context) const {
+  const auto goal = context.getGoal();
+  switch (goal->getType()) {
+    case ompl::base::GoalType::GOAL_STATE: {
+      ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(
+          context_->getStateSpace(), goal->as<ompl::base::GoalState>()->getState());
+      auto goal = std::make_shared<TikzNode>();
+      goal->setPosition(goalState[0], goalState[1]);
+      goal->setOptions("goal");
+      goal->setName("goal");
+      picture_.addNode(goal);
+      break;
+    }
+    case ompl::base::GoalType::GOAL_STATES: {
+      for (auto i = 0u; i < goal->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
+        ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(
+            context_->getStateSpace(), goal->as<ompl::base::GoalStates>()->getState(i));
+        auto goal = std::make_shared<TikzNode>();
+        goal->setPosition(goalState[0], goalState[1]);
+        goal->setOptions("goal");
+        goal->setName("goal");
+        picture_.addNode(goal);
+      }
+      break;
+    }
+    case ompl::base::GoalType::GOAL_SPACE: {
+      auto goalSpace = goal->as<ompl::base::GoalSpace>()->getSpace();
+      auto bounds = goalSpace->as<ompl::base::RealVectorStateSpace>()->getBounds();
+      std::vector<double> widths;
+      std::vector<double> anchor;
+      for (auto i = 0u; i < goalSpace->getDimension(); ++i) {
+        widths.emplace_back(bounds.high[i] - bounds.low[i]);
+        anchor.emplace_back((bounds.high[i] + bounds.low[i]) / 2.0);
+      }
+      drawRectangle(anchor[0], anchor[1], widths[0], widths[1], "goal region");
+      break;
+    }
+    default: { throw std::runtime_error("Can not visualize goal type."); }
+  }
 }
 
 void TikzVisualizer::drawStartVertex(const ompl::base::PlannerDataVertex& vertex) const {
@@ -576,8 +619,7 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
   auto nextEdge = aitstarData->getNextEdge();
   if (nextEdge.first && nextEdge.second) {
     drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
-             nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(),
-             "edge, espred");
+             nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, espred");
   }
 
   // // Draw the next vertex in the queue.

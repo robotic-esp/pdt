@@ -57,11 +57,9 @@ GoalEnclosure::GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>
     goalOutsideWidth_(config->get<double>("context/" + name + "/goalOutsideWidth")),
     goalInsideWidth_(config->get<double>("context/" + name + "/goalInsideWidth")),
     goalGapWidth_(config->get<double>("context/" + name + "/goalGapWidth")),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
+    startState_(spaceInfo) {
   // Get the start and goal positions.
   auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
 
   // Assert configuration sanity.
   if (config->get<std::vector<double>>("context/" + name + "/start").size() != dimensionality_) {
@@ -105,7 +103,6 @@ GoalEnclosure::GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>
   // Fill the start and goal states' coordinates.
   for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
   }
 }
 
@@ -119,10 +116,8 @@ ompl::base::ProblemDefinitionPtr GoalEnclosure::instantiateNewProblemDefinition(
   // Set the start state in the problem definition.
   problemDefinition->addStartState(startState_);
 
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
+  // Set the goal for the problem definition.
+  problemDefinition->setGoal(goal_);
 
   // Return the new definition.
   return problemDefinition;
@@ -130,10 +125,6 @@ ompl::base::ProblemDefinitionPtr GoalEnclosure::instantiateNewProblemDefinition(
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> GoalEnclosure::getStartState() const {
   return startState_;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> GoalEnclosure::getGoalState() const {
-  return goalState_;
 }
 
 void GoalEnclosure::accept(const ContextVisitor& visitor) const {

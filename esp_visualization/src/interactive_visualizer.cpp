@@ -36,6 +36,9 @@
 
 #include "esp_visualization/interactive_visualizer.h"
 
+#include <ompl/base/goals/GoalSpace.h>
+#include <ompl/base/goals/GoalState.h>
+#include <ompl/base/goals/GoalStates.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/planners/informedtrees/bitstar/Vertex.h>
 
@@ -113,8 +116,8 @@ void InteractiveVisualizer::run() {
   if (context_->getDimension() == 2u) {
     // glShadeModel(GL_FLAT);
     // glEnable(GL_LINE_SMOOTH);
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     // glDisable(GL_DEPTH_TEST);
     // glDisable(GL_LIGHTING);
@@ -179,10 +182,14 @@ void InteractiveVisualizer::run() {
 
   maxCost_ = 0.1;
   minCost_ = 0.0;
+
+  // Give the data thread a head start.
+  std::this_thread::sleep_for(std::chrono::milliseconds(10u));
+  
   while (!pangolin::ShouldQuit()) {
     if (displayIteration_ != lastDisplayIteration_) {
-      std::cout << "Iteration: " << displayIteration_ << ", time: "
-                << getTotalElapsedDuration(displayIteration_).count()
+      std::cout << "Iteration: " << displayIteration_
+                << ", time: " << getTotalElapsedDuration(displayIteration_).count()
                 << ", cost: " << getSolutionCost(displayIteration_).value() << '\n';
       lastDisplayIteration_ = displayIteration_;
     }
@@ -487,7 +494,7 @@ void InteractiveVisualizer::visit(const CentreSquare& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -496,7 +503,7 @@ void InteractiveVisualizer::visit(const DividingWalls& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -505,7 +512,7 @@ void InteractiveVisualizer::visit(const DoubleEnclosure& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -514,7 +521,7 @@ void InteractiveVisualizer::visit(const FlankingGap& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -523,7 +530,7 @@ void InteractiveVisualizer::visit(const FourRooms& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -532,7 +539,7 @@ void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -541,7 +548,7 @@ void InteractiveVisualizer::visit(const NarrowPassage& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -550,7 +557,7 @@ void InteractiveVisualizer::visit(const ObstacleFree& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -558,8 +565,8 @@ void InteractiveVisualizer::visit(const ObstacleFree& context) const {
 void InteractiveVisualizer::visit(const RandomRectangles& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  // Get the goal.
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -568,7 +575,7 @@ void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& context)
   // Draw the start states.
   drawPoints(context.getStartStates(), green, 4.0);
   // Draw the goal states.
-  drawPoints(context.getGoalStates(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -577,7 +584,7 @@ void InteractiveVisualizer::visit(const RepeatingRectangles& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -586,7 +593,7 @@ void InteractiveVisualizer::visit(const StartEnclosure& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
 }
@@ -595,9 +602,44 @@ void InteractiveVisualizer::visit(const WallGap& context) const {
   // Draw the start states.
   drawPoint(context.getStartState(), green, 4.0);
   // Draw the goal states.
-  drawPoint(context.getGoalState(), red, 4.0);
+  drawGoal();
   // Draw the boundaries.
   drawBoundary(context);
+}
+
+void InteractiveVisualizer::drawGoal() const {
+  const auto goal = context_->getGoal();
+
+  switch (goal->getType()) {
+    case ompl::base::GoalType::GOAL_STATE: {
+      ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(
+          context_->getStateSpace(), goal->as<ompl::base::GoalState>()->getState());
+      drawPoint(goalState, red, 4.0);
+      break;
+    }
+    case ompl::base::GoalType::GOAL_STATES: {
+      for (auto i = 0u; i < goal->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
+        ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(
+            context_->getStateSpace(), goal->as<ompl::base::GoalStates>()->getState(i));
+        drawPoint(goalState, red, 5.0);
+      }
+      break;
+    }
+    case ompl::base::GoalType::GOAL_SPACE: {
+      float goalColor[4] = {0.808, 0.243, 0.082, 0.3};
+      auto goalSpace = goal->as<ompl::base::GoalSpace>()->getSpace();
+      auto bounds = goalSpace->as<ompl::base::RealVectorStateSpace>()->getBounds();
+      std::vector<double> widths;
+      std::vector<double> anchor;
+      for (auto i = 0u; i < goalSpace->getDimension(); ++i) {
+        widths.emplace_back(bounds.high[i] - bounds.low[i]);
+        anchor.emplace_back((bounds.high[i] + bounds.low[i]) / 2.0);
+      }
+      drawRectangle(anchor, widths, goalColor, goalColor);
+      break;
+    }
+    default: { throw std::runtime_error("Can not visualize goal type."); }
+  }
 }
 
 void InteractiveVisualizer::drawBoundary(const RealVectorGeometricContext& context) const {

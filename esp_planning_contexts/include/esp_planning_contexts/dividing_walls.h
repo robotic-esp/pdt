@@ -66,9 +66,6 @@ class DividingWalls : public RealVectorGeometricContext {
   /** \brief Return a copy of the start state. */
   ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
 
-  /** \brief Return a copy of the goal state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getGoalState() const;
-
   /** \brief Accept a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
 
@@ -96,9 +93,6 @@ class DividingWalls : public RealVectorGeometricContext {
 
   /** \brief The start state. */
   ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState_;
-
-  /** \brief The goal state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState_;
 };
 
 }  // namespace ompltools
