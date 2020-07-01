@@ -36,51 +36,32 @@
 
 #pragma once
 
-#include <memory>
-
-#include <ompl/base/GoalTypes.h>
-#include <ompl/base/ProblemDefinition.h>
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/goals/GoalSampleableRegion.h>
+#include <ompl/base/ScopedState.h>
+#include <ompl/base/State.h>
+#include <ompl/base/goals/GoalSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#include <openrave-core.h>
-#pragma GCC diagnostic pop
-
 #include "esp_configuration/configuration.h"
-#include "esp_open_rave/open_rave_base_context.h"
-#include "esp_planning_contexts/base_context.h"
-#include "esp_planning_contexts/context_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
 /** \brief A planning context to plugin to the OpenRave simulator. */
-class OpenRaveSE3 : public OpenRaveBaseContext {
+class OpenRaveKneeGoal : public ompl::base::GoalSpace {
  public:
-  OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-              const std::shared_ptr<const Configuration>& config, const std::string& name);
-  virtual ~OpenRaveSE3();
+  OpenRaveKneeGoal(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                   const std::shared_ptr<const Configuration>& config, const std::string& name);
+  virtual ~OpenRaveKneeGoal() = default;
 
-  /** \brief Instantiate a problem definition for this context. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const override;
-
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::SE3StateSpace> getStartState() const;
-
-  /** \brief Accepts a context visitor. */
-  virtual void accept(const ContextVisitor& visitor) const override final;
+  void sampleGoal(ompl::base::State* st) const override;
 
  private:
-  /** \brief Create a new goal. */
-  std::shared_ptr<ompl::base::Goal> createGoal() const;
+  /** \brief The goal state that is definitely valid. */
+  ompl::base::ScopedState<ompl::base::SE3StateSpace> goalState_;
 
-  /** \brief The start state. */
-  ompl::base::ScopedState<ompl::base::SE3StateSpace> startState_;
+  /** \brief The number of sampled goals so far. */
+  mutable unsigned int numSampledGoals_{0u};
 };
 
 }  // namespace ompltools

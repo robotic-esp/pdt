@@ -42,10 +42,12 @@
 
 #include <ompl/base/goals/GoalSpace.h>
 #include <ompl/base/goals/GoalState.h>
+#include <ompl/base/goals/GoalStates.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
 #include <openrave/environment.h>
 
+#include "esp_open_rave/open_rave_knee_goal.h"
 #include "esp_open_rave/open_rave_se3_validity_checker.h"
 
 using namespace std::string_literals;
@@ -66,49 +68,6 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
   startState_.get()->rotation().y = startPosition.at(4u);
   startState_.get()->rotation().z = startPosition.at(5u);
   startState_.get()->rotation().w = startPosition.at(6u);
-
-  // Get the goal
-  const auto goalType = config->get<std::string>("context/" + name + "/goalType");
-  if (goalType == "goalSpace"s) {
-    goalType_ = ompl::base::GoalType::GOAL_SAMPLEABLE_REGION;
-
-    // Get the goal bounds.
-    ompl::base::RealVectorBounds goalBounds(3u);
-    goalBounds.low = config->get<std::vector<double>>("context/" + name + "/goalLowerBounds");
-    goalBounds.high = config->get<std::vector<double>>("context/" + name + "/goalUpperBounds");
-
-    // Generate a goal space.
-    auto goalSpace = std::make_shared<ompl::base::SE3StateSpace>();
-
-    // Set the goal bounds.
-    goalSpace->setBounds(goalBounds);
-
-    // Let the goal know about the goal space.
-    goal_ = std::make_shared<ompl::base::GoalSpace>(spaceInfo);
-    goal_->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
-  } else if (goalType == "goalState"s) {
-    goalType_ = ompl::base::GoalType::GOAL_STATE;
-    // Get the goal position.
-    const auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
-
-    // Check dimensionality of the goal state position.
-    if (goalPosition.size() != 7u) {
-      OMPL_ERROR("%s: Goal state must be of the form [ x y z qx qy qz qw ].", name.c_str());
-      throw std::runtime_error("Context error.");
-    }
-
-    // Allocate a goal state and set the position.
-    auto goalState = spaceInfo->allocState()->as<ompl::base::SE3StateSpace::StateType>();
-    goalState->setXYZ(goalPosition.at(0u), goalPosition.at(1u), goalPosition.at(2u));
-    goalState->rotation().x = goalPosition.at(3u);
-    goalState->rotation().y = goalPosition.at(4u);
-    goalState->rotation().z = goalPosition.at(5u);
-    goalState->rotation().w = goalPosition.at(6u);
-
-    // Register the goal state with the goal.
-    goal_ = std::make_shared<ompl::base::GoalState>(spaceInfo);
-    goal_->as<ompl::base::GoalState>()->setState(goalState);
-  }
 
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
@@ -159,9 +118,6 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
 
 OpenRaveSE3::~OpenRaveSE3() {
   OpenRAVE::RaveDestroy();
-  if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
-    spaceInfo_->freeState(goal_->as<ompl::base::GoalState>()->getState());
-  }
 }
 
 ompl::base::ProblemDefinitionPtr OpenRaveSE3::instantiateNewProblemDefinition() const {
@@ -175,18 +131,81 @@ ompl::base::ProblemDefinitionPtr OpenRaveSE3::instantiateNewProblemDefinition() 
   problemDefinition->addStartState(startState_);
 
   // Set the goal in the definition.
-  problemDefinition->setGoal(goal_);
+  problemDefinition->setGoal(createGoal());
 
   // Return the new definition.
   return problemDefinition;
 }
 
-ompl::base::ScopedState<ompl::base::SE3StateSpace> OpenRaveSE3::getStartState() const {
-  return startState_;
+std::shared_ptr<ompl::base::Goal> OpenRaveSE3::createGoal() const {
+  // Instantiate the goal.
+  switch (goalType_) {
+    case ompl::base::GoalType::GOAL_STATE: {
+      // Get the goal position.
+      const auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");
+
+      // Check dimensionality of the goal state position.
+      if (goalPosition.size() != dimensionality_) {
+        OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
+                   name_.c_str());
+        throw std::runtime_error("Context error.");
+      }
+
+      // Allocate a goal state and set the position.
+      ompl::base::ScopedState<ompl::base::SE3StateSpace> goalState(spaceInfo_);
+
+      // Fill the goal state's coordinates.
+      goalState->setXYZ(goalPosition.at(0u), goalPosition.at(1u), goalPosition.at(2u));
+      goalState->rotation().x = goalPosition.at(3u);
+      goalState->rotation().y = goalPosition.at(4u);
+      goalState->rotation().z = goalPosition.at(5u);
+      goalState->rotation().w = goalPosition.at(6u);
+
+      // Register the goal state with the goal.
+      auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+      goal->as<ompl::base::GoalState>()->setState(goalState);
+      return goal;
+    }
+    case ompl::base::GoalType::GOAL_STATES: {
+      const auto numGoals = config_->get<unsigned>("context/" + name_ + "/numGoals");
+      ompl::base::ScopedState<ompl::base::SE3StateSpace> goalState(spaceInfo_);
+      auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
+      for (auto i = 0u; i < numGoals; ++i) {
+        goalState.random();
+        goal->addState(goalState);
+      }
+      return goal;
+    }
+    case ompl::base::GoalType::GOAL_SPACE: {
+      // Get the goal bounds.
+      ompl::base::RealVectorBounds goalBounds(dimensionality_);
+      goalBounds.low = config_->get<std::vector<double>>("context/" + name_ + "/goalLowerBounds");
+      goalBounds.high = config_->get<std::vector<double>>("context/" + name_ + "/goalUpperBounds");
+
+      // Generate a goal space.
+      auto goalSpace = std::make_shared<ompl::base::SE3StateSpace>();
+
+      // Set the goal bounds.
+      goalSpace->setBounds(goalBounds);
+
+      if (name_ == "Knee"s) {
+        auto goal = std::make_shared<OpenRaveKneeGoal>(spaceInfo_, config_, name_);
+        goal->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
+        return goal;
+      } else {
+        // Let the goal know about the goal space.
+        auto goal = std::make_shared<ompl::base::GoalSpace>(spaceInfo_);
+        goal->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
+        return goal;
+      }
+      break;
+    }
+    default: { throw std::runtime_error("Goal type not implemented."); }
+  }
 }
 
-std::shared_ptr<ompl::base::GoalSampleableRegion> OpenRaveSE3::getGoal() const {
-  return goal_;
+ompl::base::ScopedState<ompl::base::SE3StateSpace> OpenRaveSE3::getStartState() const {
+  return startState_;
 }
 
 void OpenRaveSE3::accept(const ContextVisitor& visitor) const {

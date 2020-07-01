@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, University of Toronto
+ *  Copyright (c) 2020, University of Oxford
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -34,54 +34,38 @@
 
 // Authors: Marlin Strub
 
-#pragma once
+#include "esp_open_rave/open_rave_knee_goal.h"
 
-#include <memory>
-
-#include <ompl/base/GoalTypes.h>
-#include <ompl/base/ProblemDefinition.h>
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/goals/GoalSampleableRegion.h>
-#include <ompl/base/spaces/SE3StateSpace.h>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#include <openrave-core.h>
-#pragma GCC diagnostic pop
-
-#include "esp_configuration/configuration.h"
-#include "esp_open_rave/open_rave_base_context.h"
-#include "esp_planning_contexts/base_context.h"
-#include "esp_planning_contexts/context_visitor.h"
+#include <vector>
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief A planning context to plugin to the OpenRave simulator. */
-class OpenRaveSE3 : public OpenRaveBaseContext {
- public:
-  OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-              const std::shared_ptr<const Configuration>& config, const std::string& name);
-  virtual ~OpenRaveSE3();
+OpenRaveKneeGoal::OpenRaveKneeGoal(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+                                   const std::shared_ptr<const Configuration>& config,
+                                   const std::string& name) :
+    GoalSpace(spaceInfo),
+    goalState_(spaceInfo) {
+  auto goalPosition = config->get<std::vector<double>>("context/" + name + "/validGoal");
+  if (goalPosition.size() != 7u) {
+    throw std::runtime_error("Valid goal must be a vector of the form [ x y z qx qy qz qw ].");
+  }
+  goalState_.get()->setXYZ(goalPosition[0u], goalPosition[1u], goalPosition[2u]);
+  goalState_.get()->rotation().x = goalPosition[3u];
+  goalState_.get()->rotation().y = goalPosition[4u];
+  goalState_.get()->rotation().z = goalPosition[5u];
+  goalState_.get()->rotation().w = goalPosition[6u];
+}
 
-  /** \brief Instantiate a problem definition for this context. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const override;
-
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::SE3StateSpace> getStartState() const;
-
-  /** \brief Accepts a context visitor. */
-  virtual void accept(const ContextVisitor& visitor) const override final;
-
- private:
-  /** \brief Create a new goal. */
-  std::shared_ptr<ompl::base::Goal> createGoal() const;
-
-  /** \brief The start state. */
-  ompl::base::ScopedState<ompl::base::SE3StateSpace> startState_;
-};
+void OpenRaveKneeGoal::sampleGoal(ompl::base::State* st) const {
+  if (numSampledGoals_ == 0u) {
+    si_->copyState(st, goalState_.get());
+  } else {
+    GoalSpace::sampleGoal(st);
+  }
+  ++numSampledGoals_;
+}
 
 }  // namespace ompltools
 

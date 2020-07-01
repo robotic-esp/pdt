@@ -16,6 +16,108 @@
                 "collisionDetectionOnReverseSearch": true,
                 "numInitialCollisionChecks": 1
             }
+        },
+        "defaultEITstarK100": {
+            "type": "EITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espgreen",
+                "name": "EIT*"
+            },
+            "options": {
+                "samplesPerBatch": 100,
+                "radiusFactor": 1.001,
+                "repairFactor": 1.2,
+                "useKNearest": true,
+                "repairReverseSearchTreeUponCollisionDetection": false,
+                "collisionDetectionOnReverseSearch": true,
+                "numInitialCollisionChecks": 1
+            }
+        },
+        "defaultEITstarK50": {
+            "type": "EITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espgreen",
+                "name": "EIT*"
+            },
+            "options": {
+                "samplesPerBatch": 50,
+                "radiusFactor": 1.001,
+                "repairFactor": 1.2,
+                "useKNearest": true,
+                "repairReverseSearchTreeUponCollisionDetection": false,
+                "collisionDetectionOnReverseSearch": true,
+                "numInitialCollisionChecks": 1
+            }
+        },
+        "defaultEITstarK10": {
+            "type": "EITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espgreen",
+                "name": "EIT*"
+            },
+            "options": {
+                "samplesPerBatch": 10,
+                "radiusFactor": 1.001,
+                "repairFactor": 1.2,
+                "useKNearest": true,
+                "repairReverseSearchTreeUponCollisionDetection": false,
+                "collisionDetectionOnReverseSearch": true,
+                "numInitialCollisionChecks": 1
+            }
+        },
+        "defaultEITstarR100": {
+            "type": "EITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espgreen",
+                "name": "EIT*"
+            },
+            "options": {
+                "samplesPerBatch": 100,
+                "radiusFactor": 1.001,
+                "repairFactor": 1.2,
+                "useKNearest": false,
+                "repairReverseSearchTreeUponCollisionDetection": false,
+                "collisionDetectionOnReverseSearch": true,
+                "numInitialCollisionChecks": 1
+            }
+        },
+        "defaultEITstarR50": {
+            "type": "EITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espgreen",
+                "name": "EIT*"
+            },
+            "options": {
+                "samplesPerBatch": 50,
+                "radiusFactor": 1.001,
+                "repairFactor": 1.2,
+                "useKNearest": false,
+                "repairReverseSearchTreeUponCollisionDetection": false,
+                "collisionDetectionOnReverseSearch": true,
+                "numInitialCollisionChecks": 1
+            }
+        },
+        "defaultEITstarR10": {
+            "type": "EITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espgreen",
+                "name": "EIT*"
+            },
+            "options": {
+                "samplesPerBatch": 10,
+                "radiusFactor": 1.001,
+                "repairFactor": 1.2,
+                "useKNearest": false,
+                "repairReverseSearchTreeUponCollisionDetection": false,
+                "collisionDetectionOnReverseSearch": true,
+                "numInitialCollisionChecks": 1
+            }
         }
     }
 }
