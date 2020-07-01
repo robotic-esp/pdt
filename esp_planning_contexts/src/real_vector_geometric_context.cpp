@@ -57,62 +57,6 @@ RealVectorGeometricContext::RealVectorGeometricContext(
     bounds_.low.at(dim) = -0.5 * sideLengths.at(dim);
     bounds_.high.at(dim) = 0.5 * sideLengths.at(dim);
   }
-
-  // Instantiate the goal.
-  switch (goal_->getType()) {
-    case ompl::base::GoalType::GOAL_STATE: {
-      // Get the goal position.
-      const auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
-
-      // Check dimensionality of the goal state position.
-      if (goalPosition.size() != dimensionality_) {
-        OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
-                   name.c_str());
-        throw std::runtime_error("Context error.");
-      }
-
-      // Allocate a goal state and set the position.
-      ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(spaceInfo_);
-
-      // Fill the goal state's coordinates.
-      for (auto i = 0u; i < dimensionality_; ++i) {
-        goalState[i] = goalPosition.at(i);
-      }
-
-      // Register the goal state with the goal.
-      goal_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-      goal_->as<ompl::base::GoalState>()->setState(goalState);
-      break;
-    }
-    case ompl::base::GoalType::GOAL_STATES: {
-      const auto numGoals = config->get<unsigned>("context/" + name + "/numGoals");
-      ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(spaceInfo_);
-
-      for (auto i = 0u; i < numGoals; ++i) {
-        goalState.random();
-        goal_->as<ompl::base::GoalStates>()->addState(goalState);
-      }
-      break;
-    }
-    case ompl::base::GoalType::GOAL_SPACE: {
-      // Get the goal bounds.
-      ompl::base::RealVectorBounds goalBounds(dimensionality_);
-      goalBounds.low = config->get<std::vector<double>>("context/" + name + "/goalLowerBounds");
-      goalBounds.high = config->get<std::vector<double>>("context/" + name + "/goalUpperBounds");
-
-      // Generate a goal space.
-      auto goalSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
-
-      // Set the goal bounds.
-      goalSpace->setBounds(goalBounds);
-
-      // Let the goal know about the goal space.
-      goal_ = std::make_shared<ompl::base::GoalSpace>(spaceInfo);
-      goal_->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
-      break;
-    }
-    default: { throw std::runtime_error("Goal type not implemented."); }
-  }
 }
 
 std::vector<std::shared_ptr<BaseObstacle>> RealVectorGeometricContext::getObstacles() const {
@@ -126,6 +70,64 @@ std::vector<std::shared_ptr<BaseAntiObstacle>> RealVectorGeometricContext::getAn
 
 const ompl::base::RealVectorBounds& RealVectorGeometricContext::getBoundaries() const {
   return bounds_;
+}
+
+std::shared_ptr<ompl::base::Goal> RealVectorGeometricContext::createGoal() const {
+  // Instantiate the goal.
+  switch (goalType_) {
+    case ompl::base::GoalType::GOAL_STATE: {
+      // Get the goal position.
+      const auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");
+
+      // Check dimensionality of the goal state position.
+      if (goalPosition.size() != dimensionality_) {
+        OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
+                   name_.c_str());
+        throw std::runtime_error("Context error.");
+      }
+
+      // Allocate a goal state and set the position.
+      ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(spaceInfo_);
+
+      // Fill the goal state's coordinates.
+      for (auto i = 0u; i < dimensionality_; ++i) {
+        goalState[i] = goalPosition.at(i);
+      }
+
+      // Register the goal state with the goal.
+      auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+      goal->as<ompl::base::GoalState>()->setState(goalState);
+      return goal;
+    }
+    case ompl::base::GoalType::GOAL_STATES: {
+      const auto numGoals = config_->get<unsigned>("context/" + name_ + "/numGoals");
+      ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(spaceInfo_);
+      auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
+      for (auto i = 0u; i < numGoals; ++i) {
+        goalState.random();
+        goal->as<ompl::base::GoalStates>()->addState(goalState);
+      }
+      return goal;
+    }
+    case ompl::base::GoalType::GOAL_SPACE: {
+      // Get the goal bounds.
+      ompl::base::RealVectorBounds goalBounds(dimensionality_);
+      goalBounds.low = config_->get<std::vector<double>>("context/" + name_ + "/goalLowerBounds");
+      goalBounds.high = config_->get<std::vector<double>>("context/" + name_ + "/goalUpperBounds");
+
+      // Generate a goal space.
+      auto goalSpace = std::make_shared<ompl::base::RealVectorStateSpace>(dimensionality_);
+
+      // Set the goal bounds.
+      goalSpace->setBounds(goalBounds);
+
+      // Let the goal know about the goal space.
+      auto goal = std::make_shared<ompl::base::GoalSpace>(spaceInfo_);
+      goal->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
+      return goal;
+    }
+    default: { throw std::runtime_error("Goal type not implemented."); }
+  }
 }
 
 }  // namespace ompltools

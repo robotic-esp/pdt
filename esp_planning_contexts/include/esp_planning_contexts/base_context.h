@@ -40,6 +40,7 @@
 #include <string>
 
 #include <ompl/base/Goal.h>
+#include <ompl/base/GoalTypes.h>
 #include <ompl/base/OptimizationObjective.h>
 #include <ompl/base/ProblemDefinition.h>
 #include <ompl/base/ScopedState.h>
@@ -74,8 +75,6 @@ class BaseContext {
   /** \brief Returns the optimization objective of this context. */
   ompl::base::OptimizationObjectivePtr getObjective() const;
 
-  std::shared_ptr<ompl::base::Goal> getGoal() const;
-
   /** \brief Returns the maximum duration to solve this context. */
   time::Duration getMaxSolveDuration() const;
 
@@ -97,7 +96,7 @@ class BaseContext {
   ompl::base::OptimizationObjectivePtr objective_{};
 
   /** \brief The goal specification of the planning problem. */
-  std::shared_ptr<ompl::base::Goal> goal_{};
+  ompl::base::GoalType goalType_{ompl::base::GoalType::GOAL_ANY};
 
   /** \brief The maximum duration to solve this context. */
   time::Duration maxSolveDuration_{};

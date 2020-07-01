@@ -608,7 +608,7 @@ void InteractiveVisualizer::visit(const WallGap& context) const {
 }
 
 void InteractiveVisualizer::drawGoal() const {
-  const auto goal = context_->getGoal();
+  const auto goal = context_->createGoal();
 
   switch (goal->getType()) {
     case ompl::base::GoalType::GOAL_STATE: {

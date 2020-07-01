@@ -436,7 +436,7 @@ void TikzVisualizer::drawBoundary(const RealVectorGeometricContext& context) con
 }
 
 void TikzVisualizer::drawGoal(const RealVectorGeometricContext& context) const {
-  const auto goal = context.getGoal();
+  const auto goal = context.createGoal();
   switch (goal->getType()) {
     case ompl::base::GoalType::GOAL_STATE: {
       ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(

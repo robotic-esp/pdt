@@ -114,7 +114,7 @@ ompl::base::ProblemDefinitionPtr FourRooms::instantiateNewProblemDefinition() co
   problemDefinition->addStartState(startState_);
 
   // Set the goal for the problem definition.
-  problemDefinition->setGoal(goal_);
+  problemDefinition->setGoal(createGoal());
 
   // Return the new definition.
   return problemDefinition;

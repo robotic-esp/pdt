@@ -117,7 +117,7 @@ ompl::base::ProblemDefinitionPtr GoalEnclosure::instantiateNewProblemDefinition(
   problemDefinition->addStartState(startState_);
 
   // Set the goal for the problem definition.
-  problemDefinition->setGoal(goal_);
+  problemDefinition->setGoal(createGoal());
 
   // Return the new definition.
   return problemDefinition;

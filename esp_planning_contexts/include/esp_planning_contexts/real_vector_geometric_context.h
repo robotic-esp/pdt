@@ -79,6 +79,9 @@ class RealVectorGeometricContext : public BaseContext {
   // Accept a visitor.
   virtual void accept(const ContextVisitor& visitor) const = 0;
 
+  /** \brief Create a new goal. */
+  std::shared_ptr<ompl::base::Goal> createGoal() const;
+
  protected:
   /** \brief The state space bounds. */
   ompl::base::RealVectorBounds bounds_;

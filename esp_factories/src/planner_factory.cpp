@@ -105,9 +105,6 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setInitialNumberOfSparseCollisionChecks(
           config_->get<std::size_t>(optionsKey + "/numInitialCollisionChecks"));
       planner->setRadiusFactor(config_->get<double>(optionsKey + "/radiusFactor"));
-      planner->setRepairFactor(config_->get<double>(optionsKey + "/repairFactor"));
-      planner->enableRepairingReverseTree(
-          config_->get<bool>(optionsKey + "/repairReverseSearchTreeUponCollisionDetection"));
       planner->enableCollisionDetectionInReverseSearch(
           config_->get<bool>(optionsKey + "/collisionDetectionOnReverseSearch"));
       return {planner, PLANNER_TYPE::EITSTAR};
