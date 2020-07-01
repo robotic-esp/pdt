@@ -115,7 +115,7 @@ ompl::base::ProblemDefinitionPtr RandomRectangles::instantiateNewProblemDefiniti
   problemDefinition->addStartState(startState_);
 
   // Set the goal for the problem definition.
-  problemDefinition->setGoal(goal_);
+  problemDefinition->setGoal(createGoal());
 
   // Return the new definition.
   return problemDefinition;
@@ -130,6 +130,12 @@ void RandomRectangles::accept(const ContextVisitor& visitor) const {
 }
 
 void RandomRectangles::createObstacles() {
+  // Create a goal to make sure the obstacles don't invalidate it. Something seems funky here, there
+  // has to be a better way to do this? The problem is that I want to create a new goal whenever I
+  // create a new problem definition, so the goal can not be created in the base class and kept
+  // around.
+  auto goal = createGoal();
+
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
     // Create a random anchor (uniform).
@@ -145,16 +151,16 @@ void RandomRectangles::createObstacles() {
 
     // Add this to the obstacles if it doesn't invalidate the start or goal state.
     if (!obstacle->invalidates(startState_)) {
-      if (goal_->getType() == ompl::base::GoalType::GOAL_STATE) {
-        if (!obstacle->invalidates(goal_->as<ompl::base::GoalState>()->getState())) {
+      if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
+        if (!obstacle->invalidates(goal->as<ompl::base::GoalState>()->getState())) {
           obstacles_.emplace_back(obstacle);
         } else {
           --i;
         }
-      } else if (goal_->getType() == ompl::base::GoalType::GOAL_STATES) {
+      } else if (goalType_ == ompl::base::GoalType::GOAL_STATES) {
         auto invalidates = false;
-        for (auto i = 0u; i < goal_->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
-          if (obstacle->invalidates(goal_->as<ompl::base::GoalStates>()->getState(i))) {
+        for (auto i = 0u; i < goal->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
+          if (obstacle->invalidates(goal->as<ompl::base::GoalStates>()->getState(i))) {
             invalidates = true;
             break;
           }

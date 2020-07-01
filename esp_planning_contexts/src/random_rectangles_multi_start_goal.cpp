@@ -111,7 +111,7 @@ ompl::base::ProblemDefinitionPtr RandomRectanglesMultiStartGoal::instantiateNewP
   }
 
   // Set the goal.
-  problemDefinition->setGoal(goal_);
+  problemDefinition->setGoal(createGoal());
 
   return problemDefinition;
 }
@@ -126,6 +126,9 @@ void RandomRectanglesMultiStartGoal::accept(const ContextVisitor& visitor) const
 }
 
 void RandomRectanglesMultiStartGoal::createObstacles() {
+  // Create a goal to make sure the obstacles don't invalidate it.
+  auto goal = createGoal();
+
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
     // Create a random anchor (uniform).
@@ -145,15 +148,15 @@ void RandomRectanglesMultiStartGoal::createObstacles() {
         break;
       }
     }
-    if (!invalidates && (goal_->getType() == ompl::base::GoalType::GOAL_STATE ||
-                         goal_->getType() == ompl::base::GoalType::GOAL_STATES)) {
-      if (goal_->getType() == ompl::base::GoalType::GOAL_STATE) {
-        invalidates = obstacle->invalidates(goal_->as<ompl::base::GoalState>()->getState());
+    if (!invalidates && (goalType_ == ompl::base::GoalType::GOAL_STATE ||
+                         goalType_ == ompl::base::GoalType::GOAL_STATES)) {
+      if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
+        invalidates = obstacle->invalidates(goal->as<ompl::base::GoalState>()->getState());
         break;
       }
-      if (goal_->getType() == ompl::base::GoalType::GOAL_STATES) {
-        for (auto i = 0u; i < goal_->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
-          if (obstacle->invalidates(goal_->as<ompl::base::GoalStates>()->getState(i))) {
+      if (goalType_ == ompl::base::GoalType::GOAL_STATES) {
+        for (auto i = 0u; i < goal->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
+          if (obstacle->invalidates(goal->as<ompl::base::GoalStates>()->getState(i))) {
             invalidates = true;
             break;
           }

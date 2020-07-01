@@ -106,32 +106,17 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
   // Get the goal.
   auto goalType = config_->get<std::string>("context/" + name_ + "/goalType");
   if (goalType == "GoalState"s) {
-    goal_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+    goalType_ = ompl::base::GoalType::GOAL_STATE;
   } else if (goalType == "GoalStates"s) {
-    goal_ = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
+    goalType_ = ompl::base::GoalType::GOAL_STATES;
   } else if (goalType == "GoalSpace"s) {
-    goal_ = std::make_shared<ompl::base::GoalSpace>(spaceInfo_);
+    goalType_ = ompl::base::GoalType::GOAL_SPACE;
   } else {
     throw std::runtime_error("Invalid goal type.");
   }
 
   // // Why doesn't this work?
-  // switch (config_->get<ompl::base::GoalType>("context/" + name_ + "/goalType")) {
-  //   case ompl::base::GoalType::GOAL_STATE: {
-  //     // Instantiate a goal of correct type.
-  //     goal_ = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  //     break;
-  //   }
-  //   case ompl::base::GoalType::GOAL_STATES: {
-  //     goal_ = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
-  //     break;
-  //   }
-  //   case ompl::base::GoalType::GOAL_SPACE: {
-  //     goal_ = std::make_shared<ompl::base::GoalSpace>(spaceInfo_);
-  //     break;
-  //   }
-  //   default: { throw std::runtime_error("Invalid goal type."); }
-  // }
+  // goalType_ = config_->get<ompl::base::GoalType>("context/" + name_ + "/goalType");
 }
 
 std::string BaseContext::getName() const {
@@ -152,10 +137,6 @@ std::size_t BaseContext::getDimension() const {
 
 ompl::base::OptimizationObjectivePtr BaseContext::getObjective() const {
   return objective_;
-}
-
-std::shared_ptr<ompl::base::Goal> BaseContext::getGoal() const {
-  return goal_;
 }
 
 time::Duration BaseContext::getMaxSolveDuration() const {
