@@ -14,6 +14,51 @@
                 "repairBackwardSearch": true,
                 "trackApproximateSolutions": false
             }
+        },
+        "defaultAITstarK100": {
+            "type": "AITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espgreen",
+                "name": "AIT* K100"
+            },
+            "options": {
+                "rewireFactor": 1.001,
+                "batchSize": 100,
+                "useKNearest": true,
+                "repairBackwardSearch": true,
+                "trackApproximateSolutions": false
+            }
+        },
+        "defaultAITstarK50": {
+            "type": "AITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espblue",
+                "name": "AIT* K50"
+            },
+            "options": {
+                "rewireFactor": 1.001,
+                "batchSize": 100,
+                "useKNearest": true,
+                "repairBackwardSearch": true,
+                "trackApproximateSolutions": false
+            }
+        },
+        "defaultAITstarK10": {
+            "type": "AITstar",
+            "isAnytime": true,
+            "report": {
+                "color": "esplightblue",
+                "name": "AIT* K10"
+            },
+            "options": {
+                "rewireFactor": 1.001,
+                "batchSize": 100,
+                "useKNearest": true,
+                "repairBackwardSearch": true,
+                "trackApproximateSolutions": false
+            }
         }
     }
 }

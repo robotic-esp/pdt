@@ -8,7 +8,7 @@
                 "name": "EIT*"
             },
             "options": {
-                "samplesPerBatch": 100,
+                "batchSize": 100,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
                 "useKNearest": true,
@@ -22,10 +22,10 @@
             "isAnytime": true,
             "report": {
                 "color": "espgreen",
-                "name": "EIT*"
+                "name": "EIT* K100"
             },
             "options": {
-                "samplesPerBatch": 100,
+                "batchSize": 100,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
                 "useKNearest": true,
@@ -39,10 +39,10 @@
             "isAnytime": true,
             "report": {
                 "color": "espgreen",
-                "name": "EIT*"
+                "name": "EIT* K50"
             },
             "options": {
-                "samplesPerBatch": 50,
+                "batchSize": 50,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
                 "useKNearest": true,
@@ -55,11 +55,11 @@
             "type": "EITstar",
             "isAnytime": true,
             "report": {
-                "color": "espgreen",
-                "name": "EIT*"
+                "color": "esplightgreen",
+                "name": "EIT* K10"
             },
             "options": {
-                "samplesPerBatch": 10,
+                "batchSize": 10,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
                 "useKNearest": true,
@@ -76,7 +76,7 @@
                 "name": "EIT*"
             },
             "options": {
-                "samplesPerBatch": 100,
+                "batchSize": 100,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
                 "useKNearest": false,
@@ -93,7 +93,7 @@
                 "name": "EIT*"
             },
             "options": {
-                "samplesPerBatch": 50,
+                "batchSize": 50,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
                 "useKNearest": false,
@@ -110,7 +110,7 @@
                 "name": "EIT*"
             },
             "options": {
-                "samplesPerBatch": 10,
+                "batchSize": 10,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
                 "useKNearest": false,

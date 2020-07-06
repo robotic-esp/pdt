@@ -188,16 +188,10 @@ std::shared_ptr<ompl::base::Goal> OpenRaveSE3::createGoal() const {
       // Set the goal bounds.
       goalSpace->setBounds(goalBounds);
 
-      if (name_ == "Knee"s) {
-        auto goal = std::make_shared<OpenRaveKneeGoal>(spaceInfo_, config_, name_);
-        goal->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
-        return goal;
-      } else {
-        // Let the goal know about the goal space.
-        auto goal = std::make_shared<ompl::base::GoalSpace>(spaceInfo_);
-        goal->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
-        return goal;
-      }
+      // Let the goal know about the goal space.
+      auto goal = std::make_shared<ompl::base::GoalSpace>(spaceInfo_);
+      goal->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
+      return goal;
       break;
     }
     default: { throw std::runtime_error("Goal type not implemented."); }

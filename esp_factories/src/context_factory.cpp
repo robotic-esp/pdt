@@ -39,6 +39,8 @@
 #include <ompl/base/StateSpace.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/base/spaces/SE3StateSpace.h>
+#include <ompl/base/spaces/ConstrainedSE3StateSpace.h>
 
 #include "nlohmann/json.hpp"
 
@@ -200,6 +202,20 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<OpenRaveSE3>(spaceInfo, config_, contextName);
       } catch (const json::detail::type_error& e) {
         throw std::runtime_error("Error allocating an OpenRaveSE3 context.");
+      }
+    }
+    case CONTEXT_TYPE::OPEN_RAVE_CONSTRAINED_SE3: {
+      try {
+        // Allocate a real vector state space.
+        // The state space bounds are set in the context.
+        auto stateSpace = std::make_shared<ompl::base::ConstrainedSE3StateSpace>();
+        stateSpace->setMaxRotation(config_->get<double>(parentKey + "/maxRotation"));
+
+        // Allocate the state information for this space.
+        auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+        return std::make_shared<OpenRaveSE3>(spaceInfo, config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating a ConstrainedOpenRaveSE3 context.");
       }
     }
     case CONTEXT_TYPE::RANDOM_RECTANGLES: {
