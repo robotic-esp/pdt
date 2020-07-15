@@ -85,7 +85,14 @@ OpenRaveManipulator::OpenRaveManipulator(
   robot->SetActiveDOFs(config_->get<std::vector<int>>("context/" + name + "/activeDofIndices"));
 
   // Set the bounds of the state space.
-  spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->setBounds(0.0, 1.0);
+  // Get the upper and lower bounds of the state dimensions.
+  std::vector<double> raveLowerBounds, raveUpperBounds;
+  robot->GetActiveDOFLimits(raveLowerBounds, raveUpperBounds);
+  assert(raveLowerBounds.size() == raveUpperBounds.size());
+  ompl::base::RealVectorBounds bounds(raveLowerBounds.size());
+  bounds.low = raveLowerBounds;
+  bounds.high = raveUpperBounds;
+  spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->setBounds(bounds);
 
   // Create the validity checker.
   auto validityChecker =
@@ -103,22 +110,10 @@ OpenRaveManipulator::OpenRaveManipulator(
   auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");
   auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
 
-  // Get the upper and lower bounds of the state dimensions.
-  std::vector<double> raveLowerBounds, raveUpperBounds, raveStateScales;
-  robot->GetActiveDOFLimits(raveLowerBounds, raveUpperBounds);
-  assert(raveLowerBounds.size() == raveUpperBounds.size());
-
-  // Compute the scale for the bounds.
-  raveStateScales.reserve(raveLowerBounds.size());
-  for (std::size_t i = 0u; i < raveLowerBounds.size(); ++i) {
-    assert(raveUpperBounds[i] > raveLowerBounds[i]);
-    raveStateScales.emplace_back(raveUpperBounds[i] - raveLowerBounds[i]);
-  }
-
   // Fill the start and goal states' coordinates.
   for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = (startPosition.at(i) - raveLowerBounds.at(i)) / raveStateScales.at(i);
-    goalState_[i] = (goalPosition.at(i) - raveLowerBounds.at(i)) / raveStateScales.at(i);
+    startState_[i] = startPosition.at(i);
+    goalState_[i] = goalPosition.at(i);
   }
 }
 

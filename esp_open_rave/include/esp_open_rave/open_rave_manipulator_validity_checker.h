@@ -76,15 +76,6 @@ class OpenRaveManipulatorValidityChecker : public OpenRaveBaseValidityChecker {
  private:
   /** \brief The state in a format that rave can check. */
   mutable std::vector<double> raveState_;
-
-  /** \brief The lower bound of the rave state. This is needed as the asao-planners require [0, 1]^n spaces. */
-  std::vector<double> raveLowerBounds_;
-
-  /** \brief The upper bound of the rave state. This is needed as the asao-planners require [0, 1]^n spaces. */
-  std::vector<double> raveUpperBounds_;
-
-  /** \brief The scaling factors to convert an OMPL state dimension to a RAVE state. */
-  std::vector<double> raveStateScales_;
 };
 
 }  // namespace ompltools
