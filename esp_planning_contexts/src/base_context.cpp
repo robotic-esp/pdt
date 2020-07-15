@@ -62,15 +62,20 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
     name_(name),
     maxSolveDuration_(time::seconds(config->get<double>("context/" + name + "/maxTime"))),
     config_(config) {
+  // Construct the parent key.
+  const auto parentKey =
+      "objective/"s + config_->get<std::string>("context/" + name_ + "/objective");
+
   // Get the optimization objective.
-  switch (config_->get<OBJECTIVE_TYPE>(
-      "objective/" + config_->get<std::string>("context/" + name_ + "/objective") + "/type")) {
+  switch (config_->get<OBJECTIVE_TYPE>(parentKey + "/type")) {
     case OBJECTIVE_TYPE::COSTMAP: {
       throw std::runtime_error("CostMap objective is not yet implemented.");
       break;
     }
     case OBJECTIVE_TYPE::MAXMINCLEARANCE: {
       objective_ = std::make_shared<MaxMinClearanceOptimizationObjective>(spaceInfo_);
+      objective_->setCostThreshold(
+          ompl::base::Cost(config_->get<double>(parentKey + "/solvedCost")));
       objective_->setCostToGoHeuristic([this](const ompl::base::State*, const ompl::base::Goal*) {
         return objective_->identityCost();
       });
@@ -78,6 +83,8 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
     }
     case OBJECTIVE_TYPE::RECIPROCALCLEARANCE: {
       objective_ = std::make_shared<ReciprocalClearanceOptimizationObjective>(spaceInfo_);
+      objective_->setCostThreshold(
+          ompl::base::Cost(config_->get<double>(parentKey + "/solvedCost")));
       objective_->setCostToGoHeuristic([this](const ompl::base::State*, const ompl::base::Goal*) {
         return objective_->identityCost();
       });
@@ -85,11 +92,15 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
     }
     case OBJECTIVE_TYPE::PATHLENGTH: {
       objective_ = std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
+      objective_->setCostThreshold(
+          ompl::base::Cost(config_->get<double>(parentKey + "/solvedCost")));
       objective_->setCostToGoHeuristic(&ompl::base::goalRegionCostToGo);
       break;
     }
     case OBJECTIVE_TYPE::POTENTIALFIELD: {
       objective_ = std::make_shared<PotentialFieldOptimizationObjective>(spaceInfo_, config_);
+      objective_->setCostThreshold(
+          ompl::base::Cost(config_->get<double>(parentKey + "/solvedCost")));
       objective_->setCostToGoHeuristic([this](const ompl::base::State*, const ompl::base::Goal*) {
         return objective_->identityCost();
       });

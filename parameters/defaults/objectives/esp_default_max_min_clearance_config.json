@@ -1,7 +1,8 @@
 {
     "objective": {
         "defaultMaxMinClearance": {
-            "type": "MaxMinClearance"
+            "type": "MaxMinClearance",
+            "solvedCost": 0.0
         }
     }
 }

@@ -1,7 +1,12 @@
 {
     "objective": {
         "defaultPathLength": {
-            "type": "PathLength"
+            "type": "PathLength",
+            "solvedCost": 0.0
+        },
+        "initialSolutionPathLength": {
+            "type": "PathLength",
+            "solvedCost": 1000000.0
         }
     }
 }

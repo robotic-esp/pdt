@@ -14,7 +14,8 @@
                 "useKNearest": true,
                 "repairReverseSearchTreeUponCollisionDetection": false,
                 "collisionDetectionOnReverseSearch": true,
-                "numInitialCollisionChecks": 1
+                "numInitialCollisionChecks": 1,
+                "resetSuboptimalityFactorOnEveryApproximation": true
             }
         },
         "defaultEITstarK100": {

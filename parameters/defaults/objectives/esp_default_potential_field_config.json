@@ -2,6 +2,7 @@
     "objective": {
         "defaultPotentialField": {
             "type": "PotentialField",
+            "solvedCost": 0.0,
             "sources": [
                 [-0.3, 0.2],
                 [0.3, 0.2]

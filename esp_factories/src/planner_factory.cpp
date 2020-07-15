@@ -36,11 +36,11 @@
 
 #include "esp_factories/planner_factory.h"
 
-#include <ompl/geometric/planners/informedtrees/AITstar.h>
-#include <ompl/geometric/planners/informedtrees/ABITstar.h>
-#include <ompl/geometric/planners/informedtrees/BITstar.h>
 #include <ompl/geometric/planners/eitstar/EITstar.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
+#include <ompl/geometric/planners/informedtrees/ABITstar.h>
+#include <ompl/geometric/planners/informedtrees/AITstar.h>
+#include <ompl/geometric/planners/informedtrees/BITstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
@@ -108,6 +108,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->enableCollisionDetectionInReverseSearch(
           config_->get<bool>(optionsKey + "/collisionDetectionOnReverseSearch"));
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->resetSuboptimalityFactorOnEveryApproximation(
+          config_->get<bool>(optionsKey + "/resetSuboptimalityFactorOnEveryApproximation"));
       return {planner, PLANNER_TYPE::EITSTAR};
     }
     case PLANNER_TYPE::AITSTAR: {
@@ -119,7 +121,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
-      planner->trackApproximateSolutions(config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
+      planner->trackApproximateSolutions(
+          config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
       return {planner, PLANNER_TYPE::AITSTAR};
     }
     case PLANNER_TYPE::BITSTAR: {
