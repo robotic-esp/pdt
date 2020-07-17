@@ -268,6 +268,8 @@ void Configuration::loadDefaultConfigs(bool loadDefaultContextConfigs,
           throw std::ios_base::failure("Configuration error.");
         }
 
+        OMPL_DEBUG("Loading configuration from '%s'", directoryEntry.path().c_str());
+
         // Load the file into a temporary config.
         json::json config;
         configFile >> config;
@@ -354,6 +356,8 @@ void Configuration::loadDefaultConfigs(bool loadDefaultContextConfigs,
                      directoryEntry.path().string().c_str());
           throw std::ios_base::failure("Configuration error.");
         }
+
+        OMPL_DEBUG("Loading configuration from '%s'", directoryEntry.path().c_str());
 
         // Load the file into a temporary config.
         json::json config;
