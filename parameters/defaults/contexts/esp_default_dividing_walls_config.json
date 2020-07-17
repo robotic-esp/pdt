@@ -1,18 +1,88 @@
 {
     "context": {
-        "defaultDividingWalls": {
+        "defaultDividingWalls2D": {
             "type": "DividingWalls",
             "objective": "defaultPathLength",
-            "start": [-0.45, 0.0],
-            "goal": [0.45, 0.0],
+            "start": [ -0.45, 0.0 ],
+            "goal": [ 0.45, 0.0 ],
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
-            "collisionCheckResolution": 0.0001,
+            "collisionCheckResolution": 0.000005,
             "numWalls": 3,
-            "wallThicknesses": [0.05, 0.1, 0.05],
+            "wallThicknesses": [ 0.05, 0.1, 0.05 ],
             "numGaps": 6,
-            "gapWidths": [0.05, 0.03, 0.01, 0.01, 0.03, 0.05]
+            "gapWidths": [ 0.05, 0.03, 0.01, 0.01, 0.03, 0.05 ]
+        },
+        "defaultDividingWalls3D": {
+            "type": "DividingWalls",
+            "objective": "defaultPathLength",
+            "start": [ -0.45, 0.0, 0.0 ],
+            "goal": [ 0.45, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 3,
+            "boundarySideLengths" : [ 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "numWalls": 3,
+            "wallThicknesses": [ 0.05, 0.1, 0.05 ],
+            "numGaps": 6,
+            "gapWidths": [ 0.05, 0.03, 0.01, 0.01, 0.03, 0.05 ]
+        },
+        "defaultDividingWalls4D": {
+            "type": "DividingWalls",
+            "objective": "defaultPathLength",
+            "start": [ -0.45, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.45, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 4,
+            "boundarySideLengths" : [ 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "numWalls": 3,
+            "wallThicknesses": [ 0.05, 0.1, 0.05 ],
+            "numGaps": 6,
+            "gapWidths": [ 0.05, 0.03, 0.01, 0.01, 0.03, 0.05 ]
+        },
+        "defaultDividingWalls8D": {
+            "type": "DividingWalls",
+            "objective": "defaultPathLength",
+            "start": [ -0.45, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.45, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 8,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "numWalls": 3,
+            "wallThicknesses": [ 0.05, 0.1, 0.05 ],
+            "numGaps": 6,
+            "gapWidths": [ 0.05, 0.03, 0.01, 0.01, 0.03, 0.05 ]
+        },
+        "defaultDividingWalls16D": {
+            "type": "DividingWalls",
+            "objective": "defaultPathLength",
+            "start": [ -0.45, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.45, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 16,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "numWalls": 3,
+            "wallThicknesses": [ 0.05, 0.1, 0.05 ],
+            "numGaps": 6,
+            "gapWidths": [ 0.05, 0.03, 0.01, 0.01, 0.03, 0.05 ]
+        },
+        "defaultDividingWalls32D": {
+            "type": "DividingWalls",
+            "objective": "defaultPathLength",
+            "start": [ -0.45, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.45, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 32,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "numWalls": 3,
+            "wallThicknesses": [ 0.05, 0.1, 0.05 ],
+            "numGaps": 6,
+            "gapWidths": [ 0.05, 0.03, 0.01, 0.01, 0.03, 0.05 ]
         }
     }
 }

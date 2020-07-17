@@ -110,6 +110,8 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->resetSuboptimalityFactorOnEveryApproximation(
           config_->get<bool>(optionsKey + "/resetSuboptimalityFactorOnEveryApproximation"));
+      planner->trackApproximateSolutions(
+          config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
       return {planner, PLANNER_TYPE::EITSTAR};
     }
     case PLANNER_TYPE::AITSTAR: {

@@ -2,7 +2,7 @@
     "experiment": {
         "executable": "visualization",
         "planner": "defaultEITstar",
-        "context": "defaultWallGap",
+        "context": "defaultWallGap2D",
         "useOnlyThisConfig": false
     }
 }

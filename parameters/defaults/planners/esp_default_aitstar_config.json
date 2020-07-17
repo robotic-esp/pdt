@@ -10,7 +10,7 @@
             "options": {
                 "rewireFactor": 1.001,
                 "batchSize": 100,
-                "useKNearest": true,
+                "useKNearest": false,
                 "repairBackwardSearch": true,
                 "trackApproximateSolutions": false
             }

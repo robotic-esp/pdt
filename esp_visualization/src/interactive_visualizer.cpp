@@ -1136,7 +1136,7 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
     // Get the reverse queue.
     auto reverseQueue = eitstarData->getReverseQueue();
     std::vector<Eigen::Vector2d> reverseQueueEdges;
-    forwardQueueEdges.reserve(2u * reverseQueue.size());
+    reverseQueueEdges.reserve(2u * reverseQueue.size());
     for (const auto& edge : reverseQueue) {
       auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       reverseQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
@@ -1171,8 +1171,8 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
           nextForwardEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto childState =
           nextForwardEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      nextEdge.emplace_back(parentState->operator[](0), parentState->operator[](1));
-      nextEdge.emplace_back(childState->operator[](0), childState->operator[](1));
+      nextEdge.emplace_back((*parentState)[0u], (*parentState)[1u]);
+      nextEdge.emplace_back((*childState)[0u], (*childState)[1u]);
       // Draw the next edge.
       drawLines(nextEdge, 3.0, red);
     }
@@ -1187,8 +1187,82 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
           nextReverseEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto childState =
           nextReverseEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      nextEdge.emplace_back(parentState->operator[](0), parentState->operator[](1));
-      nextEdge.emplace_back(childState->operator[](0), childState->operator[](1));
+      nextEdge.emplace_back((*parentState)[0u], (*parentState)[1u]);
+      nextEdge.emplace_back((*childState)[0u], (*childState)[1u]);
+      // Draw the next edge.
+      drawLines(nextEdge, 3.0, darkred);
+    }
+  } else if (context_->getDimension() == 3u) {
+    // Get the forward queue.
+    auto forwardQueue = eitstarData->getForwardQueue();
+    std::vector<Eigen::Vector3d> forwardQueueEdges;
+    forwardQueueEdges.reserve(2u * forwardQueue.size());
+    for (const auto& edge : forwardQueue) {
+      auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      forwardQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]);
+      auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      forwardQueueEdges.emplace_back((*childState)[0u], (*childState)[1u], (*childState)[2u]);
+    }
+
+    // Draw the forward queue.
+    drawLines(forwardQueueEdges, 1.5, lightblue);
+
+    // Get the reverse queue.
+    auto reverseQueue = eitstarData->getReverseQueue();
+    std::vector<Eigen::Vector3d> reverseQueueEdges;
+    reverseQueueEdges.reserve(2u * reverseQueue.size());
+    for (const auto& edge : reverseQueue) {
+      auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]);
+      auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseQueueEdges.emplace_back((*childState)[0u], (*childState)[1u], (*childState)[2u]);
+    }
+
+    // Draw the reverse queue.
+    drawLines(reverseQueueEdges, 1.5, yellow);
+
+    // Get the reverse tree.
+    auto reverseTree = eitstarData->getReverseTree();
+    std::vector<Eigen::Vector3d> reverseTreeEdges;
+    reverseTreeEdges.reserve(2u * reverseTree.size());
+    for (const auto& edge : reverseTree) {
+      auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseTreeEdges.emplace_back((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]);
+      auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      reverseTreeEdges.emplace_back((*childState)[0u], (*childState)[1u], (*childState)[2u]);
+    }
+
+    // Draw the reverse tree.
+    drawLines(reverseTreeEdges, 2.0, blue);
+
+    // Get the next edge in the forward queue.
+    auto nextForwardEdge = eitstarData->getNextForwardEdge();
+
+    // If there are no more edges in the queue, this will return an edge with nullptrs.
+    if (nextForwardEdge.source && nextForwardEdge.target) {
+      std::vector<Eigen::Vector3d> nextEdge;
+      auto parentState =
+          nextForwardEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto childState =
+          nextForwardEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      nextEdge.emplace_back((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]);
+      nextEdge.emplace_back((*childState)[0u], (*childState)[1u], (*childState)[2u]);
+      // Draw the next edge.
+      drawLines(nextEdge, 3.0, red);
+    }
+
+    // Get the next edge in the reverse queue.
+    auto nextReverseEdge = eitstarData->getNextReverseEdge();
+
+    // If there are no more edges in the queue, this will return an edge with nullptrs.
+    if (nextReverseEdge.source && nextReverseEdge.target) {
+      std::vector<Eigen::Vector3d> nextEdge;
+      auto parentState =
+          nextReverseEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto childState =
+          nextReverseEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+      nextEdge.emplace_back((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]);
+      nextEdge.emplace_back((*childState)[0u], (*childState)[1u], (*childState)[2u]);
       // Draw the next edge.
       drawLines(nextEdge, 3.0, darkred);
     }

@@ -1,14 +1,79 @@
 {
     "context": {
-        "defaultGoalEnclosure": {
+        "defaultGoalEnclosure2D": {
             "type": "GoalEnclosure",
             "objective": "defaultPathLength",
-            "start": [-0.2, 0.0],
-            "goal": [0.2, 0.0],
+            "start": [ -0.2, 0.0 ],
+            "goal": [ 0.2, 0.0 ],
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
-            "collisionCheckResolution": 0.0001,
+            "collisionCheckResolution": 0.000005,
+            "goalOutsideWidth": 0.25,
+            "goalInsideWidth": 0.2,
+            "goalGapWidth": 0.2
+        },
+        "defaultGoalEnclosure3D": {
+            "type": "GoalEnclosure",
+            "objective": "defaultPathLength",
+            "start": [ -0.2, 0.0, 0.0 ],
+            "goal": [ 0.2, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 3,
+            "boundarySideLengths" : [ 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "goalOutsideWidth": 0.25,
+            "goalInsideWidth": 0.2,
+            "goalGapWidth": 0.2
+        },
+        "defaultGoalEnclosure4D": {
+            "type": "GoalEnclosure",
+            "objective": "defaultPathLength",
+            "start": [ -0.2, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.2, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 4,
+            "boundarySideLengths" : [ 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "goalOutsideWidth": 0.25,
+            "goalInsideWidth": 0.2,
+            "goalGapWidth": 0.2
+        },
+        "defaultGoalEnclosure8D": {
+            "type": "GoalEnclosure",
+            "objective": "defaultPathLength",
+            "start": [ -0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 8,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "goalOutsideWidth": 0.25,
+            "goalInsideWidth": 0.2,
+            "goalGapWidth": 0.2
+        },
+        "defaultGoalEnclosure16D": {
+            "type": "GoalEnclosure",
+            "objective": "defaultPathLength",
+            "start": [ -0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 100.0,
+            "dimensions": 16,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "goalOutsideWidth": 0.25,
+            "goalInsideWidth": 0.2,
+            "goalGapWidth": 0.2
+        },
+        "defaultGoalEnclosure32D": {
+            "type": "GoalEnclosure",
+            "objective": "defaultPathLength",
+            "start": [ -0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 100.0,
+            "dimensions": 32,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
             "goalOutsideWidth": 0.25,
             "goalInsideWidth": 0.2,
             "goalGapWidth": 0.2

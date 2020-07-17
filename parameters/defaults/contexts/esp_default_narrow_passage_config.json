@@ -1,14 +1,79 @@
 {
     "context": {
-        "defaultNarrowPassage": {
+        "defaultNarrowPassage2D": {
             "type": "NarrowPassage",
             "objective": "defaultPathLength",
-            "start": [-0.2, 0.0],
-            "goal": [0.2, 0.0],
+            "start": [ -0.2, 0.0 ],
+            "goal": [ 0.2, 0.0 ],
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
-            "collisionCheckResolution": 0.0001,
+            "collisionCheckResolution": 0.000005,
+            "wallThickness": 0.2,
+            "passageWidth": 0.1,
+            "passageOffset": 0.1
+        },
+        "defaultNarrowPassage3D": {
+            "type": "NarrowPassage",
+            "objective": "defaultPathLength",
+            "start": [ -0.2, 0.0, 0.0 ],
+            "goal": [ 0.2, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 3,
+            "boundarySideLengths" : [ 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "wallThickness": 0.2,
+            "passageWidth": 0.1,
+            "passageOffset": 0.1
+        },
+        "defaultNarrowPassage4D": {
+            "type": "NarrowPassage",
+            "objective": "defaultPathLength",
+            "start": [ -0.2, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.2, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 4,
+            "boundarySideLengths" : [ 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "wallThickness": 0.2,
+            "passageWidth": 0.1,
+            "passageOffset": 0.1
+        },
+        "defaultNarrowPassage8D": {
+            "type": "NarrowPassage",
+            "objective": "defaultPathLength",
+            "start": [ -0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 8,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "wallThickness": 0.2,
+            "passageWidth": 0.1,
+            "passageOffset": 0.1
+        },
+        "defaultNarrowPassage16D": {
+            "type": "NarrowPassage",
+            "objective": "defaultPathLength",
+            "start": [ -0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 16,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "wallThickness": 0.2,
+            "passageWidth": 0.1,
+            "passageOffset": 0.1
+        },
+        "defaultNarrowPassage32D": {
+            "type": "NarrowPassage",
+            "objective": "defaultPathLength",
+            "start": [ -0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 32,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005,
             "wallThickness": 0.2,
             "passageWidth": 0.1,
             "passageOffset": 0.1

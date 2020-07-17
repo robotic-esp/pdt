@@ -1,10 +1,10 @@
 {
     "context": {
-        "defaultFourRooms": {
+        "defaultFourRooms2D": {
             "type": "FourRooms",
             "objective": "defaultPathLength",
-            "start": [0.25, -0.25],
-            "goal": [0.25, 0.25],
+            "start": [ 0.25, -0.25 ],
+            "goal": [ 0.25, 0.25 ],
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],

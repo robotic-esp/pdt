@@ -11,11 +11,12 @@
                 "batchSize": 100,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
-                "useKNearest": true,
+                "useKNearest": false,
+                "trackApproximateSolutions": false,
                 "repairReverseSearchTreeUponCollisionDetection": false,
                 "collisionDetectionOnReverseSearch": true,
                 "numInitialCollisionChecks": 1,
-                "resetSuboptimalityFactorOnEveryApproximation": true
+                "resetSuboptimalityFactorOnEveryApproximation": false
             }
         },
         "defaultEITstarK100": {

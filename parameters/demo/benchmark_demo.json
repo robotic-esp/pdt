@@ -8,7 +8,7 @@
             "defaultABITstar",
             "defaultEITstar"
         ],
-        "context": "defaultWallGap",
+        "context": "defaultWallGap2D",
         "numRuns": 100,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
