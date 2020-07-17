@@ -1,16 +1,76 @@
 {
     "context": {
-        "defaultRepeatingRectangles": {
-            "type": "RepeatingRectangles",
-            "objective": "defaultPathLength",
-            "maxTime": 0.1,
+        "defaultrepeatingrectangles2D": {
+            "type": "repeatingrectangles",
+            "objective": "defaultpathlength",
+            "maxtime": 0.1,
             "dimensions": 2,
-            "boundarySideLengths" : [ 1, 1 ],
-            "start": [-0.25, 0.0],
-            "goal": [0.25, 0.0],
-            "collisionCheckResolution": 0.001,
-            "numObstaclesPerDim": 49,
-            "obstacleWidth": 0.01
+            "boundarysidelengths" : [ 1, 1 ],
+            "start": [ -0.25, 0.0 ],
+            "goal": [ 0.25, 0.0 ],
+            "collisioncheckresolution": 0.000005,
+            "numobstaclesperdim": 49,
+            "obstaclewidth": 0.01
+        },
+        "defaultrepeatingrectangles3D": {
+            "type": "repeatingrectangles",
+            "objective": "defaultpathlength",
+            "maxtime": 0.1,
+            "dimensions": 3,
+            "boundarysidelengths" : [ 1, 1, 1 ],
+            "start": [ -0.25, 0.0, 0.0 ],
+            "goal": [ 0.25, 0.0, 0.0 ],
+            "collisioncheckresolution": 0.000005,
+            "numobstaclesperdim": 49,
+            "obstaclewidth": 0.01
+        },
+        "defaultrepeatingrectangles4D": {
+            "type": "repeatingrectangles",
+            "objective": "defaultpathlength",
+            "maxtime": 0.1,
+            "dimensions": 4,
+            "boundarysidelengths" : [ 1, 1, 1, 1 ],
+            "start": [ -0.25, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.25, 0.0, 0.0, 0.0 ],
+            "collisioncheckresolution": 0.000005,
+            "numobstaclesperdim": 49,
+            "obstaclewidth": 0.01
+        },
+        "defaultrepeatingrectangles8D": {
+            "type": "repeatingrectangles",
+            "objective": "defaultpathlength",
+            "maxtime": 0.1,
+            "dimensions": 8,
+            "boundarysidelengths" : [ 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "start": [ -0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "collisioncheckresolution": 0.000005,
+            "numobstaclesperdim": 49,
+            "obstaclewidth": 0.01
+        },
+        "defaultrepeatingrectangles16D": {
+            "type": "repeatingrectangles",
+            "objective": "defaultpathlength",
+            "maxtime": 0.1,
+            "dimensions": 16,
+            "boundarysidelengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "start": [ -0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "collisioncheckresolution": 0.000005,
+            "numobstaclesperdim": 49,
+            "obstaclewidth": 0.01
+        },
+        "defaultrepeatingrectangles32D": {
+            "type": "repeatingrectangles",
+            "objective": "defaultpathlength",
+            "maxtime": 0.1,
+            "dimensions": 32,
+            "boundarysidelengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "start": [ -0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "collisioncheckresolution": 0.000005,
+            "numobstaclesperdim": 49,
+            "obstaclewidth": 0.01
         }
     }
 }

@@ -1,14 +1,64 @@
 {
     "context": {
-        "defaultObstacleFree": {
+        "defaultObstacleFree2D": {
             "type": "ObstacleFree",
             "objective": "defaultPathLength",
-            "start": [-4, 0.0],
-            "goal": [4, 0.0],
+            "start": [ -0.4, 0.0 ],
+            "goal": [ 0.4, 0.0 ],
             "maxTime": 0.1,
             "dimensions": 2,
-            "boundarySideLengths" : [ 10, 1 ],
-            "collisionCheckResolution": 0.001
+            "boundarySideLengths" : [ 1, 1 ],
+            "collisionCheckResolution": 0.000005
+        },
+        "defaultObstacleFree3D": {
+            "type": "ObstacleFree",
+            "objective": "defaultPathLength",
+            "start": [ -0.4, 0.0, 0.0 ],
+            "goal": [ 0.4, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 3,
+            "boundarySideLengths" : [ 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005
+        },
+        "defaultObstacleFree4D": {
+            "type": "ObstacleFree",
+            "objective": "defaultPathLength",
+            "start": [ -0.4, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.4, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 4,
+            "boundarySideLengths" : [ 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005
+        },
+        "defaultObstacleFree8D": {
+            "type": "ObstacleFree",
+            "objective": "defaultPathLength",
+            "start": [ -0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 8,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005
+        },
+        "defaultObstacleFree16D": {
+            "type": "ObstacleFree",
+            "objective": "defaultPathLength",
+            "start": [ -0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 16,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005
+        },
+        "defaultObstacleFree32D": {
+            "type": "ObstacleFree",
+            "objective": "defaultPathLength",
+            "start": [ -0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "maxTime": 0.1,
+            "dimensions": 32,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005
         }
     }
 }
