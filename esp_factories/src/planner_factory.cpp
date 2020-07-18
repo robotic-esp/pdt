@@ -41,6 +41,7 @@
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -166,6 +167,13 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setNumSamplingAttempts(
           config_->get<std::size_t>(optionsKey + "/numSamplingAttempts"));
       return {planner, PLANNER_TYPE::INFORMEDRRTSTAR};
+    }
+    case PLANNER_TYPE::LAZYPRMSTAR: {
+      auto planner =
+          std::make_shared<ompl::geometric::LazyPRMstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      return {planner, PLANNER_TYPE::LAZYPRMSTAR};
     }
     case PLANNER_TYPE::LBTRRT: {
       auto planner =
