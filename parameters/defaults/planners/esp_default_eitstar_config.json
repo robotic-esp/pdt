@@ -8,7 +8,7 @@
                 "name": "EIT*"
             },
             "options": {
-                "samplesPerBatch": 100,
+                "batchSize": 100,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
                 "useKNearest": false,
