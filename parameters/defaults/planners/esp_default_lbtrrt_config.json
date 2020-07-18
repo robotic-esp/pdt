@@ -1,0 +1,26 @@
+{
+    "planner": {
+        "defaultLBTRRT": {
+            "type": "LBTRRT",
+            "isAnytime": true,
+            "report": {
+                "color": "esplightpurple",
+                "name": "LBTRRT"
+            },
+            "options": {
+                "goalBias": 0.05,
+                "maxEdgeLength": {
+                    "2d": 0.3,
+                    "4d": 0.5,
+                    "6d": 0.9,
+                    "8d": 1.25,
+                    "12d": 2.0,
+                    "14d": 2.4,
+                    "16d": 3.0,
+                    "32d": 7.0
+                },
+                "approximationFactor": 0.4
+            }
+        }
+    }
+}

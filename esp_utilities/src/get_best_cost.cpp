@@ -78,6 +78,9 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     case PLANNER_TYPE::INFORMEDRRTSTAR: {
       return planner->as<ompl::geometric::InformedRRTstar>()->bestCost();
     }
+    case PLANNER_TYPE::LBTRRT: {
+      return planner->as<ompl::geometric::LBTRRT>()->bestCost();
+    }
     case PLANNER_TYPE::RRT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
