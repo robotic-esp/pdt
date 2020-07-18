@@ -19,7 +19,8 @@
                     "8d": 1.25,
                     "12d": 2.0,
                     "14d": 2.4,
-                    "16d": 3.0
+                    "16d": 3.0,
+                    "32d": 7.0
                 },
                 "delayCollisionChecks": true,
                 "useAdmissibleCostToCome": true
