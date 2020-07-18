@@ -4,7 +4,7 @@
             "type": "RRTstar",
             "isAnytime": true,
             "report": {
-                "color": "espred",
+                "color": "esppurple",
                 "name": "RRT*"
             },
             "options": {
