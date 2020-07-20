@@ -41,7 +41,9 @@
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
+#include <ompl/geometric/planners/rrt/LBTRRT.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
@@ -165,6 +167,24 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setNumSamplingAttempts(
           config_->get<std::size_t>(optionsKey + "/numSamplingAttempts"));
       return {planner, PLANNER_TYPE::INFORMEDRRTSTAR};
+    }
+    case PLANNER_TYPE::LAZYPRMSTAR: {
+      auto planner =
+          std::make_shared<ompl::geometric::LazyPRMstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      return {planner, PLANNER_TYPE::LAZYPRMSTAR};
+    }
+    case PLANNER_TYPE::LBTRRT: {
+      auto planner =
+          std::make_shared<ompl::geometric::LBTRRT>(context_->getSpaceInformation());
+      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
+      planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
+      planner->setApproximationFactor(config_->get<double>(optionsKey + "/approximationFactor"));
+      return {planner, PLANNER_TYPE::LBTRRT};
     }
     case PLANNER_TYPE::RRT: {
       // Allocate and configure an RRT planner.

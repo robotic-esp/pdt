@@ -1,0 +1,15 @@
+{
+    "planner": {
+        "defaultLazyPRMstar": {
+            "type": "LazyPRMstar",
+            "isAnytime": true,
+            "report": {
+                "color": "esplightred",
+                "name": "LazyPRM*"
+            },
+            "options": {
+                "none": true
+            }
+        }
+    }
+}

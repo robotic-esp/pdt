@@ -40,9 +40,10 @@
 #include <string>
 
 #include <ompl/geometric/planners/eitstar/EITstar.h>
-#include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
+#include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -77,6 +78,12 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     }
     case PLANNER_TYPE::INFORMEDRRTSTAR: {
       return planner->as<ompl::geometric::InformedRRTstar>()->bestCost();
+    }
+    case PLANNER_TYPE::LAZYPRMSTAR: {
+      return planner->as<ompl::geometric::LazyPRMstar>()->bestCost();
+    }
+    case PLANNER_TYPE::LBTRRT: {
+      return planner->as<ompl::geometric::LBTRRT>()->bestCost();
     }
     case PLANNER_TYPE::RRT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());

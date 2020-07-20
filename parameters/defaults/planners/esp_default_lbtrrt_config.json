@@ -1,19 +1,16 @@
 {
     "planner": {
-        "defaultRRTstar": {
-            "type": "RRTstar",
+        "defaultLBTRRT": {
+            "type": "LBTRRT",
             "isAnytime": true,
             "report": {
-                "color": "esppurple",
-                "name": "RRT*"
+                "color": "esplightpurple",
+                "name": "LBTRRT"
             },
             "options": {
-                "useKNearest": false,
-                "rewireFactor": 1.001,
                 "goalBias": 0.05,
                 "maxEdgeLength": {
                     "2d": 0.3,
-                    "3d": 0.4,
                     "4d": 0.5,
                     "6d": 0.9,
                     "8d": 1.25,
@@ -22,8 +19,7 @@
                     "16d": 3.0,
                     "32d": 7.0
                 },
-                "delayCollisionChecks": true,
-                "useAdmissibleCostToCome": true
+                "approximationFactor": 0.4
             }
         }
     }
