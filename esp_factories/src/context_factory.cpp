@@ -40,7 +40,7 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
-#include <ompl/base/spaces/ConstrainedSE3StateSpace.h>
+#include <ompl/base/spaces/SE3WAxisAngleBoundStateSpace.h>
 
 #include "nlohmann/json.hpp"
 
@@ -208,7 +208,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
       try {
         // Allocate a real vector state space.
         // The state space bounds are set in the context.
-        auto stateSpace = std::make_shared<ompl::base::ConstrainedSE3StateSpace>();
+        auto stateSpace = std::make_shared<ompl::base::SE3WAxisAngleBoundStateSpace>();
         stateSpace->setMaxRotation(config_->get<double>(parentKey + "/maxRotation"));
 
         // Allocate the state information for this space.
