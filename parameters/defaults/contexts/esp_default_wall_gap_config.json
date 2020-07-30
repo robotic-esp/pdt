@@ -2,7 +2,7 @@
     "context": {
         "defaultWallGap2D": {
             "type": "WallGap",
-            "objective": "defaultReciprocalClearance",
+            "objective": "defaultPathLength",
             "start": [ -0.3, 0.0 ],
             "goal": [ 0.3, 0.0 ],
             "goalType": "GoalState",

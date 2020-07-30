@@ -11,7 +11,7 @@
                 "batchSize": 100,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
-                "useKNearest": false,
+                "useKNearest": true,
                 "trackApproximateSolutions": false,
                 "repairReverseSearchTreeUponCollisionDetection": false,
                 "collisionDetectionOnReverseSearch": true,
