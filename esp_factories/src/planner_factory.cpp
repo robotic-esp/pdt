@@ -103,6 +103,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::EITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
+      planner->enablePruning(config_->get<bool>(optionsKey + "/enablePruning"));
       planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
       planner->setInitialNumberOfSparseCollisionChecks(
           config_->get<std::size_t>(optionsKey + "/numInitialCollisionChecks"));
@@ -121,6 +122,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::AITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
+      planner->enablePruning(config_->get<bool>(optionsKey + "/enablePruning"));
       planner->setRepairReverseSearch(config_->get<bool>(optionsKey + "/repairBackwardSearch"));
       planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
@@ -176,8 +178,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       return {planner, PLANNER_TYPE::LAZYPRMSTAR};
     }
     case PLANNER_TYPE::LBTRRT: {
-      auto planner =
-          std::make_shared<ompl::geometric::LBTRRT>(context_->getSpaceInformation());
+      auto planner = std::make_shared<ompl::geometric::LBTRRT>(context_->getSpaceInformation());
       auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
