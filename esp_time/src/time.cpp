@@ -51,7 +51,7 @@ std::string toDateString(const std::chrono::system_clock::time_point& timePoint)
 std::string toDurationString(const Duration& duration) {
   std::stringstream stream;
   stream << duration;
-  return stream.str();
+  return stream.str().substr(0, stream.str().size() - 7u);
 }
 
 Duration seconds(double sec) {
