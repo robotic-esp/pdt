@@ -77,31 +77,76 @@ int main(int argc, char **argv) {
   // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
 
-  // Print some basic info about this experiment.
+  // Print some basic info about this benchmark.
   auto estimatedRuntime = config->get<std::size_t>("experiment/numRuns") *
                           config->get<std::vector<std::string>>("experiment/planners").size() *
                           context->getMaxSolveDuration();
-  std::cout
-      << "\nExecuting " << config->get<std::size_t>("experiment/numRuns") << " runs of "
-      << config->get<std::string>("experiment/context") << " with " << ompl::RNG::getSeed()
-      << " as the seed and a maximum runtime of " << context->getMaxSolveDuration().count()
-      << " seconds per planner.\n"
-      << "This benchmark should be done by "
-      << esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
-             std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
-             estimatedRuntime))
-      << " (runtime <= " << esp::ompltools::time::toDurationString(estimatedRuntime) << ").\n";
+  auto estimatedDoneBy =
+      esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
+          std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
+          estimatedRuntime));
+  std::cout << "\nBenchmark parameters\n";
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Number of planners" << std::setw(20) << std::right
+            << config->get<std::vector<std::string>>("experiment/planners").size() << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Number of runs per planner" << std::setw(20) << std::right
+            << config->get<std::size_t>("experiment/numRuns") << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Maximum time per run" << std::setw(20) << std::right
+            << context->getMaxSolveDuration().count() << " s\n";
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Cost log frequency" << std::setw(20) << std::right
+            << config->get<std::size_t>("experiment/logFrequency") << " Hz\n";
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Expected runtime no more than" << std::setw(20) << std::right
+            << esp::ompltools::time::toDurationString(estimatedRuntime) << " HH:MM:SS\n";
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Expected to be done before" << std::setw(20) << std::right
+            << estimatedDoneBy << " YYYY-MM-DD_HH-MM-SS\n";
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Random number seed" << std::setw(20) << std::right
+            << ompl::RNG::getSeed() << '\n';
+
+  // Print some info about the context of this benchmark.
+  std::cout << "\nContext parameters\n";
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Context name" << std::setw(20) << std::right
+            << config->get<std::string>("experiment/context") << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Problem dimension" << std::setw(20) << std::right
+            << context->getDimension() << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "State space" << std::setw(20) << std::right
+            << context->getStateSpace()->getName() << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "State space measure" << std::setw(20) << std::right
+            << context->getSpaceInformation()->getSpaceMeasure() << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "State space maximum extent" << std::setw(20) << std::right
+            << context->getSpaceInformation()->getMaximumExtent() << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Relative collision resolution" << std::setw(20) << std::right
+            << context->getSpaceInformation()->getStateValidityCheckingResolution() << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Absolute collision resolution" << std::setw(20) << std::right
+            << context->getStateSpace()->getLongestValidSegmentLength() << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Objective" << std::setw(20) << std::right
+            << context->getObjective()->getDescription() << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Cost threshold" << std::setw(20) << std::right
+            << context->getObjective()->getCostThreshold() << '\n';
 
   // Setup the results table.
-  std::cout << '\n';
+  std::cout << "\nTesting planners\n";
   for (const auto &plannerName : config->get<std::vector<std::string>>("experiment/planners")) {
-    std::cout << std::setw(7) << std::setfill(' ') << ' ' << std::setw(21) << std::setfill(' ')
-              << std::left << std::string(plannerName);
+    std::cout << std::setw(2) << std::setfill(' ') << ' ' << plannerName << '\n';
   }
-  std::cout << '\n';
+  std::cout << "\nBenchmark\n";
 
   // Create a name for this experiment.
-  std::string experimentName = experimentStartTimeString + '_' + context->getName();
+  std::string experimentName = experimentStartTimeString + "_" + context->getName();
   config->add<std::string>("experiment/name", experimentName);
 
   // Create the directory for the results of this experiment to live in.
@@ -115,10 +160,19 @@ int main(int argc, char **argv) {
   // Add the result path to the experiment.
   config->add<std::string>("experiment/results", results.getFilePath());
 
+  // Compute the total number of runs.
+  const auto totalNumberOfRuns =
+      config->get<std::size_t>("experiment/numRuns") *
+      config->get<std::vector<std::string>>("experiment/planners").size();
+  auto currentRun = 0u;
+
   // May the best planner win.
   for (std::size_t i = 0; i < config->get<std::size_t>("experiment/numRuns"); ++i) {
-    std::cout << '\n' << std::setw(4) << std::right << std::setfill(' ') << i << " | ";
-    for (const auto &plannerName : config->get<std::vector<std::string>>("experiment/planners")) {
+    // Randomly shuffle the planners.
+    auto plannerNames = config->get<std::vector<std::string>>("experiment/planners");
+    std::random_shuffle(plannerNames.begin(), plannerNames.end());
+
+    for (const auto &plannerName : plannerNames) {
       // Create the logger for this run.
       esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
                                             config->get<std::size_t>("experiment/logFrequency"));
@@ -181,9 +235,19 @@ int main(int argc, char **argv) {
 
       // Add this run to the log and report it to the console.
       results.addResult(planner->getName(), logger);
-      const auto result = logger.lastMeasurement();
-      std::cout << std::setw(17) << std::left << result.first << std::setw(8) << std::fixed
-                << result.second << " | " << std::flush;
+
+      // Compute the progress.
+      ++currentRun;
+      const auto progress = static_cast<float>(currentRun) / totalNumberOfRuns;
+      constexpr auto barWidth = 36u;
+      std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
+                << (std::ceil(progress * barWidth) != barWidth
+                        ? std::setw(std::ceil(progress * barWidth))
+                        : std::setw(std::ceil(progress * barWidth) - 1u))
+                << std::setfill('.') << (currentRun != totalNumberOfRuns ? '|' : '.') << std::right
+                << std::setw(barWidth - std::ceil(progress * barWidth)) << std::setfill('.') << '.'
+                << std::right << std::fixed << std::setw(6) << std::setfill(' ')
+                << std::setprecision(2) << progress * 100.0f << " %" << std::flush;
     }
   }
 
@@ -192,12 +256,26 @@ int main(int argc, char **argv) {
   auto experimentEndTimeString = esp::ompltools::time::toDateString(experimentEndTime);
   esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
 
-  // Report success.
-  std::cout << "\n\nExperiment ran for:\t" << (experimentEndTime - experimentStartTime) << "\t\t("
-            << experimentStartTimeString << " -- " << experimentEndTimeString << ")\n\n";
+  // Report the elapsed time and some statistics.
+  std::cout << '\n'
+            << std::setw(2u) << std::setfill(' ') << ' ' << std::setw(30) << std::setfill('.')
+            << std::left << "Elapsed time" << std::setw(20) << std::right
+            << esp::ompltools::time::toDurationString(experimentEndTime - experimentStartTime)
+            << " HH:MM:SS\n"
+            << std::setw(2u) << std::setfill(' ') << ' ' << std::setw(30) << std::setfill('.')
+            << std::left << "Number of checked motions" << std::setw(20) << std::right
+            << context->getSpaceInformation()->getCheckedMotionCount() << '\n'
+            << std::setw(2u) << std::setfill(' ') << ' ' << std::setw(30) << std::setfill('.')
+            << std::left << "Percentage of valid motions" << std::setw(20) << std::right
+            << context->getSpaceInformation()->getMotionValidator()->getValidMotionFraction() *
+                   100.0f
+            << " %\n";
 
-  // Generate the report.
-  std::cout << "Compiling report. This may take a couple of minutes.\n";
+  // Inform that the report is being compiled.
+  std::cout << "\nReport\n"
+            << std::setw(2u) << std::setfill(' ') << ' '
+            << "Compiling (this may take a couple of minutes)" << std::flush;
+
   // Generate the statistic.
   esp::ompltools::Statistics stats(config, true);
 
@@ -205,6 +283,11 @@ int main(int argc, char **argv) {
   esp::ompltools::ExperimentReport report(config, stats);
   report.generateReport();
   auto reportPath = report.compileReport();
+
+  // Inform that we are done compiling the report.
+  std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
+            << std::setfill(' ') << ' ' << "Compilation done\n"
+            << std::flush;
 
   // Log some info to a log file.
   auto logPath = experimentDirectory / "log.txt"s;
@@ -219,14 +302,12 @@ int main(int argc, char **argv) {
               esp::ompltools::time::toDurationString(experimentDuration).c_str());
   OMPL_INFORM("Wrote results to '%s'", results.getFilePath().c_str());
 
+  // Inform where we wrote the report to.
+  std::cout << std::setw(2u) << std::setfill(' ') << ' ' << "Location " << reportPath << "\n\n";
+
   // Dump the accessed parameters next to the results file.
   auto configPath = experimentDirectory / "config.json"s;
   config->dumpAccessed(fs::current_path().string() + '/' + configPath.string());
-
-  std::cout << "\nWrote results to:\t" << results.getFilePath() << "\nWrote config to:\t"
-            << fs::current_path() / configPath << "\nWrote log to:\t\t"
-            << fs::current_path() / logPath << "\nWrote report to:\t"
-            << reportPath << "\n\n";
 
   return 0;
 }
