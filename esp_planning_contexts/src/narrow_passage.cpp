@@ -49,6 +49,7 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
     RealVectorGeometricContext(spaceInfo, config, name),
     dimensionality_(spaceInfo->getStateDimension()),
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
+    wallOffsetX_(config->get<double>("context/" + name + "/wallOffset")),
     passageWidth_(config->get<double>("context/" + name + "/passageWidth")),
     passageOffset_(config->get<double>("context/" + name + "/passageOffset")),
     startState_(spaceInfo) {
@@ -128,11 +129,12 @@ void NarrowPassage::createObstacles() {
   // Get the state space bounds.
   auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
 
-  // Get the midpoint between the start and goal positions.
+  // Get the midpoint of the state space and add the offset in X direction.
   ompl::base::ScopedState<> midpoint(spaceInfo_);
   for (std::size_t j = 0u; j < dimensionality_; ++j) {
     midpoint[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
   }
+  midpoint[0] += wallOffsetX_;
 
   // Create an anchor point for the lower obstacle.
   ompl::base::ScopedState<> lowerAnchor(midpoint);
