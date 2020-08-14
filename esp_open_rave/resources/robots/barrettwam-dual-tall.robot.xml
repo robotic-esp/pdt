@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- combines two barrett wam arms -->
+<Robot name="barrettwam-dual">
+  <KinBody>
+    <body name="chest">
+      <geom type="box">
+        <extents>0.04 1.5 1.1</extents>
+        <translation>-0.268 0 1.1</translation>
+      </geom>
+    </body>
+  </KinBody>
+  <!-- left arm -->
+  <Robot>
+    <Robot prefix="l_" file="/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrettwam.robot.xml"></Robot>
+    <translation>0 -0.6 1.1</translation>
+    <rotationaxis>0 1 0 0</rotationaxis>
+  </Robot>
+  <!-- right arm -->
+  <Robot>
+    <Robot prefix="r_" file="/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrettwam.robot.xml"></Robot>
+    <translation>0 0.6 1.1</translation>
+    <rotationaxis>0 1 0 0</rotationaxis>
+  </Robot>
+  <!-- connect the two arms with dummy joints -->
+  <KinBody>
+    <joint name="leftdummy" type="hinge" enable="false">
+      <body>chest</body>
+      <body>l_wam0</body>
+      <limitsdeg>0 0</limitsdeg>
+    </joint>
+    <joint name="rightdummy" type="hinge" enable="false">
+      <body>chest</body>
+      <body>r_wam0</body>
+      <limitsdeg>0 0</limitsdeg>
+    </joint>
+  </KinBody>
+</Robot>
