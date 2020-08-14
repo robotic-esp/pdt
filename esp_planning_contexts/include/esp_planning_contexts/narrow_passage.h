@@ -79,6 +79,9 @@ class NarrowPassage : public RealVectorGeometricContext {
   /** \brief The wall thickness. */
   double wallThickness_;
 
+  /** \brief The wall offset. */
+  double wallOffsetX_;
+
   /** \brief The gap width. */
   double passageWidth_;
 
