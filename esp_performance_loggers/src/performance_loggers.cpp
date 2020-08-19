@@ -73,7 +73,7 @@ void TimeCostLogger::addMeasurement(const esp::ompltools::time::Duration& durati
 std::string TimeCostLogger::createLogString(const std::string& prefix) const {
   if (measurements_.capacity() > allocSize_) {
     OMPL_WARN(
-        "The result file was under-allocated (reserved: %d, used: %d). This will affect the "
+        "The result vector was under-allocated (reserved: %d, used: %d). This will affect the "
         "accuracy of timings.",
         allocSize_, measurements_.size());
   }
