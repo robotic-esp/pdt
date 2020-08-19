@@ -556,6 +556,11 @@ void TikzVisualizer::drawPlannerSpecificVisualizations(
           std::dynamic_pointer_cast<const AITstarData>(plannerSpecificData));
       break;
     }
+    case PLANNER_TYPE::EITSTAR: {
+      drawEITstarSpecificVisualizations(
+          std::dynamic_pointer_cast<const EITstarData>(plannerSpecificData));
+      break;
+    }
     default: { return; }
   }
 }
@@ -603,24 +608,24 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
   //              "fill = espgray, inner sep = 0mm, circle, minimum size = 0.2mm");
   // }
 
-  // // Draw the backward search tree.
-  // for (const auto& vertex : aitstarData->getVerticesInBackwardSearchTree()) {
-  //   // Add the edge to the parent.
-  //   if (vertex->hasBackwardParent()) {
-  //     auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-  //     auto parent = vertex->getBackwardParent()
-  //                       ->getState()
-  //                       ->as<ompl::base::RealVectorStateSpace::StateType>();
-  //     drawEdge(parent, state, "esplightblue");
-  //   }
-  // }
-
-  // Draw the top edge in the queue.
-  auto nextEdge = aitstarData->getNextEdge();
-  if (nextEdge.first && nextEdge.second) {
-    drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
-             nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, espred");
+  // Draw the backward search tree.
+  for (const auto& vertex : aitstarData->getVerticesInBackwardSearchTree()) {
+    // Add the edge to the parent.
+    if (vertex->hasReverseParent()) {
+      auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto parent = vertex->getReverseParent()
+                        ->getState()
+                        ->as<ompl::base::RealVectorStateSpace::StateType>();
+      drawEdge(parent, state, "edge, esplightblue");
+    }
   }
+
+  // // Draw the top edge in the queue.
+  // auto nextEdge = aitstarData->getNextEdge();
+  // if (nextEdge.first && nextEdge.second) {
+  //   drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
+  //            nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, espred");
+  // }
 
   // // Draw the next vertex in the queue.
   // auto nextVertex = aitstarData->getNextVertex();
@@ -628,6 +633,16 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
   //   drawVertex(nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
   //              "fill = espred, inner sep = 0mm, circle, minimum size = 0.3mm");
   // }
+}
+
+void TikzVisualizer::drawEITstarSpecificVisualizations(
+    const std::shared_ptr<const EITstarData>& eitstarData) const {
+  // Draw the backward search tree.
+  for (const auto& edge : eitstarData->getReverseTree()) {
+    const auto source = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+    const auto target = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+    drawEdge(source, target, "edge, esplightblue");
+  }
 }
 
 void TikzVisualizer::drawVertex(const ompl::base::PlannerDataVertex& vertex) const {

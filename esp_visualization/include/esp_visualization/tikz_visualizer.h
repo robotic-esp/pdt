@@ -129,6 +129,8 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
       const std::shared_ptr<const BITstarData>& bitstarData) const;
   void drawAITstarSpecificVisualizations(
       const std::shared_ptr<const AITstarData>& aitstarData) const;
+  void drawEITstarSpecificVisualizations(
+      const std::shared_ptr<const EITstarData>& aitstarData) const;
 
   // Planner and context to be visualized.
   std::shared_ptr<RealVectorGeometricContext> context_;
