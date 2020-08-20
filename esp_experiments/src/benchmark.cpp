@@ -214,9 +214,20 @@ int main(int argc, char **argv) {
       // Log the intermediate best costs.
       do {
         addMeasurementStart = esp::ompltools::time::Clock::now();
-        logger.addMeasurement(setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime),
+        logger.addMeasurement(setupDuration + (addMeasurementStart - solveStartTime),
                               esp::ompltools::utilities::getBestCost(planner, plannerType));
+
+        // Stop logging intermediate best costs if the planner overshoots.
+        if (esp::ompltools::time::seconds(addMeasurementStart - solveStartTime) >
+            maxSolveDuration) {
+          break;
+        }
       } while (future.wait_until(addMeasurementStart + idle) != std::future_status::ready);
+
+      // Wait until the planner returns.
+      OMPL_DEBUG(
+          "Stopped logging results for planner '%s' because it overshot the termination condition.",
+          plannerName.c_str());
       future.get();
 
       // Get the final runtime.
