@@ -95,7 +95,7 @@ const std::vector<PlannerResults::PlannerResult>& PlannerResults::getAllRunsAt(
       if (duration < min->first) {
         interpolatedRuns_.back().emplace_back(duration, std::numeric_limits<double>::infinity());
       } else if (duration > max->first) {
-        OMPL_ERROR("Requested to extrapolate. Max duration: %d, queried duration: %d", max->first,
+        OMPL_ERROR("Requested to extrapolate. Max duration: %f, queried duration: %f", max->first,
                    duration);
         throw std::runtime_error("Fairness error.");
       } else {
