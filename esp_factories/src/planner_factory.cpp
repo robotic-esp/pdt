@@ -163,8 +163,12 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     case PLANNER_TYPE::INFORMEDRRTSTAR: {
       auto planner =
           std::make_shared<ompl::geometric::InformedRRTstar>(context_->getSpaceInformation());
+      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
+      planner->setKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
+      planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
       planner->setNumSamplingAttempts(
           config_->get<std::size_t>(optionsKey + "/numSamplingAttempts"));
