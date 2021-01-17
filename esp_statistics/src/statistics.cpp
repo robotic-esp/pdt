@@ -665,6 +665,7 @@ Statistics::ConfidenceInterval Statistics::getMedianConfidenceInterval(
   // indices. See comment in Statistics::ConfidenceInterval class.
   static const std::map<std::size_t, std::map<std::size_t, ConfidenceInterval>>
       medianConfidenceIntervals = {
+          {1u, {{95u, {0u, 0u, 1.0}}, {99u, {0u, 0u, 1.0}}}},
           {10u, {{95u, {1u, 8u, 0.9511}}, {99u, {0u, 9u, 0.9910}}}},
           {50u, {{95u, {18u, 32u, 0.9511}}, {99u, {15u, 34u, 0.9910}}}},
           {100u, {{95u, {40u, 60u, 0.9540}}, {99u, {37u, 63u, 0.9907}}}},
