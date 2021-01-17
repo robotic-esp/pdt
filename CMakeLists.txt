@@ -1,6 +1,6 @@
 # ESP OMPL TOOLS
 # Authors: Jonathan Gammell, Marlin Strub
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 project(esp_ompl_tools)
 
 # Enforce out-of-source builds.
