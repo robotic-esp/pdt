@@ -31,9 +31,12 @@
                 "batchSize": 100,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
+                "enablePruning": true,
                 "useKNearest": true,
                 "repairReverseSearchTreeUponCollisionDetection": false,
+                "resetSuboptimalityFactorOnEveryApproximation": false,
                 "collisionDetectionOnReverseSearch": true,
+                "trackApproximateSolutions": false,
                 "numInitialCollisionChecks": 1
             }
         },
@@ -48,9 +51,12 @@
                 "batchSize": 50,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
+                "enablePruning": true,
                 "useKNearest": true,
                 "repairReverseSearchTreeUponCollisionDetection": false,
+                "resetSuboptimalityFactorOnEveryApproximation": false,
                 "collisionDetectionOnReverseSearch": true,
+                "trackApproximateSolutions": false,
                 "numInitialCollisionChecks": 1
             }
         },
@@ -65,9 +71,12 @@
                 "batchSize": 10,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
+                "enablePruning": true,
                 "useKNearest": true,
                 "repairReverseSearchTreeUponCollisionDetection": false,
+                "resetSuboptimalityFactorOnEveryApproximation": false,
                 "collisionDetectionOnReverseSearch": true,
+                "trackApproximateSolutions": false,
                 "numInitialCollisionChecks": 1
             }
         },
@@ -82,9 +91,12 @@
                 "batchSize": 100,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
+                "enablePruning": true,
                 "useKNearest": false,
                 "repairReverseSearchTreeUponCollisionDetection": false,
+                "resetSuboptimalityFactorOnEveryApproximation": false,
                 "collisionDetectionOnReverseSearch": true,
+                "trackApproximateSolutions": false,
                 "numInitialCollisionChecks": 1
             }
         },
@@ -99,9 +111,12 @@
                 "batchSize": 50,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
+                "enablePruning": true,
                 "useKNearest": false,
                 "repairReverseSearchTreeUponCollisionDetection": false,
+                "resetSuboptimalityFactorOnEveryApproximation": false,
                 "collisionDetectionOnReverseSearch": true,
+                "trackApproximateSolutions": false,
                 "numInitialCollisionChecks": 1
             }
         },
@@ -116,9 +131,12 @@
                 "batchSize": 10,
                 "radiusFactor": 1.001,
                 "repairFactor": 1.2,
+                "enablePruning": true,
                 "useKNearest": false,
                 "repairReverseSearchTreeUponCollisionDetection": false,
+                "resetSuboptimalityFactorOnEveryApproximation": false,
                 "collisionDetectionOnReverseSearch": true,
+                "trackApproximateSolutions": false,
                 "numInitialCollisionChecks": 1
             }
         }
