@@ -637,11 +637,18 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
 
 void TikzVisualizer::drawEITstarSpecificVisualizations(
     const std::shared_ptr<const EITstarData>& eitstarData) const {
-  // Draw the backward search tree.
-  for (const auto& edge : eitstarData->getReverseTree()) {
-    const auto source = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-    const auto target = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-    drawEdge(source, target, "edge, esplightblue");
+  // // Draw the backward search tree.
+  // for (const auto& edge : eitstarData->getReverseTree()) {
+  //   const auto source = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+  //   const auto target = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+  //   drawEdge(source, target, "edge, esplightblue");
+  // }
+
+  // Draw the top edge in the queue.
+  auto nextEdge = eitstarData->getNextForwardEdge();
+  if (nextEdge.source && nextEdge.target) {
+    drawEdge(nextEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>(),
+             nextEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, espred");
   }
 }
 
