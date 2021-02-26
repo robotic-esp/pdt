@@ -47,7 +47,7 @@ OpenRaveManipulatorValidityChecker::OpenRaveManipulatorValidityChecker(
     const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot,
     const std::shared_ptr<const Configuration>& config) :
     OpenRaveBaseValidityChecker(spaceInfo, environment, robot, config),
-    raveState_(robot->GetDOF()) {
+    raveState_(static_cast<std::size_t>(robot->GetDOF())) {
 }
 
 bool OpenRaveManipulatorValidityChecker::isValid(const ompl::base::State* state) const {

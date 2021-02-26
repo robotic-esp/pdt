@@ -47,6 +47,7 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #include "csv/parser.hpp"
 #pragma GCC diagnostic pop
 
@@ -597,7 +598,7 @@ fs::path Statistics::extractInitialSolutionDurationPdf(
     if (lower != bins.begin()) {
       --lower;
     }
-    binCounts.at(std::distance(bins.begin(), lower))++;
+    binCounts.at(static_cast<long unsigned int>(std::distance(bins.begin(), lower)))++;
   }
 
   // Write to file.
@@ -875,7 +876,7 @@ std::vector<double> Statistics::getNthCosts(const PlannerResults& results, std::
                  std::to_string(costs.size()) + " costs at this time."s;
       throw std::runtime_error(msg);
     }
-    auto nthCost = costs.begin() + n;
+    auto nthCost = costs.begin() + static_cast<long>(n);
     std::nth_element(costs.begin(), nthCost, costs.end());
     nthCosts.emplace_back(*nthCost);
   }
@@ -938,7 +939,7 @@ double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,
   auto initialDurations = getInitialSolutionDurations(results);
 
   // Get the nth element of this collection of durations.
-  auto nthDuration = initialDurations.begin() + n;
+  auto nthDuration = initialDurations.begin() + static_cast<long>(n);
   std::nth_element(initialDurations.begin(), nthDuration, initialDurations.end());
 
   return *nthDuration;
@@ -949,7 +950,7 @@ double Statistics::getNthInitialSolutionCost(const PlannerResults& result, std::
   auto initialCosts = getInitialSolutionCosts(result);
 
   // Get the nth element of this collection of costs.
-  auto nthCost = initialCosts.begin() + n;
+  auto nthCost = initialCosts.begin() + static_cast<long>(n);
   std::nth_element(initialCosts.begin(), nthCost, initialCosts.end());
 
   return *nthCost;

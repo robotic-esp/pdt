@@ -42,6 +42,7 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #include "csv/parser.hpp"
 #pragma GCC diagnostic pop
 

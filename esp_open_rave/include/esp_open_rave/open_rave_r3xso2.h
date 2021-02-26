@@ -49,6 +49,7 @@
 #pragma GCC diagnostic ignored "-Woverflow"
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #include <openrave-core.h>
 #pragma GCC diagnostic pop
 

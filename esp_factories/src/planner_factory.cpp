@@ -222,7 +222,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
       planner->setSampleRejection(config_->get<bool>(optionsKey + "/enableSampleRejection"));
-      planner->setVariant(config_->get<unsigned>(optionsKey + "/variant"));
+      planner->setVariant(config_->get<int>(optionsKey + "/variant"));
       planner->setInformedSampling(false);
       return {planner, PLANNER_TYPE::RRTSHARP};
     }

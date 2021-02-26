@@ -178,7 +178,9 @@ time::Duration BaseVisualizer::getTotalElapsedDuration(std::size_t iteration) co
     throw std::runtime_error(
         "Requested elapsed duration of iteration that has not yet been processed");
   }
-  return std::accumulate(durations_.begin(), durations_.begin() + iteration, setupDuration_);
+  return std::accumulate(durations_.begin(),
+                         durations_.begin() + static_cast<long int>(iteration),
+                         setupDuration_);
 }
 
 void BaseVisualizer::createData() {

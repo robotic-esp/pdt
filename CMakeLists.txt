@@ -35,7 +35,7 @@ target_compile_options(esp_ompl_tools INTERFACE
   -Wpedantic
   -Werror
   -Wconversion
-#  -Wsign-conversion
+  -Wsign-conversion
   )
 target_compile_features(esp_ompl_tools
   INTERFACE
