@@ -43,11 +43,10 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Woverflow"
 #include <openrave-core.h>
 #include <openrave/viewer.h>
-#pragma GCC diagnostic pop
 #pragma GCC diagnostic pop
 
 #include "esp_common/context_type.h"
