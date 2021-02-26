@@ -5,17 +5,10 @@ project(esp_ompl_tools)
 
 # Enforce out-of-source builds.
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-   message(SEND_ERROR "Please build this porject out-of-source.")
+   message(SEND_ERROR "Please build this project out-of-source.")
 endif()
 
-# Set the standard.
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Append the path to find installed third-party libraries.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-# Build in release if no build type is specified.
+# Build in release mode if no build type is specified.
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -23,42 +16,32 @@ endif()
 # Put executables in a bin directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 
-# Display system info.
-message(STATUS "CMAKE_SYSTEM_NAME          = ${CMAKE_SYSTEM_NAME}"         )
-message(STATUS "CMAKE_CXX_COMPILER_ID      = ${CMAKE_CXX_COMPILER_ID}"     )
-message(STATUS "CMAKE_CXX_COMPILER_VERSION = ${CMAKE_CXX_COMPILER_VERSION}")
-message(STATUS "Configuring for ${CMAKE_BUILD_TYPE} mode:")
-
-# Find Threads.
-find_package(Threads REQUIRED)
-
-# Find Boost.
-find_package(Boost 1.58 REQUIRED COMPONENTS program_options thread)
-include_directories(${Boost_INCLUDE_DIR})
-
-# Find Eigen.
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
-
-# Find OpenRAVE.
-find_package(OpenRAVE REQUIRED)
-include_directories(${OpenRAVE_INCLUDE_DIRS})
-
-# Find OMPL.
-find_package(ompl REQUIRED)
-include_directories(${OMPL_INCLUDE_DIRS})
+# Display compiler and build info.
+message(STATUS "Configuring ESP OMPL TOOLS for ${CMAKE_BUILD_TYPE} mode.")
+message(STATUS "Compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
 # Add the thirdparty projects.
 set(JSON_BuildTests OFF CACHE INTERNAL "") # Don't build the tests for json.
 set(JSON_Install OFF CACHE INTERNAL "")    # Don't install the json lib.
 add_subdirectory(thirdparty/json)
-include_directories(thirdparty)
 
-# Enable additional warnings and treat warnings as errors for our own code.
-set(ESP_CXX_COMPILE_FLAGS "-Wall -Wextra -Werror -Wdisabled-optimization -fdiagnostics-color=auto")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ESP_CXX_COMPILE_FLAGS}")
+# Collect all compile flags used for compiling internal libraries. This allows
+# us to specify esp_ompl_tools as a dependency of our build targets and enables
+# all the flags for these targets.
+add_library(esp_ompl_tools INTERFACE)
+target_compile_options(esp_ompl_tools INTERFACE 
+  -Wall
+  -Wextra
+  -Wpedantic
+  -Werror
+#  -Wconversion
+#  -Wsign-conversion
+  -fdiagnostics-color=auto)
+target_compile_features(esp_ompl_tools
+  INTERFACE
+  cxx_std_17)
 
-# Add the subdirectories.
+# Add the local libraries & executables.
 add_subdirectory(esp_common)
 add_subdirectory(esp_configuration)
 add_subdirectory(esp_experiments)

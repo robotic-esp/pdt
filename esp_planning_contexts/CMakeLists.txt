@@ -1,12 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(esp_planning_contexts)
 
-# Include necessary header directories.
-include_directories(
-  ${OMPL_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/include)
+# Find the dependencies of this library.
+find_package(ompl REQUIRED)
 
-# Build the library.
+# Specify this library as a target.
 add_library(esp_planning_contexts
   src/base_context.cpp
   src/context_validity_checker.cpp
@@ -25,21 +23,22 @@ add_library(esp_planning_contexts
   src/repeating_rectangles.cpp
   # src/spiral.cpp
   src/start_enclosure.cpp
-  src/wall_gap.cpp
-  )
+  src/wall_gap.cpp)
 
-# Link the library.
+# Specify the include directories for this target.
+target_include_directories(esp_planning_contexts PUBLIC
+  ${PROJECT_SOURCE_DIR}/include
+  ${OMPL_INCLUDE_DIRS})
+
+# Specify the link targets for this target.
 target_link_libraries(esp_planning_contexts
-  PRIVATE # Libraries not exposed in API.
+  PRIVATE
+  esp_ompl_tools
   ${OpenRAVE_LIBRARIES}
-  PUBLIC # Libraries exposed in API.
+  PUBLIC
   ${OMPL_LIBRARIES}
   esp_common
   esp_configuration
   esp_obstacles
   esp_optimization_objectives
   esp_time)
-
-# Specify the include directories exported by this library.
-target_include_directories(esp_planning_contexts PUBLIC
-  ${PROJECT_SOURCE_DIR}/include)

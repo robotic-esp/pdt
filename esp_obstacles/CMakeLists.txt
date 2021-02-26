@@ -1,24 +1,25 @@
 cmake_minimum_required(VERSION 3.10)
 project(esp_obstacles)
 
-# Include necessary header directories.
-include_directories(
-  ${EIGEN3_INCLUDE_DIR}
-  ${OMPL_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/include)
+# Find the dependencies of this library.
+find_package(Eigen3 REQUIRED)
+find_package(ompl REQUIRED)
 
-# Build the library.
+# Specify the library as a target.
 add_library(esp_obstacles
-  src/base_obstacle.cpp
-  # src/binary_map.cpp
-  )
+  src/base_obstacle.cpp)
 
-# Link the library.
+# Specify the include directories for this target.
+target_include_directories(esp_obstacles PUBLIC
+  ${PROJECT_SOURCE_DIR}/include
+  ${EIGEN3_INCLUDE_DIR}
+  ${OMPL_INCLUDE_DIRS})
+
+# Specify the link targets for this target.
 target_link_libraries(esp_obstacles
-  PUBLIC # Libraries exposed in API.
+  PRIVATE
+  esp_ompl_tools
+  PUBLIC
   ${EIGEN3_LIBRARIES}
   ${OMPL_LIBRARIES})
 
-# Specify the include directories exported by this library.
-target_include_directories(esp_obstacles PUBLIC
-  ${PROJECT_SOURCE_DIR}/include)
