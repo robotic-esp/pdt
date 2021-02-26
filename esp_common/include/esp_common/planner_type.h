@@ -36,7 +36,10 @@
 
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "nlohmann/json.hpp"
+#pragma GCC diagnostic pop
 
 namespace esp {
 
