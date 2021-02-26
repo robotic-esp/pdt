@@ -46,7 +46,6 @@
 
 #include "esp_configuration/directory.h"
 #include "esp_configuration/version.h"
-#include "esp_time/time.h"
 
 namespace esp {
 
