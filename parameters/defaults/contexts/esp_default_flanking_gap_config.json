@@ -3,16 +3,17 @@
         "defaultFlankingGap2D": {
             "type": "FlankingGap",
             "objective": "defaultPathLength",
+            "goalType": "GoalState",
             "start": [ -0.2, 0.0 ],
             "goal": [ 0.2, 0.0 ],
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
             "collisionCheckResolution": 0.000005,
-            "wallWidth": 0.8,
+            "wallWidth": 0.7,
             "wallThickness": 0.1,
-            "gapOffset": 0.1,
-            "gapWidth": 0.01
+            "gapOffset": 0.2,
+            "gapWidth": 0.03
         },
         "defaultFlankingGap3D": {
             "type": "FlankingGap",
