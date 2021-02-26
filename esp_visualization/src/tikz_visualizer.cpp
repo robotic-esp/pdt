@@ -102,7 +102,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
   drawPlannerSpecificVisualizations(plannerSpecificData);
 
   // Draw the vertices and edges.
-  for (std::size_t i = 0u; i < plannerData.numVertices(); ++i) {
+  for (auto i = 0u; i < plannerData.numVertices(); ++i) {
     // Get the vertex.
     auto vertex = plannerData.getVertex(i);
 

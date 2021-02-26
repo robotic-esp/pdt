@@ -334,8 +334,8 @@ std::stringstream ExperimentReport::individualResults() const {
     auto pdf = initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name);
     pdf->overlay(cdf.get());
     for (const auto& plot : pdf->getPlots()) {
-      plot->options.drawOpacity = 0.2;
-      plot->options.fillOpacity = 0.1;
+      plot->options.drawOpacity = 0.2f;
+      plot->options.fillOpacity = 0.1f;
     }
 
     // Create the scatter axis of all initial solutions.

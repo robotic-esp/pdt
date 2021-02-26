@@ -34,9 +34,9 @@ target_compile_options(esp_ompl_tools INTERFACE
   -Wextra
   -Wpedantic
   -Werror
-#  -Wconversion
+  -Wconversion
 #  -Wsign-conversion
-  -fdiagnostics-color=auto)
+  )
 target_compile_features(esp_ompl_tools
   INTERFACE
   cxx_std_17)

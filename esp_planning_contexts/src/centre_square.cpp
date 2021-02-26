@@ -76,14 +76,14 @@ CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& 
   }
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
   }
 
   // Compute the midpoint of the obstacle.
   auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
   auto midpoint = std::make_unique<ompl::base::ScopedState<>>(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     (*midpoint)[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
 

@@ -45,6 +45,8 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Woverflow"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 #include <openrave-core.h>
 #include <openrave/viewer.h>
 #pragma GCC diagnostic pop
@@ -121,7 +123,7 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
 
       // Visualize the solution.
       for (const auto solutionState : solutionStates) {
-        for (std::size_t i = 0u; i < openRaveState.size(); ++i) {
+        for (auto i = 0u; i < openRaveState.size(); ++i) {
           openRaveState[i] =
               solutionState->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](i);
         }

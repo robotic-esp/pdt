@@ -58,7 +58,7 @@ bool OpenRaveManipulatorValidityChecker::isValid(const ompl::base::State* state)
 
   // Fill the rave state with the ompl state values.
   auto realVectorState = state->as<ompl::base::RealVectorStateSpace::StateType>();
-  for (std::size_t i = 0u; i < stateSpace_->getDimension(); ++i) {
+  for (auto i = 0u; i < stateSpace_->getDimension(); ++i) {
     raveState_[i] = realVectorState->operator[](i);
   }
 
@@ -78,7 +78,7 @@ bool OpenRaveManipulatorValidityChecker::isValid(const ompl::base::State* state)
 double OpenRaveManipulatorValidityChecker::clearance(const ompl::base::State* state) const {
   // Fill the rave state with the ompl state values.
   auto realVectorState = state->as<ompl::base::RealVectorStateSpace::StateType>();
-  for (std::size_t i = 0u; i < stateSpace_->getDimension(); ++i) {
+  for (auto i = 0u; i < stateSpace_->getDimension(); ++i) {
     raveState_[i] = realVectorState->operator[](i);
   }
 

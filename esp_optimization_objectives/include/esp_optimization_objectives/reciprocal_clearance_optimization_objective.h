@@ -57,6 +57,9 @@ class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostInt
 
   ompl::base::Cost stateCost(const ompl::base::State* state) const override;
 
+  ompl::base::Cost motionCostHeuristic(const ompl::base::State* s1,
+                                       const ompl::base::State* s2) const override;
+
   void accept(const ObjectiveVisitor& visitor) const override;
 
  private:

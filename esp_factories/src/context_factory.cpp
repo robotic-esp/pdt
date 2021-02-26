@@ -272,7 +272,7 @@ std::shared_ptr<ompl::base::SpaceInformation> ContextFactory::createRealVectorSp
 
   // Set the bounds.
   auto sideLengths = config_->get<std::vector<double>>(parentKey + "/boundarySideLengths");
-  ompl::base::RealVectorBounds bounds(config_->get<std::size_t>(parentKey + "/dimensions"));
+  ompl::base::RealVectorBounds bounds(config_->get<unsigned>(parentKey + "/dimensions"));
   for (std::size_t dim = 0u; dim < config_->get<std::size_t>(parentKey + "/dimensions"); ++dim) {
     bounds.low.at(dim) = -0.5 * sideLengths.at(dim);
     bounds.high.at(dim) = 0.5 * sideLengths.at(dim);

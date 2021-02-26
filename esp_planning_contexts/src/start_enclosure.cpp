@@ -103,7 +103,7 @@ StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformatio
   spaceInfo_->setup();
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
     goalState_[i] = goalPosition.at(i);
   }
@@ -142,7 +142,7 @@ void StartEnclosure::accept(const ContextVisitor& visitor) const {
 
 void StartEnclosure::createObstacles() {
   ompl::base::ScopedState<> startOutsideAnchor(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     startOutsideAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
   std::vector<double> startWidths(dimensionality_, startOutsideWidth_);
@@ -153,7 +153,7 @@ void StartEnclosure::createObstacles() {
 void StartEnclosure::createAntiObstacles() {
   // Create the inside.
   ompl::base::ScopedState<> startInsideAnchor(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     startInsideAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
   std::vector<double> startWidths(dimensionality_, startInsideWidth_);
@@ -164,7 +164,7 @@ void StartEnclosure::createAntiObstacles() {
   ompl::base::ScopedState<> startGapAnchor(spaceInfo_);
   startGapAnchor[0u] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(0u) -
                        startInsideWidth_ / 2.0 - (startOutsideWidth_ - startInsideWidth_) / 4.0;
-  for (std::size_t i = 1u; i < dimensionality_; ++i) {
+  for (auto i = 1u; i < dimensionality_; ++i) {
     startGapAnchor[i] = 0.0;
   }
   std::vector<double> startGapWidths(dimensionality_, startGapWidth_);

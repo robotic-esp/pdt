@@ -59,9 +59,10 @@ namespace fs = std::experimental::filesystem;
 
 TimeCostLogger::TimeCostLogger(const esp::ompltools::time::Duration& maxDuration,
                                double logFrequency) :
-    allocSize_(std::ceil(ALLOC_SAFETY_FACTOR *
+  allocSize_(static_cast<std::size_t>(
+               std::ceil(ALLOC_SAFETY_FACTOR *
                          std::chrono::duration<double, std::ratio<1>>(maxDuration).count() *
-                         logFrequency)) {
+                         logFrequency))) {
   measurements_.reserve(allocSize_);
 }
 
@@ -109,13 +110,15 @@ std::string TimeCostLogger::createLogString(const std::string& prefix) const {
 TimeIterationCostLogger::TimeIterationCostLogger(double runTimeSeconds,
                                                  unsigned int recordPeriodMicrosecond) {
   allocSize_ =
-      ALLOC_SAFETY_FACTOR * runTimeSeconds / (static_cast<double>(recordPeriodMicrosecond) / 1e6);
+    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * runTimeSeconds /
+                          (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
 TimeIterationCostLogger::TimeIterationCostLogger(const esp::ompltools::time::Duration& runTime,
                                                  unsigned int recordPeriodMicrosecond) {
-  allocSize_ = ALLOC_SAFETY_FACTOR * esp::ompltools::time::seconds(runTime) /
-               (static_cast<double>(recordPeriodMicrosecond) / 1e6);
+  allocSize_ =
+    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * esp::ompltools::time::seconds(runTime) /
+                          (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
 std::string TimeIterationCostLogger::output(const std::string& labelPrefix) {
@@ -172,13 +175,15 @@ IterationCostLogger::IterationCostLogger(unsigned int numIterations) {
 IterationCostLogger::IterationCostLogger(double runTimeSeconds,
                                          unsigned int recordPeriodMicrosecond) {
   allocSize_ =
-      ALLOC_SAFETY_FACTOR * runTimeSeconds / (static_cast<double>(recordPeriodMicrosecond) / 1e6);
+    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * runTimeSeconds /
+                          (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
 IterationCostLogger::IterationCostLogger(const esp::ompltools::time::Duration& runTime,
                                          unsigned int recordPeriodMicrosecond) {
-  allocSize_ = ALLOC_SAFETY_FACTOR * esp::ompltools::time::seconds(runTime) /
-               (static_cast<double>(recordPeriodMicrosecond) / 1e6);
+  allocSize_ =
+    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * esp::ompltools::time::seconds(runTime) /
+                          (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
 std::string IterationCostLogger::output(const std::string& labelPrefix) {

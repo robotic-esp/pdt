@@ -170,18 +170,18 @@ void InteractiveVisualizer::run() {
   pangolin::RegisterKeyPressCallback('f', [this]() { incrementIteration(1u); });
   pangolin::RegisterKeyPressCallback('b', [this]() { decrementIteration(1u); });
   pangolin::RegisterKeyPressCallback('F', [this]() {
-    incrementIteration(std::ceil(0.1 * static_cast<double>(largestIteration_)));
+    incrementIteration(static_cast<std::size_t>(std::ceil(0.1 * static_cast<double>(largestIteration_))));
   });
   pangolin::RegisterKeyPressCallback('B', [this]() {
-    decrementIteration(std::ceil(0.1 * static_cast<double>(largestIteration_)));
+    decrementIteration(static_cast<std::size_t>(std::ceil(0.1 * static_cast<double>(largestIteration_))));
   });
   pangolin::RegisterKeyPressCallback(' ', [&optionTrack]() { optionTrack = !optionTrack; });
 
   // This sets the color used when clearing the screen.
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
-  maxCost_ = 0.1;
-  minCost_ = 0.0;
+  maxCost_ = 0.1f;
+  minCost_ = 0.0f;
 
   // Give the data thread a head start.
   std::this_thread::sleep_for(std::chrono::milliseconds(10u));
@@ -362,8 +362,8 @@ void InteractiveVisualizer::run() {
     }
 
     // Set the correct view of the plot.
-    plotter.SetView(pangolin::XYRangef(0, 1.06 * static_cast<float>(largestPlottedIteration_),
-                                       0.98 * minCost_, 1.02 * maxCost_));
+    plotter.SetView(pangolin::XYRangef(0, 1.06f * static_cast<float>(largestPlottedIteration_),
+                                       0.98f * minCost_, 1.02f * maxCost_));
     // Add the marker for the current iteration to the plot.
     plotter.ClearMarkers();
     plotter.AddMarker(pangolin::Marker(
@@ -407,10 +407,12 @@ void InteractiveVisualizer::decrementIteration(std::size_t num) {
 
 void InteractiveVisualizer::updateCostLog() {
   while (largestPlottedIteration_ < static_cast<int>(displayIteration_)) {
-    auto path = getSolutionPath(++largestPlottedIteration_)->as<ompl::geometric::PathGeometric>();
+    auto path =
+      getSolutionPath(static_cast<std::size_t>(++largestPlottedIteration_))->as<ompl::geometric::PathGeometric>();
     if (path != nullptr) {
-      double cost =
-          path->cost(planner_->getProblemDefinition()->getOptimizationObjective()).value();
+      float cost =
+        static_cast<float>(
+           path->cost(planner_->getProblemDefinition()->getOptimizationObjective()).value());
       if (cost > maxCost_) {
         maxCost_ = cost;
       }
@@ -419,7 +421,7 @@ void InteractiveVisualizer::updateCostLog() {
       }
       costLog_.Log(cost);
     } else {
-      costLog_.Log(std::numeric_limits<double>::max());
+      costLog_.Log(std::numeric_limits<float>::max());
     }
   }
 }
@@ -427,12 +429,12 @@ void InteractiveVisualizer::updateCostLog() {
 void InteractiveVisualizer::drawVerticesAndEdges(std::size_t iteration) {
   if (context_->getDimension() == 2u) {
     auto [vertices, edges] = getVerticesAndEdges2D(iteration);
-    drawPoints(vertices, blue, 2.0);
-    drawLines(edges, 3.0, gray);
+    drawPoints(vertices, blue, 2.0f);
+    drawLines(edges, 3.0f, gray);
   } else if (context_->getDimension() == 3u) {
     auto [vertices, edges] = getVerticesAndEdges3D(iteration);
-    drawPoints(vertices, blue, 2.0);
-    drawLines(edges, 3.0, gray, 0.8);
+    drawPoints(vertices, blue, 2.0f);
+    drawLines(edges, 3.0f, gray, 0.8f);
   }
 }
 
@@ -449,10 +451,10 @@ void InteractiveVisualizer::drawVertices(std::size_t iteration) {
 void InteractiveVisualizer::drawEdges(std::size_t iteration) {
   if (context_->getDimension() == 2u) {
     auto edges = getEdges2D(iteration);
-    drawLines(edges, 3.0, gray);
+    drawLines(edges, 3.0f, gray);
   } else if (context_->getDimension() == 3u) {
     auto edges = getEdges3D(iteration);
-    drawLines(edges, 3.0, gray, 0.8);
+    drawLines(edges, 3.0f, gray, 0.8f);
   }
 }
 
@@ -475,13 +477,14 @@ void InteractiveVisualizer::drawStateIds(std::size_t iteration) {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   const auto& plannerData = getPlannerData(iteration);
-  for (std::size_t i = 0u; i < plannerData->numVertices(); ++i) {
+  for (auto i = 0u; i < plannerData->numVertices(); ++i) {
     auto vertex = plannerData->getVertex(i);
     if (vertex != ompl::base::PlannerData::NO_VERTEX) {
       auto vertexState = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      glColor3f(1.0, 0.2, 0.4);
+      glColor3f(1.0f, 0.2f, 0.4f);
       pangolin::GlText txt = pangolin::GlFont::I().Text(std::to_string(vertex.getTag()).c_str());
-      txt.Draw(vertexState->values[0], vertexState->values[1]);
+      txt.Draw(static_cast<float>(vertexState->values[0]),
+               static_cast<float>(vertexState->values[1]));
     }
   }
 
@@ -626,14 +629,14 @@ void InteractiveVisualizer::drawGoal() const {
       break;
     }
     case ompl::base::GoalType::GOAL_SPACE: {
-      float goalColor[4] = {0.808, 0.243, 0.082, 0.3};
+      float goalColor[4] = {0.808f, 0.243f, 0.082f, 0.3f};
       auto goalSpace = goal->as<ompl::base::GoalSpace>()->getSpace();
       auto bounds = goalSpace->as<ompl::base::RealVectorStateSpace>()->getBounds();
-      std::vector<double> widths;
-      std::vector<double> anchor;
+      std::vector<float> widths;
+      std::vector<float> anchor;
       for (auto i = 0u; i < goalSpace->getDimension(); ++i) {
         widths.emplace_back(bounds.high[i] - bounds.low[i]);
-        anchor.emplace_back((bounds.high[i] + bounds.low[i]) / 2.0);
+        anchor.emplace_back((bounds.high[i] + bounds.low[i]) / 2.0f);
       }
       drawRectangle(anchor, widths, goalColor, goalColor);
       break;
@@ -647,8 +650,10 @@ void InteractiveVisualizer::drawBoundary(const RealVectorGeometricContext& conte
   glLineWidth(3.0);
   if (context.getDimension() == 2u) {
     auto bounds = context.getBoundaries();
-    pangolin::glDrawRectPerimeter(bounds.low.at(0), bounds.low.at(1), bounds.high.at(0),
-                                  bounds.high.at(1));
+    pangolin::glDrawRectPerimeter(static_cast<float>(bounds.low.at(0)),
+                                  static_cast<float>(bounds.low.at(1)),
+                                  static_cast<float>(bounds.high.at(0)),
+                                  static_cast<float>(bounds.high.at(1)));
   } else if (context.getDimension() == 3u) {
     auto bounds = context.getBoundaries();
     std::vector<Eigen::Vector3d> points{
@@ -681,8 +686,8 @@ void InteractiveVisualizer::drawBoundary(const RealVectorGeometricContext& conte
   }
 }
 
-void InteractiveVisualizer::drawRectangle(const std::vector<double>& midpoint,
-                                          const std::vector<double>& widths, const float* faceColor,
+void InteractiveVisualizer::drawRectangle(const std::vector<float>& midpoint,
+                                          const std::vector<float>& widths, const float* faceColor,
                                           const float* edgeColor) const {
   if (midpoint.size() == 2u && widths.size() == 2u) {
     drawRectangle2D(midpoint, widths, faceColor, edgeColor);
@@ -694,24 +699,24 @@ void InteractiveVisualizer::drawRectangle(const std::vector<double>& midpoint,
   }
 }
 
-void InteractiveVisualizer::drawRectangle2D(const std::vector<double>& midpoint,
-                                            const std::vector<double>& widths,
+void InteractiveVisualizer::drawRectangle2D(const std::vector<float>& midpoint,
+                                            const std::vector<float>& widths,
                                             const float* faceColor, const float* edgeColor) const {
   glColor4fv(faceColor);
-  pangolin::glDrawRect(midpoint.at(0) - widths.at(0) / 2.0, midpoint.at(1) - widths.at(1) / 2.0,
-                       midpoint.at(0) + widths.at(0) / 2.0, midpoint.at(1) + widths.at(1) / 2.0);
+  pangolin::glDrawRect(midpoint.at(0) - widths.at(0) / 2.0f, midpoint.at(1) - widths.at(1) / 2.0f,
+                       midpoint.at(0) + widths.at(0) / 2.0f, midpoint.at(1) + widths.at(1) / 2.0f);
   glColor4fv(edgeColor);
   pangolin::glDrawRectPerimeter(
-      midpoint.at(0) - widths.at(0) / 2.0, midpoint.at(1) - widths.at(1) / 2.0,
-      midpoint.at(0) + widths.at(0) / 2.0, midpoint.at(1) + widths.at(1) / 2.0);
+      midpoint.at(0) - widths.at(0) / 2.0f, midpoint.at(1) - widths.at(1) / 2.0f,
+      midpoint.at(0) + widths.at(0) / 2.0f, midpoint.at(1) + widths.at(1) / 2.0f);
 }
 
-void InteractiveVisualizer::drawRectangle3D(const std::vector<double>& midpoint,
-                                            const std::vector<double>& widths,
+void InteractiveVisualizer::drawRectangle3D(const std::vector<float>& midpoint,
+                                            const std::vector<float>& widths,
                                             const float* faceColor, const float* edgeColor) const {
-  float xhalf = widths[0] / 2.0;
-  float yhalf = widths[1] / 2.0;
-  float zhalf = widths[2] / 2.0;
+  float xhalf = widths[0] / 2.0f;
+  float yhalf = widths[1] / 2.0f;
+  float zhalf = widths[2] / 2.0f;
   const GLfloat xmin = midpoint[0] - xhalf;
   const GLfloat xmax = midpoint[0] + xhalf;
   const GLfloat ymin = midpoint[1] - yhalf;
@@ -743,15 +748,15 @@ void InteractiveVisualizer::drawRectangle3D(const std::vector<double>& midpoint,
   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void InteractiveVisualizer::drawPoint(const Eigen::Vector2d& point, const float* color,
+void InteractiveVisualizer::drawPoint(const Eigen::Vector2f& point, const float* color,
                                       float size) const {
   glColor4fv(color);
-  pangolin::glDrawCircle(point[0], point[1], size / 1000.0);
+  pangolin::glDrawCircle(point[0], point[1], size / 1000.0f);
 }
 
-void InteractiveVisualizer::drawPoint(const Eigen::Vector3d& point, const float* color,
+void InteractiveVisualizer::drawPoint(const Eigen::Vector3f& point, const float* color,
                                       float size) const {
-  std::vector<Eigen::Vector3d> points;
+  std::vector<Eigen::Vector3f> points;
   points.emplace_back(point);
   drawPoints(points, color, size);
 }
@@ -760,23 +765,26 @@ void InteractiveVisualizer::drawPoint(
     const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state, const float* color,
     float size) const {
   if (state.getSpace()->getDimension() == 2u) {
-    drawPoint(Eigen::Vector2d(state[0u], state[1u]), color, size);
+    drawPoint(Eigen::Vector2f(static_cast<float>(state[0u]),
+                              static_cast<float>(state[1u])), color, size);
   } else if (state.getSpace()->getDimension() == 3u) {
-    drawPoint(Eigen::Vector3d(state[0u], state[1u], state[2u]), color, size);
+    drawPoint(Eigen::Vector3f(static_cast<float>(state[0u]),
+                              static_cast<float>(state[1u]),
+                              static_cast<float>(state[2u])), color, size);
   } else {
     throw std::runtime_error("Can only visualize 2d and 3d states.");
   }
 }
 
-void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector2d>& points,
+void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector2f>& points,
                                        const float* color, float size) const {
   glColor4fv(color);
   for (const auto& point : points) {
-    pangolin::glDrawCircle(point[0], point[1], size / 1000.0);
+    pangolin::glDrawCircle(point[0], point[1], size / 1000.0f);
   }
 }
 
-void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector3d>& points,
+void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector3f>& points,
                                        const float* color, float size) const {
   glColor4fv(color);
   glPointSize(size);
@@ -787,13 +795,13 @@ void InteractiveVisualizer::drawPoints(
     const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states,
     const float* color, float size) const {
   if (states.front().getSpace()->getDimension() == 2u) {
-    std::vector<Eigen::Vector2d> points;
+    std::vector<Eigen::Vector2f> points;
     for (const auto& state : states) {
       points.emplace_back(state[0], state[1]);
     }
     drawPoints(points, color, size);
   } else if (states.front().getSpace()->getDimension() == 3u) {
-    std::vector<Eigen::Vector3d> points;
+    std::vector<Eigen::Vector3f> points;
     for (const auto& state : states) {
       points.emplace_back(state[0], state[1], state[2]);
     }
@@ -801,7 +809,7 @@ void InteractiveVisualizer::drawPoints(
   }
 }
 
-void InteractiveVisualizer::drawLines(const std::vector<Eigen::Vector2d>& points, float width,
+void InteractiveVisualizer::drawLines(const std::vector<Eigen::Vector2f>& points, float width,
                                       const float* color, float alpha) const {
   assert(points.size() % 2 == 0u);
   glColor4f(color[0], color[1], color[2], alpha);
@@ -809,7 +817,7 @@ void InteractiveVisualizer::drawLines(const std::vector<Eigen::Vector2d>& points
   pangolin::glDrawLines(points);
 }
 
-void InteractiveVisualizer::drawLines(const std::vector<Eigen::Vector3d>& points, float width,
+void InteractiveVisualizer::drawLines(const std::vector<Eigen::Vector3f>& points, float width,
                                       const float* color, float alpha) const {
   assert(points.size() % 2 == 0u);
   glColor4f(color[0], color[1], color[2], alpha);
@@ -817,14 +825,14 @@ void InteractiveVisualizer::drawLines(const std::vector<Eigen::Vector3d>& points
   pangolin::glDrawLines(points);
 }
 
-void InteractiveVisualizer::drawPath(const std::vector<Eigen::Vector2d>& points, float width,
+void InteractiveVisualizer::drawPath(const std::vector<Eigen::Vector2f>& points, float width,
                                      const float* color, float alpha) const {
   glColor4f(color[0], color[1], color[2], alpha);
   glLineWidth(width);
   pangolin::glDrawLineStrip(points);
 }
 
-void InteractiveVisualizer::drawPath(const std::vector<Eigen::Vector3d>& points, float width,
+void InteractiveVisualizer::drawPath(const std::vector<Eigen::Vector3f>& points, float width,
                                      const float* color, float alpha) const {
   glColor4f(color[0], color[1], color[2], alpha);
   glLineWidth(width);
@@ -832,63 +840,71 @@ void InteractiveVisualizer::drawPath(const std::vector<Eigen::Vector3d>& points,
 }
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
-  drawRectangle(obstacle.getAnchorCoordinates(), obstacle.getWidths(), black, black);
+  const auto anchorCoords = obstacle.getAnchorCoordinates();
+  std::vector<float> anchor(anchorCoords.begin(), anchorCoords.end());
+  const auto obstacleWidth = obstacle.getWidths();
+  std::vector<float> widths(obstacleWidth.begin(), obstacleWidth.end());
+  drawRectangle(anchor, widths, black, black);
 }
 
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
-  drawRectangle(antiObstacle.getAnchorCoordinates(), antiObstacle.getWidths(), white, white);
+  const auto anchorCoords = antiObstacle.getAnchorCoordinates();
+  std::vector<float> anchor(anchorCoords.begin(), anchorCoords.end());
+  const auto antiObstacleWidth = antiObstacle.getWidths();
+  std::vector<float> widths(antiObstacleWidth.begin(), antiObstacleWidth.end());
+  drawRectangle(anchor, widths, white, white);
 }
 
 void InteractiveVisualizer::visit(const PotentialFieldOptimizationObjective& objective) const {
   if (context_->getDimension() == 2u) {
     // Get the widths of the context.
-    const double minX = context_->getBoundaries().low.at(0u);
-    const double maxX = context_->getBoundaries().high.at(0u);
-    const double minY = context_->getBoundaries().low.at(1u);
-    const double maxY = context_->getBoundaries().high.at(1u);
-    const double widthX = maxX - minX;
-    const double widthY = maxY - minY;
+    const auto minX = static_cast<float>(context_->getBoundaries().low.at(0u));
+    const auto maxX = static_cast<float>(context_->getBoundaries().high.at(0u));
+    const auto minY = static_cast<float>(context_->getBoundaries().low.at(1u));
+    const auto maxY = static_cast<float>(context_->getBoundaries().high.at(1u));
+    const auto widthX = maxX - minX;
+    const auto widthY = maxY - minY;
 
     // Define the number of points per axis.
-    constexpr std::size_t numPointsPerAxis{40u};
+    constexpr unsigned numPointsPerAxis{40u};
 
     // Compute the resulting step sizes.
-    const double stepX = widthX / (numPointsPerAxis);
-    const double stepY = widthY / (numPointsPerAxis);
+    const auto stepX = widthX / static_cast<float>(numPointsPerAxis);
+    const auto stepY = widthY / static_cast<float>(numPointsPerAxis);
 
     // Prepare a state to probe the cost at the discretized locations.
     auto costState =
         context_->getStateSpace()->allocState()->as<ompl::base::RealVectorStateSpace::StateType>();
 
     // Determine the min and max costs if not already determined.
-    if (minOptimizationCost_ == std::numeric_limits<double>::max()) {
-      for (std::size_t i = 0u; i < numPointsPerAxis; ++i) {
-        costState->operator[](0u) = minX + stepX / 2.0 + i * stepX;
-        for (std::size_t j = 0u; j < numPointsPerAxis; ++j) {
-          costState->operator[](1u) = minY + stepY / 2.0 + j * stepY;
+    if (minOptimizationCost_ == std::numeric_limits<float>::max()) {
+      for (auto i = 0u; i < numPointsPerAxis; ++i) {
+        costState->operator[](0u) = minX + stepX / 2.0f + static_cast<float>(i) * stepX;
+        for (auto j = 0u; j < numPointsPerAxis; ++j) {
+          costState->operator[](1u) = minY + stepY / 2.0f + static_cast<float>(j) * stepY;
 
           // Compute the cost at this state.
           auto cost = objective.stateCost(costState);
           if (objective.isCostBetterThan(cost, ompl::base::Cost(minOptimizationCost_))) {
-            minOptimizationCost_ = cost.value();
+            minOptimizationCost_ = static_cast<float>(cost.value());
           }
           if (objective.isCostBetterThan(ompl::base::Cost(maxOptimizationCost_), cost)) {
-            maxOptimizationCost_ = cost.value();
+            maxOptimizationCost_ = static_cast<float>(cost.value());
           }
         }
       }
     }
 
     // Iterate over the grid to visualize the resulting cost.
-    for (std::size_t i = 0u; i < numPointsPerAxis; ++i) {
-      double x = minX + stepX / 2.0 + i * stepX;
+    for (auto i = 0u; i < numPointsPerAxis; ++i) {
+      float x = minX + stepX / 2.0f + static_cast<float>(i) * stepX;
       costState->operator[](0u) = x;
       for (std::size_t j = 0u; j < numPointsPerAxis; ++j) {
-        double y = minY + stepY / 2.0 + j * stepY;
+        float y = minY + stepY / 2.0f + static_cast<float>(j) * stepY;
         costState->operator[](1u) = y;
 
         // Compute the cost at this state.
-        auto cost = objective.stateCost(costState).value();
+        auto cost = static_cast<float>(objective.stateCost(costState).value());
 
         // Compute the color for this cost.
         auto color = interpolateColors(
@@ -896,7 +912,7 @@ void InteractiveVisualizer::visit(const PotentialFieldOptimizationObjective& obj
             (cost - minOptimizationCost_) / (maxOptimizationCost_ - minOptimizationCost_));
 
         // Draw the rectangle.
-        drawRectangle2D(std::vector<double>{x, y}, std::vector<double>{stepX, stepY}, color.data(),
+        drawRectangle2D(std::vector<float>{x, y}, std::vector<float>{stepX, stepY}, color.data(),
                         color.data());
       }
     }
@@ -918,10 +934,10 @@ void InteractiveVisualizer::visit(
 
 std::array<float, 4u> InteractiveVisualizer::interpolateColors(const float* color1,
                                                                const float* color2,
-                                                               double t) const {
+                                                               const float step) const {
   std::array<float, 4u> color;
   for (std::size_t i = 0u; i < 4u; ++i) {
-    color[i] = color1[i] + (color2[i] - color1[i]) * std::pow(t, 0.25);
+    color[i] = color1[i] + (color2[i] - color1[i]) * std::pow(step, 0.25f);
   }
   return color;
 }
@@ -953,12 +969,12 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
   if (context_->getDimension() == 2u) {
     // Get the edge queue.
     auto edgeQueue = bitstarData->getEdgeQueue();
-    std::vector<Eigen::Vector2d> edges{};
+    std::vector<Eigen::Vector2f> edges{};
     for (const auto& edge : edgeQueue) {
       auto sourceState = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector2d((*sourceState)[0u], (*sourceState)[1u]));
+      edges.push_back(Eigen::Vector2f((*sourceState)[0u], (*sourceState)[1u]));
       auto targetState = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector2d((*targetState)[0u], (*targetState)[1u]));
+      edges.push_back(Eigen::Vector2f((*targetState)[0u], (*targetState)[1u]));
     }
 
     // Draw the edge queue.
@@ -973,20 +989,24 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
     }
     auto sourceState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
     auto targetState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-    std::vector<Eigen::Vector2d> nextEdge{Eigen::Vector2d((*sourceState)[0u], (*sourceState)[1u]),
-                                          Eigen::Vector2d((*targetState)[0u], (*targetState)[1u])};
+    std::vector<Eigen::Vector2f> nextEdge{Eigen::Vector2f((*sourceState)[0u], (*sourceState)[1u]),
+                                          Eigen::Vector2f((*targetState)[0u], (*targetState)[1u])};
 
     // Draw the next edge.
     drawLines(nextEdge, 3.0, red);
   } else if (context_->getDimension() == 3u) {
     // Get the edge queue.
     auto edgeQueue = bitstarData->getEdgeQueue();
-    std::vector<Eigen::Vector3d> edges{};
+    std::vector<Eigen::Vector3f> edges{};
     for (const auto& edge : edgeQueue) {
       auto sourceState = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector3d((*sourceState)[0u], (*sourceState)[1u], (*sourceState)[2u]));
+      edges.push_back(Eigen::Vector3f(static_cast<float>((*sourceState)[0u]),
+                                      static_cast<float>((*sourceState)[1u]),
+                                      static_cast<float>((*sourceState)[2u])));
       auto targetState = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector3d((*targetState)[0u], (*targetState)[1u], (*targetState)[2u]));
+      edges.push_back(Eigen::Vector3f(static_cast<float>((*targetState)[0u]),
+                                      static_cast<float>((*targetState)[1u]),
+                                      static_cast<float>((*targetState)[2u])));
     }
 
     // Draw the edge queue.
@@ -1001,9 +1021,13 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
     }
     auto sourceState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
     auto targetState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-    std::vector<Eigen::Vector3d> nextEdge{
-        Eigen::Vector3d((*sourceState)[0u], (*sourceState)[1u], (*sourceState)[2u]),
-        Eigen::Vector3d((*targetState)[0u], (*targetState)[1u], (*targetState)[2u])};
+    std::vector<Eigen::Vector3f> nextEdge{
+      Eigen::Vector3f(static_cast<float>((*sourceState)[0u]),
+                      static_cast<float>((*sourceState)[1u]),
+                      static_cast<float>((*sourceState)[2u])),
+      Eigen::Vector3f(static_cast<float>((*targetState)[0u]),
+                      static_cast<float>((*targetState)[1u]),
+                      static_cast<float>((*targetState)[2u]))};
 
     // Draw the next edge.
     drawLines(nextEdge, 3.0, red);
@@ -1020,40 +1044,44 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
   if (context_->getDimension() == 2u) {
     // Get the edge queue.
     auto forwardQueue = aitstarData->getForwardQueue();
-    std::vector<Eigen::Vector2d> forwardQueueEdges;
+    std::vector<Eigen::Vector2f> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
     for (const auto& edge : forwardQueue) {
       auto sourceState =
           edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*sourceState)[0u], (*sourceState)[1u]);
+      forwardQueueEdges.emplace_back(static_cast<float>((*sourceState)[0u]),
+                                     static_cast<float>((*sourceState)[1u]));
       auto targetState =
           edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*targetState)[0u], (*targetState)[1u]);
+      forwardQueueEdges.emplace_back(static_cast<float>((*targetState)[0u]),
+                                     static_cast<float>((*targetState)[1u]));
     }
 
     drawLines(forwardQueueEdges, 1.5, lightblue);
 
     // Get the vertex queue.
     auto backwardQueue = aitstarData->getBackwardQueue();
-    std::vector<Eigen::Vector2d> backwardQueueVertices{};
+    std::vector<Eigen::Vector2f> backwardQueueVertices{};
     for (const auto& vertex : backwardQueue) {
       auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      backwardQueueVertices.emplace_back((*state)[0u], (*state)[1u]);
+      backwardQueueVertices.emplace_back(static_cast<float>((*state)[0u]),
+                                         static_cast<float>((*state)[1u]));
     }
 
-    drawPoints(backwardQueueVertices, yellow, 5.0);
+    drawPoints(backwardQueueVertices, yellow, 5.0f);
 
     // Get the next vertex in the queue.
     auto nextVertex = aitstarData->getNextVertex();
     if (nextVertex) {
       auto state = nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      drawPoints(std::vector<Eigen::Vector2d>{Eigen::Vector2d((*state)[0u], (*state)[1u])}, red,
-                 10.0);
+      drawPoints(std::vector<Eigen::Vector2f>{Eigen::Vector2f(static_cast<float>((*state)[0u]),
+                                                              static_cast<float>((*state)[1u]))},
+        red, 10.0f);
     }
 
     // Draw the backward search tree.
     auto backwardSearchTree = aitstarData->getVerticesInBackwardSearchTree();
-    std::vector<Eigen::Vector2d> backwardSearchTreeEdges;
+    std::vector<Eigen::Vector2f> backwardSearchTreeEdges;
     for (const auto& vertex : backwardSearchTree) {
       // Add the edge to the parent.
       if (vertex->hasReverseParent()) {
@@ -1061,12 +1089,14 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
         auto parent = vertex->getReverseParent()
                           ->getState()
                           ->as<ompl::base::RealVectorStateSpace::StateType>();
-        backwardSearchTreeEdges.emplace_back((*state)[0u], (*state)[1u]);
-        backwardSearchTreeEdges.emplace_back((*parent)[0u], (*parent)[1u]);
+        backwardSearchTreeEdges.emplace_back(static_cast<float>((*state)[0u]),
+                                             static_cast<float>((*state)[1u]));
+        backwardSearchTreeEdges.emplace_back(static_cast<float>((*parent)[0u]),
+                                             static_cast<float>((*parent)[1u]));
       }
     }
 
-    drawLines(backwardSearchTreeEdges, 2.0, yellow);
+    drawLines(backwardSearchTreeEdges, 2.0f, yellow);
 
     // Get the next edge in the queue.
     auto nextEdgeStates = aitstarData->getNextEdge();
@@ -1077,25 +1107,31 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
     }
     auto sourceState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
     auto targetState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-    std::vector<Eigen::Vector2d> nextEdge{Eigen::Vector2d((*sourceState)[0u], (*sourceState)[1u]),
-                                          Eigen::Vector2d((*targetState)[0u], (*targetState)[1u])};
+    std::vector<Eigen::Vector2f> nextEdge{Eigen::Vector2f(static_cast<float>((*sourceState)[0u]),
+                                                          static_cast<float>((*sourceState)[1u])),
+                                          Eigen::Vector2f(static_cast<float>((*targetState)[0u]),
+                                                          static_cast<float>((*targetState)[1u]))};
     // Draw the next edge.
-    drawLines(nextEdge, 3.0, red);
+    drawLines(nextEdge, 3.0f, red);
   } else if (context_->getDimension() == 3u) {
     // Get the edge queue.
     auto edgeQueue = aitstarData->getForwardQueue();
-    std::vector<Eigen::Vector3d> edges{};
+    std::vector<Eigen::Vector3f> edges{};
     for (const auto& edge : edgeQueue) {
       auto sourceState =
           edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector3d((*sourceState)[0u], (*sourceState)[1u], (*sourceState)[2u]));
+      edges.push_back(Eigen::Vector3f(static_cast<float>((*sourceState)[0u]),
+                                      static_cast<float>((*sourceState)[1u]),
+                                      static_cast<float>((*sourceState)[2u])));
       auto targetState =
           edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      edges.push_back(Eigen::Vector3d((*targetState)[0u], (*targetState)[1u], (*targetState)[2u]));
+      edges.push_back(Eigen::Vector3f(static_cast<float>((*targetState)[0u]),
+                                      static_cast<float>((*targetState)[1u]),
+                                      static_cast<float>((*targetState)[2u])));
     }
 
     // Draw the edge queue.
-    drawLines(edges, 1.5, lightblue);
+    drawLines(edges, 1.5f, lightblue);
 
     // Get the next edge in the queue.
     auto nextEdgeStates = aitstarData->getNextEdge();
@@ -1106,11 +1142,15 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
     }
     auto sourceState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
     auto targetState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-    std::vector<Eigen::Vector3d> nextEdgeVector{
-        Eigen::Vector3d((*sourceState)[0u], (*sourceState)[1u], (*sourceState)[2u]),
-        Eigen::Vector3d((*targetState)[0u], (*targetState)[1u], (*targetState)[2u])};
+    std::vector<Eigen::Vector3f> nextEdgeVector{
+      Eigen::Vector3f(static_cast<float>((*sourceState)[0u]),
+                      static_cast<float>((*sourceState)[1u]),
+                      static_cast<float>((*sourceState)[2u])),
+      Eigen::Vector3f(static_cast<float>((*targetState)[0u]),
+                      static_cast<float>((*targetState)[1u]),
+                      static_cast<float>((*targetState)[2u]))};
     // Draw the next edge.
-    drawLines(nextEdgeVector, 3.0, red);
+    drawLines(nextEdgeVector, 3.0f, red);
   }
 }
 
@@ -1121,60 +1161,68 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
   if (context_->getDimension() == 2u) {
     // Get the forward queue.
     auto forwardQueue = eitstarData->getForwardQueue();
-    std::vector<Eigen::Vector2d> forwardQueueEdges;
+    std::vector<Eigen::Vector2f> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
     for (const auto& edge : forwardQueue) {
       auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
+      forwardQueueEdges.emplace_back(static_cast<float>((*parentState)[0u]),
+                                     static_cast<float>((*parentState)[1u]));
       auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*childState)[0u], (*childState)[1u]);
+      forwardQueueEdges.emplace_back(static_cast<float>((*childState)[0u]),
+                                     static_cast<float>((*childState)[1u]));
     }
 
     // Draw the forward queue.
-    drawLines(forwardQueueEdges, 1.5, lightblue);
+    drawLines(forwardQueueEdges, 1.5f, lightblue);
 
     // Get the reverse queue.
     auto reverseQueue = eitstarData->getReverseQueue();
-    std::vector<Eigen::Vector2d> reverseQueueEdges;
+    std::vector<Eigen::Vector2f> reverseQueueEdges;
     reverseQueueEdges.reserve(2u * reverseQueue.size());
     for (const auto& edge : reverseQueue) {
       auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
+      reverseQueueEdges.emplace_back(static_cast<float>((*parentState)[0u]),
+                                     static_cast<float>((*parentState)[1u]));
       auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseQueueEdges.emplace_back((*childState)[0u], (*childState)[1u]);
+      reverseQueueEdges.emplace_back(static_cast<float>((*childState)[0u]),
+                                     static_cast<float>((*childState)[1u]));
     }
 
     // Draw the reverse queue.
-    drawLines(reverseQueueEdges, 1.5, yellow);
+    drawLines(reverseQueueEdges, 1.5f, yellow);
 
     // Get the reverse tree.
     auto reverseTree = eitstarData->getReverseTree();
-    std::vector<Eigen::Vector2d> reverseTreeEdges;
+    std::vector<Eigen::Vector2f> reverseTreeEdges;
     reverseTreeEdges.reserve(2u * reverseTree.size());
     for (const auto& edge : reverseTree) {
       auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseTreeEdges.emplace_back((*parentState)[0u], (*parentState)[1u]);
+      reverseTreeEdges.emplace_back(static_cast<float>((*parentState)[0u]),
+                                    static_cast<float>((*parentState)[1u]));
       auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseTreeEdges.emplace_back((*childState)[0u], (*childState)[1u]);
+      reverseTreeEdges.emplace_back(static_cast<float>((*childState)[0u]),
+                                    static_cast<float>((*childState)[1u]));
     }
 
     // Draw the reverse tree.
-    drawLines(reverseTreeEdges, 2.0, blue);
+    drawLines(reverseTreeEdges, 2.0f, blue);
 
     // Get the next edge in the forward queue.
     auto nextForwardEdge = eitstarData->getNextForwardEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (nextForwardEdge.source && nextForwardEdge.target) {
-      std::vector<Eigen::Vector2d> nextEdge;
+      std::vector<Eigen::Vector2f> nextEdge;
       auto parentState =
           nextForwardEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto childState =
           nextForwardEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      nextEdge.emplace_back((*parentState)[0u], (*parentState)[1u]);
-      nextEdge.emplace_back((*childState)[0u], (*childState)[1u]);
+      nextEdge.emplace_back(static_cast<float>((*parentState)[0u]),
+                            static_cast<float>((*parentState)[1u]));
+      nextEdge.emplace_back(static_cast<float>((*childState)[0u]),
+                            static_cast<float>((*childState)[1u]));
       // Draw the next edge.
-      drawLines(nextEdge, 3.0, red);
+      drawLines(nextEdge, 3.0f, red);
     }
 
     // Get the next edge in the reverse queue.
@@ -1182,73 +1230,91 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (nextReverseEdge.source && nextReverseEdge.target) {
-      std::vector<Eigen::Vector2d> nextEdge;
+      std::vector<Eigen::Vector2f> nextEdge;
       auto parentState =
           nextReverseEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto childState =
           nextReverseEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      nextEdge.emplace_back((*parentState)[0u], (*parentState)[1u]);
-      nextEdge.emplace_back((*childState)[0u], (*childState)[1u]);
+      nextEdge.emplace_back(static_cast<float>((*parentState)[0u]),
+                            static_cast<float>((*parentState)[1u]));
+      nextEdge.emplace_back(static_cast<float>((*childState)[0u]),
+                            static_cast<float>((*childState)[1u]));
       // Draw the next edge.
-      drawLines(nextEdge, 3.0, darkred);
+      drawLines(nextEdge, 3.0f, darkred);
     }
   } else if (context_->getDimension() == 3u) {
     // Get the forward queue.
     auto forwardQueue = eitstarData->getForwardQueue();
-    std::vector<Eigen::Vector3d> forwardQueueEdges;
+    std::vector<Eigen::Vector3f> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
     for (const auto& edge : forwardQueue) {
       auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]);
+      forwardQueueEdges.emplace_back(static_cast<float>((*parentState)[0u]),
+                                     static_cast<float>((*parentState)[1u]),
+                                     static_cast<float>((*parentState)[2u]));
       auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      forwardQueueEdges.emplace_back((*childState)[0u], (*childState)[1u], (*childState)[2u]);
+      forwardQueueEdges.emplace_back(static_cast<float>((*childState)[0u]),
+                                     static_cast<float>((*childState)[1u]),
+                                     static_cast<float>((*childState)[2u]));
     }
 
     // Draw the forward queue.
-    drawLines(forwardQueueEdges, 1.5, lightblue);
+    drawLines(forwardQueueEdges, 1.5f, lightblue);
 
     // Get the reverse queue.
     auto reverseQueue = eitstarData->getReverseQueue();
-    std::vector<Eigen::Vector3d> reverseQueueEdges;
+    std::vector<Eigen::Vector3f> reverseQueueEdges;
     reverseQueueEdges.reserve(2u * reverseQueue.size());
     for (const auto& edge : reverseQueue) {
       auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseQueueEdges.emplace_back((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]);
+      reverseQueueEdges.emplace_back(static_cast<float>((*parentState)[0u]),
+                                     static_cast<float>((*parentState)[1u]),
+                                     static_cast<float>((*parentState)[2u]));
       auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseQueueEdges.emplace_back((*childState)[0u], (*childState)[1u], (*childState)[2u]);
+      reverseQueueEdges.emplace_back(static_cast<float>((*childState)[0u]),
+                                     static_cast<float>((*childState)[1u]),
+                                     static_cast<float>((*childState)[2u]));
     }
 
     // Draw the reverse queue.
-    drawLines(reverseQueueEdges, 1.5, yellow);
+    drawLines(reverseQueueEdges, 1.5f, yellow);
 
     // Get the reverse tree.
     auto reverseTree = eitstarData->getReverseTree();
-    std::vector<Eigen::Vector3d> reverseTreeEdges;
+    std::vector<Eigen::Vector3f> reverseTreeEdges;
     reverseTreeEdges.reserve(2u * reverseTree.size());
     for (const auto& edge : reverseTree) {
       auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseTreeEdges.emplace_back((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]);
+      reverseTreeEdges.emplace_back(static_cast<float>((*parentState)[0u]),
+                                    static_cast<float>((*parentState)[1u]),
+                                    static_cast<float>((*parentState)[2u]));
       auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseTreeEdges.emplace_back((*childState)[0u], (*childState)[1u], (*childState)[2u]);
+      reverseTreeEdges.emplace_back(static_cast<float>((*childState)[0u]),
+                                    static_cast<float>((*childState)[1u]),
+                                    static_cast<float>((*childState)[2u]));
     }
 
     // Draw the reverse tree.
-    drawLines(reverseTreeEdges, 2.0, blue);
+    drawLines(reverseTreeEdges, 2.0f, blue);
 
     // Get the next edge in the forward queue.
     auto nextForwardEdge = eitstarData->getNextForwardEdge();
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (nextForwardEdge.source && nextForwardEdge.target) {
-      std::vector<Eigen::Vector3d> nextEdge;
+      std::vector<Eigen::Vector3f> nextEdge;
       auto parentState =
           nextForwardEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto childState =
           nextForwardEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      nextEdge.emplace_back((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]);
-      nextEdge.emplace_back((*childState)[0u], (*childState)[1u], (*childState)[2u]);
+      nextEdge.emplace_back(static_cast<float>((*parentState)[0u]),
+                            static_cast<float>((*parentState)[1u]),
+                            static_cast<float>((*parentState)[2u]));
+      nextEdge.emplace_back(static_cast<float>((*childState)[0u]),
+                            static_cast<float>((*childState)[1u]),
+                            static_cast<float>((*childState)[2u]));
       // Draw the next edge.
-      drawLines(nextEdge, 3.0, red);
+      drawLines(nextEdge, 3.0f, red);
     }
 
     // Get the next edge in the reverse queue.
@@ -1256,26 +1322,30 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
 
     // If there are no more edges in the queue, this will return an edge with nullptrs.
     if (nextReverseEdge.source && nextReverseEdge.target) {
-      std::vector<Eigen::Vector3d> nextEdge;
+      std::vector<Eigen::Vector3f> nextEdge;
       auto parentState =
           nextReverseEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto childState =
           nextReverseEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      nextEdge.emplace_back((*parentState)[0u], (*parentState)[1u], (*parentState)[2u]);
-      nextEdge.emplace_back((*childState)[0u], (*childState)[1u], (*childState)[2u]);
+      nextEdge.emplace_back(static_cast<float>((*parentState)[0u]),
+                            static_cast<float>((*parentState)[1u]),
+                            static_cast<float>((*parentState)[2u]));
+      nextEdge.emplace_back(static_cast<float>((*childState)[0u]),
+                            static_cast<float>((*childState)[1u]),
+                            static_cast<float>((*childState)[2u]));
       // Draw the next edge.
-      drawLines(nextEdge, 3.0, darkred);
+      drawLines(nextEdge, 3.0f, darkred);
     }
   }
 }
 
-std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>>
+std::pair<std::vector<Eigen::Vector2f>, std::vector<Eigen::Vector2f>>
 InteractiveVisualizer::getVerticesAndEdges2D(std::size_t iteration) const {
   const auto& currentPlannerData = getPlannerData(iteration);
   // Get the vertices and edges in the format supported by Panglin.
-  std::vector<Eigen::Vector2d> vertices{};
-  std::vector<Eigen::Vector2d> edges{};  // Size must be multiple of two.
-  for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
+  std::vector<Eigen::Vector2f> vertices{};
+  std::vector<Eigen::Vector2f> edges{};  // Size must be multiple of two.
+  for (auto i = 0u; i < currentPlannerData->numVertices(); ++i) {
     auto vertex = currentPlannerData->getVertex(i);
     // Check the vertex is valid.
     if (vertex != ompl::base::PlannerData::NO_VERTEX) {
@@ -1304,13 +1374,13 @@ InteractiveVisualizer::getVerticesAndEdges2D(std::size_t iteration) const {
   return {vertices, edges};
 }
 
-std::pair<std::vector<Eigen::Vector3d>, std::vector<Eigen::Vector3d>>
+std::pair<std::vector<Eigen::Vector3f>, std::vector<Eigen::Vector3f>>
 InteractiveVisualizer::getVerticesAndEdges3D(std::size_t iteration) const {
   const auto& currentPlannerData = getPlannerData(iteration);
   // Get the vertices and edges in the format supported by Panglin.
-  std::vector<Eigen::Vector3d> vertices{};
-  std::vector<Eigen::Vector3d> edges{};  // Size must be multiple of two.
-  for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
+  std::vector<Eigen::Vector3f> vertices{};
+  std::vector<Eigen::Vector3f> edges{};  // Size must be multiple of two.
+  for (auto i = 0u; i < currentPlannerData->numVertices(); ++i) {
     auto vertex = currentPlannerData->getVertex(i);
     // Check the vertex is valid.
     if (vertex != ompl::base::PlannerData::NO_VERTEX) {
@@ -1321,7 +1391,7 @@ InteractiveVisualizer::getVerticesAndEdges3D(std::size_t iteration) const {
       // Get the outgoing edges of this vertex.
       std::vector<unsigned int> outgoingEdges{};
       currentPlannerData->getEdges(i, outgoingEdges);
-      for (std::size_t j = 0; j < outgoingEdges.size(); ++j) {
+      for (auto j = 0u; j < outgoingEdges.size(); ++j) {
         // Check that the vertex is valid.
         auto child = currentPlannerData->getVertex(outgoingEdges.at(j));
         if (child != ompl::base::PlannerData::NO_VERTEX) {
@@ -1340,11 +1410,11 @@ InteractiveVisualizer::getVerticesAndEdges3D(std::size_t iteration) const {
   return {vertices, edges};
 }
 
-std::vector<Eigen::Vector2d> InteractiveVisualizer::getVertices2D(std::size_t iteration) const {
+std::vector<Eigen::Vector2f> InteractiveVisualizer::getVertices2D(std::size_t iteration) const {
   const auto& currentPlannerData = getPlannerData(iteration);
   // Get the vertices in a format supported by Pangolin.
-  std::vector<Eigen::Vector2d> vertices{};
-  for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
+  std::vector<Eigen::Vector2f> vertices{};
+  for (auto i = 0u; i < currentPlannerData->numVertices(); ++i) {
     auto vertex = currentPlannerData->getVertex(i);
     // Check the vertex is valid.
     if (vertex != ompl::base::PlannerData::NO_VERTEX) {
@@ -1356,11 +1426,11 @@ std::vector<Eigen::Vector2d> InteractiveVisualizer::getVertices2D(std::size_t it
   return vertices;
 }
 
-std::vector<Eigen::Vector3d> InteractiveVisualizer::getVertices3D(std::size_t iteration) const {
+std::vector<Eigen::Vector3f> InteractiveVisualizer::getVertices3D(std::size_t iteration) const {
   const auto& currentPlannerData = getPlannerData(iteration);
   // Get the vertices in a format supported by Pangolin.
-  std::vector<Eigen::Vector3d> vertices{};
-  for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
+  std::vector<Eigen::Vector3f> vertices{};
+  for (auto i = 0u; i < currentPlannerData->numVertices(); ++i) {
     auto vertex = currentPlannerData->getVertex(i);
     // Check the vertex is valid.
     if (vertex != ompl::base::PlannerData::NO_VERTEX) {
@@ -1372,10 +1442,10 @@ std::vector<Eigen::Vector3d> InteractiveVisualizer::getVertices3D(std::size_t it
   return vertices;
 }
 
-std::vector<Eigen::Vector2d> InteractiveVisualizer::getEdges2D(std::size_t iteration) const {
+std::vector<Eigen::Vector2f> InteractiveVisualizer::getEdges2D(std::size_t iteration) const {
   const auto& currentPlannerData = getPlannerData(iteration);
-  std::vector<Eigen::Vector2d> edges{};  // Size must be multiple of two.
-  for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
+  std::vector<Eigen::Vector2f> edges{};  // Size must be multiple of two.
+  for (auto i = 0u; i < currentPlannerData->numVertices(); ++i) {
     auto parent = currentPlannerData->getVertex(i);
     // Check the vertex is valid.
     if (parent != ompl::base::PlannerData::NO_VERTEX) {
@@ -1403,10 +1473,10 @@ std::vector<Eigen::Vector2d> InteractiveVisualizer::getEdges2D(std::size_t itera
   return edges;
 }
 
-std::vector<Eigen::Vector3d> InteractiveVisualizer::getEdges3D(std::size_t iteration) const {
+std::vector<Eigen::Vector3f> InteractiveVisualizer::getEdges3D(std::size_t iteration) const {
   const auto& currentPlannerData = getPlannerData(iteration);
-  std::vector<Eigen::Vector3d> edges{};  // Size must be multiple of two.
-  for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
+  std::vector<Eigen::Vector3f> edges{};  // Size must be multiple of two.
+  for (auto i = 0u; i < currentPlannerData->numVertices(); ++i) {
     auto parent = currentPlannerData->getVertex(i);
     // Check the vertex is valid.
     if (parent != ompl::base::PlannerData::NO_VERTEX) {
@@ -1435,8 +1505,8 @@ std::vector<Eigen::Vector3d> InteractiveVisualizer::getEdges3D(std::size_t itera
   return edges;
 }
 
-std::vector<Eigen::Vector2d> InteractiveVisualizer::getPath2D(std::size_t iteration) const {
-  std::vector<Eigen::Vector2d> points{};
+std::vector<Eigen::Vector2f> InteractiveVisualizer::getPath2D(std::size_t iteration) const {
+  std::vector<Eigen::Vector2f> points{};
   auto solution = getSolutionPath(iteration);
   if (solution != nullptr) {
     auto path = solution->as<ompl::geometric::PathGeometric>()->getStates();
@@ -1449,8 +1519,8 @@ std::vector<Eigen::Vector2d> InteractiveVisualizer::getPath2D(std::size_t iterat
   return points;
 }
 
-std::vector<Eigen::Vector3d> InteractiveVisualizer::getPath3D(std::size_t iteration) const {
-  std::vector<Eigen::Vector3d> points{};
+std::vector<Eigen::Vector3f> InteractiveVisualizer::getPath3D(std::size_t iteration) const {
+  std::vector<Eigen::Vector3f> points{};
   auto solution = getSolutionPath(iteration);
   if (solution != nullptr) {
     auto path = solution->as<ompl::geometric::PathGeometric>()->getStates();

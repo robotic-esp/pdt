@@ -98,7 +98,7 @@ RepeatingRectangles::RepeatingRectangles(
   spaceInfo_->setup();
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
     goalState_[i] = goalPosition.at(i);
   }
@@ -152,7 +152,9 @@ void RepeatingRectangles::createObstacles() {
   coordinates.reserve(numObsPerDim_ * dimensionality_);
   for (std::size_t i = 0u; i < numObsPerDim_; ++i) {
     coordinates.emplace_back(
-        ((i + 1u) * (bounds.high.at(0) - bounds.low.at(0)) / (numObsPerDim_ + 1u)) +
+        (static_cast<double>((i + 1u)) *
+         (bounds.high.at(0) - bounds.low.at(0)) /
+         static_cast<double>((numObsPerDim_ + 1u))) +
         bounds.low.at(0u));
   }
   // Let d be the dimensionality. We need all combinations of d elements from the above coordinates
@@ -167,7 +169,7 @@ void RepeatingRectangles::createObstacles() {
   do {
     // Take the coordinates of the bitmask for the midpoint.
     ompl::base::ScopedState<> midpoint(spaceInfo_);
-    std::size_t dim{0u};
+    auto dim { 0u };
     for (std::size_t i = 0u; i < bitmask.size(); ++i) {
       if (bitmask[i]) {
         midpoint[dim++] = coordinates[i];

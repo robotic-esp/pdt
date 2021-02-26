@@ -175,7 +175,7 @@ int main(int argc, char **argv) {
     for (const auto &plannerName : plannerNames) {
       // Create the logger for this run.
       esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
-                                            config->get<std::size_t>("experiment/logFrequency"));
+                                            config->get<double>("experiment/logFrequency"));
 
       // The following results in more consistent measurements. I don't fully understand why, but it
       // seems to be connected to creating a separate thread.
@@ -249,14 +249,15 @@ int main(int argc, char **argv) {
 
       // Compute the progress.
       ++currentRun;
-      const auto progress = static_cast<float>(currentRun) / totalNumberOfRuns;
-      constexpr auto barWidth = 36u;
+      const auto progress = static_cast<float>(currentRun) / static_cast<float>(totalNumberOfRuns);
+      constexpr auto barWidth = 36;
       std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
                 << (std::ceil(progress * barWidth) != barWidth
-                        ? std::setw(std::ceil(progress * barWidth))
-                        : std::setw(std::ceil(progress * barWidth) - 1u))
+                    ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
+                    : std::setw(static_cast<int>(std::ceil(progress * barWidth) - 1u)))
                 << std::setfill('.') << (currentRun != totalNumberOfRuns ? '|' : '.') << std::right
-                << std::setw(barWidth - std::ceil(progress * barWidth)) << std::setfill('.') << '.'
+                << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
+                << std::setfill('.') << '.'
                 << std::right << std::fixed << std::setw(6) << std::setfill(' ')
                 << std::setprecision(2) << progress * 100.0f << " %" << std::flush;
     }

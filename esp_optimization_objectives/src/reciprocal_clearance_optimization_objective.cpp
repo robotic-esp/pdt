@@ -36,6 +36,7 @@
 
 #include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
 
+#include <cmath>
 #include <memory>
 
 #include <ompl/base/spaces/RealVectorStateSpace.h>
@@ -54,7 +55,7 @@ ReciprocalClearanceOptimizationObjective::ReciprocalClearanceOptimizationObjecti
 
 ompl::base::Cost ReciprocalClearanceOptimizationObjective::stateCost(
     const ompl::base::State* state) const {
-  auto clearance = spaceInfo_->getStateValidityChecker()->clearance(state);
+  const auto clearance = spaceInfo_->getStateValidityChecker()->clearance(state);
   if (clearance > 1e-6) {
     return ompl::base::Cost(1.0 / clearance);
   } else {
@@ -65,6 +66,14 @@ ompl::base::Cost ReciprocalClearanceOptimizationObjective::stateCost(
     return ompl::base::Cost(1e6);
   }
 }
+
+  ompl::base::Cost ReciprocalClearanceOptimizationObjective::motionCostHeuristic(const ompl::base::State* s1, const ompl::base::State* s2) const {
+    const auto clearance1 = spaceInfo_->getStateValidityChecker()->clearance(s1);
+    const auto clearance2 = spaceInfo_->getStateValidityChecker()->clearance(s2);
+    const auto clearance = clearance1 < clearance2 ? clearance1 : clearance2;
+    const auto distance  = spaceInfo_->distance(s1, s2);
+    return ompl::base::Cost(std::log((clearance + distance) / clearance));
+  }
 
 void ReciprocalClearanceOptimizationObjective::accept(const ObjectiveVisitor& visitor) const {
   visitor.visit(*this);

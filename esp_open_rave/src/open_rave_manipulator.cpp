@@ -89,7 +89,7 @@ OpenRaveManipulator::OpenRaveManipulator(
   std::vector<double> raveLowerBounds, raveUpperBounds;
   robot->GetActiveDOFLimits(raveLowerBounds, raveUpperBounds);
   assert(raveLowerBounds.size() == raveUpperBounds.size());
-  ompl::base::RealVectorBounds bounds(raveLowerBounds.size());
+  ompl::base::RealVectorBounds bounds(static_cast<unsigned>(raveLowerBounds.size()));
   bounds.low = raveLowerBounds;
   bounds.high = raveUpperBounds;
   spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->setBounds(bounds);
@@ -111,7 +111,7 @@ OpenRaveManipulator::OpenRaveManipulator(
   auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
     goalState_[i] = goalPosition.at(i);
   }

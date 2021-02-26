@@ -127,7 +127,7 @@ template <typename T>
 bool Hyperrectangle<T>::isInside(const ompl::base::State* state) const {
   // Let's be conservative here.
   auto rstate = state->as<ompl::base::RealVectorStateSpace::StateType>();
-  for (std::size_t dim = 0; dim < spaceInfo_->getStateDimension(); ++dim) {
+  for (auto dim = 0u; dim < spaceInfo_->getStateDimension(); ++dim) {
     if (rstate->values[dim] <
             T::anchor_[dim] - widths_[dim] / 2.0 - std::numeric_limits<double>::epsilon() ||
         rstate->values[dim] >
@@ -156,7 +156,7 @@ double Hyperrectangle<T>::clearance(const ompl::base::State* state) const {
 
   // Compute the sum of squares.
   double sumOfSquares = 0.0;
-  for (std::size_t dim = 0u; dim < spaceInfo_->getStateDimension(); ++dim) {
+  for (auto dim = 0u; dim < spaceInfo_->getStateDimension(); ++dim) {
     double delta = std::max(
         std::abs(
             rstate->operator[](dim) -

@@ -178,7 +178,7 @@ std::shared_ptr<ompl::base::Goal> OpenRaveSE3::createGoal() const {
     }
     case ompl::base::GoalType::GOAL_SPACE: {
       // Get the goal bounds.
-      ompl::base::RealVectorBounds goalBounds(dimensionality_);
+      ompl::base::RealVectorBounds goalBounds(static_cast<unsigned>(dimensionality_));
       goalBounds.low = config_->get<std::vector<double>>("context/" + name_ + "/goalLowerBounds");
       goalBounds.high = config_->get<std::vector<double>>("context/" + name_ + "/goalUpperBounds");
 

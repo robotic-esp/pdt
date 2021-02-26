@@ -98,7 +98,7 @@ FourRooms::FourRooms(const std::shared_ptr<ompl::base::SpaceInformation>& spaceI
   spaceInfo_->setup();
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
   }
 }
@@ -134,7 +134,7 @@ void FourRooms::createObstacles() {
 
   // Create the obstacle that divides the space parallel to the x axis.
   ompl::base::ScopedState<> midpointX(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     midpointX[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
 
@@ -149,7 +149,7 @@ void FourRooms::createObstacles() {
 
   // Create the obstacle that divides the space parallel to the x axis.
   ompl::base::ScopedState<> midpointY(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     midpointY[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
 
@@ -169,7 +169,7 @@ void FourRooms::createAntiObstacles() {
 
   // Create the gap in the south.
   ompl::base::ScopedState<> midpointSouth(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     midpointSouth[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
   midpointSouth[1u] = bounds.low.at(1u) + (gapWidth_ / 2.0);
@@ -183,7 +183,7 @@ void FourRooms::createAntiObstacles() {
 
   // Create the gap in the north.
   ompl::base::ScopedState<> midpointNorth(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     midpointNorth[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
   midpointNorth[1u] = bounds.high.at(1u) - (gapWidth_ / 2.0);
@@ -197,7 +197,7 @@ void FourRooms::createAntiObstacles() {
 
   // Create the gap in the west.
   ompl::base::ScopedState<> midpointWest(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     midpointWest[i] = (bounds.low.at(i) + bounds.high.at(i)) / 2.0;
   }
   midpointWest[0u] = bounds.low.at(0u) + (gapWidth_ / 2.0);

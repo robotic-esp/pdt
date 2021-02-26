@@ -77,7 +77,7 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
   }
 
   // Fill the start state's coordinates.
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     startState_[i] = startPosition.at(i);
   }
 

@@ -55,8 +55,9 @@ MedianCostEvolutionPlotter::MedianCostEvolutionPlotter(
     stats_(stats) {
   // Compute the duration bin size.
   auto contextName = config_->get<std::string>("experiment/context");
-  std::size_t numBins = std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
-                                  config_->get<double>("experiment/logFrequency"));
+  std::size_t numBins =
+    static_cast<std::size_t>(std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
+                                       config_->get<double>("experiment/logFrequency")));
   double binSize = 1.0 / config_->get<double>("experiment/logFrequency");
   binnedDurations_.reserve(numBins);
   for (std::size_t i = 0u; i < numBins; ++i) {
@@ -74,24 +75,24 @@ struct Interval {
   float probability{0.0f};
 };
 static const std::map<std::size_t, std::map<std::size_t, Interval>> medianConfidenceIntervals = {
-    {10u, {{95u, {1u, 8u, 0.9511}}, {99u, {0u, 9u, 0.9910}}}},
-    {50u, {{95u, {17u, 31u, 0.9511}}, {99u, {14u, 33u, 0.9910}}}},
-    {100u, {{95u, {39u, 59u, 0.9540}}, {99u, {36u, 62u, 0.9907}}}},
-    {200u, {{95u, {85u, 113u, 0.9520}}, {99u, {80u, 117u, 0.9906}}}},
-    {250u, {{95u, {109u, 140u, 0.9503}}, {99u, {102u, 143u, 0.9900}}}},
-    {300u, {{95u, {132u, 166u, 0.9502}}, {99u, {126u, 171u, 0.9903}}}},
-    {400u, {{95u, {178u, 218u, 0.9522}}, {99u, {173u, 225u, 0.9907}}}},
-    {500u, {{95u, {227u, 271u, 0.9508}}, {99u, {220u, 278u, 0.9905}}}},
-    {600u, {{95u, {273u, 322u, 0.9508}}, {99u, {266u, 330u, 0.9907}}}},
-    {700u, {{95u, {323u, 375u, 0.9517}}, {99u, {313u, 382u, 0.9901}}}},
-    {800u, {{95u, {370u, 426u, 0.9511}}, {99u, {362u, 435u, 0.9900}}}},
-    {900u, {{95u, {419u, 478u, 0.9503}}, {99u, {409u, 487u, 0.9904}}}},
-    {1000u, {{95u, {468u, 530u, 0.9500}}, {99u, {457u, 530u, 0.9905}}}},
-    {2000u, {{95u, {954u, 1042u, 0.9504}}, {99u, {939u, 1055u, 0.9901}}}},
-    {5000u, {{95u, {2428u, 2567u, 0.9503}}, {99u, {2405u, 2588u, 0.9901}}}},
-    {10000u, {{95u, {4896u, 5093u, 0.9500}}, {99u, {4868u, 5126u, 0.9900}}}},
-    {100000u, {{95u, {49686u, 50306u, 0.9500}}, {99u, {49587u, 50402u, 0.9900}}}},
-    {1000000u, {{95u, {499017u, 500977u, 0.9500}}, {99u, {498706u, 501282u, 0.9900}}}}};
+    {10u, {{95u, {1u, 8u, 0.9511f}}, {99u, {0u, 9u, 0.9910f}}}},
+    {50u, {{95u, {17u, 31u, 0.9511f}}, {99u, {14u, 33u, 0.9910f}}}},
+    {100u, {{95u, {39u, 59u, 0.9540f}}, {99u, {36u, 62u, 0.9907f}}}},
+    {200u, {{95u, {85u, 113u, 0.9520f}}, {99u, {80u, 117u, 0.9906f}}}},
+    {250u, {{95u, {109u, 140u, 0.9503f}}, {99u, {102u, 143u, 0.9900f}}}},
+    {300u, {{95u, {132u, 166u, 0.9502f}}, {99u, {126u, 171u, 0.9903f}}}},
+    {400u, {{95u, {178u, 218u, 0.9522f}}, {99u, {173u, 225u, 0.9907f}}}},
+    {500u, {{95u, {227u, 271u, 0.9508f}}, {99u, {220u, 278u, 0.9905f}}}},
+    {600u, {{95u, {273u, 322u, 0.9508f}}, {99u, {266u, 330u, 0.9907f}}}},
+    {700u, {{95u, {323u, 375u, 0.9517f}}, {99u, {313u, 382u, 0.9901f}}}},
+    {800u, {{95u, {370u, 426u, 0.9511f}}, {99u, {362u, 435u, 0.9900f}}}},
+    {900u, {{95u, {419u, 478u, 0.9503f}}, {99u, {409u, 487u, 0.9904f}}}},
+    {1000u, {{95u, {468u, 530u, 0.9500f}}, {99u, {457u, 530u, 0.9905f}}}},
+    {2000u, {{95u, {954u, 1042u, 0.9504f}}, {99u, {939u, 1055u, 0.9901f}}}},
+    {5000u, {{95u, {2428u, 2567u, 0.9503f}}, {99u, {2405u, 2588u, 0.9901f}}}},
+    {10000u, {{95u, {4896u, 5093u, 0.9500f}}, {99u, {4868u, 5126u, 0.9900f}}}},
+    {100000u, {{95u, {49686u, 50306u, 0.9500f}}, {99u, {49587u, 50402u, 0.9900f}}}},
+    {1000000u, {{95u, {499017u, 500977u, 0.9500f}}, {99u, {498706u, 501282u, 0.9900f}}}}};
 
 std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAxis() const {
   auto axis = std::make_shared<PgfAxis>();
@@ -255,8 +256,8 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUp
   plot->options.lineWidth = config_->get<double>("medianCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolutionUpperConfidence"s;
-  plot->options.drawOpacity = config_->get<double>("medianCostPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<double>("medianCostPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity = config_->get<float>("medianCostPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity = config_->get<float>("medianCostPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -288,8 +289,8 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionLo
   plot->options.lineWidth = config_->get<double>("medianCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolutionLowerConfidence"s;
-  plot->options.drawOpacity = config_->get<double>("medianCostPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<double>("medianCostPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity = config_->get<float>("medianCostPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity = config_->get<float>("medianCostPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -304,7 +305,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionFi
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
-  plot->options.fillOpacity = config_->get<double>("medianCostPlots/confidenceIntervalFillOpacity");
+  plot->options.fillOpacity = config_->get<float>("medianCostPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
 
   return plot;

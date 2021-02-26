@@ -302,8 +302,8 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
   // Compute the default binning durations for the medians.
   auto contextName = config_->get<std::string>("experiment/context");
   std::size_t numMeasurements =
-      std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
-                config_->get<double>("experiment/logFrequency"));
+    static_cast<std::size_t>(std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
+                                       config_->get<double>("experiment/logFrequency")));
   double medianBinSize = 1.0 / config_->get<double>("experiment/logFrequency");
   defaultMedianBinDurations_.reserve(numMeasurements);
   for (std::size_t i = 0u; i < numMeasurements; ++i) {
@@ -311,11 +311,11 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
   }
 
   // Compute the default binning durations for the initial solution pdf.
-  double initDurationNumBins =
+  auto initDurationNumBins =
       config_->get<std::size_t>("statistics/initialSolutions/numDurationBins");
   double minExp = std::log10(minInitialSolutionDuration_);
   double maxExp = std::log10(maxNonInfInitialSolutionDuration_);
-  double binExpStep = (maxExp - minExp) / initDurationNumBins;
+  double binExpStep = (maxExp - minExp) / static_cast<double>(initDurationNumBins);
   for (std::size_t i = 0u; i < initDurationNumBins; ++i) {
     defaultInitialSolutionBinDurations_.emplace_back(
         std::pow(10.0, minExp + static_cast<double>(i) * binExpStep));
@@ -427,10 +427,16 @@ fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
   for (const auto percentile : percentiles) {
     std::vector<double> costs{};
     if (percentile < 0.5) {
-      costs = getNthCosts(results_.at(plannerName), std::floor(percentile * numRunsPerPlanner_),
+      costs = getNthCosts(results_.at(plannerName),
+                          static_cast<std::size_t>(
+                            std::floor(percentile *
+                                       static_cast<double>(numRunsPerPlanner_))),
                           durations);
     } else if (percentile > 0.5) {
-      costs = getNthCosts(results_.at(plannerName), std::ceil(percentile * numRunsPerPlanner_) - 1u,
+      costs = getNthCosts(results_.at(plannerName),
+                          static_cast<std::size_t>(
+                            std::ceil(percentile *
+                                      static_cast<double>(numRunsPerPlanner_))) - 1u,
                           durations);
     } else {
       costs = getMedianCosts(results_.at(plannerName), durations);
@@ -666,24 +672,24 @@ Statistics::ConfidenceInterval Statistics::getMedianConfidenceInterval(
   static const std::map<std::size_t, std::map<std::size_t, ConfidenceInterval>>
       medianConfidenceIntervals = {
           {1u, {{95u, {0u, 0u, 1.0}}, {99u, {0u, 0u, 1.0}}}},
-          {10u, {{95u, {1u, 8u, 0.9511}}, {99u, {0u, 9u, 0.9910}}}},
-          {50u, {{95u, {18u, 32u, 0.9511}}, {99u, {15u, 34u, 0.9910}}}},
-          {100u, {{95u, {40u, 60u, 0.9540}}, {99u, {37u, 63u, 0.9907}}}},
-          {200u, {{95u, {86u, 114u, 0.9520}}, {99u, {81u, 118u, 0.9906}}}},
-          {250u, {{95u, {110u, 141u, 0.9503}}, {99u, {104u, 145u, 0.9900}}}},
-          {300u, {{95u, {133u, 167u, 0.9502}}, {99u, {127u, 172u, 0.9903}}}},
-          {400u, {{95u, {179u, 219u, 0.9522}}, {99u, {174u, 226u, 0.9907}}}},
-          {500u, {{95u, {228u, 272u, 0.9508}}, {99u, {221u, 279u, 0.9905}}}},
-          {600u, {{95u, {274u, 323u, 0.9508}}, {99u, {267u, 331u, 0.9907}}}},
-          {700u, {{95u, {324u, 376u, 0.9517}}, {99u, {314u, 383u, 0.9901}}}},
-          {800u, {{95u, {371u, 427u, 0.9511}}, {99u, {363u, 436u, 0.9900}}}},
-          {900u, {{95u, {420u, 479u, 0.9503}}, {99u, {410u, 488u, 0.9904}}}},
-          {1000u, {{95u, {469u, 531u, 0.9500}}, {99u, {458u, 531u, 0.9905}}}},
-          {2000u, {{95u, {955u, 1043u, 0.9504}}, {99u, {940u, 1056u, 0.9901}}}},
-          {5000u, {{95u, {2429u, 2568u, 0.9503}}, {99u, {2406u, 2589u, 0.9901}}}},
-          {10000u, {{95u, {4897u, 5094u, 0.9500}}, {99u, {4869u, 5127u, 0.9900}}}},
-          {100000u, {{95u, {49687u, 50307u, 0.9500}}, {99u, {49588u, 50403u, 0.9900}}}},
-          {1000000u, {{95u, {499018u, 500978u, 0.9500}}, {99u, {498707u, 501283u, 0.9900}}}}};
+          {10u, {{95u, {1u, 8u, 0.9511f}}, {99u, {0u, 9u, 0.9910f}}}},
+          {50u, {{95u, {18u, 32u, 0.9511f}}, {99u, {15u, 34u, 0.9910f}}}},
+          {100u, {{95u, {40u, 60u, 0.9540f}}, {99u, {37u, 63u, 0.9907f}}}},
+          {200u, {{95u, {86u, 114u, 0.9520f}}, {99u, {81u, 118u, 0.9906f}}}},
+          {250u, {{95u, {110u, 141u, 0.9503f}}, {99u, {104u, 145u, 0.9900f}}}},
+          {300u, {{95u, {133u, 167u, 0.9502f}}, {99u, {127u, 172u, 0.9903f}}}},
+          {400u, {{95u, {179u, 219u, 0.9522f}}, {99u, {174u, 226u, 0.9907f}}}},
+          {500u, {{95u, {228u, 272u, 0.9508f}}, {99u, {221u, 279u, 0.9905f}}}},
+          {600u, {{95u, {274u, 323u, 0.9508f}}, {99u, {267u, 331u, 0.9907f}}}},
+          {700u, {{95u, {324u, 376u, 0.9517f}}, {99u, {314u, 383u, 0.9901f}}}},
+          {800u, {{95u, {371u, 427u, 0.9511f}}, {99u, {363u, 436u, 0.9900f}}}},
+          {900u, {{95u, {420u, 479u, 0.9503f}}, {99u, {410u, 488u, 0.9904f}}}},
+          {1000u, {{95u, {469u, 531u, 0.9500f}}, {99u, {458u, 531u, 0.9905f}}}},
+          {2000u, {{95u, {955u, 1043u, 0.9504f}}, {99u, {940u, 1056u, 0.9901f}}}},
+          {5000u, {{95u, {2429u, 2568u, 0.9503f}}, {99u, {2406u, 2589u, 0.9901f}}}},
+          {10000u, {{95u, {4897u, 5094u, 0.9500f}}, {99u, {4869u, 5127u, 0.9900f}}}},
+          {100000u, {{95u, {49687u, 50307u, 0.9500f}}, {99u, {49588u, 50403u, 0.9900f}}}},
+          {1000000u, {{95u, {499018u, 500978u, 0.9500f}}, {99u, {498707u, 501283u, 0.9900f}}}}};
   if (medianConfidenceIntervals.find(numRunsPerPlanner_) == medianConfidenceIntervals.end()) {
     auto msg = "No precomputed values for the median confidence interval with "s +
                std::to_string(numRunsPerPlanner_) + " runs. The precomputed values are:\n"s;

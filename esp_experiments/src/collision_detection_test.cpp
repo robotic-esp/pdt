@@ -171,7 +171,8 @@ int main(int argc, char** argv) {
         for (std::size_t i = 0u; i < candidateResolutions.size(); ++i) {
           std::cout << "  " << std::fixed << candidateResolutions[i] << "  "
                     << falseNegativesResults[i] << " / " << numTestedInvalid << " -> "
-                    << static_cast<double>(falseNegativesResults[i]) / numTestedInvalid << "\n";
+                    << static_cast<double>(falseNegativesResults[i]) /
+                       static_cast<double>(numTestedInvalid) << "\n";
         }
       }
     }
@@ -186,7 +187,8 @@ int main(int argc, char** argv) {
   for (std::size_t i = 0u; i < candidateResolutions.size(); ++i) {
     std::cout << "Resolution: " << std::fixed << candidateResolutions[i]
               << "\n\tFalse Neg: " << falseNegativesResults[i]
-              << "\tFalse Neg [%]: " << static_cast<double>(falseNegativesResults[i]) / numTestedInvalid
+              << "\tFalse Neg [%]: " << static_cast<float>(falseNegativesResults[i]) /
+                                        static_cast<float>(numTestedInvalid)
               << "\tValid Mean: " << boost::accumulators::extract_result<boost::accumulators::tag::mean>(timingResults[i].first)
               << "\tValid Max: " << boost::accumulators::extract_result<boost::accumulators::tag::max>(timingResults[i].first)
               << "\tValid Min: " << boost::accumulators::extract_result<boost::accumulators::tag::min>(timingResults[i].first)
