@@ -29,14 +29,14 @@ add_subdirectory(thirdparty/json)
 # us to specify esp_ompl_tools as a dependency of our build targets and enables
 # all the flags for these targets.
 add_library(esp_ompl_tools INTERFACE)
-target_compile_options(esp_ompl_tools INTERFACE 
+target_compile_options(esp_ompl_tools
+  INTERFACE 
   -Wall
   -Wextra
   -Wpedantic
   -Werror
   -Wconversion
-  -Wsign-conversion
-  )
+  -Wsign-conversion)
 target_compile_features(esp_ompl_tools
   INTERFACE
   cxx_std_17)
