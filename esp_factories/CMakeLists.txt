@@ -3,6 +3,7 @@ project(esp_factories)
 
 # Find the dependencies of this library.
 find_package(ompl REQUIRED)
+find_package(Boost 1.58 REQUIRED COMPONENTS system)
 
 # Specify the library as a target.
 add_library(esp_factories
@@ -19,6 +20,7 @@ target_link_libraries(esp_factories
   PRIVATE
   esp_ompl_tools
   PUBLIC
+  ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
   esp_common
   esp_configuration
