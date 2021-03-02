@@ -1,0 +1,59 @@
+{
+    "context": {
+        "test2d": {
+            "type": "ObstacleFree",
+            "objective": "defaultPathLength",
+            "start": [ -0.4, 0.0 ],
+            "goal": [ 0.4, 0.0 ],
+            "goalType": "GoalState",
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : [ 1, 1 ],
+            "collisionCheckResolution": 0.000005
+        },
+        "test4d": {
+            "type": "ObstacleFree",
+            "objective": "defaultPathLength",
+            "start": [ -0.4, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.4, 0.0, 0.0, 0.0 ],
+            "goalType": "GoalState",
+            "maxTime": 0.1,
+            "dimensions": 4,
+            "boundarySideLengths" : [ 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005
+        },
+        "test8d": {
+            "type": "ObstacleFree",
+            "objective": "defaultPathLength",
+            "start": [ -0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goalType": "GoalState",
+            "maxTime": 0.1,
+            "dimensions": 8,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005
+        },
+        "test16d": {
+            "type": "ObstacleFree",
+            "objective": "defaultPathLength",
+            "start": [ -0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goalType": "GoalState",
+            "maxTime": 0.1,
+            "dimensions": 16,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005
+        },
+        "test32d": {
+            "type": "ObstacleFree",
+            "objective": "defaultPathLength",
+            "start": [ -0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goal": [ 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+            "goalType": "GoalState",
+            "maxTime": 0.1,
+            "dimensions": 32,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.000005
+        }
+    }
+}

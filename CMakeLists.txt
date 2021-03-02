@@ -63,3 +63,4 @@ add_subdirectory(esp_visualization)
 
 # Add the tests.
 add_subdirectory(test/esp_configuration)
+add_subdirectory(test/esp_optimization_objectives)

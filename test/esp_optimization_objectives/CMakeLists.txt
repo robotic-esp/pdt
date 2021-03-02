@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.10)
+project(test_esp_optimization_objectives)
+
+# Find the dependencies of this library.
+find_package(ompl REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+# Specify the unit test as a target.
+add_executable(test_esp_optimization_objectives
+  unit_tests.cpp)
+
+# Specify the include directories for this target.
+target_include_directories(test_esp_optimization_objectives
+  PRIVATE
+  ${EIGEN_INCLUDE_DIRS}
+  ${OMPL_INCLUDE_DIRS})
+
+# Specify the link targets for this target.
+target_link_libraries(test_esp_optimization_objectives
+  PRIVATE
+  doctest
+  esp_ompl_tools
+  esp_configuration
+  esp_factories
+  esp_optimization_objectives)
+  
