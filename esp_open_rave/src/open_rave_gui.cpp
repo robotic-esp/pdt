@@ -352,7 +352,7 @@ void planR3xSO2(std::shared_ptr<esp::ompltools::Configuration> config,
   }
 }
 
-int main(int argc, char** argv) {
+int main(const int argc, const char** argv) {
   // Instantiate the config.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
   config->registerAsExperiment();

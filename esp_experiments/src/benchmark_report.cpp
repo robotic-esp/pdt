@@ -48,7 +48,7 @@
 
 using namespace std::string_literals;
 
-int main(int argc, char** argv) {
+int main(const int argc, const char** argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
 

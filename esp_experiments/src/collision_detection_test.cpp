@@ -55,7 +55,7 @@ using AccumulatorSet = boost::accumulators::accumulator_set<
                 boost::accumulators::tag::max, boost::accumulators::tag::mean,
                 boost::accumulators::tag::median, boost::accumulators::tag::lazy_variance>>;
 
-int main(int argc, char** argv) {
+int main(const int argc, const char** argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
   config->registerAsExperiment();
