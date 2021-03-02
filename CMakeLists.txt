@@ -60,3 +60,6 @@ add_subdirectory(esp_tikz)
 add_subdirectory(esp_time)
 add_subdirectory(esp_utilities)
 add_subdirectory(esp_visualization)
+
+# Add the tests.
+add_subdirectory(test/esp_configuration)
