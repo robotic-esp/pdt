@@ -20,14 +20,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 message(STATUS "Configuring ESP OMPL TOOLS for ${CMAKE_BUILD_TYPE} mode.")
 message(STATUS "Compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
-# Add the thirdparty projects.
+# Add json as a thirdparty project.
 set(JSON_BuildTests OFF CACHE INTERNAL "") # Don't build the tests for json.
 set(JSON_Install OFF CACHE INTERNAL "")    # Don't install the json lib.
 add_subdirectory(thirdparty/json)
 
-# Collect all compile flags used for compiling internal libraries. This allows
-# us to specify esp_ompl_tools as a dependency of our build targets and enables
-# all the flags for these targets.
+# Add doctest as a thirdparty project.
+add_subdirectory(thirdparty/doctest)
+
+# Collect all compile flags used for compiling internal libraries. Creating
+# esp_ompl_tools as an empty interface library allows us to specify esp_ompl_tools
+# as a private dependency for our build targets, which enables all the flags for these
+# targets without propagating them to external targets that depend on them.
 add_library(esp_ompl_tools INTERFACE)
 target_compile_options(esp_ompl_tools
   INTERFACE 
