@@ -68,11 +68,25 @@ ompl::base::Cost ReciprocalClearanceOptimizationObjective::stateCost(
 }
 
   ompl::base::Cost ReciprocalClearanceOptimizationObjective::motionCostHeuristic(const ompl::base::State* s1, const ompl::base::State* s2) const {
-    const auto clearance1 = spaceInfo_->getStateValidityChecker()->clearance(s1);
-    const auto clearance2 = spaceInfo_->getStateValidityChecker()->clearance(s2);
-    const auto clearance = clearance1 < clearance2 ? clearance1 : clearance2;
-    const auto distance  = spaceInfo_->distance(s1, s2);
-    return ompl::base::Cost(std::log((clearance + distance) / clearance));
+    // Get the clearance of the end states, bounded from below.
+    const auto c1 = std::max(spaceInfo_->getStateValidityChecker()->clearance(s1), 1e-6);
+    const auto c2 = std::max(spaceInfo_->getStateValidityChecker()->clearance(s2), 1e-6);
+
+    // Compute the distance between the states.
+    const auto d  = spaceInfo_->distance(s1, s2);
+
+    // Compute the intersection of the slopes.
+    const auto ti = 0.5 * (c2 - c1 + d);
+
+    // If the intersection is within the integration limits, integrate each part separately.
+    // Otherwise, integrate the part with the smaller clearance.
+    if (ti > 0 && ti < d) {
+      return ompl::base::Cost(std::log((c1 + c2 + d) / (2.0 * c1)) +
+                              std::log((c1 + c2 + d) / (2.0 * c2)));
+    } else {
+      const auto c = c1 < c2 ? c1 : c2;
+      return ompl::base::Cost(std::log((c + d) / c));
+    }
   }
 
 void ReciprocalClearanceOptimizationObjective::accept(const ObjectiveVisitor& visitor) const {
