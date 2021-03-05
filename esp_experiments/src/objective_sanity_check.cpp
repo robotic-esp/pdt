@@ -95,15 +95,15 @@ int main(const int argc, const char** argv) {
         sampler->sampleUniform(state2);
       } while (!spaceInfo->isValid(state2));
 
-      if (ii < 25) continue;
-
       // Compute the true and heuristic costs between the states.
       auto trueCost = objective->motionCost(state1, state2);
       auto heuristicCost = objective->motionCostHeuristic(state1, state2);
 
       if (objective->isCostBetterThan(trueCost, heuristicCost)) {
+        std::cout << std::boolalpha << std::setprecision(12);
         std::cout << "Cost: " << trueCost << ", heuristic: " << heuristicCost << '\n';
-        std::cout << "Edge index (ii): " << ii << '\n';
+        std::cout << "Edge index (i/ii): " << i << '/' << ii << '\n';
+        std::cout << "Edge valid: " << spaceInfo->getMotionValidator()->checkMotion(state1, state2) << '\n';
         std::cout << "Distance: " << spaceInfo->distance(state1, state2) << '\n';
         std::cout << "Cost 1: " << objective->stateCost(state1) << '\n';
         std::cout << "Cost 2: " << objective->stateCost(state2) << '\n';
