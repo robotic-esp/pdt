@@ -15,3 +15,6 @@ target_link_libraries(test_esp_configuration
   esp_ompl_tools
   esp_configuration)
   
+list(APPEND CMAKE_MODULE_PATH ${doctest_SOURCE_DIR}/scripts/cmake)
+include(doctest)
+doctest_discover_tests(test_esp_configuration)

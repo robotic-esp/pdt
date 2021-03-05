@@ -23,4 +23,7 @@ target_link_libraries(test_esp_optimization_objectives
   esp_configuration
   esp_factories
   esp_optimization_objectives)
-  
+
+list(APPEND CMAKE_MODULE_PATH ${doctest_SOURCE_DIR}/scripts/cmake)
+include(doctest)
+doctest_discover_tests(test_esp_optimization_objectives)

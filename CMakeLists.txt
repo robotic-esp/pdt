@@ -25,9 +25,6 @@ set(JSON_BuildTests OFF CACHE INTERNAL "") # Don't build the tests for json.
 set(JSON_Install OFF CACHE INTERNAL "")    # Don't install the json lib.
 add_subdirectory(thirdparty/json)
 
-# Add doctest as a thirdparty project.
-add_subdirectory(thirdparty/doctest)
-
 # Collect all compile flags used for compiling internal libraries. Creating
 # esp_ompl_tools as an empty interface library allows us to specify esp_ompl_tools
 # as a private dependency for our build targets, which enables all the flags for these
@@ -61,6 +58,15 @@ add_subdirectory(esp_time)
 add_subdirectory(esp_utilities)
 add_subdirectory(esp_visualization)
 
-# Add the tests.
-add_subdirectory(test/esp_configuration)
-add_subdirectory(test/esp_optimization_objectives)
+# Add the tests if requested.
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+  # Include CMake's test utilities.
+  include(CTest)
+  
+  # Add doctest as a thirdparty project.
+  add_subdirectory(thirdparty/doctest)
+
+  # Build the tests.
+  add_subdirectory(test/esp_configuration)
+  add_subdirectory(test/esp_optimization_objectives)
+endif()
