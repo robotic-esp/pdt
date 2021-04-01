@@ -68,6 +68,7 @@ int main(const int argc, const char** argv) {
   AccumulatorSet accuracyStats;
 
   // Keep track of how many edges were valid.
+  auto numEdges = 0u;
   auto numValidEdges = 0u;
 
   // Let's test.
@@ -87,6 +88,10 @@ int main(const int argc, const char** argv) {
 
     // Test edge costs.
     for (auto ii = 0u; ii < config->get<std::size_t>("experiment/numEdges"); ++ii) {
+      if (numEdges % 1000 == 0u) {
+        std::cout << "Tested " << numEdges << " edges.\n";
+      }
+      
       // Sample two valid states.
       do {
         sampler->sampleUniform(state1);
@@ -100,6 +105,7 @@ int main(const int argc, const char** argv) {
       auto heuristicCost = objective->motionCostHeuristic(state1, state2);
 
       if (objective->isCostBetterThan(trueCost, heuristicCost)) {
+        config->dumpAccessed();
         std::cout << std::boolalpha << std::setprecision(12);
         std::cout << "Cost: " << trueCost << ", heuristic: " << heuristicCost << '\n';
         std::cout << "Edge index (i/ii): " << i << '/' << ii << '\n';
@@ -109,14 +115,16 @@ int main(const int argc, const char** argv) {
         std::cout << "Cost 2: " << objective->stateCost(state2) << '\n';
         std::cout << "Clearance 1: " << spaceInfo->getStateValidityChecker()->clearance(state1) << '\n';
         std::cout << "Clearance 2: " << spaceInfo->getStateValidityChecker()->clearance(state2) << '\n';
-        throw std::runtime_error("Found invalid edge");
-      } else {
-        if (spaceInfo->checkMotion(state1, state2)) {
-          std::cout << "Cost: " << trueCost << ", heuristic: " << heuristicCost << '\n';
-          ++numValidEdges;
-          accuracyStats(heuristicCost.value() / trueCost.value());
-        }
+        OMPL_WARN("Found edge with inadmissible cost.");
       }
+      if (spaceInfo->checkMotion(state1, state2)) {
+        ++numValidEdges;
+        accuracyStats(heuristicCost.value() / trueCost.value());
+      }
+      
+
+      // Keep track of the tested edges.
+      ++numEdges;
     }
 
     // Free the allocated states.

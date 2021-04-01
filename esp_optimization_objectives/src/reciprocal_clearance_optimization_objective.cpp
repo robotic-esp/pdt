@@ -38,8 +38,11 @@
 
 #include <cmath>
 #include <memory>
+#include <string>
 
 #include <ompl/base/spaces/RealVectorStateSpace.h>
+
+using namespace std::string_literals;
 
 namespace esp {
 
@@ -47,12 +50,27 @@ namespace ompltools {
 
 ReciprocalClearanceOptimizationObjective::ReciprocalClearanceOptimizationObjective(
   const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-  const std::vector<double>& sampleFactors) :
+  const double heuristicSampleFraction) :
     ompl::base::StateCostIntegralObjective(spaceInfo, true),
     spaceInfo_(spaceInfo),
-    sampleFactors_(sampleFactors) {
-  // Optimization objectives have descriptions. (...)
-  description_ = "Reciprocal Clearance";
+    heuristicSampleFraction_(heuristicSampleFraction)
+{
+  description_ = "Reciprocal clearance objective that samples "s +
+                 std::to_string(heuristicSampleFraction) +
+                 " as many states as necessary to validate an edge to compute" +
+                 " an admissible heuristic.";
+}
+  
+ReciprocalClearanceOptimizationObjective::ReciprocalClearanceOptimizationObjective(
+  const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+  const std::vector<double>& heuristicSampleFactors) :
+    ompl::base::StateCostIntegralObjective(spaceInfo, true),
+    spaceInfo_(spaceInfo),
+    heuristicSampleFactors_(heuristicSampleFactors)
+{
+  description_ = "Reciprocal clearance objective that samples "s +
+                 std::to_string(heuristicSampleFactors.size()) +
+                 " states along each edge to compute an admissible heuristic.";
 }
 
 ompl::base::Cost ReciprocalClearanceOptimizationObjective::stateCost(
@@ -69,46 +87,67 @@ ompl::base::Cost ReciprocalClearanceOptimizationObjective::stateCost(
   }
 }
 
-  ompl::base::Cost ReciprocalClearanceOptimizationObjective::motionCostHeuristic(const ompl::base::State* s1, const ompl::base::State* s2) const {
+  ompl::base::Cost ReciprocalClearanceOptimizationObjective::motionCostHeuristic(                                                             const ompl::base::State* s1,
+                                     const ompl::base::State* s2,
+                                     const std::vector<double>& factors) const {
+  
     // Compute the distance between the states.
     const auto d  = spaceInfo_->distance(s1, s2);
     
     // Allocate state to test clearance.
     auto s = spaceInfo_->allocState();
 
-    // Get the clearance of all samples along edge.
-    constexpr auto percent = 0.5;
-    const auto segments = spaceInfo_->getStateSpace()->validSegmentCount(s1, s2);
-    const auto numSamples = std::max(2u, static_cast<unsigned>(std::ceil(percent * (segments + 1u))));
-    std::vector<double> ts(numSamples, 0.0);
-    std::vector<double> ds(numSamples, 0.0);
+    // Get the clearance of all samples along edge. 
+    const auto numSamples = factors.size();
     std::vector<double> cs(numSamples, 0.0);
     for (auto i = 0u; i < numSamples; ++i) {
-      ts[i] = 1.0 / static_cast<double>(numSamples) * static_cast<double>(i);
-      spaceInfo_->getStateSpace()->interpolate(s1, s2, ts[i], s);
+      spaceInfo_->getStateSpace()->interpolate(s1, s2, factors[i], s);
       cs[i] = std::max(spaceInfo_->getStateValidityChecker()->clearance(s), 1e-6);
-      ds[i] = d * ts[i];
     }
     
     // Free the allocated state.
     spaceInfo_->freeState(s);
     
-    // Compute first term.
-    ompl::base::Cost cost(std::log((ds[0u] + cs[0u]) / cs[0u]));
+    // Compute the first half-term, i.e., the component left of the first sample.
+    ompl::base::Cost cost(std::log((d * factors[0u] + cs[0u]) / cs[0u]));
 
-    // Compute the middle terms.
-    for (auto i = 1u; i < numSamples - 2u; ++i) {
+    // Compute terms between the samples.
+    for (auto i = 0u; i < numSamples - 1u; ++i) {
       const auto seg = ompl::base::Cost(
-          std::log(std::pow(cs[i] + cs[i + 1u] - (ds[i] - ds[i + 1u]), 2.0) /
+          std::log(std::pow(cs[i] + cs[i + 1u] + d * (factors[i + 1u] - factors[i]), 2.0) /
                    (4.0 * cs[i] * cs[i + 1u])));
       cost = combineCosts(cost, seg);
     }
 
-    // add the last term.
+    // Add the last half-term, i.e., the component right of the last sample.
     return combineCosts(cost,
-                        ompl::base::Cost(std::log((d - ds[numSamples - 1u] + cs[numSamples - 1u]) /
+                        ompl::base::Cost(std::log((d * (1 - factors[numSamples - 1u]) +
+                                                   cs[numSamples - 1u]) /
                                                   cs[numSamples - 1u])));
+}
+
+ompl::base::Cost
+ReciprocalClearanceOptimizationObjective::motionCostHeuristic(const ompl::base::State* s1,
+                                                              const ompl::base::State* s2) const {
+  if (heuristicSampleFraction_ >= 0.0) {
+    assert(heuristicSampleFraction_ <= 1.0);
+    const auto segments = spaceInfo_->getStateSpace()->validSegmentCount(s1, s2);
+    const auto numSamples =
+      std::max(2u, static_cast<unsigned>(std::ceil(heuristicSampleFraction_ *
+                                                   (segments + 1u))));
+    heuristicSampleFactors_.resize(numSamples);
+    std::generate(heuristicSampleFactors_.begin(),
+                  heuristicSampleFactors_.end(),
+                  [numSamples, i = 0u]() mutable {
+                    return static_cast<double>(i++) / static_cast<double>(numSamples - 1u);
+                  });
   }
+
+  // std::for_each(heuristicSampleFactors_.begin(), heuristicSampleFactors_.end(),
+  //               [](const auto factor){ std::cout << factor << " "; });
+
+  return motionCostHeuristic(s1, s2, heuristicSampleFactors_);  
+}
 
 void ReciprocalClearanceOptimizationObjective::accept(const ObjectiveVisitor& visitor) const {
   visitor.visit(*this);

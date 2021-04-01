@@ -47,13 +47,18 @@ namespace esp {
 
 namespace ompltools {
 
-// Obstacles are geometric primitives.
+// Reciprocal obstacle clearance optimization objective.
 class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostIntegralObjective,
                                                  public BaseOptimizationObjective {
  public:
   ReciprocalClearanceOptimizationObjective(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-    const std::vector<double>& sampleFactors = {0.0, 1.0});
+    const double heuristicSampleFraction);
+  
+  ReciprocalClearanceOptimizationObjective(
+    const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+    const std::vector<double>& heuristicSampleFactors);
+                                           
   virtual ~ReciprocalClearanceOptimizationObjective() = default;
 
   ompl::base::Cost stateCost(const ompl::base::State* state) const override;
@@ -64,8 +69,14 @@ class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostInt
   void accept(const ObjectiveVisitor& visitor) const override;
 
  private:
+  ompl::base::Cost motionCostHeuristic(const ompl::base::State* s1,
+                                       const ompl::base::State* s2,
+                                       const std::vector<double>& factors) const;
+  
   const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
-  const std::vector<double> sampleFactors_{};
+  const double heuristicSampleFraction_{-1.0};
+  // const unsigned heuristicSampleCount_{0u};
+  mutable std::vector<double> heuristicSampleFactors_{};
 };
 
 }  // namespace ompltools
