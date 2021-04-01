@@ -64,6 +64,38 @@
                 "useMoreSamplesIfUnsuccessful": false
             }
         },
+        "defaultFMTstar300": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espyellow",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 300,
+                "useKNearest": true,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
+        "defaultFMTstar400": {
+            "type": "FMTstar",
+            "isAnytime": false,
+            "report": {
+                "color": "espyellow",
+                "name": "FMT*"
+            },
+            "options": {
+                "numSamples": 400,
+                "useKNearest": true,
+                "radiusFactor": 1.001,
+                "useCollisionDetectionCache": true,
+                "useHeuristics": false,
+                "useMoreSamplesIfUnsuccessful": false
+            }
+        },
         "defaultFMTstar500": {
             "type": "FMTstar",
             "isAnytime": false,
