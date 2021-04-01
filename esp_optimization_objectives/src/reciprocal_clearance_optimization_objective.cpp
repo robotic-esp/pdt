@@ -46,9 +46,11 @@ namespace esp {
 namespace ompltools {
 
 ReciprocalClearanceOptimizationObjective::ReciprocalClearanceOptimizationObjective(
-    const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo) :
+  const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+  const std::vector<double>& sampleFactors) :
     ompl::base::StateCostIntegralObjective(spaceInfo, true),
-    spaceInfo_(spaceInfo) {
+    spaceInfo_(spaceInfo),
+    sampleFactors_(sampleFactors) {
   // Optimization objectives have descriptions. (...)
   description_ = "Reciprocal Clearance";
 }
@@ -63,30 +65,49 @@ ompl::base::Cost ReciprocalClearanceOptimizationObjective::stateCost(
     // is that this cost is sometimes used for further computation (such as for distance computation
     // in a nearest neighbor struct in FMT*) and overflows/infs/nans can result in segfaults because
     // these cases aren't handled propperly.
-    return ompl::base::Cost(1e6);
+    return ompl::base::Cost(1.0 / 1e-6);
   }
 }
 
   ompl::base::Cost ReciprocalClearanceOptimizationObjective::motionCostHeuristic(const ompl::base::State* s1, const ompl::base::State* s2) const {
-    // Get the clearance of the end states, bounded from below.
-    const auto c1 = std::max(spaceInfo_->getStateValidityChecker()->clearance(s1), 1e-6);
-    const auto c2 = std::max(spaceInfo_->getStateValidityChecker()->clearance(s2), 1e-6);
-
     // Compute the distance between the states.
     const auto d  = spaceInfo_->distance(s1, s2);
+    
+    // Allocate state to test clearance.
+    auto s = spaceInfo_->allocState();
 
-    // Compute the intersection of the slopes.
-    const auto ti = 0.5 * (c2 - c1 + d);
-
-    // If the intersection is within the integration limits, integrate each part separately.
-    // Otherwise, integrate the part with the smaller clearance.
-    if (ti > 0 && ti < d) {
-      return ompl::base::Cost(std::log((c1 + c2 + d) / (2.0 * c1)) +
-                              std::log((c1 + c2 + d) / (2.0 * c2)));
-    } else {
-      const auto c = c1 < c2 ? c1 : c2;
-      return ompl::base::Cost(std::log((c + d) / c));
+    // Get the clearance of all samples along edge.
+    constexpr auto percent = 0.5;
+    const auto segments = spaceInfo_->getStateSpace()->validSegmentCount(s1, s2);
+    const auto numSamples = std::max(2u, static_cast<unsigned>(std::ceil(percent * (segments + 1u))));
+    std::vector<double> ts(numSamples, 0.0);
+    std::vector<double> ds(numSamples, 0.0);
+    std::vector<double> cs(numSamples, 0.0);
+    for (auto i = 0u; i < numSamples; ++i) {
+      ts[i] = 1.0 / static_cast<double>(numSamples) * static_cast<double>(i);
+      spaceInfo_->getStateSpace()->interpolate(s1, s2, ts[i], s);
+      cs[i] = std::max(spaceInfo_->getStateValidityChecker()->clearance(s), 1e-6);
+      ds[i] = d * ts[i];
     }
+    
+    // Free the allocated state.
+    spaceInfo_->freeState(s);
+    
+    // Compute first term.
+    ompl::base::Cost cost(std::log((ds[0u] + cs[0u]) / cs[0u]));
+
+    // Compute the middle terms.
+    for (auto i = 1u; i < numSamples - 2u; ++i) {
+      const auto seg = ompl::base::Cost(
+          std::log(std::pow(cs[i] + cs[i + 1u] - (ds[i] - ds[i + 1u]), 2.0) /
+                   (4.0 * cs[i] * cs[i + 1u])));
+      cost = combineCosts(cost, seg);
+    }
+
+    // add the last term.
+    return combineCosts(cost,
+                        ompl::base::Cost(std::log((d - ds[numSamples - 1u] + cs[numSamples - 1u]) /
+                                                  cs[numSamples - 1u])));
   }
 
 void ReciprocalClearanceOptimizationObjective::accept(const ObjectiveVisitor& visitor) const {

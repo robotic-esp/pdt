@@ -52,7 +52,8 @@ class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostInt
                                                  public BaseOptimizationObjective {
  public:
   ReciprocalClearanceOptimizationObjective(
-      const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo);
+    const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+    const std::vector<double>& sampleFactors = {0.0, 1.0});
   virtual ~ReciprocalClearanceOptimizationObjective() = default;
 
   ompl::base::Cost stateCost(const ompl::base::State* state) const override;
@@ -64,6 +65,7 @@ class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostInt
 
  private:
   const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
+  const std::vector<double> sampleFactors_{};
 };
 
 }  // namespace ompltools
