@@ -57,7 +57,7 @@ ReciprocalClearanceOptimizationObjective::ReciprocalClearanceOptimizationObjecti
 {
   description_ = "Reciprocal clearance objective that samples "s +
                  std::to_string(heuristicSampleFraction) +
-                 " as many states as necessary to validate an edge to compute" +
+                 " times as many states as necessary to validate an edge to compute" +
                  " an admissible heuristic.";
 }
   
