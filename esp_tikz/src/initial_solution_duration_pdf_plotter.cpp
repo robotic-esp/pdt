@@ -133,7 +133,7 @@ std::shared_ptr<PgfPlot> InitialSolutionDurationPdfPlotter::createInitialSolutio
 
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(table);
-  plot->options.markSize = 0.0;
+  plot->options.mark = "\"none\"";
   plot->options.lineWidth = 0.0;
   plot->options.namePath = plannerName + "InitialSolutionDurationPdf"s;
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);

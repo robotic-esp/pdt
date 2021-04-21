@@ -39,6 +39,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <limits>
 
 #include "esp_tikz/pgf_plot.h"
 

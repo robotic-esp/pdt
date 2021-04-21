@@ -218,7 +218,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionPl
 
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
-  plot->options.markSize = 0.0;
+  plot->options.mark = "\"none\""s;
   plot->options.lineWidth = config_->get<double>("medianCostPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolution"s;
@@ -252,7 +252,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUp
 
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
-  plot->options.markSize = 0.0;
+  plot->options.mark = "\"none\""s;
   plot->options.lineWidth = config_->get<double>("medianCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolutionUpperConfidence"s;
@@ -285,7 +285,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionLo
 
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
-  plot->options.markSize = 0.0;
+  plot->options.mark = "\"none\""s;
   plot->options.lineWidth = config_->get<double>("medianCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolutionLowerConfidence"s;

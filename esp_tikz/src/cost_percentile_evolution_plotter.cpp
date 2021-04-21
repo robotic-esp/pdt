@@ -133,7 +133,7 @@ std::shared_ptr<PgfPlot> CostPercentileEvolutionPlotter::createCostPercentileEvo
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   // Common plot options.
-  plot->options.markSize = 0.0;
+  plot->options.mark = "\"none\""s;
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + percentileName.str() + "CostEvolution"s;
 
