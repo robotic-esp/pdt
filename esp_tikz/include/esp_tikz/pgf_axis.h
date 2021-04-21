@@ -90,6 +90,7 @@ class PgfAxis {
     std::string height{"0.5\\textwidth"};
     std::string majorGridStyle{"{densely dotted, black!20}"};
     std::string minorGridStyle{"{densely dotted, black!20}"};
+    std::string axisLineStyle{"{solid, black}"};
     std::string majorTickLength{""};
     std::string minorTickLength{""};
     std::string legendStyle{""};
