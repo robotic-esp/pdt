@@ -587,10 +587,10 @@ void TikzVisualizer::drawBITstarSpecificVisualizations(
   }
 
   // Draw the ellipse.
-  // auto nextEdgeQueueValue = bitstarData->getNextEdgeValueInQueue();
-  // if (!std::isnan(nextEdgeQueueValue.value()) && !std::isinf(nextEdgeQueueValue.value())) {
-  //   drawEllipse(nextEdgeQueueValue.value());
-  // }
+  auto nextEdgeQueueValue = bitstarData->getNextEdgeValueInQueue();
+  if (!std::isnan(nextEdgeQueueValue.value()) && !std::isinf(nextEdgeQueueValue.value())) {
+    drawEllipse(nextEdgeQueueValue.value());
+  }
 }
 
 void TikzVisualizer::drawAITstarSpecificVisualizations(
@@ -608,24 +608,24 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
   //              "fill = espgray, inner sep = 0mm, circle, minimum size = 0.2mm");
   // }
 
-  // Draw the backward search tree.
-  for (const auto& vertex : aitstarData->getVerticesInBackwardSearchTree()) {
-    // Add the edge to the parent.
-    if (vertex->hasReverseParent()) {
-      auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      auto parent = vertex->getReverseParent()
-                        ->getState()
-                        ->as<ompl::base::RealVectorStateSpace::StateType>();
-      drawEdge(parent, state, "edge, esplightblue");
-    }
-  }
-
-  // // Draw the top edge in the queue.
-  // auto nextEdge = aitstarData->getNextEdge();
-  // if (nextEdge.first && nextEdge.second) {
-  //   drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
-  //            nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, espred");
+  // // Draw the backward search tree.
+  // for (const auto& vertex : aitstarData->getVerticesInBackwardSearchTree()) {
+  //   // Add the edge to the parent.
+  //   if (vertex->hasReverseParent()) {
+  //     auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+  //     auto parent = vertex->getReverseParent()
+  //                       ->getState()
+  //                       ->as<ompl::base::RealVectorStateSpace::StateType>();
+  //     drawEdge(parent, state, "edge, esplightblue");
+  //   }
   // }
+
+  // Draw the top edge in the queue.
+  auto nextEdge = aitstarData->getNextEdge();
+  if (nextEdge.first && nextEdge.second) {
+    drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
+             nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, espred");
+  }
 
   // // Draw the next vertex in the queue.
   // auto nextVertex = aitstarData->getNextVertex();
@@ -715,18 +715,34 @@ void TikzVisualizer::drawEllipse(double cost) const {
   auto goal = config_->get<std::vector<double>>("context/"s + contextName + "/goal");
   auto length =
       std::sqrt(std::pow(start.at(0u) - goal.at(0u), 2) + std::pow(start.at(1u) - goal.at(1u), 2));
+  auto angle = std::atan2(goal.at(1u) - start.at(1u), goal.at(0u) - start.at(0u));
+
+  std::vector<double> center{(start.at(0u) + goal.at(0u)) / 2.0,
+                             (start.at(1u) + goal.at(1u)) / 2.0};
 
   // Compute the semi major-axis.
-  auto semiMajorAxis = cost / 2.0;
-  auto semiMinorAxis = std::sqrt(std::pow((cost / 2.0), 2) - std::pow((length / 2.0), 2));
+  auto majorAxisLength = cost / 2.0;
+  auto minorAxisLength = std::sqrt(cost * cost - length * length) / 2.0;
 
-  // Get midpoint of start and goal.
-  auto draw = std::make_shared<TikzDraw>();
-  draw->setFromPosition((start.at(0u) + goal.at(0u)) / 2.0, (start.at(1u) + goal.at(1u)) / 2.0);
-  draw->setToPosition(std::to_string(semiMajorAxis) + " and "s + std::to_string(semiMinorAxis));
-  draw->setConnection("ellipse");
-  draw->setOptions("densely dashed, thin, espgray");
-  picture_.addDraw(draw);
+  constexpr auto piHalf = 3.1415926535897 / 2.0;
+  std::vector<double> majorAxis{majorAxisLength * std::cos(angle),
+                                majorAxisLength * std::sin(angle)};
+  std::vector<double> minorAxis{minorAxisLength * std::cos(angle + piHalf),
+                                minorAxisLength * std::sin(angle + piHalf)};
+
+  std::ostringstream ellipseCommand{};
+
+  ellipseCommand << "\\color{gray}\n\\pgfpathellipse"
+                 // << "{\\pgfpointxy{" << start.at(0u) << "}{" << start.at(1u) << "}}"
+                 // << "{\\pgfpointxy{" << cost << "}{" << 0 << "}}"
+                 // << "{\\pgfpointxy{" << 0 << "}{" << cost << "}}"
+                 << "{\\pgfpointxy{" << center.at(0u) << "}{" << center.at(1u) << "}}"
+                 << "{\\pgfpointxy{" << majorAxis.at(0u) << "}{" << majorAxis.at(1u) << "}}"
+                 << "{\\pgfpointxy{" << minorAxis.at(0u) << "}{" << minorAxis.at(1u) << "}}\n"
+                 << "\\pgfsetdash{{1.2mm}{0.8mm}}{0cm}\n"
+                 << "\\pgfsetlinewidth{0.8mm}"
+                 << "\\pgfusepath{draw}\n";
+  picture_.addText(ellipseCommand.str());
 }
 
 }  // namespace ompltools

@@ -69,6 +69,7 @@ void TikzPicture::clear() {
   axes_.clear();
   nodes_.clear();
   draws_.clear();
+  texts_.clear();
 }
 
 void TikzPicture::setOptions(const TikzPictureOptions& options) {
@@ -85,6 +86,10 @@ void TikzPicture::addNode(const std::shared_ptr<TikzNode>& node) {
 
 void TikzPicture::addDraw(const std::shared_ptr<TikzDraw>& draw) {
   draws_.emplace_back(draw);
+}
+
+void TikzPicture::addText(const std::string& line) {
+  texts_.emplace_back(line);
 }
 
 void TikzPicture::setClipCommand(const std::string& clip) {
@@ -104,7 +109,8 @@ std::shared_ptr<PgfAxis> TikzPicture::generateLegendAxis() const {
   for (const auto& name : plannerNames) {
     std::string imageOptions{config_->get<std::string>("planner/"s + name + "/report/color"s) +
                              ", line width = 1.0pt, mark size=1.0pt, mark=square*"};
-    legendAxis->addLegendEntry(config_->get<std::string>("planner/"s + name + "/report/name"s), imageOptions);
+    legendAxis->addLegendEntry(config_->get<std::string>("planner/"s + name + "/report/name"s),
+                               imageOptions);
   }
   return legendAxis;
 }
@@ -129,6 +135,9 @@ std::string TikzPicture::string() const {
   }
   for (const auto& draw : draws_) {
     stream << draw->string() << '\n';
+  }
+  for (const auto& text : texts_) {
+    stream << text << '\n';
   }
   stream << "\\end{tikzpicture}%";
   return stream.str();
