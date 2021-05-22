@@ -134,10 +134,9 @@ ompl::base::Cost ReciprocalClearanceOptimizationObjective::motionCostHeuristic(
                   [numSamples, i = 0u]() mutable {
                     return static_cast<double>(i++) / static_cast<double>(numSamples - 1u);
                   });
+  } else {
+    return ompl::base::Cost(0.0);
   }
-
-  // std::for_each(heuristicSampleFactors_.begin(), heuristicSampleFactors_.end(),
-  //               [](const auto factor){ std::cout << factor << " "; });
 
   return motionCostHeuristic(s1, s2, heuristicSampleFactors_);
 }

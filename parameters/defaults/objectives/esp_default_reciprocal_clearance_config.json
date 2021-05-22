@@ -3,7 +3,7 @@
         "defaultReciprocalClearance": {
             "type": "ReciprocalClearance",
             "heuristicType": "fraction",
-            "heuristicFraction": 0.0,
+            "heuristicFraction": -1.0,
             "heuristicFactors": [0.0, 1.0],
             "solvedCost": 0.0
         }
