@@ -157,7 +157,7 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionDrawPlannerSpecificData(optionsName + ".Planner Specific", true, true);
   pangolin::Var<bool> optionDrawSolution(optionsName + ".Solution", true, true);
   pangolin::Var<bool> optionDrawStateIds(optionsName + ".State IDs", false, true);
-  pangolin::Var<bool> optionTrack(optionsName + ".Track", true, true);
+  pangolin::Var<bool> optionTrack(optionsName + ".Track", false, true);
   // Buttons.
   pangolin::Var<bool> optionScreenshot(optionsName + ".Screenshot", false, false);
   pangolin::Var<bool> optionTikzshot(optionsName + ".TikZshot", false, false);
