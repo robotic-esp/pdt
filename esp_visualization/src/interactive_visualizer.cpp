@@ -234,7 +234,7 @@ void InteractiveVisualizer::run() {
       recording_ = true;
       contextView.RecordOnRender("ffmpeg:[fps=60,bps=100000000,unique_filename]//" +
                                  std::to_string(screencaptureId_++) + '_' + context_->getName() +
-                                 '_' + planner_->getName() + ".avi");
+                                 '_' + planner_->getName() + ".mp4");
     }
     if (pangolin::Pushed(optionExport)) {
       optionTrack = false;
@@ -1042,7 +1042,7 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
   auto aitstarData =
       std::dynamic_pointer_cast<const AITstarData>(getPlannerSpecificData(iteration));
   if (context_->getDimension() == 2u) {
-    // Get the edge queue.
+    // Get the forward edge queue.
     auto forwardQueue = aitstarData->getForwardQueue();
     std::vector<Eigen::Vector2f> forwardQueueEdges;
     forwardQueueEdges.reserve(2u * forwardQueue.size());
