@@ -108,11 +108,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setInitialNumberOfSparseCollisionChecks(
           config_->get<std::size_t>(optionsKey + "/numInitialCollisionChecks"));
       planner->setRadiusFactor(config_->get<double>(optionsKey + "/radiusFactor"));
-      planner->enableCollisionDetectionInReverseSearch(
-          config_->get<bool>(optionsKey + "/collisionDetectionOnReverseSearch"));
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
-      planner->resetSuboptimalityFactorOnEveryApproximation(
-          config_->get<bool>(optionsKey + "/resetSuboptimalityFactorOnEveryApproximation"));
       planner->trackApproximateSolutions(
           config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
       return {planner, PLANNER_TYPE::EITSTAR};
@@ -123,7 +119,6 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->enablePruning(config_->get<bool>(optionsKey + "/enablePruning"));
-      planner->setRepairReverseSearch(config_->get<bool>(optionsKey + "/repairBackwardSearch"));
       planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
