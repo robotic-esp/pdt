@@ -1175,21 +1175,21 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
     // Draw the forward queue.
     drawLines(forwardQueueEdges, 1.5f, lightblue);
 
-    // Get the reverse queue.
-    auto reverseQueue = eitstarData->getReverseQueue();
-    std::vector<Eigen::Vector2f> reverseQueueEdges;
-    reverseQueueEdges.reserve(2u * reverseQueue.size());
-    for (const auto& edge : reverseQueue) {
-      auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseQueueEdges.emplace_back(static_cast<float>((*parentState)[0u]),
-                                     static_cast<float>((*parentState)[1u]));
-      auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-      reverseQueueEdges.emplace_back(static_cast<float>((*childState)[0u]),
-                                     static_cast<float>((*childState)[1u]));
-    }
+    // // Get the reverse queue.
+    // auto reverseQueue = eitstarData->getReverseQueue();
+    // std::vector<Eigen::Vector2f> reverseQueueEdges;
+    // reverseQueueEdges.reserve(2u * reverseQueue.size());
+    // for (const auto& edge : reverseQueue) {
+    //   auto parentState = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+    //   reverseQueueEdges.emplace_back(static_cast<float>((*parentState)[0u]),
+    //                                  static_cast<float>((*parentState)[1u]));
+    //   auto childState = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+    //   reverseQueueEdges.emplace_back(static_cast<float>((*childState)[0u]),
+    //                                  static_cast<float>((*childState)[1u]));
+    // }
 
-    // Draw the reverse queue.
-    drawLines(reverseQueueEdges, 1.5f, yellow);
+    // // Draw the reverse queue.
+    // drawLines(reverseQueueEdges, 1.5f, yellow);
 
     // Get the reverse tree.
     auto reverseTree = eitstarData->getReverseTree();
