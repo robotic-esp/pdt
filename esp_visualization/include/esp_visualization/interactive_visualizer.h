@@ -61,8 +61,7 @@ class InteractiveVisualizer : public BaseVisualizer,
                               public ObjectiveVisitor {
  public:
   InteractiveVisualizer(
-      const std::shared_ptr<Configuration>& config,
-      const std::shared_ptr<RealVectorGeometricContext>& context,
+      const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
       const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
   ~InteractiveVisualizer() = default;
 
@@ -115,7 +114,7 @@ class InteractiveVisualizer : public BaseVisualizer,
   void drawRectangle3D(const std::vector<float>& midpoint, const std::vector<float>& widths,
                        const float* faceColor, const float* edgeColor) const;
   void drawGoal() const;
-  void drawBoundary(const RealVectorGeometricContext& context) const;
+  void drawBoundary() const;
   void drawPoint(const Eigen::Vector2f& point, const float* color, float size) const;
   void drawPoint(const Eigen::Vector3f& point, const float* color, float size) const;
   void drawPoint(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state,
@@ -133,6 +132,8 @@ class InteractiveVisualizer : public BaseVisualizer,
                 float alpha = 1.0) const;
   void drawPath(const std::vector<Eigen::Vector3f>& points, float width, const float* color,
                 float alpha = 1.0) const;
+  void drawCars(const std::vector<Eigen::Vector3f>& points, float width, const float* color,
+                float alpha = 1.0) const;
 
   // Implement visualizations of contexts.
   void visit(const CentreSquare& context) const override;
@@ -145,6 +146,7 @@ class InteractiveVisualizer : public BaseVisualizer,
   void visit(const ObstacleFree& context) const override;
   void visit(const RandomRectangles& context) const override;
   void visit(const RandomRectanglesMultiStartGoal& context) const override;
+  void visit(const ReedsSheppRandomRectangles& context) const override;
   void visit(const RepeatingRectangles& context) const override;
   void visit(const StartEnclosure& context) const override;
   void visit(const WallGap& context) const override;
@@ -175,6 +177,10 @@ class InteractiveVisualizer : public BaseVisualizer,
   std::vector<Eigen::Vector3f> getEdges3D(std::size_t iteration) const;
   std::vector<Eigen::Vector2f> getPath2D(std::size_t iteration) const;
   std::vector<Eigen::Vector3f> getPath3D(std::size_t iteration) const;
+  std::vector<Eigen::Vector3f> getPathSE2(std::size_t iteration) const;
+
+  // The bounds of the context (the real-vector part of it).
+  ompl::base::RealVectorBounds bounds_;
 
   // The tikz visualizer.
   TikzVisualizer tikzVisualizer_;

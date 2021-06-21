@@ -32,74 +32,61 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+// Authors: Marlin Strub
+
+#pragma once
+
+#include <memory>
+#include <utility>
+
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/StateValidityChecker.h>
+#include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/datastructures/NearestNeighborsGNAT.h>
 
 #include "esp_obstacles/base_obstacle.h"
+#include "esp_obstacles/hyperrectangle.h"
+#include "esp_obstacles/obstacle_visitor.h"
 
 namespace esp {
 
 namespace ompltools {
 
-GeometricShape::GeometricShape(const ompl::base::SpaceInformationPtr& spaceInfo) :
-    space_(spaceInfo->getStateSpace()),
-    anchor_(spaceInfo) {
-}
+class ReedsSheppValidityChecker : public ompl::base::StateValidityChecker {
+ public:
+  explicit ReedsSheppValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo);
+  virtual ~ReedsSheppValidityChecker() = default;
 
-GeometricShape::GeometricShape(const ompl::base::StateSpacePtr& space) :
-    space_(space),
-    anchor_(space) {
-}
+  // Check if a state is valid.
+  virtual bool isValid(const ompl::base::State* state) const override;
 
-void GeometricShape::setAnchor(const ompl::base::ScopedState<>& state) {
-  anchor_ = state;
-}
+  // Return the minimum distance of a point to any obstacle.
+  virtual double clearance(const ompl::base::State* state) const override;
 
-ompl::base::ScopedState<> GeometricShape::getAnchor() const {
-  return anchor_;
-}
+  // Add obstacles.
+  virtual void addObstacle(const std::shared_ptr<BaseObstacle>& obstacle);
+  virtual void addObstacles(const std::vector<std::shared_ptr<BaseObstacle>>& obstacles);
 
-const ompl::base::State* GeometricShape::getState() const {
-  return anchor_.get();
-}
+  // Make obstacles accessible.
+  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const;
 
-std::vector<double> GeometricShape::getAnchorCoordinates() const {
-  // return anchor_.reals() ?
-  std::vector<double> coordinates(space_->getDimension(), 0.0);
-  for (auto i = 0u; i < coordinates.size(); ++i) {
-    coordinates[i] = anchor_[i];
-  }
-  return coordinates;
-}
+ protected:
+  // The normalized width and length of the Reeds-Shepp car.
+  double width_{0.02};
+  double length_{0.04};
+  double circumradius_;
 
-BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& spaceInfo) :
-    GeometricShape(spaceInfo) {
-}
+  using Point = std::array<double, 2u>;
+  using Axis = std::array<double, 2u>;
 
-BaseObstacle::BaseObstacle(const ompl::base::StateSpacePtr& space) : GeometricShape(space) {
-}
+  Point project(const Point& point, const Axis& axis) const;
+  double dotProduct(const Point& point, const Axis& axis) const;
 
-BaseAntiObstacle::BaseAntiObstacle(const ompl::base::SpaceInformationPtr& spaceInfo) :
-    GeometricShape(spaceInfo) {
-}
+  ompl::base::RealVectorStateSpace* vectorSpace_{};
+  ompl::base::SO2StateSpace* so2Space_{};
 
-BaseAntiObstacle::BaseAntiObstacle(const ompl::base::StateSpacePtr& space) : GeometricShape(space) {
-}
-
-bool BaseObstacle::invalidates(const ompl::base::State* state) const {
-  return isInside(state);
-}
-
-bool BaseObstacle::invalidates(const ompl::base::ScopedState<> state) const {
-  return invalidates(state.get());
-}
-
-bool BaseAntiObstacle::validates(const ompl::base::State* state) const {
-  return isInside(state);
-}
-
-bool BaseAntiObstacle::validates(const ompl::base::ScopedState<> state) const {
-  return validates(state.get());
-}
+  std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
+};
 
 }  // namespace ompltools
 

@@ -51,15 +51,27 @@ namespace esp {
 namespace ompltools {
 
 InteractiveVisualizer::InteractiveVisualizer(
-    const std::shared_ptr<Configuration>& config,
-    const std::shared_ptr<RealVectorGeometricContext>& context,
+    const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
     BaseVisualizer(config, context, plannerPair),
+    bounds_(2u),
     tikzVisualizer_(config, context, plannerPair),
     config_(config) {
-  if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
-    OMPL_ERROR("Visualizer only tested for real vector state spaces.");
+  if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR &&
+      context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_SE2) {
+    OMPL_ERROR("Visualizer only tested for real vector and SE(2) state spaces.");
     throw std::runtime_error("Visualizer error.");
+  }
+
+  // Get the bounds of the real vector part.
+  const auto vectorContext = std::dynamic_pointer_cast<RealVectorGeometricContext>(context_);
+  const auto se2Context = std::dynamic_pointer_cast<ReedsSheppRandomRectangles>(context_);
+  if (vectorContext) {
+    bounds_ = vectorContext->getBoundaries();
+  } else if (se2Context) {
+    bounds_ = se2Context->getBoundaries();
+  } else {
+    std::runtime_error("Interactive visualizer can only handle real vector and SE2 state spaces.");
   }
 }
 
@@ -87,17 +99,17 @@ void InteractiveVisualizer::run() {
   // respect to the window boundaries (0 is left/bottom, 1 is right/top).
   // We can also set an aspect ratio such that even if the window gets
   // rescaled the drawings in the viewport do not get distorted.
-  auto bounds = context_->getBoundaries();
-  if (context_->getDimension() == 2u) {
+  const auto dimension = bounds_.low.size();
+  if (dimension == 2u) {
     contextView.SetBounds(
         pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5), pangolin::Attach::Pix(205),
         pangolin::Attach::ReversePix(5),
-        (bounds.high.at(0) - bounds.low.at(0)) / (bounds.high.at(1) - bounds.low.at(1)));
+        (bounds_.high.at(0) - bounds_.low.at(0)) / (bounds_.high.at(1) - bounds_.low.at(1)));
   } else {
     contextView.SetBounds(
         pangolin::Attach::Pix(205), pangolin::Attach::ReversePix(5), pangolin::Attach::Pix(205),
         pangolin::Attach::ReversePix(5),
-        -(bounds.high.at(0) - bounds.low.at(0)) / (bounds.high.at(1) - bounds.low.at(1)));
+        -(bounds_.high.at(0) - bounds_.low.at(0)) / (bounds_.high.at(1) - bounds_.low.at(1)));
   }
   plotView.SetBounds(0.0, pangolin::Attach::Pix(200), pangolin::Attach::Pix(200), 1.0);
   pangolin::Plotter plotter(&costLog_, 0.0, 1.0, 0.0, 5.0);
@@ -113,7 +125,7 @@ void InteractiveVisualizer::run() {
   pangolin::Handler3D handler(renderState);
 
   // Get the bounds of the context to setup a correct renderstate.
-  if (context_->getDimension() == 2u) {
+  if (dimension == 2u) {
     // glShadeModel(GL_FLAT);
     // glEnable(GL_LINE_SMOOTH);
     glEnable(GL_BLEND);
@@ -122,14 +134,14 @@ void InteractiveVisualizer::run() {
     // glDisable(GL_DEPTH_TEST);
     // glDisable(GL_LIGHTING);
     renderState.SetProjectionMatrix(pangolin::ProjectionMatrixOrthographic(
-        bounds.low.at(0),   // The left boundary of the problem
-        bounds.high.at(0),  // The right boundary of the problem
-        bounds.low.at(1),   // The bottom boundary of the porblem
-        bounds.high.at(1),  // The top boundary of the problem
-        -1.0f,              // Shouldn't have to change this in 2D
-        1.0f                // Shouldn't have to change this in 2D
+        bounds_.low.at(0),   // The left boundary of the problem
+        bounds_.high.at(0),  // The right boundary of the problem
+        bounds_.low.at(1),   // The bottom boundary of the porblem
+        bounds_.high.at(1),  // The top boundary of the problem
+        -1.0f,               // Shouldn't have to change this in 2D
+        1.0f                 // Shouldn't have to change this in 2D
         ));
-  } else if (context_->getDimension() == 3u) {
+  } else if (dimension == 3u) {
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -170,10 +182,12 @@ void InteractiveVisualizer::run() {
   pangolin::RegisterKeyPressCallback('f', [this]() { incrementIteration(1u); });
   pangolin::RegisterKeyPressCallback('b', [this]() { decrementIteration(1u); });
   pangolin::RegisterKeyPressCallback('F', [this]() {
-    incrementIteration(static_cast<std::size_t>(std::ceil(0.1 * static_cast<double>(largestIteration_))));
+    incrementIteration(
+        static_cast<std::size_t>(std::ceil(0.1 * static_cast<double>(largestIteration_))));
   });
   pangolin::RegisterKeyPressCallback('B', [this]() {
-    decrementIteration(static_cast<std::size_t>(std::ceil(0.1 * static_cast<double>(largestIteration_))));
+    decrementIteration(
+        static_cast<std::size_t>(std::ceil(0.1 * static_cast<double>(largestIteration_))));
   });
   pangolin::RegisterKeyPressCallback(' ', [&optionTrack]() { optionTrack = !optionTrack; });
 
@@ -185,7 +199,7 @@ void InteractiveVisualizer::run() {
 
   // Give the data thread a head start.
   std::this_thread::sleep_for(std::chrono::milliseconds(10u));
-  
+
   while (!pangolin::ShouldQuit()) {
     if (displayIteration_ != lastDisplayIteration_) {
       std::cout << "Iteration: " << displayIteration_
@@ -407,12 +421,11 @@ void InteractiveVisualizer::decrementIteration(std::size_t num) {
 
 void InteractiveVisualizer::updateCostLog() {
   while (largestPlottedIteration_ < static_cast<int>(displayIteration_)) {
-    auto path =
-      getSolutionPath(static_cast<std::size_t>(++largestPlottedIteration_))->as<ompl::geometric::PathGeometric>();
+    auto path = getSolutionPath(static_cast<std::size_t>(++largestPlottedIteration_))
+                    ->as<ompl::geometric::PathGeometric>();
     if (path != nullptr) {
-      float cost =
-        static_cast<float>(
-           path->cost(planner_->getProblemDefinition()->getOptimizationObjective()).value());
+      float cost = static_cast<float>(
+          path->cost(planner_->getProblemDefinition()->getOptimizationObjective()).value());
       if (cost > maxCost_) {
         maxCost_ = cost;
       }
@@ -427,11 +440,11 @@ void InteractiveVisualizer::updateCostLog() {
 }
 
 void InteractiveVisualizer::drawVerticesAndEdges(std::size_t iteration) {
-  if (context_->getDimension() == 2u) {
+  if (bounds_.low.size() == 2u) {
     auto [vertices, edges] = getVerticesAndEdges2D(iteration);
     drawPoints(vertices, blue, 2.0f);
     drawLines(edges, 3.0f, gray);
-  } else if (context_->getDimension() == 3u) {
+  } else if (bounds_.low.size() == 3u) {
     auto [vertices, edges] = getVerticesAndEdges3D(iteration);
     drawPoints(vertices, blue, 2.0f);
     drawLines(edges, 3.0f, gray, 0.8f);
@@ -439,32 +452,39 @@ void InteractiveVisualizer::drawVerticesAndEdges(std::size_t iteration) {
 }
 
 void InteractiveVisualizer::drawVertices(std::size_t iteration) {
-  if (context_->getDimension() == 2u) {
+  if (bounds_.low.size() == 2u) {
     auto vertices = getVertices2D(iteration);
     drawPoints(vertices, blue, 2.0);
-  } else if (context_->getDimension() == 3u) {
+  } else if (bounds_.low.size() == 3u) {
     auto vertices = getVertices3D(iteration);
     drawPoints(vertices, blue, 2.0);
   }
 }
 
 void InteractiveVisualizer::drawEdges(std::size_t iteration) {
-  if (context_->getDimension() == 2u) {
+  if (bounds_.low.size() == 2u) {
     auto edges = getEdges2D(iteration);
     drawLines(edges, 3.0f, gray);
-  } else if (context_->getDimension() == 3u) {
+  } else if (bounds_.low.size() == 3u) {
     auto edges = getEdges3D(iteration);
     drawLines(edges, 3.0f, gray, 0.8f);
   }
 }
 
 void InteractiveVisualizer::drawSolution(std::size_t iteration) {
-  if (context_->getDimension() == 2u) {
-    auto path = getPath2D(iteration);
-    drawPath(path, 3.0, purple);
-  } else if (context_->getDimension() == 3u) {
-    auto path = getPath3D(iteration);
-    drawPath(path, 3.0, purple, 1.0);
+  if (context_->getStateSpace()->getType() == ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
+    if (bounds_.low.size() == 2u) {
+      auto path = getPath2D(iteration);
+      drawPath(path, 3.0, purple);
+    } else if (bounds_.low.size() == 3u) {
+      auto path = getPath3D(iteration);
+      drawPath(path, 3.0, purple, 1.0);
+    }
+  } else if (context_->getStateSpace()->getType() == ompl::base::StateSpaceType::STATE_SPACE_SE2) {
+    auto path = getPathSE2(iteration);
+    drawCars(path, 1.0, purple);
+  } else {
+    throw std::runtime_error("Don't know how to draw the solution for given state space.");
   }
 }
 
@@ -499,7 +519,7 @@ void InteractiveVisualizer::visit(const CentreSquare& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const DividingWalls& context) const {
@@ -508,7 +528,7 @@ void InteractiveVisualizer::visit(const DividingWalls& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const DoubleEnclosure& context) const {
@@ -517,7 +537,7 @@ void InteractiveVisualizer::visit(const DoubleEnclosure& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const FlankingGap& context) const {
@@ -526,7 +546,7 @@ void InteractiveVisualizer::visit(const FlankingGap& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const FourRooms& context) const {
@@ -535,7 +555,7 @@ void InteractiveVisualizer::visit(const FourRooms& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
@@ -544,7 +564,7 @@ void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const NarrowPassage& context) const {
@@ -553,7 +573,7 @@ void InteractiveVisualizer::visit(const NarrowPassage& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const ObstacleFree& context) const {
@@ -562,7 +582,7 @@ void InteractiveVisualizer::visit(const ObstacleFree& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const RandomRectangles& context) const {
@@ -571,7 +591,7 @@ void InteractiveVisualizer::visit(const RandomRectangles& context) const {
   // Get the goal.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const {
@@ -580,7 +600,16 @@ void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& context)
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit(const ReedsSheppRandomRectangles& context) const {
+  // Draw the start states.
+  drawPoint(context.getStartState(), green, 4.0);
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const RepeatingRectangles& context) const {
@@ -589,7 +618,7 @@ void InteractiveVisualizer::visit(const RepeatingRectangles& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const StartEnclosure& context) const {
@@ -598,7 +627,7 @@ void InteractiveVisualizer::visit(const StartEnclosure& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::visit(const WallGap& context) const {
@@ -607,7 +636,7 @@ void InteractiveVisualizer::visit(const WallGap& context) const {
   // Draw the goal states.
   drawGoal();
   // Draw the boundaries.
-  drawBoundary(context);
+  drawBoundary();
 }
 
 void InteractiveVisualizer::drawGoal() const {
@@ -645,53 +674,53 @@ void InteractiveVisualizer::drawGoal() const {
   }
 }
 
-void InteractiveVisualizer::drawBoundary(const RealVectorGeometricContext& context) const {
+void InteractiveVisualizer::drawBoundary() const {
   glColor4fv(black);
-  glLineWidth(3.0);
-  if (context.getDimension() == 2u) {
-    auto bounds = context.getBoundaries();
-    pangolin::glDrawRectPerimeter(static_cast<float>(bounds.low.at(0)),
-                                  static_cast<float>(bounds.low.at(1)),
-                                  static_cast<float>(bounds.high.at(0)),
-                                  static_cast<float>(bounds.high.at(1)));
-  } else if (context.getDimension() == 3u) {
-    auto bounds = context.getBoundaries();
+  const auto dimension = bounds_.low.size();
+  if (dimension == 2u) {
+    pangolin::glDrawRectPerimeter(
+        static_cast<float>(bounds_.low.at(0)), static_cast<float>(bounds_.low.at(1)),
+        static_cast<float>(bounds_.high.at(0)), static_cast<float>(bounds_.high.at(1)));
+  } else if (dimension == 3u) {
     std::vector<Eigen::Vector3d> points{
-        {bounds.low.at(0), bounds.low.at(1), bounds.low.at(2)},
-        {bounds.low.at(0), bounds.low.at(1), bounds.high.at(2)},
-        {bounds.low.at(0), bounds.low.at(1), bounds.low.at(2)},
-        {bounds.low.at(0), bounds.high.at(1), bounds.low.at(2)},
-        {bounds.low.at(0), bounds.low.at(1), bounds.low.at(2)},
-        {bounds.high.at(0), bounds.low.at(1), bounds.low.at(2)},
-        {bounds.high.at(0), bounds.high.at(1), bounds.high.at(2)},
-        {bounds.high.at(0), bounds.high.at(1), bounds.low.at(2)},
-        {bounds.high.at(0), bounds.high.at(1), bounds.high.at(2)},
-        {bounds.high.at(0), bounds.low.at(1), bounds.high.at(2)},
-        {bounds.high.at(0), bounds.high.at(1), bounds.high.at(2)},
-        {bounds.low.at(0), bounds.high.at(1), bounds.high.at(2)},
-        {bounds.low.at(0), bounds.low.at(1), bounds.high.at(2)},
-        {bounds.low.at(0), bounds.high.at(1), bounds.high.at(2)},
-        {bounds.low.at(0), bounds.low.at(1), bounds.high.at(2)},
-        {bounds.high.at(0), bounds.low.at(1), bounds.high.at(2)},
-        {bounds.low.at(0), bounds.high.at(1), bounds.low.at(2)},
-        {bounds.low.at(0), bounds.high.at(1), bounds.high.at(2)},
-        {bounds.low.at(0), bounds.high.at(1), bounds.low.at(2)},
-        {bounds.high.at(0), bounds.high.at(1), bounds.low.at(2)},
-        {bounds.high.at(0), bounds.low.at(1), bounds.low.at(2)},
-        {bounds.high.at(0), bounds.high.at(1), bounds.low.at(2)},
-        {bounds.high.at(0), bounds.low.at(1), bounds.low.at(2)},
-        {bounds.high.at(0), bounds.low.at(1), bounds.high.at(2)},
+        {bounds_.low.at(0), bounds_.low.at(1), bounds_.low.at(2)},
+        {bounds_.low.at(0), bounds_.low.at(1), bounds_.high.at(2)},
+        {bounds_.low.at(0), bounds_.low.at(1), bounds_.low.at(2)},
+        {bounds_.low.at(0), bounds_.high.at(1), bounds_.low.at(2)},
+        {bounds_.low.at(0), bounds_.low.at(1), bounds_.low.at(2)},
+        {bounds_.high.at(0), bounds_.low.at(1), bounds_.low.at(2)},
+        {bounds_.high.at(0), bounds_.high.at(1), bounds_.high.at(2)},
+        {bounds_.high.at(0), bounds_.high.at(1), bounds_.low.at(2)},
+        {bounds_.high.at(0), bounds_.high.at(1), bounds_.high.at(2)},
+        {bounds_.high.at(0), bounds_.low.at(1), bounds_.high.at(2)},
+        {bounds_.high.at(0), bounds_.high.at(1), bounds_.high.at(2)},
+        {bounds_.low.at(0), bounds_.high.at(1), bounds_.high.at(2)},
+        {bounds_.low.at(0), bounds_.low.at(1), bounds_.high.at(2)},
+        {bounds_.low.at(0), bounds_.high.at(1), bounds_.high.at(2)},
+        {bounds_.low.at(0), bounds_.low.at(1), bounds_.high.at(2)},
+        {bounds_.high.at(0), bounds_.low.at(1), bounds_.high.at(2)},
+        {bounds_.low.at(0), bounds_.high.at(1), bounds_.low.at(2)},
+        {bounds_.low.at(0), bounds_.high.at(1), bounds_.high.at(2)},
+        {bounds_.low.at(0), bounds_.high.at(1), bounds_.low.at(2)},
+        {bounds_.high.at(0), bounds_.high.at(1), bounds_.low.at(2)},
+        {bounds_.high.at(0), bounds_.low.at(1), bounds_.low.at(2)},
+        {bounds_.high.at(0), bounds_.high.at(1), bounds_.low.at(2)},
+        {bounds_.high.at(0), bounds_.low.at(1), bounds_.low.at(2)},
+        {bounds_.high.at(0), bounds_.low.at(1), bounds_.high.at(2)},
     };
     pangolin::glDrawLines(points);
+  } else {
+    OMPL_ERROR("Interactive visualizer can only visualize 2D or 3D contexts.");
+    throw std::runtime_error("Visualization error.");
   }
 }
 
 void InteractiveVisualizer::drawRectangle(const std::vector<float>& midpoint,
                                           const std::vector<float>& widths, const float* faceColor,
                                           const float* edgeColor) const {
-  if (midpoint.size() == 2u && widths.size() == 2u) {
+  if (widths.size() == 2u) {
     drawRectangle2D(midpoint, widths, faceColor, edgeColor);
-  } else if (midpoint.size() == 3u && widths.size() == 3u) {
+  } else if (widths.size() == 3u) {
     drawRectangle3D(midpoint, widths, faceColor, edgeColor);
   } else {
     OMPL_ERROR("Interactive visualizer can only visualize 2D or 3D contexts.");
@@ -765,12 +794,12 @@ void InteractiveVisualizer::drawPoint(
     const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state, const float* color,
     float size) const {
   if (state.getSpace()->getDimension() == 2u) {
-    drawPoint(Eigen::Vector2f(static_cast<float>(state[0u]),
-                              static_cast<float>(state[1u])), color, size);
+    drawPoint(Eigen::Vector2f(static_cast<float>(state[0u]), static_cast<float>(state[1u])), color,
+              size);
   } else if (state.getSpace()->getDimension() == 3u) {
-    drawPoint(Eigen::Vector3f(static_cast<float>(state[0u]),
-                              static_cast<float>(state[1u]),
-                              static_cast<float>(state[2u])), color, size);
+    drawPoint(Eigen::Vector3f(static_cast<float>(state[0u]), static_cast<float>(state[1u]),
+                              static_cast<float>(state[2u])),
+              color, size);
   } else {
     throw std::runtime_error("Can only visualize 2d and 3d states.");
   }
@@ -839,6 +868,52 @@ void InteractiveVisualizer::drawPath(const std::vector<Eigen::Vector3f>& points,
   pangolin::glDrawLineStrip(points);
 }
 
+void InteractiveVisualizer::drawCars(const std::vector<Eigen::Vector3f>& states, float width,
+                                     const float* color, float alpha) const {
+  glColor4f(color[0], color[1], color[2], alpha);
+  const auto carWidth = 0.02;
+  const auto carLength = 0.04;
+
+  // Compute the corners of the car in car coordinates and same order as above:
+  // upper left, upper right, lower right, lower left.
+  const std::vector<Eigen::Vector2f> carCornersCar{{-carLength / 2.0, carWidth / 2.0},
+                                                   {carLength / 2.0, carWidth / 2.0},
+                                                   {carLength / 2.0, -carWidth / 2.0},
+                                                   {-carLength / 2.0, -carWidth / 2.0}};
+
+  glLineWidth(width);
+
+  // Draw all cars.
+  std::vector<Eigen::Vector2f> points;
+  points.reserve(states.size());
+  for (const auto& state : states) {
+    // Remember the position of the car.
+    points.emplace_back(state[0u], state[1u]);
+
+    // Compute the corners of the car in world coordinates.
+    std::vector<Eigen::Vector2f> carCornersWorld{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+    for (auto i = 0u; i < 4u; ++i) {
+      carCornersWorld.at(i)[0u] = carCornersCar[i][0u] * std::cos(state[2u]) -
+                                  carCornersCar[i][1u] * std::sin(state[2u]) + state[0u];
+      carCornersWorld.at(i)[1u] = carCornersCar[i][0u] * std::sin(state[2u]) +
+                                  carCornersCar[i][1u] * std::cos(state[2u]) + state[1u];
+    }
+
+    // Draw the car.
+    pangolin::glDrawLine(carCornersWorld[0u][0u], carCornersWorld[0u][1u], carCornersWorld[1u][0u],
+                         carCornersWorld[1u][1u]);
+    pangolin::glDrawLine(carCornersWorld[1u][0u], carCornersWorld[1u][1u], carCornersWorld[2u][0u],
+                         carCornersWorld[2u][1u]);
+    pangolin::glDrawLine(carCornersWorld[2u][0u], carCornersWorld[2u][1u], carCornersWorld[3u][0u],
+                         carCornersWorld[3u][1u]);
+    pangolin::glDrawLine(carCornersWorld[3u][0u], carCornersWorld[3u][1u], carCornersWorld[0u][0u],
+                         carCornersWorld[0u][1u]);
+  }
+
+  // Draw the path as well.
+  drawPath(points, width, color, alpha);
+}
+
 void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
   const auto anchorCoords = obstacle.getAnchorCoordinates();
   std::vector<float> anchor(anchorCoords.begin(), anchorCoords.end());
@@ -856,12 +931,22 @@ void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiOb
 }
 
 void InteractiveVisualizer::visit(const PotentialFieldOptimizationObjective& objective) const {
-  if (context_->getDimension() == 2u) {
+  if (bounds_.low.size() == 2u) {
+    const auto vectorContext = std::dynamic_pointer_cast<RealVectorGeometricContext>(context_);
+    const auto se2Context = std::dynamic_pointer_cast<ReedsSheppRandomRectangles>(context_);
+    auto boundaries = ompl::base::RealVectorBounds(2u);
+
+    if (vectorContext) {
+      boundaries = vectorContext->getBoundaries();
+    } else if (se2Context) {
+      boundaries = se2Context->getBoundaries();
+    }
+
     // Get the widths of the context.
-    const auto minX = static_cast<float>(context_->getBoundaries().low.at(0u));
-    const auto maxX = static_cast<float>(context_->getBoundaries().high.at(0u));
-    const auto minY = static_cast<float>(context_->getBoundaries().low.at(1u));
-    const auto maxY = static_cast<float>(context_->getBoundaries().high.at(1u));
+    const auto minX = static_cast<float>(boundaries.low.at(0u));
+    const auto maxX = static_cast<float>(boundaries.high.at(0u));
+    const auto minY = static_cast<float>(boundaries.low.at(1u));
+    const auto maxY = static_cast<float>(boundaries.high.at(1u));
     const auto widthX = maxX - minX;
     const auto widthY = maxY - minY;
 
@@ -966,7 +1051,7 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
   // Get the BIT* specific data.
   auto bitstarData =
       std::dynamic_pointer_cast<const BITstarData>(getPlannerSpecificData(iteration));
-  if (context_->getDimension() == 2u) {
+  if (bounds_.low.size() == 2u) {
     // Get the edge queue.
     auto edgeQueue = bitstarData->getEdgeQueue();
     std::vector<Eigen::Vector2f> edges{};
@@ -994,7 +1079,7 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
 
     // Draw the next edge.
     drawLines(nextEdge, 3.0, red);
-  } else if (context_->getDimension() == 3u) {
+  } else if (bounds_.low.size() == 3u) {
     // Get the edge queue.
     auto edgeQueue = bitstarData->getEdgeQueue();
     std::vector<Eigen::Vector3f> edges{};
@@ -1021,13 +1106,12 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
     }
     auto sourceState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
     auto targetState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-    std::vector<Eigen::Vector3f> nextEdge{
-      Eigen::Vector3f(static_cast<float>((*sourceState)[0u]),
-                      static_cast<float>((*sourceState)[1u]),
-                      static_cast<float>((*sourceState)[2u])),
-      Eigen::Vector3f(static_cast<float>((*targetState)[0u]),
-                      static_cast<float>((*targetState)[1u]),
-                      static_cast<float>((*targetState)[2u]))};
+    std::vector<Eigen::Vector3f> nextEdge{Eigen::Vector3f(static_cast<float>((*sourceState)[0u]),
+                                                          static_cast<float>((*sourceState)[1u]),
+                                                          static_cast<float>((*sourceState)[2u])),
+                                          Eigen::Vector3f(static_cast<float>((*targetState)[0u]),
+                                                          static_cast<float>((*targetState)[1u]),
+                                                          static_cast<float>((*targetState)[2u]))};
 
     // Draw the next edge.
     drawLines(nextEdge, 3.0, red);
@@ -1041,7 +1125,7 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
   // Get the TBD* specific data.
   auto aitstarData =
       std::dynamic_pointer_cast<const AITstarData>(getPlannerSpecificData(iteration));
-  if (context_->getDimension() == 2u) {
+  if (bounds_.low.size() == 2u) {
     // Get the forward edge queue.
     auto forwardQueue = aitstarData->getForwardQueue();
     std::vector<Eigen::Vector2f> forwardQueueEdges;
@@ -1076,7 +1160,7 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
       auto state = nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       drawPoints(std::vector<Eigen::Vector2f>{Eigen::Vector2f(static_cast<float>((*state)[0u]),
                                                               static_cast<float>((*state)[1u]))},
-        red, 10.0f);
+                 red, 10.0f);
     }
 
     // Draw the backward search tree.
@@ -1113,7 +1197,7 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
                                                           static_cast<float>((*targetState)[1u]))};
     // Draw the next edge.
     drawLines(nextEdge, 3.0f, red);
-  } else if (context_->getDimension() == 3u) {
+  } else if (bounds_.low.size() == 3u) {
     // Get the edge queue.
     auto edgeQueue = aitstarData->getForwardQueue();
     std::vector<Eigen::Vector3f> edges{};
@@ -1143,12 +1227,12 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
     auto sourceState = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
     auto targetState = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
     std::vector<Eigen::Vector3f> nextEdgeVector{
-      Eigen::Vector3f(static_cast<float>((*sourceState)[0u]),
-                      static_cast<float>((*sourceState)[1u]),
-                      static_cast<float>((*sourceState)[2u])),
-      Eigen::Vector3f(static_cast<float>((*targetState)[0u]),
-                      static_cast<float>((*targetState)[1u]),
-                      static_cast<float>((*targetState)[2u]))};
+        Eigen::Vector3f(static_cast<float>((*sourceState)[0u]),
+                        static_cast<float>((*sourceState)[1u]),
+                        static_cast<float>((*sourceState)[2u])),
+        Eigen::Vector3f(static_cast<float>((*targetState)[0u]),
+                        static_cast<float>((*targetState)[1u]),
+                        static_cast<float>((*targetState)[2u]))};
     // Draw the next edge.
     drawLines(nextEdgeVector, 3.0f, red);
   }
@@ -1158,7 +1242,7 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
   // Get the EIT* specific data.
   auto eitstarData =
       std::dynamic_pointer_cast<const EITstarData>(getPlannerSpecificData(iteration));
-  if (context_->getDimension() == 2u) {
+  if (bounds_.low.size() == 2u) {
     // Get the forward queue.
     auto forwardQueue = eitstarData->getForwardQueue();
     std::vector<Eigen::Vector2f> forwardQueueEdges;
@@ -1242,7 +1326,7 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
       // Draw the next edge.
       drawLines(nextEdge, 3.0f, darkred);
     }
-  } else if (context_->getDimension() == 3u) {
+  } else if (bounds_.low.size() == 3u) {
     // Get the forward queue.
     auto forwardQueue = eitstarData->getForwardQueue();
     std::vector<Eigen::Vector3f> forwardQueueEdges;
@@ -1342,16 +1426,30 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
 std::pair<std::vector<Eigen::Vector2f>, std::vector<Eigen::Vector2f>>
 InteractiveVisualizer::getVerticesAndEdges2D(std::size_t iteration) const {
   const auto& currentPlannerData = getPlannerData(iteration);
+  const auto vectorContext = std::dynamic_pointer_cast<RealVectorGeometricContext>(context_);
+  const auto se2Context = std::dynamic_pointer_cast<ReedsSheppRandomRectangles>(context_);
+
   // Get the vertices and edges in the format supported by Panglin.
   std::vector<Eigen::Vector2f> vertices{};
   std::vector<Eigen::Vector2f> edges{};  // Size must be multiple of two.
   for (auto i = 0u; i < currentPlannerData->numVertices(); ++i) {
     auto vertex = currentPlannerData->getVertex(i);
+    auto vertexX = 0.0;
+    auto vertexY = 0.0;
+
     // Check the vertex is valid.
     if (vertex != ompl::base::PlannerData::NO_VERTEX) {
-      const auto* vertexState =
-          static_cast<const ompl::base::RealVectorStateSpace::StateType*>(vertex.getState());
-      vertices.emplace_back(vertexState->values[0], vertexState->values[1]);
+      if (vectorContext) {
+        vertexX = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->values[0u];
+        vertexY = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->values[1u];
+      } else if (se2Context) {
+        vertexX = vertex.getState()->as<ompl::base::SE2StateSpace::StateType>()->getX();
+        vertexY = vertex.getState()->as<ompl::base::SE2StateSpace::StateType>()->getY();
+      } else {
+        std::runtime_error(
+            "Interactive visualizer can only handle real vector and SE2 state spaces.");
+      }
+      vertices.emplace_back(vertexX, vertexY);
 
       // Get the outgoing edges of this vertex.
       std::vector<unsigned int> outgoingEdges{};
@@ -1360,17 +1458,32 @@ InteractiveVisualizer::getVerticesAndEdges2D(std::size_t iteration) const {
         // Check that the vertex is valid.
         auto child = currentPlannerData->getVertex(outgoingEdges.at(j));
         if (child != ompl::base::PlannerData::NO_VERTEX) {
+          auto childX = 0.0;
+          auto childY = 0.0;
+
+          if (vectorContext) {
+            childX =
+                child.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->values[0u];
+            childY =
+                child.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->values[1u];
+          } else if (se2Context) {
+            childX = child.getState()->as<ompl::base::SE2StateSpace::StateType>()->getX();
+            childY = child.getState()->as<ompl::base::SE2StateSpace::StateType>()->getY();
+          } else {
+            std::runtime_error(
+                "Interactive visualizer can only handle real vector and SE2 state spaces.");
+          }
+
           // Add the parent.
-          edges.emplace_back(vertexState->values[0], vertexState->values[1]);
+          edges.emplace_back(vertexX, vertexY);
 
           // Add the child.
-          const auto* targetState =
-              static_cast<const ompl::base::RealVectorStateSpace::StateType*>(child.getState());
-          edges.emplace_back(targetState->values[0], targetState->values[1]);
+          edges.emplace_back(childX, childY);
         }
       }
     }
   }
+
   return {vertices, edges};
 }
 
@@ -1402,7 +1515,8 @@ InteractiveVisualizer::getVerticesAndEdges3D(std::size_t iteration) const {
           // Add the child.
           const auto* targetState =
               static_cast<const ompl::base::RealVectorStateSpace::StateType*>(child.getState());
-          edges.emplace_back(targetState->values[0], targetState->values[1], targetState->values[2]);
+          edges.emplace_back(targetState->values[0], targetState->values[1],
+                             targetState->values[2]);
         }
       }
     }
@@ -1497,7 +1611,8 @@ std::vector<Eigen::Vector3f> InteractiveVisualizer::getEdges3D(std::size_t itera
           // Add the child.
           const auto* targetState =
               static_cast<const ompl::base::RealVectorStateSpace::StateType*>(child.getState());
-          edges.emplace_back(targetState->values[0], targetState->values[1], targetState->values[2]);
+          edges.emplace_back(targetState->values[0], targetState->values[1],
+                             targetState->values[2]);
         }
       }
     }
@@ -1512,7 +1627,7 @@ std::vector<Eigen::Vector2f> InteractiveVisualizer::getPath2D(std::size_t iterat
     auto path = solution->as<ompl::geometric::PathGeometric>()->getStates();
     points.reserve(path.size());
     for (const auto state : path) {
-      const auto* rstate = static_cast<const ompl::base::RealVectorStateSpace::StateType*>(state);
+      const auto* rstate = state->as<ompl::base::RealVectorStateSpace::StateType>();
       points.emplace_back(rstate->values[0], rstate->values[1]);
     }
   }
@@ -1526,11 +1641,27 @@ std::vector<Eigen::Vector3f> InteractiveVisualizer::getPath3D(std::size_t iterat
     auto path = solution->as<ompl::geometric::PathGeometric>()->getStates();
     points.reserve(path.size());
     for (const auto state : path) {
-      const auto* rstate = static_cast<const ompl::base::RealVectorStateSpace::StateType*>(state);
+      const auto* rstate = state->as<ompl::base::RealVectorStateSpace::StateType>();
       points.emplace_back(rstate->values[0], rstate->values[1], rstate->values[2]);
     }
   }
   return points;
+}
+
+std::vector<Eigen::Vector3f> InteractiveVisualizer::getPathSE2(std::size_t iteration) const {
+  std::vector<Eigen::Vector3f> states{};
+  auto solution = getSolutionPath(iteration);
+  if (solution != nullptr) {
+    auto path = solution->as<ompl::geometric::PathGeometric>();
+    path->interpolate(20);
+    auto se2states = path->getStates();
+    states.reserve(se2states.size());
+    for (const auto state : se2states) {
+      const auto* se2state = state->as<ompl::base::SE2StateSpace::StateType>();
+      states.emplace_back(se2state->getX(), se2state->getY(), se2state->getYaw());
+    }
+  }
+  return states;
 }
 
 }  // namespace ompltools

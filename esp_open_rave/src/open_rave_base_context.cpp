@@ -60,6 +60,18 @@ OpenRaveBaseContext::OpenRaveBaseContext(
     BaseContext(spaceInfo, config, name) {
 }
 
+std::vector<std::shared_ptr<BaseObstacle>> OpenRaveBaseContext::getObstacles() const {
+  return {};
+}
+
+std::vector<std::shared_ptr<BaseAntiObstacle>> OpenRaveBaseContext::getAntiObstacles() const {
+  return {};
+}
+
+std::shared_ptr<ompl::base::Goal> OpenRaveBaseContext::createGoal() const {
+  return std::make_shared<ompl::base::GoalState>(spaceInfo_);
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

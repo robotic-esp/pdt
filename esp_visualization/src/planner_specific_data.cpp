@@ -119,7 +119,7 @@ void AITstarData::setVerticesInBackwardSearchTree(
   verticesInBackwardSearchTree_.reserve(vertices.size());
   for (const auto& vertex : vertices) {
     verticesInBackwardSearchTree_.emplace_back(
-        std::make_shared<ompl::geometric::aitstar::Vertex>(*vertex));
+        std::make_shared<ompl::geometric::aitstar::Vertex>(vertex));
   }
 }
 

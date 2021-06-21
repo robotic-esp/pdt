@@ -72,6 +72,10 @@ const ompl::base::RealVectorBounds& RealVectorGeometricContext::getBoundaries() 
   return bounds_;
 }
 
+void RealVectorGeometricContext::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
+}
+
 std::shared_ptr<ompl::base::Goal> RealVectorGeometricContext::createGoal() const {
   // Instantiate the goal.
   switch (goalType_) {

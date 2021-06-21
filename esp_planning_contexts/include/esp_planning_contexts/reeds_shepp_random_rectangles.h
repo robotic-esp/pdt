@@ -37,60 +37,79 @@
 #pragma once
 
 #include <memory>
-#include <utility>
-#include <vector>
+#include <string>
 
-#include <ompl/base/Cost.h>
-#include <ompl/base/StateSpace.h>
-#include <ompl/base/spaces/RealVectorBounds.h>
-#include <ompl/datastructures/NearestNeighborsGNAT.h>
-#include <ompl/util/Console.h>
-#include <ompl/util/Exception.h>
+#include <ompl/base/ProblemDefinition.h>
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/goals/GoalSampleableRegion.h>
+#include <ompl/base/spaces/SE2StateSpace.h>
+#include <ompl/util/RandomNumbers.h>
 
 #include "esp_configuration/configuration.h"
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_planning_contexts/base_context.h"
 #include "esp_planning_contexts/context_visitor.h"
-#include "esp_time/time.h"
+#include "esp_planning_contexts/real_vector_geometric_context.h"
 
 namespace esp {
 
 namespace ompltools {
 
-/** \brief The base class for an experiment */
-class RealVectorGeometricContext : public BaseContext {
+/** \brief An experiment with a singularly placed square obstacle*/
+class ReedsSheppRandomRectangles : public BaseContext {
  public:
-  RealVectorGeometricContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+  /** \brief The constructor. */
+  ReedsSheppRandomRectangles(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                              const std::shared_ptr<const Configuration>& config,
                              const std::string& name);
 
-  // Use default virtual destructor.
-  virtual ~RealVectorGeometricContext() = default;
+  /** \brief The destructor. */
+  virtual ~ReedsSheppRandomRectangles() = default;
 
-  /** \brief Get the state-space limit */
-  const ompl::base::RealVectorBounds& getBoundaries() const;
+  /** \brief Instantiate a problem definition for this context. */
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
+      const override;
 
-  // Get the obstacles.
-  std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const override;
+  /** \brief Return a copy of the start state. */
+  ompl::base::ScopedState<ompl::base::SE2StateSpace> getStartState() const;
 
-  // Get the antiobstacles.
-  std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const override;
+  /** \brief Return a copy of the bounds. */
+  ompl::base::RealVectorBounds getBoundaries() const;
 
-  // Accept a visitor.
+  /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
 
-  /** \brief Create a new goal. */
+  /** \brief Get the obstacles. */
+  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const override;
+
+  /** \brief Get the antiobstacles */
+  virtual std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const override;
+
+  /** \brief Create the goal. */
   std::shared_ptr<ompl::base::Goal> createGoal() const override;
 
  protected:
+  /** \brief Create the obstacles. */
+  void createObstacles();
+
   /** \brief The state space bounds. */
   ompl::base::RealVectorBounds bounds_;
 
   /** \brief The obstacles. */
   std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
 
-  /** \brief The anti obstacles. */
-  std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
+  /** \brief The number of hyper rectangles. */
+  std::size_t numRectangles_;
+
+  /** \brief The minimum side length of the hyper rectangles. */
+  double minSideLength_;
+
+  /** \brief The maximum side length of the hyper rectangles. */
+  double maxSideLength_;
+
+  /** \brief The random number generator. */
+  ompl::RNG rng_{};
+
+  /** \brief The start state. */
+  ompl::base::ScopedState<ompl::base::SE2StateSpace> startState_;
 };
 
 }  // namespace ompltools

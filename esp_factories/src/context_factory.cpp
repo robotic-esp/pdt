@@ -39,6 +39,8 @@
 #include <ompl/base/StateSpace.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/base/spaces/SE2StateSpace.h>
+#include <ompl/base/spaces/ReedsSheppStateSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/spaces/SE3WAxisAngleBoundStateSpace.h>
 
@@ -234,6 +236,14 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         throw std::runtime_error("Error allocating a RandomRectanglesMultiStartGoal context.");
       }
     }
+    case CONTEXT_TYPE::REEDS_SHEPP_RANDOM_RECTANGLES: {
+      try {
+        return std::make_shared<ReedsSheppRandomRectangles>(
+            createReedsSheppSpaceInfo(parentKey), config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating a RandomRectanglesMultiStartGoal context.");
+      }
+    }
     case CONTEXT_TYPE::REPEATING_RECTANGLES: {
       try {
         return std::make_shared<RepeatingRectangles>(createRealVectorSpaceInfo(parentKey), config_,
@@ -274,6 +284,25 @@ std::shared_ptr<ompl::base::SpaceInformation> ContextFactory::createRealVectorSp
   auto sideLengths = config_->get<std::vector<double>>(parentKey + "/boundarySideLengths");
   ompl::base::RealVectorBounds bounds(config_->get<unsigned>(parentKey + "/dimensions"));
   for (std::size_t dim = 0u; dim < config_->get<std::size_t>(parentKey + "/dimensions"); ++dim) {
+    bounds.low.at(dim) = -0.5 * sideLengths.at(dim);
+    bounds.high.at(dim) = 0.5 * sideLengths.at(dim);
+  }
+  stateSpace->setBounds(bounds);
+
+  // Allocate the state information for this space.
+  return std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+}
+
+  std::shared_ptr<ompl::base::SpaceInformation> ContextFactory::createReedsSheppSpaceInfo(
+    const std::string& parentKey) const {
+  assert(config_->get<std::vector<double>>(parentKey + "/boundarySideLengths").size() == 2u);
+  // Allocate a real vector state space.
+  auto stateSpace = std::make_shared<ompl::base::ReedsSheppStateSpace>(0.1);
+
+  // Set the bounds.
+  auto sideLengths = config_->get<std::vector<double>>(parentKey + "/boundarySideLengths");
+  ompl::base::RealVectorBounds bounds(2u);
+  for (std::size_t dim = 0u; dim < 2u; ++dim) {
     bounds.low.at(dim) = -0.5 * sideLengths.at(dim);
     bounds.high.at(dim) = 0.5 * sideLengths.at(dim);
   }
