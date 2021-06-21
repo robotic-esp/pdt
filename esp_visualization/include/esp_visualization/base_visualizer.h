@@ -61,7 +61,7 @@ namespace ompltools {
 class BaseVisualizer {
  public:
   BaseVisualizer(const std::shared_ptr<Configuration> &config,
-                 const std::shared_ptr<RealVectorGeometricContext> &context,
+                 const std::shared_ptr<BaseContext> &context,
                  const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
   virtual ~BaseVisualizer();
 
@@ -82,7 +82,7 @@ class BaseVisualizer {
   time::Duration getTotalElapsedDuration(std::size_t iteration) const;
 
   // The current context.
-  std::shared_ptr<RealVectorGeometricContext> context_{};
+  std::shared_ptr<BaseContext> context_{};
 
   // The current planner.
   std::shared_ptr<ompl::base::Planner> planner_{};
@@ -113,7 +113,7 @@ class BaseVisualizer {
   const std::shared_ptr<const Configuration> config_;
 
   // This is how many iterations we'll create ahead of the viewed iteration.
-  std::size_t iterationBuffer_{1000u};
+  std::size_t iterationBuffer_{1u};
 
   // The planner data, indexed by the iteration.
   std::vector<std::shared_ptr<ompl::base::PlannerData>> plannerData_{};

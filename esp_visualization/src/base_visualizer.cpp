@@ -52,7 +52,7 @@ namespace ompltools {
 
 BaseVisualizer::BaseVisualizer(
     const std::shared_ptr<Configuration> &config,
-    const std::shared_ptr<RealVectorGeometricContext> &context,
+    const std::shared_ptr<BaseContext> &context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
     context_(context),
     planner_(plannerPair.first),

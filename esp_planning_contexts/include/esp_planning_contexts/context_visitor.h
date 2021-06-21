@@ -53,6 +53,7 @@ class OpenRaveManipulator;
 class OpenRaveSE3;
 class RandomRectangles;
 class RandomRectanglesMultiStartGoal;
+class ReedsSheppRandomRectangles;
 class RepeatingRectangles;
 class Spiral;
 class StartEnclosure;
@@ -74,6 +75,7 @@ class ContextVisitor {
   virtual void visit(const ObstacleFree &context) const = 0;
   virtual void visit(const RandomRectangles &context) const = 0;
   virtual void visit(const RandomRectanglesMultiStartGoal &context) const = 0;
+  virtual void visit(const ReedsSheppRandomRectangles &context) const = 0;
   virtual void visit(const RepeatingRectangles &context) const = 0;
   // virtual void visit(const Spiral &context) const = 0;
   virtual void visit(const StartEnclosure &context) const = 0;

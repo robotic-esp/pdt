@@ -63,12 +63,20 @@ namespace ompltools {
 class OpenRaveBaseContext : public BaseContext {
  public:
   OpenRaveBaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-           const std::shared_ptr<const Configuration>& config, const std::string& name);
+                      const std::shared_ptr<const Configuration>& config, const std::string& name);
   virtual ~OpenRaveBaseContext() = default;
 
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override = 0;
 
+  /** \brief Get the obstacles. */
+  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const override;
+
+  /** \brief Get the antiobstacles. */
+  virtual std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const override;
+
+  /** \brief Create a new goal. */
+  virtual std::shared_ptr<ompl::base::Goal> createGoal() const override;
 };
 
 }  // namespace ompltools

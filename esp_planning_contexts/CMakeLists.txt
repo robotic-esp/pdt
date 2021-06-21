@@ -20,6 +20,8 @@ add_library(esp_planning_contexts
   src/random_rectangles.cpp
   src/random_rectangles_multi_start_goal.cpp
   src/real_vector_geometric_context.cpp
+  src/reeds_shepp_random_rectangles.cpp
+  src/reeds_shepp_validity_checker.cpp
   src/repeating_rectangles.cpp
   # src/spiral.cpp
   src/start_enclosure.cpp
