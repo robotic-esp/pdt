@@ -81,7 +81,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
                             const ompl::base::PathPtr path,
                             const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData,
                             double iterationTime, double totalTime, double solutionCost) {
-  if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR ||
+  if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR &&
       context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_SE2) {
     OMPL_ERROR("Tikz visualizer can only visualize 2d real vector or se2 contexts.");
     throw std::runtime_error("Visualizer error.");
