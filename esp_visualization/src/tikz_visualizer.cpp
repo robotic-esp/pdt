@@ -200,12 +200,13 @@ std::experimental::filesystem::path TikzVisualizer::compile(
              << "\\RequirePackage{pdftexcmds}\n"
              << "\\makeatletter\n"
              << "\\let\\pdfshellescape\\pdf@shellescape\n"
-             << "\\makeatother "
+             << "\\makeatother\n"
              << "\\RequirePackage{luatex85}\n"
              << "\\documentclass[convert={density=300,outext=.png}]{"
                 "standalone}\n"
              << "\\usepackage{xcolor}\n"
              << "\\usepackage{fontspec}\n"
+             << "\\setmainfont{Roboto}"
              << "\\usepackage{tikz}\n\n";
 
   // Define the colors.
@@ -231,9 +232,9 @@ std::experimental::filesystem::path TikzVisualizer::compile(
   standalone << "\n\\begin{document}\n"
              << "\\pagecolor{white}\n"
              << "\\begin{minipage}{10cm}\n"
-             << "\n\\noindent\\Large\\vphantom{pP}"
+             << "\n\\noindent\\Huge\\vphantom{pP}\\textbf{"
              << config_->get<std::string>("planner/" + name_ + "/report/name")
-             << "\\vphantom{pP}\\quad\\small Cost: ";
+             << "}\\vphantom{pP}\\\\\\LARGE Cost: ";
   if (std::isfinite(cost)) {
     standalone << cost;
   } else {
