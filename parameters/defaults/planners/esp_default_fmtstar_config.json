@@ -5,7 +5,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (10)"
             },
             "options": {
                 "numSamples": 10,
@@ -21,7 +21,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (50)"
             },
             "options": {
                 "numSamples": 50,
@@ -37,7 +37,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (100)"
             },
             "options": {
                 "numSamples": 100,
@@ -53,7 +53,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (200)"
             },
             "options": {
                 "numSamples": 200,
@@ -69,7 +69,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (300)"
             },
             "options": {
                 "numSamples": 300,
@@ -85,7 +85,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (400)"
             },
             "options": {
                 "numSamples": 400,
@@ -101,7 +101,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (500)"
             },
             "options": {
                 "numSamples": 500,
@@ -117,7 +117,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (750)"
             },
             "options": {
                 "numSamples": 500,
@@ -133,7 +133,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (1000)"
             },
             "options": {
                 "numSamples": 1000,
@@ -149,7 +149,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (2000)"
             },
             "options": {
                 "numSamples": 2000,
@@ -165,7 +165,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (3000)"
             },
             "options": {
                 "numSamples": 3000,
@@ -181,7 +181,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (4000)"
             },
             "options": {
                 "numSamples": 4000,
@@ -197,7 +197,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (5000)"
             },
             "options": {
                 "numSamples": 5000,
@@ -213,7 +213,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (7500)"
             },
             "options": {
                 "numSamples": 7500,
@@ -229,7 +229,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (10000)"
             },
             "options": {
                 "numSamples": 10000,
@@ -245,7 +245,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (25000)"
             },
             "options": {
                 "numSamples": 25000,
@@ -261,7 +261,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (50000)"
             },
             "options": {
                 "numSamples": 50000,
@@ -277,7 +277,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (75000)"
             },
             "options": {
                 "numSamples": 75000,
@@ -293,7 +293,7 @@
             "isAnytime": false,
             "report": {
                 "color": "espyellow",
-                "name": "FMT*"
+                "name": "FMT* (100000)"
             },
             "options": {
                 "numSamples": 100000,
