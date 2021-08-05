@@ -59,12 +59,15 @@ KpiTable::KpiTable(const std::shared_ptr<const Configuration>& config, const Sta
 
 void KpiTable::addKpi(const std::string& plannerName, const std::string& plannerPlotName) {
   plannerNames_.push_back(plannerPlotName);
-  auto initMinDuration = stats_.getMinInitialSolutionDuration(plannerName);
-  auto initMedDuration = stats_.getMedianInitialSolutionDuration(plannerName);
-  auto initMaxDuration = stats_.getMaxInitialSolutionDuration(plannerName);
   auto initMinCost = stats_.getMinInitialSolutionCost(plannerName);
   auto initMedCost = stats_.getMedianInitialSolutionCost(plannerName);
   auto initMaxCost = stats_.getMaxInitialSolutionCost(plannerName);
+  auto initMinDuration = stats_.getMinInitialSolutionDuration(plannerName);
+  auto initMedDuration = stats_.getMedianInitialSolutionDuration(plannerName);
+  auto initMaxDuration = std::numeric_limits<double>::infinity();
+  if (std::isfinite(initMaxCost)) {
+    initMaxDuration = stats_.getMaxNonInfInitialSolutionDuration(plannerName);
+  }
   auto success = stats_.getSuccessRate(plannerName);
 
   if (config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
