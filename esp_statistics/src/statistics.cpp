@@ -173,6 +173,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
         minInitialSolutionDurations_[name] = std::numeric_limits<double>::infinity();
         maxInitialSolutionDurations_[name] = std::numeric_limits<double>::lowest();
         maxNonInfInitialSolutionDurations_[name] = std::numeric_limits<double>::lowest();
+        successRates_[name] = 0.0;
       }
     } else if (row.at(0) != name) {
       throw std::runtime_error("Csv file has unexpected structure.");
@@ -274,6 +275,9 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
         if (i == row.size() - 1u && cost < minFinalCosts_.at(name)) {
           minFinalCosts_.at(name) = cost;
         }
+        if (i == row.size() - 1u && cost != std::numeric_limits<double>::infinity()) {
+          successRates_.at(name) += 1.0;  // We divide by num runs later.
+        }
 
         // Remember this cost (for max initial solution durations).
         lastCost = cost;
@@ -300,11 +304,16 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
     numRunsPerPlanner_ = results_.begin()->second.numMeasuredRuns();
   }
 
+  // Compute the success rates.
+  for (auto& element : successRates_) {
+    element.second = element.second / static_cast<double>(numRunsPerPlanner_);
+  }
+
   // Compute the default binning durations for the medians.
   auto contextName = config_->get<std::string>("experiment/context");
-  std::size_t numMeasurements =
-    static_cast<std::size_t>(std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
-                                       config_->get<double>("experiment/logFrequency")));
+  std::size_t numMeasurements = static_cast<std::size_t>(
+      std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
+                config_->get<double>("experiment/logFrequency")));
   double medianBinSize = 1.0 / config_->get<double>("experiment/logFrequency");
   defaultMedianBinDurations_.reserve(numMeasurements);
   for (std::size_t i = 0u; i < numMeasurements; ++i) {
@@ -430,14 +439,13 @@ fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
     if (percentile < 0.5) {
       costs = getNthCosts(results_.at(plannerName),
                           static_cast<std::size_t>(
-                            std::floor(percentile *
-                                       static_cast<double>(numRunsPerPlanner_))),
+                              std::floor(percentile * static_cast<double>(numRunsPerPlanner_))),
                           durations);
     } else if (percentile > 0.5) {
       costs = getNthCosts(results_.at(plannerName),
                           static_cast<std::size_t>(
-                            std::ceil(percentile *
-                                      static_cast<double>(numRunsPerPlanner_))) - 1u,
+                              std::ceil(percentile * static_cast<double>(numRunsPerPlanner_))) -
+                              1u,
                           durations);
     } else {
       costs = getMedianCosts(results_.at(plannerName), durations);
@@ -807,6 +815,10 @@ double Statistics::getMedianInitialSolutionDuration(const std::string& plannerNa
 
 double Statistics::getMedianInitialSolutionCost(const std::string& plannerName) const {
   return getMedianInitialSolutionCost(results_.at(plannerName));
+}
+
+double Statistics::getSuccessRate(const std::string& plannerName) const {
+  return successRates_.at(plannerName);
 }
 
 std::vector<double> Statistics::getDefaultBinDurations() const {

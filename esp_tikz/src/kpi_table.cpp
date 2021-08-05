@@ -36,7 +36,7 @@
 
 /*
 Algorithm | t_init,min | t_init,med | t_init,max | c_init,min | c_init,med | c_init,max | c_fin,min
-| c_fin,med | c_fin,max |
+| c_fin,med | c_fin,max | success|
  */
 
 #include "esp_tikz/kpi_table.h"
@@ -65,18 +65,20 @@ void KpiTable::addKpi(const std::string& plannerName, const std::string& planner
   auto initMinCost = stats_.getMinInitialSolutionCost(plannerName);
   auto initMedCost = stats_.getMedianInitialSolutionCost(plannerName);
   auto initMaxCost = stats_.getMaxInitialSolutionCost(plannerName);
+  auto success = stats_.getSuccessRate(plannerName);
+
   if (config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto finalMinCost = stats_.getMinFinalCost(plannerName);
     auto finalMedCost = stats_.getMedianFinalCost(plannerName);
     auto finalMaxCost = stats_.getMaxFinalCost(plannerName);
     appendRow({initMinDuration, initMedDuration, initMaxDuration, initMinCost, initMedCost,
-               initMaxCost, finalMinCost, finalMedCost, finalMaxCost});
+        initMaxCost, finalMinCost, finalMedCost, finalMaxCost, success});
   } else {
     auto finalMinCost = initMinCost;
     auto finalMedCost = initMedCost;
     auto finalMaxCost = initMaxCost;
     appendRow({initMinDuration, initMedDuration, initMaxDuration, initMinCost, initMedCost,
-               initMaxCost, finalMinCost, finalMedCost, finalMaxCost});
+        initMaxCost, finalMinCost, finalMedCost, finalMaxCost, success});
   }
 }
 
@@ -88,10 +90,19 @@ std::string KpiTable::string() const {
   // Figure out which values are the best.
   std::map<std::size_t, std::pair<std::size_t, double>> best{};  // col, {row, val}.
   for (std::size_t col = 0u; col < data_.size(); ++col) {
-    best[col] = {0u, std::numeric_limits<double>::infinity()};
-    for (std::size_t row = 0u; row < data_.at(0u).size(); ++row) {
-      if (data_.at(col).at(row) < best.at(col).second) {
-        best.at(col) = {row, data_.at(col).at(row)};
+    if (col != data_.size() - 1u) {
+      best[col] = {0u, std::numeric_limits<double>::infinity()};
+      for (std::size_t row = 0u; row < data_.at(0u).size(); ++row) {
+        if (data_.at(col).at(row) < best.at(col).second) {
+          best.at(col) = {row, data_.at(col).at(row)};
+        }
+      }
+    } else {
+      best[col] = {0u, 0.0};
+      for (std::size_t row = 0u; row < data_.at(0u).size(); ++row) {
+        if (data_.at(col).at(row) > best.at(col).second) {
+          best.at(col) = {row, data_.at(col).at(row)};
+        }
       }
     }
   }
@@ -99,28 +110,31 @@ std::string KpiTable::string() const {
   std::stringstream stream;
   stream << std::fixed;
   stream << "{\\tiny\n";
-  stream << "\\begin{tabularx}{\\textwidth}[c]{Xccccccccc}\\toprule\n";
-  stream << "Planner " << options.colSep << " \\(t_\\mathrm{initial}^\\mathrm{min}\\) "
-         << options.colSep << " \\(t_\\mathrm{initial}^\\mathrm{med}\\) " << options.colSep
-         << " \\(t_\\mathrm{initial}^\\mathrm{max}\\) " << options.colSep
-         << " \\(c_\\mathrm{initial}^\\mathrm{min}\\) " << options.colSep
-         << " \\(c_\\mathrm{initial}^\\mathrm{med}\\) " << options.colSep
-         << " \\(c_\\mathrm{initial}^\\mathrm{max}\\) " << options.colSep
+  stream << "\\setlength{\\tabcolsep}{0.8em}\n";
+  stream << "\\begin{tabularx}{\\textwidth}[c]{Xcccccccccc}\\toprule\n";
+  stream << "Planner " << options.colSep << " \\(t_\\mathrm{init}^\\mathrm{min}\\) "
+         << options.colSep << " \\(t_\\mathrm{init}^\\mathrm{med}\\) " << options.colSep
+         << " \\(t_\\mathrm{init}^\\mathrm{max}\\) " << options.colSep
+         << " \\(c_\\mathrm{init}^\\mathrm{min}\\) " << options.colSep
+         << " \\(c_\\mathrm{init}^\\mathrm{med}\\) " << options.colSep
+         << " \\(c_\\mathrm{init}^\\mathrm{max}\\) " << options.colSep
          << " \\(c_\\mathrm{final}^\\mathrm{min}\\) " << options.colSep
          << " \\(c_\\mathrm{final}^\\mathrm{med}\\) " << options.colSep
-         << " \\(c_\\mathrm{final}^\\mathrm{max}\\) " << options.rowSep << "\\midrule\n";
+         << " \\(c_\\mathrm{final}^\\mathrm{max}\\) " << options.colSep
+         << " Success " << options.rowSep << "\\midrule\n";
   for (std::size_t row = 0u; row < data_.at(0u).size(); ++row) {
     stream << plannerNames_.at(row) << options.colSep << ' ';
     for (std::size_t col = 0u; col < data_.size(); ++col) {
-      if (col < 3) {
-        stream << std::setprecision(5);
+      if (col == data_.size() - 1u) {
+        stream << std::setprecision(2);
       } else {
-        stream << std::setprecision(3);
+        stream << std::setprecision(4);
       }
+      
       if (data_.at(col).at(row) == std::numeric_limits<double>::infinity()) {
         stream << "\\infty ";
       } else {
-        if (row == best.at(col).first) {
+        if (data_.at(col).at(row) == best.at(col).second) {
           stream << "\\bfseries ";
         }
         stream << data_.at(col).at(row) << ' ';
