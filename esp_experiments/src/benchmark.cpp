@@ -222,6 +222,7 @@ int main(int argc, char **argv) {
             maxSolveDuration) {
           break;
         }
+<<<<<<< HEAD
       } while (future.wait_until(addMeasurementStart + idle) != std::future_status::ready);
 
       // Wait until the planner returns.
@@ -242,6 +243,19 @@ int main(int argc, char **argv) {
       } else {
         logger.addMeasurement(totalDuration,
                               ompl::base::Cost(std::numeric_limits<double>::infinity()));
+      }
+
+      // some planners can stop early. Thus, we need to add an additional final measurement point
+      // just above the maximum runtime
+      const auto maxRunDuration = context->getMaxSolveDuration()*(1+1e-6);
+      if (totalDuration < maxRunDuration) {
+        if (problem->hasExactSolution()) {
+          logger.addMeasurement(maxRunDuration,
+                                problem->getSolutionPath()->cost(context->getObjective()));
+        } else {
+          logger.addMeasurement(maxRunDuration,
+                                ompl::base::Cost(std::numeric_limits<double>::infinity()));
+        }
       }
 
       // Add this run to the log and report it to the console.
