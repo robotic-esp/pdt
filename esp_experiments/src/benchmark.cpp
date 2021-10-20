@@ -222,7 +222,6 @@ int main(int argc, char **argv) {
             maxSolveDuration) {
           break;
         }
-<<<<<<< HEAD
       } while (future.wait_until(addMeasurementStart + idle) != std::future_status::ready);
 
       // Wait until the planner returns.
