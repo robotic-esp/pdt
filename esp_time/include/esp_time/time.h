@@ -40,6 +40,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 namespace esp {
 
@@ -47,8 +48,18 @@ namespace ompltools {
 
 namespace time {
 
-// We need a steady clock because we use it as a stopwatch.
-using Clock = std::chrono::steady_clock;
+// There are two fundamentally different types of clocks, called steady and unsteady. Steady clocks
+// are monotonically increasing, which makes them good at measuring duration. Unsteady clocks
+// sometimes move backward in time to correct for accumulated drift, which makes them good for
+// telling the exact time. We need a steady clock because we care about measuring duration.
+using Clock = std::conditional<std::chrono::high_resolution_clock::is_steady,
+                               std::chrono::high_resolution_clock, std::chrono::steady_clock>::type;
+
+// Apparently sometimes even stead_clock is not steady. For example GCC 4.7 must be built with
+// --enable-libstdcxx-time=rt to get a steady std::steady_clock. Let's prevent nasty surprises.
+static_assert(Clock::is_steady);
+
+// Storing durations as seconds in doubles.
 using Duration = std::chrono::duration<double, std::ratio<1>>;
 
 // Convert a TimePoint to a string.

@@ -33,7 +33,7 @@ make -j 4
 sudo make install
 ```
 
-Make sure you are on the `esp_ompl_tools` branch. You can use `git branch` to check which branch you have checked out.
+Make sure you are on the `esp-master` branch. You can use `git branch` to check which branch you have checked out.
 
 #### Boost
 

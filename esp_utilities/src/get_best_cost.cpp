@@ -39,10 +39,10 @@
 #include <limits>
 #include <string>
 
-#include <ompl/geometric/planners/eitstar/EITstar.h>
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/EITstar.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
