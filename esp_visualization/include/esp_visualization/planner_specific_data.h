@@ -37,10 +37,10 @@
 #pragma once
 
 #include <ompl/base/SpaceInformation.h>
-#include <ompl/geometric/planners/eitstar/EITstar.h>
-#include <ompl/geometric/planners/eitstar/Edge.h>
-#include <ompl/geometric/planners/informedtrees/BITstar.h>
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
+#include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/EITstar.h>
+#include <ompl/geometric/planners/informedtrees/eitstar/Edge.h>
 #include <ompl/geometric/planners/informedtrees/aitstar/Edge.h>
 
 #include "esp_common/planner_type.h"
@@ -128,8 +128,7 @@ class AITstarData : public PlannerSpecificData {
 
 class EITstarData : public PlannerSpecificData {
  public:
-  EITstarData(const ompl::base::SpaceInformationPtr& spaceInfo) :
-      PlannerSpecificData(spaceInfo) {}
+  EITstarData(const ompl::base::SpaceInformationPtr& spaceInfo) : PlannerSpecificData(spaceInfo) {}
   // Getters
   std::vector<ompl::geometric::eitstar::Edge> getReverseTree() const;
   std::vector<ompl::geometric::eitstar::Edge> getForwardQueue() const;
