@@ -47,7 +47,6 @@ FlankingGap::FlankingGap(const std::shared_ptr<ompl::base::SpaceInformation>& sp
                          const std::shared_ptr<const Configuration>& config,
                          const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    dimensionality_(spaceInfo_->getStateDimension()),
     wallWidth_(config->get<double>("context/" + name + "/wallWidth")),
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
     gapWidth_(config->get<double>("context/" + name + "/gapWidth")),

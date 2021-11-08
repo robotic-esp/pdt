@@ -76,9 +76,6 @@ class FourRooms : public RealVectorGeometricContext {
   /** \brief Create the anti obstacles. */
   void createAntiObstacles();
 
-  /** \brief The dimensionality of the underlying state space. */
-  std::size_t dimensionality_;
-
   /** \brief The wall thickness. */
   double wallThickness_;
 

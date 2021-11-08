@@ -75,9 +75,6 @@ class DoubleEnclosure : public RealVectorGeometricContext {
   /** \brief Create the anti obstacles. */
   void createAntiObstacles();
 
-  /** \brief The dimensionality of the underlying state space. */
-  std::size_t dimensionality_;
-
   /** \brief The outside width of the start enclosure. */
   double startOutsideWidth_;
 
