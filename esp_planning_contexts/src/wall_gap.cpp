@@ -46,7 +46,6 @@ namespace ompltools {
 WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                  const std::shared_ptr<const Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    dimensionality_(spaceInfo->getStateDimension()),
     wallWidth_(config->get<double>("context/" + name + "/wallWidth")),
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
     gapWidth_(config->get<double>("context/" + name + "/gapWidth")),

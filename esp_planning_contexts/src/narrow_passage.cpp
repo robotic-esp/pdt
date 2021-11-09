@@ -47,7 +47,6 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
                              const std::shared_ptr<const Configuration>& config,
                              const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    dimensionality_(spaceInfo->getStateDimension()),
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
     wallOffsetX_(config->get<double>("context/" + name + "/wallOffset")),
     passageWidth_(config->get<double>("context/" + name + "/passageWidth")),

@@ -51,7 +51,6 @@ RepeatingRectangles::RepeatingRectangles(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
     const std::shared_ptr<const Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    dimensionality_(spaceInfo->getStateDimension()),
     numObsPerDim_(config->get<std::size_t>("context/" + name + "/numObstaclesPerDim")),
     obsWidth_(config->get<double>("context/" + name + "/obstacleWidth")),
     startState_(spaceInfo),

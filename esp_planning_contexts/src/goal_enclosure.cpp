@@ -53,7 +53,6 @@ GoalEnclosure::GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>
                              const std::shared_ptr<const Configuration>& config,
                              const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    dimensionality_(spaceInfo_->getStateDimension()),
     goalOutsideWidth_(config->get<double>("context/" + name + "/goalOutsideWidth")),
     goalInsideWidth_(config->get<double>("context/" + name + "/goalInsideWidth")),
     goalGapWidth_(config->get<double>("context/" + name + "/goalGapWidth")),

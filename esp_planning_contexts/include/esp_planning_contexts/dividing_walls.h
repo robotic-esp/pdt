@@ -76,9 +76,6 @@ class DividingWalls : public RealVectorGeometricContext {
   /** \brief Create the anti obstacles. */
   void createAntiObstacles();
 
-  /** \brief The dimensionality of the context. */
-  std::size_t dimensionality_;
-
   /** \brief The number of walls. */
   std::size_t numWalls_;
 
