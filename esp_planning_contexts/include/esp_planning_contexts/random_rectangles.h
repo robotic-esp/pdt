@@ -77,9 +77,6 @@ class RandomRectangles : public RealVectorGeometricContext {
   /** \brief Create the obstacles. */
   void createObstacles();
 
-  /** \brief The dimensionality of the underlying state space. */
-  std::size_t dimensionality_;
-
   /** \brief The number of hyper rectangles. */
   std::size_t numRectangles_;
 

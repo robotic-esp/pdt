@@ -55,7 +55,6 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
     const std::shared_ptr<const Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    dimensionality_(spaceInfo_->getStateDimension()),
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
     maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),

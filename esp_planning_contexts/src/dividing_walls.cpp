@@ -51,7 +51,6 @@ DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>
                              const std::shared_ptr<const Configuration>& config,
                              const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    dimensionality_(spaceInfo->getStateDimension()),
     numWalls_(config->get<std::size_t>("context/" + name + "/numWalls")),
     wallThicknesses_(config->get<std::vector<double>>("context/" + name + "/wallThicknesses")),
     numGaps_(config->get<std::size_t>("context/" + name + "/numGaps")),

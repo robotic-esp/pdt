@@ -53,7 +53,6 @@ StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformatio
                                const std::shared_ptr<const Configuration>& config,
                                const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    dimensionality_(spaceInfo_->getStateDimension()),
     startOutsideWidth_(config->get<double>("context/" + name + "/startOutsideWidth")),
     startInsideWidth_(config->get<double>("context/" + name + "/startInsideWidth")),
     startGapWidth_(config->get<double>("context/" + name + "/startGapWidth")),

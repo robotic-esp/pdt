@@ -73,9 +73,6 @@ class WallGap : public RealVectorGeometricContext {
   /** \brief Create the obstacles. */
   void createObstacles();
 
-  /** \brief The dimensionality of the underlying state space. */
-  std::size_t dimensionality_;
-
   /** \brief The wall width. */
   double wallWidth_;
 

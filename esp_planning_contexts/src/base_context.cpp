@@ -143,7 +143,7 @@ std::shared_ptr<ompl::base::StateSpace> BaseContext::getStateSpace() const {
 }
 
 std::size_t BaseContext::getDimension() const {
-  return spaceInfo_->getStateDimension();
+  return dimensionality_;
 }
 
 ompl::base::OptimizationObjectivePtr BaseContext::getObjective() const {
