@@ -6,7 +6,7 @@ function [lowIdx, highIdx, confidence] = computeConfidenceInterval(n, p)
     endSearchIdx = n;
     if n <= 100 % just brute force it.
         startSearchIdx = 0;
-        endSearchidx = n;
+        endSearchIdx = n;
     elseif n < 1000 % be a little less conservative.
         startSearchIdx = ceil(n/3);
         endSearchIdx = ceil(2*n/3);

@@ -684,11 +684,12 @@ Statistics::ConfidenceInterval Statistics::getMedianConfidenceInterval(
           {100000u, {{95u, {49687u, 50307u, 0.9500}}, {99u, {49588u, 50403u, 0.9900}}}},
           {1000000u, {{95u, {499018u, 500978u, 0.9500}}, {99u, {498707u, 501283u, 0.9900}}}}};
   if (medianConfidenceIntervals.find(numRunsPerPlanner_) == medianConfidenceIntervals.end()) {
-    auto msg = "No precomputed values for the median confidence interval with "s +
-               std::to_string(numRunsPerPlanner_) + " runs. The precomputed values are:\n"s;
+    auto msg = "\nNo precomputed values for the median confidence interval with "s +
+               std::to_string(numRunsPerPlanner_) + " runs. Values are available for runs of size:\n"s;
     for (const auto& entry : medianConfidenceIntervals) {
-      msg += std::to_string(entry.first) + '\n';
+      msg += "  "s + std::to_string(entry.first) + "\n"s;
     }
+    msg += "To calculate values for a new number of runs, please see scripts/matlab/computeConfidenceInterval.m or scripts/python/computeConfidenceInterval.py\n"s;
     throw std::runtime_error(msg);
   }
   if (confidence != 95u && confidence != 99u) {
