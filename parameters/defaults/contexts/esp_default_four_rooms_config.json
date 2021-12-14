@@ -5,6 +5,7 @@
             "objective": "defaultPathLength",
             "start": [ 0.25, -0.25 ],
             "goal": [ 0.25, 0.25 ],
+            "goalType": "GoalState",
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
