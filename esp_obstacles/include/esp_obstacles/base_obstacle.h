@@ -83,7 +83,7 @@ class GeometricShape {
   virtual bool isInside(const ompl::base::State* state) const = 0;
 
   // Information about the space this shape lives in.
-  ompl::base::SpaceInformationPtr spaceInfo_{};
+  std::weak_ptr<ompl::base::SpaceInformation> spaceInfo_{};
 
   // The anchor point.
   ompl::base::ScopedState<> anchor_;

@@ -89,7 +89,7 @@ class Hyperrectangle : public T {
   bool isInside(const ompl::base::State* state) const override;
 
   // The space information.
-  ompl::base::SpaceInformationPtr spaceInfo_;
+  const unsigned int dimension_;
 
   // The widhts of this hyperrectangle's sides.
   std::vector<double> widths_{};
@@ -98,8 +98,8 @@ class Hyperrectangle : public T {
 template <typename T>
 Hyperrectangle<T>::Hyperrectangle(const ompl::base::SpaceInformationPtr& spaceInfo) :
     T(spaceInfo),
-    spaceInfo_(spaceInfo),
-    widths_(spaceInfo->getStateDimension(), 0.0) {
+    dimension_(spaceInfo->getStateDimension()),
+    widths_(dimension_, 0.0) {
 }
 
 template <typename T>
@@ -107,10 +107,10 @@ Hyperrectangle<T>::Hyperrectangle(const ompl::base::SpaceInformationPtr& spaceIn
                                   const ompl::base::ScopedState<>& anchor,
                                   const std::vector<double>& widths) :
     T(spaceInfo),
-    spaceInfo_(spaceInfo),
+    dimension_(spaceInfo->getStateDimension()),
     widths_(widths) {
   // What's a hyperrectangle in a non-real-vector-state-space?
-  if (spaceInfo_->getStateSpace()->getType() !=
+  if (spaceInfo->getStateSpace()->getType() !=
       ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
     throw std::runtime_error(
         "Hyperrectangles are only defined (or at least tested) for real vector state spaces.");
@@ -127,7 +127,7 @@ template <typename T>
 bool Hyperrectangle<T>::isInside(const ompl::base::State* state) const {
   // Let's be conservative here.
   auto rstate = state->as<ompl::base::RealVectorStateSpace::StateType>();
-  for (std::size_t dim = 0; dim < spaceInfo_->getStateDimension(); ++dim) {
+  for (std::size_t dim = 0; dim < dimension_; ++dim) {
     if (rstate->values[dim] <
             T::anchor_[dim] - widths_[dim] / 2.0 - std::numeric_limits<double>::epsilon() ||
         rstate->values[dim] >
@@ -156,7 +156,7 @@ double Hyperrectangle<T>::clearance(const ompl::base::State* state) const {
 
   // Compute the sum of squares.
   double sumOfSquares = 0.0;
-  for (std::size_t dim = 0u; dim < spaceInfo_->getStateDimension(); ++dim) {
+  for (std::size_t dim = 0u; dim < dimension_; ++dim) {
     double delta = std::max(
         std::abs(
             rstate->operator[](dim) -

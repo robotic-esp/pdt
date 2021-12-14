@@ -59,11 +59,15 @@ const ompl::base::State* GeometricShape::getState() const {
 
 std::vector<double> GeometricShape::getAnchorCoordinates() const {
   // return anchor_.reals() ?
-  std::vector<double> coordinates(spaceInfo_->getStateSpace()->getDimension(), 0.0);
-  for (std::size_t i = 0; i < coordinates.size(); ++i) {
-    coordinates[i] = anchor_[i];
+  if (auto spi = spaceInfo_.lock()) {
+    std::vector<double> coordinates(spi->getStateSpace()->getDimension(), 0.0);
+    for (std::size_t i = 0; i < coordinates.size(); ++i) {
+      coordinates[i] = anchor_[i];
+    }
+    return coordinates;
+  } else {
+    throw std::runtime_error("Space Information expired. This should not happen.");
   }
-  return coordinates;
 }
 
 BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& spaceInfo) :
