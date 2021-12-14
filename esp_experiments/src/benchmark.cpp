@@ -262,6 +262,10 @@ int main(int argc, char **argv) {
     }
   }
 
+  // dump the complete config to make sure that we can produce the report once we ran the experiment
+  auto configPath = experimentDirectory / "config.json"s;
+  config->dumpAll(fs::current_path().string() + '/' + configPath.string());
+
   // Register the end time of the experiment.
   auto experimentEndTime = std::chrono::system_clock::now();
   auto experimentEndTimeString = esp::ompltools::time::toDateString(experimentEndTime);
@@ -317,7 +321,8 @@ int main(int argc, char **argv) {
   std::cout << std::setw(2u) << std::setfill(' ') << ' ' << "Location " << reportPath << "\n\n";
 
   // Dump the accessed parameters next to the results file.
-  auto configPath = experimentDirectory / "config.json"s;
+  // This overwrites the previously dumped config with one that only consists of the
+  // accessed parameters.
   config->dumpAccessed(fs::current_path().string() + '/' + configPath.string());
 
   return 0;

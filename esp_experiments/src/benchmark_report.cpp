@@ -52,6 +52,10 @@ int main(int argc, char** argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
 
+  std::cout << "\nReport\n"
+            << std::setw(2u) << std::setfill(' ') << ' '
+            << "Compiling (this may take a couple of minutes)" << std::flush;
+
   // Get the statistics.
   esp::ompltools::Statistics stats(config, true);
 
@@ -59,6 +63,11 @@ int main(int argc, char** argv) {
   esp::ompltools::ExperimentReport report(config, stats);
   report.generateReport();
   report.compileReport();
+  
+  // Inform that we are done compiling the report.
+  std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
+            << std::setfill(' ') << ' ' << "Compilation done\n"
+            << std::flush;
 
   return 0;
 }
