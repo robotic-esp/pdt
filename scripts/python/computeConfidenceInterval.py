@@ -29,11 +29,11 @@ def computeConfidenceInterval(n, p):
          startIndex = math.ceil(n/3)
          endIndex = math.ceil(2*n/3)
     elif n < 5000: # be a little less conservative still.
-         startIndex = math.ceil(7*n/15)
-         endIndex = math.ceil(8*n/15)
+         startIndex = math.ceil(6*n/15)
+         endIndex = math.ceil(9*n/15)
     elif n < 20000: # be a little less conservative still.
-         startIndex = math.ceil(15*n/31)
-         endIndex = math.ceil(16*n/31)
+         startIndex = math.ceil(14*n/31)
+         endIndex = math.ceil(17*n/31)
     elif n < 100000: # be a little less conservative still.
          startIndex = math.ceil(35*n/71)
          endIndex = math.ceil(36*n/71)

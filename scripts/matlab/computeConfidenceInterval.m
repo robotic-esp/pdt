@@ -11,11 +11,11 @@ function [lowIdx, highIdx, confidence] = computeConfidenceInterval(n, p)
         startSearchIdx = ceil(n/3);
         endSearchIdx = ceil(2*n/3);
     elseif n < 5000 % be a little less conservative still.
-        startSearchIdx = ceil(7*n/15);
-        endSearchIdx = ceil(8*n/15);
+        startSearchIdx = ceil(6*n/15);
+        endSearchIdx = ceil(9*n/15);
     elseif n < 20000 % be a little less conservative still.
-        startSearchIdx = ceil(15*n/31);
-        endSearchIdx = ceil(16*n/31);
+        startSearchIdx = ceil(14*n/31);
+        endSearchIdx = ceil(17*n/31);
     elseif n < 100000 % be a little less conservative still.
         startSearchIdx = ceil(35*n/71);
         endSearchIdx = ceil(36*n/71);
