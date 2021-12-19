@@ -58,7 +58,8 @@ InteractiveVisualizer::InteractiveVisualizer(
     tikzVisualizer_(config, context, plannerPair),
     config_(config) {
   if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR &&
-      context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_SE2) {
+      context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_SE2 &&
+      context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REEDS_SHEPP) {
     OMPL_ERROR("Visualizer only tested for real vector and SE(2) state spaces.");
     throw std::runtime_error("Visualizer error.");
   }
@@ -480,7 +481,7 @@ void InteractiveVisualizer::drawSolution(std::size_t iteration) {
       auto path = getPath3D(iteration);
       drawPath(path, 3.0, purple, 1.0);
     }
-  } else if (context_->getStateSpace()->getType() == ompl::base::StateSpaceType::STATE_SPACE_SE2) {
+  } else if (context_->getStateSpace()->getType() == ompl::base::StateSpaceType::STATE_SPACE_REEDS_SHEPP) {
     auto path = getPathSE2(iteration);
     drawCars(path, 1.0, purple);
   } else {
@@ -1434,11 +1435,12 @@ InteractiveVisualizer::getVerticesAndEdges2D(std::size_t iteration) const {
   std::vector<Eigen::Vector2f> edges{};  // Size must be multiple of two.
   for (auto i = 0u; i < currentPlannerData->numVertices(); ++i) {
     auto vertex = currentPlannerData->getVertex(i);
-    auto vertexX = 0.0;
-    auto vertexY = 0.0;
-
+    
     // Check the vertex is valid.
     if (vertex != ompl::base::PlannerData::NO_VERTEX) {
+      auto vertexX = 0.0;
+      auto vertexY = 0.0;
+
       if (vectorContext) {
         vertexX = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->values[0u];
         vertexY = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->values[1u];
@@ -1653,7 +1655,7 @@ std::vector<Eigen::Vector3f> InteractiveVisualizer::getPathSE2(std::size_t itera
   auto solution = getSolutionPath(iteration);
   if (solution != nullptr) {
     auto path = solution->as<ompl::geometric::PathGeometric>();
-    path->interpolate(20);
+    path->interpolate(200);
     auto se2states = path->getStates();
     states.reserve(se2states.size());
     for (const auto state : se2states) {
