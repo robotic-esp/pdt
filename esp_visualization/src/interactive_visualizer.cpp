@@ -57,8 +57,10 @@ InteractiveVisualizer::InteractiveVisualizer(
     BaseVisualizer(config, context, plannerPair),
     tikzVisualizer_(config, context, plannerPair),
     config_(config) {
-  if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
-    OMPL_ERROR("Visualizer only tested for real vector state spaces.");
+  if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR &&
+      context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_SE2 &&
+      context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REEDS_SHEPP) {
+    OMPL_ERROR("Visualizer only tested for real vector and SE(2) state spaces.");
     throw std::runtime_error("Visualizer error.");
   }
 }
@@ -457,12 +459,19 @@ void InteractiveVisualizer::drawEdges(std::size_t iteration) {
 }
 
 void InteractiveVisualizer::drawSolution(std::size_t iteration) {
-  if (context_->getDimension() == 2u) {
-    auto path = getPath2D(iteration);
-    drawPath(path, 3.0, purple);
-  } else if (context_->getDimension() == 3u) {
-    auto path = getPath3D(iteration);
-    drawPath(path, 3.0, purple, 1.0);
+  if (context_->getStateSpace()->getType() == ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR) {
+    if (bounds_.low.size() == 2u) {
+      auto path = getPath2D(iteration);
+      drawPath(path, 3.0, purple);
+    } else if (bounds_.low.size() == 3u) {
+      auto path = getPath3D(iteration);
+      drawPath(path, 3.0, purple, 1.0);
+    }
+  } else if (context_->getStateSpace()->getType() == ompl::base::StateSpaceType::STATE_SPACE_REEDS_SHEPP) {
+    auto path = getPathSE2(iteration);
+    drawCars(path, 1.0, purple);
+  } else {
+    throw std::runtime_error("Don't know how to draw the solution for given state space.");
   }
 }
 
@@ -1277,11 +1286,23 @@ InteractiveVisualizer::getVerticesAndEdges2D(std::size_t iteration) const {
   std::vector<Eigen::Vector2d> edges{};  // Size must be multiple of two.
   for (std::size_t i = 0u; i < currentPlannerData->numVertices(); ++i) {
     auto vertex = currentPlannerData->getVertex(i);
+    
     // Check the vertex is valid.
     if (vertex != ompl::base::PlannerData::NO_VERTEX) {
-      const auto* vertexState =
-          static_cast<const ompl::base::RealVectorStateSpace::StateType*>(vertex.getState());
-      vertices.emplace_back(vertexState->values[0], vertexState->values[1]);
+      auto vertexX = 0.0;
+      auto vertexY = 0.0;
+
+      if (vectorContext) {
+        vertexX = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->values[0u];
+        vertexY = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->values[1u];
+      } else if (se2Context) {
+        vertexX = vertex.getState()->as<ompl::base::SE2StateSpace::StateType>()->getX();
+        vertexY = vertex.getState()->as<ompl::base::SE2StateSpace::StateType>()->getY();
+      } else {
+        std::runtime_error(
+            "Interactive visualizer can only handle real vector and SE2 state spaces.");
+      }
+      vertices.emplace_back(vertexX, vertexY);
 
       // Get the outgoing edges of this vertex.
       std::vector<unsigned int> outgoingEdges{};
@@ -1461,6 +1482,22 @@ std::vector<Eigen::Vector3d> InteractiveVisualizer::getPath3D(std::size_t iterat
     }
   }
   return points;
+}
+
+std::vector<Eigen::Vector3f> InteractiveVisualizer::getPathSE2(std::size_t iteration) const {
+  std::vector<Eigen::Vector3f> states{};
+  auto solution = getSolutionPath(iteration);
+  if (solution != nullptr) {
+    auto path = solution->as<ompl::geometric::PathGeometric>();
+    path->interpolate(200);
+    auto se2states = path->getStates();
+    states.reserve(se2states.size());
+    for (const auto state : se2states) {
+      const auto* se2state = state->as<ompl::base::SE2StateSpace::StateType>();
+      states.emplace_back(se2state->getX(), se2state->getY(), se2state->getYaw());
+    }
+  }
+  return states;
 }
 
 }  // namespace ompltools
