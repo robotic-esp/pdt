@@ -1,0 +1,37 @@
+<kinbody name="ikeatable">
+  <body name="base" type="dynamic">
+    <geom type="box">
+      <extents>0.6 0.6 0.015</extents>
+      <translation>0 0 -0.015</translation>
+      <diffusecolor>1.0 1.0 1.0</diffusecolor>
+    </geom>
+    <geom type="cylinder">
+      <rotationaxis>1 0 0 90</rotationaxis>
+      <radius>0.027</radius>
+      <height>0.71</height>
+      <translation>0.52 -0.52 -0.385</translation>
+      <diffusecolor>1.0 1.0 1.0</diffusecolor>
+    </geom>
+      <geom type="cylinder">
+      <rotationaxis>1 0 0 90</rotationaxis>
+      <radius>0.027</radius>
+      <height>0.71</height>
+      <translation>-0.52 -0.52 -0.385</translation>
+      <diffusecolor>1.0 1.0 1.0</diffusecolor>
+    </geom>
+    <geom type="cylinder">
+      <rotationaxis>1 0 0 90</rotationaxis>
+      <radius>0.027</radius>
+      <height>0.71</height>
+      <translation>-0.52 0.52 -0.385</translation>
+      <diffusecolor>1.0 1.0 1.0</diffusecolor>
+    </geom>
+    <geom type="cylinder">
+      <rotationaxis>1 0 0 90</rotationaxis>
+      <radius>0.027</radius>
+      <height>0.71</height>
+      <translation>0.52 0.52 -0.385</translation>
+      <diffusecolor>1.0 1.0 1.0</diffusecolor>
+    </geom>
+  </body>
+</kinbody>

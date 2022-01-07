@@ -36,9 +36,21 @@
 
 #include "esp_factories/context_factory.h"
 
+#include <ompl/base/StateSpace.h>
+#include <ompl/base/spaces/RealVectorStateSpace.h>
+#include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/base/spaces/SE2StateSpace.h>
+#include <ompl/base/spaces/ReedsSheppStateSpace.h>
+#include <ompl/base/spaces/SE3StateSpace.h>
+#include <ompl/base/spaces/SE3WAxisAngleBoundStateSpace.h>
+
 #include "nlohmann/json.hpp"
 
 #include "esp_common/context_type.h"
+#include "esp_open_rave/open_rave_manipulator.h"
+#include "esp_open_rave/open_rave_r3.h"
+#include "esp_open_rave/open_rave_r3xso2.h"
+#include "esp_open_rave/open_rave_se3.h"
 #include "esp_planning_contexts/all_contexts.h"
 
 namespace esp {
@@ -74,9 +86,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<CentreSquare>(createRealVectorSpaceInfo(parentKey), config_,
                                               contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a CentreSquare context. Check the spelling of the parameters in the "
-            "context factory and the json file.");
+        throw std::runtime_error("Error allocating a CentreSquare context.");
       }
     }
     case CONTEXT_TYPE::DIVIDING_WALLS: {
@@ -84,9 +94,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<DividingWalls>(createRealVectorSpaceInfo(parentKey), config_,
                                                contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a DividingWall context. Check the spelling of the parameters in the "
-            "context factory and the json file.");
+        throw std::runtime_error("Error allocating a DividingWall context.");
       }
     }
     case CONTEXT_TYPE::DOUBLE_ENCLOSURE: {
@@ -94,9 +102,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<DoubleEnclosure>(createRealVectorSpaceInfo(parentKey), config_,
                                                  contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a DoubleEnclosure context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a DoubleEnclosure context.");
       }
     }
     case CONTEXT_TYPE::FLANKING_GAP: {
@@ -104,9 +110,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<FlankingGap>(createRealVectorSpaceInfo(parentKey), config_,
                                              contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a FlankingGap context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a FlankingGap context.");
       }
     }
     case CONTEXT_TYPE::FOUR_ROOMS: {
@@ -114,9 +118,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<FourRooms>(createRealVectorSpaceInfo(parentKey), config_,
                                            contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a FlankingGap context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a FlankingGap context.");
       }
     }
     case CONTEXT_TYPE::GOAL_ENCLOSURE: {
@@ -124,9 +126,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<GoalEnclosure>(createRealVectorSpaceInfo(parentKey), config_,
                                                contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a GoalEnclosure context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a GoalEnclosure context.");
       }
     }
     case CONTEXT_TYPE::NARROW_PASSAGE: {
@@ -142,9 +142,82 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<ObstacleFree>(createRealVectorSpaceInfo(parentKey), config_,
                                               contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a ObstacleFree context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a ObstacleFree context.");
+      }
+    }
+    case CONTEXT_TYPE::OPEN_RAVE_MANIPULATOR: {
+      try {
+        // Allocate a real vector state space.
+        // The state space bounds are set in the context.
+        auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(
+            config_->get<std::size_t>(parentKey + "/dimensions"));
+
+        // Allocate the state information for this space.
+        auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+        return std::make_shared<OpenRaveManipulator>(spaceInfo, config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating a OpenRaveManipulator context.");
+      }
+    }
+    case CONTEXT_TYPE::OPEN_RAVE_R3: {
+      try {
+        // Allocate a real vector state space.
+        // The state space bounds are set in the context.
+        auto stateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(3u);
+
+        // Allocate the state information for this space.
+        auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+        return std::make_shared<OpenRaveR3>(spaceInfo, config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating a OpenRaveMover context.");
+      }
+    }
+    case CONTEXT_TYPE::OPEN_RAVE_R3XSO2: {
+      try {
+        // Allocate the R3 component of the state space.
+        // The space bounds are set in the context.
+        auto r3StateSpace = std::make_shared<ompl::base::RealVectorStateSpace>(3u);
+
+        // Allocate the O2 component of the state space.
+        auto so2StateSpace = std::make_shared<ompl::base::SO2StateSpace>();
+
+        // Allocate the compound state space.
+        auto stateSpace = std::make_shared<ompl::base::CompoundStateSpace>(
+            std::vector<ompl::base::StateSpacePtr>({r3StateSpace, so2StateSpace}),
+            std::vector<double>({1.0, 0.01}));
+
+        // Allocate the space information for this space.
+        auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+        return std::make_shared<OpenRaveR3xSO2>(spaceInfo, config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating an OpenRaveR3XO2 context.");
+      }
+    }
+    case CONTEXT_TYPE::OPEN_RAVE_SE3: {
+      try {
+        // Allocate a real vector state space.
+        // The state space bounds are set in the context.
+        auto stateSpace = std::make_shared<ompl::base::SE3StateSpace>();
+
+        // Allocate the state information for this space.
+        auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+        return std::make_shared<OpenRaveSE3>(spaceInfo, config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating an OpenRaveSE3 context.");
+      }
+    }
+    case CONTEXT_TYPE::OPEN_RAVE_CONSTRAINED_SE3: {
+      try {
+        // Allocate a real vector state space.
+        // The state space bounds are set in the context.
+        auto stateSpace = std::make_shared<ompl::base::SE3WAxisAngleBoundStateSpace>();
+        stateSpace->setMaxRotation(config_->get<double>(parentKey + "/maxRotation"));
+
+        // Allocate the state information for this space.
+        auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+        return std::make_shared<OpenRaveSE3>(spaceInfo, config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating a ConstrainedOpenRaveSE3 context.");
       }
     }
     case CONTEXT_TYPE::RANDOM_RECTANGLES: {
@@ -152,9 +225,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<RandomRectangles>(createRealVectorSpaceInfo(parentKey), config_,
                                                   contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a RandomRectangles context. Check the spelling of the parameters in "
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a RandomRectangles context.");
       }
     }
     case CONTEXT_TYPE::RANDOM_RECTANGLES_MULTI_START_GOAL: {
@@ -162,9 +233,15 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<RandomRectanglesMultiStartGoal>(
             createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a RandomRectanglesMultiStartGoal context. Check the spelling of the "
-            "parameters in the context factory and the json file.");
+        throw std::runtime_error("Error allocating a RandomRectanglesMultiStartGoal context.");
+      }
+    }
+    case CONTEXT_TYPE::REEDS_SHEPP_RANDOM_RECTANGLES: {
+      try {
+        return std::make_shared<ReedsSheppRandomRectangles>(createReedsSheppSpaceInfo(parentKey),
+                                                            config_, contextName);
+      } catch (const json::detail::type_error& e) {
+        throw std::runtime_error("Error allocating a RandomRectanglesMultiStartGoal context.");
       }
     }
     case CONTEXT_TYPE::REPEATING_RECTANGLES: {
@@ -172,9 +249,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<RepeatingRectangles>(createRealVectorSpaceInfo(parentKey), config_,
                                                      contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a RepeatingRectangles context. Check the spelling of the "
-            "parameters in the context factory and the json file.");
+        throw std::runtime_error("Error allocating a RepeatingRectangles context.");
       }
     }
     case CONTEXT_TYPE::START_ENCLOSURE: {
@@ -182,9 +257,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<StartEnclosure>(createRealVectorSpaceInfo(parentKey), config_,
                                                 contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a StartEnclosure context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a StartEnclosure context.");
       }
     }
     case CONTEXT_TYPE::WALL_GAP: {
@@ -192,9 +265,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         return std::make_shared<WallGap>(createRealVectorSpaceInfo(parentKey), config_,
                                          contextName);
       } catch (const json::detail::type_error& e) {
-        throw std::runtime_error(
-            "Error allocating a WallGap context. Check the spelling of the parameters in"
-            "the context factory and the json file.");
+        throw std::runtime_error("Error allocating a WallGap context.");
       }
     }
     default: { throw std::invalid_argument("Context '"s + contextName + "' is of unknown type."s); }
@@ -211,8 +282,27 @@ std::shared_ptr<ompl::base::SpaceInformation> ContextFactory::createRealVectorSp
 
   // Set the bounds.
   auto sideLengths = config_->get<std::vector<double>>(parentKey + "/boundarySideLengths");
-  ompl::base::RealVectorBounds bounds(config_->get<std::size_t>(parentKey + "/dimensions"));
+  ompl::base::RealVectorBounds bounds(config_->get<unsigned>(parentKey + "/dimensions"));
   for (std::size_t dim = 0u; dim < config_->get<std::size_t>(parentKey + "/dimensions"); ++dim) {
+    bounds.low.at(dim) = -0.5 * sideLengths.at(dim);
+    bounds.high.at(dim) = 0.5 * sideLengths.at(dim);
+  }
+  stateSpace->setBounds(bounds);
+
+  // Allocate the state information for this space.
+  return std::make_shared<ompl::base::SpaceInformation>(stateSpace);
+}
+
+std::shared_ptr<ompl::base::SpaceInformation> ContextFactory::createReedsSheppSpaceInfo(
+    const std::string& parentKey) const {
+  assert(config_->get<std::vector<double>>(parentKey + "/boundarySideLengths").size() == 2u);
+  // Allocate a real vector state space.
+  auto stateSpace = std::make_shared<ompl::base::ReedsSheppStateSpace>(0.1);
+
+  // Set the bounds.
+  auto sideLengths = config_->get<std::vector<double>>(parentKey + "/boundarySideLengths");
+  ompl::base::RealVectorBounds bounds(2u);
+  for (std::size_t dim = 0u; dim < 2u; ++dim) {
     bounds.low.at(dim) = -0.5 * sideLengths.at(dim);
     bounds.high.at(dim) = 0.5 * sideLengths.at(dim);
   }

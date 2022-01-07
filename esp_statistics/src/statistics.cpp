@@ -47,6 +47,7 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #include "csv/parser.hpp"
 #pragma GCC diagnostic pop
 
@@ -95,7 +96,7 @@ const std::vector<PlannerResults::PlannerResult>& PlannerResults::getAllRunsAt(
       if (duration < min->first) {
         interpolatedRuns_.back().emplace_back(duration, std::numeric_limits<double>::infinity());
       } else if (duration > max->first) {
-        OMPL_ERROR("Requested to extrapolate. Max duration: %d, queried duration: %d", max->first,
+        OMPL_ERROR("Requested to extrapolate. Max duration: %f, queried duration: %f", max->first,
                    duration);
         throw std::runtime_error("Fairness error.");
       } else {
@@ -172,6 +173,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
         minInitialSolutionDurations_[name] = std::numeric_limits<double>::infinity();
         maxInitialSolutionDurations_[name] = std::numeric_limits<double>::lowest();
         maxNonInfInitialSolutionDurations_[name] = std::numeric_limits<double>::lowest();
+        successRates_[name] = 0.0;
       }
     } else if (row.at(0) != name) {
       throw std::runtime_error("Csv file has unexpected structure.");
@@ -273,6 +275,9 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
         if (i == row.size() - 1u && cost < minFinalCosts_.at(name)) {
           minFinalCosts_.at(name) = cost;
         }
+        if (i == row.size() - 1u && cost != std::numeric_limits<double>::infinity()) {
+          successRates_.at(name) += 1.0;  // We divide by num runs later.
+        }
 
         // Remember this cost (for max initial solution durations).
         lastCost = cost;
@@ -299,11 +304,16 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
     numRunsPerPlanner_ = results_.begin()->second.numMeasuredRuns();
   }
 
+  // Compute the success rates.
+  for (auto& element : successRates_) {
+    element.second = element.second / static_cast<double>(numRunsPerPlanner_);
+  }
+
   // Compute the default binning durations for the medians.
   auto contextName = config_->get<std::string>("experiment/context");
-  std::size_t numMeasurements =
+  std::size_t numMeasurements = static_cast<std::size_t>(
       std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
-                config_->get<double>("experiment/logFrequency"));
+                config_->get<double>("experiment/logFrequency")));
   double medianBinSize = 1.0 / config_->get<double>("experiment/logFrequency");
   defaultMedianBinDurations_.reserve(numMeasurements);
   for (std::size_t i = 0u; i < numMeasurements; ++i) {
@@ -311,11 +321,11 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
   }
 
   // Compute the default binning durations for the initial solution pdf.
-  double initDurationNumBins =
+  auto initDurationNumBins =
       config_->get<std::size_t>("statistics/initialSolutions/numDurationBins");
   double minExp = std::log10(minInitialSolutionDuration_);
   double maxExp = std::log10(maxNonInfInitialSolutionDuration_);
-  double binExpStep = (maxExp - minExp) / initDurationNumBins;
+  double binExpStep = (maxExp - minExp) / static_cast<double>(initDurationNumBins);
   for (std::size_t i = 0u; i < initDurationNumBins; ++i) {
     defaultInitialSolutionBinDurations_.emplace_back(
         std::pow(10.0, minExp + static_cast<double>(i) * binExpStep));
@@ -427,10 +437,15 @@ fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
   for (const auto percentile : percentiles) {
     std::vector<double> costs{};
     if (percentile < 0.5) {
-      costs = getNthCosts(results_.at(plannerName), std::floor(percentile * numRunsPerPlanner_),
+      costs = getNthCosts(results_.at(plannerName),
+                          static_cast<std::size_t>(
+                              std::floor(percentile * static_cast<double>(numRunsPerPlanner_))),
                           durations);
     } else if (percentile > 0.5) {
-      costs = getNthCosts(results_.at(plannerName), std::ceil(percentile * numRunsPerPlanner_) - 1u,
+      costs = getNthCosts(results_.at(plannerName),
+                          static_cast<std::size_t>(
+                              std::ceil(percentile * static_cast<double>(numRunsPerPlanner_))) -
+                              1u,
                           durations);
     } else {
       costs = getMedianCosts(results_.at(plannerName), durations);
@@ -591,7 +606,7 @@ fs::path Statistics::extractInitialSolutionDurationPdf(
     if (lower != bins.begin()) {
       --lower;
     }
-    binCounts.at(std::distance(bins.begin(), lower))++;
+    binCounts.at(static_cast<long unsigned int>(std::distance(bins.begin(), lower)))++;
   }
 
   // Write to file.
@@ -804,6 +819,10 @@ double Statistics::getMedianInitialSolutionCost(const std::string& plannerName) 
   return getMedianInitialSolutionCost(results_.at(plannerName));
 }
 
+double Statistics::getSuccessRate(const std::string& plannerName) const {
+  return successRates_.at(plannerName);
+}
+
 std::vector<double> Statistics::getDefaultBinDurations() const {
   return defaultMedianBinDurations_;
 }
@@ -871,7 +890,7 @@ std::vector<double> Statistics::getNthCosts(const PlannerResults& results, std::
                  std::to_string(costs.size()) + " costs at this time."s;
       throw std::runtime_error(msg);
     }
-    auto nthCost = costs.begin() + n;
+    auto nthCost = costs.begin() + static_cast<long>(n);
     std::nth_element(costs.begin(), nthCost, costs.end());
     nthCosts.emplace_back(*nthCost);
   }
@@ -934,7 +953,7 @@ double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,
   auto initialDurations = getInitialSolutionDurations(results);
 
   // Get the nth element of this collection of durations.
-  auto nthDuration = initialDurations.begin() + n;
+  auto nthDuration = initialDurations.begin() + static_cast<long>(n);
   std::nth_element(initialDurations.begin(), nthDuration, initialDurations.end());
 
   return *nthDuration;
@@ -945,7 +964,7 @@ double Statistics::getNthInitialSolutionCost(const PlannerResults& result, std::
   auto initialCosts = getInitialSolutionCosts(result);
 
   // Get the nth element of this collection of costs.
-  auto nthCost = initialCosts.begin() + n;
+  auto nthCost = initialCosts.begin() + static_cast<long>(n);
   std::nth_element(initialCosts.begin(), nthCost, initialCosts.end());
 
   return *nthCost;

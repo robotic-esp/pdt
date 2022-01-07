@@ -1,0 +1,8 @@
+<kinbody name="computer">
+  <body name="computerbase" type="static">
+    <geom type="trimesh" modifiable="false">
+      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/objects/computer.iv</data>
+      <render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/objects/computer.iv</render>
+    </geom>
+  </body>
+</kinbody>

@@ -52,7 +52,7 @@ namespace ompltools {
 
 BaseVisualizer::BaseVisualizer(
     const std::shared_ptr<Configuration> &config,
-    const std::shared_ptr<RealVectorGeometricContext> &context,
+    const std::shared_ptr<BaseContext> &context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
     context_(context),
     planner_(plannerPair.first),
@@ -178,7 +178,9 @@ time::Duration BaseVisualizer::getTotalElapsedDuration(std::size_t iteration) co
     throw std::runtime_error(
         "Requested elapsed duration of iteration that has not yet been processed");
   }
-  return std::accumulate(durations_.begin(), durations_.begin() + iteration, setupDuration_);
+  return std::accumulate(durations_.begin(),
+                         durations_.begin() + static_cast<long int>(iteration),
+                         setupDuration_);
 }
 
 void BaseVisualizer::createData() {

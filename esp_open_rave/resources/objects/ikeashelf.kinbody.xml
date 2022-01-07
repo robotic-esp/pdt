@@ -1,0 +1,111 @@
+<KinBody name="ikeashelf">
+  <Body type="static">
+    <!-- Left Wall -->
+    <Geom type="box">
+      <Translation>0.0 0.79 0.53</Translation>
+      <extents>0.14 0.01 0.53</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+
+    <!-- Middle Wall -->
+    <Geom type="box">
+      <Translation>0.01 0.0 0.53</Translation>
+      <extents>0.13 0.01 0.53</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+
+    <!-- Right Wall -->
+    <Geom type="box">
+      <Translation>0.0 -0.79 0.53</Translation>
+      <extents>0.14 0.01 0.53</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+
+    <!-- Back Wall -->
+    <Geom type="box">
+      <Translation>-0.13 0 0.53</Translation>
+      <extents>0.01 0.78 0.53</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+
+    <!-- Bottom Left Wall -->
+    <Geom type="box">
+      <Translation>0.1 0.395 0.0425</Translation>
+      <extents>0.01 0.385 0.0425</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+
+    <!-- Bottom Right Wall -->
+    <Geom type="box">
+      <Translation>0.1 -0.395 0.0425</Translation>
+      <extents>0.01 0.385 0.0425</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+
+    <!-- Shelves -->
+    <!-- Roof -->
+    <Geom type="box">
+      <Translation>0.0 0.0 1.07</Translation>
+      <extents>0.14 0.8 0.01</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+
+    <!-- Top Left Shelf -->
+    <Geom type="box">
+      <Translation>0.01 -0.395 0.8</Translation>
+      <extents>0.13 0.385 0.01</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+
+    <!-- Top Right Shelf -->
+    <Geom type="box">
+      <Translation>0.01 0.395 0.8</Translation>
+      <extents>0.13 0.385 0.01</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+    
+    <!-- Mid Left Shelf -->
+    <Geom type="box">
+      <Translation>0.01 -0.395 0.5</Translation>
+      <extents>0.13 0.385 0.01</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+
+    <!-- Mid Right Shelf -->
+    <Geom type="box">
+      <Translation>0.01 0.395 0.4</Translation>
+      <extents>0.13 0.385 0.01</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+    
+    <!-- Bottom Left Shelf -->
+    <Geom type="box">
+      <Translation>0.01 -0.395 0.095</Translation>
+      <extents>0.13 0.385 0.01</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+
+    <!-- Bottom Right Shelf -->
+    <Geom type="box">
+      <Translation>0.01 0.395 0.095</Translation>
+      <extents>0.13 0.385 0.01</extents>
+      <diffusecolor>0.7 0.7 0.7</diffusecolor>
+    </Geom>
+    <!-- <Geom type="box"> -->
+    <!--   <Translation>0 0 0.764</Translation> -->
+    <!--   <extents>0.14 0.8 0.01</extents> -->
+    <!--   <diffusecolor>0.7 0.7 0.7</diffusecolor> -->
+    <!-- </Geom> -->
+    <!-- <Geom type="box"> -->
+    <!--   <Translation>0 0 0.467</Translation> -->
+    <!--   <extents>0.14 0.8 0.01</extents> -->
+    <!--   <diffusecolor>0.7 0.7 0.7</diffusecolor> -->
+    <!-- </Geom> -->
+    <!-- <Geom type="box"> -->
+    <!--   <Translation>0 0 0.095</Translation> -->
+    <!--   <extents>0.14 0.8 0.01</extents> -->
+    <!--   <diffusecolor>0.7 0.7 0.7</diffusecolor> -->
+    <!-- </Geom> -->
+
+  </Body>
+</KinBody>

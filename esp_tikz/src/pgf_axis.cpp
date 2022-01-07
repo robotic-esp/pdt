@@ -114,7 +114,8 @@ std::string PgfAxis::string() const {
   stream << "\\begin{axis} [";
   stream << "\n  width=" << options.width << ",\n  height=" << options.height << ",\n  at={"
          << options.at << '}' << ",\n  unbounded coords=" << options.unboundedCoords
-         << ",\n  xtick align=" << options.xtickAlign << ",\n  ytick align=" << options.ytickAlign;
+         << ",\n  xtick align=" << options.xtickAlign << ",\n  ytick align=" << options.ytickAlign
+         << ",\n  axis line style=" << options.axisLineStyle;
   if (options.name != ""s) {
     stream << ",\n  name=" << options.name;
   }

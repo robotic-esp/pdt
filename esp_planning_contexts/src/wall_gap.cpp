@@ -89,7 +89,7 @@ WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
   spaceInfo_->setup();
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
   }
 }
@@ -127,7 +127,7 @@ void WallGap::createObstacles() {
   ompl::base::ScopedState<> anchor_low(spaceInfo_);
 
   // Set the obstacle anchor in the middle of the state space.
-  for (std::size_t j = 0u; j < dimensionality_; ++j) {
+  for (auto j = 0u; j < dimensionality_; ++j) {
     anchor_low[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
   }
 
@@ -157,7 +157,7 @@ void WallGap::createObstacles() {
   ompl::base::ScopedState<> anchor_up(spaceInfo_);
 
   // Set the obstacle anchor in the middle of the state space.
-  for (std::size_t j = 0u; j < dimensionality_; ++j) {
+  for (auto j = 0u; j < dimensionality_; ++j) {
     anchor_up[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
   }
 

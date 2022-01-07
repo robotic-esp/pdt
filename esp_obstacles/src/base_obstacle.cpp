@@ -41,8 +41,13 @@ namespace esp {
 namespace ompltools {
 
 GeometricShape::GeometricShape(const ompl::base::SpaceInformationPtr& spaceInfo) :
-    spaceInfo_(spaceInfo),
+    space_(spaceInfo->getStateSpace()),
     anchor_(spaceInfo) {
+}
+
+GeometricShape::GeometricShape(const ompl::base::StateSpacePtr& space) :
+    space_(space),
+    anchor_(space) {
 }
 
 void GeometricShape::setAnchor(const ompl::base::ScopedState<>& state) {
@@ -59,23 +64,25 @@ const ompl::base::State* GeometricShape::getState() const {
 
 std::vector<double> GeometricShape::getAnchorCoordinates() const {
   // return anchor_.reals() ?
-  if (auto spi = spaceInfo_.lock()) {
-    std::vector<double> coordinates(spi->getStateSpace()->getDimension(), 0.0);
-    for (std::size_t i = 0; i < coordinates.size(); ++i) {
-      coordinates[i] = anchor_[i];
-    }
-    return coordinates;
-  } else {
-    throw std::runtime_error("Space Information expired. This should not happen.");
+  std::vector<double> coordinates(space_->getDimension(), 0.0);
+  for (auto i = 0u; i < coordinates.size(); ++i) {
+    coordinates[i] = anchor_[i];
   }
+  return coordinates;
 }
 
 BaseObstacle::BaseObstacle(const ompl::base::SpaceInformationPtr& spaceInfo) :
     GeometricShape(spaceInfo) {
 }
 
+BaseObstacle::BaseObstacle(const ompl::base::StateSpacePtr& space) : GeometricShape(space) {
+}
+
 BaseAntiObstacle::BaseAntiObstacle(const ompl::base::SpaceInformationPtr& spaceInfo) :
     GeometricShape(spaceInfo) {
+}
+
+BaseAntiObstacle::BaseAntiObstacle(const ompl::base::StateSpacePtr& space) : GeometricShape(space) {
 }
 
 bool BaseObstacle::invalidates(const ompl::base::State* state) const {

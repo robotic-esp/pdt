@@ -46,7 +46,6 @@
 
 #include "esp_configuration/directory.h"
 #include "esp_configuration/version.h"
-#include "esp_time/time.h"
 
 namespace esp {
 
@@ -57,12 +56,88 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 namespace po = boost::program_options;
 
-Configuration::Configuration(int argc, char **argv) :
+Configuration::Configuration(const int argc, const char **argv) :
     executable_(fs::path(std::string(argv[0]).substr(2)).filename().string()) {
   load(argc, argv);
 }
 
-void Configuration::load(int argc, char **argv) {
+void Configuration::clear() {
+  executable_ = "";
+  parameters_.clear();
+  accessedParameters_.clear();
+}
+
+void Configuration::load(const fs::path& config) {
+  if (!fs::exists(config)) {
+    OMPL_ERROR("Cannot find provided configuration file at %s", config.c_str());
+    throw std::ios_base::failure("Cannot find config file.");
+  }
+
+  // Open the config file.
+  std::ifstream file;
+  if (fs::is_symlink(config)) {
+    file.open(fs::read_symlink(config).string());
+  } else {
+    file.open(config.string());
+  }
+  if (!file.is_open()) {
+    OMPL_ERROR("Found file at %s but unable to open it.", config.c_str());
+    throw std::ios_base::failure("Cannot open config file.");
+  }
+
+  // Load the file as a patch.
+  json::json patch;
+  file >> patch;
+  bool loadDefaultPlannerConfigs{true};
+  bool loadDefaultContextConfigs{true};
+  bool loadDefaultObjectiveConfigs{true};
+  if (patch.contains("experiment")) {
+    if (patch["experiment"].contains("loadDefaultPlannerConfig")) {
+      loadDefaultPlannerConfigs = patch["experiment"]["loadDefaultPlannerConfig"].get<bool>();
+    }
+    if (patch["experiment"].contains("loadDefaultContextConfig")) {
+      loadDefaultContextConfigs = patch["experiment"]["loadDefaultContextConfig"].get<bool>();
+    }
+    if (patch["experiment"].contains("loadDefaultObjectiveConfig")) {
+      loadDefaultObjectiveConfigs =
+        patch["experiment"]["loadDefaultObjectiveConfig"].get<bool>();
+    }
+  }
+    
+  // Set the appropriate log level.
+  if (patch.count("log") != 0) {
+    auto level = patch["log"]["level"];
+    if (level == "dev2"s) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV2);
+    } else if (level == "dev1"s) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV1);
+    } else if (level == "debug"s) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEBUG);
+    } else if (level == "info"s) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
+    } else if (level == "warn"s) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+    } else if (level == "error"s) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_ERROR);
+    } else if (level == "none"s) {
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_NONE);
+    } else {
+      OMPL_WARN("Config specifies invalid OMPL log level. Setting the log level to LOG_WARN");
+      ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+    }
+  } else {
+    ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
+  }
+
+  // Load the default config.
+  loadDefaultConfigs(loadDefaultContextConfigs, loadDefaultPlannerConfigs,
+                     loadDefaultObjectiveConfigs);
+  // Merge the patch, possibly overriding default values.
+  parameters_.merge_patch(patch);
+  OMPL_INFORM("Loaded configuration patch from %s", config.c_str());
+}
+
+void Configuration::load(const int argc, const char **argv) {
   // Declare the available options.
   po::options_description availableOptions("Configuration options");
   availableOptions.add_options()("help,h", "Display available options.")(
@@ -83,68 +158,7 @@ void Configuration::load(int argc, char **argv) {
   if (!invokedOptions.count("config-patch")) {
     loadDefaultConfigs();
   } else {
-    fs::path patchConfig(invokedOptions["config-patch"].as<std::string>());
-    if (fs::exists(patchConfig)) {
-      // If it the file is a symlink, read the actual file.
-      if (fs::is_symlink(patchConfig)) {
-        patchConfig = fs::read_symlink(patchConfig);
-      }
-      // Load the patch config.
-      std::ifstream file(patchConfig.string());
-      json::json patch;
-      file >> patch;
-      bool loadDefaultPlannerConfigs{true};
-      bool loadDefaultContextConfigs{true};
-      bool loadDefaultObjectiveConfigs{true};
-      if (patch.contains("experiment")) {
-        if (patch["experiment"].contains("loadDefaultPlannerConfig")) {
-          loadDefaultPlannerConfigs = patch["experiment"]["loadDefaultPlannerConfig"].get<bool>();
-        }
-        if (patch["experiment"].contains("loadDefaultContextConfig")) {
-          loadDefaultContextConfigs = patch["experiment"]["loadDefaultContextConfig"].get<bool>();
-        }
-        if (patch["experiment"].contains("loadDefaultObjectiveConfig")) {
-          loadDefaultObjectiveConfigs =
-              patch["experiment"]["loadDefaultObjectiveConfig"].get<bool>();
-        }
-      }
-
-      // Set the appropriate log level.
-      if (patch.count("log") != 0) {
-        auto level = patch["log"]["level"];
-        if (level == "dev2"s) {
-          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV2);
-        } else if (level == "dev1"s) {
-          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEV1);
-        } else if (level == "debug"s) {
-          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_DEBUG);
-        } else if (level == "info"s) {
-          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
-        } else if (level == "warn"s) {
-          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
-        } else if (level == "error"s) {
-          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_ERROR);
-        } else if (level == "none"s) {
-          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_NONE);
-        } else {
-          OMPL_WARN("Config specifies invalid OMPL log level. Setting the log level to LOG_WARN");
-          ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
-        }
-      } else {
-        ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
-      }
-
-      // Load the default config.
-      loadDefaultConfigs(loadDefaultContextConfigs, loadDefaultPlannerConfigs,
-                         loadDefaultObjectiveConfigs);
-      // Merge the patch, possibly overriding default values.
-      parameters_.merge_patch(patch);
-      OMPL_INFORM("Loaded configuration patch from %s", patchConfig.c_str());
-    } else {
-      // The provided patch config file does not exist.
-      OMPL_ERROR("Cannot find provided configuration file at %s", patchConfig.c_str());
-      throw std::ios_base::failure("Cannot find patch config file.");
-    }
+    load(invokedOptions["config-patch"].as<std::string>());
   }
 }
 

@@ -60,6 +60,10 @@ class ContextFactory {
   /** \brief Create a space info with a real vector state space. */
   std::shared_ptr<ompl::base::SpaceInformation> createRealVectorSpaceInfo(
       const std::string &parentKey) const;
+  
+  /** \brief Create a space info with a real vector state space. */
+  std::shared_ptr<ompl::base::SpaceInformation> createReedsSheppSpaceInfo(
+      const std::string &parentKey) const;
 
   /** \brief The configuration which specifies the context properties. */
   const std::shared_ptr<const Configuration> config_;

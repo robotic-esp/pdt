@@ -2,11 +2,11 @@
     "context": {
         "defaultWallGap2D": {
             "type": "WallGap",
-            "objective": "defaultReciprocalClearance",
+            "objective": "defaultPathLength",
             "start": [ -0.3, 0.0 ],
             "goal": [ 0.3, 0.0 ],
             "goalType": "GoalState",
-            "maxTime": 1.0,
+            "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
             "collisionCheckResolution": 0.000005,

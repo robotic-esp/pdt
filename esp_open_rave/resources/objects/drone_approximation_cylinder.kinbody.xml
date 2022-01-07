@@ -1,0 +1,11 @@
+<kinbody name="drone_approximation">
+    <body name="approximation" type="dynamic">
+      <geom type="cylinder">
+        <height>0.15</height>
+        <radius>0.25</radius>
+	      <rotationaxis>1 0 0 90</rotationaxis>
+        <diffusecolor>0.9 0.2 0.2</diffusecolor>
+        <ambientcolor>0.9 0.2 0.2</ambientcolor>
+      </geom>
+    </body>
+</kinbody>

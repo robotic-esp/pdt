@@ -62,7 +62,10 @@ std::string PgfPlot::string() const {
   std::ostringstream stream{};
   stream << "\\addplot [\n";
   stream << "  line width=" << options.lineWidth << ",\n  color=" << options.color
-         << ",\n  mark=" << options.mark << ",\n  mark size=" << options.markSize;
+         << ",\n  mark=" << options.mark;
+  if (options.mark != "\"none\""s) {
+    stream << ",\n  mark size=" << options.markSize;
+  }
   if (options.onlyMarks) {
     stream << ",\n  only marks";
   }

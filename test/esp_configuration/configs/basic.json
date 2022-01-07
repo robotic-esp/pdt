@@ -1,0 +1,12 @@
+{
+    "Hello": "World",
+    "You": {
+        "are": "beautiful!"
+    },
+    "Because of": {
+        "Integers": 42,
+        "Floats": 4.2,
+        "Doubles": 4.2,
+        "Vectors": [3, 1, 4, 1, 5, 9]
+    }
+}

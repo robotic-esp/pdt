@@ -57,8 +57,9 @@ CostPercentileEvolutionPlotter::CostPercentileEvolutionPlotter(
     stats_(stats) {
   // Compute the duration bin size.
   auto contextName = config_->get<std::string>("experiment/context");
-  std::size_t numBins = std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
-                                  config_->get<double>("experiment/logFrequency"));
+  std::size_t numBins =
+    static_cast<std::size_t>(std::ceil(config_->get<double>("context/" + contextName + "/maxTime")) *
+                                       config_->get<double>("experiment/logFrequency"));
   double binSize = 1.0 / config_->get<double>("experiment/logFrequency");
   binnedDurations_.reserve(numBins);
   for (std::size_t i = 0u; i < numBins; ++i) {
@@ -132,7 +133,7 @@ std::shared_ptr<PgfPlot> CostPercentileEvolutionPlotter::createCostPercentileEvo
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   // Common plot options.
-  plot->options.markSize = 0.0;
+  plot->options.mark = "\"none\""s;
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + percentileName.str() + "CostEvolution"s;
 

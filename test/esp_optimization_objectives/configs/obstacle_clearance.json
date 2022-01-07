@@ -1,0 +1,87 @@
+{
+    "experiment": {
+        "seed": 42
+    },
+    "objective": {
+        "testObjectiveFactors(0,1)": {
+            "type": "ReciprocalClearance",
+            "heuristicType": "factors",
+            "heuristicFactors": [0.0, 1.0],
+            "solvedCost": 0.0
+        },
+        "testObjectiveFactors(0,0.5,1)": {
+            "type": "ReciprocalClearance",
+            "heuristicType": "factors",
+            "heuristicFactors": [0.0, 0.5, 1.0],
+            "solvedCost": 0.0
+        },
+        "testObjectiveFraction(0.5)": {
+            "type": "ReciprocalClearance",
+            "heuristicType": "fraction",
+            "heuristicFraction": 0.5,
+            "solvedCost": 0.0
+        }
+    },
+    "context": {
+        "test2d": {
+            "type": "CentreSquare",
+            "objective": "testObjectiveFactors(0,1)",
+            "start": [ -0.3, -0.3 ],
+            "goalType": "GoalState",
+            "goal": [ 0.3, 0.3 ],
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : [ 1, 1 ],
+            "collisionCheckResolution": 0.0001,
+            "obstacleWidth": 0.4
+        },
+        "test4d": {
+            "type": "CentreSquare",
+            "objective": "testObjectiveFactors(0,1)",
+            "start": [ -0.3, -0.3, -0.3, -0.3 ],
+            "goalType": "GoalState",
+            "goal": [ 0.3, 0.3, 0.3, 0.3 ],
+            "maxTime": 0.1,
+            "dimensions": 4,
+            "boundarySideLengths" : [ 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.0001,
+            "obstacleWidth": 0.4
+        },
+        "test8d": {
+            "type": "CentreSquare",
+            "objective": "testObjectiveFactors(0,1)",
+            "start": [ -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3 ],
+            "goalType": "GoalState",
+            "goal": [ 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3 ],
+            "maxTime": 0.1,
+            "dimensions": 8,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.0001,
+            "obstacleWidth": 0.4
+        },
+        "test16d": {
+            "type": "CentreSquare",
+            "objective": "testObjectiveFactors(0,1)",
+            "start": [ -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3 ],
+            "goalType": "GoalState",
+            "goal": [ 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3 ],
+            "maxTime": 0.1,
+            "dimensions": 16,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.0001,
+            "obstacleWidth": 0.4
+        },
+        "test32d": {
+            "type": "CentreSquare",
+            "objective": "testObjectiveFactors(0,1)",
+            "start": [ -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3 ],
+            "goalType": "GoalState",
+            "goal": [ 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3 ],
+            "maxTime": 0.1,
+            "dimensions": 32,
+            "boundarySideLengths" : [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+            "collisionCheckResolution": 0.0001,
+            "obstacleWidth": 0.4
+        }
+    }
+}

@@ -75,12 +75,12 @@ std::ostream& operator<<(std::ostream& out, const esp::ompltools::time::Duration
     stream << "inf";
   } else {
     // Convert to HH:MM:SS:XXXXXX format (15 chars wide).
-    long hr = std::chrono::duration_cast<std::chrono::hours>(duration).count();
-    long min = std::chrono::duration_cast<std::chrono::minutes>(duration).count() - 60 * hr;
-    long s =
+    auto hr = std::chrono::duration_cast<std::chrono::hours>(duration).count();
+    auto min = std::chrono::duration_cast<std::chrono::minutes>(duration).count() - 60 * hr;
+    auto s =
         std::chrono::duration_cast<std::chrono::seconds>(duration).count() - 60 * (min + 60 * hr);
-    long us = std::chrono::duration_cast<std::chrono::microseconds>(duration).count() -
-              1e6 * (s + 60 * (min + 60 * hr));
+    auto us = std::chrono::duration_cast<std::chrono::microseconds>(duration).count() -
+              1000000 * (s + 60 * (min + 60 * hr));
 
     stream << std::setw(2) << std::setfill('0') << hr << ":" << std::setw(2) << std::setfill('0')
            << min << ":" << std::setw(2) << std::setfill('0') << s << "." << std::setw(6)
