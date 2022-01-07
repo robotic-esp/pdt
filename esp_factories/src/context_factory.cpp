@@ -38,20 +38,23 @@
 
 #include <ompl/base/StateSpace.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
-#include <ompl/base/spaces/SO2StateSpace.h>
-#include <ompl/base/spaces/SE2StateSpace.h>
 #include <ompl/base/spaces/ReedsSheppStateSpace.h>
+#include <ompl/base/spaces/SE2StateSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/spaces/SE3WAxisAngleBoundStateSpace.h>
+#include <ompl/base/spaces/SO2StateSpace.h>
 
 #include "nlohmann/json.hpp"
 
 #include "esp_common/context_type.h"
+#include "esp_planning_contexts/all_contexts.h"
+
+#if ESP_OMPL_TOOLS_OPEN_RAVE
 #include "esp_open_rave/open_rave_manipulator.h"
 #include "esp_open_rave/open_rave_r3.h"
 #include "esp_open_rave/open_rave_r3xso2.h"
 #include "esp_open_rave/open_rave_se3.h"
-#include "esp_planning_contexts/all_contexts.h"
+#endif
 
 namespace esp {
 
@@ -145,6 +148,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         throw std::runtime_error("Error allocating a ObstacleFree context.");
       }
     }
+#if ESP_OMPL_TOOLS_OPEN_RAVE
     case CONTEXT_TYPE::OPEN_RAVE_MANIPULATOR: {
       try {
         // Allocate a real vector state space.
@@ -220,6 +224,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         throw std::runtime_error("Error allocating a ConstrainedOpenRaveSE3 context.");
       }
     }
+#endif
     case CONTEXT_TYPE::RANDOM_RECTANGLES: {
       try {
         return std::make_shared<RandomRectangles>(createRealVectorSpaceInfo(parentKey), config_,

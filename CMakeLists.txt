@@ -57,6 +57,12 @@ add_subdirectory(esp_time)
 add_subdirectory(esp_utilities)
 add_subdirectory(esp_visualization)
 
+# Add open-rave integration if requested.
+option(ESP_OMPL_TOOLS_OPEN_RAVE "Enable OpenRAVE integration." OFF)
+if(ESP_OMPL_TOOLS_OPEN_RAVE)
+  add_subdirectory(esp_open_rave)
+endif()
+
 # Add the tests if requested.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   # Include CMake's test utilities.
