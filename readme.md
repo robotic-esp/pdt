@@ -26,7 +26,7 @@ We want to test our own planners, which are developed in our private OMPL fork:
 git clone git@github.com:robotic-esp/ompl-private.git
 cd ompl-private
 git fetch
-git checkout esp_ompl_tools
+git checkout esp-master
 mkdir build && cd build
 cmake ..
 make -j 4
