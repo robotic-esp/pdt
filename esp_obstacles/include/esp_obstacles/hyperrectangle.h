@@ -58,10 +58,7 @@ template <typename T>
 class Hyperrectangle : public T {
  public:
   explicit Hyperrectangle(const ompl::base::SpaceInformationPtr& spaceInfo);
-  explicit Hyperrectangle(const ompl::base::StateSpacePtr& spaceInfo);
   Hyperrectangle(const ompl::base::SpaceInformationPtr& spaceInfo,
-                 const ompl::base::ScopedState<>& anchor, const std::vector<double>& widths);
-  Hyperrectangle(const ompl::base::StateSpacePtr& space,
                  const ompl::base::ScopedState<>& anchor, const std::vector<double>& widths);
   virtual ~Hyperrectangle() = default;
 
@@ -103,8 +100,8 @@ class Hyperrectangle : public T {
   // The circumradius of the hyperrectangle.
   mutable double measure_{std::numeric_limits<double>::infinity()};
 
-  // The state space.
-  ompl::base::StateSpacePtr space_;
+  // The state space dimension.
+  const unsigned int dimension_;
 
   // The widhts of this hyperrectangle's sides.
   std::vector<double> widths_{};
@@ -113,15 +110,8 @@ class Hyperrectangle : public T {
 template <typename T>
 Hyperrectangle<T>::Hyperrectangle(const ompl::base::SpaceInformationPtr& spaceInfo) :
     T(spaceInfo),
-    space_(spaceInfo->getStateSpace()),
-    widths_(spaceInfo->getStateDimension(), 0.0) {
-}
-
-template <typename T>
-Hyperrectangle<T>::Hyperrectangle(const ompl::base::StateSpacePtr& space) :
-    T(space),
-    space_(space),
-    widths_(space->getDimension(), 0.0) {
+    dimension_(spaceInfo->getStateDimension()),
+    widths_(dimension_, 0.0) {
 }
 
 template <typename T>
@@ -129,27 +119,10 @@ Hyperrectangle<T>::Hyperrectangle(const ompl::base::SpaceInformationPtr& spaceIn
                                   const ompl::base::ScopedState<>& anchor,
                                   const std::vector<double>& widths) :
     T(spaceInfo),
-    space_(spaceInfo->getStateSpace()),
+    dimension_(spaceInfo->getStateDimension()),
     widths_(widths) {
   // What's a hyperrectangle in a non-real-vector-state-space?
-  const auto stateSpaceType = space_->getType();
-  if (stateSpaceType != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR &&
-      stateSpaceType != ompl::base::StateSpaceType::STATE_SPACE_SE2 &&
-      stateSpaceType != ompl::base::StateSpaceType::STATE_SPACE_SE3) {
-    throw std::runtime_error("What do hyperrectangles look like in your state space?");
-  }
-  T::setAnchor(anchor);
-}
-
-template <typename T>
-Hyperrectangle<T>::Hyperrectangle(const ompl::base::StateSpacePtr& space,
-                                  const ompl::base::ScopedState<>& anchor,
-                                  const std::vector<double>& widths) :
-    T(space),
-    space_(space),
-    widths_(widths) {
-  // What's a hyperrectangle in a non-real-vector-state-space?
-  const auto stateSpaceType = space_->getType();
+  const auto stateSpaceType = spaceInfo->getStateSpace()->getType();
   if (stateSpaceType != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR &&
       stateSpaceType != ompl::base::StateSpaceType::STATE_SPACE_SE2 &&
       stateSpaceType != ompl::base::StateSpaceType::STATE_SPACE_SE3) {
@@ -167,7 +140,7 @@ template <typename T>
 bool Hyperrectangle<T>::isInside(const ompl::base::State* state) const {
   // Let's be conservative here.
   auto rstate = state->as<ompl::base::RealVectorStateSpace::StateType>();
-  for (auto dim = 0u; dim < space_->getDimension(); ++dim) {
+  for (auto dim = 0u; dim < dimension_; ++dim) {
     if (rstate->values[dim] <
             T::anchor_[dim] - widths_[dim] / 2.0 - std::numeric_limits<double>::epsilon() ||
         rstate->values[dim] >
@@ -205,7 +178,7 @@ double Hyperrectangle<T>::clearance(const ompl::base::State* state) const {
 
   // Compute the sum of squares.
   double sumOfSquares = 0.0;
-  for (auto dim = 0u; dim < space_->getDimension(); ++dim) {
+  for (auto dim = 0u; dim < dimension_; ++dim) {
     double delta = std::max(
         std::abs(
             rstate->operator[](dim) -

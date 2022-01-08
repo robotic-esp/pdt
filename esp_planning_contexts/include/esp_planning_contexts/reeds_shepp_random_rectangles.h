@@ -110,6 +110,9 @@ class ReedsSheppRandomRectangles : public BaseContext {
 
   /** \brief The start state. */
   ompl::base::ScopedState<ompl::base::SE2StateSpace> startState_;
+
+  /** \brief The space information about the real vector component of the state space. */
+  std::shared_ptr<ompl::base::SpaceInformation> realVectorSubspaceInfo_{};
 };
 
 }  // namespace ompltools

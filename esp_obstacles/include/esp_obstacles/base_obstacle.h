@@ -52,7 +52,6 @@ namespace ompltools {
 class GeometricShape {
  public:
   explicit GeometricShape(const ompl::base::SpaceInformationPtr& spaceInfo);
-  explicit GeometricShape(const ompl::base::StateSpacePtr& space);
   virtual ~GeometricShape() = default;
 
   // Set the anchor point for this shape.
@@ -84,7 +83,7 @@ class GeometricShape {
   virtual bool isInside(const ompl::base::State* state) const = 0;
 
   // Information about the space this shape lives in.
-  ompl::base::StateSpacePtr space_{};
+  std::weak_ptr<ompl::base::SpaceInformation> spaceInfo_{};
 
   // The anchor point.
   ompl::base::ScopedState<> anchor_;
@@ -93,7 +92,6 @@ class GeometricShape {
 class BaseObstacle : public GeometricShape {
  public:
   explicit BaseObstacle(const ompl::base::SpaceInformationPtr& spaceInfo);
-  explicit BaseObstacle(const ompl::base::StateSpacePtr& space);
   virtual ~BaseObstacle() = default;
 
   // Return whether this obstacle invalidates a state.
@@ -106,7 +104,6 @@ class BaseObstacle : public GeometricShape {
 class BaseAntiObstacle : public GeometricShape {
  public:
   explicit BaseAntiObstacle(const ompl::base::SpaceInformationPtr& spaceInfo);
-  explicit BaseAntiObstacle(const ompl::base::StateSpacePtr& space);
   virtual ~BaseAntiObstacle() = default;
 
   // Return whether this antiobstacle validates a state.

@@ -61,7 +61,9 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
     maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
-    startState_(spaceInfo) {
+    startState_(spaceInfo),
+    realVectorSubspaceInfo_(std::make_shared<ompl::base::SpaceInformation>(
+        spaceInfo_->getStateSpace()->as<ompl::base::SE2StateSpace>()->getSubspace(0u))) {
   // Get the start position.
   auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
 
@@ -146,13 +148,10 @@ void ReedsSheppRandomRectangles::createObstacles() {
   // around.
   auto goal = createGoal();
 
-  const auto realVectorSubspace =
-      spaceInfo_->getStateSpace()->as<ompl::base::SE2StateSpace>()->getSubspace(0u);
-
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
     // Create a random anchor (uniform).
-    ompl::base::ScopedState<> anchor(realVectorSubspace);
+    ompl::base::ScopedState<> anchor(realVectorSubspaceInfo_);
     anchor.random();
 
     // Create random widths (uniform).
@@ -161,7 +160,7 @@ void ReedsSheppRandomRectangles::createObstacles() {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
     auto obstacle =
-        std::make_shared<Hyperrectangle<BaseObstacle>>(realVectorSubspace, anchor, widths);
+        std::make_shared<Hyperrectangle<BaseObstacle>>(realVectorSubspaceInfo_, anchor, widths);
 
     auto validityChecker = std::make_shared<ReedsSheppValidityChecker>(spaceInfo_);
     validityChecker->addObstacle(obstacle);
