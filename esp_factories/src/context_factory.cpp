@@ -49,7 +49,7 @@
 #include "esp_common/context_type.h"
 #include "esp_planning_contexts/all_contexts.h"
 
-#if ESP_OMPL_TOOLS_OPEN_RAVE
+#ifdef ESP_OMPL_TOOLS_OPEN_RAVE
 #include "esp_open_rave/open_rave_manipulator.h"
 #include "esp_open_rave/open_rave_r3.h"
 #include "esp_open_rave/open_rave_r3xso2.h"
@@ -148,7 +148,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         throw std::runtime_error("Error allocating a ObstacleFree context.");
       }
     }
-#if ESP_OMPL_TOOLS_OPEN_RAVE
+#ifdef ESP_OMPL_TOOLS_OPEN_RAVE
     case CONTEXT_TYPE::OPEN_RAVE_MANIPULATOR: {
       try {
         // Allocate a real vector state space.
@@ -273,7 +273,10 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         throw std::runtime_error("Error allocating a WallGap context.");
       }
     }
-    default: { throw std::invalid_argument("Context '"s + contextName + "' is of unknown type."s); }
+    default: {
+      throw std::invalid_argument("Context '"s + contextName + "' is of unknown type '"s +
+                                  config_->get<std::string>(parentKey + "/type") + "'."s);
+    }
   }
 }
 

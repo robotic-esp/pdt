@@ -42,6 +42,14 @@ target_compile_features(esp_ompl_tools
   INTERFACE
   cxx_std_17)
 
+# Add open-rave integration if requested. This option must be processed before
+# the local libraries as some of them depend on this option.
+option(ESP_OMPL_TOOLS_OPEN_RAVE "Enable OpenRAVE integration." OFF)
+if(ESP_OMPL_TOOLS_OPEN_RAVE)
+  add_definitions(-DESP_OMPL_TOOLS_OPEN_RAVE)
+  add_subdirectory(esp_open_rave)
+endif()
+
 # Add the local libraries & executables.
 add_subdirectory(esp_common)
 add_subdirectory(esp_configuration)
@@ -56,12 +64,6 @@ add_subdirectory(esp_tikz)
 add_subdirectory(esp_time)
 add_subdirectory(esp_utilities)
 add_subdirectory(esp_visualization)
-
-# Add open-rave integration if requested.
-option(ESP_OMPL_TOOLS_OPEN_RAVE "Enable OpenRAVE integration." OFF)
-if(ESP_OMPL_TOOLS_OPEN_RAVE)
-  add_subdirectory(esp_open_rave)
-endif()
 
 # Add the tests if requested.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
