@@ -1,0 +1,9 @@
+<kinbody name="rolly_chair">
+  <body name="rolly_chair" type="static">
+    <geom type="trimesh" modifiable="false">
+      <data>objects/rolly-chair.iv</data>
+      <render>objects/rolly-chair.iv</render>
+      <rotationaxis>1 0 0 90</rotationaxis>
+    </geom>
+  </body>
+</kinbody>

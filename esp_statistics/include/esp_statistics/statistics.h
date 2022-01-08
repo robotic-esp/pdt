@@ -122,6 +122,7 @@ class Statistics {
   double getMaxNonInfInitialSolutionDuration(const std::string& plannerName) const;
   double getMedianInitialSolutionDuration(const std::string& plannerName) const;
   double getMedianInitialSolutionCost(const std::string& plannerName) const;
+  double getSuccessRate(const std::string& plannerName) const;
 
   std::vector<double> getDefaultBinDurations() const;
   std::shared_ptr<Configuration> getConfig() const;
@@ -186,6 +187,7 @@ class Statistics {
   std::map<std::string, double> minInitialSolutionDurations_{};
   std::map<std::string, double> maxInitialSolutionDurations_{};
   std::map<std::string, double> maxNonInfInitialSolutionDurations_{};
+  std::map<std::string, double> successRates_{};
 
   // Overall min and max values.
   double minCost_{std::numeric_limits<double>::infinity()};

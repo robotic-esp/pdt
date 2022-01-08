@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Robot name="barrettwam-wall">
+  <KinBody>
+    <body name="chest">
+      <geom type="box">
+        <extents>0.04 1.5 1.1</extents>
+        <translation>-0.268 0 1.1</translation>
+        <diffuseColor>0.8 0.8 0.8</diffuseColor>
+      	<ambientColor>0.9 0.9 0.9</ambientColor>
+      </geom>
+    </body>
+  </KinBody>
+  <Robot>
+    <Robot file="robots/barrettwam.robot.xml"></Robot>
+    <translation>0 -0.6 1.1</translation>
+    <rotationaxis>0 1 0 0</rotationaxis>
+  </Robot>
+  <KinBody>
+    <joint name="leftdummy" type="hinge" enable="false">
+      <body>chest</body>
+      <body>wam0</body>
+      <limitsdeg>0 0</limitsdeg>
+    </joint>
+  </KinBody>
+</Robot>

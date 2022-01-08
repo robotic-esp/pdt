@@ -67,7 +67,7 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutio
 
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     auto plot = createInitialSolutionDurationPdfPlot(name);
-    plot->options.fillOpacity = config_->get<double>("initialSolutionPlots/combinedFillOpacity");
+    plot->options.fillOpacity = config_->get<float>("initialSolutionPlots/combinedFillOpacity");
     plot->options.lineWidth = config_->get<double>("initialSolutionPlots/lineWidth");
     axis_->addPlot(plot);
   }
@@ -133,7 +133,7 @@ std::shared_ptr<PgfPlot> InitialSolutionDurationPdfPlotter::createInitialSolutio
 
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(table);
-  plot->options.markSize = 0.0;
+  plot->options.mark = "\"none\"";
   plot->options.lineWidth = 0.0;
   plot->options.namePath = plannerName + "InitialSolutionDurationPdf"s;
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);

@@ -59,9 +59,9 @@ const ompl::base::State* GeometricShape::getState() const {
 
 std::vector<double> GeometricShape::getAnchorCoordinates() const {
   // return anchor_.reals() ?
-  if (auto spi = spaceInfo_.lock()) {
-    std::vector<double> coordinates(spi->getStateSpace()->getDimension(), 0.0);
-    for (std::size_t i = 0; i < coordinates.size(); ++i) {
+  if (auto spaceInfo = spaceInfo_.lock()) {
+    std::vector<double> coordinates(spaceInfo->getStateDimension(), 0.0);
+    for (auto i = 0u; i < coordinates.size(); ++i) {
       coordinates[i] = anchor_[i];
     }
     return coordinates;

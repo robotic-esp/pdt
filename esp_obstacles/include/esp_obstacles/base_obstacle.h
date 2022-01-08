@@ -51,7 +51,7 @@ namespace ompltools {
 // Obstacles are geometric primitives.
 class GeometricShape {
  public:
-  GeometricShape(const ompl::base::SpaceInformationPtr& spaceInfo);
+  explicit GeometricShape(const ompl::base::SpaceInformationPtr& spaceInfo);
   virtual ~GeometricShape() = default;
 
   // Set the anchor point for this shape.
@@ -67,10 +67,10 @@ class GeometricShape {
   std::vector<double> getAnchorCoordinates() const;
 
   // Get the measure of this obstacle.
-  virtual double computeMeasure() const = 0;
+  virtual double getMeasure() const = 0;
 
-  // The radius of the smallest circumscribing hypersphere with center at the anchor.
-  virtual double computeMinCircumscribingRadius() const = 0;
+  // The radius of the circumscribing sphere with center at the anchor.
+  virtual double getCircumradius() const = 0;
 
   // The clearance from a state to this obstacle.
   virtual double clearance(const ompl::base::State* state) const = 0;
@@ -91,7 +91,7 @@ class GeometricShape {
 
 class BaseObstacle : public GeometricShape {
  public:
-  BaseObstacle(const ompl::base::SpaceInformationPtr& spaceInfo);
+  explicit BaseObstacle(const ompl::base::SpaceInformationPtr& spaceInfo);
   virtual ~BaseObstacle() = default;
 
   // Return whether this obstacle invalidates a state.
@@ -103,7 +103,7 @@ class BaseObstacle : public GeometricShape {
 
 class BaseAntiObstacle : public GeometricShape {
  public:
-  BaseAntiObstacle(const ompl::base::SpaceInformationPtr& spaceInfo);
+  explicit BaseAntiObstacle(const ompl::base::SpaceInformationPtr& spaceInfo);
   virtual ~BaseAntiObstacle() = default;
 
   // Return whether this antiobstacle validates a state.

@@ -1,0 +1,18 @@
+{
+    "context": {
+        "defaultReedsSheppRandomRectangles": {
+            "type": "ReedsSheppRandomRectangles",
+            "objective": "defaultPathLength",
+            "maxTime": 1.0,
+            "boundarySideLengths" : [ 1.0, 1.0 ],
+            "start": [ -0.1, -0.1, 0.0 ],
+            "goal": [ 0.4, 0.4, 1.57079632679 ],
+            "goalType": "GoalState",
+            "dimensions": 3,
+            "collisionCheckResolution": 0.001,
+            "numObstacles": 50,
+            "maxSideLength": 0.05,
+            "minSideLength": 0.02
+        }
+    }
+}

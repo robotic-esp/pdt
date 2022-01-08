@@ -48,6 +48,8 @@
 #include <ompl/base/StateSpace.h>
 
 #include "esp_configuration/configuration.h"
+#include "esp_obstacles/base_obstacle.h"
+#include "esp_planning_contexts/context_visitor.h"
 #include "esp_time/time.h"
 
 namespace esp {
@@ -81,6 +83,18 @@ class BaseContext {
   /** \brief Return a newly generated problem definition */
   virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
       const = 0;
+
+  /** \brief Accepts a context visitor. */
+  virtual void accept(const ContextVisitor& visitor) const = 0;
+
+  /** \brief Get the obstacles. */
+  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const = 0;
+
+  /** \brief Get the antiobstacles */
+  virtual std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const = 0;
+
+  /** \brief Create a goal. */
+  virtual std::shared_ptr<ompl::base::Goal> createGoal() const = 0;
 
  protected:
   /** \brief The space information associated with this context. */

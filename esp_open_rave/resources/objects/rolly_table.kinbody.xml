@@ -1,0 +1,9 @@
+<kinbody name="rolly_table">
+  <body name="rolly_table" type="static">
+    <geom type="trimesh" modifiable="false">
+      <render>objects/rolly-table.iv 2</render>
+      <collision>objects/rolly-table.iv 2</collision>
+      <rotationaxis>1 0 0 90</rotationaxis>
+    </geom>
+  </body>
+</kinbody>

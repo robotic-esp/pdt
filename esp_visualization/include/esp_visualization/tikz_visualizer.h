@@ -57,7 +57,7 @@ namespace ompltools {
 class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
  public:
   TikzVisualizer(const std::shared_ptr<const Configuration>& config,
-                 const std::shared_ptr<RealVectorGeometricContext>& context,
+                 const std::shared_ptr<BaseContext>& context,
                  const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE>& plannerPair);
   ~TikzVisualizer() = default;
 
@@ -91,6 +91,7 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
   void visit(const ObstacleFree& context) const override;
   void visit(const RandomRectangles& context) const override;
   void visit(const RandomRectanglesMultiStartGoal& context) const override;
+  void visit(const ReedsSheppRandomRectangles& context) const override;
   void visit(const RepeatingRectangles& context) const override;
   void visit(const StartEnclosure& context) const override;
   void visit(const WallGap& context) const override;
@@ -101,7 +102,8 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
 
   // Helper functions.
   void drawBoundary(const RealVectorGeometricContext& context) const;
-  void drawGoal(const RealVectorGeometricContext& context) const;
+  void drawBoundary(const ReedsSheppRandomRectangles& context) const;
+  void drawGoal(const std::shared_ptr<ompl::base::Goal>& context) const;
   void drawStartVertex(const ompl::base::PlannerDataVertex& vertex) const;
   void drawStartState(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const;
   void drawStartStates(
@@ -133,7 +135,7 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
       const std::shared_ptr<const EITstarData>& aitstarData) const;
 
   // Planner and context to be visualized.
-  std::shared_ptr<RealVectorGeometricContext> context_;
+  std::shared_ptr<BaseContext> context_;
   PLANNER_TYPE plannerType_{PLANNER_TYPE::INVALID};
   std::string name_{"invalid planner"};
 

@@ -59,11 +59,17 @@ namespace json = nlohmann;
 // A class to manage configuration for repeatable experiments.
 class Configuration {
  public:
-  Configuration(int argc, char** argv);
+  Configuration(const int argc, const char** argv);
   ~Configuration() = default;
 
+  // Clear the stored configuration.
+  void clear();
+
+  // Load a given configuration file.
+  void load(const std::experimental::filesystem::path& config);
+
   // Load from command line options.
-  void load(int argc, char** argv);
+  void load(const int argc, const char** argv);
 
   // Check if a key exists.
   bool contains(const std::string& key) const;

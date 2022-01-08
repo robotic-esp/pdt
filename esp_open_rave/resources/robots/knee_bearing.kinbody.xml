@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<kinbody name="knee-bearing">
+  <body type="dynamic">
+    <geom type="trimesh">
+      <data>robots/bearing_new_origin.stl</data>
+       <render>robots/bearing_new_origin.stl</render>
+    </geom>
+  </body>
+</kinbody>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="BarrettWAM">
+  <kinbody file="robots/wam7.kinbody.xml"/>
+  <kinbody file="robots/barretthand.kinbody.xml"/>
+  <kinbody>
+    <body name="handbase">
+      <offsetfrom>wam7</offsetfrom>
+    </body>
+    <joint name="dummyhand" type="hinge" enable="false">
+      <body>wam7</body>
+      <body>handbase</body>
+      <limits>0 0</limits>
+    </joint>
+  </kinbody>
+  <manipulator name="arm">
+    <base>wam0</base>
+    <effector>wam7</effector>
+    <iksolver>WAM7ikfast 0.05</iksolver>
+    <translation>0 0 0.16</translation>
+    <joints>JF1 JF2 JF3 JF4</joints>
+    <closingdirection>1 1 1 0</closingdirection>
+    <direction>0 0 1</direction>
+  </manipulator>
+</robot>

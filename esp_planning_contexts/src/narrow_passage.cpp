@@ -79,7 +79,7 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
   }
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
   }
 
@@ -130,7 +130,7 @@ void NarrowPassage::createObstacles() {
 
   // Get the midpoint of the state space and add the offset in X direction.
   ompl::base::ScopedState<> midpoint(spaceInfo_);
-  for (std::size_t j = 0u; j < dimensionality_; ++j) {
+  for (auto j = 0u; j < dimensionality_; ++j) {
     midpoint[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
   }
   midpoint[0] += wallOffsetX_;

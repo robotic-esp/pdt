@@ -45,8 +45,8 @@
 #include "esp_common/goal_type.h"
 #include "esp_common/objective_type.h"
 #include "esp_optimization_objectives/max_min_clearance_optimization_objective.h"
-#include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
 #include "esp_optimization_objectives/potential_field_optimization_objective.h"
+#include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
 
 using namespace std::string_literals;
 
@@ -82,7 +82,17 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
       break;
     }
     case OBJECTIVE_TYPE::RECIPROCALCLEARANCE: {
-      objective_ = std::make_shared<ReciprocalClearanceOptimizationObjective>(spaceInfo_);
+      if (config_->get<std::string>(parentKey + "/heuristicType") == "fraction"s) {
+        const auto fraction = config_->get<double>(parentKey + "/heuristicFraction");
+        objective_ =
+          std::make_shared<ReciprocalClearanceOptimizationObjective>(spaceInfo_, fraction);
+      } else if (config_->get<std::string>(parentKey + "/heuristicType") == "factors"s) {
+        const auto factors = config_->get<std::vector<double>>(parentKey + "/heuristicFactors");
+        objective_ =
+          std::make_shared<ReciprocalClearanceOptimizationObjective>(spaceInfo_, factors);
+      } else {
+        throw std::runtime_error("Unknown heuristic type for reciprocal clearance objective.");
+      }
       objective_->setCostThreshold(
           ompl::base::Cost(config_->get<double>(parentKey + "/solvedCost")));
       objective_->setCostToGoHeuristic([this](const ompl::base::State*, const ompl::base::Goal*) {

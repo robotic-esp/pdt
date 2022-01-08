@@ -52,8 +52,7 @@ namespace ompltools {
 using namespace std::string_literals;
 
 TikzVisualizer::TikzVisualizer(
-    const std::shared_ptr<const Configuration>& config,
-    const std::shared_ptr<RealVectorGeometricContext>& context,
+    const std::shared_ptr<const Configuration>& config, const std::shared_ptr<BaseContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE>& plannerPair) :
     config_(config),
     context_(context),
@@ -83,10 +82,12 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
                             const ompl::base::PathPtr path,
                             const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData,
                             double iterationTime, double totalTime, double solutionCost) {
-  if (context_->getDimension() != 2u) {
-    OMPL_ERROR("Tikz visualizer can only handle two dimensional contexts.");
+  if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR &&
+      context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_SE2) {
+    OMPL_ERROR("Tikz visualizer can only visualize 2d real vector or se2 contexts.");
     throw std::runtime_error("Visualizer error.");
   }
+
   // Draw the obstacles.
   for (const auto& obstacle : context_->getObstacles()) {
     obstacle->accept(*this);
@@ -104,7 +105,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
   drawPlannerSpecificVisualizations(plannerSpecificData);
 
   // Draw the vertices and edges.
-  for (std::size_t i = 0u; i < plannerData.numVertices(); ++i) {
+  for (auto i = 0u; i < plannerData.numVertices(); ++i) {
     // Get the vertex.
     auto vertex = plannerData.getVertex(i);
 
@@ -135,7 +136,16 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
   drawSolution(path);
 
   // Clip the picture to the boundaries.
-  auto boundaries = context_->getBoundaries();
+  const auto vectorContext = std::dynamic_pointer_cast<RealVectorGeometricContext>(context_);
+  const auto se2Context = std::dynamic_pointer_cast<RealVectorGeometricContext>(context_);
+  auto boundaries = ompl::base::RealVectorBounds(2u);
+  if (vectorContext) {
+    boundaries = vectorContext->getBoundaries();
+  } else if (se2Context) {
+    boundaries = se2Context->getBoundaries();
+  } else {
+    std::runtime_error("Tikz visualizer can only handle real vector and SE2 state spaces.");
+  }
   auto minX = boundaries.low.at(0);
   auto maxX = boundaries.high.at(0);
   auto minY = boundaries.low.at(1);
@@ -191,12 +201,13 @@ std::experimental::filesystem::path TikzVisualizer::compile(
              << "\\RequirePackage{pdftexcmds}\n"
              << "\\makeatletter\n"
              << "\\let\\pdfshellescape\\pdf@shellescape\n"
-             << "\\makeatother "
+             << "\\makeatother\n"
              << "\\RequirePackage{luatex85}\n"
              << "\\documentclass[convert={density=300,outext=.png}]{"
                 "standalone}\n"
              << "\\usepackage{xcolor}\n"
              << "\\usepackage{fontspec}\n"
+             << "\\setmainfont{Roboto}"
              << "\\usepackage{tikz}\n\n";
 
   // Define the colors.
@@ -222,9 +233,9 @@ std::experimental::filesystem::path TikzVisualizer::compile(
   standalone << "\n\\begin{document}\n"
              << "\\pagecolor{white}\n"
              << "\\begin{minipage}{10cm}\n"
-             << "\n\\noindent\\Large\\vphantom{pP}"
+             << "\n\\noindent\\Huge\\vphantom{pP}\\textbf{"
              << config_->get<std::string>("planner/" + name_ + "/report/name")
-             << "\\vphantom{pP}\\quad\\small Cost: ";
+             << "}\\vphantom{pP}\\\\\\LARGE Cost: ";
   if (std::isfinite(cost)) {
     standalone << cost;
   } else {
@@ -282,7 +293,7 @@ void TikzVisualizer::visit(const CentreSquare& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const DividingWalls& context) const {
@@ -293,7 +304,7 @@ void TikzVisualizer::visit(const DividingWalls& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const DoubleEnclosure& context) const {
@@ -304,7 +315,7 @@ void TikzVisualizer::visit(const DoubleEnclosure& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const FlankingGap& context) const {
@@ -315,7 +326,7 @@ void TikzVisualizer::visit(const FlankingGap& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const FourRooms& context) const {
@@ -326,7 +337,7 @@ void TikzVisualizer::visit(const FourRooms& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const GoalEnclosure& context) const {
@@ -337,7 +348,7 @@ void TikzVisualizer::visit(const GoalEnclosure& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const NarrowPassage& context) const {
@@ -348,7 +359,7 @@ void TikzVisualizer::visit(const NarrowPassage& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const ObstacleFree& context) const {
@@ -359,7 +370,7 @@ void TikzVisualizer::visit(const ObstacleFree& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const RandomRectangles& context) const {
@@ -370,7 +381,7 @@ void TikzVisualizer::visit(const RandomRectangles& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const {
@@ -381,7 +392,18 @@ void TikzVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const 
   drawStartStates(context.getStartStates());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
+}
+
+void TikzVisualizer::visit(const ReedsSheppRandomRectangles& context) const {
+  // Draw the boundary.
+  drawBoundary(context);
+
+  // Draw the start states.
+  drawStartState(context.getStartState());
+
+  // Draw the goal states.
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const RepeatingRectangles& context) const {
@@ -392,7 +414,7 @@ void TikzVisualizer::visit(const RepeatingRectangles& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const StartEnclosure& context) const {
@@ -403,7 +425,7 @@ void TikzVisualizer::visit(const StartEnclosure& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const WallGap& context) const {
@@ -414,7 +436,7 @@ void TikzVisualizer::visit(const WallGap& context) const {
   drawStartState(context.getStartState());
 
   // Draw the goal states.
-  drawGoal(context);
+  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
@@ -437,8 +459,16 @@ void TikzVisualizer::drawBoundary(const RealVectorGeometricContext& context) con
   drawRectangle(midX, midY, widthX, widthY, "boundary");
 }
 
-void TikzVisualizer::drawGoal(const RealVectorGeometricContext& context) const {
-  const auto goal = context.createGoal();
+void TikzVisualizer::drawBoundary(const ReedsSheppRandomRectangles& context) const {
+  const auto boundaries = context.getBoundaries();
+  double midX = (boundaries.low.at(0u) + boundaries.high.at(0u)) / 2.0;
+  double midY = (boundaries.low.at(1u) + boundaries.high.at(1u)) / 2.0;
+  double widthX = boundaries.high.at(0u) - boundaries.low.at(0u);
+  double widthY = boundaries.high.at(1u) - boundaries.low.at(1u);
+  drawRectangle(midX, midY, widthX, widthY, "boundary");
+}
+
+void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) const {
   switch (goal->getType()) {
     case ompl::base::GoalType::GOAL_STATE: {
       ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(
@@ -589,10 +619,10 @@ void TikzVisualizer::drawBITstarSpecificVisualizations(
   }
 
   // Draw the ellipse.
-  // auto nextEdgeQueueValue = bitstarData->getNextEdgeValueInQueue();
-  // if (!std::isnan(nextEdgeQueueValue.value()) && !std::isinf(nextEdgeQueueValue.value())) {
-  //   drawEllipse(nextEdgeQueueValue.value());
-  // }
+  auto nextEdgeQueueValue = bitstarData->getNextEdgeValueInQueue();
+  if (!std::isnan(nextEdgeQueueValue.value()) && !std::isinf(nextEdgeQueueValue.value())) {
+    drawEllipse(nextEdgeQueueValue.value());
+  }
 }
 
 void TikzVisualizer::drawAITstarSpecificVisualizations(
@@ -629,13 +659,6 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
              nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, espred");
   }
 
-  // // Draw the top edge in the queue.
-  // auto nextEdge = aitstarData->getNextEdge();
-  // if (nextEdge.first && nextEdge.second) {
-  //   drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
-  //            nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, espred");
-  // }
-
   // // Draw the next vertex in the queue.
   // auto nextVertex = aitstarData->getNextVertex();
   // if (nextVertex) {
@@ -646,11 +669,19 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
 
 void TikzVisualizer::drawEITstarSpecificVisualizations(
     const std::shared_ptr<const EITstarData>& eitstarData) const {
-  // Draw the backward search tree.
-  for (const auto& edge : eitstarData->getReverseTree()) {
-    const auto source = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-    const auto target = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-    drawEdge(source, target, "edge, esplightblue");
+  // // Draw the backward search tree.
+  // for (const auto& edge : eitstarData->getReverseTree()) {
+  //   const auto source = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+  //   const auto target = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
+  //   drawEdge(source, target, "edge, esplightblue");
+  // }
+
+  // Draw the top edge in the queue.
+  auto nextEdge = eitstarData->getNextForwardEdge();
+  if (nextEdge.source && nextEdge.target) {
+    drawEdge(nextEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>(),
+             nextEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>(),
+             "edge, espred");
   }
 
   // // Draw the top edge in the queue.
@@ -725,18 +756,34 @@ void TikzVisualizer::drawEllipse(double cost) const {
   auto goal = config_->get<std::vector<double>>("context/"s + contextName + "/goal");
   auto length =
       std::sqrt(std::pow(start.at(0u) - goal.at(0u), 2) + std::pow(start.at(1u) - goal.at(1u), 2));
+  auto angle = std::atan2(goal.at(1u) - start.at(1u), goal.at(0u) - start.at(0u));
+
+  std::vector<double> center{(start.at(0u) + goal.at(0u)) / 2.0,
+                             (start.at(1u) + goal.at(1u)) / 2.0};
 
   // Compute the semi major-axis.
-  auto semiMajorAxis = cost / 2.0;
-  auto semiMinorAxis = std::sqrt(std::pow((cost / 2.0), 2) - std::pow((length / 2.0), 2));
+  auto majorAxisLength = cost / 2.0;
+  auto minorAxisLength = std::sqrt(cost * cost - length * length) / 2.0;
 
-  // Get midpoint of start and goal.
-  auto draw = std::make_shared<TikzDraw>();
-  draw->setFromPosition((start.at(0u) + goal.at(0u)) / 2.0, (start.at(1u) + goal.at(1u)) / 2.0);
-  draw->setToPosition(std::to_string(semiMajorAxis) + " and "s + std::to_string(semiMinorAxis));
-  draw->setConnection("ellipse");
-  draw->setOptions("densely dashed, thin, espgray");
-  picture_.addDraw(draw);
+  constexpr auto piHalf = 3.1415926535897 / 2.0;
+  std::vector<double> majorAxis{majorAxisLength * std::cos(angle),
+                                majorAxisLength * std::sin(angle)};
+  std::vector<double> minorAxis{minorAxisLength * std::cos(angle + piHalf),
+                                minorAxisLength * std::sin(angle + piHalf)};
+
+  std::ostringstream ellipseCommand{};
+
+  ellipseCommand << "\\color{gray}\n\\pgfpathellipse"
+                 // << "{\\pgfpointxy{" << start.at(0u) << "}{" << start.at(1u) << "}}"
+                 // << "{\\pgfpointxy{" << cost << "}{" << 0 << "}}"
+                 // << "{\\pgfpointxy{" << 0 << "}{" << cost << "}}"
+                 << "{\\pgfpointxy{" << center.at(0u) << "}{" << center.at(1u) << "}}"
+                 << "{\\pgfpointxy{" << majorAxis.at(0u) << "}{" << majorAxis.at(1u) << "}}"
+                 << "{\\pgfpointxy{" << minorAxis.at(0u) << "}{" << minorAxis.at(1u) << "}}\n"
+                 << "\\pgfsetdash{{1.2mm}{0.8mm}}{0cm}\n"
+                 << "\\pgfsetlinewidth{0.8mm}"
+                 << "\\pgfusepath{draw}\n";
+  picture_.addText(ellipseCommand.str());
 }
 
 }  // namespace ompltools

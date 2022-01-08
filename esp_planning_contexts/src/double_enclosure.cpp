@@ -106,7 +106,7 @@ DoubleEnclosure::DoubleEnclosure(const std::shared_ptr<ompl::base::SpaceInformat
   spaceInfo_->setup();
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
   }
 }
@@ -139,7 +139,7 @@ void DoubleEnclosure::accept(const ContextVisitor& visitor) const {
 void DoubleEnclosure::createObstacles() {
   // Create the anchor for the start enclosure obstacle.
   ompl::base::ScopedState<> startAnchor(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     startAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
 
@@ -152,7 +152,7 @@ void DoubleEnclosure::createObstacles() {
 
   // Create the anchor for the goal enclosure obstacle.
   ompl::base::ScopedState<> goalAnchor(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     goalAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(i);
   }
 
@@ -167,7 +167,7 @@ void DoubleEnclosure::createObstacles() {
 void DoubleEnclosure::createAntiObstacles() {
   // Create the anchor for the start enclosure anti obstacle.
   ompl::base::ScopedState<> startAnchor(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     startAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
 
@@ -180,7 +180,7 @@ void DoubleEnclosure::createAntiObstacles() {
 
   // Create the anchor for the goal enclosure anti obstacle.
   ompl::base::ScopedState<> goalAnchor(spaceInfo_);
-  for (std::size_t i = 0u; i < dimensionality_; ++i) {
+  for (auto i = 0u; i < dimensionality_; ++i) {
     goalAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(i);
   }
 
@@ -195,7 +195,7 @@ void DoubleEnclosure::createAntiObstacles() {
   ompl::base::ScopedState<> startGapMidpoint(spaceInfo_);
   startGapMidpoint[0u] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(0u) -
                          startInsideWidth_ / 2.0 - (startOutsideWidth_ - startInsideWidth_) / 4.0;
-  for (std::size_t i = 1u; i < dimensionality_; ++i) {
+  for (auto i = 1u; i < dimensionality_; ++i) {
     startGapMidpoint[i] = 0.0;
   }
   std::vector<double> startGapWidths(dimensionality_, startGapWidth_);
@@ -207,7 +207,7 @@ void DoubleEnclosure::createAntiObstacles() {
   ompl::base::ScopedState<> goalGapMidpoint(spaceInfo_);
   goalGapMidpoint[0u] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(0u) +
                         goalInsideWidth_ / 2.0 + (goalOutsideWidth_ - goalInsideWidth_) / 4.0;
-  for (std::size_t i = 1u; i < dimensionality_; ++i) {
+  for (auto i = 1u; i < dimensionality_; ++i) {
     goalGapMidpoint[i] = 0.0;
   }
   std::vector<double> goalGapWidths(dimensionality_, goalGapWidth_);

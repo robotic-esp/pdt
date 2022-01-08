@@ -1,57 +1,56 @@
 # ESP OMPL TOOLS
 # Authors: Jonathan Gammell, Marlin Strub
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 project(esp_ompl_tools)
 
 # Enforce out-of-source builds.
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-   message(SEND_ERROR "Please build this porject out-of-source.")
+   message(SEND_ERROR "Please build this project out-of-source.")
 endif()
 
-# Set the standard.
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Build in release if no build type is specified.
+# Build in release mode if no build type is specified.
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-# Put executables in bin directory.
+# Put executables in a bin directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 
-# Display system info.
-message(STATUS "CMAKE_SYSTEM_NAME          = ${CMAKE_SYSTEM_NAME}"         )
-message(STATUS "CMAKE_CXX_COMPILER_ID      = ${CMAKE_CXX_COMPILER_ID}"     )
-message(STATUS "CMAKE_CXX_COMPILER_VERSION = ${CMAKE_CXX_COMPILER_VERSION}")
-message(STATUS "Configuring for ${CMAKE_BUILD_TYPE} mode:")
+# Display compiler and build info.
+message(STATUS "Configuring ESP OMPL TOOLS for ${CMAKE_BUILD_TYPE} mode.")
+message(STATUS "Compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
-# Find Threads.
-find_package(Threads REQUIRED)
-
-# Find Eigen.
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
-
-# Find Boost.
-find_package(Boost 1.46.0 REQUIRED COMPONENTS program_options thread)
-include_directories(${Boost_INCLUDE_DIR})
-
-# Find OMPL.
-find_package(ompl REQUIRED)
-include_directories(${OMPL_INCLUDE_DIRS})
-
-# Add the thirdparty projects.
+# Add json as a thirdparty project.
 set(JSON_BuildTests OFF CACHE INTERNAL "") # Don't build the tests for json.
 set(JSON_Install OFF CACHE INTERNAL "")    # Don't install the json lib.
 add_subdirectory(thirdparty/json)
-include_directories(thirdparty)
 
-# Enable additional warnings and treat warnings as errors for our own code.
-set(ESP_CXX_COMPILE_FLAGS "-Wall -Wextra -Werror -Wdisabled-optimization -fdiagnostics-color=auto")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ESP_CXX_COMPILE_FLAGS}")
+# Collect all compile flags used for compiling internal libraries. Creating
+# esp_ompl_tools as an empty interface library allows us to specify esp_ompl_tools
+# as a private dependency for our build targets, which enables all the flags for these
+# targets without propagating them to external targets that depend on them.
+add_library(esp_ompl_tools INTERFACE)
+target_compile_options(esp_ompl_tools
+  INTERFACE 
+  -Wall
+  -Wextra
+  -Wpedantic
+  -Werror
+  -Wconversion
+  -Wsign-conversion)
+target_compile_features(esp_ompl_tools
+  INTERFACE
+  cxx_std_17)
 
-# Add the subdirectories.
+# Add open-rave integration if requested. This option must be processed before
+# the local libraries as some of them depend on this option.
+option(ESP_OMPL_TOOLS_OPEN_RAVE "Enable OpenRAVE integration." OFF)
+if(ESP_OMPL_TOOLS_OPEN_RAVE)
+  add_definitions(-DESP_OMPL_TOOLS_OPEN_RAVE)
+  add_subdirectory(esp_open_rave)
+endif()
+
+# Add the local libraries & executables.
 add_subdirectory(esp_common)
 add_subdirectory(esp_configuration)
 add_subdirectory(esp_experiments)
@@ -65,3 +64,16 @@ add_subdirectory(esp_tikz)
 add_subdirectory(esp_time)
 add_subdirectory(esp_utilities)
 add_subdirectory(esp_visualization)
+
+# Add the tests if requested.
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+  # Include CMake's test utilities.
+  include(CTest)
+  
+  # Add doctest as a thirdparty project.
+  add_subdirectory(thirdparty/doctest)
+
+  # Build the tests.
+  add_subdirectory(test/esp_configuration)
+  add_subdirectory(test/esp_optimization_objectives)
+endif()

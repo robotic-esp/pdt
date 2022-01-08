@@ -1,0 +1,41 @@
+<kinbody name="drone_approximation">
+    <body name="approximation" type="dynamic">
+      <geom type="box">
+        <extents>0.2 0.2 0.1</extents>
+        <diffusecolor>0.9 0.2 0.2</diffusecolor>
+        <ambientcolor>0.9 0.2 0.2</ambientcolor>
+      </geom>
+      <geom type="cylinder">
+        <height>0.1</height>
+        <radius>0.2</radius>
+        <translation>0.3 0.3 0.1</translation>
+	      <rotationaxis>1 0 0 90</rotationaxis>
+        <diffusecolor>0.9 0.2 0.2</diffusecolor>
+        <ambientcolor>0.9 0.2 0.2</ambientcolor>
+      </geom>
+      <geom type="cylinder">
+        <height>0.1</height>
+        <radius>0.2</radius>
+        <translation>-0.3 0.3 0.1</translation>
+	      <rotationaxis>1 0 0 90</rotationaxis>
+        <diffusecolor>0.9 0.2 0.2</diffusecolor>
+        <ambientcolor>0.9 0.2 0.2</ambientcolor>
+      </geom>
+      <geom type="cylinder">
+        <height>0.1</height>
+        <radius>0.2</radius>
+        <translation>0.3 -0.3 0.1</translation>
+	      <rotationaxis>1 0 0 90</rotationaxis>
+        <diffusecolor>0.9 0.2 0.2</diffusecolor>
+        <ambientcolor>0.9 0.2 0.2</ambientcolor>
+      </geom>
+      <geom type="cylinder">
+        <height>0.1</height>
+        <radius>0.2</radius>
+        <translation>-0.3 -0.3 0.1</translation>
+	      <rotationaxis>1 0 0 90</rotationaxis>
+        <diffusecolor>0.9 0.2 0.2</diffusecolor>
+        <ambientcolor>0.9 0.2 0.2</ambientcolor>
+      </geom>
+    </body>
+</kinbody>

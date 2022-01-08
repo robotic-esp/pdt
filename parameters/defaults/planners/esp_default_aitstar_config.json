@@ -11,7 +11,7 @@
                 "rewireFactor": 1.001,
                 "batchSize": 100,
                 "enablePruning": true,
-                "useKNearest": false,
+                "useKNearest": true,
                 "repairBackwardSearch": true,
                 "trackApproximateSolutions": false
             }

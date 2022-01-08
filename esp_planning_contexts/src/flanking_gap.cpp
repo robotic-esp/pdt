@@ -94,7 +94,7 @@ FlankingGap::FlankingGap(const std::shared_ptr<ompl::base::SpaceInformation>& sp
   spaceInfo_->setup();
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
   }
 }
@@ -132,7 +132,7 @@ void FlankingGap::createObstacles() {
   ompl::base::ScopedState<> anchor(spaceInfo_);
 
   // Set the obstacle midpoint in the middle of the state space.
-  for (std::size_t j = 0u; j < dimensionality_; ++j) {
+  for (auto j = 0u; j < dimensionality_; ++j) {
     anchor[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
   }
 
@@ -161,7 +161,7 @@ void FlankingGap::createAntiObstacles() {
   anchor[1u] = gapOffset_ + gapWidth_ / 2.0;
 
   // Set the obstacle midpoint in the remaining dimension.
-  for (std::size_t j = 0; j < dimensionality_; ++j) {
+  for (auto j = 0u; j < dimensionality_; ++j) {
     if (j != 1u) {
       anchor[j] = (bounds.low.at(j) + bounds.high.at(j)) / 2.0;
     }

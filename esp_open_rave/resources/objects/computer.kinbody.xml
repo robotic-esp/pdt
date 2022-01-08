@@ -1,0 +1,8 @@
+<kinbody name="computer">
+  <body name="computerbase" type="static">
+    <geom type="trimesh" modifiable="false">
+      <data>objects/computer.iv</data>
+      <render>objects/computer.iv</render>
+    </geom>
+  </body>
+</kinbody>

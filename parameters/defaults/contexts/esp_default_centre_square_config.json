@@ -3,15 +3,14 @@
         "defaultCentreSquare2D": {
             "type": "CentreSquare",
             "objective": "defaultPathLength",
-            "start": [ -0.3, -0.3 ],
-            "goalType": "GoalSpace",
-            "goalUpperBounds": [ 0.5, 0.5 ],
-            "goalLowerBounds": [ 0.4, 0.4 ],
+            "start": [ -0.3, 0.0 ],
+            "goalType": "GoalState",
+            "goal": [ 0.3, 0.0 ],
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
             "collisionCheckResolution": 0.000005,
-            "obstacleWidth": 0.2
+            "obstacleWidth": 0.4
         },
         "defaultCentreSquare3D": {
             "type": "CentreSquare",

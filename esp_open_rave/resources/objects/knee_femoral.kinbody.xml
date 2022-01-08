@@ -1,0 +1,8 @@
+<kinbody name="knee-femoral">
+  <body name="knee-femoral" type="static">
+    <geom type="trimesh" modifiable="false">
+      <data>objects/femoral_approximation_new_origin.stl</data>
+      <render>objects/femoral_approximation_new_origin.stl</render>
+    </geom>
+  </body>
+</kinbody>

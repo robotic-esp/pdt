@@ -47,19 +47,13 @@
 
 using namespace std::string_literals;
 
-int main(int argc, char** argv) {
+int main(const int argc, const char** argv) {
   // Load the config.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
   config->registerAsExperiment();
 
   auto contextFactory = std::make_shared<esp::ompltools::ContextFactory>(config);
-  auto context = std::dynamic_pointer_cast<esp::ompltools::RealVectorGeometricContext>(
-      contextFactory->create(config->get<std::string>("experiment/context")));
-
-  if (!context) {
-    auto msg = "Can not visualize '"s + config->get<std::string>("experiment/context") + "'."s;
-    throw std::invalid_argument(msg);
-  }
+  auto context = contextFactory->create(config->get<std::string>("experiment/context"));
 
   auto plannerFactory = std::make_shared<esp::ompltools::PlannerFactory>(config, context);
   auto [planner, plannerType] =
