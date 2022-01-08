@@ -3,8 +3,8 @@
 <kinbody name="knee-bearing">
   <body type="dynamic">
     <geom type="trimesh">
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/bearing_new_origin.stl</data>
-       <render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/bearing_new_origin.stl</render>
+      <data>robots/bearing_new_origin.stl</data>
+       <render>robots/bearing_new_origin.stl</render>
     </geom>
   </body>
 </kinbody>

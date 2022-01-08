@@ -46,6 +46,7 @@
 
 #include <openrave/environment.h>
 
+#include "esp_configuration/directory.h"
 #include "esp_open_rave/open_rave_r3_validity_checker.h"
 
 using namespace std::string_literals;
@@ -91,7 +92,8 @@ OpenRaveR3::OpenRaveR3(const std::shared_ptr<ompl::base::SpaceInformation>& spac
   environment->SetCollisionChecker(collisionChecker);
 
   // Load the specified environment.
-  environment->Load(config_->get<std::string>("context/" + name + "/environment"));
+  environment->Load(std::string(Directory::SOURCE) + "/"s +
+                    config_->get<std::string>("context/" + name + "/environment"));
 
   // Load the robot.
   auto robot = environment->GetRobot(config_->get<std::string>("context/" + name + "/robot"));
@@ -103,7 +105,7 @@ OpenRaveR3::OpenRaveR3(const std::shared_ptr<ompl::base::SpaceInformation>& spac
   auto r3space = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>();
   ompl::base::RealVectorBounds bounds(3u);
   bounds.high = config_->get<std::vector<double>>("context/"s + name + "/upperBounds"s);  // x y z
-  bounds.low = config_->get<std::vector<double>>("context/"s + name + "/lowerBounds"s);  // x y z
+  bounds.low = config_->get<std::vector<double>>("context/"s + name + "/lowerBounds"s);   // x y z
   r3space->setBounds(bounds);
 
   // Create the validity checker.

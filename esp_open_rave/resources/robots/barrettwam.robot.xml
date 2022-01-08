@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot name="BarrettWAM">
-  <kinbody file="/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/wam7.kinbody.xml"/>
-  <kinbody file="/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barretthand.kinbody.xml"/>
+  <kinbody file="robots/wam7.kinbody.xml"/>
+  <kinbody file="robots/barretthand.kinbody.xml"/>
   <kinbody>
     <body name="handbase">
       <offsetfrom>wam7</offsetfrom>

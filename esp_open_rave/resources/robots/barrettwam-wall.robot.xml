@@ -11,7 +11,7 @@
     </body>
   </KinBody>
   <Robot>
-    <Robot file="/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrettwam.robot.xml"></Robot>
+    <Robot file="robots/barrettwam.robot.xml"></Robot>
     <translation>0 -0.6 1.1</translation>
     <rotationaxis>0 1 0 0</rotationaxis>
   </Robot>

@@ -47,6 +47,7 @@
 
 #include <openrave/environment.h>
 
+#include "esp_configuration/directory.h"
 #include "esp_open_rave/open_rave_knee_goal.h"
 #include "esp_open_rave/open_rave_se3_validity_checker.h"
 
@@ -86,7 +87,8 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
   environment->SetCollisionChecker(collisionChecker);
 
   // Load the specified environment.
-  environment->Load(config_->get<std::string>("context/" + name + "/environment"));
+  environment->Load(std::string(Directory::SOURCE) + "/"s +
+                    config_->get<std::string>("context/" + name + "/environment"));
 
   // Load the robot.
   auto robot = environment->GetRobot(config_->get<std::string>("context/" + name + "/robot"));
@@ -145,7 +147,7 @@ std::shared_ptr<ompl::base::Goal> OpenRaveSE3::createGoal() const {
       const auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");
 
       // Check dimensionality of the goal state position.
-      if (goalPosition.size() != dimensionality_) {
+      if (goalPosition.size() - 1u != dimensionality_) {
         OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                    name_.c_str());
         throw std::runtime_error("Context error.");

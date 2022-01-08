@@ -1,8 +1,8 @@
 <kinbody name="wall_shelfes">
   <body name="wall_shelfes" type="static">
     <geom type="trimesh" modifiable="false">
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/objects/wall-shelves.iv</data>
-      <render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/objects/wall-shelves.iv</render>
+      <data>objects/wall-shelves.iv</data>
+      <render>objects/wall-shelves.iv</render>
       <rotationaxis>1 0 0 90</rotationaxis>
     </geom>
   </body>

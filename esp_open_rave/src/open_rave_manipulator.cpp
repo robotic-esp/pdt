@@ -46,6 +46,7 @@
 
 #include <openrave/environment.h>
 
+#include "esp_configuration/directory.h"
 #include "esp_open_rave/open_rave_manipulator_validity_checker.h"
 
 using namespace std::string_literals;
@@ -69,14 +70,16 @@ OpenRaveManipulator::OpenRaveManipulator(
   // Create a collision checker.
   OpenRAVE::CollisionCheckerBasePtr collisionChecker = OpenRAVE::RaveCreateCollisionChecker(
       environment, config->get<std::string>("context/" + name + "/collisionChecker"));
-  const auto boundingVolumeHierarchyRepresentation = config->get<std::string>("context/" + name + "/boundingVolumeHierarchyRepresentation");
+  const auto boundingVolumeHierarchyRepresentation =
+      config->get<std::string>("context/" + name + "/boundingVolumeHierarchyRepresentation");
   std::string cmd = "SetBVHRepresentation " + boundingVolumeHierarchyRepresentation;
   std::string bhv = "";
   collisionChecker->SendCommand(bhv, cmd);
   environment->SetCollisionChecker(collisionChecker);
 
   // Load the specified environment.
-  environment->Load(config_->get<std::string>("context/" + name + "/environment"));
+  environment->Load(std::string(Directory::SOURCE) + "/"s +
+                    config_->get<std::string>("context/" + name + "/environment"));
 
   // Load the robot.
   auto robot = environment->GetRobot(config_->get<std::string>("context/" + name + "/robot"));

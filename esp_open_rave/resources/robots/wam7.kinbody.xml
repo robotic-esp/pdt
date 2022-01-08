@@ -8,8 +8,8 @@
   <Body name="wam0" type="dynamic">
     <Translation>-0.22 -0.14 -0.346</Translation>
     <Geom type="trimesh">
-      <Data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam0.iv 1.0</Data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam0.iv  1.0</Render>
+      <Data>robots/WAM/wam0.iv 1.0</Data>
+      <Render>robots/WAM/wam0.iv  1.0</Render>
     </Geom>
     <mass type="custom">
       <total>9.97059584</total>
@@ -24,8 +24,8 @@
     <rotationaxis>1 0 0 -90</rotationaxis>
     <Geom type="trimesh">
       <rotationaxis>1 0 0 90</rotationaxis>
-      <Data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam1.iv 1.0</Data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam1.iv  1.0</Render>
+      <Data>robots/WAM/wam1.iv 1.0</Data>
+      <Render>robots/WAM/wam1.iv  1.0</Render>
     </Geom>
     <mass type="custom">
       <total>8.3936</total>
@@ -53,8 +53,8 @@
     <Translation>0  0  0</Translation>
     <Geom type="trimesh">
       <rotationaxis>1 0 0 -90</rotationaxis>
-      <Data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam2.iv  1.0</Data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam2.iv  1.0</Render>
+      <Data>robots/WAM/wam2.iv  1.0</Data>
+      <Render>robots/WAM/wam2.iv  1.0</Render>
     </Geom>
     <mass type="custom">
       <total>3.87493756</total>
@@ -81,8 +81,8 @@
     <Geom type="trimesh">
       <rotationaxis>1 0 0 90</rotationaxis>
       <translation>-0.045 0.55 0</translation>
-      <Data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam3.iv  1.0</Data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam3.iv  1.0</Render>
+      <Data>robots/WAM/wam3.iv  1.0</Data>
+      <Render>robots/WAM/wam3.iv  1.0</Render>
     </Geom>
     <mass type="custom">
       <total>1.80228141</total>
@@ -109,8 +109,8 @@
     <Geom type="trimesh">
       <rotationaxis>1 0 0 -90</rotationaxis>
       <translation>0.045 0 0</translation>
-      <Data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam4.iv  1.0</Data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam4.iv  1.0</Render>
+      <Data>robots/WAM/wam4.iv  1.0</Data>
+      <Render>robots/WAM/wam4.iv  1.0</Render>
     </Geom>
     <mass type="custom">
       <total>2.40016804 </total>
@@ -137,8 +137,8 @@
     <Geom type="trimesh">
       <translation>0 0.3 0</translation>
       <rotationaxis>1 0 0 90</rotationaxis>
-      <Data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam5.iv  1.0</Data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam5.iv  1.0</Render>
+      <Data>robots/WAM/wam5.iv  1.0</Data>
+      <Render>robots/WAM/wam5.iv  1.0</Render>
     </Geom>
     <mass type="custom">
       <total>0.12376019</total>
@@ -164,8 +164,8 @@
     <rotationaxis>1 0 0 90</rotationaxis>
     <Geom type="trimesh">
       <rotationaxis>1 0 0 -90</rotationaxis>
-      <Data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam6.iv  1.0</Data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam6.iv  1.0</Render>
+      <Data>robots/WAM/wam6.iv  1.0</Data>
+      <Render>robots/WAM/wam6.iv  1.0</Render>
     </Geom>
     <mass type="custom">
       <total>0.41797364</total>
@@ -191,8 +191,8 @@
     <Translation>0.0  0.0  0.06</Translation>
     <Geom type="trimesh">
       <Translation>0.0  0.0  -0.06</Translation>
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam7_nohand.iv 1.0</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/WAM/wam7_nohand.iv 1.0</Render>
+      <data>robots/WAM/wam7_nohand.iv 1.0</data>
+      <Render>robots/WAM/wam7_nohand.iv 1.0</Render>
     </Geom>
     <mass type="custom">
       <total>0.06864753</total>

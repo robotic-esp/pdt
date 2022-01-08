@@ -2,14 +2,14 @@
   <Body name="handbase" type="dynamic">
     <Geom type="trimesh" modifiable="false">
       <Translation>0.0  0.0  -0.06</Translation>
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/palm.iv 1</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/palm.iv 1</Render>
+      <data>robots/barrett/palm.iv 1</data>
+      <Render>robots/barrett/palm.iv 1</Render>
     </Geom>
     <Geom type="trimesh" modifiable="false">
       <Translation>0.0  0.0  0.0915</Translation>
       <RotationMat>-1 0 0 0 -1 0 0 0 1</RotationMat>
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link1.iv 0.001</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link1.iv 0.001</Render>
+      <data>robots/barrett/link1.iv 0.001</data>
+      <Render>robots/barrett/link1.iv 0.001</Render>
     </Geom>
     <mass type="custom">
       <!-- cylinder -->
@@ -24,8 +24,8 @@
     <offsetfrom>handbase</offsetfrom>
     <Translation>0 -0.025 0.0915</Translation>
     <Geom type="trimesh" modifiable="false">
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link1.iv 0.001</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link1.iv 0.001</Render>
+      <data>robots/barrett/link1.iv 0.001</data>
+      <Render>robots/barrett/link1.iv 0.001</Render>
     </Geom>
     <mass type="custom">
       <!-- approximate as box -->
@@ -40,8 +40,8 @@
     <RotationMat>1 0 0 0 0 -1 0 1 0</RotationMat>
     <Geom type="trimesh" modifiable="false">
       <Translation>0 0 0</Translation>
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link2.iv 0.001</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link2.iv 0.001</Render>
+      <data>robots/barrett/link2.iv 0.001</data>
+      <Render>robots/barrett/link2.iv 0.001</Render>
     </Geom>
     <mass type="custom">
       <!-- approximate as box -->
@@ -67,8 +67,8 @@
     <RotationMat>1 0 0 0 1 0 0 0 1</RotationMat>
     <Geom type="trimesh" modifiable="false">
       <Translation>0 0 0</Translation>
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link3.iv 0.001</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link3.iv 0.001</Render>
+      <data>robots/barrett/link3.iv 0.001</data>
+      <Render>robots/barrett/link3.iv 0.001</Render>
     </Geom>
     <mass type="custom">
       <!-- approximate as box -->
@@ -93,8 +93,8 @@
     <offsetfrom>handbase</offsetfrom>
     <Translation>0 0.025 0.0915</Translation>
     <Geom type="trimesh" modifiable="false">
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link1.iv 0.001</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link1.iv 0.001</Render>
+      <data>robots/barrett/link1.iv 0.001</data>
+      <Render>robots/barrett/link1.iv 0.001</Render>
     </Geom>
     <mass type="custom">
       <!-- approximate as box -->
@@ -109,8 +109,8 @@
     <RotationMat>1 0 0 0 0 -1 0 1 0</RotationMat>
     <Geom type="trimesh" modifiable="false">
       <Translation>0 0 0</Translation>
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link2.iv 0.001</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link2.iv 0.001</Render>
+      <data>robots/barrett/link2.iv 0.001</data>
+      <Render>robots/barrett/link2.iv 0.001</Render>
     </Geom>
     <mass type="custom">
       <!-- approximate as box -->
@@ -136,8 +136,8 @@
     <RotationMat>1 0 0 0 1 0 0 0 1</RotationMat>
     <Geom type="trimesh" modifiable="false">
       <Translation>0 0 0</Translation>
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link3.iv 0.001</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link3.iv 0.001</Render>
+      <data>robots/barrett/link3.iv 0.001</data>
+      <Render>robots/barrett/link3.iv 0.001</Render>
     </Geom>
     <mass type="custom">
       <!-- approximate as box -->
@@ -165,8 +165,8 @@
     <RotationMat>-1 0 0 0 0 1 0 1 0</RotationMat>
     <Geom type="trimesh" modifiable="false">
       <Translation>0 0 0</Translation>
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link2.iv 0.001</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link2.iv 0.001</Render>
+      <data>robots/barrett/link2.iv 0.001</data>
+      <Render>robots/barrett/link2.iv 0.001</Render>
     </Geom>
     <mass type="custom">
       <!-- approximate as box -->
@@ -192,8 +192,8 @@
     <RotationMat>1 0 0 0 1 0 0 0 1</RotationMat>
     <Geom type="trimesh" modifiable="false">
       <Translation>0 0 0</Translation>
-      <data>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link3.iv 0.001</data>
-      <Render>/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/robots/barrett/link3.iv 0.001</Render>
+      <data>robots/barrett/link3.iv 0.001</data>
+      <Render>robots/barrett/link3.iv 0.001</Render>
     </Geom>
     <mass type="custom">
       <!-- approximate as box -->
