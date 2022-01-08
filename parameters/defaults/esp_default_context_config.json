@@ -10,7 +10,7 @@
             "maxTime": 100,
             "dimensions": 14,
             "activeDofIndices": [0, 1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16, 17],
-            "environment": "/home/marlin/code/esp_ompl_tools/esp_open_rave/resources/bookshelf.env.xml",
+            "environment": "esp_open_rave/resources/bookshelf.env.xml",
             "robot": "BarrettWAM-dual",
             "collisionCheckResolution": 0.01
         },
