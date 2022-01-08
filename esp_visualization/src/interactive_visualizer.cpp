@@ -247,9 +247,8 @@ void InteractiveVisualizer::run() {
       actualDisplayDuration_ = time::Duration(0.0);
       displayStartTime_ = time::Clock::now();
       recording_ = true;
-      contextView.RecordOnRender("ffmpeg:[fps=60,bps=100000000,unique_filename]//" +
-                                 std::to_string(screencaptureId_++) + '_' + context_->getName() +
-                                 '_' + planner_->getName() + ".mp4");
+      contextView.RecordOnRender("ffmpeg:[fps=30,unique_filename]//" +
+                                 context_->getName() + '_' + planner_->getName() + ".avi");
     }
     if (pangolin::Pushed(optionExport)) {
       optionTrack = false;
@@ -264,9 +263,9 @@ void InteractiveVisualizer::run() {
         displayIteration_ = iterationToPlayTo_;
         playToIteration_ = false;
         if (recording_) {
-          contextView.RecordOnRender("ffmpeg:[fps=60,bps=100000000,unique_filename]//" +
-                                     std::to_string(screencaptureId_) + '_' + context_->getName() +
-                                     '_' + planner_->getName() + ".avi");
+          contextView.RecordOnRender("ffmpeg:[fps=30,unique_filename]//" +
+                                     context_->getName() + '_' + planner_->getName() + ".avi");
+          recording_ = false;
         }
       } else {
         actualDisplayDuration_ += time::Duration(
