@@ -131,6 +131,7 @@ class PgfAxis {
     double ymax{std::numeric_limits<double>::infinity()};
     std::string axisYLine{""};
     std::string ytick{""};
+    std::string ytickPos{""};
     std::string ytickAlign{"inside"};
     std::string yticklabel{""};
     std::string yticklabelStyle{"font=\\footnotesize"};

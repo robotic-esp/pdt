@@ -331,6 +331,7 @@ std::stringstream ExperimentReport::individualResults() const {
     auto cdf = successPlotter_.createSuccessAxis(name);
     cdf->options.xmin = stats_.getMinInitialSolutionDuration(name);
     cdf->options.xmax = config_->get<double>("context/"s + config_->get<std::string>("experiment/context") + "/maxTime");
+    cdf->options.ytickPos = "left";
     auto pdf = initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name);
     pdf->overlay(cdf.get());
     for (const auto& plot : pdf->getPlots()) {

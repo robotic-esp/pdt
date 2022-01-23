@@ -227,6 +227,9 @@ std::string PgfAxis::string() const {
   if (options.ytick != ""s) {
     stream << ",\n  ytick={" << options.ytick << '}';
   }
+  if (options.ytickPos != ""s) {
+    stream << ",\n ytick pos={" << options.ytickPos << '}';
+  }
   if (options.yticklabel != ""s) {
     stream << ",\n  yticklabel={" << options.yticklabel << '}';
   }
