@@ -43,6 +43,14 @@ Our tools depend on the `thread` and `program_options` components of [Boost](htt
 
 Follow the installation guide of the [official repo](https://github.com/stevenlovegrove/Pangolin), it's well documented.
 
+**Note**: Pangolin got refactored in early 2021, but our tools haven't been updated yet. The latest stable version of Pangolin that our tools compile with is v0.6. Once you have cloned the Pangolin repo, cd into it and run
+
+```bash
+git checkout v0.6
+```
+
+before building and installing.
+
 #### FFmpeg
 
 FFmpeg is only needed if you want to record videos. The code should compile without it.
