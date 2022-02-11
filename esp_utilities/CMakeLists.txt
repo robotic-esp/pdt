@@ -9,13 +9,17 @@ find_package(Eigen3 REQUIRED)
 add_library(esp_utilities
   src/get_best_cost.cpp)
 
-# Specify the include directories for this target.
+# Specify our include directories for this target.
 target_include_directories(esp_utilities
+  PUBLIC
+  ${PROJECT_SOURCE_DIR}/include)
+
+# Specify third-party include directories as system includes to suppress warnings.
+target_include_directories(esp_utilities SYSTEM
   PRIVATE
   ${EIGEN3_INCLUDE_DIR}
   PUBLIC
-  ${OMPL_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/include)
+  ${OMPL_INCLUDE_DIRS})
 
 # Specify the link targets for this target.
 target_link_libraries(esp_utilities

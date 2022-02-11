@@ -8,10 +8,14 @@ find_package(ompl REQUIRED)
 add_library(esp_performance_loggers
   src/performance_loggers.cpp)
 
-# Specify the include directories for this library.
+# Specify our include directories for this library.
 target_include_directories(esp_performance_loggers
   PUBLIC
-  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/include)
+
+# Specify third-party include directories as system includes to suppress warnings.
+target_include_directories(esp_performance_loggers SYSTEM
+  PUBLIC
   ${OMPL_INCLUDE_DIRS})
 
 # Specify the link targets for this library.

@@ -4,9 +4,9 @@ project(esp_common)
 # Specify the library as a target.
 add_library(esp_common INTERFACE)
 
-# Specify the include directories for this target.
-target_include_directories(esp_common
-  SYSTEM INTERFACE
+# Specify third-party include directories as system includes to suppress warnings.
+target_include_directories(esp_common SYSTEM
+  INTERFACE
   ${NLOHMANN_JSON_INCLUDE_BUILD_DIR}
   ${PROJECT_SOURCE_DIR}/include)
 

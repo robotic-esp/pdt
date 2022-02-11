@@ -23,11 +23,15 @@ add_library(esp_configuration
   ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/directory.cpp)
 
-# Specify the include directories for this target.
+# Specify our include directories for this target.
 target_include_directories(esp_configuration
   PUBLIC
-  ${OMPL_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include)
+
+# Specify third-party include directories as system includes to suppress warnings.
+target_include_directories(esp_configuration SYSTEM
+  PUBLIC
+  ${OMPL_INCLUDE_DIRS})
 
 # Specify the link targets for this target.
 target_link_libraries(esp_configuration

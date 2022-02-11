@@ -16,9 +16,14 @@ add_library(esp_visualization
   src/tikz_visualizer.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/fonts.cpp)
 
-# Specify the include directories for this target.
-target_include_directories(esp_visualization PUBLIC
-  ${PROJECT_SOURCE_DIR}/include
+# Specify our include directories for this target.
+target_include_directories(esp_visualization
+  PUBLIC
+  ${PROJECT_SOURCE_DIR}/include)
+
+# Specify third-party include directories as system includes to suppress warnings.
+target_include_directories(esp_visualization SYSTEM
+  PUBLIC
   ${Pangolin_INCLUDE_DIRS} 
   ${OMPL_INCLUDE_DIRS})
 

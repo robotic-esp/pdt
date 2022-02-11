@@ -11,9 +11,14 @@ add_library(esp_optimization_objectives
   src/max_min_clearance_optimization_objective.cpp
   src/reciprocal_clearance_optimization_objective.cpp)
 
-# Specify the include directories for this target.
-target_include_directories(esp_optimization_objectives PUBLIC
-  ${PROJECT_SOURCE_DIR}/include
+# Specify our include directories for this target.
+target_include_directories(esp_optimization_objectives
+  PUBLIC
+  ${PROJECT_SOURCE_DIR}/include)
+
+# Specify third-party include directories as system includes to suppress warnings.
+target_include_directories(esp_optimization_objectives SYSTEM
+  PUBLIC
   ${EIGEN3_INCLUDE_DIR}
   ${OMPL_INCLUDE_DIRS})
 

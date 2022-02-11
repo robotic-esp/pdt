@@ -9,9 +9,14 @@ find_package(ompl REQUIRED)
 add_library(esp_obstacles
   src/base_obstacle.cpp)
 
-# Specify the include directories for this target.
-target_include_directories(esp_obstacles PUBLIC
-  ${PROJECT_SOURCE_DIR}/include
+# Specify our include directories for this target.
+target_include_directories(esp_obstacles
+  PUBLIC
+  ${PROJECT_SOURCE_DIR}/include)
+
+# Specify third-party include directories as system includes to suppress warnings.
+target_include_directories(esp_obstacles SYSTEM
+  PUBLIC
   ${EIGEN3_INCLUDE_DIR}
   ${OMPL_INCLUDE_DIRS})
 

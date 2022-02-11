@@ -9,8 +9,8 @@ find_package(Eigen3 REQUIRED)
 add_executable(test_esp_optimization_objectives
   unit_tests.cpp)
 
-# Specify the include directories for this target.
-target_include_directories(test_esp_optimization_objectives
+# Specify third-party include directories as system includes to suppress warnings.
+target_include_directories(test_esp_optimization_objectives SYSTEM
   PRIVATE
   ${EIGEN_INCLUDE_DIRS}
   ${OMPL_INCLUDE_DIRS})

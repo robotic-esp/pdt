@@ -24,10 +24,14 @@ add_library(esp_open_rave
   src/open_rave_se3.cpp
   src/open_rave_se3_validity_checker.cpp)
 
-# Specify the include directories for this target.
+# Specify our include directories for this target.
 target_include_directories(esp_open_rave
   PUBLIC
-  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/include)
+
+# Specify third-party include directories as system includes to suppress warnings.
+target_include_directories(esp_open_rave SYSTEM
+  PUBLIC
   ${OMPL_INCLUDE_DIRS}
   ${OpenRAVE_INCLUDE_DIRS})
 
