@@ -149,6 +149,26 @@ The visualization is interactive. These are the five keys that are currently bou
 
 When tracking is on, the most recently computed iteration is visualized.
 
+# Troubleshooting
+
+## The compilation fails because some headers are not found
+
+You have built and installed the ESP version of OMPL, but the compilation fails because it is missing headers? Make sure the correct OMPL is found (`cmake` will report the path of the OMPL it finds). Say you installed the ESP version of OMPL to `/usr/local/`, but also have ROS installed on your system and `cmake` uses the ROS version of OMPL. One way to force `cmake` to use the library in `/usr/local` (or any other path) is to replace `find_package(ompl REQUIRED)` with `find_package(ompl REQUIRED PATHS /usr/local NO_DEFAULT_PATH)`.
+
+## Executing a program complains about missing symbols
+
+This can happen if the wrong version of OMPL is dynamically linked to your executable. I don't have an elegant solution to this problem. A quick and dirty hack is to wrap your executable, e.g., `build/bin/benchmark` into a script and modify `LD_LIBRARY_PATH` in that script:
+
+```bash
+#!/bin/bash
+export LD_LIBRARY_PATH="/usr/local/lib/:${LD_LIBRARY_PATH}"
+/path/to/esp_ompl_tools/build/bin/benchmark -c /path/to/esp_ompl_tools/parameters/demo/benchmark_demo.json
+```
+
+## The benchmark report doesn't compile
+
+Turn on the verbose compilation in the benchmark configuration `.json` file. If the error is related to LuaTeX, e.g., `! LaTeX Error: file 'luatex85.sty' not found.`, make sure LuaTeX is installed on your system. An easy way to install it in Ubuntu is `sudo apt install texlive-luatex`.
+
 # Miscellaneous
 
 ## Why OMPL?
