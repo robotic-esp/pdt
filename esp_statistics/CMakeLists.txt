@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(esp_statistics)
 
-# Find the dependencies of this library.
-find_package(ompl REQUIRED)
-
 # Specify this library as a target.
 add_library(esp_statistics
   src/statistics.cpp)

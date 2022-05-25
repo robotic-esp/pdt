@@ -14,7 +14,6 @@ configure_file(src/directory.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/directory.cpp @O
 
 # Find the dependencies of this library.
 find_package(Boost 1.58 REQUIRED COMPONENTS program_options)
-find_package(ompl REQUIRED)
 
 # Specify the library as a target.
 add_library(esp_configuration

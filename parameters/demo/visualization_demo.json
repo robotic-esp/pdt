@@ -2,7 +2,37 @@
     "experiment": {
         "executable": "visualization",
         "planner": "defaultEITstar",
-        "context": "defaultWallGap2D",
+        "context": "RandomRectangles2D",
         "useOnlyThisConfig": false
+    },
+    "context": {
+        "RandomRectangles2D": {
+            "type": "RandomRectangles",
+            "objective": "defaultPathLength",
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : [ 1, 1 ],
+            "start": [ -0.1, -0.1 ],
+            "goal": [ 0.4, 0.4 ],
+            "goalType": "GoalState",
+            "collisionCheckResolution": 0.000005,
+            "numObstacles": 20,
+            "maxSideLength": 0.2,
+            "minSideLength": 0.1
+        },
+        "RandomRectangles3D": {
+            "type": "RandomRectangles",
+            "objective": "defaultPathLength",
+            "maxTime": 0.1,
+            "dimensions": 3,
+            "boundarySideLengths" : [ 1, 1, 1 ],
+            "start": [ -0.1, -0.1, -0.1 ],
+            "goal": [ 0.4, 0.4, 0.4 ],
+            "goalType": "GoalState",
+            "collisionCheckResolution": 0.000005,
+            "numObstacles": 50,
+            "maxSideLength": 0.2,
+            "minSideLength": 0.1
+        }
     }
 }

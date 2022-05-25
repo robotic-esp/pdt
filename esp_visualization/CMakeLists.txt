@@ -3,7 +3,6 @@ project(esp_visualization)
 
 # Find the dependencies for this library.
 find_package(Pangolin REQUIRED)
-find_package(ompl REQUIRED)
 
 # Make the path to the source directory available in code.
 configure_file(src/fonts.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/fonts.cpp @ONLY)

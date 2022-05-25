@@ -3,7 +3,6 @@ project(esp_optimization_objectives)
 
 # Find the dependencies of this library.
 find_package(Eigen3 REQUIRED)
-find_package(ompl REQUIRED)
 
 # Specify the library as a target.
 add_library(esp_optimization_objectives

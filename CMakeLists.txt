@@ -16,6 +16,13 @@ endif()
 # Put executables in a bin directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 
+# Let the user specify the path to the OMPL library they want to compile with.
+if(NOT ESP_OMPL_TOOLS_OMPL_DIR)
+  find_package(ompl REQUIRED)
+else()
+  find_package(ompl REQUIRED PATHS ${ESP_OMPL_TOOLS_OMPL_DIR} NO_DEFAULT_PATH)
+endif()
+
 # Display compiler and build info.
 message(STATUS "Configuring ESP OMPL TOOLS for ${CMAKE_BUILD_TYPE} mode.")
 message(STATUS "Compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")

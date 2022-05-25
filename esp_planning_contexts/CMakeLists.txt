@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(esp_planning_contexts)
 
-# Find the dependencies of this library.
-find_package(ompl REQUIRED)
-
 # Specify this library as a target.
 add_library(esp_planning_contexts
   src/base_context.cpp

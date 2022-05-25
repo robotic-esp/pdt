@@ -153,7 +153,7 @@ When tracking is on, the most recently computed iteration is visualized.
 
 ## The compilation fails because some headers are not found
 
-You have built and installed the ESP version of OMPL, but the compilation fails because it is missing headers? Make sure the correct OMPL is found (`cmake` will report the path of the OMPL it finds). Say you installed the ESP version of OMPL to `/usr/local/`, but also have ROS installed on your system and `cmake` uses the ROS version of OMPL. One way to force `cmake` to use the library in `/usr/local` (or any other path) is to replace `find_package(ompl REQUIRED)` with `find_package(ompl REQUIRED PATHS /usr/local NO_DEFAULT_PATH)`.
+You have built and installed the ESP version of OMPL, but the compilation fails because it is missing headers? Make sure the correct OMPL is found (`cmake` will report the path of the OMPL it finds). Say you installed the ESP version of OMPL to `/usr/local/`, but also have ROS installed on your system and `cmake` prefers the ROS version. You can specify the path ESP OMPL TOOLS looks for OMPL in the variable `ESP_OMPL_TOOLS_OMPL_DIR`, e.g., by running `cmake -DESP_OMPL_TOOLS_OMPL_DIR=/usr/local`. If you don't define the variable, CMake will look in the standard places.
 
 ## Executing a program complains about missing symbols
 

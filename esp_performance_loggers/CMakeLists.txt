@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(esp_performance_loggers)
 
-# Find the dependencies of this library.
-find_package(ompl REQUIRED)
-
 # Specify the library as a target.
 add_library(esp_performance_loggers
   src/performance_loggers.cpp)

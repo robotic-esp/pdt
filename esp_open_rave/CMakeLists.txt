@@ -5,7 +5,6 @@ project(esp_open_rave)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Find the dependencies of this library.
-find_package(ompl REQUIRED)
 find_package(OpenRAVE REQUIRED)
 find_package(Boost 1.58 REQUIRED COMPONENTS system)
 find_package(Threads REQUIRED)

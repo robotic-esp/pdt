@@ -6,8 +6,6 @@ project(esp_experiments)
 find_package(Boost 1.58 REQUIRED COMPONENTS program_options thread)
 include_directories(${Boost_INCLUDE_DIR})
 
-find_package(ompl REQUIRED)
-
 # Specify the benchmark executable target.
 add_executable(benchmark
   src/benchmark.cpp)
