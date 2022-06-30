@@ -43,12 +43,33 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
 #include "esp_configuration/configuration.h"
+#include "esp_planning_contexts/context_validity_checker.h"
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 
 namespace esp {
 
 namespace ompltools {
+
+class ContextValidityCheckerRepeatingRectangles : public ContextValidityChecker {
+ public:
+  ContextValidityCheckerRepeatingRectangles(const ompl::base::SpaceInformationPtr& spaceInfo,
+                                            const std::size_t numObsPerDim, const double obsWidth);
+  ~ContextValidityCheckerRepeatingRectangles() = default;
+
+  /** \brief Check if a state is valid. */
+  virtual bool isValid(const ompl::base::State* state) const override;
+
+ private:
+  /** \brief The centers of the obstacles. */
+  std::vector<double> coordinates_{};
+
+  /** \brief The number of obstacles per dimension. */
+  std::size_t numObsPerDim_{};
+
+  /** \brief The width of the obstacles. */
+  double obsWidth_{};
+};
 
 /** \brief An experiment with a singularly placed square obstacle*/
 class RepeatingRectangles : public RealVectorGeometricContext {
