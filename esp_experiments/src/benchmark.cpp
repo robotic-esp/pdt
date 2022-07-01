@@ -244,7 +244,7 @@ int main(const int argc, const char **argv) {
                               ompl::base::Cost(context->getObjective()->infiniteCost()));
       }
 
-      // Anytime planners can stop early, e.g. if they know that they found the optimal solution. 
+      // Anytime planners can stop early, e.g. if they know that they found the optimal solution.
       // Thus, we need to add an additional final measurement point at the maximum runtime.
       const auto maxRunDuration = context->getMaxSolveDuration();
       if (totalDuration < maxRunDuration) {
@@ -266,13 +266,13 @@ int main(const int argc, const char **argv) {
       constexpr auto barWidth = 36;
       std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
                 << (std::ceil(progress * barWidth) != barWidth
-                    ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
-                    : std::setw(static_cast<int>(std::ceil(progress * barWidth) - 1u)))
+                        ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
+                        : std::setw(static_cast<int>(std::ceil(progress * barWidth) - 1u)))
                 << std::setfill('.') << (currentRun != totalNumberOfRuns ? '|' : '.') << std::right
                 << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
-                << std::setfill('.') << '.'
-                << std::right << std::fixed << std::setw(6) << std::setfill(' ')
-                << std::setprecision(2) << progress * 100.0f << " %" << std::flush;
+                << std::setfill('.') << '.' << std::right << std::fixed << std::setw(6)
+                << std::setfill(' ') << std::setprecision(2) << progress * 100.0f << " %"
+                << std::flush;
     }
   }
 
