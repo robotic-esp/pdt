@@ -1,0 +1,34 @@
+<kinbody name="box">
+  <body name="box" type="static">
+    <geom type="box">
+      <extents>0.1 0.1 0.01</extents>
+      <translation>0.0 0.0 -0.05</translation>
+      <diffusecolor>0.9 0.2 0.2</diffusecolor>
+      <ambientcolor>0.9 0.2 0.2</ambientcolor>
+    </geom>
+    <geom type="box">
+      <extents>0.12 0.01 0.05</extents>
+      <translation>0.0 0.11 -0.01</translation>
+      <diffusecolor>0.9 0.2 0.2</diffusecolor>
+      <ambientcolor>0.9 0.2 0.2</ambientcolor>
+    </geom>
+    <geom type="box">
+      <extents>0.12 0.01 0.05</extents>
+      <translation>0.0 -0.11 -0.01</translation>
+      <diffusecolor>0.9 0.2 0.2</diffusecolor>
+      <ambientcolor>0.9 0.2 0.2</ambientcolor>
+    </geom>
+    <geom type="box">
+      <extents>0.01 0.1 0.05</extents>
+      <translation>0.11 0.0 -0.01</translation>
+      <diffusecolor>0.9 0.2 0.2</diffusecolor>
+      <ambientcolor>0.9 0.2 0.2</ambientcolor>
+    </geom>
+    <geom type="box">
+      <extents>0.01 0.1 0.05</extents>
+      <translation>-0.11 0.0 -0.01</translation>
+      <diffusecolor>0.9 0.2 0.2</diffusecolor>
+      <ambientcolor>0.9 0.2 0.2</ambientcolor>
+    </geom>
+  </body>
+</kinbody>

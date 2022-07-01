@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 project(esp_configuration)
 
 # Get the git branch, commit hash, and status.
@@ -12,28 +12,34 @@ configure_file(src/version.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/version.cpp @ONLY)
 # Make the path to the source directory available in code.
 configure_file(src/directory.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/directory.cpp @ONLY)
 
-# Include necessary header directories.
-include_directories(
-  ${OMPL_INCLUDE_DIRS}
-  ${NLOHMANN_JSON_INCLUDE_BUILD_DIR}
-  ${PROJECT_SOURCE_DIR}/include)
+# Find the dependencies of this library.
+find_package(Boost 1.58 REQUIRED COMPONENTS program_options)
 
-# Build the library.
+# Specify the library as a target.
 add_library(esp_configuration
+  STATIC
   src/configuration.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/directory.cpp)
 
-# Link the library.
-target_link_libraries(esp_configuration
-  PRIVATE # Libraries not exposed in API.
-  nlohmann_json::nlohmann_json
-  PUBLIC # Libraries exposed in API.
-  ${Boost_LIBRARIES}
-  ${OMPL_LIBRARIES}
-  stdc++fs
-  esp_time)
-
-# Specify the include directories exported by this library.
-target_include_directories(esp_configuration PUBLIC
+# Specify our include directories for this target.
+target_include_directories(esp_configuration
+  PUBLIC
   ${PROJECT_SOURCE_DIR}/include)
+
+# Specify third-party include directories as system includes to suppress warnings.
+target_include_directories(esp_configuration SYSTEM
+  PUBLIC
+  ${OMPL_INCLUDE_DIRS})
+
+# Specify the link targets for this target.
+target_link_libraries(esp_configuration
+  PRIVATE
+  esp_ompl_tools
+  ${Boost_LIBRARIES}
+  PUBLIC
+  nlohmann_json::nlohmann_json
+  ${OMPL_LIBRARIES}
+  stdc++fs)
+
+

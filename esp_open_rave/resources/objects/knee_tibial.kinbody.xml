@@ -1,0 +1,8 @@
+<kinbody name="knee-tibial">
+  <body name="knee-tibial" type="static">
+    <geom type="trimesh" modifiable="false">
+      <data>objects/tibial_approximation_new_origin.stl</data>
+      <render>objects/tibial_approximation_new_origin.stl</render>
+    </geom>
+  </body>
+</kinbody>

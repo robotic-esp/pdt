@@ -61,8 +61,7 @@ class InteractiveVisualizer : public BaseVisualizer,
                               public ObjectiveVisitor {
  public:
   InteractiveVisualizer(
-      const std::shared_ptr<Configuration>& config,
-      const std::shared_ptr<RealVectorGeometricContext>& context,
+      const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
       const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
   ~InteractiveVisualizer() = default;
 
@@ -87,9 +86,9 @@ class InteractiveVisualizer : public BaseVisualizer,
   // Plotting.
   pangolin::DataLog costLog_{};
   void updateCostLog();
-  double minCost_{0.0};
-  double maxCost_{0.0};
-  float plotBackgroundColor_[4]{0.9, 0.9, 0.9, 1.0};
+  float minCost_{0.0};
+  float maxCost_{0.0};
+  float plotBackgroundColor_[4]{0.9f, 0.9f, 0.9f, 1.0f};
   int largestPlottedIteration_{-1};
   void logCost();
 
@@ -108,30 +107,32 @@ class InteractiveVisualizer : public BaseVisualizer,
   void drawEITstarSpecificVisualizations(std::size_t iteration) const;
 
   // Lowlevel drawing.
-  void drawRectangle(const std::vector<double>& midpoint, const std::vector<double>& widths,
+  void drawRectangle(const std::vector<float>& midpoint, const std::vector<float>& widths,
                      const float* faceColor, const float* edgeColor) const;
-  void drawRectangle2D(const std::vector<double>& midpoint, const std::vector<double>& widths,
+  void drawRectangle2D(const std::vector<float>& midpoint, const std::vector<float>& widths,
                        const float* faceColor, const float* edgeColor) const;
-  void drawRectangle3D(const std::vector<double>& midpoint, const std::vector<double>& widths,
+  void drawRectangle3D(const std::vector<float>& midpoint, const std::vector<float>& widths,
                        const float* faceColor, const float* edgeColor) const;
   void drawGoal() const;
-  void drawBoundary(const RealVectorGeometricContext& context) const;
-  void drawPoint(const Eigen::Vector2d& point, const float* color, float size) const;
-  void drawPoint(const Eigen::Vector3d& point, const float* color, float size) const;
+  void drawBoundary() const;
+  void drawPoint(const Eigen::Vector2f& point, const float* color, float size) const;
+  void drawPoint(const Eigen::Vector3f& point, const float* color, float size) const;
   void drawPoint(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state,
                  const float* color, float size) const;
-  void drawPoints(const std::vector<Eigen::Vector2d>& points, const float* color, float size) const;
-  void drawPoints(const std::vector<Eigen::Vector3d>& points, const float* color, float size) const;
+  void drawPoints(const std::vector<Eigen::Vector2f>& points, const float* color, float size) const;
+  void drawPoints(const std::vector<Eigen::Vector3f>& points, const float* color, float size) const;
   void drawPoints(
       const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states,
       const float* color, float size) const;
-  void drawLines(const std::vector<Eigen::Vector2d>& points, float width, const float* color,
+  void drawLines(const std::vector<Eigen::Vector2f>& points, float width, const float* color,
                  float alpha = 1.0) const;
-  void drawLines(const std::vector<Eigen::Vector3d>& points, float width, const float* color,
+  void drawLines(const std::vector<Eigen::Vector3f>& points, float width, const float* color,
                  float alpha = 1.0) const;
-  void drawPath(const std::vector<Eigen::Vector2d>& points, float width, const float* color,
+  void drawPath(const std::vector<Eigen::Vector2f>& points, float width, const float* color,
                 float alpha = 1.0) const;
-  void drawPath(const std::vector<Eigen::Vector3d>& points, float width, const float* color,
+  void drawPath(const std::vector<Eigen::Vector3f>& points, float width, const float* color,
+                float alpha = 1.0) const;
+  void drawCars(const std::vector<Eigen::Vector3f>& points, float width, const float* color,
                 float alpha = 1.0) const;
 
   // Implement visualizations of contexts.
@@ -145,6 +146,7 @@ class InteractiveVisualizer : public BaseVisualizer,
   void visit(const ObstacleFree& context) const override;
   void visit(const RandomRectangles& context) const override;
   void visit(const RandomRectanglesMultiStartGoal& context) const override;
+  void visit(const ReedsSheppRandomRectangles& context) const override;
   void visit(const RepeatingRectangles& context) const override;
   void visit(const StartEnclosure& context) const override;
   void visit(const WallGap& context) const override;
@@ -159,22 +161,26 @@ class InteractiveVisualizer : public BaseVisualizer,
   void visit(const MaxMinClearanceOptimizationObjective& objective) const override;
 
   // Objective coloring helpers.
-  mutable double minOptimizationCost_{std::numeric_limits<double>::max()};
-  mutable double maxOptimizationCost_{std::numeric_limits<double>::lowest()};
+  mutable float minOptimizationCost_{std::numeric_limits<float>::max()};
+  mutable float maxOptimizationCost_{std::numeric_limits<float>::lowest()};
   std::array<float, 4u> interpolateColors(const float* color1, const float* color2,
-                                          double step) const;
+                                          const float step) const;
 
   // Helpers.
-  std::pair<std::vector<Eigen::Vector2d>, std::vector<Eigen::Vector2d>> getVerticesAndEdges2D(
+  std::pair<std::vector<Eigen::Vector2f>, std::vector<Eigen::Vector2f>> getVerticesAndEdges2D(
       std::size_t iteration) const;
-  std::pair<std::vector<Eigen::Vector3d>, std::vector<Eigen::Vector3d>> getVerticesAndEdges3D(
+  std::pair<std::vector<Eigen::Vector3f>, std::vector<Eigen::Vector3f>> getVerticesAndEdges3D(
       std::size_t iteration) const;
-  std::vector<Eigen::Vector2d> getVertices2D(std::size_t iteration) const;
-  std::vector<Eigen::Vector3d> getVertices3D(std::size_t iteration) const;
-  std::vector<Eigen::Vector2d> getEdges2D(std::size_t iteration) const;
-  std::vector<Eigen::Vector3d> getEdges3D(std::size_t iteration) const;
-  std::vector<Eigen::Vector2d> getPath2D(std::size_t iteration) const;
-  std::vector<Eigen::Vector3d> getPath3D(std::size_t iteration) const;
+  std::vector<Eigen::Vector2f> getVertices2D(std::size_t iteration) const;
+  std::vector<Eigen::Vector3f> getVertices3D(std::size_t iteration) const;
+  std::vector<Eigen::Vector2f> getEdges2D(std::size_t iteration) const;
+  std::vector<Eigen::Vector3f> getEdges3D(std::size_t iteration) const;
+  std::vector<Eigen::Vector2f> getPath2D(std::size_t iteration) const;
+  std::vector<Eigen::Vector3f> getPath3D(std::size_t iteration) const;
+  std::vector<Eigen::Vector3f> getPathSE2(std::size_t iteration) const;
+
+  // The bounds of the context (the real-vector part of it).
+  ompl::base::RealVectorBounds bounds_;
 
   // The tikz visualizer.
   TikzVisualizer tikzVisualizer_;

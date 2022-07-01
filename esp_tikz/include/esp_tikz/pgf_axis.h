@@ -39,6 +39,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <limits>
 
 #include "esp_tikz/pgf_plot.h"
 
@@ -90,6 +91,7 @@ class PgfAxis {
     std::string height{"0.5\\textwidth"};
     std::string majorGridStyle{"{densely dotted, black!20}"};
     std::string minorGridStyle{"{densely dotted, black!20}"};
+    std::string axisLineStyle{"{solid, black}"};
     std::string majorTickLength{""};
     std::string minorTickLength{""};
     std::string legendStyle{""};
@@ -129,6 +131,7 @@ class PgfAxis {
     double ymax{std::numeric_limits<double>::infinity()};
     std::string axisYLine{""};
     std::string ytick{""};
+    std::string ytickPos{""};
     std::string ytickAlign{"inside"};
     std::string yticklabel{""};
     std::string yticklabelStyle{"font=\\footnotesize"};

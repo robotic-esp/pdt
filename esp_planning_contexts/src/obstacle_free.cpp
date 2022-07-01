@@ -78,7 +78,7 @@ ObstacleFree::ObstacleFree(const std::shared_ptr<ompl::base::SpaceInformation>& 
   spaceInfo_->setup();
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
   }
 }

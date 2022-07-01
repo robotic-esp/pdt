@@ -36,11 +36,11 @@
 
 #include "esp_factories/planner_factory.h"
 
-#include <ompl/geometric/planners/eitstar/EITstar.h>
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/EITstar.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
@@ -84,7 +84,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setName(plannerName);
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
-      planner->setSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
+      planner->setSamplesPerBatch(config_->get<unsigned>(optionsKey + "/samplesPerBatch"));
       planner->setPruning(config_->get<bool>(optionsKey + "/enablePruning"));
       planner->setPruneThresholdFraction(config_->get<double>(optionsKey + "/pruningThreshold"));
       planner->setDropSamplesOnPrune(config_->get<bool>(optionsKey + "/dropSamplesOnPrune"));
@@ -104,7 +104,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->enablePruning(config_->get<bool>(optionsKey + "/enablePruning"));
-      planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
+      planner->setBatchSize(config_->get<unsigned>(optionsKey + "/batchSize"));
       planner->setInitialNumberOfSparseCollisionChecks(
           config_->get<std::size_t>(optionsKey + "/numInitialCollisionChecks"));
       planner->setRadiusFactor(config_->get<double>(optionsKey + "/radiusFactor"));
@@ -133,7 +133,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setName(plannerName);
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
-      planner->setSamplesPerBatch(config_->get<std::size_t>(optionsKey + "/samplesPerBatch"));
+      planner->setSamplesPerBatch(config_->get<unsigned>(optionsKey + "/samplesPerBatch"));
       planner->setPruning(config_->get<bool>(optionsKey + "/enablePruning"));
       planner->setPruneThresholdFraction(config_->get<double>(optionsKey + "/pruningThreshold"));
       planner->setDropSamplesOnPrune(config_->get<bool>(optionsKey + "/dropSamplesOnPrune"));
@@ -147,7 +147,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       auto planner = std::make_shared<ompl::geometric::FMT>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setNumSamples(config_->get<std::size_t>(optionsKey + "/numSamples"));
+      planner->setNumSamples(config_->get<unsigned>(optionsKey + "/numSamples"));
       planner->setNearestK(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRadiusMultiplier(config_->get<double>(optionsKey + "/radiusFactor"));
       planner->setCacheCC(config_->get<bool>(optionsKey + "/useCollisionDetectionCache"));
@@ -158,11 +158,14 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
     case PLANNER_TYPE::INFORMEDRRTSTAR: {
       auto planner =
           std::make_shared<ompl::geometric::InformedRRTstar>(context_->getSpaceInformation());
+      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
+      planner->setKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
+      planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
-      planner->setNumSamplingAttempts(
-          config_->get<std::size_t>(optionsKey + "/numSamplingAttempts"));
+      planner->setNumSamplingAttempts(config_->get<unsigned>(optionsKey + "/numSamplingAttempts"));
       return {planner, PLANNER_TYPE::INFORMEDRRTSTAR};
     }
     case PLANNER_TYPE::LAZYPRMSTAR: {
@@ -214,7 +217,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
       planner->setSampleRejection(config_->get<bool>(optionsKey + "/enableSampleRejection"));
-      planner->setVariant(config_->get<std::size_t>(optionsKey + "/variant"));
+      planner->setVariant(config_->get<int>(optionsKey + "/variant"));
       planner->setInformedSampling(false);
       return {planner, PLANNER_TYPE::RRTSHARP};
     }

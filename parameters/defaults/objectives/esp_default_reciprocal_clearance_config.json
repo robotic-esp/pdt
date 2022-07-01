@@ -2,6 +2,9 @@
     "objective": {
         "defaultReciprocalClearance": {
             "type": "ReciprocalClearance",
+            "heuristicType": "fraction",
+            "heuristicFraction": -1.0,
+            "heuristicFactors": [0.0, 1.0],
             "solvedCost": 0.0
         }
     }

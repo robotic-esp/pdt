@@ -26,14 +26,14 @@ We want to test our own planners, which are developed in our private OMPL fork:
 git clone git@github.com:robotic-esp/ompl-private.git
 cd ompl-private
 git fetch
-git checkout esp_ompl_tools
+git checkout esp-master
 mkdir build && cd build
 cmake ..
 make -j 4
 sudo make install
 ```
 
-Make sure you are on the `esp_ompl_tools` branch. You can use `git branch` to check which branch you have checked out.
+Make sure you are on the `esp-master` branch. You can use `git branch` to check which branch you have checked out.
 
 #### Boost
 
@@ -42,6 +42,14 @@ Our tools depend on the `thread` and `program_options` components of [Boost](htt
 #### Pangolin
 
 Follow the installation guide of the [official repo](https://github.com/stevenlovegrove/Pangolin), it's well documented.
+
+**Note**: Pangolin got refactored in early 2021, but our tools haven't been updated yet. The latest stable version of Pangolin that our tools compile with is v0.6. Once you have cloned the Pangolin repo, cd into it and run
+
+```bash
+git checkout v0.6
+```
+
+before building and installing.
 
 #### FFmpeg
 
@@ -56,12 +64,21 @@ sudo apt install ffmpeg
 The automatic report generation relies on LuaLaTeX to dynamically allocate as much memory as needed. The infallible wisdom of the internet suggests that all major LaTeX distributions include LuaLaTeX, so I figured this is not too much of an additional dependency.
 
 ```bash
-sudo apt install texlive-luatex
+sudo apt install texlive-latex-base texlive-luatex
 ```
 
 If running `which lualatex` echoes a path, you should be good to go, otherwise install lualatex.
 
 The reporting tool loads the whole `result.csv` into memory. This file can be quite large, depending on `logFrequency`, `maxTime`, and the number of planners. If your system runs out of memory, ensure you have swap turned on ([see, e.g., here on how to do it](https://tecadmin.net/enable-swap-on-ubuntu/)), or rerun experiment with a lower `logFrequency`, a lower `maxTime`, or fewer planners.
+
+#### ImageMagick
+
+The report generation uses ImageMagick to convert PDFs to PNGs. It is likely installed on your machine by default but can be installed with
+```bash
+sudo apt install imagemagick
+```
+
+If you get an error during report compilation related to "operation not allowed by the security policy `PDF'", then see you need to [change your GhostScript security policy](https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion).
 
 
 ### ESP OMPL TOOLS
@@ -131,6 +148,26 @@ The visualization is interactive. These are the five keys that are currently bou
 - ' ': Toggle tracking
 
 When tracking is on, the most recently computed iteration is visualized.
+
+# Troubleshooting
+
+## The compilation fails because some headers are not found
+
+You have built and installed the ESP version of OMPL, but the compilation fails because it is missing headers? Make sure the correct OMPL is found (`cmake` will report the path of the OMPL it finds). Say you installed the ESP version of OMPL to `/usr/local/`, but also have ROS installed on your system and `cmake` prefers the ROS version. You can specify the path ESP OMPL TOOLS looks for OMPL in the variable `ESP_OMPL_TOOLS_OMPL_DIR`, e.g., by running `cmake -DESP_OMPL_TOOLS_OMPL_DIR=/usr/local`. If you don't define the variable, CMake will look in the standard places.
+
+## Executing a program complains about missing symbols
+
+This can happen if the wrong version of OMPL is dynamically linked to your executable. I don't have an elegant solution to this problem. A quick and dirty hack is to wrap your executable, e.g., `build/bin/benchmark` into a script and modify `LD_LIBRARY_PATH` in that script:
+
+```bash
+#!/bin/bash
+export LD_LIBRARY_PATH="/usr/local/lib/:${LD_LIBRARY_PATH}"
+/path/to/esp_ompl_tools/build/bin/benchmark -c /path/to/esp_ompl_tools/parameters/demo/benchmark_demo.json
+```
+
+## The benchmark report doesn't compile
+
+Turn on the verbose compilation in the benchmark configuration `.json` file. If the error is related to LuaTeX, e.g., `! LaTeX Error: file 'luatex85.sty' not found.`, make sure LuaTeX is installed on your system. An easy way to install it in Ubuntu is `sudo apt install texlive-luatex`.
 
 # Miscellaneous
 

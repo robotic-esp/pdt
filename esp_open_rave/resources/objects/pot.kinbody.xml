@@ -1,0 +1,8 @@
+<kinbody name="bin">
+  <body name="bin" type="static">
+    <geom type="trimesh" modifiable="false" renderScale="0.1">
+      <data>objects/pot.iv</data>
+      <render>objects/pot.iv</render>
+    </geom>
+  </body>
+</kinbody>

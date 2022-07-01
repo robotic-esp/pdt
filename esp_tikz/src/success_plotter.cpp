@@ -141,7 +141,7 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessPlot(const std::string& pl
   auto plot = std::make_shared<PgfPlot>(table);
 
   // Add the appropriate options.
-  plot->options.markSize = config_->get<double>("successPlots/markSize");
+  plot->options.mark = "\"none\""s;
   plot->options.lineWidth = config_->get<double>("successPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "Success"s;

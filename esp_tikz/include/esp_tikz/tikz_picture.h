@@ -75,6 +75,9 @@ class TikzPicture {
   // Adds a draw command to this picture.
   void addDraw(const std::shared_ptr<TikzDraw>& draw);
 
+  // Adds a text line to this picture.
+  void addText(const std::string& line);
+
   // Sets the clip command.
   void setClipCommand(const std::string& clip);
 
@@ -92,6 +95,7 @@ class TikzPicture {
   std::vector<std::shared_ptr<PgfAxis>> axes_{};
   std::vector<std::shared_ptr<TikzNode>> nodes_{};
   std::vector<std::shared_ptr<TikzDraw>> draws_{};
+  std::vector<std::string> texts_{};
   std::string clip_{""};
   TikzPictureOptions options_{};
   std::map<std::string, std::array<int, 3>> espColors_{};

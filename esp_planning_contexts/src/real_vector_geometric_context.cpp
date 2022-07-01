@@ -49,11 +49,11 @@ RealVectorGeometricContext::RealVectorGeometricContext(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
     const std::shared_ptr<const Configuration>& config, const std::string& name) :
     BaseContext(spaceInfo, config, name),
-    bounds_(getDimension()) {
+    bounds_(static_cast<unsigned int>(dimensionality_)) {
   // Fill the state space bounds.
   auto sideLengths = config->get<std::vector<double>>("context/" + name + "/boundarySideLengths");
-  assert(sideLengths.size() == getDimension());
-  for (std::size_t dim = 0u; dim < getDimension(); ++dim) {
+  assert(sideLengths.size() == dimensionality_);
+  for (std::size_t dim = 0u; dim < dimensionality_; ++dim) {
     bounds_.low.at(dim) = -0.5 * sideLengths.at(dim);
     bounds_.high.at(dim) = 0.5 * sideLengths.at(dim);
   }
@@ -70,6 +70,10 @@ std::vector<std::shared_ptr<BaseAntiObstacle>> RealVectorGeometricContext::getAn
 
 const ompl::base::RealVectorBounds& RealVectorGeometricContext::getBoundaries() const {
   return bounds_;
+}
+
+void RealVectorGeometricContext::accept(const ContextVisitor& visitor) const {
+  visitor.visit(*this);
 }
 
 std::shared_ptr<ompl::base::Goal> RealVectorGeometricContext::createGoal() const {
@@ -111,7 +115,7 @@ std::shared_ptr<ompl::base::Goal> RealVectorGeometricContext::createGoal() const
     }
     case ompl::base::GoalType::GOAL_SPACE: {
       // Get the goal bounds.
-      ompl::base::RealVectorBounds goalBounds(dimensionality_);
+      ompl::base::RealVectorBounds goalBounds(static_cast<unsigned>(dimensionality_));
       goalBounds.low = config_->get<std::vector<double>>("context/" + name_ + "/goalLowerBounds");
       goalBounds.high = config_->get<std::vector<double>>("context/" + name_ + "/goalUpperBounds");
 

@@ -1,0 +1,3 @@
+<robot name="knee-bearing">
+  <kinbody file="robots/bearing_approximation_new_origin.stl"/>
+</robot>

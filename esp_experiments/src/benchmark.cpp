@@ -61,7 +61,7 @@
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-int main(int argc, char **argv) {
+int main(const int argc, const char **argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
   config->registerAsExperiment();
@@ -175,7 +175,7 @@ int main(int argc, char **argv) {
     for (const auto &plannerName : plannerNames) {
       // Create the logger for this run.
       esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
-                                            config->get<std::size_t>("experiment/logFrequency"));
+                                            config->get<double>("experiment/logFrequency"));
 
       // The following results in more consistent measurements. I don't fully understand why, but it
       // seems to be connected to creating a separate thread.
@@ -262,18 +262,23 @@ int main(int argc, char **argv) {
 
       // Compute the progress.
       ++currentRun;
-      const auto progress = static_cast<float>(currentRun) / totalNumberOfRuns;
-      constexpr auto barWidth = 36u;
+      const auto progress = static_cast<float>(currentRun) / static_cast<float>(totalNumberOfRuns);
+      constexpr auto barWidth = 36;
       std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
                 << (std::ceil(progress * barWidth) != barWidth
-                        ? std::setw(std::ceil(progress * barWidth))
-                        : std::setw(std::ceil(progress * barWidth) - 1u))
+                    ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
+                    : std::setw(static_cast<int>(std::ceil(progress * barWidth) - 1u)))
                 << std::setfill('.') << (currentRun != totalNumberOfRuns ? '|' : '.') << std::right
-                << std::setw(barWidth - std::ceil(progress * barWidth)) << std::setfill('.') << '.'
+                << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
+                << std::setfill('.') << '.'
                 << std::right << std::fixed << std::setw(6) << std::setfill(' ')
                 << std::setprecision(2) << progress * 100.0f << " %" << std::flush;
     }
   }
+
+  // dump the complete config to make sure that we can produce the report once we ran the experiment
+  auto configPath = experimentDirectory / "config.json"s;
+  config->dumpAll(fs::current_path().string() + '/' + configPath.string());
 
   // Register the end time of the experiment.
   auto experimentEndTime = std::chrono::system_clock::now();
@@ -330,7 +335,8 @@ int main(int argc, char **argv) {
   std::cout << std::setw(2u) << std::setfill(' ') << ' ' << "Location " << reportPath << "\n\n";
 
   // Dump the accessed parameters next to the results file.
-  auto configPath = experimentDirectory / "config.json"s;
+  // This overwrites the previously dumped config with one that only consists of the
+  // accessed parameters.
   config->dumpAccessed(fs::current_path().string() + '/' + configPath.string());
 
   return 0;

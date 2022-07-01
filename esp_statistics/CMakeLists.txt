@@ -1,18 +1,20 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 project(esp_statistics)
 
-# Include necessary header directories.
-include_directories(
-  ${PROJECT_SOURCE_DIR}/include)
-
-# Add the library as an interface.
+# Specify this library as a target.
 add_library(esp_statistics
   src/statistics.cpp)
 
-target_link_libraries(esp_statistics
-  esp_configuration)
-
-# Specify the include directories exported by this library.
+# Specify the include directories for this library.
 target_include_directories(esp_statistics
   PUBLIC
+  ${CMAKE_SOURCE_DIR}/thirdparty
   ${PROJECT_SOURCE_DIR}/include)
+
+# Specify the link targets for this library.
+target_link_libraries(esp_statistics
+  PRIVATE
+  esp_ompl_tools
+  PUBLIC
+  ${OMPL_LIBRARIES}
+  esp_configuration)

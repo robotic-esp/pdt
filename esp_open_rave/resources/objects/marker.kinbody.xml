@@ -1,0 +1,8 @@
+<kinbody>
+  <body type="static">
+    <geom type="box">
+      <extents>0.02 0.02 0.02</extents>
+      <diffuseColor>1.0 0.2 0.2</diffuseColor>
+    </geom>
+  </body>
+</kinbody>

@@ -1,0 +1,3 @@
+<robot name="kuka-youbot">
+  <robot file="robots/kuka-youbot.dae">
+</robot>

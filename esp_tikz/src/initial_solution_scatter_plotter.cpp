@@ -67,7 +67,7 @@ std::shared_ptr<PgfAxis> InitialSolutionScatterPlotter::createInitialSolutionSca
 
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     auto plot = createInitialSolutionScatterPlot(name);
-    plot->options.fillOpacity = config_->get<double>("initialSolutionScatterPlots/combinedFillOpacity");
+    plot->options.fillOpacity = config_->get<float>("initialSolutionScatterPlots/combinedFillOpacity");
     plot->options.lineWidth = config_->get<double>("initialSolutionScatterPlots/lineWidth");
     axis->addPlot(plot);
   }

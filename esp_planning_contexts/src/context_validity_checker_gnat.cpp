@@ -99,9 +99,8 @@ bool ContextValidityCheckerGNAT::isValid(const ompl::base::State* state) const {
 }
 
 void ContextValidityCheckerGNAT::addObstacle(const std::shared_ptr<BaseObstacle>& obstacle) {
-  double circumscribingRadius = obstacle->computeMinCircumscribingRadius();
-  if (maxObstacleRadius_ < circumscribingRadius) {
-    maxObstacleRadius_ = circumscribingRadius;
+  if (maxObstacleRadius_ < obstacle->getCircumradius()) {
+    maxObstacleRadius_ = obstacle->getCircumradius();
   }
   obstacles_.push_back(obstacle);
   obstacleAnchors_.add(std::make_pair(obstacles_.size() - 1u, obstacle->getState()));
@@ -113,9 +112,8 @@ void ContextValidityCheckerGNAT::addObstacles(
   // going to happen frequently, so better safe than fast.
   obstacles_.reserve(obstacles_.size() + obstacles.size());
   for (const auto& obstacle : obstacles) {
-    double circumscribingRadius = obstacle->computeMinCircumscribingRadius();
-    if (maxObstacleRadius_ < circumscribingRadius) {
-      maxObstacleRadius_ = circumscribingRadius;
+    if (maxObstacleRadius_ < obstacle->getCircumradius()) {
+      maxObstacleRadius_ = obstacle->getCircumradius();
     }
     obstacles_.push_back(obstacle);
     obstacleAnchors_.add(std::make_pair(obstacles_.size() - 1u, obstacle->getState()));
@@ -123,9 +121,8 @@ void ContextValidityCheckerGNAT::addObstacles(
 }
 
 void ContextValidityCheckerGNAT::addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti) {
-  double circumscribingRadius = anti->computeMinCircumscribingRadius();
-  if (maxAntiObstacleRadius_ < circumscribingRadius) {
-    maxAntiObstacleRadius_ = circumscribingRadius;
+  if (maxAntiObstacleRadius_ < anti->getCircumradius()) {
+    maxAntiObstacleRadius_ = anti->getCircumradius();
   }
   antiObstacles_.push_back(anti);
   antiObstacleAnchors_.add(std::make_pair(antiObstacles_.size() - 1u, anti->getState()));
@@ -135,9 +132,8 @@ void ContextValidityCheckerGNAT::addAntiObstacles(
     const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis) {
   antiObstacles_.reserve(antiObstacles_.size() + antis.size());
   for (const auto& anti : antis) {
-    double circumscribingRadius = anti->computeMinCircumscribingRadius();
-    if (maxAntiObstacleRadius_ < circumscribingRadius) {
-      maxAntiObstacleRadius_ = circumscribingRadius;
+    if (maxAntiObstacleRadius_ < anti->getCircumradius()) {
+      maxAntiObstacleRadius_ = anti->getCircumradius();
     }
     antiObstacles_.push_back(anti);
     antiObstacleAnchors_.add(std::make_pair(antiObstacles_.size() - 1u, anti->getState()));

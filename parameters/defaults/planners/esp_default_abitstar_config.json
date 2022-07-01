@@ -8,7 +8,7 @@
                 "name": "ABIT*"
             },
             "options": {
-                "useKNearest": false,
+                "useKNearest": true,
                 "rewireFactor": 1.001,
                 "samplesPerBatch": 100,
                 "enablePruning": true,

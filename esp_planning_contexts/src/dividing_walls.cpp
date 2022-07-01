@@ -51,7 +51,6 @@ DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>
                              const std::shared_ptr<const Configuration>& config,
                              const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
-    dimensionality_(spaceInfo->getStateDimension()),
     numWalls_(config->get<std::size_t>("context/" + name + "/numWalls")),
     wallThicknesses_(config->get<std::vector<double>>("context/" + name + "/wallThicknesses")),
     numGaps_(config->get<std::size_t>("context/" + name + "/numGaps")),
@@ -95,7 +94,7 @@ DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>
   spaceInfo_->setup();
 
   // Fill the start and goal states' coordinates.
-  for (std::size_t i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
     startState_[i] = startPosition.at(i);
   }
 }
@@ -127,15 +126,16 @@ void DividingWalls::accept(const ContextVisitor& visitor) const {
 
 void DividingWalls::createObstacles() {
   // Create the walls.
-  for (std::size_t i = 0; i < numWalls_; ++i) {
+  for (auto i = 0u; i < numWalls_; ++i) {
     // Create an obstacle midpoint for this wall.
     ompl::base::ScopedState<> midpoint(spaceInfo_);
 
     // Set the obstacle midpoint in the first dimension.
-    midpoint[0u] = ((i + 1u) * (bounds_.high.at(0u) - bounds_.low.at(0u)) / (numWalls_ + 1u)) +
+    midpoint[0u] = ((i + 1u) * (bounds_.high.at(0u) - bounds_.low.at(0u)) /
+                    static_cast<double>((numWalls_ + 1u))) +
                    bounds_.low.at(0u);
     // Set the obstacle midpoint in the remaining dimension.
-    for (std::size_t j = 1; j < dimensionality_; ++j) {
+    for (auto j = 1u; j < dimensionality_; ++j) {
       midpoint[j] = (bounds_.low.at(j) + bounds_.high.at(j)) / 2.0;
     }
     // Create the widths of this wall.
@@ -161,10 +161,12 @@ void DividingWalls::createAntiObstacles() {
 
     // Set the obstacle midpoint in the second dimension.
     midpoint[1u] =
-        (i + 1u) * (bounds_.high.at(1u) - bounds_.low.at(1u)) / (numGaps_ + 1u) + bounds_.low.at(1);
+      static_cast<double>((i + 1u)) *
+      (bounds_.high.at(1u) - bounds_.low.at(1u)) /
+      static_cast<double>((numGaps_ + 1u)) + bounds_.low.at(1);
 
     // Set the obstacle midpoint in the remaining dimension.
-    for (std::size_t j = 0; j < dimensionality_; ++j) {
+    for (auto j = 0u; j < dimensionality_; ++j) {
       if (j != 1u) {
         midpoint[j] = (bounds_.low.at(j) + bounds_.high.at(j)) / 2.0;
       }

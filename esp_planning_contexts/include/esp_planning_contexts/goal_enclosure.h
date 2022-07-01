@@ -75,9 +75,6 @@ class GoalEnclosure : public RealVectorGeometricContext {
   /** \brief Create the anti obstacles. */
   void createAntiObstacles();
 
-  /** \brief The dimensionality of the context. */
-  std::size_t dimensionality_{0u};
-
   /** \brief The outside width of the goal enclosure. */
   double goalOutsideWidth_{0.0};
 

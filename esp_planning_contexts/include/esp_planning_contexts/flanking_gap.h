@@ -75,9 +75,6 @@ class FlankingGap : public RealVectorGeometricContext {
   /** \brief Create the anti obstacles. */
   void createAntiObstacles();
 
-  /** \brief The dimensionality of the underlying state space. */
-  std::size_t dimensionality_;
-
   /** \brief The wall width. */
   double wallWidth_;
 

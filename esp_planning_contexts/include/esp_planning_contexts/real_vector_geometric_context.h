@@ -71,16 +71,16 @@ class RealVectorGeometricContext : public BaseContext {
   const ompl::base::RealVectorBounds& getBoundaries() const;
 
   // Get the obstacles.
-  std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const;
+  std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const override;
 
   // Get the antiobstacles.
-  std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const;
+  std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const override;
 
   // Accept a visitor.
-  virtual void accept(const ContextVisitor& visitor) const = 0;
+  virtual void accept(const ContextVisitor& visitor) const override;
 
   /** \brief Create a new goal. */
-  std::shared_ptr<ompl::base::Goal> createGoal() const;
+  std::shared_ptr<ompl::base::Goal> createGoal() const override;
 
  protected:
   /** \brief The state space bounds. */

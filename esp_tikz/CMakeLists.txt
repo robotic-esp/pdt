@@ -1,11 +1,7 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 project(esp_tikz)
 
-# Include necessary header directories.
-include_directories(
-  ${PROJECT_SOURCE_DIR}/include)
-
-# Add the library.
+# Specify the library as a target.
 add_library(esp_tikz
   src/cost_percentile_evolution_plotter.cpp
   src/experiment_report.cpp
@@ -26,13 +22,17 @@ add_library(esp_tikz
   src/tikz_node.cpp
   src/tikz_picture.cpp)
 
+# Specify the include directories for this target.
+target_include_directories(esp_tikz
+  PUBLIC
+  ${PROJECT_SOURCE_DIR}/include)
+
+# Specify the link targets for this target.
 target_link_libraries(esp_tikz
+  PRIVATE
+  esp_ompl_tools
+  PUBLIC
   esp_common
   esp_configuration
   esp_factories
   esp_statistics)
-
-# Specify the include directories exported by this library.
-target_include_directories(esp_tikz
-  PUBLIC
-  ${PROJECT_SOURCE_DIR}/include)

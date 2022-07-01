@@ -1,0 +1,9 @@
+<kinbody name="simple_shelves">
+  <body name="simple_shelves" type="static">
+    <geom type="trimesh" modifiable="false">
+      <data>objects/simple-shelfes.iv</data>
+      <render>objects/simple-shelfes.iv</render>
+      <rotationaxis>1 0 0 90</rotationaxis>
+    </geom>
+  </body>
+</kinbody>

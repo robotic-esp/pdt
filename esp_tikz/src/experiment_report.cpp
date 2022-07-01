@@ -331,11 +331,12 @@ std::stringstream ExperimentReport::individualResults() const {
     auto cdf = successPlotter_.createSuccessAxis(name);
     cdf->options.xmin = stats_.getMinInitialSolutionDuration(name);
     cdf->options.xmax = config_->get<double>("context/"s + config_->get<std::string>("experiment/context") + "/maxTime");
+    cdf->options.ytickPos = "left";
     auto pdf = initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name);
     pdf->overlay(cdf.get());
     for (const auto& plot : pdf->getPlots()) {
-      plot->options.drawOpacity = 0.2;
-      plot->options.fillOpacity = 0.1;
+      plot->options.drawOpacity = 0.2f;
+      plot->options.fillOpacity = 0.1f;
     }
 
     // Create the scatter axis of all initial solutions.
