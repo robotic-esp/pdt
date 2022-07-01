@@ -141,7 +141,7 @@ fs::path ExperimentReport::generateReport() {
 std::stringstream ExperimentReport::preamble() const {
   std::stringstream preamble;
   // First we need the 'Required' packages.
-  for (const auto package : requirePackages_) {
+  for (const auto& package : requirePackages_) {
     preamble << "\\RequirePackage{" << package << "}\n";
   }
 

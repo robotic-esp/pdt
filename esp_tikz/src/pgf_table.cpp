@@ -269,7 +269,7 @@ std::size_t PgfTable::getNumRows() const {
 std::vector<double> PgfTable::getRow(std::size_t index) const {
   std::vector<double> row;
   row.reserve(data_.size());
-  for (const auto col : data_) {
+  for (const auto& col : data_) {
     row.emplace_back(col.at(index));
   }
   return row;
@@ -277,7 +277,7 @@ std::vector<double> PgfTable::getRow(std::size_t index) const {
 
 double PgfTable::getMaxValue() const {
   double max = std::numeric_limits<double>::lowest();
-  for (const auto col : data_) {
+  for (const auto& col : data_) {
     for (const auto value : col) {
       if (value > max) {
         max = value;
@@ -289,7 +289,7 @@ double PgfTable::getMaxValue() const {
 
 double PgfTable::getMinValue() const {
   double min = std::numeric_limits<double>::max();
-  for (const auto col : data_) {
+  for (const auto& col : data_) {
     for (const auto value : col) {
       if (value < min) {
         min = value;

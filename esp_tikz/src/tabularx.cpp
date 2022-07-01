@@ -175,7 +175,7 @@ std::size_t TabularX::getNumRows() const {
 std::vector<double> TabularX::getRow(std::size_t index) const {
   std::vector<double> row;
   row.reserve(data_.size());
-  for (const auto col : data_) {
+  for (const auto& col : data_) {
     row.emplace_back(col.at(index));
   }
   return row;
