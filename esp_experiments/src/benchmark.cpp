@@ -61,6 +61,28 @@
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
+// Function to check if the start/goal query we are looking at is actually valid.
+// To that end, we run an RRTConnect planner on the problem for 10s.
+bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext>& context){
+  std::cout << "Checking context validity" << std::endl;
+
+  const auto p = context->instantiateNewProblemDefinition();
+
+  auto planner =
+      std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
+  planner->setProblemDefinition(p);
+
+  const auto status = planner->solve(ompl::base::timedPlannerTerminationCondition(10.0));
+
+  if (!status){
+    std::cout << "No solution found." << std::endl;
+    return false;
+  }
+  std::cout << std::endl;
+
+  return true;
+}
+
 int main(const int argc, const char **argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
@@ -73,6 +95,10 @@ int main(const int argc, const char **argv) {
   // Create the context for this experiment.
   esp::ompltools::ContextFactory contextFactory(config);
   auto context = contextFactory.create(config->get<std::string>("experiment/context"));
+
+  while (!checkContextValidity(context)){
+    std::cout << "Context invalid, rerun with different seed or check starts and goals." << std::endl;
+  }
 
   // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
