@@ -58,17 +58,7 @@ DoubleEnclosure::DoubleEnclosure(const std::shared_ptr<ompl::base::SpaceInformat
     startGapWidth_(config->get<double>("context/" + name + "/startGapWidth")),
     goalOutsideWidth_(config->get<double>("context/" + name + "/goalOutsideWidth")),
     goalInsideWidth_(config->get<double>("context/" + name + "/goalInsideWidth")),
-    goalGapWidth_(config->get<double>("context/" + name + "/goalGapWidth")),
-    startState_(spaceInfo) {
-  // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-
-  // Assert configuration sanity.
-  if (startPosition.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
+    goalGapWidth_(config->get<double>("context/" + name + "/goalGapWidth")){
   if (startInsideWidth_ > startOutsideWidth_) {
     OMPL_ERROR("%s: Start inside width is greater than start outside width.", name.c_str());
     throw std::runtime_error("Context error.");
@@ -105,31 +95,11 @@ DoubleEnclosure::DoubleEnclosure(const std::shared_ptr<ompl::base::SpaceInformat
   // Set up the space info.
   spaceInfo_->setup();
 
-  // Fill the start and goal states' coordinates.
-  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = startPosition.at(i);
-  }
-}
-
-ompl::base::ProblemDefinitionPtr DoubleEnclosure::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
-
-  // Set the goal for the problem definition.
-  problemDefinition->setGoal(createGoal());
-
-  // Return the new definition.
-  return problemDefinition;
+  startGoalPair_ = makeStartGoalPair();
 }
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> DoubleEnclosure::getStartState() const {
-  return startState_;
+  return startGoalPair_.start.at(0);
 }
 
 void DoubleEnclosure::accept(const ContextVisitor& visitor) const {

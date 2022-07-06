@@ -96,8 +96,9 @@ int main(const int argc, const char **argv) {
   esp::ompltools::ContextFactory contextFactory(config);
   auto context = contextFactory.create(config->get<std::string>("experiment/context"));
 
-  while (!checkContextValidity(context)){
+  if (!checkContextValidity(context)){
     std::cout << "Context invalid, rerun with different seed or check starts and goals." << std::endl;
+    return 0;
   }
 
   // Create a planner factory for planners in this context.

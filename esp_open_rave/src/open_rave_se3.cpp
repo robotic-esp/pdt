@@ -60,16 +60,7 @@ namespace ompltools {
 OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                          const std::shared_ptr<const Configuration>& config,
                          const std::string& name) :
-    OpenRaveBaseContext(spaceInfo, config, name),
-    startState_(spaceInfo) {
-  // Get the start position.
-  auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");
-  startState_.get()->setXYZ(startPosition.at(0u), startPosition.at(1u), startPosition.at(2u));
-  startState_.get()->rotation().x = startPosition.at(3u);
-  startState_.get()->rotation().y = startPosition.at(4u);
-  startState_.get()->rotation().z = startPosition.at(5u);
-  startState_.get()->rotation().w = startPosition.at(6u);
-
+    OpenRaveBaseContext(spaceInfo, config, name){
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
 
@@ -116,27 +107,29 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
 
   // Setup the space info.
   spaceInfo_->setup();
+
+  startGoalPair_ = makeStartGoalPair();
 }
 
 OpenRaveSE3::~OpenRaveSE3() {
   OpenRAVE::RaveDestroy();
 }
 
-ompl::base::ProblemDefinitionPtr OpenRaveSE3::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+StartGoalPair OpenRaveSE3::makeStartGoalPair() const{
+  auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");
 
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
+  ompl::base::ScopedState<ompl::base::SE3StateSpace> startState(spaceInfo_);
+  startState.get()->setXYZ(startPosition.at(0u), startPosition.at(1u), startPosition.at(2u));
+  startState.get()->rotation().x = startPosition.at(3u);
+  startState.get()->rotation().y = startPosition.at(4u);
+  startState.get()->rotation().z = startPosition.at(5u);
+  startState.get()->rotation().w = startPosition.at(6u);
 
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
+  StartGoalPair pair;
+  pair.start = {startState};
+  pair.goal = createGoal();
 
-  // Set the goal in the definition.
-  problemDefinition->setGoal(createGoal());
-
-  // Return the new definition.
-  return problemDefinition;
+  return pair;
 }
 
 std::shared_ptr<ompl::base::Goal> OpenRaveSE3::createGoal() const {
@@ -147,7 +140,7 @@ std::shared_ptr<ompl::base::Goal> OpenRaveSE3::createGoal() const {
       const auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");
 
       // Check dimensionality of the goal state position.
-      if (goalPosition.size() - 1u != dimensionality_) {
+      if (goalPosition.size() - 1 != dimensionality_) {
         OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                    name_.c_str());
         throw std::runtime_error("Context error.");
@@ -201,7 +194,7 @@ std::shared_ptr<ompl::base::Goal> OpenRaveSE3::createGoal() const {
 }
 
 ompl::base::ScopedState<ompl::base::SE3StateSpace> OpenRaveSE3::getStartState() const {
-  return startState_;
+  return startGoalPair_.start.at(0);
 }
 
 void OpenRaveSE3::accept(const ContextVisitor& visitor) const {

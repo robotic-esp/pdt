@@ -61,27 +61,15 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
     maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
-    startState_(spaceInfo),
     realVectorSubspaceInfo_(std::make_shared<ompl::base::SpaceInformation>(
         spaceInfo_->getStateSpace()->as<ompl::base::SE2StateSpace>()->getSubspace(0u))) {
-  // Get the start position.
-  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+  
+  startGoalPair_ = makeStartGoalPair();
 
-  // Assert configuration sanity.
-  if (startPosition.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
   if (minSideLength_ > maxSideLength_) {
     OMPL_ERROR("%s: Specified min side length is greater than specified max side length.",
                name.c_str());
     throw std::runtime_error("Context error.");
-  }
-
-  // Fill the start state's coordinates.
-  for (auto i = 0u; i < dimensionality_; ++i) {
-    startState_[i] = startPosition.at(i);
   }
 
   // Fill the state space bounds.
@@ -110,27 +98,9 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
   spaceInfo_->setup();
 }
 
-ompl::base::ProblemDefinitionPtr ReedsSheppRandomRectangles::instantiateNewProblemDefinition()
-    const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
-
-  // Set the goal for the problem definition.
-  problemDefinition->setGoal(createGoal());
-
-  // Return the new definition.
-  return problemDefinition;
-}
-
 ompl::base::ScopedState<ompl::base::SE2StateSpace> ReedsSheppRandomRectangles::getStartState()
     const {
-  return startState_;
+  return startGoalPair_.start.at(0);
 }
 
 ompl::base::RealVectorBounds ReedsSheppRandomRectangles::getBoundaries() const {
@@ -146,7 +116,7 @@ void ReedsSheppRandomRectangles::createObstacles() {
   // has to be a better way to do this? The problem is that I want to create a new goal whenever I
   // create a new problem definition, so the goal can not be created in the base class and kept
   // around.
-  auto goal = createGoal();
+  auto goal = startGoalPair_.goal;
 
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
@@ -166,7 +136,7 @@ void ReedsSheppRandomRectangles::createObstacles() {
     validityChecker->addObstacle(obstacle);
 
     // Add this to the obstacles if it doesn't invalidate the start or goal state.
-    if (validityChecker->isValid(startState_.get())) {
+    if (validityChecker->isValid(startGoalPair_.start.at(0).get())) {
       if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
         if (validityChecker->isValid(goal->as<ompl::base::GoalState>()->getState())) {
           obstacles_.emplace_back(obstacle);

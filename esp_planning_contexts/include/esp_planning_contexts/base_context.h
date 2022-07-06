@@ -56,6 +56,12 @@ namespace esp {
 
 namespace ompltools {
 
+/** \brief Struct defining the start/end points of a planning problem. */
+struct StartGoalPair {
+  std::vector<ompl::base::ScopedState<>> start;
+  std::shared_ptr<ompl::base::Goal> goal;                                                                                                  
+};
+
 /** \brief The base class for an experiment */
 class BaseContext {
  public:
@@ -80,9 +86,11 @@ class BaseContext {
   /** \brief Returns the maximum duration to solve this context. */
   time::Duration getMaxSolveDuration() const;
 
+  /** \brief Returns the start/goal pair. */
+  StartGoalPair getStartGoalPair() const;
+
   /** \brief Return a newly generated problem definition */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const = 0;
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition() const;
 
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const = 0;
@@ -97,6 +105,9 @@ class BaseContext {
   virtual std::shared_ptr<ompl::base::Goal> createGoal() const = 0;
 
  protected:
+  /** \brief Return a start/goal pair. */
+  virtual StartGoalPair makeStartGoalPair() const;
+
   /** \brief The space information associated with this context. */
   ompl::base::SpaceInformationPtr spaceInfo_{};
 
@@ -111,6 +122,9 @@ class BaseContext {
 
   /** \brief The goal specification of the planning problem. */
   ompl::base::GoalType goalType_{ompl::base::GoalType::GOAL_ANY};
+
+  /** \brief The start/goal pair for the planning problem. */
+  StartGoalPair startGoalPair_{};
 
   /** \brief The maximum duration to solve this context. */
   time::Duration maxSolveDuration_{};

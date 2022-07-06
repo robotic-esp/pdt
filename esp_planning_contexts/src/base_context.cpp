@@ -164,6 +164,59 @@ time::Duration BaseContext::getMaxSolveDuration() const {
   return maxSolveDuration_;
 }
 
+StartGoalPair BaseContext::getStartGoalPair() const{
+  return startGoalPair_;
+}
+
+ompl::base::ProblemDefinitionPtr BaseContext::instantiateNewProblemDefinition() const {
+  // Instantiate a new problem definition.
+  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+
+  // Set the objective.
+  problemDefinition->setOptimizationObjective(objective_);
+
+  // As default, we set the first start/goal pair for the problem definition.
+  for (const auto &s: startGoalPair_.start){
+    problemDefinition->addStartState(s);
+  }
+
+  // Set the goal for the problem definition.
+  problemDefinition->setGoal(startGoalPair_.goal);
+
+  // Return the new definition.
+  return problemDefinition;
+}
+
+StartGoalPair BaseContext::makeStartGoalPair() const{
+  StartGoalPair pair;
+
+  if (config_->contains("context/" + name_ + "/start")) {
+    const auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");
+
+    // ensure that the dimensionality works
+    if (startPosition.size() != dimensionality_) {
+      OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
+                 name_.c_str());
+      throw std::runtime_error("Context error.");
+    }
+
+    // Fill the start and goal states' coordinates.
+    ompl::base::ScopedState<> startState(spaceInfo_);
+    for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+      startState[i] = startPosition.at(i);
+    }
+
+    pair.start = {startState};
+    pair.goal = createGoal();
+  }
+  else{
+    OMPL_ERROR("%s: 'start' not specified.", name_.c_str());
+    throw std::runtime_error("Context error.");
+  }
+
+  return pair;
+}
+
 }  // namespace ompltools
 
 }  // namespace esp

@@ -59,26 +59,13 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
     RealVectorGeometricContext(spaceInfo, config, name),
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
-    maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
-    startState_(spaceInfo) {
-  // Get the start position.
-  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
+    maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")){
+  startGoalPair_ = makeStartGoalPair();
 
-  // Assert configuration sanity.
-  if (startPosition.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
   if (minSideLength_ > maxSideLength_) {
     OMPL_ERROR("%s: Specified min side length is greater than specified max side length.",
                name.c_str());
     throw std::runtime_error("Context error.");
-  }
-
-  // Fill the start state's coordinates.
-  for (auto i = 0u; i < dimensionality_; ++i) {
-    startState_[i] = startPosition.at(i);
   }
 
   // Create the obstacles and add them to the validity checker.
@@ -102,27 +89,11 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
 
   // Set up the space info.
   spaceInfo_->setup();
-}
 
-ompl::base::ProblemDefinitionPtr RandomRectangles::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
-
-  // Set the goal for the problem definition.
-  problemDefinition->setGoal(createGoal());
-
-  // Return the new definition.
-  return problemDefinition;
 }
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RandomRectangles::getStartState() const {
-  return startState_;
+  return startGoalPair_.start.at(0);
 }
 
 void RandomRectangles::accept(const ContextVisitor& visitor) const {
@@ -130,11 +101,7 @@ void RandomRectangles::accept(const ContextVisitor& visitor) const {
 }
 
 void RandomRectangles::createObstacles() {
-  // Create a goal to make sure the obstacles don't invalidate it. Something seems funky here, there
-  // has to be a better way to do this? The problem is that I want to create a new goal whenever I
-  // create a new problem definition, so the goal can not be created in the base class and kept
-  // around.
-  auto goal = createGoal();
+  const auto &goal = startGoalPair_.goal;
 
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
@@ -150,7 +117,7 @@ void RandomRectangles::createObstacles() {
     auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths);
 
     // Add this to the obstacles if it doesn't invalidate the start or goal state.
-    if (!obstacle->invalidates(startState_)) {
+    if (!obstacle->invalidates(startGoalPair_.start.at(0))) {
       if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
         if (!obstacle->invalidates(goal->as<ompl::base::GoalState>()->getState())) {
           obstacles_.emplace_back(obstacle);
