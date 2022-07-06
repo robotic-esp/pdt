@@ -58,9 +58,7 @@ namespace ompltools {
 OpenRaveManipulator::OpenRaveManipulator(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
     const std::shared_ptr<const Configuration>& config, const std::string& name) :
-    OpenRaveBaseContext(spaceInfo, config, name),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
+    OpenRaveBaseContext(spaceInfo, config, name){
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
 
@@ -109,49 +107,42 @@ OpenRaveManipulator::OpenRaveManipulator(
   // Setup the space info.
   spaceInfo_->setup();
 
-  // Get the start and goal positions.
-  auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
-
-  // Fill the start and goal states' coordinates.
-  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
-  }
+  startGoalPair_ = makeStartGoalPair();
 }
 
 OpenRaveManipulator::~OpenRaveManipulator() {
   OpenRAVE::RaveDestroy();
 }
 
-ompl::base::ProblemDefinitionPtr OpenRaveManipulator::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+StartGoalPair OpenRaveManipulator::makeStartGoalPair() const{
+  // Get the start and goal positions.
+  const auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");
+  const auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");
 
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
+  ompl::base::ScopedState<ompl::base::CompoundStateSpace> startState(spaceInfo_);
+  ompl::base::ScopedState<ompl::base::CompoundStateSpace> goalState(spaceInfo_);
 
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
+  // Fill the start and goal states' coordinates.
+  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
+    startState[i] = startPosition.at(i);
+    goalState[i] = goalPosition.at(i);
+  }
+  
+  StartGoalPair pair;
+  pair.start = {startState};
 
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
+  const auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goal->setState(goalState);
+  pair.goal = goal;
 
-  // Return the new definition.
-  return problemDefinition;
+  return pair;
 }
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> OpenRaveManipulator::getStartState()
     const {
-  return startState_;
+  return startGoalPair_.start.at(0);
 }
 
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> OpenRaveManipulator::getGoalState()
-    const {
-  return goalState_;
-}
 
 void OpenRaveManipulator::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);

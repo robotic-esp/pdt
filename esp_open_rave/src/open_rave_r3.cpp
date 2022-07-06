@@ -58,23 +58,7 @@ namespace ompltools {
 OpenRaveR3::OpenRaveR3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                        const std::shared_ptr<const Configuration>& config,
                        const std::string& name) :
-    OpenRaveBaseContext(spaceInfo, config, name),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
-  // Get the start and goal positions.
-  auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");
-
-  // Set the start position.
-  (*startState_)[0] = startPosition.at(0u);
-  (*startState_)[1] = startPosition.at(1u);
-  (*startState_)[2] = startPosition.at(2u);
-
-  // Set the goal position.
-  (*goalState_)[0] = goalPosition.at(0u);
-  (*goalState_)[1] = goalPosition.at(1u);
-  (*goalState_)[2] = goalPosition.at(2u);
-
+    OpenRaveBaseContext(spaceInfo, config, name){
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
 
@@ -122,37 +106,44 @@ OpenRaveR3::OpenRaveR3(const std::shared_ptr<ompl::base::SpaceInformation>& spac
 
   // Setup the space info.
   spaceInfo_->setup();
+
+  startGoalPair_ = makeStartGoalPair();
 }
 
 OpenRaveR3::~OpenRaveR3() {
   OpenRAVE::RaveDestroy();
 }
 
-ompl::base::ProblemDefinitionPtr OpenRaveR3::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+StartGoalPair OpenRaveR3::makeStartGoalPair() const{
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState(spaceInfo_);
+  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(spaceInfo_);
+  
+  // Get the start and goal positions.
+  auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");
+  auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");
 
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
+  // Set the start position.
+  (*startState)[0] = startPosition.at(0u);
+  (*startState)[1] = startPosition.at(1u);
+  (*startState)[2] = startPosition.at(2u);
 
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
+  // Set the goal position.
+  (*goalState)[0] = goalPosition.at(0u);
+  (*goalState)[1] = goalPosition.at(1u);
+  (*goalState)[2] = goalPosition.at(2u);
 
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
+  StartGoalPair pair;
+  pair.start = {startState};
 
-  // Return the new definition.
-  return problemDefinition;
+  const auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goal->setState(goalState);
+  pair.goal = goal;
+
+  return pair;
 }
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> OpenRaveR3::getStartState() const {
-  return startState_;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> OpenRaveR3::getGoalState() const {
-  return goalState_;
+  return startGoalPair_.start.at(0);
 }
 
 void OpenRaveR3::accept(const ContextVisitor& visitor) const {

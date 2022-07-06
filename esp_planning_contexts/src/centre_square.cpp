@@ -55,29 +55,14 @@ namespace ompltools {
 CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                            const std::shared_ptr<const Configuration>& config,
                            const std::string& name) :
-    RealVectorGeometricContext(spaceInfo, config, name),
-    startState_(spaceInfo) {
-  // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-
+    RealVectorGeometricContext(spaceInfo, config, name){
   // Get the obstacle widths.
   std::vector<double> widths(dimensionality_,
                              config_->get<double>("context/" + name + "/obstacleWidth"));
 
-  // Assert configuration sanity.
-  if (startPosition.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
   if (widths.at(0u) < 0.0) {
     OMPL_ERROR("%s: Obstacle width must be positive.", name.c_str());
     throw std::runtime_error("Context error.");
-  }
-
-  // Fill the start and goal states' coordinates.
-  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = startPosition.at(i);
   }
 
   // Compute the midpoint of the obstacle.
@@ -103,27 +88,12 @@ CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& 
 
   // Set up the space info.
   spaceInfo_->setup();
-}
 
-ompl::base::ProblemDefinitionPtr CentreSquare::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
-
-  // Set the goal for the problem definition.
-  problemDefinition->setGoal(createGoal());
-
-  // Return the new definition.
-  return problemDefinition;
+  startGoalPair_ = makeStartGoalPair();
 }
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> CentreSquare::getStartState() const {
-  return startState_;
+  return startGoalPair_.start.at(0);
 }
 
 void CentreSquare::accept(const ContextVisitor& visitor) const {

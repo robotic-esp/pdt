@@ -50,22 +50,7 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
     wallOffsetX_(config->get<double>("context/" + name + "/wallOffset")),
     passageWidth_(config->get<double>("context/" + name + "/passageWidth")),
-    passageOffset_(config->get<double>("context/" + name + "/passageOffset")),
-    startState_(spaceInfo) {
-  // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-
-  // Assert configuration sanity.
-  if (config->get<std::vector<double>>("context/" + name + "/start").size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
-  if (config->get<std::vector<double>>("context/" + name + "/goal").size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
+    passageOffset_(config->get<double>("context/" + name + "/passageOffset")) {
   if (wallThickness_ < 0.0) {
     OMPL_ERROR("%s: Wall thickness is negative.", name.c_str());
     throw std::runtime_error("Context error.");
@@ -76,11 +61,6 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
   }
   if (passageOffset_ == 0.0) {
     OMPL_WARN("%s: Passage offset is 0, straight-line connection is valid.");
-  }
-
-  // Fill the start and goal states' coordinates.
-  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = startPosition.at(i);
   }
 
   // Create the validity checker.
@@ -97,27 +77,12 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
 
   // Set up the space info.
   spaceInfo_->setup();
-}
 
-ompl::base::ProblemDefinitionPtr NarrowPassage::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
-
-  // Set the goal for the problem definition.
-  problemDefinition->setGoal(createGoal());
-
-  // Return the new definition.
-  return problemDefinition;
+  startGoalPair_ = makeStartGoalPair();
 }
 
 ompl::base::ScopedState<ompl::base::RealVectorStateSpace> NarrowPassage::getStartState() const {
-  return startState_;
+  return startGoalPair_.start.at(0);
 }
 
 void NarrowPassage::accept(const ContextVisitor& visitor) const {

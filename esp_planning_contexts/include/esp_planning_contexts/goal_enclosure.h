@@ -58,10 +58,6 @@ class GoalEnclosure : public RealVectorGeometricContext {
                 const std::shared_ptr<const Configuration>& config, const std::string& name);
   virtual ~GoalEnclosure() = default;
 
-  /** \brief Instantiate a problem definition for this context. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const override;
-
   /** \brief Return a copy of the start state. */
   ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
 
@@ -83,9 +79,6 @@ class GoalEnclosure : public RealVectorGeometricContext {
 
   /** \brief The gap width of the goal enclosure. */
   double goalGapWidth_{0.0};
-
-  /** \brief The start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState_;
 };
 
 }  // namespace ompltools

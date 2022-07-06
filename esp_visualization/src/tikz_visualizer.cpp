@@ -528,7 +528,7 @@ void TikzVisualizer::drawStartState(
 }
 
 void TikzVisualizer::drawStartStates(
-    const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states) const {
+    const std::vector<ompl::base::ScopedState<>>& states) const {
   for (const auto& state : states) {
     drawStartState(state);
   }
