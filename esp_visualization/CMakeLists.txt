@@ -32,7 +32,10 @@ target_link_libraries(esp_visualization
   esp_ompl_tools
   PUBLIC
   ${OMPL_LIBRARIES}
-  ${Pangolin_LIBRARIES}
+  pango_core
+  pango_display
+  pango_plot
+  pango_windowing
   esp_common
   esp_factories
   esp_optimization_objectives

@@ -42,8 +42,6 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/planners/informedtrees/bitstar/Vertex.h>
 
-#include <pangolin/display/display_internal.h>
-
 #include "esp_visualization/fonts.h"
 
 namespace esp {
@@ -85,10 +83,6 @@ void InteractiveVisualizer::run() {
 
   // Create a window and bind it to the current OpenGL context.
   pangolin::CreateWindowAndBind("esp ompltools", windowWidth, windowHeight);
-
-  // Set a more pleasureable font.
-  auto GlContext = pangolin::GetCurrentContext();
-  GlContext->font = std::make_shared<pangolin::GlFont>(Fonts::ROBOTO_REGULAR.string(), 16);
 
   // Set up a viewport. A viewport is where OpenGL draws to. We can
   // have multiple viewports for different parts of a window. Any draw
@@ -176,7 +170,6 @@ void InteractiveVisualizer::run() {
   pangolin::Var<bool> optionTikzshot(optionsName + ".TikZshot", false, false);
   pangolin::Var<double> optionSlowdown(optionsName + ".Replay Factor", 1, 1e-3, 1e2, true);
   pangolin::Var<bool> optionPlay(optionsName + ".Play", false, false);
-  pangolin::Var<bool> optionRecord(optionsName + ".Record", false, false);
   pangolin::Var<bool> optionExport(optionsName + ".Export", false, false);
 
   // Register some keypresses.
@@ -210,8 +203,8 @@ void InteractiveVisualizer::run() {
     }
     // Register input.
     if (pangolin::Pushed(optionScreenshot)) {
-      contextView.SaveOnRender(std::to_string(screencaptureId_++) + '_' + context_->getName() +
-                               '_' + planner_->getName());
+      pangolin::SaveWindowOnRender(std::to_string(screencaptureId_++) + '_' + context_->getName() +
+                                   '_' + planner_->getName());
     }
     if (pangolin::Pushed(optionTikzshot)) {
       if (optionDrawPlannerSpecificData) {
@@ -238,18 +231,6 @@ void InteractiveVisualizer::run() {
       actualDisplayDuration_ = time::Duration(0.0);
       displayStartTime_ = time::Clock::now();
     }
-    if (pangolin::Pushed(optionRecord)) {
-      optionTrack = false;
-      playToIteration_ = true;
-      iterationToPlayTo_ = displayIteration_;
-      displayIteration_ = 0u;
-      desiredDisplayDuration_ = getIterationDuration(displayIteration_);
-      actualDisplayDuration_ = time::Duration(0.0);
-      displayStartTime_ = time::Clock::now();
-      recording_ = true;
-      contextView.RecordOnRender("ffmpeg:[fps=30,unique_filename]//" +
-                                 context_->getName() + '_' + planner_->getName() + ".avi");
-    }
     if (pangolin::Pushed(optionExport)) {
       optionTrack = false;
       exporting_ = true;
@@ -262,11 +243,6 @@ void InteractiveVisualizer::run() {
       if (displayIteration_ >= iterationToPlayTo_) {
         displayIteration_ = iterationToPlayTo_;
         playToIteration_ = false;
-        if (recording_) {
-          contextView.RecordOnRender("ffmpeg:[fps=30,unique_filename]//" +
-                                     context_->getName() + '_' + planner_->getName() + ".avi");
-          recording_ = false;
-        }
       } else {
         actualDisplayDuration_ += time::Duration(
             time::Duration((time::Clock::now() - displayStartTime_)).count() * optionSlowdown);
@@ -480,7 +456,8 @@ void InteractiveVisualizer::drawSolution(std::size_t iteration) {
       auto path = getPath3D(iteration);
       drawPath(path, 3.0, purple, 1.0);
     }
-  } else if (context_->getStateSpace()->getType() == ompl::base::StateSpaceType::STATE_SPACE_REEDS_SHEPP) {
+  } else if (context_->getStateSpace()->getType() ==
+             ompl::base::StateSpaceType::STATE_SPACE_REEDS_SHEPP) {
     auto path = getPathSE2(iteration);
     drawCars(path, 1.0, purple);
   } else {
@@ -497,12 +474,13 @@ void InteractiveVisualizer::drawStateIds(std::size_t iteration) {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   const auto& plannerData = getPlannerData(iteration);
+  pangolin::GlFont font(Fonts::ROBOTO_REGULAR.string(), 16);
   for (auto i = 0u; i < plannerData->numVertices(); ++i) {
     auto vertex = plannerData->getVertex(i);
     if (vertex != ompl::base::PlannerData::NO_VERTEX) {
       auto vertexState = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       glColor3f(1.0f, 0.2f, 0.4f);
-      pangolin::GlText txt = pangolin::GlFont::I().Text(std::to_string(vertex.getTag()).c_str());
+      pangolin::GlText txt = font.Text(std::to_string(vertex.getTag()).c_str());
       txt.Draw(static_cast<float>(vertexState->values[0]),
                static_cast<float>(vertexState->values[1]));
     }
@@ -670,7 +648,9 @@ void InteractiveVisualizer::drawGoal() const {
       drawRectangle(anchor, widths, goalColor, goalColor);
       break;
     }
-    default: { throw std::runtime_error("Can not visualize goal type."); }
+    default: {
+      throw std::runtime_error("Can not visualize goal type.");
+    }
   }
 }
 
@@ -1434,7 +1414,7 @@ InteractiveVisualizer::getVerticesAndEdges2D(std::size_t iteration) const {
   std::vector<Eigen::Vector2f> edges{};  // Size must be multiple of two.
   for (auto i = 0u; i < currentPlannerData->numVertices(); ++i) {
     auto vertex = currentPlannerData->getVertex(i);
-    
+
     // Check the vertex is valid.
     if (vertex != ompl::base::PlannerData::NO_VERTEX) {
       auto vertexX = 0.0;
