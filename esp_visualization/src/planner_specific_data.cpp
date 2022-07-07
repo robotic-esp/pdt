@@ -40,6 +40,22 @@ namespace esp {
 
 namespace ompltools {
 
+std::vector<LazyPRMstarData::Edge> LazyPRMstarData::getValidEdges() const{
+  return validEdges_;
+}
+
+void LazyPRMstarData::setValidEdges(const std::vector<LazyPRMstarData::Edge> &edges){
+  validEdges_ = edges;
+}
+
+std::vector<std::size_t> LazyPRMstarData::getNewEdgeIndices() const{
+  return newEdgeIndices_;
+}
+
+void LazyPRMstarData::setNewEdgeIndices(const std::vector<std::size_t> &newEdgeIndices){
+  newEdgeIndices_ = newEdgeIndices;
+}
+
 std::vector<BITstarData::BITstarEdge> BITstarData::getEdgeQueue() const {
   return edgeQueue_;
 }

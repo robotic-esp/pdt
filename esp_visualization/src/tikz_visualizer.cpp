@@ -593,6 +593,11 @@ void TikzVisualizer::drawPlannerSpecificVisualizations(
           std::dynamic_pointer_cast<const EITstarData>(plannerSpecificData));
       break;
     }
+    case PLANNER_TYPE::LAZYPRMSTAR: {
+      drawLazyPRMstarSpecificVisualizations(
+          std::dynamic_pointer_cast<const LazyPRMstarData>(plannerSpecificData));
+      break;
+    }
     default: { return; }
   }
 }
@@ -691,6 +696,28 @@ void TikzVisualizer::drawEITstarSpecificVisualizations(
   //            nextEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>(),
   //            "edge, espred");
   // }
+}
+
+void TikzVisualizer::drawLazyPRMstarSpecificVisualizations(
+    const std::shared_ptr<const LazyPRMstarData>& lPRMstarData) const {
+  if (context_->getDimension() == 2u) {
+    // draw all valid edges
+    const auto &edges = lPRMstarData->getValidEdges();
+    for (const auto &edge: edges){
+      auto source = edge.first.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto target = edge.second.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+
+      drawEdge(source, target, "edge, espgray");
+    }
+
+    // draw all new edges
+    for (const auto &idx: lPRMstarData->getNewEdgeIndices()){
+      auto source = edges[idx].first.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto target = edges[idx].second.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+
+      drawEdge(source, target, "edge, espred");
+    }
+  }	  
 }
 
 void TikzVisualizer::drawVertex(const ompl::base::PlannerDataVertex& vertex) const {

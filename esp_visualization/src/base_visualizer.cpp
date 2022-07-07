@@ -43,6 +43,7 @@
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/prm/LazyPRMstar.h>
 
 #include "esp_time/time.h"
 
@@ -203,9 +204,9 @@ void BaseVisualizer::createData() {
       } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::ABITSTAR) {
         planner_->as<ompl::geometric::ABITstar>()->setLocalSeed(
             config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::AITSTAR) {
+      /*} else if (plannerType_ == esp::ompltools::PLANNER_TYPE::AITSTAR) {
         planner_->as<ompl::geometric::AITstar>()->setLocalSeed(
-        config_->get<std::size_t>("experiment/seed"));
+        config_->get<std::size_t>("experiment/seed"));*/
       } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::EITSTAR) {
         planner_->as<ompl::geometric::EITstar>()->setLocalSeed(
         config_->get<std::size_t>("experiment/seed"));
@@ -343,6 +344,17 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(eitstarData);
           break;
         }
+        case PLANNER_TYPE::LAZYPRMSTAR: {
+          auto lPRMstarData = std::make_shared<LazyPRMstarData>(context_->getSpaceInformation());
+
+          lPRMstarData->setValidEdges(
+              planner_->as<ompl::geometric::LazyPRMstar>()->getValidEdges());
+
+          // Store the data.
+          std::scoped_lock lock(plannerSpecificDataMutex_);
+          plannerSpecificData_.emplace_back(lPRMstarData);
+          break;
+        }
         default:
           // Defaults to not getting any data.
           break;
@@ -350,6 +362,7 @@ void BaseVisualizer::createData() {
 
       {  // Store the planner data.
         std::scoped_lock lock(plannerDataMutex_);
+        plannerData->decoupleFromPlanner();
         plannerData_.emplace_back(plannerData);
         largestIteration_ = plannerData_.size() - 1u;
       }

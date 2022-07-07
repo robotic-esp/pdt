@@ -1022,6 +1022,10 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iterat
       drawEITstarSpecificVisualizations(iteration);
       return;
     }
+    case PLANNER_TYPE::LAZYPRMSTAR: {
+      drawLazyPRMstarSpecificVisualizations(iteration);
+      return;
+    }
     default:
       return;
   }
@@ -1400,6 +1404,30 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iterat
       // Draw the next edge.
       drawLines(nextEdge, 3.0f, darkred);
     }
+  }
+}
+
+void InteractiveVisualizer::drawLazyPRMstarSpecificVisualizations(std::size_t iteration) const {
+  // Get the LPRM* specific data.
+  auto lPRMstarData =
+      std::dynamic_pointer_cast<const LazyPRMstarData>(getPlannerSpecificData(iteration));
+  if (context_->getDimension() == 2u) {
+    std::vector<Eigen::Vector2f> edges{};
+    for (const auto &edge: lPRMstarData->getValidEdges()){
+      auto parentState = edge.first.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector2f(static_cast<float>((*parentState)[0u]),
+                                      static_cast<float>((*parentState)[1u])));
+      auto childState = edge.second.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
+      edges.push_back(Eigen::Vector2f(static_cast<float>((*childState)[0u]),
+                                      static_cast<float>((*childState)[1u])));
+
+    }
+    // Draw the edge queue.
+    drawLines(edges, 1.5f, lightblue);
+  }
+  else{
+    throw std::runtime_error(
+        "LazyPRMstar specific visualizations only implemented for 2d contexts.");
   }
 }
 
