@@ -40,15 +40,18 @@
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/EIRMstar.h>
 #include <ompl/geometric/planners/informedtrees/EITstar.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
+#include <ompl/geometric/planners/prm/PRMstar.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
+#include <ompl/geometric/planners/prm/SPARStwo.h>
 
 #include "nlohmann/json.hpp"
 
@@ -97,6 +100,22 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setTruncationScalingParameter(
           config_->get<double>(optionsKey + "/truncationParameter"));
       return {planner, PLANNER_TYPE::ABITSTAR};
+    }
+    case PLANNER_TYPE::EIRMSTAR: {
+      // Allocate and configure an EIRM* planner.
+      auto planner = std::make_shared<ompl::geometric::EIRMstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      planner->setStartGoalPruningThreshold(config_->get<unsigned>(optionsKey + "/startGoalPruningThreshold"));
+      planner->enablePruning(config_->get<bool>(optionsKey + "/enablePruning"));
+      planner->setBatchSize(config_->get<unsigned>(optionsKey + "/batchSize"));
+      planner->setInitialNumberOfSparseCollisionChecks(
+          config_->get<std::size_t>(optionsKey + "/numInitialCollisionChecks"));
+      planner->setRadiusFactor(config_->get<double>(optionsKey + "/radiusFactor"));
+      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->trackApproximateSolutions(
+          config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
+      return {planner, PLANNER_TYPE::EIRMSTAR};
     }
     case PLANNER_TYPE::EITSTAR: {
       // Allocate and configure an EIT* planner.
@@ -185,6 +204,13 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setApproximationFactor(config_->get<double>(optionsKey + "/approximationFactor"));
       return {planner, PLANNER_TYPE::LBTRRT};
     }
+    case PLANNER_TYPE::PRMSTAR: {
+      auto planner =
+          std::make_shared<ompl::geometric::PRMstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      return {planner, PLANNER_TYPE::PRMSTAR};
+    }
     case PLANNER_TYPE::RRT: {
       // Allocate and configure an RRT planner.
       auto planner = std::make_shared<ompl::geometric::RRT>(context_->getSpaceInformation());
@@ -239,6 +265,13 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->setNewStateRejection(false);
       planner->setInformedSampling(false);
       return {planner, PLANNER_TYPE::RRTSTAR};
+    }
+    case PLANNER_TYPE::SPARStwo: {
+      auto planner =
+          std::make_shared<ompl::geometric::SPARStwo>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      return {planner, PLANNER_TYPE::SPARStwo};
     }
     default: { throw std::runtime_error("Planner '"s + plannerName + "' is of unknown type."s); }
   }

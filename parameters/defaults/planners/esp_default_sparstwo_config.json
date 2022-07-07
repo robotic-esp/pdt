@@ -1,0 +1,15 @@
+{
+    "planner": {
+        "defaultSPARStwo": {
+            "type": "SPARStwo",
+            "isAnytime": true,
+            "report": {
+                "color": "espdarkblue",
+                "name": "SPARS2"
+            },
+            "options": {
+                "none": true
+            }
+        }
+    }
+}

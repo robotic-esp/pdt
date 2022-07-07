@@ -43,13 +43,16 @@
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
 #include <ompl/geometric/planners/informedtrees/EITstar.h>
+#include <ompl/geometric/planners/informedtrees/EIRMstar.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
+#include <ompl/geometric/planners/prm/PRMstar.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
+#include <ompl/geometric/planners/prm/SPARStwo.h>
 
 #include "esp_common/planner_type.h"
 
@@ -66,6 +69,9 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     }
     case PLANNER_TYPE::AITSTAR: {
       return planner->as<ompl::geometric::AITstar>()->bestCost();
+    }
+    case PLANNER_TYPE::EIRMSTAR: {
+      return planner->as<ompl::geometric::EIRMstar>()->bestCost();
     }
     case PLANNER_TYPE::EITSTAR: {
       return planner->as<ompl::geometric::EITstar>()->bestCost();
@@ -85,6 +91,9 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     case PLANNER_TYPE::LBTRRT: {
       return planner->as<ompl::geometric::LBTRRT>()->bestCost();
     }
+    case PLANNER_TYPE::PRMSTAR: {
+      return planner->as<ompl::geometric::PRMstar>()->bestCost();
+    }
     case PLANNER_TYPE::RRT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
@@ -96,6 +105,9 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     }
     case PLANNER_TYPE::RRTSTAR: {
       return planner->as<ompl::geometric::RRTstar>()->bestCost();
+    }
+    case PLANNER_TYPE::SPARStwo: {
+      return planner->as<ompl::geometric::SPARStwo>()->bestCost();
     }
     default: {
       throw std::runtime_error("Received request to get best cost of unknown planner type.");
