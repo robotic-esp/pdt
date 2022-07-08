@@ -116,7 +116,7 @@ fs::path MedianInitialSolutionPlotter::createMedianInitialSolutionPicture() cons
   picture.addAxis(createMedianInitialSolutionAxis());
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                      fs::path("tikz/all_planners_median_initial_solution_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -129,7 +129,7 @@ fs::path MedianInitialSolutionPlotter::createMedianInitialSolutionPicture(
   picture.addAxis(createMedianInitialSolutionAxis(plannerName));
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                      fs::path("tikz/"s + plannerName + "_median_initial_solution_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

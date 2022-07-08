@@ -141,7 +141,8 @@ void Configuration::load(const int argc, const char **argv) {
   // Declare the available options.
   po::options_description availableOptions("Configuration options");
   availableOptions.add_options()("help,h", "Display available options.")(
-      "config-patch,c", po::value<std::string>(), "Path to the configuration patch file.");
+      "config-patch,c", po::value<std::string>(), "Path to the configuration patch file.")(
+      "path,p", po::value<std::string>(), "Path where the experiments should be stored.");
 
   // Parse the command line arguments to see which options were invoked.
   po::variables_map invokedOptions;
@@ -159,6 +160,13 @@ void Configuration::load(const int argc, const char **argv) {
     loadDefaultConfigs();
   } else {
     load(invokedOptions["config-patch"].as<std::string>());
+  }
+
+  // if no path is specified, we store the experiments where the executable is called from
+  if (!invokedOptions.count("path")) {
+    add<std::string>("experiment/baseDirectory", fs::absolute(executable_ + "s/").string());
+  } else {
+    add<std::string>("experiment/baseDirectory", fs::absolute(invokedOptions["path"].as<std::string>()).string());
   }
 }
 

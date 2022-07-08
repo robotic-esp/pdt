@@ -91,7 +91,7 @@ fs::path CostPercentileEvolutionPlotter::createCostPercentileEvolutionPicture(
   picture.addAxis(createCostPercentileEvolutionAxis(plannerName));
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                      fs::path("tikz/"s + plannerName + "_cost_percentile_evolution_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

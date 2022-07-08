@@ -91,7 +91,7 @@ fs::path InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPict
   picture.addAxis(axis_);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                      fs::path("tikz/all_planners_initial_solution_pdf_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -105,7 +105,7 @@ fs::path InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPict
   picture.addAxis(axis_);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                      fs::path("tikz/"s + plannerName + "_initial_solution_pdf_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

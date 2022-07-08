@@ -126,7 +126,7 @@ std::size_t PlannerResults::numMeasuredRuns() const {
 
 Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceComputation) :
     config_(config),
-    statisticsDirectory_(fs::path(config_->get<std::string>("experiment/results")).parent_path() /
+    statisticsDirectory_(fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                          "statistics/"),
     forceComputation_(forceComputation) {
   // Create the statistics directory.
