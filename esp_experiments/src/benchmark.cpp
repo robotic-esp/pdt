@@ -251,15 +251,24 @@ int main(const int argc, const char **argv) {
       ++currentRun;
       const auto progress = static_cast<float>(currentRun) / static_cast<float>(totalNumberOfRuns);
       constexpr auto barWidth = 36;
+
+      // estimate how much time is left by extrapolating from the time spent so far.
+      // This is more accurate than subtracting the time used so far from the worst case total time
+      // since it can take planners that terminate early into account.
+      const auto timeSoFar = std::chrono::system_clock::now() - experimentStartTime;
+      const auto extrapolatedRuntime = timeSoFar / progress;
+
       std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
                 << (std::ceil(progress * barWidth) != barWidth
-                    ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
-                    : std::setw(static_cast<int>(std::ceil(progress * barWidth) - 1u)))
+                        ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
+                        : std::setw(static_cast<int>(std::ceil(progress * barWidth) - 1u)))
                 << std::setfill('.') << (currentRun != totalNumberOfRuns ? '|' : '.') << std::right
                 << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
-                << std::setfill('.') << '.'
-                << std::right << std::fixed << std::setw(6) << std::setfill(' ')
-                << std::setprecision(2) << progress * 100.0f << " %" << std::flush;
+                << std::setfill('.') << '.' << std::right << std::fixed << std::setw(6)
+                << std::setfill(' ') << std::setprecision(2) << progress * 100.0f << " %"
+                << "(est. time left: "
+                << esp::ompltools::time::toDurationString(extrapolatedRuntime - timeSoFar) << " )"
+                << std::flush;
     }
   }
 
