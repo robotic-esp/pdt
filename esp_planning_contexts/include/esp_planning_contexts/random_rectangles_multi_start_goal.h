@@ -64,15 +64,12 @@ class RandomRectanglesMultiStartGoal : public RealVectorGeometricContext {
   /** \brief The destructor. */
   virtual ~RandomRectanglesMultiStartGoal() = default;
 
-  /** \brief Return a copy of the start state. */
-  std::vector<ompl::base::ScopedState<>> getStartStates() const;
-
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
   /** \brief Return a start/goal pair. */
-  virtual StartGoalPair makeStartGoalPair() const override;
+  virtual std::vector<StartGoalPair> makeStartGoalPair() const override;
 
   /** \brief Create the obstacles. */
   void createObstacles();

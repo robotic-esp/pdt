@@ -80,6 +80,9 @@ class BaseContext {
   /** \brief Returns the dimension of the state space. */
   std::size_t getDimension() const;
 
+  /** \brief Returns the dimension of the state space. */
+  std::size_t getNumQueries() const;
+
   /** \brief Returns the optimization objective of this context. */
   ompl::base::OptimizationObjectivePtr getObjective() const;
 
@@ -87,10 +90,13 @@ class BaseContext {
   time::Duration getMaxSolveDuration() const;
 
   /** \brief Returns the start/goal pair. */
-  StartGoalPair getStartGoalPair() const;
+  StartGoalPair getNthStartGoalPair(const std::size_t n) const;
 
   /** \brief Return a newly generated problem definition */
   virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition() const;
+
+  /** \brief Return a newly generated problem definition */
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNthProblemDefinition(const std::size_t n) const;
 
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const = 0;
@@ -104,9 +110,21 @@ class BaseContext {
   /** \brief Create a goal. */
   virtual std::shared_ptr<ompl::base::Goal> createGoal() const = 0;
 
+  /** \brief Regenerates the queries. */
+  void regenerateQueries();
+
  protected:
   /** \brief Return a start/goal pair. */
-  virtual StartGoalPair makeStartGoalPair() const;
+  virtual std::vector<StartGoalPair> makeStartGoalPair() const;
+
+  /** \brief Parse start and goal specification used for multiquery benchmarking. */
+  std::vector<StartGoalPair> parseMultiqueryStartGoalPairs() const;
+
+  /** \brief Parse explicitly specified starts/goals. */
+  std::vector<ompl::base::ScopedState<>> parseSpecifiedStates(const std::string &key) const;
+
+  /** \brief Generate randomly samples starts/goals. */
+  std::vector<ompl::base::ScopedState<>> generateRandomStates(const std::string &key) const;
 
   /** \brief The space information associated with this context. */
   ompl::base::SpaceInformationPtr spaceInfo_{};
@@ -124,7 +142,7 @@ class BaseContext {
   ompl::base::GoalType goalType_{ompl::base::GoalType::GOAL_ANY};
 
   /** \brief The start/goal pair for the planning problem. */
-  StartGoalPair startGoalPair_{};
+  std::vector<StartGoalPair> startGoalPairs_{};
 
   /** \brief The maximum duration to solve this context. */
   time::Duration maxSolveDuration_{};

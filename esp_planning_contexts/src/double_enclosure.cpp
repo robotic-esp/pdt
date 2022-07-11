@@ -95,11 +95,7 @@ DoubleEnclosure::DoubleEnclosure(const std::shared_ptr<ompl::base::SpaceInformat
   // Set up the space info.
   spaceInfo_->setup();
 
-  startGoalPair_ = makeStartGoalPair();
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> DoubleEnclosure::getStartState() const {
-  return startGoalPair_.start.at(0);
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void DoubleEnclosure::accept(const ContextVisitor& visitor) const {

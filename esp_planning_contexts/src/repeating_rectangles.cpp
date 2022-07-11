@@ -137,12 +137,7 @@ RepeatingRectangles::RepeatingRectangles(
   // Set up the space info.
   spaceInfo_->setup();
 
-  startGoalPair_ = makeStartGoalPair();
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RepeatingRectangles::getStartState()
-    const {
-  return startGoalPair_.start.at(0);
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void RepeatingRectangles::accept(const ContextVisitor& visitor) const {

@@ -107,14 +107,19 @@ OpenRaveManipulator::OpenRaveManipulator(
   // Setup the space info.
   spaceInfo_->setup();
 
-  startGoalPair_ = makeStartGoalPair();
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 OpenRaveManipulator::~OpenRaveManipulator() {
   OpenRAVE::RaveDestroy();
 }
 
-StartGoalPair OpenRaveManipulator::makeStartGoalPair() const{
+std::vector<StartGoalPair> OpenRaveManipulator::makeStartGoalPair() const{
+  if (config_->contains("context/" + name_ + "/starts")) {
+    OMPL_ERROR("OpenRaveManipulator context does not support multiple queries.");
+    throw std::runtime_error("Context error.");
+  }
+
   // Get the start and goal positions.
   const auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");
   const auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");
@@ -135,14 +140,8 @@ StartGoalPair OpenRaveManipulator::makeStartGoalPair() const{
   goal->setState(goalState);
   pair.goal = goal;
 
-  return pair;
+  return {pair};
 }
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> OpenRaveManipulator::getStartState()
-    const {
-  return startGoalPair_.start.at(0);
-}
-
 
 void OpenRaveManipulator::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);

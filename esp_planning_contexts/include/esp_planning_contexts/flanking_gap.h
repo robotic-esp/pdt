@@ -58,9 +58,6 @@ class FlankingGap : public RealVectorGeometricContext {
               const std::shared_ptr<const Configuration>& config, const std::string& name);
   virtual ~FlankingGap() = default;
 
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
-
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
 

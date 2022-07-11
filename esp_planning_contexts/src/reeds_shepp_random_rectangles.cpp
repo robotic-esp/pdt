@@ -63,8 +63,6 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
     maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
     realVectorSubspaceInfo_(std::make_shared<ompl::base::SpaceInformation>(
         spaceInfo_->getStateSpace()->as<ompl::base::SE2StateSpace>()->getSubspace(0u))) {
-  
-  startGoalPair_ = makeStartGoalPair();
 
   if (minSideLength_ > maxSideLength_) {
     OMPL_ERROR("%s: Specified min side length is greater than specified max side length.",
@@ -96,11 +94,8 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
 
   // Set up the space info.
   spaceInfo_->setup();
-}
-
-ompl::base::ScopedState<ompl::base::SE2StateSpace> ReedsSheppRandomRectangles::getStartState()
-    const {
-  return startGoalPair_.start.at(0);
+  
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 ompl::base::RealVectorBounds ReedsSheppRandomRectangles::getBoundaries() const {
@@ -112,12 +107,6 @@ void ReedsSheppRandomRectangles::accept(const ContextVisitor& visitor) const {
 }
 
 void ReedsSheppRandomRectangles::createObstacles() {
-  // Create a goal to make sure the obstacles don't invalidate it. Something seems funky here, there
-  // has to be a better way to do this? The problem is that I want to create a new goal whenever I
-  // create a new problem definition, so the goal can not be created in the base class and kept
-  // around.
-  auto goal = startGoalPair_.goal;
-
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
     // Create a random anchor (uniform).
@@ -131,35 +120,7 @@ void ReedsSheppRandomRectangles::createObstacles() {
     }
     auto obstacle =
         std::make_shared<Hyperrectangle<BaseObstacle>>(realVectorSubspaceInfo_, anchor, widths);
-
-    auto validityChecker = std::make_shared<ReedsSheppValidityChecker>(spaceInfo_);
-    validityChecker->addObstacle(obstacle);
-
-    // Add this to the obstacles if it doesn't invalidate the start or goal state.
-    if (validityChecker->isValid(startGoalPair_.start.at(0).get())) {
-      if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
-        if (validityChecker->isValid(goal->as<ompl::base::GoalState>()->getState())) {
-          obstacles_.emplace_back(obstacle);
-        } else {
-          --i;
-        }
-      } else if (goalType_ == ompl::base::GoalType::GOAL_STATES) {
-        auto invalidates = false;
-        for (auto i = 0u; i < goal->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
-          if (validityChecker->isValid(goal->as<ompl::base::GoalStates>()->getState(i))) {
-            invalidates = true;
-            break;
-          }
-        }
-        if (!invalidates) {
-          obstacles_.emplace_back(obstacle);
-        } else {
-          --i;
-        }
-      }
-    } else {
-      --i;
-    }
+    obstacles_.emplace_back(obstacle);
   }
 }
 

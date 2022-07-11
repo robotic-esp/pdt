@@ -81,11 +81,7 @@ FourRooms::FourRooms(const std::shared_ptr<ompl::base::SpaceInformation>& spaceI
   // Set up the space info.
   spaceInfo_->setup();
 
-  startGoalPair_ = makeStartGoalPair();
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> FourRooms::getStartState() const {
-  return startGoalPair_.start.at(0);
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void FourRooms::accept(const ContextVisitor& visitor) const {

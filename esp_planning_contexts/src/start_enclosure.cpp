@@ -84,11 +84,7 @@ StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformatio
   // Set up the space info.
   spaceInfo_->setup();
 
-  startGoalPair_ = makeStartGoalPair();
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> StartEnclosure::getStartState() const {
-  return startGoalPair_.start.at(0);
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void StartEnclosure::accept(const ContextVisitor& visitor) const {

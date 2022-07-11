@@ -41,6 +41,7 @@
 #include <ompl/base/goals/GoalStates.h>
 #include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+#include <ompl/base/spaces/RealVectorStateSpace.h>
 
 #include "esp_common/goal_type.h"
 #include "esp_common/objective_type.h"
@@ -164,8 +165,15 @@ time::Duration BaseContext::getMaxSolveDuration() const {
   return maxSolveDuration_;
 }
 
-StartGoalPair BaseContext::getStartGoalPair() const{
-  return startGoalPair_;
+StartGoalPair BaseContext::getNthStartGoalPair(std::size_t n) const{
+  if (n >= getNumQueries()){
+    throw std::runtime_error("Query number out of bounds.");
+  }
+  return startGoalPairs_[n];
+}
+
+std::size_t BaseContext::getNumQueries() const {
+  return startGoalPairs_.size();
 }
 
 ompl::base::ProblemDefinitionPtr BaseContext::instantiateNewProblemDefinition() const {
@@ -176,21 +184,202 @@ ompl::base::ProblemDefinitionPtr BaseContext::instantiateNewProblemDefinition() 
   problemDefinition->setOptimizationObjective(objective_);
 
   // As default, we set the first start/goal pair for the problem definition.
-  for (const auto &s: startGoalPair_.start){
+  for (const auto &s: startGoalPairs_[0].start){
     problemDefinition->addStartState(s);
   }
 
   // Set the goal for the problem definition.
-  problemDefinition->setGoal(startGoalPair_.goal);
+  problemDefinition->setGoal(startGoalPairs_[0].goal);
 
   // Return the new definition.
   return problemDefinition;
 }
 
-StartGoalPair BaseContext::makeStartGoalPair() const{
-  StartGoalPair pair;
+ompl::base::ProblemDefinitionPtr BaseContext::instantiateNthProblemDefinition(const std::size_t n) const {
+  if (n >= getNumQueries()){
+    throw std::runtime_error("Query number out of bounds.");
+  }
 
-  if (config_->contains("context/" + name_ + "/start")) {
+  // Instantiate a new problem definition.
+  auto problemDefinition = instantiateNewProblemDefinition();
+
+  // Set the start state in the problem definition.
+  problemDefinition->clearStartStates();
+  for (auto s: startGoalPairs_[n].start){
+    problemDefinition->addStartState(s);
+  }
+
+  // Set the goal for the problem definition.
+  problemDefinition->clearGoal();
+  problemDefinition->setGoal(startGoalPairs_[n].goal);
+
+  // Return the new definition.
+  return problemDefinition;
+}
+
+std::vector<ompl::base::ScopedState<>> BaseContext::parseSpecifiedStates(const std::string &key) const{
+  if (!config_->contains(key)){
+    throw std::runtime_error("No states specified.");
+  }
+  std::vector<ompl::base::ScopedState<>> states;
+
+  const auto positions = config_->get<std::vector<std::vector<double>>>(key);
+
+  for (const auto &s: positions){
+    // Allocate a goal state and set the position.
+    ompl::base::ScopedState<> state(spaceInfo_);
+
+    // Fill the goal state's coordinates.
+    for (auto i = 0u; i < dimensionality_; ++i) {
+      state[i] = s.at(i);
+    }
+
+    states.push_back(state);
+  }
+
+  return states;
+}
+
+std::vector<ompl::base::ScopedState<>> BaseContext::generateRandomStates(const std::string &key) const{
+  const std::size_t numStates = config_->get<std::size_t>(key + "numGenerated");
+  std::vector<ompl::base::ScopedState<>> states;
+
+  for (auto i=0u; i<numStates; ++i){
+    ompl::base::ScopedState<> s(spaceInfo_);
+    if (config_->get<std::string>(key + "generativeModel") == "uniform"){
+      do{
+        s.random();
+      } while (!spaceInfo_->isValid(s.get()));
+    }
+    else if (config_->get<std::string>(key + "generativeModel") == "subregion"){
+      const auto low = config_->get<std::vector<double>>(key + "generator/lowerBounds");
+      const auto high = config_->get<std::vector<double>>(key + "generator/upperBounds");
+
+      ompl::base::RealVectorStateSpace samplingStateSpace(static_cast<unsigned int>(dimensionality_));
+      ompl::base::RealVectorBounds bounds(static_cast<unsigned int>(dimensionality_));
+      for (auto j=0u; j<dimensionality_; ++j){
+        bounds.setLow(j, low[j]);
+        bounds.setHigh(j, high[j]);
+      }
+      samplingStateSpace.setBounds(bounds);
+
+      ompl::base::RealVectorStateSampler sampler(&samplingStateSpace);
+
+      do{
+        sampler.sampleUniform(s());
+      } while (!spaceInfo_->isValid(s.get()));
+    }
+
+    states.emplace_back(s);
+  }
+
+  return states;
+}
+
+std::vector<StartGoalPair> BaseContext::parseMultiqueryStartGoalPairs() const{
+  std::vector<StartGoalPair> pairs;
+
+  const std::string baseKey = "context/" + name_ + "/";
+
+  // Sanity checks
+  if (!config_->contains(baseKey + "starts")){
+    throw std::runtime_error("No starts specified.");
+  }
+  if (!config_->contains(baseKey + "goals")){
+    throw std::runtime_error("No goals specified.");
+  }
+
+  // read starts from config
+  std::vector<std::vector<ompl::base::ScopedState<>>> starts;
+
+  if (!config_->contains(baseKey + "starts/type")){
+    throw std::runtime_error("No start type specified.");
+  }
+
+  // std::cout << "Starts: " << std::endl;
+  if (config_->get<std::string>(baseKey + "starts/type") == "specified"){
+    const auto states = parseSpecifiedStates(baseKey + "starts/states");
+    for (const auto &state: states){
+      std::vector<ompl::base::ScopedState<>> tmp{state};
+      starts.emplace_back(tmp);
+    }
+  }
+  else if (config_->get<std::string>(baseKey + "starts/type") == "generated"){
+    const auto states = generateRandomStates(baseKey + "starts/");
+    for (const auto &state: states){
+      std::vector<ompl::base::ScopedState<>> tmp{state};
+      starts.emplace_back(tmp);
+    }
+  }
+
+  // read goals from config
+  std::vector<std::shared_ptr<ompl::base::Goal>> goals;
+
+  if (!config_->contains(baseKey + "goals/type")){
+    throw std::runtime_error("No goals type specified.");
+  }
+
+  if (config_->get<std::string>(baseKey + "goals/type") == "specified"){
+    const auto states = parseSpecifiedStates(baseKey + "goals/states");
+    for (const auto &state: states){
+      auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
+      goal->as<ompl::base::GoalStates>()->addState(state);
+      goals.emplace_back(goal);
+    }
+  }
+  else if(config_->get<std::string>(baseKey + "goals/type") == "generated"){
+    const auto states = generateRandomStates(baseKey + "goals/");
+    for (const auto &state: states){
+      auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
+      goal->as<ompl::base::GoalStates>()->addState(state);
+      goals.emplace_back(goal);
+    }
+  }
+  else if(config_->get<std::string>(baseKey + "goals/type") == "followStarts"){
+    // the goal of the first query is the start of the next query.
+    const std::size_t numGoals = config_->get<std::size_t>(baseKey + "goals/numGenerated");
+    for (auto i=0u; i<numGoals; ++i){
+      auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
+      if (i+1 < starts.size()){
+        for (const auto tmp: starts[i+1]){
+          goal->as<ompl::base::GoalStates>()->addState(tmp);
+        }
+      }
+      else{
+        ompl::base::ScopedState<> g(spaceInfo_);
+        do{
+          g.random();
+        } while (!spaceInfo_->isValid(g.get()));
+        goal->as<ompl::base::GoalStates>()->addState(g);
+      }
+
+      goals.emplace_back(goal);
+    }
+  }
+
+  // merge starts and goals
+  if (starts.size() != goals.size()){
+    throw std::runtime_error("Different number of starts and goals specified.");
+  }
+
+  for (auto i=0u; i<starts.size(); ++i){
+    StartGoalPair pair;
+    pair.start = starts[i];
+    pair.goal = goals[i];
+
+    pairs.emplace_back(pair);
+  }
+
+  return pairs;
+}
+
+std::vector<StartGoalPair> BaseContext::makeStartGoalPair() const{
+  std::vector<StartGoalPair> pairs;
+
+  if (config_->contains("context/" + name_ + "/starts")) { // if a 'starts' spec is given, read that
+    pairs = parseMultiqueryStartGoalPairs();
+  }
+  else if (config_->contains("context/" + name_ + "/start")) { // else check if a single start state is given
     const auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");
 
     // ensure that the dimensionality works
@@ -206,15 +395,20 @@ StartGoalPair BaseContext::makeStartGoalPair() const{
       startState[i] = startPosition.at(i);
     }
 
-    pair.start = {startState};
-    pair.goal = createGoal();
+    pairs.emplace_back(StartGoalPair());
+    pairs[0].start = {startState};
+    pairs[0].goal = createGoal();
   }
   else{
-    OMPL_ERROR("%s: 'start' not specified.", name_.c_str());
+    OMPL_ERROR("%s: Neither 'start' nor 'starts' specified.", name_.c_str());
     throw std::runtime_error("Context error.");
   }
 
-  return pair;
+  return pairs;
+}
+
+void BaseContext::regenerateQueries(){
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 }  // namespace ompltools

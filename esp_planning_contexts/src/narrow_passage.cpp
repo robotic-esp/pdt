@@ -78,11 +78,7 @@ NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>
   // Set up the space info.
   spaceInfo_->setup();
 
-  startGoalPair_ = makeStartGoalPair();
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> NarrowPassage::getStartState() const {
-  return startGoalPair_.start.at(0);
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void NarrowPassage::accept(const ContextVisitor& visitor) const {

@@ -69,15 +69,12 @@ class OpenRaveSE3 : public OpenRaveBaseContext {
               const std::shared_ptr<const Configuration>& config, const std::string& name);
   virtual ~OpenRaveSE3();
 
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::SE3StateSpace> getStartState() const;
-
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override final;
 
  private:
   /** \brief Return a start/goal pair. */
-  virtual StartGoalPair makeStartGoalPair() const override;
+  virtual std::vector<StartGoalPair> makeStartGoalPair() const override;
 
   /** \brief Create a new goal. */
   std::shared_ptr<ompl::base::Goal> createGoal() const;
