@@ -60,7 +60,7 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
     maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
     numStarts_(config->get<std::size_t>("context/" + name + "/numStarts")),
     numGoals_(config->get<std::size_t>("context/" + name + "/numGoals")) {
-  startGoalPair_ = makeStartGoalPair();
+  startGoalPairs_ = makeStartGoalPair();
 
   // Assert configuration sanity.
   if (numStarts_ == 0u) {
@@ -93,7 +93,12 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
   spaceInfo_->setup();
 }
 
-StartGoalPair RandomRectanglesMultiStartGoal::makeStartGoalPair() const{
+std::vector<StartGoalPair> RandomRectanglesMultiStartGoal::makeStartGoalPair() const{
+  if (config_->contains("context/" + name_ + "/starts")) {
+    OMPL_ERROR("MultiStartGoal context does not support multiple queries.");
+    throw std::runtime_error("Context error.");
+  }
+
   // Fill the start and goal states' coordinates.
   std::vector<ompl::base::ScopedState<>> startStates;
 
@@ -107,12 +112,7 @@ StartGoalPair RandomRectanglesMultiStartGoal::makeStartGoalPair() const{
   pair.start = startStates;
   pair.goal = createGoal();
 
-  return pair;
-}
-
-std::vector<ompl::base::ScopedState<>>
-RandomRectanglesMultiStartGoal::getStartStates() const {
-  return startGoalPair_.start;
+  return {pair};
 }
 
 void RandomRectanglesMultiStartGoal::accept(const ContextVisitor& visitor) const {
@@ -121,7 +121,7 @@ void RandomRectanglesMultiStartGoal::accept(const ContextVisitor& visitor) const
 
 void RandomRectanglesMultiStartGoal::createObstacles() {
   // Create a goal to make sure the obstacles don't invalidate it.
-  const auto &goal = startGoalPair_.goal;
+  const auto &goal = startGoalPairs_[0].goal;
 
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
@@ -136,7 +136,7 @@ void RandomRectanglesMultiStartGoal::createObstacles() {
     bool invalidates = false;
     auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths);
     // Add this to the obstacles if it doesn't invalidate the start or goal states.
-    for (const auto& start : startGoalPair_.start) {
+    for (const auto& start : startGoalPairs_[0].start) {
       if (obstacle->invalidates(start)) {
         invalidates = true;
         break;

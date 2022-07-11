@@ -60,8 +60,6 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
     maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")){
-  startGoalPair_ = makeStartGoalPair();
-
   if (minSideLength_ > maxSideLength_) {
     OMPL_ERROR("%s: Specified min side length is greater than specified max side length.",
                name.c_str());
@@ -90,10 +88,7 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
   // Set up the space info.
   spaceInfo_->setup();
 
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RandomRectangles::getStartState() const {
-  return startGoalPair_.start.at(0);
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void RandomRectangles::accept(const ContextVisitor& visitor) const {
@@ -101,8 +96,6 @@ void RandomRectangles::accept(const ContextVisitor& visitor) const {
 }
 
 void RandomRectangles::createObstacles() {
-  const auto &goal = startGoalPair_.goal;
-
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
     // Create a random anchor (uniform).
@@ -115,32 +108,7 @@ void RandomRectangles::createObstacles() {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
     auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths);
-
-    // Add this to the obstacles if it doesn't invalidate the start or goal state.
-    if (!obstacle->invalidates(startGoalPair_.start.at(0))) {
-      if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
-        if (!obstacle->invalidates(goal->as<ompl::base::GoalState>()->getState())) {
-          obstacles_.emplace_back(obstacle);
-        } else {
-          --i;
-        }
-      } else if (goalType_ == ompl::base::GoalType::GOAL_STATES) {
-        auto invalidates = false;
-        for (auto i = 0u; i < goal->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
-          if (obstacle->invalidates(goal->as<ompl::base::GoalStates>()->getState(i))) {
-            invalidates = true;
-            break;
-          }
-        }
-        if (!invalidates) {
-          obstacles_.emplace_back(obstacle);
-        } else {
-          --i;
-        }
-      }
-    } else {
-      --i;
-    }
+    obstacles_.emplace_back(obstacle);
   }
 }
 

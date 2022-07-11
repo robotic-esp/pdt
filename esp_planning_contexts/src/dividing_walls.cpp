@@ -83,11 +83,7 @@ DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>
   // Set up the space info.
   spaceInfo_->setup();
 
-  startGoalPair_ = makeStartGoalPair();
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> DividingWalls::getStartState() const {
-  return startGoalPair_.start.at(0);
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void DividingWalls::accept(const ContextVisitor& visitor) const {

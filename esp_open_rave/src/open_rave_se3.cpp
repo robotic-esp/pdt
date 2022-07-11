@@ -108,14 +108,19 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
   // Setup the space info.
   spaceInfo_->setup();
 
-  startGoalPair_ = makeStartGoalPair();
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 OpenRaveSE3::~OpenRaveSE3() {
   OpenRAVE::RaveDestroy();
 }
 
-StartGoalPair OpenRaveSE3::makeStartGoalPair() const{
+std::vector<StartGoalPair> OpenRaveSE3::makeStartGoalPair() const{
+  if (config_->contains("context/" + name_ + "/starts")) {
+    OMPL_ERROR("OpenRaveSE3 context does not support multiple queries.");
+    throw std::runtime_error("Context error.");
+  }
+
   auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");
 
   ompl::base::ScopedState<ompl::base::SE3StateSpace> startState(spaceInfo_);
@@ -129,7 +134,7 @@ StartGoalPair OpenRaveSE3::makeStartGoalPair() const{
   pair.start = {startState};
   pair.goal = createGoal();
 
-  return pair;
+  return {pair};
 }
 
 std::shared_ptr<ompl::base::Goal> OpenRaveSE3::createGoal() const {
@@ -191,10 +196,6 @@ std::shared_ptr<ompl::base::Goal> OpenRaveSE3::createGoal() const {
     }
     default: { throw std::runtime_error("Goal type not implemented."); }
   }
-}
-
-ompl::base::ScopedState<ompl::base::SE3StateSpace> OpenRaveSE3::getStartState() const {
-  return startGoalPair_.start.at(0);
 }
 
 void OpenRaveSE3::accept(const ContextVisitor& visitor) const {

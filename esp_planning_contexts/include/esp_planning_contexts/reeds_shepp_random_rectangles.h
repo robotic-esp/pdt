@@ -64,9 +64,6 @@ class ReedsSheppRandomRectangles : public BaseContext {
   /** \brief The destructor. */
   virtual ~ReedsSheppRandomRectangles() = default;
 
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::SE2StateSpace> getStartState() const;
-
   /** \brief Return a copy of the bounds. */
   ompl::base::RealVectorBounds getBoundaries() const;
 

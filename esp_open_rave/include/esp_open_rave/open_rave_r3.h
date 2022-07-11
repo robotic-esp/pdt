@@ -67,15 +67,12 @@ class OpenRaveR3 : public OpenRaveBaseContext {
              const std::shared_ptr<const Configuration>& config, const std::string& name);
   virtual ~OpenRaveR3();
 
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
-
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override final;
 
  private:
   /** \brief Return a start/goal pair. */
-  virtual StartGoalPair makeStartGoalPair() const override;
+  virtual std::vector<StartGoalPair> makeStartGoalPair() const override;
 };
 
 }  // namespace ompltools

@@ -78,11 +78,7 @@ WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
   // Set up the space info.
   spaceInfo_->setup();
 
-  startGoalPair_ = makeStartGoalPair();
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> WallGap::getStartState() const {
-  return startGoalPair_.start.at(0);
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void WallGap::accept(const ContextVisitor& visitor) const {
