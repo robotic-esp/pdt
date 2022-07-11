@@ -632,7 +632,7 @@ void InteractiveVisualizer::visit(const WallGap& context) const {
 }
 
 void InteractiveVisualizer::drawStarts() const {
-  const auto &starts = context_->getStartGoalPair().start;
+  const auto &starts = context_->getNthStartGoalPair(0).start;
 
   for (const auto& start: starts){
     drawPoint(start, green, 4.0);
@@ -640,7 +640,7 @@ void InteractiveVisualizer::drawStarts() const {
 }
 
 void InteractiveVisualizer::drawGoal() const {
-  const auto goal = context_->getStartGoalPair().goal;
+  const auto goal = context_->getNthStartGoalPair(0).goal;
 
   switch (goal->getType()) {
     case ompl::base::GoalType::GOAL_STATE: {
