@@ -71,7 +71,7 @@ class PlannerResults {
 
 class Statistics {
  public:
-  Statistics(const std::shared_ptr<Configuration>& config, bool forceComputation = false);
+  Statistics(const std::shared_ptr<Configuration>& config, const std::experimental::filesystem::path &resultsPath, bool forceComputation = false);
   ~Statistics() = default;
 
   std::experimental::filesystem::path extractMedians(

@@ -67,18 +67,24 @@ bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext> &co
                           const double runtime) {
   std::cout << "Validating problem definition... ";
 
-  const auto p = context->instantiateNewProblemDefinition();
+  const std::size_t numQueries = context->getNumQueries();
+  for (auto n=0u; n<numQueries; ++n){
+    std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' '
+              << "Query " << n+1 << "/" << numQueries << std::flush;
 
-  auto planner = std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
-  planner->setProblemDefinition(p);
+    auto planner = std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
 
-  const auto status = planner->solve(ompl::base::timedPlannerTerminationCondition(runtime));
+    const auto p = context->instantiateNthProblemDefinition(n);
+    planner->setProblemDefinition(p);
 
-  if (!status) {
-    std::cout << "Failed." << std::endl;
-    return false;
-  } else {
-    std::cout << "OK." << std::endl;
+    const auto status = planner->solve(ompl::base::timedPlannerTerminationCondition(runtime));
+
+    if (!status) {
+      std::cout << "Failed on query " << n << "." << std::endl;
+      return false;
+    } else {
+      std::cout << "OK." << std::endl;
+    }
   }
   std::cout << std::endl;
 
@@ -114,13 +120,16 @@ int main(const int argc, const char **argv) {
     }
   }
 
+  const std::size_t numQueries = context->getNumQueries();
+
   // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
 
   // Print some basic info about this benchmark.
   auto estimatedRuntime = config->get<std::size_t>("experiment/numRuns") *
                           config->get<std::vector<std::string>>("experiment/planners").size() *
-                          context->getMaxSolveDuration();
+                          context->getMaxSolveDuration() * 
+                          numQueries;
   auto estimatedDoneBy =
       esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
           std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
@@ -132,6 +141,9 @@ int main(const int argc, const char **argv) {
   std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
             << std::setfill('.') << "Number of runs per planner" << std::setw(20) << std::right
             << config->get<std::size_t>("experiment/numRuns") << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Number of queries" << std::setw(20) << std::right
+            << numQueries << '\n';
   std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
             << std::setfill('.') << "Maximum time per run" << std::setw(20) << std::right
             << context->getMaxSolveDuration().count() << " s\n";
@@ -195,44 +207,29 @@ int main(const int argc, const char **argv) {
   config->add<std::string>("experiment/experimentDirectory",
                            fs::absolute(experimentDirectory).string());
 
-  // Create the performance log.
-  esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(experimentDirectory /
-                                                                    "results.csv"s);
-
-  // Add the result path to the experiment.
-  config->add<std::string>("experiment/results", results.getFilePath());
+  std::vector<std::string> resultPaths;
 
   // Compute the total number of runs.
   const auto totalNumberOfRuns =
       config->get<std::size_t>("experiment/numRuns") *
-      config->get<std::vector<std::string>>("experiment/planners").size();
+      config->get<std::vector<std::string>>("experiment/planners").size() * 
+      numQueries;
   auto currentRun = 0u;
 
   // May the best planner win.
-  for (std::size_t i = 0; i < config->get<std::size_t>("experiment/numRuns"); ++i) {
+  for (auto i = 0u; i < config->get<std::size_t>("experiment/numRuns"); ++i) {
     // Randomly shuffle the planners.
     auto plannerNames = config->get<std::vector<std::string>>("experiment/planners");
     std::random_shuffle(plannerNames.begin(), plannerNames.end());
 
+    // regenerate the start/goal pairs if so desired
+    if (config->contains("experiment/regenerateQueries") && config->get<bool>("experiment/regenerateQueries")){
+       context->regenerateQueries();
+    }
+
     for (const auto &plannerName : plannerNames) {
-      // Create the logger for this run.
-      esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
-                                            config->get<double>("experiment/logFrequency"));
-
-      // The following results in more consistent measurements. I don't fully understand why, but it
-      // seems to be connected to creating a separate thread.
-      {
-        auto reconciler =
-            std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
-        reconciler->setName("ReconcilingPlanner");
-        reconciler->setProblemDefinition(context->instantiateNewProblemDefinition());
-        auto hotpath = std::async(std::launch::async, [&reconciler]() {
-          reconciler->solve(ompl::base::timedPlannerTerminationCondition(0.0));
-        });
-        hotpath.get();
-      }
-
       // Allocate the planner.
+      context->instantiateNthProblemDefinition(0u);
       auto [planner, plannerType] = plannerFactory.create(plannerName);
 
       // Set it up.
@@ -240,88 +237,133 @@ int main(const int argc, const char **argv) {
       planner->setup();
       const auto setupDuration = esp::ompltools::time::Clock::now() - setupStartTime;
 
-      // Compute the duration we have left for solving.
-      const auto maxSolveDuration =
-          esp::ompltools::time::seconds(context->getMaxSolveDuration() - setupDuration);
-      const std::chrono::microseconds idle(1000000u /
-                                           config->get<std::size_t>("experiment/logFrequency"));
+      for (auto n=0u; n<numQueries; ++n){
+        // Only the first run contains the time needed for the setup of the planner.
+        // We need to do this such that planners that compute some information beforehand do not have an unfair
+        // advantage in the logged times.
+        const double firstQueryMultiplier = (n == 0u);
 
-      // Solve the problem on a separate thread.
-      esp::ompltools::time::Clock::time_point addMeasurementStart;
-      const auto solveStartTime = esp::ompltools::time::Clock::now();
-      std::future<void> future = std::async(std::launch::async, [&planner, &maxSolveDuration]() {
-        planner->solve(maxSolveDuration);
-      });
+        // Create the logger for this run.
+        esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
+                                              config->get<double>("experiment/logFrequency"));
 
-      // Log the intermediate best costs.
-      do {
-        addMeasurementStart = esp::ompltools::time::Clock::now();
-        logger.addMeasurement(setupDuration + (addMeasurementStart - solveStartTime),
-                              esp::ompltools::utilities::getBestCost(planner, plannerType));
+        planner->clearQuery();
 
-        // Stop logging intermediate best costs if the planner overshoots.
-        if (esp::ompltools::time::seconds(addMeasurementStart - solveStartTime) >
-            maxSolveDuration) {
-          break;
+        // The following results in more consistent measurements. I don't fully understand why, but it
+        // seems to be connected to creating a separate thread.
+        {
+          auto reconciler =
+              std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
+          reconciler->setName("ReconcilingPlanner");
+          reconciler->setProblemDefinition(context->instantiateNewProblemDefinition());
+          auto hotpath = std::async(std::launch::async, [&reconciler]() {
+            reconciler->solve(ompl::base::timedPlannerTerminationCondition(0.0));
+          });
+          hotpath.get();
         }
-      } while (future.wait_until(addMeasurementStart + idle) != std::future_status::ready);
 
-      // Wait until the planner returns.
-      OMPL_DEBUG(
-          "Stopped logging results for planner '%s' because it overshot the termination condition.",
-          plannerName.c_str());
-      future.get();
+        // get the problem settng for the nth query, and hand it over to the planner.
+        const auto p = context->instantiateNthProblemDefinition(n);
+        planner->setProblemDefinition(p);
 
-      // Get the final runtime.
-      const auto totalDuration =
-          setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
+        // Create the performance log.
+        const fs::path path = (fs::absolute(experimentDirectory) / ("raw/results_" + std::to_string(n) + ".csv"s));
 
-      // Store the final cost.
-      const auto problem = planner->getProblemDefinition();
-      if (problem->hasExactSolution()) {
-        logger.addMeasurement(totalDuration,
-                              problem->getSolutionPath()->cost(context->getObjective()));
-      } else {
-        logger.addMeasurement(totalDuration,
-                              ompl::base::Cost(std::numeric_limits<double>::infinity()));
+        if (std::find(resultPaths.begin(), resultPaths.end(), path.string()) == resultPaths.end()){
+          resultPaths.emplace_back(path.string());
+        }
+
+        esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(path);
+
+        // Compute the duration we have left for solving.
+        const auto maxSolveDuration =
+            esp::ompltools::time::seconds(context->getMaxSolveDuration() - setupDuration*firstQueryMultiplier);
+        const std::chrono::microseconds idle(1000000u /
+                                             config->get<std::size_t>("experiment/logFrequency"));
+
+        // Solve the problem on a separate thread.
+        esp::ompltools::time::Clock::time_point addMeasurementStart;
+        const auto solveStartTime = esp::ompltools::time::Clock::now();
+        std::future<void> future = std::async(std::launch::async, [&planner, &maxSolveDuration]() {
+          planner->solve(maxSolveDuration);
+        });
+
+        // Log the intermediate best costs.
+        do {
+          addMeasurementStart = esp::ompltools::time::Clock::now();
+          logger.addMeasurement(firstQueryMultiplier*setupDuration + (addMeasurementStart - solveStartTime),
+                                esp::ompltools::utilities::getBestCost(planner, plannerType));
+
+          // Stop logging intermediate best costs if the planner overshoots.
+          if (esp::ompltools::time::seconds(addMeasurementStart - solveStartTime) >
+              maxSolveDuration) {
+            break;
+          }
+        } while (future.wait_until(addMeasurementStart + idle) != std::future_status::ready);
+
+        // Wait until the planner returns.
+        OMPL_DEBUG(
+            "Stopped logging results for planner '%s' because it overshot the termination condition.",
+            plannerName.c_str());
+        future.get();
+
+        // Get the final runtime.
+        const auto totalDuration =
+            firstQueryMultiplier*setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
+
+        // Store the final cost.
+        const auto problem = planner->getProblemDefinition();
+        if (problem->hasExactSolution()) {
+          logger.addMeasurement(totalDuration,
+                                problem->getSolutionPath()->cost(context->getObjective()));
+        } else {
+          logger.addMeasurement(totalDuration,
+                                ompl::base::Cost(std::numeric_limits<double>::infinity()));
+        }
+
+        // Add this run to the log and report it to the console.
+        results.addResult(planner->getName(), logger);
+
+        // Compute the progress.
+        ++currentRun;
+        const auto progress = static_cast<float>(currentRun) / static_cast<float>(totalNumberOfRuns);
+        constexpr auto barWidth = 36;
+
+        // estimate how much time is left by extrapolating from the time spent so far.
+        // This is more accurate than subtracting the time used so far from the worst case total time
+        // since it can take planners that terminate early into account.
+        const auto timeSoFar = std::chrono::system_clock::now() - experimentStartTime;
+        const auto extrapolatedRuntime = timeSoFar / progress;
+        const auto estimatedTimeString =
+            " (est. time left: "s +
+            esp::ompltools::time::toDurationString(
+                std::chrono::ceil<std::chrono::seconds>(extrapolatedRuntime - timeSoFar)) +
+            ")"s;
+
+        std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
+                  << (std::ceil(progress * barWidth) != barWidth
+                          ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
+                          : std::setw(static_cast<int>(std::ceil(progress * barWidth) - 1u)))
+                  << std::setfill('.') << (currentRun != totalNumberOfRuns ? '|' : '.') << std::right
+                  << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
+                  << std::setfill('.') << '.' << std::right << std::fixed << std::setw(6)
+                  << std::setfill(' ') << std::setprecision(2) << progress * 100.0f << " %";
+        if (currentRun != totalNumberOfRuns) {
+          std::cout << estimatedTimeString;
+        } else {
+          std::cout << std::setfill(' ') << std::setw(static_cast<int>(estimatedTimeString.length()))
+                    << " ";
+        }
+        std::cout << std::flush;
       }
-
-      // Add this run to the log and report it to the console.
-      results.addResult(planner->getName(), logger);
-
-      // Compute the progress.
-      ++currentRun;
-      const auto progress = static_cast<float>(currentRun) / static_cast<float>(totalNumberOfRuns);
-      constexpr auto barWidth = 36;
-
-      // estimate how much time is left by extrapolating from the time spent so far.
-      // This is more accurate than subtracting the time used so far from the worst case total time
-      // since it can take planners that terminate early into account.
-      const auto timeSoFar = std::chrono::system_clock::now() - experimentStartTime;
-      const auto extrapolatedRuntime = timeSoFar / progress;
-      const auto estimatedTimeString =
-          " (est. time left: "s +
-          esp::ompltools::time::toDurationString(
-              std::chrono::ceil<std::chrono::seconds>(extrapolatedRuntime - timeSoFar)) +
-          ")"s;
-
-      std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
-                << (std::ceil(progress * barWidth) != barWidth
-                        ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
-                        : std::setw(static_cast<int>(std::ceil(progress * barWidth) - 1u)))
-                << std::setfill('.') << (currentRun != totalNumberOfRuns ? '|' : '.') << std::right
-                << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
-                << std::setfill('.') << '.' << std::right << std::fixed << std::setw(6)
-                << std::setfill(' ') << std::setprecision(2) << progress * 100.0f << " %";
-      if (currentRun != totalNumberOfRuns) {
-        std::cout << estimatedTimeString;
-      } else {
-        std::cout << std::setfill(' ') << std::setw(static_cast<int>(estimatedTimeString.length()))
-                  << " ";
-      }
-      std::cout << std::flush;
     }
   }
+  
+  // Add the result path to the experiment.
+  std::cout << "A" << std::endl;
+  config->add<std::vector<std::string>>("experiment/results", resultPaths);
+  config->add<std::string>("experiment/experimentDirectory", fs::absolute(experimentDirectory).string());
+  std::cout << "A" << std::endl;
 
   // dump the complete config to make sure that we can produce the report once we ran the experiment
   auto configPath = experimentDirectory / "config.json"s;
@@ -353,12 +395,25 @@ int main(const int argc, const char **argv) {
             << "Compiling (this may take a couple of minutes)" << std::flush;
 
   // Generate the statistic.
-  esp::ompltools::Statistics stats(config, true);
+  std::vector<esp::ompltools::Statistics> stats;
+
+  for (const auto &path: resultPaths){
+    stats.push_back(esp::ompltools::Statistics(config, path, true));
+  }
 
   // Generate the report.
-  esp::ompltools::ExperimentReport report(config, stats);
-  report.generateReport();
-  auto reportPath = report.compileReport();
+  fs::path reportPath;
+  if (stats.size() == 0u){
+    std::cout << "No statistics were generated, thus no report can be compiled." << std::endl;
+  }
+  else if(stats.size() == 1u){ // Single query report
+    esp::ompltools::ExperimentReport report(config, stats[0u]);
+    report.generateReport();
+    reportPath = report.compileReport();
+  }
+  else{ // Multiquery report
+
+  }
 
   // Inform that we are done compiling the report.
   std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
@@ -376,7 +431,7 @@ int main(const int argc, const char **argv) {
               esp::ompltools::time::toDateString(experimentEndTime).c_str());
   OMPL_INFORM("Duration of experiment: '%s'",
               esp::ompltools::time::toDurationString(experimentDuration).c_str());
-  OMPL_INFORM("Wrote results to '%s'", results.getFilePath().c_str());
+  OMPL_INFORM("Wrote results to '%s'", experimentDirectory.string());
 
   // Inform where we wrote the report to.
   std::cout << std::setw(2u) << std::setfill(' ') << ' ' << "Location " << reportPath << "\n\n";

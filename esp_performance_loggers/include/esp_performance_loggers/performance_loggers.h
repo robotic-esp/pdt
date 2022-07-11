@@ -216,11 +216,6 @@ class ResultLog {
       auto msg = "Could not open results file at "s + filepath_.string() + "."s;
       throw std::ios_base::failure(msg);
     }
-    
-
-    // Set the permissions to read only.
-    fs::permissions(filepath_,
-                    fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
   };
 
   fs::path getFilePath() const { return fs::absolute(filepath_); }
@@ -246,10 +241,6 @@ class ResultLog {
 
     // Close the file:
     filestream.close();
-
-    // This file should not accidentally be written to.
-    fs::permissions(filepath_,
-                    fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
   }
 
  private:
