@@ -166,7 +166,7 @@ void Configuration::load(const int argc, const char **argv) {
   if (!invokedOptions.count("path")) {
     add<std::string>("experiment/baseDirectory", fs::absolute(executable_ + "s/").string());
   } else {
-    add<std::string>("experiment/baseDirectory", fs::absolute(invokedOptions["path"].as<std::string>()).string());
+    add<std::string>("experiment/baseDirectory", fs::canonical(fs::absolute(invokedOptions["path"].as<std::string>()).string()));
   }
 }
 
