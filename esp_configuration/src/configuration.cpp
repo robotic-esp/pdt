@@ -166,7 +166,12 @@ void Configuration::load(const int argc, const char **argv) {
   if (!invokedOptions.count("path")) {
     add<std::string>("experiment/baseDirectory", fs::absolute(executable_ + "s/").string());
   } else {
-    add<std::string>("experiment/baseDirectory", fs::canonical(fs::absolute(invokedOptions["path"].as<std::string>()).string()));
+    // We create the folder directly here, since
+    // fs::canonical requires the folder that we are trying to resolve to exist.
+    // fs::weakly_canonical relaxes this requirement, but is not in the experimental filesystem header
+    const auto absolutePath = fs::absolute(invokedOptions["path"].as<std::string>());
+    fs::create_directories(absolutePath);
+    add<std::string>("experiment/baseDirectory", fs::canonical(absolutePath.string()));
   }
 }
 
