@@ -150,8 +150,9 @@ int main(const int argc, const char **argv) {
   config->add<std::string>("experiment/name", experimentName);
 
   // Create the directory for the results of this experiment to live in.
-  fs::path experimentDirectory(config->get<std::string>("experiment/executable") + "s/"s +
+  fs::path experimentDirectory(fs::path(config->get<std::string>("experiment/baseDirectory")) /
                                experimentName);
+  config->add<std::string>("experiment/experimentDirectory", fs::absolute(experimentDirectory).string());
 
   // Create the performance log.
   esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(experimentDirectory /
@@ -274,7 +275,7 @@ int main(const int argc, const char **argv) {
 
   // dump the complete config to make sure that we can produce the report once we ran the experiment
   auto configPath = experimentDirectory / "config.json"s;
-  config->dumpAll(fs::current_path().string() + '/' + configPath.string());
+  config->dumpAll(configPath.string());
 
   // Register the end time of the experiment.
   auto experimentEndTime = std::chrono::system_clock::now();
@@ -333,7 +334,7 @@ int main(const int argc, const char **argv) {
   // Dump the accessed parameters next to the results file.
   // This overwrites the previously dumped config with one that only consists of the
   // accessed parameters.
-  config->dumpAccessed(fs::current_path().string() + '/' + configPath.string());
+  config->dumpAccessed(configPath.string());
 
   return 0;
 }
