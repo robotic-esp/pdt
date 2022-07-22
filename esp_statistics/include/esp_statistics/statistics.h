@@ -75,7 +75,7 @@ class Statistics {
   ~Statistics() = default;
 
   std::experimental::filesystem::path extractMedians(
-      const std::string& plannerName, std::size_t confidence = 99u,
+      const std::string& plannerName, std::size_t confidence,
       const std::vector<double>& binDurations = {}) const;
 
   std::experimental::filesystem::path extractCostPercentiles(
@@ -83,7 +83,7 @@ class Statistics {
       const std::vector<double>& binDurations = {}) const;
 
   std::experimental::filesystem::path extractMedianInitialSolution(
-      const std::string& plannerName, std::size_t confidence = 99u) const;
+      const std::string& plannerName, std::size_t confidence) const;
 
   std::experimental::filesystem::path extractInitialSolutionDurationCdf(
       const std::string& plannerName) const;

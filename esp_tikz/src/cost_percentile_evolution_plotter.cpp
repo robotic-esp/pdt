@@ -76,7 +76,7 @@ std::shared_ptr<PgfAxis> CostPercentileEvolutionPlotter::createCostPercentileEvo
   setCostPercentileEvolutionAxisOptions(axis);
 
   // Add all the cost percentil evolution plots.
-  for (const auto percentile : percentiles) {
+  for (const auto percentile : percentiles_) {
     axis->addPlot(createCostPercentileEvolutionPlot(plannerName, percentile));
   }
   axis->options.name = plannerName + "CostPercentileEvolutionAxis";
@@ -127,7 +127,7 @@ std::shared_ptr<PgfPlot> CostPercentileEvolutionPlotter::createCostPercentileEvo
   // Get the table from the appropriate file.
   std::stringstream percentileName;
   percentileName << std::setprecision(3) << "percentile" << percentile;
-  auto table = std::make_shared<PgfTable>(stats_.extractCostPercentiles(plannerName, percentiles),
+  auto table = std::make_shared<PgfTable>(stats_.extractCostPercentiles(plannerName, percentiles_),
                                           "durations", percentileName.str());
 
   // Create the plot and set the options.
