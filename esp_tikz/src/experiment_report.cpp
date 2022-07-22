@@ -287,7 +287,7 @@ std::stringstream ExperimentReport::overview() const {
       << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
       << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
          "at any given time. (Bottom) Median cost evolution and median of initial solution with "
-      << config_->get<std::size_t>("medianInitialSolutionPlots/confidence")
+      << 100.0 * config_->get<double>("medianInitialSolutionPlots/confidence")
       << "\\% confidence intervals.}\n\\end{center}\n";
 
   // Create the initial solution overview section.
@@ -368,7 +368,7 @@ std::stringstream ExperimentReport::individualResults() const {
             << "}\n\\captionof{figure}{\\footnotesize (Top) Sample pdf and cdf of "
             << plotPlannerNames_.at(name) << ". (Bottom) All initial solutions of "
             << plotPlannerNames_.at(name) << " and their median with "
-            << config_->get<std::size_t>("medianInitialSolutionPlots/confidence")
+            << 100.0 * config_->get<double>("medianInitialSolutionPlots/confidence")
             << "\\% confidence intervals.}\n\\end{center}\n";
 
     // Show the cost evolution plots for anytime planners.
@@ -385,7 +385,7 @@ std::stringstream ExperimentReport::individualResults() const {
               << latexPlotter_.createPicture(medianEvolution, percentileEvolution).string()
               << "}\n\\captionof{figure}{\\footnotesize (Top) Median cost evolution of "
               << plotPlannerNames_.at(name) << " with "
-              << config_->get<std::size_t>("medianCostPlots/confidence")
+              << 100.0 * config_->get<double>("medianCostPlots/confidence")
               << "\\% confidence interval. (Bottom) Seven percentiles of the cost evolution of "
               << plotPlannerNames_.at(name) << ".}\\end{center}\n";
     }

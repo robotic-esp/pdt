@@ -134,7 +134,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
   // Load the median initial duration and cost into a table.
   auto table = std::make_shared<PgfTable>(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<std::size_t>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Create the plot.
@@ -153,13 +153,13 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
   // Load the median initial solution.
   PgfTable medianInitialSolution(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<std::size_t>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Load the duration confidence interval.
   PgfTable interval(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<std::size_t>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "lower initial solution duration confidence bound",
       "upper initial solution duration confidence bound");
 
@@ -189,13 +189,13 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
   // Load the median initial solution.
   PgfTable medianInitialSolution(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<std::size_t>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Load the duration confidence interval.
   PgfTable interval(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<std::size_t>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "lower initial solution cost confidence bound",
       "upper initial solution cost confidence bound");
 

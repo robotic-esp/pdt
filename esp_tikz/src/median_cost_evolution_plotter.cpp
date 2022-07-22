@@ -185,7 +185,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionPl
 
   // Get the table from the appropriate file.
   auto table =
-      std::make_shared<PgfTable>(stats_.extractMedians(plannerName, config_->get<std::size_t>(
+      std::make_shared<PgfTable>(stats_.extractMedians(plannerName, config_->get<double>(
                                                           "medianCostPlots/confidence")),
                                  "durations", "median costs");
 
@@ -214,7 +214,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUp
 
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(stats_.extractMedians(plannerName,
-                                                                config_->get<std::size_t>(
+                                                                config_->get<double>(
                                                                   "medianCostPlots/confidence")),
                                           "durations", "upper confidence bound");
 
@@ -252,7 +252,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionLo
 
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(stats_.extractMedians(plannerName,
-                                                                config_->get<std::size_t>(
+                                                                config_->get<double>(
                                                                   "medianCostPlots/confidence")),
                                           "durations", "lower confidence bound");
 
