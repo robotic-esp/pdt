@@ -267,9 +267,9 @@ int main(const int argc, const char **argv) {
                 << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
                 << std::setfill('.') << '.' << std::right << std::fixed << std::setw(6)
                 << std::setfill(' ') << std::setprecision(2) << progress * 100.0f << " %"
-                << "(est. time left: "
-                << esp::ompltools::time::toDurationString(extrapolatedRuntime - timeSoFar) << " )"
-                << std::flush;
+                << " (est. time left: " << esp::ompltools::time::toDurationString(
+                      std::chrono::ceil<std::chrono::seconds>(extrapolatedRuntime - timeSoFar))
+                << ")" << std::flush;
     }
   }
 
