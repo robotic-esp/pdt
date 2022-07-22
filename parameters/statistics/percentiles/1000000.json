@@ -1,0 +1,26 @@
+{
+    "statistics": {
+        "percentiles": {
+            "sampleSize": {
+                "1000000": {
+                    "populationPercentile": {
+                        "0.50": {
+                            "confidenceInterval": {
+                                "0.95": {
+                                    "lowerOrderedIndex": 499017,
+                                    "upperOrderedIndex": 500977,
+                                    "confidence": 0.9500
+                                },
+                                "0.99": {
+                                    "lowerOrderedIndex": 498706,
+                                    "upperOrderedIndex": 501282,
+                                    "confidence": 0.9900
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

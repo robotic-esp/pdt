@@ -662,45 +662,18 @@ std::string Statistics::createHeader(const std::string& statisticType,
 
 Statistics::ConfidenceInterval Statistics::getMedianConfidenceInterval(
     double confidence) const {
-  // These lower and upper bounds are computed with scripts/python/computeConfidenceInterval.py.
-  // They are off-by-one because python has one-based indices and C++ has zero-based indices.
-  static const std::map<std::size_t, std::map<double, ConfidenceInterval>>
-      medianConfidenceIntervals = {
-          {10u, {{0.95, {1u, 8u, 0.9785f}}, {0.99, {0u, 9u, 0.9980f}}}},
-          {50u, {{0.95, {17u, 31u, 0.9511f}}, {0.99, {14u, 33u, 0.9910f}}}},
-          {100u, {{0.95, {39u, 59u, 0.9540f}}, {0.99, {36u, 62u, 0.9907f}}}},
-          {200u, {{0.95, {85u, 113u, 0.9520f}}, {0.99, {80u, 117u, 0.9906f}}}},
-          {250u, {{0.95, {109u, 140u, 0.9503f}}, {0.99, {103u, 144u, 0.9900f}}}},
-          {300u, {{0.95, {132u, 166u, 0.9502f}}, {0.99, {126u, 171u, 0.9903f}}}},
-          {400u, {{0.95, {178u, 218u, 0.9522f}}, {0.99, {173u, 225u, 0.9907f}}}},
-          {500u, {{0.95, {227u, 271u, 0.9508f}}, {0.99, {220u, 278u, 0.9905f}}}},
-          {600u, {{0.95, {273u, 322u, 0.9517f}}, {0.99, {266u, 330u, 0.9906f}}}},
-          {700u, {{0.95, {323u, 375u, 0.9505f}}, {0.99, {313u, 382u, 0.9901f}}}},
-          {800u, {{0.95, {370u, 426u, 0.9511f}}, {0.99, {362u, 435u, 0.9900f}}}},
-          {900u, {{0.95, {419u, 478u, 0.9503f}}, {0.99, {409u, 487u, 0.9904f}}}},
-          {1000u, {{0.95, {468u, 530u, 0.9500f}}, {0.99, {457u, 539u, 0.9902f}}}},
-          {2000u, {{0.95, {954u, 1042u, 0.9504f}}, {0.99, {939u, 1055u, 0.9901f}}}},
-          {5000u, {{0.95, {2428u, 2567u, 0.9503f}}, {0.99, {2405u, 2588u, 0.9901f}}}},
-          {10000u, {{0.95, {4896u, 5093u, 0.9500f}}, {0.99, {4868u, 5126u, 0.9900f}}}},
-          {100000u, {{0.95, {49686u, 50306u, 0.9500f}}, {0.99, {49587u, 50402u, 0.9900f}}}},
-          {1000000u, {{0.95, {499017u, 500977u, 0.9500f}}, {0.99, {498706u, 501282u, 0.9900f}}}}};
-  if (medianConfidenceIntervals.find(numRunsPerPlanner_) == medianConfidenceIntervals.end()) {
-    auto msg = "\nNo precomputed values for the median confidence interval with "s +
-               std::to_string(numRunsPerPlanner_) +
-               " runs. Values are available for runs of size:\n"s;
-    for (const auto& entry : medianConfidenceIntervals) {
-      msg += "  "s + std::to_string(entry.first) + "\n"s;
-    }
-    msg +=
-        "To calculate values for a new number of runs, please see scripts/matlab/computeConfidenceInterval.m or scripts/python/computeConfidenceInterval.py\n"s;
-    throw std::runtime_error(msg);
+  std::stringstream key;
+  key << "statistics/percentiles/sampleSize/"s << numRunsPerPlanner_ << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed << std::setfill('0') << std::setw(4) << std::setprecision(2) << confidence;
+  if (!config_->contains(key.str())) {
+    std::stringstream msg;
+    msg << "\nNo precomputed indices for the "s << std::fixed << std::setfill('0') << std::setw(4) << std::setprecision(2) << confidence
+        << " confidence interval for the median of "s
+        << std::to_string(numRunsPerPlanner_) << " runs were found in 'parameters/statistics/percentiles/'.\nPlease calculate the necessary values in a new JSON file (see scripts/matlab/computeConfidenceInterval.m or scripts/python/computeConfidenceInterval.py).\n"s;
+    throw std::runtime_error(msg.str());
   }
-  if (confidence != 0.95 && confidence != 0.99) {
-    auto msg =
-        "Invalid confidence, only know confidence intervals for 95 and 99 percent confidence."s;
-    throw std::runtime_error(msg);
-  }
-  return medianConfidenceIntervals.at(numRunsPerPlanner_).at(confidence);
+  return {config_->get<std::size_t>(key.str() + "/lowerOrderedIndex"),
+            config_->get<std::size_t>(key.str() + "/upperOrderedIndex"),
+            config_->get<double>(key.str() + "/confidence")};
 }
 
 std::size_t Statistics::getNumRunsPerPlanner() const {
