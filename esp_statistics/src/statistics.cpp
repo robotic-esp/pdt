@@ -690,7 +690,7 @@ Statistics::ConfidenceInterval Statistics::getMedianConfidenceInterval(
                " runs. Values are available for runs of size:\n"s;
     for (const auto& entry : medianConfidenceIntervals) {
       msg += "  "s + std::to_string(entry.first) + "\n"s;
-  }
+    }
     msg +=
         "To calculate values for a new number of runs, please see scripts/matlab/computeConfidenceInterval.m or scripts/python/computeConfidenceInterval.py\n"s;
     throw std::runtime_error(msg);
@@ -830,7 +830,7 @@ double Statistics::getMedianInitialSolutionCost(const PlannerResults& results) c
   return getNthInitialSolutionCost(results, getOrderedIndex(0.50));
 }
 
-std::vector<double> Statistics::getNthCosts(const PlannerResults& results, double n,
+std::vector<double> Statistics::getNthCosts(const PlannerResults& results, std::size_t n,
                                             const std::vector<double>& durations) const {
   // Note that n is taken as an interpolation between the bounding integer indices
   if (durations.empty()) {
@@ -852,7 +852,7 @@ std::vector<double> Statistics::getNthCosts(const PlannerResults& results, doubl
                  std::to_string(costs.size()) + " costs at this time."s;
       throw std::runtime_error(msg);
     }
-    nthCosts.emplace_back(interpolateBetweenIndices(&costs, n));
+    nthCosts.emplace_back(getNthValue(&costs, n));
   }
   return nthCosts;
 }
@@ -908,31 +908,31 @@ std::vector<double> Statistics::getInitialSolutionCosts(const PlannerResults& re
 }
 
 double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,
-                                                 double n) const {
+                                                 std::size_t n) const {
   // Get the durations of the initial solutions of all runs.
   auto initialDurations = getInitialSolutionDurations(results);
 
-  if (static_cast<std::size_t>(std::ceil(n)) > initialDurations.size()) {
+  if (n > initialDurations.size()) {
     auto msg = "Cannot get "s + std::to_string(n) + "th initial duration, there are only "s + std::to_string(initialDurations.size()) + " initial durations."s;
     throw std::runtime_error(msg);
   }
 
-  return interpolateBetweenIndices(&initialDurations, n);
+  return getNthValue(&initialDurations, n);
 }
 
-double Statistics::getNthInitialSolutionCost(const PlannerResults& result, double n) const {
+double Statistics::getNthInitialSolutionCost(const PlannerResults& result, std::size_t n) const {
   // Get the costs of the initial solutions of all runs.
   auto initialCosts = getInitialSolutionCosts(result);
 
-  if (static_cast<std::size_t>(std::ceil(n)) > initialCosts.size()) {
+  if (n > initialCosts.size()) {
     auto msg = "Cannot get "s + std::to_string(n) + "th initial cost, there are only "s + std::to_string(initialCosts.size()) + " initial costs."s;
     throw std::runtime_error(msg);
   }
 
-  return interpolateBetweenIndices(&initialCosts, n);
+  return getNthValue(&initialCosts, n);
 }
 
-double Statistics::getOrderedIndex(const double percentile) const {
+std::size_t Statistics::getOrderedIndex(const double percentile) const {
   if (percentile < 0.0 || percentile > 1.0) {
     auto msg = "The requested percentile ("s + std::to_string(percentile) + ") is not in the interval [0, 1]."s;
     throw std::runtime_error(msg);
@@ -946,35 +946,18 @@ double Statistics::getOrderedIndex(const double percentile) const {
       << "/orderedIndex"s;
 
   if (!config_->contains(key.str())) {
-    double orderedIndex = percentile * static_cast<double>(numRunsPerPlanner_ - 1u);
-    config_->add<double>(key.str(), orderedIndex);
+    // Our sorting is already assuming that we are minimizing cost, so rounding an index up is conservative.
+    std::size_t orderedIndex = static_cast<std::size_t>(std::ceil(percentile * static_cast<double>(numRunsPerPlanner_ - 1u)));
+    config_->add<std::size_t>(key.str(), orderedIndex);
   }
 
-  return config_->get<double>(key.str());
+  return config_->get<std::size_t>(key.str());
 }
 
-double Statistics::interpolateBetweenIndices(std::vector<double>* values, double n) const {
-  // If double is an integer, life is easy
-  if (std::trunc(n) == n) {
-    auto nthIter = values->begin() + static_cast<long>(n);
+double Statistics::getNthValue(std::vector<double>* values, std::size_t n) const {
+  auto nthIter = values->begin() + static_cast<long int>(n);
     std::nth_element(values->begin(), nthIter, values->end());
     return *nthIter;
-  }
-
-  // If not, fetch either side.
-  auto beforeIter = values->begin() + static_cast<long>(std::floor(n));
-  std::nth_element(values->begin(), beforeIter, values->end());
-  double beforeValue = *beforeIter;
-  auto afterIter = values->begin() + static_cast<long>(std::ceil(n));
-  std::nth_element(values->begin(), afterIter, values->end());
-  double afterValue = *afterIter;
-
-  // Linearly interpolate (delta n = std::ceil(n) - std::floor(n) = 1)
-  if (std::isinf(beforeValue) || std::isinf(afterValue))
-  {
-    return std::numeric_limits<double>::infinity();
-  }
-  return beforeValue + (afterValue - beforeValue) * (n - std::floor(n));
 }
 
 }  // namespace ompltools

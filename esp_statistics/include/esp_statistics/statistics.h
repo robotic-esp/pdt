@@ -138,26 +138,27 @@ class Statistics {
     //   v = { 0.1 0.3 0.4 0.5 0.8 0.9 1.1 1.3 1.7 1.9 },
     // then lower and upper bound indices of 1 and 8, respectively, mean that the median is with
     // <probability> certainty between v[1] and v[8].
-    double lower{0.0}, upper{0.0}, probability{0.0};
+    std::size_t lower{0u}, upper{0u};
+    double probability{0.0f};
   };
   ConfidenceInterval getMedianConfidenceInterval(double confidence) const;
 
   std::vector<double> getPercentileCosts(const PlannerResults& results, double percentile,
                                      const std::vector<double>& durations) const;
-  std::vector<double> getNthCosts(const PlannerResults& results, double n,
+  std::vector<double> getNthCosts(const PlannerResults& results, std::size_t n,
                                   const std::vector<double>& durations) const;
 
   double getMedianInitialSolutionDuration(const PlannerResults& results) const;
   double getMedianInitialSolutionCost(const PlannerResults& results) const;
 
-  double getNthInitialSolutionDuration(const PlannerResults& results, double n) const;
-  double getNthInitialSolutionCost(const PlannerResults& results, double n) const;
+  double getNthInitialSolutionDuration(const PlannerResults& results, std::size_t n) const;
+  double getNthInitialSolutionCost(const PlannerResults& results, std::size_t n) const;
 
   std::vector<double> getInitialSolutionDurations(const PlannerResults& results) const;
   std::vector<double> getInitialSolutionCosts(const PlannerResults& results) const;
 
-  double getOrderedIndex(const double percentile) const;
-  double interpolateBetweenIndices(std::vector<double>* values, double n) const;
+  std::size_t getOrderedIndex(const double percentile) const;
+  double getNthValue(std::vector<double>* values, std::size_t n) const;
 
   std::shared_ptr<Configuration> config_;
   const std::experimental::filesystem::path statisticsDirectory_;
