@@ -177,6 +177,14 @@ Turn on the verbose compilation in the benchmark configuration `.json` file. If 
 - Possible integration with PlannerArena
 - Possible integration in core OMPL
 
+## Formatting code
+
+Before submitting code to OMPL Tools, please format your code using:
+
+```bash
+clang-format -i ./path/to/file
+```
+
 ## Backlog
 
 ### ESP OMPL TOOLS
