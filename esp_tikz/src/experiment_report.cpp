@@ -282,12 +282,18 @@ std::stringstream ExperimentReport::overview() const {
   // Stack the axes
   latexPlotter_.stack(successAxis, medianCostEvolutionAxis, legend);
 
+  std::stringstream ciKey;
+  ciKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
+        << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed << std::setfill('0')
+        << std::setw(4) << std::setprecision(2)
+        << config_->get<double>("medianInitialSolutionPlots/confidence") << "/confidence"s;
+
   overview
       << "\\begin{center}\n\\input{"
       << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
       << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
          "at any given time. (Bottom) Median cost evolution and median of initial solution with "
-      << 100.0 * config_->get<double>("medianInitialSolutionPlots/confidence")
+      << std::floor(100.0 * config_->get<double>(ciKey.str()))
       << "\\% confidence intervals.}\n\\end{center}\n";
 
   // Create the initial solution overview section.
@@ -363,13 +369,19 @@ std::stringstream ExperimentReport::individualResults() const {
     cdf->options.enlargeXLimits = "lower";
     scatter->options.enlargeXLimits = "lower";
 
+    std::stringstream initialCIKey;
+    initialCIKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
+                 << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed
+                 << std::setfill('0') << std::setw(4) << std::setprecision(2)
+                 << config_->get<double>("medianInitialSolutionPlots/confidence") << "/confidence"s;
+
     // Create a picture out of the three initial solution axes.
     results << "\\begin{center}\n\\input{"
             << latexPlotter_.createPicture(cdf, pdf, scatter).string()
             << "}\n\\captionof{figure}{\\footnotesize (Top) Sample pdf and cdf of "
             << plotPlannerNames_.at(name) << ". (Bottom) All initial solutions of "
             << plotPlannerNames_.at(name) << " and their median with "
-            << 100.0 * config_->get<double>("medianInitialSolutionPlots/confidence")
+            << std::floor(100.0 * config_->get<double>(initialCIKey.str()))
             << "\\% confidence intervals.}\n\\end{center}\n";
 
     // Show the cost evolution plots for anytime planners.
@@ -381,12 +393,18 @@ std::stringstream ExperimentReport::individualResults() const {
       medianEvolution->matchAbszisse(*percentileEvolution);
       latexPlotter_.stack(medianEvolution, percentileEvolution);
 
+      std::stringstream costCIKey;
+      costCIKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
+                << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed
+                << std::setfill('0') << std::setw(4) << std::setprecision(2)
+                << config_->get<double>("medianCostPlots/confidence") << "/confidence"s;
+
       results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";
       results << "\\begin{center}\n\\input{"
               << latexPlotter_.createPicture(medianEvolution, percentileEvolution).string()
               << "}\n\\captionof{figure}{\\footnotesize (Top) Median cost evolution of "
               << plotPlannerNames_.at(name) << " with "
-              << 100.0 * config_->get<double>("medianCostPlots/confidence")
+              << std::floor(100.0 * config_->get<double>(costCIKey.str()))
               << "\\% confidence interval. (Bottom) Seven percentiles of the cost evolution of "
               << plotPlannerNames_.at(name) << ".}\\end{center}\n";
     }
