@@ -55,9 +55,9 @@ MedianCostEvolutionPlotter::MedianCostEvolutionPlotter(
     stats_(stats) {
   // Compute the duration bin size.
   auto contextName = config_->get<std::string>("experiment/context");
-  std::size_t numBins =
-    static_cast<std::size_t>(std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
-                                       config_->get<double>("experiment/logFrequency")));
+  std::size_t numBins = static_cast<std::size_t>(
+      std::ceil(config_->get<double>("context/" + contextName + "/maxTime") *
+                config_->get<double>("experiment/logFrequency")));
   double binSize = 1.0 / config_->get<double>("experiment/logFrequency");
   binnedDurations_.reserve(numBins);
   for (std::size_t i = 0u; i < numBins; ++i) {
@@ -184,10 +184,9 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionPl
   }
 
   // Get the table from the appropriate file.
-  auto table =
-      std::make_shared<PgfTable>(stats_.extractMedians(plannerName, config_->get<double>(
-                                                          "medianCostPlots/confidence")),
-                                 "durations", "median costs");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedians(plannerName, config_->get<double>("medianCostPlots/confidence")),
+      "durations", "median costs");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -213,10 +212,9 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUp
   }
 
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(stats_.extractMedians(plannerName,
-                                                                config_->get<double>(
-                                                                  "medianCostPlots/confidence")),
-                                          "durations", "upper confidence bound");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedians(plannerName, config_->get<double>("medianCostPlots/confidence")),
+      "durations", "upper confidence bound");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -251,10 +249,9 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionLo
   }
 
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(stats_.extractMedians(plannerName,
-                                                                config_->get<double>(
-                                                                  "medianCostPlots/confidence")),
-                                          "durations", "lower confidence bound");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedians(plannerName, config_->get<double>("medianCostPlots/confidence")),
+      "durations", "lower confidence bound");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();

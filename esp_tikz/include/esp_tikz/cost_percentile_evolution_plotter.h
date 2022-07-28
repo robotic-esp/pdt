@@ -51,17 +51,20 @@ namespace ompltools {
 
 class CostPercentileEvolutionPlotter : public LatexPlotter {
  public:
-  CostPercentileEvolutionPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
+  CostPercentileEvolutionPlotter(const std::shared_ptr<const Configuration>& config,
+                                 const Statistics& stats);
   ~CostPercentileEvolutionPlotter() = default;
 
   // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
   std::shared_ptr<PgfAxis> createCostPercentileEvolutionAxis(const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the median cost axis of the specified planner.
-  std::experimental::filesystem::path createCostPercentileEvolutionPicture(const std::string& plannerName) const;
+  std::experimental::filesystem::path createCostPercentileEvolutionPicture(
+      const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createCostPercentileEvolutionPlot(const std::string& plannerName, double percentile) const;
+  std::shared_ptr<PgfPlot> createCostPercentileEvolutionPlot(const std::string& plannerName,
+                                                             double percentile) const;
 
   void setCostPercentileEvolutionAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 

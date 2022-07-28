@@ -133,7 +133,6 @@ void Configuration::load(const std::experimental::filesystem::path& config) {
   // Load the default config.
   loadDefaultConfigs(loadDefaultContextConfigs, loadDefaultPlannerConfigs,
                      loadDefaultObjectiveConfigs);
-  loadStatisticsConfigs();
   // Merge the patch, possibly overriding default values.
   parameters_.merge_patch(patch);
   OMPL_INFORM("Loaded configuration patch from %s", config.c_str());
@@ -160,7 +159,6 @@ void Configuration::load(const int argc, const char **argv) {
   // If the user does not provide a config file, we should always load the default configs.
   if (!invokedOptions.count("config-patch")) {
     loadDefaultConfigs();
-    loadStatisticsConfigs();
   } else {
     load(invokedOptions["config-patch"].as<std::string>());
   }
@@ -517,105 +515,6 @@ void Configuration::loadDefaultConfigs(bool loadDefaultContextConfigs,
   } else {
     OMPL_INFORM("Not loading default objective configs.");
   }
-}
-
-void Configuration::loadStatisticsConfigs() {
-  fs::path defaultStatisticsConfigDirectory(Directory::SOURCE / "parameters/statistics/percentiles/");
-  if (fs::exists(defaultStatisticsConfigDirectory)) {
-    // Load all files in this directory as patches.
-    for (auto &directoryEntry : fs::directory_iterator(defaultStatisticsConfigDirectory)) {
-      // Make sure the file exists.
-      if (!fs::exists(directoryEntry.path())) {
-        OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
-                  defaultStatisticsConfigDirectory.c_str(), directoryEntry.path().c_str());
-        continue;
-      }
-
-      // Make sure the file can be opened.
-      std::ifstream configFile(directoryEntry.path().string());
-      if (configFile.fail()) {
-        OMPL_ERROR("File '%s' exists but cannot be opened.",
-                    directoryEntry.path().string().c_str());
-        throw std::ios_base::failure("Configuration error.");
-      }
-
-      // Load the file into a temporary config.
-      json::json config;
-      configFile >> config;
-
-      // Make sure the config is a sane statistics configuration.
-      if (!config.contains("statistics")) {
-        throw std::invalid_argument("Default statistics configuration at '"s +
-                                    directoryEntry.path().string() +
-                                    "' is not a valid statistics configuration. Valid statistics "
-                                    "configurations must be encapsulated in a 'statistics' key."s);
-      }
-      if (!config.front().contains("percentiles")) {
-        throw std::invalid_argument("Default statistics configuration at '"s +
-                                    directoryEntry.path().string() +
-                                    "' is not a valid statistics configuration. Valid statistics "
-                                    "configurations must be encapsulated in a 'statistics/percentiles' key."s);
-      }
-      if (!config.front().front().contains("sampleSize")) {
-        throw std::invalid_argument("Default statistics configuration at '"s +
-                                    directoryEntry.path().string() +
-                                    "' is not a valid statistics configuration. Valid statistics "
-                                    "configurations must be encapsulated in a 'statistics/percentiles/sampleSize' key."s);
-      }
-      if (config.front().front().front().size() > 1) {
-        throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
-                                    "' must only contain one statistics/percentiles/sampleSize/ configuration."s);
-      }
-      // Check that the default configs don't specify the same sampleSize twice.
-      for (const auto &entry : config.front().front().front().items()) {
-        if (parameters_["statistics"]["percentiles"]["sampleSize"].contains(entry.key())) {
-          throw std::invalid_argument(directoryEntry.path().string() +
-                                      ": Overwrites existing statistics config for statistics/percentiles/sampleSize/"s +
-                                      entry.key().c_str() + "."s);
-        }
-      }
-      if (!config.front().front().front().front().contains("populationPercentile")) {
-        throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
-                                    "' is not a valid statistics configuration. Valid statistics "
-                                    "configurations must include a 'statistics/percentiles/sampleSize/INTEGER/populationPercentile' key."s);
-      }
-
-      // Check that the config specifies the right things (and not the wrong things).
-      // Iterate through all specified population percentiles
-      for (const auto &percentiles : config.front().front().front().front().front().items()) {
-          if (percentiles.value().contains("orderedIndex")) {
-            throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
-                                    "' must NOT include a 'statistics/percentiles/sampleSize/INTEGER/populationPercentile/0.XY/orderedKey' configuration."s);
-          }
-          if (!percentiles.value().contains("confidenceInterval")) {
-            throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
-                                    "' must include a 'statistics/percentiles/sampleSize/INTEGER/populationPercentile/0.XY/confidenceInterval' key."s);
-          }
-          // Iterate through all confidence intervals for the given population percentile
-          for (const auto &confidences : percentiles.value().front().items()) {
-            const std::vector<std::string> necessaryKeys = {"lowerOrderedIndex", "upperOrderedIndex", "confidence"};    
-            // Iterate through necessary keys
-            for (const auto &key : necessaryKeys) {
-              if (!confidences.value().contains(key)) {
-                throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
-                                      "' must include a 'statistics/percentiles/sampleSize/INTEGER/populationPercentile/0.XY/confidenceInterval/"s +
-                                      key + "' configuration."s);
-              }
-            }
-          }
-      }
-
-      parameters_.merge_patch(config);
-      OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
-      // No need to close config, std::ifstreams are closed on destruction.
-    }
-  } else {
-    // Cannot find default statistics config at default location.
-    auto msg = "Default statistics config directory does not exist at '"s +
-                defaultStatisticsConfigDirectory.string() + "'."s;
-    throw std::ios_base::failure(msg.c_str());
-  }
-  OMPL_INFORM("Loaded default statistics configs.");
 }
 
 void Configuration::loadReportConfig(const std::experimental::filesystem::path &path) {

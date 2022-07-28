@@ -57,9 +57,9 @@ CostPercentileEvolutionPlotter::CostPercentileEvolutionPlotter(
     stats_(stats) {
   // Compute the duration bin size.
   auto contextName = config_->get<std::string>("experiment/context");
-  std::size_t numBins =
-    static_cast<std::size_t>(std::ceil(config_->get<double>("context/" + contextName + "/maxTime")) *
-                                       config_->get<double>("experiment/logFrequency"));
+  std::size_t numBins = static_cast<std::size_t>(
+      std::ceil(config_->get<double>("context/" + contextName + "/maxTime")) *
+      config_->get<double>("experiment/logFrequency"));
   double binSize = 1.0 / config_->get<double>("experiment/logFrequency");
   binnedDurations_.reserve(numBins);
   for (std::size_t i = 0u; i < numBins; ++i) {

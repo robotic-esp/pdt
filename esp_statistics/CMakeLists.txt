@@ -3,7 +3,8 @@ project(esp_statistics)
 
 # Specify this library as a target.
 add_library(esp_statistics
-  src/statistics.cpp)
+  src/statistics.cpp
+  src/population_statistics.cpp)
 
 # Specify the include directories for this library.
 target_include_directories(esp_statistics

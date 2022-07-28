@@ -117,8 +117,6 @@ class Configuration {
                           bool loadDefaultPlannerConfigs = true,
                           bool loadDefaultObjectiveConfigs = true);
 
-  void loadStatisticsConfigs();
-
   void loadReportConfig(const std::experimental::filesystem::path& path);
 
   // Check if the name is nested, i.e., contains a '/'.

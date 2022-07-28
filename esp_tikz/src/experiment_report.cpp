@@ -330,7 +330,8 @@ std::stringstream ExperimentReport::individualResults() const {
     // Overlay the pdf with the cdf for the first initial durations plot.
     auto cdf = successPlotter_.createSuccessAxis(name);
     cdf->options.xmin = stats_.getMinInitialSolutionDuration(name);
-    cdf->options.xmax = config_->get<double>("context/"s + config_->get<std::string>("experiment/context") + "/maxTime");
+    cdf->options.xmax = config_->get<double>(
+        "context/"s + config_->get<std::string>("experiment/context") + "/maxTime");
     cdf->options.ytickPos = "left";
     auto pdf = initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name);
     pdf->overlay(cdf.get());
@@ -432,15 +433,16 @@ fs::path ExperimentReport::compileReport() const {
   auto reportPath =
       fs::path(config_->get<std::string>("experiment/results")).parent_path() / "report.tex";
   auto currentPath = fs::current_path();
-  auto cmd = "cd \""s + reportPath.parent_path().string() + "\" && lualatex --interaction=nonstopmode --shell-escape \""s +
-             reportPath.string() + "\""s;
+  auto cmd = "cd \""s + reportPath.parent_path().string() +
+             "\" && lualatex --interaction=nonstopmode --shell-escape \""s + reportPath.string() +
+             "\""s;
   if (!config_->get<bool>("experiment/report/verboseCompilation")) {
     cmd += " > /dev/null";
   }
   cmd += " && cd \""s + currentPath.string() + '\"';
   int retval = std::system(cmd.c_str());
-  retval = std::system(cmd.c_str()); //  We compile the report twice to get the references right.
-  (void)retval;  // Get rid of warning for unused variable.
+  retval = std::system(cmd.c_str());  //  We compile the report twice to get the references right.
+  (void)retval;                       // Get rid of warning for unused variable.
   return fs::path(reportPath).replace_extension(".pdf");
 }
 

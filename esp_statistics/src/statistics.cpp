@@ -128,6 +128,10 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
     config_(config),
     statisticsDirectory_(fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                          "statistics/"),
+
+    // Our sorting in this class is already assuming we are minimizing cost, so rounding an index up
+    // is conservative.
+    populationStats_(config_, PopulationStatistics::INDEX_ROUNDING::UP),
     forceComputation_(forceComputation) {
   // Create the statistics directory.
   fs::create_directories(statisticsDirectory_);
@@ -304,6 +308,9 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
     numRunsPerPlanner_ = results_.begin()->second.numMeasuredRuns();
   }
 
+  // Initialize the population statistics helper
+  populationStats_.setSampleSize(numRunsPerPlanner_);
+
   // Compute the success rates.
   for (auto& element : successRates_) {
     element.second = element.second / static_cast<double>(numRunsPerPlanner_);
@@ -359,7 +366,7 @@ fs::path Statistics::extractMedians(const std::string& plannerName, double confi
   auto medianCosts = getPercentileCosts(results_.at(plannerName), 0.50, durations);
 
   // Get the interval indices.
-  auto interval = getMedianConfidenceInterval(confidence);
+  auto interval = populationStats_.findPercentileConfidenceInterval(0.5, confidence);
 
   // Get the interval bound costs.
   auto lowerCosts = getNthCosts(results_.at(plannerName), interval.lower, durations);
@@ -485,7 +492,7 @@ fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName
   double medianCost = getMedianInitialSolutionCost(results_.at(plannerName));
 
   // Get the interval for the upper and lower bounds.
-  auto interval = getMedianConfidenceInterval(confidence);
+  auto interval = populationStats_.findPercentileConfidenceInterval(0.5, confidence);
 
   // Get the upper and lower confidence bounds on the median initial solution duration and cost.
   auto lowerDurationBound = getNthInitialSolutionDuration(results_.at(plannerName), interval.lower);
@@ -660,22 +667,6 @@ std::string Statistics::createHeader(const std::string& statisticType,
   return stream.str();
 }
 
-Statistics::ConfidenceInterval Statistics::getMedianConfidenceInterval(
-    double confidence) const {
-  std::stringstream key;
-  key << "statistics/percentiles/sampleSize/"s << numRunsPerPlanner_ << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed << std::setfill('0') << std::setw(4) << std::setprecision(2) << confidence;
-  if (!config_->contains(key.str())) {
-    std::stringstream msg;
-    msg << "\nNo precomputed indices for the "s << std::fixed << std::setfill('0') << std::setw(4) << std::setprecision(2) << confidence
-        << " confidence interval for the median of "s
-        << std::to_string(numRunsPerPlanner_) << " runs were found in 'parameters/statistics/percentiles/'.\nPlease calculate the necessary values in a new JSON file (see scripts/matlab/computeConfidenceInterval.m or scripts/python/computeConfidenceInterval.py).\n"s;
-    throw std::runtime_error(msg.str());
-  }
-  return {config_->get<std::size_t>(key.str() + "/lowerOrderedIndex"),
-            config_->get<std::size_t>(key.str() + "/upperOrderedIndex"),
-            config_->get<double>(key.str() + "/confidence")};
-}
-
 std::size_t Statistics::getNumRunsPerPlanner() const {
   if (results_.empty()) {
     return 0u;
@@ -791,16 +782,16 @@ std::shared_ptr<Configuration> Statistics::getConfig() const {
 }
 
 std::vector<double> Statistics::getPercentileCosts(const PlannerResults& results, double percentile,
-                                               const std::vector<double>& durations) const {
-  return getNthCosts(results, getOrderedIndex(percentile), durations);
+                                                   const std::vector<double>& durations) const {
+  return getNthCosts(results, populationStats_.estimatePercentileAsIndex(percentile), durations);
 }
 
 double Statistics::getMedianInitialSolutionDuration(const PlannerResults& results) const {
-  return getNthInitialSolutionDuration(results, getOrderedIndex(0.50));
+  return getNthInitialSolutionDuration(results, populationStats_.estimatePercentileAsIndex(0.50));
 }
 
 double Statistics::getMedianInitialSolutionCost(const PlannerResults& results) const {
-  return getNthInitialSolutionCost(results, getOrderedIndex(0.50));
+  return getNthInitialSolutionCost(results, populationStats_.estimatePercentileAsIndex(0.50));
 }
 
 std::vector<double> Statistics::getNthCosts(const PlannerResults& results, std::size_t n,
@@ -886,7 +877,8 @@ double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,
   auto initialDurations = getInitialSolutionDurations(results);
 
   if (n > initialDurations.size()) {
-    auto msg = "Cannot get "s + std::to_string(n) + "th initial duration, there are only "s + std::to_string(initialDurations.size()) + " initial durations."s;
+    auto msg = "Cannot get "s + std::to_string(n) + "th initial duration, there are only "s +
+               std::to_string(initialDurations.size()) + " initial durations."s;
     throw std::runtime_error(msg);
   }
 
@@ -898,39 +890,18 @@ double Statistics::getNthInitialSolutionCost(const PlannerResults& result, std::
   auto initialCosts = getInitialSolutionCosts(result);
 
   if (n > initialCosts.size()) {
-    auto msg = "Cannot get "s + std::to_string(n) + "th initial cost, there are only "s + std::to_string(initialCosts.size()) + " initial costs."s;
+    auto msg = "Cannot get "s + std::to_string(n) + "th initial cost, there are only "s +
+               std::to_string(initialCosts.size()) + " initial costs."s;
     throw std::runtime_error(msg);
   }
 
   return getNthValue(&initialCosts, n);
 }
 
-std::size_t Statistics::getOrderedIndex(const double percentile) const {
-  if (percentile < 0.0 || percentile > 1.0) {
-    auto msg = "The requested percentile ("s + std::to_string(percentile) + ") is not in the interval [0, 1]."s;
-    throw std::runtime_error(msg);
-  }
-
-  std::stringstream key;
-  key << "statistics/percentiles/sampleSize/"s
-      << std::to_string(numRunsPerPlanner_)
-      << "/populationPercentile/"s
-      << std::fixed << std::setfill('0') << std::setw(4) << std::setprecision(2) << percentile
-      << "/orderedIndex"s;
-
-  if (!config_->contains(key.str())) {
-    // Our sorting is already assuming that we are minimizing cost, so rounding an index up is conservative.
-    std::size_t orderedIndex = static_cast<std::size_t>(std::ceil(percentile * static_cast<double>(numRunsPerPlanner_ - 1u)));
-    config_->add<std::size_t>(key.str(), orderedIndex);
-  }
-
-  return config_->get<std::size_t>(key.str());
-}
-
 double Statistics::getNthValue(std::vector<double>* values, std::size_t n) const {
   auto nthIter = values->begin() + static_cast<long int>(n);
-    std::nth_element(values->begin(), nthIter, values->end());
-    return *nthIter;
+  std::nth_element(values->begin(), nthIter, values->end());
+  return *nthIter;
 }
 
 }  // namespace ompltools

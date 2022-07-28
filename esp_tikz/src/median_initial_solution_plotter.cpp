@@ -157,11 +157,10 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
       "median initial solution duration", "median initial solution cost");
 
   // Load the duration confidence interval.
-  PgfTable interval(
-      stats_.extractMedianInitialSolution(
-          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
-      "lower initial solution duration confidence bound",
-      "upper initial solution duration confidence bound");
+  PgfTable interval(stats_.extractMedianInitialSolution(
+                        plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
+                    "lower initial solution duration confidence bound",
+                    "upper initial solution duration confidence bound");
 
   double medianCost = medianInitialSolution.getRow(0u).at(1u);
   double lowerDurationBound = interval.getRow(0u).at(0u);
@@ -193,11 +192,10 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
       "median initial solution duration", "median initial solution cost");
 
   // Load the duration confidence interval.
-  PgfTable interval(
-      stats_.extractMedianInitialSolution(
-          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
-      "lower initial solution cost confidence bound",
-      "upper initial solution cost confidence bound");
+  PgfTable interval(stats_.extractMedianInitialSolution(
+                        plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
+                    "lower initial solution cost confidence bound",
+                    "upper initial solution cost confidence bound");
 
   double medianDuration = medianInitialSolution.getRow(0u).at(0u);
   double lowerCostBound = interval.getRow(0u).at(0u);
