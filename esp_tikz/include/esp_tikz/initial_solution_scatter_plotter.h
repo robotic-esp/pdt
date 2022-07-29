@@ -51,20 +51,20 @@ namespace ompltools {
 class InitialSolutionScatterPlotter : public LatexPlotter {
  public:
   InitialSolutionScatterPlotter(const std::shared_ptr<const Configuration>& config,
-                                    const Statistics& stats);
+                                const Statistics& stats);
   ~InitialSolutionScatterPlotter() = default;
 
-  // Creates a pgf axis that hold the initial solution duration pdf of all planners.
+  // Creates a pgf axis that hold the initial solution scatter plot of all planners.
   std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis() const;
 
-  // Creates a pgf axis that hold the initial solution duration pdf of the specified planner.
+  // Creates a pgf axis that hold the initial solution scatter plot of the specified planner.
   std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis(
       const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the initial solution duration pdf axis of all planners.
+  // Creates a tikz picture that contains the initial solution scatter plot of all planners.
   std::experimental::filesystem::path createInitialSolutionScatterPicture() const;
 
-  // Creates a tikz picture that contains the initial solution duration pdf axis of all planners.
+  // Creates a tikz picture that contains the initial solution scatter plot axis of all planners.
   std::experimental::filesystem::path createInitialSolutionScatterPicture(
       const std::string& plannerName) const;
 

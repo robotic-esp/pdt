@@ -60,7 +60,7 @@ ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
                                    const Statistics& stats) :
     latexPlotter_(config),
     costPercentileEvolutionPlotter_(config, stats),
-    initialSolutionDurationPdfPlotter_(config, stats),
+    initialSolutionDurationHistogramPlotter_(config, stats),
     initialSolutionScatterPlotter_(config, stats),
     medianCostEvolutionPlotter_(config, stats),
     medianInitialSolutionPlotter_(config, stats),
@@ -282,10 +282,10 @@ std::stringstream ExperimentReport::overview() const {
   // Stack the axes
   latexPlotter_.stack(successAxis, medianCostEvolutionAxis, legend);
 
-  std::stringstream ciKey;
-  ciKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
-        << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed << std::setfill('0')
-        << std::setw(4) << std::setprecision(2)
+  std::stringstream medianCiKey;
+  medianCiKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
+              << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed
+              << std::setfill('0') << std::setw(4) << std::setprecision(2)
         << config_->get<double>("medianInitialSolutionPlots/confidence") << "/confidence"s;
 
   overview
@@ -293,29 +293,28 @@ std::stringstream ExperimentReport::overview() const {
       << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
       << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
          "at any given time. (Bottom) Median cost evolution and median of initial solution with "
-      << std::floor(100.0 * config_->get<double>(ciKey.str()))
+      << std::floor(100.0 * config_->get<double>(medianCiKey.str()))
       << "\\% confidence intervals.}\n\\end{center}\n";
 
   // Create the initial solution overview section.
   overview << "\\pagebreak\n";
   overview << "\\subsection{Initial Solutions}\\label{sec:overview-initial-solutions}\n";
 
-  // Collect all initial solution duration pdf plots.
-  std::vector<std::shared_ptr<PgfAxis>> initialSolutionDurationPdfAxes{};
+  // Collect all initial solution duration histogram plots.
+  std::vector<std::shared_ptr<PgfAxis>> initialSolutionDurationHistogramAxes{};
   for (const auto& name : plannerNames) {
-    initialSolutionDurationPdfAxes.emplace_back(
-        initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name));
+    initialSolutionDurationHistogramAxes.emplace_back(
+        initialSolutionDurationHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name));
   }
-  latexPlotter_.alignAbszissen(initialSolutionDurationPdfAxes);
-  latexPlotter_.alignOrdinates(initialSolutionDurationPdfAxes);
-  initialSolutionDurationPdfAxes.push_back(legend);
-  latexPlotter_.stack(initialSolutionDurationPdfAxes);
+  latexPlotter_.alignAbszissen(initialSolutionDurationHistogramAxes);
+  latexPlotter_.alignOrdinates(initialSolutionDurationHistogramAxes);
+  initialSolutionDurationHistogramAxes.push_back(legend);
+  latexPlotter_.stack(initialSolutionDurationHistogramAxes);
 
   overview << "\\begin{center}\n\\input{"
-           << latexPlotter_.createPicture(initialSolutionDurationPdfAxes).string()
-           << "}\n\\captionof{figure}{\\footnotesize Sample probability density functions of "
-              "initial solution "
-              "times.}\n\\end{center}";
+           << latexPlotter_.createPicture(initialSolutionDurationHistogramAxes).string()
+           << "}\n\\captionof{figure}{\\footnotesize Histograms of "
+              "initial solution times.}\n\\end{center}";
 
   return overview;
 }
@@ -333,15 +332,16 @@ std::stringstream ExperimentReport::individualResults() const {
     // First report on the initial solutions.
     results << "\\subsection{Initial Solutions}\\label{sec:" << name << "-initial-solution}\n";
 
-    // Overlay the pdf with the cdf for the first initial durations plot.
-    auto cdf = successPlotter_.createSuccessAxis(name);
-    cdf->options.xmin = stats_.getMinInitialSolutionDuration(name);
-    cdf->options.xmax = config_->get<double>(
+    // Overlay the histogram with the edf for the first initial durations plot.
+    auto edf = successPlotter_.createSuccessAxis(name);
+    edf->options.xmin = stats_.getMinInitialSolutionDuration(name);
+    edf->options.xmax = config_->get<double>(
         "context/"s + config_->get<std::string>("experiment/context") + "/maxTime");
-    cdf->options.ytickPos = "left";
-    auto pdf = initialSolutionDurationPdfPlotter_.createInitialSolutionDurationPdfAxis(name);
-    pdf->overlay(cdf.get());
-    for (const auto& plot : pdf->getPlots()) {
+    edf->options.ytickPos = "left";
+    auto histo =
+        initialSolutionDurationHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name);
+    histo->overlay(edf.get());
+    for (const auto& plot : histo->getPlots()) {
       plot->options.drawOpacity = 0.2f;
       plot->options.fillOpacity = 0.1f;
     }
@@ -359,14 +359,14 @@ std::stringstream ExperimentReport::individualResults() const {
     // Merge the plots from the median axis into the scatter axis.
     scatter->mergePlots(median);
 
-    // Place the scatter plot underneath the cdf/pdf plot
-    scatter->matchAbszisse(*cdf);
-    latexPlotter_.stack(cdf, scatter);
+    // Place the scatter plot underneath the edf/histogram plot
+    scatter->matchAbszisse(*edf);
+    latexPlotter_.stack(edf, scatter);
 
     // Enlarge all x axis limits such that the earliest and latest initial solutions aren't glued to
     // the axis box.
-    pdf->options.enlargeXLimits = "lower";
-    cdf->options.enlargeXLimits = "lower";
+    histo->options.enlargeXLimits = "lower";
+    edf->options.enlargeXLimits = "lower";
     scatter->options.enlargeXLimits = "lower";
 
     std::stringstream initialCIKey;
@@ -377,8 +377,9 @@ std::stringstream ExperimentReport::individualResults() const {
 
     // Create a picture out of the three initial solution axes.
     results << "\\begin{center}\n\\input{"
-            << latexPlotter_.createPicture(cdf, pdf, scatter).string()
-            << "}\n\\captionof{figure}{\\footnotesize (Top) Sample pdf and cdf of "
+            << latexPlotter_.createPicture(edf, histo, scatter).string()
+            << "}\n\\captionof{figure}{\\footnotesize (Top) Histogram and associated "
+               "empirical distribution function (EDF) of "
             << plotPlannerNames_.at(name) << ". (Bottom) All initial solutions of "
             << plotPlannerNames_.at(name) << " and their median with "
             << std::floor(100.0 * config_->get<double>(initialCIKey.str()))

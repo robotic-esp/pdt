@@ -121,11 +121,11 @@ void SuccessPlotter::setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const 
 }
 
 std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessPlot(const std::string& plannerName) const {
-  // Store the initial solution cdf in a pgf table.
-  auto table = std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationCdf(plannerName),
-                                          "durations", "cdf");
+  // Store the initial solution edf in a pgf table.
+  auto table = std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationEdf(plannerName),
+                                          "durations", "edf");
 
-  // Multiply the cdf values by 100 to get the percentage.
+  // Multiply the edf values by 100 to get the percentage.
   table->replaceInCodomain([](double number) { return 100.0 * number; });
 
   // A zero in the domain will result in a jumped coordinate, because its a logarithmic plot.

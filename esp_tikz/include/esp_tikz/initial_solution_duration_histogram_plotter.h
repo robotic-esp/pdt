@@ -49,31 +49,33 @@ namespace esp {
 
 namespace ompltools {
 
-class InitialSolutionDurationPdfPlotter : public LatexPlotter {
+class InitialSolutionDurationHistogramPlotter : public LatexPlotter {
  public:
-  InitialSolutionDurationPdfPlotter(const std::shared_ptr<const Configuration>& config,
-                                    const Statistics& stats);
-  ~InitialSolutionDurationPdfPlotter() = default;
+  InitialSolutionDurationHistogramPlotter(const std::shared_ptr<const Configuration>& config,
+                                          const Statistics& stats);
+  ~InitialSolutionDurationHistogramPlotter() = default;
 
-  // Creates a pgf axis that hold the initial solution duration pdf of all planners.
-  std::shared_ptr<PgfAxis> createInitialSolutionDurationPdfAxis() const;
+  // Creates a pgf axis that hold the initial solution duration histogram of all planners.
+  std::shared_ptr<PgfAxis> createInitialSolutionDurationHistogramAxis() const;
 
-  // Creates a pgf axis that hold the initial solution duration pdf of the specified planner.
-  std::shared_ptr<PgfAxis> createInitialSolutionDurationPdfAxis(
+  // Creates a pgf axis that hold the initial solution duration histogram of the specified planner.
+  std::shared_ptr<PgfAxis> createInitialSolutionDurationHistogramAxis(
       const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the initial solution duration pdf axis of all planners.
-  std::experimental::filesystem::path createInitialSolutionDurationPdfPicture() const;
+  // Creates a tikz picture that contains the initial solution duration histogram axis of all
+  // planners.
+  std::experimental::filesystem::path createInitialSolutionDurationHistogramPicture() const;
 
-  // Creates a tikz picture that contains the initial solution duration pdf axis of all planners.
-  std::experimental::filesystem::path createInitialSolutionDurationPdfPicture(
+  // Creates a tikz picture that contains the initial solution duration histogram axis of all
+  // planners.
+  std::experimental::filesystem::path createInitialSolutionDurationHistogramPicture(
       const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createInitialSolutionDurationPdfPlot(
+  std::shared_ptr<PgfPlot> createInitialSolutionDurationHistogramPlot(
       const std::string& plannerName) const;
 
-  void setInitialSolutionDurationPdfAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setInitialSolutionDurationHistogramAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
   mutable std::shared_ptr<PgfAxis> axis_;
   const Statistics& stats_;

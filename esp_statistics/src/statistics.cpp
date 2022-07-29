@@ -327,7 +327,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
     defaultMedianBinDurations_.emplace_back(static_cast<double>(i + 1u) * medianBinSize);
   }
 
-  // Compute the default binning durations for the initial solution pdf.
+  // Compute the default binning durations for the initial solution histogram.
   auto initDurationNumBins =
       config_->get<std::size_t>("statistics/initialSolutions/numDurationBins");
   double minExp = std::log10(minInitialSolutionDuration_);
@@ -521,15 +521,15 @@ fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName
   return filepath;  // Note: std::ofstream closes itself upon destruction.
 }
 
-fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& plannerName) const {
+fs::path Statistics::extractInitialSolutionDurationEdf(const std::string& plannerName) const {
   if (results_.find(plannerName) == results_.end()) {
     auto msg = "Cannot find results for '" + plannerName +
-               "' and can therefore not extract initial solution duration cdf."s;
+               "' and can therefore not extract initial solution duration edf."s;
     throw std::runtime_error(msg);
   }
 
   // Check if the file already exists.
-  fs::path filepath = statisticsDirectory_ / (plannerName + "_initial_solution_durations_cdf.csv"s);
+  fs::path filepath = statisticsDirectory_ / (plannerName + "_initial_solution_durations_edf.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
     return filepath;
   }
@@ -546,18 +546,18 @@ fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& planne
   // Write to file.
   std::ofstream filestream(filepath.string());
   if (filestream.fail()) {
-    auto msg = "Cannot write initial solution duration cdf for '"s + plannerName + "' to '"s +
+    auto msg = "Cannot write initial solution duration edf for '"s + plannerName + "' to '"s +
                filepath.string() + "'."s;
     throw std::ios_base::failure(msg);
   }
 
-  filestream << createHeader("Initial solution duration cdf", plannerName);
+  filestream << createHeader("Initial solution duration edf", plannerName);
   filestream << std::setprecision(21);
   filestream << "durations, 0.0";
   for (const auto duration : initialSolutionDurations) {
     filestream << ',' << duration;
   }
-  filestream << "\ncdf, 0.0";
+  filestream << "\nedf, 0.0";
   for (std::size_t i = 0u; i < initialSolutionDurations.size(); ++i) {
     filestream << ','
                << static_cast<double>(++numSolvedRuns) / static_cast<double>(numRunsPerPlanner_);
@@ -567,16 +567,17 @@ fs::path Statistics::extractInitialSolutionDurationCdf(const std::string& planne
   return filepath;  // Note: std::ofstream is a big boy and closes itself upon destruction.
 }
 
-fs::path Statistics::extractInitialSolutionDurationPdf(
+fs::path Statistics::extractInitialSolutionDurationHistogram(
     const std::string& plannerName, const std::vector<double>& binDurations) const {
   if (results_.find(plannerName) == results_.end()) {
     auto msg = "Cannot find results for '" + plannerName +
-               "' and can therefore not extract initial solution duration pdf."s;
+               "' and can therefore not extract initial solution duration histogram."s;
     throw std::runtime_error(msg);
   }
 
   // Check if the file already exists.
-  fs::path filepath = statisticsDirectory_ / (plannerName + "_initial_solution_durations_pdf.csv"s);
+  fs::path filepath =
+      statisticsDirectory_ / (plannerName + "_initial_solution_durations_histogram.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
     return filepath;
   }
@@ -605,12 +606,12 @@ fs::path Statistics::extractInitialSolutionDurationPdf(
   // Write to file.
   std::ofstream filestream(filepath.string());
   if (filestream.fail()) {
-    auto msg = "Cannot write initial solution duration cdf for '"s + plannerName + "' to '"s +
+    auto msg = "Cannot write initial solution duration histogram for '"s + plannerName + "' to '"s +
                filepath.string() + "'."s;
     throw std::ios_base::failure(msg);
   }
 
-  filestream << createHeader("Initial solution duration pdf", plannerName);
+  filestream << createHeader("Initial solution duration histogram", plannerName);
   filestream << std::setprecision(21);
   filestream << "bin begin durations";
   for (const auto duration : bins) {
