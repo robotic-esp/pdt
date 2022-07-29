@@ -86,7 +86,8 @@ class Statistics {
   std::experimental::filesystem::path extractMedianInitialSolution(const std::string& plannerName,
                                                                    double confidence) const;
 
-  std::experimental::filesystem::path extractInitialSolutionDurationEdf(const std::string& plannerName) const;
+  std::experimental::filesystem::path extractInitialSolutionDurationEdf(
+      const std::string& plannerName, double confidence) const;
 
   std::experimental::filesystem::path extractInitialSolutionDurationHistogram(
       const std::string& plannerName, const std::vector<double>& binDurations = {}) const;

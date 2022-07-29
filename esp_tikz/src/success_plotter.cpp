@@ -37,6 +37,7 @@
 #include "esp_tikz/success_plotter.h"
 
 #include "esp_tikz/pgf_axis.h"
+#include "esp_tikz/pgf_fillbetween.h"
 #include "esp_tikz/pgf_plot.h"
 #include "esp_tikz/pgf_table.h"
 #include "esp_tikz/tikz_picture.h"
@@ -63,6 +64,26 @@ std::shared_ptr<PgfAxis> SuccessPlotter::createSuccessAxis() const {
 
   // Fill the axis with the success plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
+    // First the lower and upper confidence bounds, if desired.
+    if (config_->get<bool>("successPlots/plotConfidenceIntervalInAllPlots")) {
+      std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
+      bool successCI = true;
+      try {
+        upperCI = createSuccessUpperCIPlot(name);
+        lowerCI = createSuccessLowerCIPlot(name);
+        fillCI = createSuccessFillCIPlot(name);
+      } catch (const std::runtime_error& e) {
+        // If the above methods throw, the corresponding plots should not be added.
+        successCI = false;
+      }
+      if (successCI) {
+        axis->addPlot(upperCI);
+        axis->addPlot(lowerCI);
+        axis->addPlot(fillCI);
+      }
+    }
+
+    // Then the estimate.
     axis->addPlot(createSuccessPlot(name));
   }
 
@@ -72,6 +93,27 @@ std::shared_ptr<PgfAxis> SuccessPlotter::createSuccessAxis() const {
 std::shared_ptr<PgfAxis> SuccessPlotter::createSuccessAxis(const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setSuccessAxisOptions(axis);
+
+  // First the lower and upper confidence bounds, if desired.
+  if (config_->get<bool>("successPlots/plotConfidenceIntervalInAllPlots")) {
+    std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
+    bool successCI = true;
+    try {
+      upperCI = createSuccessUpperCIPlot(plannerName);
+      lowerCI = createSuccessLowerCIPlot(plannerName);
+      fillCI = createSuccessFillCIPlot(plannerName);
+    } catch (const std::runtime_error& e) {
+      // If the above methods throw, the corresponding plots should not be added.
+      successCI = false;
+    }
+    if (successCI) {
+      axis->addPlot(upperCI);
+      axis->addPlot(lowerCI);
+      axis->addPlot(fillCI);
+    }
+  }
+
+  // Then the estimate.
   axis->addPlot(createSuccessPlot(plannerName));
   return axis;
 }
@@ -122,17 +164,19 @@ void SuccessPlotter::setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const 
 
 std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessPlot(const std::string& plannerName) const {
   // Store the initial solution edf in a pgf table.
-  auto table = std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationEdf(plannerName),
+  auto table =
+      std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationEdf(
+                                     plannerName, config_->get<double>("successPlots/confidence")),
                                           "durations", "edf");
+
+  // Remove all rows for which domain is infinite.
+  table->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
 
   // Multiply the edf values by 100 to get the percentage.
   table->replaceInCodomain([](double number) { return 100.0 * number; });
 
   // A zero in the domain will result in a jumped coordinate, because its a logarithmic plot.
   table->replaceInDomain(0.0, 1e-9);
-
-  // Remove all rows for which domain is infinite.
-  table->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
 
   // Add a row to draw the last element.
   table->appendRow({stats_.getMaxDuration(), table->getRow(table->getNumRows() - 1u).at(1u)});
@@ -145,6 +189,93 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessPlot(const std::string& pl
   plot->options.lineWidth = config_->get<double>("successPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "Success"s;
+
+  return plot;
+}
+
+std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessUpperCIPlot(
+    const std::string& plannerName) const {
+  // Get the table from the appropriate file.
+  auto table =
+      std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationEdf(
+                                     plannerName, config_->get<double>("successPlots/confidence")),
+                                 "durations", "upper confidence bound");
+
+  // Remove all rows for which domain is infinite.
+  table->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
+
+  if (table->empty()) {
+    throw std::runtime_error("Cannot create UpperCI for success plot of '"s + plannerName + "'.");
+  }
+
+  // Multiply the cdf values by 100 to get the percentage.
+  table->replaceInCodomain([](double number) { return 100.0 * number; });
+
+  // A zero in the domain will result in a jumped coordinate, because its a logarithmic plot.
+  table->replaceInDomain(0.0, 1e-9);
+
+  // Add a row to draw the last element.
+  table->appendRow({stats_.getMaxDuration(), table->getRow(table->getNumRows() - 1u).at(1u)});
+
+  // Create the plot and set the options.
+  auto plot = std::make_shared<PgfPlot>(table);
+  plot->options.mark = "\"none\""s;
+  plot->options.lineWidth = config_->get<double>("successPlots/confidenceIntervalLineWidth");
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
+  plot->options.namePath = plannerName + "SuccessUpperConfidence"s;
+  plot->options.drawOpacity = config_->get<float>("successPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity = config_->get<float>("successPlots/confidenceIntervalFillOpacity");
+
+  return plot;
+}
+
+std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessLowerCIPlot(
+    const std::string& plannerName) const {
+  // Get the table from the appropriate file.
+  auto table =
+      std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationEdf(
+                                     plannerName, config_->get<double>("successPlots/confidence")),
+                                 "durations", "lower confidence bound");
+
+  // Remove all rows for which domain is infinite.
+  table->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
+
+  if (table->empty()) {
+    throw std::runtime_error("Cannot create LowerCI for success plot of '"s + plannerName + "'.");
+  }
+
+  // Multiply the cdf values by 100 to get the percentage.
+  table->replaceInCodomain([](double number) { return 100.0 * number; });
+
+  // A zero in the domain will result in a jumped coordinate, because its a logarithmic plot.
+  table->replaceInDomain(0.0, 1e-9);
+
+  // Add a row to draw the last element.
+  table->appendRow({stats_.getMaxDuration(), table->getRow(table->getNumRows() - 1u).at(1u)});
+
+  // Create the plot and set the options.
+  auto plot = std::make_shared<PgfPlot>(table);
+  plot->options.mark = "\"none\""s;
+  plot->options.lineWidth = config_->get<double>("successPlots/confidenceIntervalLineWidth");
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
+  plot->options.namePath = plannerName + "SuccessLowerConfidence"s;
+  plot->options.drawOpacity = config_->get<float>("successPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity = config_->get<float>("successPlots/confidenceIntervalFillOpacity");
+
+  return plot;
+}
+
+std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessFillCIPlot(
+    const std::string& plannerName) const {
+  // Fill the areas between the upper and lower bound.
+  auto fillBetween = std::make_shared<PgfFillBetween>(plannerName + "SuccessUpperConfidence",
+                                                      plannerName + "SuccessLowerConfidence");
+
+  // Create the plot.
+  auto plot = std::make_shared<PgfPlot>(fillBetween);
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
+  plot->options.fillOpacity = config_->get<float>("successPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity = 0.0;
 
   return plot;
 }

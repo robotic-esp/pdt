@@ -221,7 +221,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUp
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    throw std::runtime_error("Cannot create UpperCI plot of '"s + plannerName + "'.");
+    throw std::runtime_error("Cannot create UpperCI median cost plot of '"s + plannerName + "'.");
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
@@ -258,7 +258,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionLo
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    throw std::runtime_error("Cannot create LowerCI plot of '"s + plannerName + "'.");
+    throw std::runtime_error("Cannot create LowerCI median cost plot of '"s + plannerName + "'.");
   }
 
   // Create the plot and set the options.

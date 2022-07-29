@@ -288,11 +288,13 @@ std::stringstream ExperimentReport::overview() const {
               << std::setfill('0') << std::setw(4) << std::setprecision(2)
         << config_->get<double>("medianInitialSolutionPlots/confidence") << "/confidence"s;
 
-  overview
-      << "\\begin{center}\n\\input{"
+  overview << "\\begin{center}\n\\input{"
       << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
-      << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
-         "at any given time. (Bottom) Median cost evolution and median of initial solution with "
+           << "}\n\\captionof{figure}{\\footnotesize \\textbf{Top:} Percentage of runs that found "
+              "a solution at any given time with a Clopper-Pearson (nonparametric) "
+           << 100.0 * config_->get<double>("successPlots/confidence")
+           << "\\% confidence interval. \\textbf{Bottom:} Median cost evolution and median of "
+              "initial solution with nonparametric "
       << std::floor(100.0 * config_->get<double>(medianCiKey.str()))
       << "\\% confidence intervals.}\n\\end{center}\n";
 
@@ -378,12 +380,15 @@ std::stringstream ExperimentReport::individualResults() const {
     // Create a picture out of the three initial solution axes.
     results << "\\begin{center}\n\\input{"
             << latexPlotter_.createPicture(edf, histo, scatter).string()
-            << "}\n\\captionof{figure}{\\footnotesize (Top) Histogram and associated "
+            << "}\n\\captionof{figure}{\\footnotesize \\textbf{Top:} Histogram and associated "
                "empirical distribution function (EDF) of "
-            << plotPlannerNames_.at(name) << ". (Bottom) All initial solutions of "
-            << plotPlannerNames_.at(name) << " and their median with "
+            << plotPlannerNames_.at(name) << " with a Clopper-Pearson (nonparametric) "
+            << 100.0 * config_->get<double>("successPlots/confidence")
+            << "\\% confidence interval for the underlying CDF. \\textbf{Bottom:} All initial "
+               "solutions of "
+            << plotPlannerNames_.at(name) << " and their median with a nonparametric "
             << std::floor(100.0 * config_->get<double>(initialCIKey.str()))
-            << "\\% confidence intervals.}\n\\end{center}\n";
+            << "\\% confidence interval.}\n\\end{center}\n";
 
     // Show the cost evolution plots for anytime planners.
     if (config_->get<bool>("planner/"s + name + "/isAnytime"s)) {
@@ -403,10 +408,11 @@ std::stringstream ExperimentReport::individualResults() const {
       results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";
       results << "\\begin{center}\n\\input{"
               << latexPlotter_.createPicture(medianEvolution, percentileEvolution).string()
-              << "}\n\\captionof{figure}{\\footnotesize (Top) Median cost evolution of "
-              << plotPlannerNames_.at(name) << " with "
+              << "}\n\\captionof{figure}{\\footnotesize \\textbf{Top:} Median cost evolution of "
+              << plotPlannerNames_.at(name) << " with a nonparametric "
               << std::floor(100.0 * config_->get<double>(costCIKey.str()))
-              << "\\% confidence interval. (Bottom) Seven percentiles of the cost evolution of "
+              << "\\% confidence interval. \\textbf{Bottom:} Seven percentiles of the cost "
+                 "evolution of "
               << plotPlannerNames_.at(name) << ".}\\end{center}\n";
     }
   }

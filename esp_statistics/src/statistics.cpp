@@ -43,6 +43,8 @@
 #include <iomanip>
 #include <iostream>
 
+#include <boost/math/distributions/binomial.hpp>
+
 #include <ompl/util/Console.h>
 
 #pragma GCC diagnostic push
@@ -521,7 +523,8 @@ fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName
   return filepath;  // Note: std::ofstream closes itself upon destruction.
 }
 
-fs::path Statistics::extractInitialSolutionDurationEdf(const std::string& plannerName) const {
+fs::path Statistics::extractInitialSolutionDurationEdf(const std::string& plannerName,
+                                                       double confidence) const {
   if (results_.find(plannerName) == results_.end()) {
     auto msg = "Cannot find results for '" + plannerName +
                "' and can therefore not extract initial solution duration edf."s;
@@ -540,9 +543,6 @@ fs::path Statistics::extractInitialSolutionDurationEdf(const std::string& planne
   // Sort them.
   std::sort(initialSolutionDurations.begin(), initialSolutionDurations.end());
 
-  // Prepare variable to calculate solution percentages.
-  std::size_t numSolvedRuns = 0;
-
   // Write to file.
   std::ofstream filestream(filepath.string());
   if (filestream.fail()) {
@@ -558,9 +558,36 @@ fs::path Statistics::extractInitialSolutionDurationEdf(const std::string& planne
     filestream << ',' << duration;
   }
   filestream << "\nedf, 0.0";
+  std::size_t numSolvedRuns = 0;
   for (std::size_t i = 0u; i < initialSolutionDurations.size(); ++i) {
+    // Preincrement on purpose.
     filestream << ','
                << static_cast<double>(++numSolvedRuns) / static_cast<double>(numRunsPerPlanner_);
+  }
+  filestream << "\nlower confidence bound";
+  numSolvedRuns = 0;
+  // Iterate for one more, as there is a non-zero CI at 0.0 solved.
+  for (std::size_t i = 0u; i <= initialSolutionDurations.size(); ++i) {
+    // (1-confidence)/2 as we will take a lower and upper bound, see:
+    // https://www.boost.org/doc/libs/1_79_0/libs/math/doc/html/math_toolkit/stat_tut/weg/binom_eg/binom_conf.html
+    // Postincrement on purpose.
+    filestream << ','
+               << boost::math::binomial_distribution<>::find_lower_bound_on_p(
+                      static_cast<double>(numRunsPerPlanner_), static_cast<double>(numSolvedRuns++),
+                      (1.0 - confidence) / 2.0,
+                      boost::math::binomial_distribution<>::clopper_pearson_exact_interval);
+  }
+  filestream << "\nupper confidence bound";
+  numSolvedRuns = 0;
+  // Iterate for one more, as there is a non-zero CI at 0.0 solved.
+  for (std::size_t i = 0u; i <= initialSolutionDurations.size(); ++i) {
+    // (1-confidence)/2 as for lower bound above.
+    // Postincrement on purpose.
+    filestream << ','
+               << boost::math::binomial_distribution<>::find_upper_bound_on_p(
+                      static_cast<double>(numRunsPerPlanner_), static_cast<double>(numSolvedRuns++),
+                      (1.0 - confidence) / 2.0,
+                      boost::math::binomial_distribution<>::clopper_pearson_exact_interval);
   }
   filestream << '\n';
 
