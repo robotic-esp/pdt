@@ -258,6 +258,11 @@ int main(const int argc, const char **argv) {
       // since it can take planners that terminate early into account.
       const auto timeSoFar = std::chrono::system_clock::now() - experimentStartTime;
       const auto extrapolatedRuntime = timeSoFar / progress;
+      const auto estimatedTimeString =
+          " (est. time left: "s +
+          esp::ompltools::time::toDurationString(
+              std::chrono::ceil<std::chrono::seconds>(extrapolatedRuntime - timeSoFar)) +
+          ")"s;
 
       std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
                 << (std::ceil(progress * barWidth) != barWidth
@@ -266,10 +271,14 @@ int main(const int argc, const char **argv) {
                 << std::setfill('.') << (currentRun != totalNumberOfRuns ? '|' : '.') << std::right
                 << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
                 << std::setfill('.') << '.' << std::right << std::fixed << std::setw(6)
-                << std::setfill(' ') << std::setprecision(2) << progress * 100.0f << " %"
-                << " (est. time left: " << esp::ompltools::time::toDurationString(
-                      std::chrono::ceil<std::chrono::seconds>(extrapolatedRuntime - timeSoFar))
-                << ")" << std::flush;
+                << std::setfill(' ') << std::setprecision(2) << progress * 100.0f << " %";
+      if (currentRun != totalNumberOfRuns) {
+        std::cout << estimatedTimeString;
+      } else {
+        std::cout << std::setfill(' ') << std::setw(static_cast<int>(estimatedTimeString.length()))
+                  << " ";
+      }
+      std::cout << std::flush;
     }
   }
 
