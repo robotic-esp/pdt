@@ -46,17 +46,17 @@ namespace ompltools {
 
 using namespace std::string_literals;
 
-bool operator<(const ConfidenceInterval& ci, double confidence) {
+bool operator<(const ConfidenceInterval& ci, const double confidence) {
   return ci.confidence < confidence;
 }
 
 PopulationStatistics::PopulationStatistics(const std::shared_ptr<Configuration>& config,
-                                           INDEX_ROUNDING round) :
+                                           const INDEX_ROUNDING round) :
     config_{config},
     round_{round} {
 }
 
-void PopulationStatistics::setSampleSize(std::size_t sampleSize) {
+void PopulationStatistics::setSampleSize(const std::size_t sampleSize) {
   sampleSize_ = sampleSize;
 }
 
@@ -64,7 +64,7 @@ std::size_t PopulationStatistics::getSampleSize() const {
   return sampleSize_;
 }
 
-std::size_t PopulationStatistics::estimatePercentileAsIndex(double percentile) const {
+std::size_t PopulationStatistics::estimatePercentileAsIndex(const double percentile) const {
   if (sampleSize_ == 0u) {
     throw std::out_of_range("Requested a percentile estimate for a sample size of 0.");
   }
@@ -95,8 +95,8 @@ std::size_t PopulationStatistics::estimatePercentileAsIndex(double percentile) c
   return config_->get<std::size_t>(key);
 }
 
-double PopulationStatistics::calcPercentileConfidence(double percentile, std::size_t lowerIdx,
-                                                      std::size_t upperIdx) const {
+double PopulationStatistics::calcPercentileConfidence(const double percentile, const std::size_t lowerIdx,
+                                                      const std::size_t upperIdx) const {
   if (sampleSize_ == 0u) {
     throw std::out_of_range("Requested the percentile confidence for a sample size of 0.");
   }
@@ -140,8 +140,8 @@ double PopulationStatistics::calcPercentileConfidence(double percentile, std::si
          boost::math::ibeta(sampleSize_ - lowerIdx, lowerIdx + 1u, 1.0 - percentile);
 }
 
-ConfidenceInterval PopulationStatistics::findPercentileConfidenceInterval(double percentile,
-                                                                          double confidence) const {
+ConfidenceInterval PopulationStatistics::findPercentileConfidenceInterval(const double percentile,
+                                                                          const double confidence) const {
   if (sampleSize_ == 0u) {
     throw std::out_of_range("Requested a confidence interval for a sample size of 0.");
   }
@@ -184,7 +184,7 @@ ConfidenceInterval PopulationStatistics::findPercentileConfidenceInterval(double
           config_->get<double>(key.str() + "/confidence")};
 }
 
-std::string PopulationStatistics::percentileKey(double percentile) const {
+std::string PopulationStatistics::percentileKey(const double percentile) const {
   std::stringstream key;
   key << "statistics/percentiles/sampleSize/"s << sampleSize_ << "/populationPercentile/"s
       << std::fixed << std::setfill('0') << std::setw(4) << std::setprecision(2) << percentile;
@@ -192,17 +192,17 @@ std::string PopulationStatistics::percentileKey(double percentile) const {
 }
 
 const PopulationStatistics::ConfidenceIntervalIterator PopulationStatistics::begin(
-    double percentile) const {
+    const double percentile) const {
   return ConfidenceIntervalIterator(this, percentile, 0u);
 }
 
 const PopulationStatistics::ConfidenceIntervalIterator PopulationStatistics::end(
-    double percentile) const {
+    const double percentile) const {
   return ConfidenceIntervalIterator(this, percentile);
 }
 
 PopulationStatistics::ConfidenceIntervalIterator::ConfidenceIntervalIterator(
-    const PopulationStatistics* parent, double percentile, difference_type offset) :
+    const PopulationStatistics* parent, const double percentile, const difference_type offset) :
     parent_(parent),
     percentile_(percentile),
     centreIdx_(parent_->estimatePercentileAsIndex(percentile_)),
@@ -211,7 +211,7 @@ PopulationStatistics::ConfidenceIntervalIterator::ConfidenceIntervalIterator(
 }
 
 PopulationStatistics::ConfidenceIntervalIterator::ConfidenceIntervalIterator(
-    const PopulationStatistics* parent, double percentile) :
+    const PopulationStatistics* parent, const double percentile) :
     parent_(parent),
     percentile_(percentile),
     centreIdx_(parent_->estimatePercentileAsIndex(percentile_)),
@@ -252,7 +252,7 @@ operator--() {
 }
 
 PopulationStatistics::ConfidenceIntervalIterator& PopulationStatistics::ConfidenceIntervalIterator::
-operator+=(difference_type delta) {
+operator+=(const difference_type delta) {
   // Delta cannot move the iterator further than 0 (i.e., begin()) or maxDereferenceOffset_ + 1
   // (i.e., end())
   if (delta < 0) {

@@ -114,7 +114,7 @@ void PlannerResults::addMeasuredRun(const PlannerResults::PlannerResult& run) {
   measuredRuns_.emplace_back(run);
 }
 
-const PlannerResults::PlannerResult& PlannerResults::getMeasuredRun(std::size_t i) const {
+const PlannerResults::PlannerResult& PlannerResults::getMeasuredRun(const std::size_t i) const {
   return measuredRuns_.at(i);
 }
 
@@ -126,7 +126,7 @@ std::size_t PlannerResults::numMeasuredRuns() const {
   return measuredRuns_.size();
 }
 
-Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceComputation) :
+Statistics::Statistics(const std::shared_ptr<Configuration>& config, const bool forceComputation) :
     config_(config),
     statisticsDirectory_(fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                          "statistics/"),
@@ -341,7 +341,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, bool forceC
   }
 }
 
-fs::path Statistics::extractMedians(const std::string& plannerName, double confidence,
+fs::path Statistics::extractMedians(const std::string& plannerName, const double confidence,
                                     const std::vector<double>& binDurations) const {
   if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "This method extracts median costs over time for anytime planners. '" + plannerName +
@@ -368,7 +368,7 @@ fs::path Statistics::extractMedians(const std::string& plannerName, double confi
   auto medianCosts = getPercentileCosts(results_.at(plannerName), 0.50, durations);
 
   // Get the interval indices.
-  auto interval = populationStats_.findPercentileConfidenceInterval(0.5, confidence);
+  auto interval = populationStats_.findPercentileConfidenceInterval(0.50, confidence);
 
   // Get the interval bound costs.
   auto lowerCosts = getNthCosts(results_.at(plannerName), interval.lower, durations);
@@ -417,7 +417,7 @@ fs::path Statistics::extractMedians(const std::string& plannerName, double confi
 }
 
 fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
-                                            std::set<double> percentiles,
+                                            const std::set<double>& percentiles,
                                             const std::vector<double>& binDurations) const {
   if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "This method extracts cost percentiles over time for anytime planners. '" +
@@ -443,9 +443,7 @@ fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
   // Get the percentile costs.
   std::map<double, std::vector<double>> percentileCosts{};
   for (const auto percentile : percentiles) {
-    std::vector<double> costs{};
-    costs = getPercentileCosts(results_.at(plannerName), percentile, durations);
-    percentileCosts[percentile] = costs;
+    percentileCosts[percentile] = getPercentileCosts(results_.at(plannerName), percentile, durations);
   }
 
   // Write to file.
@@ -474,7 +472,7 @@ fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
 }
 
 fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName,
-                                                  double confidence) const {
+                                                  const double confidence) const {
   if (results_.find(plannerName) == results_.end()) {
     auto msg = "Cannot find results for '" + plannerName +
                "' and can therefore not extract median initial solution."s;
@@ -494,7 +492,7 @@ fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName
   double medianCost = getMedianInitialSolutionCost(results_.at(plannerName));
 
   // Get the interval for the upper and lower bounds.
-  auto interval = populationStats_.findPercentileConfidenceInterval(0.5, confidence);
+  auto interval = populationStats_.findPercentileConfidenceInterval(0.50, confidence);
 
   // Get the upper and lower confidence bounds on the median initial solution duration and cost.
   auto lowerDurationBound = getNthInitialSolutionDuration(results_.at(plannerName), interval.lower);
@@ -524,7 +522,7 @@ fs::path Statistics::extractMedianInitialSolution(const std::string& plannerName
 }
 
 fs::path Statistics::extractInitialSolutionDurationEdf(const std::string& plannerName,
-                                                       double confidence) const {
+                                                       const double confidence) const {
   if (results_.find(plannerName) == results_.end()) {
     auto msg = "Cannot find results for '" + plannerName +
                "' and can therefore not extract initial solution duration edf."s;
@@ -809,7 +807,7 @@ std::shared_ptr<Configuration> Statistics::getConfig() const {
   return config_;
 }
 
-std::vector<double> Statistics::getPercentileCosts(const PlannerResults& results, double percentile,
+std::vector<double> Statistics::getPercentileCosts(const PlannerResults& results, const double percentile,
                                                    const std::vector<double>& durations) const {
   return getNthCosts(results, populationStats_.estimatePercentileAsIndex(percentile), durations);
 }
@@ -822,7 +820,7 @@ double Statistics::getMedianInitialSolutionCost(const PlannerResults& results) c
   return getNthInitialSolutionCost(results, populationStats_.estimatePercentileAsIndex(0.50));
 }
 
-std::vector<double> Statistics::getNthCosts(const PlannerResults& results, std::size_t n,
+std::vector<double> Statistics::getNthCosts(const PlannerResults& results, const std::size_t n,
                                             const std::vector<double>& durations) const {
   // Note that n is taken as an interpolation between the bounding integer indices
   if (durations.empty()) {
@@ -839,7 +837,7 @@ std::vector<double> Statistics::getNthCosts(const PlannerResults& results, std::
       assert(run.at(durationIndex).first == durations.at(durationIndex));
       costs.emplace_back(run.at(durationIndex).second);
     }
-    if (static_cast<std::size_t>(std::ceil(n)) > costs.size()) {
+    if (n > costs.size()) {
       auto msg = "Cannot get "s + std::to_string(n) + "th cost, there are only "s +
                  std::to_string(costs.size()) + " costs at this time."s;
       throw std::runtime_error(msg);
@@ -900,7 +898,7 @@ std::vector<double> Statistics::getInitialSolutionCosts(const PlannerResults& re
 }
 
 double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,
-                                                 std::size_t n) const {
+                                                 const std::size_t n) const {
   // Get the durations of the initial solutions of all runs.
   auto initialDurations = getInitialSolutionDurations(results);
 
@@ -913,7 +911,7 @@ double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,
   return getNthValue(&initialDurations, n);
 }
 
-double Statistics::getNthInitialSolutionCost(const PlannerResults& result, std::size_t n) const {
+double Statistics::getNthInitialSolutionCost(const PlannerResults& result, const std::size_t n) const {
   // Get the costs of the initial solutions of all runs.
   auto initialCosts = getInitialSolutionCosts(result);
 
@@ -926,7 +924,7 @@ double Statistics::getNthInitialSolutionCost(const PlannerResults& result, std::
   return getNthValue(&initialCosts, n);
 }
 
-double Statistics::getNthValue(std::vector<double>* values, std::size_t n) const {
+double Statistics::getNthValue(std::vector<double>* values, const std::size_t n) const {
   auto nthIter = values->begin() + static_cast<long int>(n);
   std::nth_element(values->begin(), nthIter, values->end());
   return *nthIter;

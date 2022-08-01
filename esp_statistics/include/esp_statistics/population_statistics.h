@@ -57,27 +57,28 @@ bool operator<(const ConfidenceInterval& ci, double confidence);
 
 class PopulationStatistics {
  public:
+  // The direction to round calculations for index corresponding to an estimate of a percentile.
   enum class INDEX_ROUNDING {
     UP,
     DOWN,
   };
 
   // Construct/initialize
-  PopulationStatistics(const std::shared_ptr<Configuration>& config, INDEX_ROUNDING rounding);
+  PopulationStatistics(const std::shared_ptr<Configuration>& config, const INDEX_ROUNDING rounding);
   ~PopulationStatistics() = default;
 
-  void setSampleSize(std::size_t sampleSize);
+  void setSampleSize(const std::size_t sampleSize);
   std::size_t getSampleSize() const;
 
   // Returns the ordered index that estimates the provided percentile.
-  std::size_t estimatePercentileAsIndex(double percentile) const;
+  std::size_t estimatePercentileAsIndex(const double percentile) const;
   // Finds an estimate for the specified percentile with the specified confidence. Specifically
   // finds a symmetric interval centered about the best-estimate of the percentile that contains the
   // true percentile with the specified confidence.
-  ConfidenceInterval findPercentileConfidenceInterval(double percentile, double confidence) const;
+  ConfidenceInterval findPercentileConfidenceInterval(const double percentile, const double confidence) const;
   // Calculates the confidence with which an interval estimates a percentile
-  double calcPercentileConfidence(double percentile, std::size_t lowerIdx,
-                                  std::size_t upperIdx) const;
+  double calcPercentileConfidence(const double percentile, const std::size_t lowerIdx,
+                                  const std::size_t upperIdx) const;
 
  private:
   class ConfidenceIntervalIterator {
@@ -91,16 +92,16 @@ class PopulationStatistics {
     using reference = value_type&;
 
     // A subset of iterator methods for std::lower_bound and other conveniences.
-    ConfidenceIntervalIterator(const PopulationStatistics* parent, double percentile,
+    ConfidenceIntervalIterator(const PopulationStatistics* parent, const double percentile,
                                difference_type offset);
     // Without an offset value, constructs end() (i.e., offset_ = maxDereferenceOffset_ + 1u).
-    ConfidenceIntervalIterator(const PopulationStatistics* parent, double percentile);
+    ConfidenceIntervalIterator(const PopulationStatistics* parent, const double percentile);
     reference operator*() const;
     pointer operator->() const;
     // Note that these define ++iter and --iter but not iter++ and iter--
     ConfidenceIntervalIterator& operator++();
     ConfidenceIntervalIterator& operator--();
-    ConfidenceIntervalIterator& operator+=(difference_type offset);
+    ConfidenceIntervalIterator& operator+=(const difference_type offset);
     difference_type operator-(const ConfidenceIntervalIterator& other);
     bool operator==(const ConfidenceIntervalIterator& other) const;
     bool operator!=(const ConfidenceIntervalIterator& other) const;
@@ -118,8 +119,8 @@ class PopulationStatistics {
   std::string percentileKey(double percentile) const;
 
   // Iterator interface for finding a specified CI for a percentile.
-  const ConfidenceIntervalIterator begin(double percentile) const;
-  const ConfidenceIntervalIterator end(double percentile) const;
+  const ConfidenceIntervalIterator begin(const double percentile) const;
+  const ConfidenceIntervalIterator end(const double percentile) const;
 
   std::shared_ptr<Configuration> config_;
   INDEX_ROUNDING round_;

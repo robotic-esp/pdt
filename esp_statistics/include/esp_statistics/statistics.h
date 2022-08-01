@@ -61,7 +61,7 @@ class PlannerResults {
 
   // Access to measured runs.
   void addMeasuredRun(const PlannerResult& run);
-  const PlannerResult& getMeasuredRun(std::size_t i) const;
+  const PlannerResult& getMeasuredRun(const std::size_t i) const;
   void clearMeasuredRuns();
   std::size_t numMeasuredRuns() const;
 
@@ -72,22 +72,22 @@ class PlannerResults {
 
 class Statistics {
  public:
-  Statistics(const std::shared_ptr<Configuration>& config, bool forceComputation = false);
+  Statistics(const std::shared_ptr<Configuration>& config, const bool forceComputation);
   ~Statistics() = default;
 
   std::experimental::filesystem::path extractMedians(
-      const std::string& plannerName, double confidence,
+      const std::string& plannerName, const double confidence,
       const std::vector<double>& binDurations = {}) const;
 
   std::experimental::filesystem::path extractCostPercentiles(
-      const std::string& plannerName, std::set<double> percentile,
+      const std::string& plannerName, const std::set<double>& percentile,
       const std::vector<double>& binDurations = {}) const;
 
   std::experimental::filesystem::path extractMedianInitialSolution(const std::string& plannerName,
-                                                                   double confidence) const;
+                                                                   const double confidence) const;
 
   std::experimental::filesystem::path extractInitialSolutionDurationEdf(
-      const std::string& plannerName, double confidence) const;
+      const std::string& plannerName, const double confidence) const;
 
   std::experimental::filesystem::path extractInitialSolutionDurationHistogram(
       const std::string& plannerName, const std::vector<double>& binDurations = {}) const;
@@ -132,21 +132,21 @@ class Statistics {
   // The identifying header line that starts each file produced by this class.
   std::string createHeader(const std::string& statisticType, const std::string& plannerName) const;
 
-  std::vector<double> getPercentileCosts(const PlannerResults& results, double percentile,
+  std::vector<double> getPercentileCosts(const PlannerResults& results, const double percentile,
                                          const std::vector<double>& durations) const;
-  std::vector<double> getNthCosts(const PlannerResults& results, std::size_t n,
+  std::vector<double> getNthCosts(const PlannerResults& results, const std::size_t n,
                                   const std::vector<double>& durations) const;
 
   double getMedianInitialSolutionDuration(const PlannerResults& results) const;
   double getMedianInitialSolutionCost(const PlannerResults& results) const;
 
-  double getNthInitialSolutionDuration(const PlannerResults& results, std::size_t n) const;
-  double getNthInitialSolutionCost(const PlannerResults& results, std::size_t n) const;
+  double getNthInitialSolutionDuration(const PlannerResults& results, const std::size_t n) const;
+  double getNthInitialSolutionCost(const PlannerResults& results, const std::size_t n) const;
 
   std::vector<double> getInitialSolutionDurations(const PlannerResults& results) const;
   std::vector<double> getInitialSolutionCosts(const PlannerResults& results) const;
 
-  double getNthValue(std::vector<double>* values, std::size_t n) const;
+  double getNthValue(std::vector<double>* values, const std::size_t n) const;
 
   std::shared_ptr<Configuration> config_;
   const std::experimental::filesystem::path statisticsDirectory_;

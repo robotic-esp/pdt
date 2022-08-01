@@ -371,8 +371,8 @@ std::stringstream ExperimentReport::individualResults() const {
     edf->options.enlargeXLimits = "lower";
     scatter->options.enlargeXLimits = "lower";
 
-    std::stringstream initialCIKey;
-    initialCIKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
+    std::stringstream initialCiKey;
+    initialCiKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
                  << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed
                  << std::setfill('0') << std::setw(4) << std::setprecision(2)
                  << config_->get<double>("medianInitialSolutionPlots/confidence") << "/confidence"s;
@@ -387,7 +387,7 @@ std::stringstream ExperimentReport::individualResults() const {
             << "\\% confidence interval for the underlying CDF. \\textbf{Bottom:} All initial "
                "solutions of "
             << plotPlannerNames_.at(name) << " and their median with a nonparametric "
-            << std::floor(100.0 * config_->get<double>(initialCIKey.str()))
+            << std::floor(100.0 * config_->get<double>(initialCiKey.str()))
             << "\\% confidence interval.}\n\\end{center}\n";
 
     // Show the cost evolution plots for anytime planners.
@@ -399,8 +399,8 @@ std::stringstream ExperimentReport::individualResults() const {
       medianEvolution->matchAbszisse(*percentileEvolution);
       latexPlotter_.stack(medianEvolution, percentileEvolution);
 
-      std::stringstream costCIKey;
-      costCIKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
+      std::stringstream costCiKey;
+      costCiKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
                 << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed
                 << std::setfill('0') << std::setw(4) << std::setprecision(2)
                 << config_->get<double>("medianCostPlots/confidence") << "/confidence"s;
@@ -410,7 +410,7 @@ std::stringstream ExperimentReport::individualResults() const {
               << latexPlotter_.createPicture(medianEvolution, percentileEvolution).string()
               << "}\n\\captionof{figure}{\\footnotesize \\textbf{Top:} Median cost evolution of "
               << plotPlannerNames_.at(name) << " with a nonparametric "
-              << std::floor(100.0 * config_->get<double>(costCIKey.str()))
+              << std::floor(100.0 * config_->get<double>(costCiKey.str()))
               << "\\% confidence interval. \\textbf{Bottom:} Seven percentiles of the cost "
                  "evolution of "
               << plotPlannerNames_.at(name) << ".}\\end{center}\n";
