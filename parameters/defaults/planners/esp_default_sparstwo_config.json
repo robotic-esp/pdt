@@ -4,7 +4,7 @@
             "type": "SPARStwo",
             "isAnytime": true,
             "report": {
-                "color": "espdarkblue",
+                "color": "espred",
                 "name": "SPARS2"
             },
             "options": {

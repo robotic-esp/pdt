@@ -204,9 +204,9 @@ void BaseVisualizer::createData() {
       } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::ABITSTAR) {
         planner_->as<ompl::geometric::ABITstar>()->setLocalSeed(
             config_->get<std::size_t>("experiment/seed"));
-      /*} else if (plannerType_ == esp::ompltools::PLANNER_TYPE::AITSTAR) {
+      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::AITSTAR) {
         planner_->as<ompl::geometric::AITstar>()->setLocalSeed(
-        config_->get<std::size_t>("experiment/seed"));*/
+        config_->get<std::size_t>("experiment/seed"));
       } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::EITSTAR) {
         planner_->as<ompl::geometric::EITstar>()->setLocalSeed(
         config_->get<std::size_t>("experiment/seed"));

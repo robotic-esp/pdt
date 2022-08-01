@@ -4,7 +4,7 @@
             "type": "EIRMstar",
             "isAnytime": true,
             "report": {
-                "color": "espred",
+                "color": "espdarkgreen",
                 "name": "EIRM*"
             },
             "options": {
