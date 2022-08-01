@@ -31,7 +31,8 @@ target_link_libraries(esp_factories
   ${OMPL_LIBRARIES}
   esp_common
   esp_configuration
-  esp_planning_contexts)
+  esp_planning_contexts
+  esp_spaces)
 
 # Add esp_open_rave as a link targets if requested.
 if(ESP_OMPL_TOOLS_OPEN_RAVE)

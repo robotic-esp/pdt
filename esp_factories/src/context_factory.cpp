@@ -49,7 +49,7 @@
 #include "esp_planning_contexts/all_contexts.h"
 
 #ifdef ESP_OMPL_TOOLS_OPEN_RAVE
-#include "esp_open_rave/SE3WAxisAngleBoundStateSpace.h"
+#include "esp_spaces/SE3WAxisAngleBoundStateSpace.h"
 #include "esp_open_rave/open_rave_manipulator.h"
 #include "esp_open_rave/open_rave_r3.h"
 #include "esp_open_rave/open_rave_r3xso2.h"
