@@ -127,15 +127,13 @@ std::vector<StartGoalPair> OpenRaveR3::makeStartGoalPair() const{
   auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");
   auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");
 
-  // Set the start position.
-  (*startState)[0] = startPosition.at(0u);
-  (*startState)[1] = startPosition.at(1u);
-  (*startState)[2] = startPosition.at(2u);
+  for (auto i=0u; i<3; ++i){
+    // Set the start position.
+    (*startState)[i] = startPosition.at(i);
 
-  // Set the goal position.
-  (*goalState)[0] = goalPosition.at(0u);
-  (*goalState)[1] = goalPosition.at(1u);
-  (*goalState)[2] = goalPosition.at(2u);
+    // Set the goal position.
+    (*goalState)[i] = goalPosition.at(i);
+  }
 
   StartGoalPair pair;
   pair.start = {startState};

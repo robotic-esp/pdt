@@ -59,11 +59,31 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
     RealVectorGeometricContext(spaceInfo, config, name),
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
-    maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")){
+    maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")) {
   if (minSideLength_ > maxSideLength_) {
     OMPL_ERROR("%s: Specified min side length is greater than specified max side length.",
                name.c_str());
     throw std::runtime_error("Context error.");
+  }
+
+  bool generateQueriesBeforeObstacles = false;
+
+  // If we only specify one single start, we first place that start/goal pair, and then generate
+  // valid obstacles around them.
+  if (config_->contains("context/" + name_ + "/start")) {
+    generateQueriesBeforeObstacles = true;
+  } else if (config_->get<std::string>("context/" + name + "/starts/type") == "specified") {
+    if (config_->get<std::size_t>("context/" + name + "/starts/numGenerated") == 1) {
+      generateQueriesBeforeObstacles = true;
+    } else {
+      throw std::runtime_error(
+          "Context error. Multiple specified starts/goals are not supported for this context at "
+          "the moment.");
+    }
+  }
+
+  if (generateQueriesBeforeObstacles) {
+    startGoalPairs_ = makeStartGoalPair();
   }
 
   // Create the obstacles and add them to the validity checker.
@@ -88,7 +108,9 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
   // Set up the space info.
   spaceInfo_->setup();
 
-  startGoalPairs_ = makeStartGoalPair();
+  if (!generateQueriesBeforeObstacles) {
+    startGoalPairs_ = makeStartGoalPair();
+  }
 }
 
 void RandomRectangles::accept(const ContextVisitor& visitor) const {
@@ -97,7 +119,7 @@ void RandomRectangles::accept(const ContextVisitor& visitor) const {
 
 void RandomRectangles::createObstacles() {
   // Instantiate obstacles.
-  for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
+  while (obstacles_.size() < numRectangles_) {
     // Create a random anchor (uniform).
     ompl::base::ScopedState<> anchor(spaceInfo_);
     anchor.random();
@@ -107,8 +129,33 @@ void RandomRectangles::createObstacles() {
     for (std::size_t j = 0; j < dimensionality_; ++j) {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
+
     auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths);
-    obstacles_.emplace_back(obstacle);
+
+    bool invalidates = false;
+    for (const auto& startGoalPair : startGoalPairs_) {
+      for (const auto& start : startGoalPair.start) {
+        if (obstacle->invalidates(start)) {
+          invalidates = true;
+          break;
+        }
+      }
+      if (invalidates) {
+        break;
+      }
+
+      // this environment does at the moment not support anything other than a sinle state
+      if (obstacle->invalidates(startGoalPair.goal->as<ompl::base::GoalState>()->getState())) {
+        invalidates = true;
+      }
+      if (invalidates) {
+        break;
+      }
+    }
+
+    if (!invalidates) {
+      obstacles_.emplace_back(obstacle);
+    }
   }
 }
 

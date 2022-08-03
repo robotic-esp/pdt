@@ -129,19 +129,19 @@ std::vector<StartGoalPair> OpenRaveR3xSO2::makeStartGoalPair() const{
   const auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");  // x y z yaw
   const auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");    // x y z yaw
 
-  // Set the start position.
-  startState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[0] =
-      startPosition.at(0u);
-  startState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[1] =
-      startPosition.at(1u);
-  startState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[2] =
-      startPosition.at(2u);
+  for (auto i=0u; i<3; ++i){
+    // Set the real component of the start position.
+    startState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[i] =
+      startPosition.at(i);
+    
+    // Set the real component of the goal position.
+    goalState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[i] = goalPosition.at(i);
+  }
+  
+  // Set the SO2-component of the start position.
   startState->as<ompl::base::SO2StateSpace::StateType>(1u)->value = startPosition.at(3u);
 
-  // Set the goal position.
-  goalState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[0] = goalPosition.at(0u);
-  goalState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[1] = goalPosition.at(1u);
-  goalState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[2] = goalPosition.at(2u);
+  // Set the sO2-component of the goal position.
   goalState->as<ompl::base::SO2StateSpace::StateType>(1u)->value = goalPosition.at(3u);
 
   StartGoalPair pair;
