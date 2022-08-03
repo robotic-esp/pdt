@@ -150,8 +150,9 @@ int main(const int argc, const char **argv) {
   config->add<std::string>("experiment/name", experimentName);
 
   // Create the directory for the results of this experiment to live in.
-  fs::path experimentDirectory(config->get<std::string>("experiment/executable") + "s/"s +
+  fs::path experimentDirectory(fs::path(config->get<std::string>("experiment/baseDirectory")) /
                                experimentName);
+  config->add<std::string>("experiment/experimentDirectory", fs::absolute(experimentDirectory).string());
 
   // Create the performance log.
   esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(experimentDirectory /
@@ -264,6 +265,18 @@ int main(const int argc, const char **argv) {
       ++currentRun;
       const auto progress = static_cast<float>(currentRun) / static_cast<float>(totalNumberOfRuns);
       constexpr auto barWidth = 36;
+
+      // estimate how much time is left by extrapolating from the time spent so far.
+      // This is more accurate than subtracting the time used so far from the worst case total time
+      // since it can take planners that terminate early into account.
+      const auto timeSoFar = std::chrono::system_clock::now() - experimentStartTime;
+      const auto extrapolatedRuntime = timeSoFar / progress;
+      const auto estimatedTimeString =
+          " (est. time left: "s +
+          esp::ompltools::time::toDurationString(
+              std::chrono::ceil<std::chrono::seconds>(extrapolatedRuntime - timeSoFar)) +
+          ")"s;
+
       std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
                 << (std::ceil(progress * barWidth) != barWidth
                         ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
@@ -271,14 +284,20 @@ int main(const int argc, const char **argv) {
                 << std::setfill('.') << (currentRun != totalNumberOfRuns ? '|' : '.') << std::right
                 << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
                 << std::setfill('.') << '.' << std::right << std::fixed << std::setw(6)
-                << std::setfill(' ') << std::setprecision(2) << progress * 100.0f << " %"
-                << std::flush;
+                << std::setfill(' ') << std::setprecision(2) << progress * 100.0f << " %";
+      if (currentRun != totalNumberOfRuns) {
+        std::cout << estimatedTimeString;
+      } else {
+        std::cout << std::setfill(' ') << std::setw(static_cast<int>(estimatedTimeString.length()))
+                  << " ";
+      }
+      std::cout << std::flush;
     }
   }
 
   // dump the complete config to make sure that we can produce the report once we ran the experiment
   auto configPath = experimentDirectory / "config.json"s;
-  config->dumpAll(fs::current_path().string() + '/' + configPath.string());
+  config->dumpAll(configPath.string());
 
   // Register the end time of the experiment.
   auto experimentEndTime = std::chrono::system_clock::now();
@@ -337,7 +356,7 @@ int main(const int argc, const char **argv) {
   // Dump the accessed parameters next to the results file.
   // This overwrites the previously dumped config with one that only consists of the
   // accessed parameters.
-  config->dumpAccessed(fs::current_path().string() + '/' + configPath.string());
+  config->dumpAccessed(configPath.string());
 
   return 0;
 }

@@ -75,7 +75,6 @@ class InteractiveVisualizer : public BaseVisualizer,
 
   // Play to view and record to view.
   bool playToIteration_{false};
-  bool recording_{false};
   bool exporting_{false};
   std::size_t iterationToPlayTo_{0u};
   time::Duration desiredDisplayDuration_{};

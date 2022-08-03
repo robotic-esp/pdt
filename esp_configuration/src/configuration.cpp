@@ -141,7 +141,8 @@ void Configuration::load(const int argc, const char **argv) {
   // Declare the available options.
   po::options_description availableOptions("Configuration options");
   availableOptions.add_options()("help,h", "Display available options.")(
-      "config-patch,c", po::value<std::string>(), "Path to the configuration patch file.");
+      "config-patch,c", po::value<std::string>(), "Path to the configuration patch file.")(
+      "path,p", po::value<std::string>(), "Path where the experiments should be stored.");
 
   // Parse the command line arguments to see which options were invoked.
   po::variables_map invokedOptions;
@@ -159,6 +160,18 @@ void Configuration::load(const int argc, const char **argv) {
     loadDefaultConfigs();
   } else {
     load(invokedOptions["config-patch"].as<std::string>());
+  }
+
+  // if no path is specified, we store the experiments where the executable is called from
+  if (!invokedOptions.count("path")) {
+    add<std::string>("experiment/baseDirectory", fs::absolute(executable_ + "s/").string());
+  } else {
+    // We create the folder directly here, since
+    // fs::canonical requires the folder that we are trying to resolve to exist.
+    // fs::weakly_canonical relaxes this requirement, but is not in the experimental filesystem header
+    const auto absolutePath = fs::absolute(invokedOptions["path"].as<std::string>());
+    fs::create_directories(absolutePath);
+    add<std::string>("experiment/baseDirectory", fs::canonical(absolutePath.string()));
   }
 }
 

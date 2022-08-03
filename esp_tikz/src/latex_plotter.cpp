@@ -130,8 +130,7 @@ std::experimental::filesystem::path LatexPlotter::createPicture(
   auto picture = collect(axes);
 
   // Create the name of this picture.
-  auto path = std::experimental::filesystem::path(config_->get<std::string>("experiment/results"))
-                  .parent_path() /
+  auto path = std::experimental::filesystem::path(config_->get<std::string>("experiment/experimentDirectory")) /
               std::experimental::filesystem::path("tikz/");
   path += "axes_collection_" + std::to_string(plotId_++) + ".tikz";
   picture->write(path);

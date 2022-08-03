@@ -82,7 +82,7 @@ fs::path SuccessPlotter::createSuccessPicture() const {
   picture.addAxis(createSuccessAxis());
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                      fs::path("tikz/all_planners_success_plot.tikz");
   picture.write(picturePath);
   return picturePath;
@@ -94,7 +94,7 @@ fs::path SuccessPlotter::createSuccessPicture(const std::string& plannerName) co
   picture.addAxis(createSuccessAxis(plannerName));
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("experiment/results")).parent_path() /
+  auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                      fs::path("tikz/"s + plannerName + "_success_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;

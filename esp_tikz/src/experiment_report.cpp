@@ -103,7 +103,7 @@ ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
 
 fs::path ExperimentReport::generateReport() {
   auto reportPath =
-      fs::path(config_->get<std::string>("experiment/results")).parent_path() / "report.tex"s;
+      fs::path(config_->get<std::string>("experiment/experimentDirectory")) / "report.tex"s;
   // Open the filestream.
   std::ofstream report;
   report.open(reportPath.c_str());
@@ -141,7 +141,7 @@ fs::path ExperimentReport::generateReport() {
 std::stringstream ExperimentReport::preamble() const {
   std::stringstream preamble;
   // First we need the 'Required' packages.
-  for (const auto package : requirePackages_) {
+  for (const auto& package : requirePackages_) {
     preamble << "\\RequirePackage{" << package << "}\n";
   }
 

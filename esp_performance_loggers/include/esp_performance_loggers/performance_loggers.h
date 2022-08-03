@@ -223,7 +223,7 @@ class ResultLog {
                     fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
   };
 
-  fs::path getFilePath() const { return fs::current_path() / filepath_; }
+  fs::path getFilePath() const { return fs::absolute(filepath_); }
 
   void addResult(const std::string& plannerName, const Logger& logger) {
     // Make sure we can write to this file.

@@ -43,13 +43,10 @@ Our tools depend on the `thread` and `program_options` components of [Boost](htt
 
 Follow the installation guide of the [official repo](https://github.com/stevenlovegrove/Pangolin), it's well documented.
 
-**Note**: Pangolin got refactored in early 2021, but our tools haven't been updated yet. The latest stable version of Pangolin that our tools compile with is v0.6. Once you have cloned the Pangolin repo, cd into it and run
-
+You then need to install it. From within the Pangolin directory:
 ```bash
-git checkout v0.6
+cmake --install build
 ```
-
-before building and installing.
 
 #### FFmpeg
 
@@ -179,6 +176,14 @@ Turn on the verbose compilation in the benchmark configuration `.json` file. If 
 - Mark & Lydia can help with reasonable problem definitions
 - Possible integration with PlannerArena
 - Possible integration in core OMPL
+
+## Formatting code
+
+Before submitting code to OMPL Tools, please format your code using:
+
+```bash
+clang-format -i ./path/to/file
+```
 
 ## Backlog
 
