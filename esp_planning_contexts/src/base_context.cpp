@@ -177,22 +177,7 @@ std::size_t BaseContext::getNumQueries() const {
 }
 
 ompl::base::ProblemDefinitionPtr BaseContext::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // As default, we set the first start/goal pair for the problem definition.
-  for (const auto &s: startGoalPairs_[0].start){
-    problemDefinition->addStartState(s);
-  }
-
-  // Set the goal for the problem definition.
-  problemDefinition->setGoal(startGoalPairs_[0].goal);
-
-  // Return the new definition.
-  return problemDefinition;
+  return instantiateNthProblemDefinition(0u);
 }
 
 ompl::base::ProblemDefinitionPtr BaseContext::instantiateNthProblemDefinition(const std::size_t n) const {
@@ -201,7 +186,10 @@ ompl::base::ProblemDefinitionPtr BaseContext::instantiateNthProblemDefinition(co
   }
 
   // Instantiate a new problem definition.
-  auto problemDefinition = instantiateNewProblemDefinition();
+  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+
+  // Set the objective.
+  problemDefinition->setOptimizationObjective(objective_);
 
   // Set the start state in the problem definition.
   problemDefinition->clearStartStates();
@@ -210,7 +198,6 @@ ompl::base::ProblemDefinitionPtr BaseContext::instantiateNthProblemDefinition(co
   }
 
   // Set the goal for the problem definition.
-  problemDefinition->clearGoal();
   problemDefinition->setGoal(startGoalPairs_[n].goal);
 
   // Return the new definition.
@@ -226,10 +213,8 @@ std::vector<ompl::base::ScopedState<>> BaseContext::parseSpecifiedStates(const s
   const auto positions = config_->get<std::vector<std::vector<double>>>(key);
 
   for (const auto &s: positions){
-    // Allocate a goal state and set the position.
+    // Allocate a state and fill the state's coordinates.
     ompl::base::ScopedState<> state(spaceInfo_);
-
-    // Fill the goal state's coordinates.
     for (auto i = 0u; i < dimensionality_; ++i) {
       state[i] = s.at(i);
     }
@@ -285,64 +270,53 @@ std::vector<StartGoalPair> BaseContext::parseMultiqueryStartGoalPairs() const{
   if (!config_->contains(baseKey + "starts")){
     throw std::runtime_error("No starts specified.");
   }
-  if (!config_->contains(baseKey + "goals")){
-    throw std::runtime_error("No goals specified.");
-  }
-
-  // read starts from config
-  std::vector<std::vector<ompl::base::ScopedState<>>> starts;
-
   if (!config_->contains(baseKey + "starts/type")){
     throw std::runtime_error("No start type specified.");
   }
 
-  // std::cout << "Starts: " << std::endl;
-  if (config_->get<std::string>(baseKey + "starts/type") == "specified"){
-    const auto states = parseSpecifiedStates(baseKey + "starts/states");
-    for (const auto &state: states){
-      std::vector<ompl::base::ScopedState<>> tmp{state};
-      starts.emplace_back(tmp);
-    }
+  if (!config_->contains(baseKey + "goals")){
+    throw std::runtime_error("No goals specified.");
   }
-  else if (config_->get<std::string>(baseKey + "starts/type") == "generated"){
-    const auto states = generateRandomStates(baseKey + "starts/");
-    for (const auto &state: states){
-      std::vector<ompl::base::ScopedState<>> tmp{state};
-      starts.emplace_back(tmp);
-    }
-  }
-
-  // read goals from config
-  std::vector<std::shared_ptr<ompl::base::Goal>> goals;
 
   if (!config_->contains(baseKey + "goals/type")){
     throw std::runtime_error("No goals type specified.");
   }
 
+  // read starts from config
+  std::vector<ompl::base::ScopedState<>> startStates;
+  if (config_->get<std::string>(baseKey + "starts/type") == "specified"){
+    startStates = parseSpecifiedStates(baseKey + "starts/states");
+  }
+  else if (config_->get<std::string>(baseKey + "starts/type") == "generated"){
+    startStates = generateRandomStates(baseKey + "starts/");
+  }
+  else{
+    throw std::runtime_error("Start type not supported. Must be either 'specified' or 'generated'.");
+  }
+
+  std::vector<std::vector<ompl::base::ScopedState<>>> starts;
+  for (const auto &state: startStates){
+    std::vector<ompl::base::ScopedState<>> tmp{state};
+    starts.emplace_back(tmp);
+  }
+
+  // read goals from config
+  std::vector<std::shared_ptr<ompl::base::Goal>> goals;
+
+  std::vector<ompl::base::ScopedState<>> goalStates;
   if (config_->get<std::string>(baseKey + "goals/type") == "specified"){
-    const auto states = parseSpecifiedStates(baseKey + "goals/states");
-    for (const auto &state: states){
-      auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
-      goal->as<ompl::base::GoalStates>()->addState(state);
-      goals.emplace_back(goal);
-    }
+    goalStates = parseSpecifiedStates(baseKey + "goals/states");
   }
   else if(config_->get<std::string>(baseKey + "goals/type") == "generated"){
-    const auto states = generateRandomStates(baseKey + "goals/");
-    for (const auto &state: states){
-      auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
-      goal->as<ompl::base::GoalStates>()->addState(state);
-      goals.emplace_back(goal);
-    }
+    goalStates = generateRandomStates(baseKey + "goals/");
   }
   else if(config_->get<std::string>(baseKey + "goals/type") == "followStarts"){
     // the goal of the first query is the start of the next query.
     const std::size_t numGoals = config_->get<std::size_t>(baseKey + "goals/numGenerated");
     for (auto i=0u; i<numGoals; ++i){
-      auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
       if (i+1 < starts.size()){
         for (const auto tmp: starts[i+1]){
-          goal->as<ompl::base::GoalStates>()->addState(tmp);
+          goalStates.push_back(tmp);
         }
       }
       else{
@@ -350,11 +324,18 @@ std::vector<StartGoalPair> BaseContext::parseMultiqueryStartGoalPairs() const{
         do{
           g.random();
         } while (!spaceInfo_->isValid(g.get()));
-        goal->as<ompl::base::GoalStates>()->addState(g);
+        goalStates.push_back(g);
       }
-
-      goals.emplace_back(goal);
     }
+  }
+  else{
+    throw std::runtime_error("Goal type not supported. Must be either 'specified', 'generated', or 'folowStarts'.");
+  }
+
+  for (const auto &state: goalStates){
+    auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
+    goal->as<ompl::base::GoalStates>()->addState(state);
+    goals.emplace_back(goal);
   }
 
   // merge starts and goals
@@ -395,9 +376,11 @@ std::vector<StartGoalPair> BaseContext::makeStartGoalPair() const{
       startState[i] = startPosition.at(i);
     }
 
-    pairs.emplace_back(StartGoalPair());
-    pairs[0].start = {startState};
-    pairs[0].goal = createGoal();
+    StartGoalPair pair;
+    pair.start = {startState};
+    pair.goal = createGoal();
+
+    pairs.emplace_back(pair);
   }
   else{
     OMPL_ERROR("%s: Neither 'start' nor 'starts' specified.", name_.c_str());

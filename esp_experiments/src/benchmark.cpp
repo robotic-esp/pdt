@@ -63,20 +63,22 @@ namespace fs = std::experimental::filesystem;
 
 // Function to check if the start/goal query we are looking at is actually valid.
 // To that end, we run an RRTConnect planner on the problem for 10s.
-bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext>& context){
-  std::cout << "Checking context validity" << std::endl;
+bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext> &context,
+                          const double runtime) {
+  std::cout << "Validating problem definition... ";
 
   const auto p = context->instantiateNewProblemDefinition();
 
-  auto planner =
-      std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
+  auto planner = std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
   planner->setProblemDefinition(p);
 
-  const auto status = planner->solve(ompl::base::timedPlannerTerminationCondition(10.0));
+  const auto status = planner->solve(ompl::base::timedPlannerTerminationCondition(runtime));
 
-  if (!status){
-    std::cout << "No solution found." << std::endl;
+  if (!status) {
+    std::cout << "Failed" << std::endl;
     return false;
+  } else {
+    std::cout << "OK." << std::endl;
   }
   std::cout << std::endl;
 
@@ -96,9 +98,16 @@ int main(const int argc, const char **argv) {
   esp::ompltools::ContextFactory contextFactory(config);
   auto context = contextFactory.create(config->get<std::string>("experiment/context"));
 
-  if (!checkContextValidity(context)){
-    std::cout << "Context invalid, rerun with different seed or check starts and goals." << std::endl;
-    return 0;
+  if (config->contains("experiment/validateProblemDefinition") &&
+      config->get<bool>("experiment/validateProblemDefinition")) {
+    const double contextCheckingRuntime = config->get<double>("experiment/validateProblemDuration");
+    if (!checkContextValidity(context, contextCheckingRuntime)) {
+      std::cout << "No solution found after " << contextCheckingRuntime << "s by RRT-Connect. "
+                << "This problem definition may not be solvable. Rerun with different seed or "
+                   "check starts and goals."
+                << std::endl;
+      return 0;
+    }
   }
 
   // Create a planner factory for planners in this context.
@@ -179,7 +188,8 @@ int main(const int argc, const char **argv) {
   // Create the directory for the results of this experiment to live in.
   fs::path experimentDirectory(fs::path(config->get<std::string>("experiment/baseDirectory")) /
                                experimentName);
-  config->add<std::string>("experiment/experimentDirectory", fs::absolute(experimentDirectory).string());
+  config->add<std::string>("experiment/experimentDirectory",
+                           fs::absolute(experimentDirectory).string());
 
   // Create the performance log.
   esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(experimentDirectory /

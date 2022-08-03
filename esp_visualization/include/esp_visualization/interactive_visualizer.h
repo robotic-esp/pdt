@@ -56,7 +56,6 @@ namespace esp {
 namespace ompltools {
 
 class InteractiveVisualizer : public BaseVisualizer,
-                              public ContextVisitor,
                               public ObstacleVisitor,
                               public ObjectiveVisitor {
  public:
@@ -134,22 +133,6 @@ class InteractiveVisualizer : public BaseVisualizer,
                 float alpha = 1.0) const;
   void drawCars(const std::vector<Eigen::Vector3f>& points, float width, const float* color,
                 float alpha = 1.0) const;
-
-  // Implement visualizations of contexts.
-  void visit(const CentreSquare& context) const override;
-  void visit(const DividingWalls& context) const override;
-  void visit(const DoubleEnclosure& context) const override;
-  void visit(const FlankingGap& context) const override;
-  void visit(const FourRooms& context) const override;
-  void visit(const GoalEnclosure& context) const override;
-  void visit(const NarrowPassage& context) const override;
-  void visit(const ObstacleFree& context) const override;
-  void visit(const RandomRectangles& context) const override;
-  void visit(const RandomRectanglesMultiStartGoal& context) const override;
-  void visit(const ReedsSheppRandomRectangles& context) const override;
-  void visit(const RepeatingRectangles& context) const override;
-  void visit(const StartEnclosure& context) const override;
-  void visit(const WallGap& context) const override;
 
   // Implement visualizations of obstacles.
   void visit(const Hyperrectangle<BaseObstacle>& obstacle) const override;

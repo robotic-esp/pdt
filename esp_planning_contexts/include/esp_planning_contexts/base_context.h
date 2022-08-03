@@ -80,7 +80,7 @@ class BaseContext {
   /** \brief Returns the dimension of the state space. */
   std::size_t getDimension() const;
 
-  /** \brief Returns the dimension of the state space. */
+  /** \brief Returns the number of start/goal queries for this context. */
   std::size_t getNumQueries() const;
 
   /** \brief Returns the optimization objective of this context. */
@@ -92,10 +92,10 @@ class BaseContext {
   /** \brief Returns the start/goal pair. */
   StartGoalPair getNthStartGoalPair(const std::size_t n) const;
 
-  /** \brief Return a newly generated problem definition */
+  /** \brief Return a newly generated problem definition. Equivalent to  instantiateNthNewProblemDefinition(0u). */
   virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition() const;
 
-  /** \brief Return a newly generated problem definition */
+  /** \brief Return a newly generated problem definition for the n-th query. */
   virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNthProblemDefinition(const std::size_t n) const;
 
   /** \brief Accepts a context visitor. */
@@ -110,11 +110,11 @@ class BaseContext {
   /** \brief Create a goal. */
   virtual std::shared_ptr<ompl::base::Goal> createGoal() const = 0;
 
-  /** \brief Regenerates the queries. */
+  /** \brief Regenerates the queries: In case they are generated randomly, this gives a new set of queries.*/
   void regenerateQueries();
 
  protected:
-  /** \brief Return a start/goal pair. */
+  /** \brief Loads the specified or randomly generates the start/goal pairs (depending on the config file). */
   virtual std::vector<StartGoalPair> makeStartGoalPair() const;
 
   /** \brief Parse start and goal specification used for multiquery benchmarking. */
@@ -123,7 +123,7 @@ class BaseContext {
   /** \brief Parse explicitly specified starts/goals. */
   std::vector<ompl::base::ScopedState<>> parseSpecifiedStates(const std::string &key) const;
 
-  /** \brief Generate randomly samples starts/goals. */
+  /** \brief Generate randomly sampled starts/goals. */
   std::vector<ompl::base::ScopedState<>> generateRandomStates(const std::string &key) const;
 
   /** \brief The space information associated with this context. */
