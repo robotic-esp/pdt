@@ -340,13 +340,11 @@ void InteractiveVisualizer::run() {
     if (optionDrawSolution) {
       drawSolution(displayIteration_);
     }
-    
-    // Draw the start states.
-    drawStarts();
-    // Draw the goal states.
-    drawGoal();
-    // Draw the boundaries.
-    drawBoundary();
+
+    // Draw the context.
+    if (optionDrawContext) {
+      context_->accept(*this);
+    }
 
     // Draw the state ids.
     if (optionDrawStateIds) {
@@ -491,6 +489,132 @@ void InteractiveVisualizer::drawStateIds(std::size_t iteration) {
   if (!glBlendEnabled) {
     glDisable(GL_BLEND);
   }
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const CentreSquare& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const DividingWalls& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const DoubleEnclosure& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const FlankingGap& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const FourRooms& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const GoalEnclosure& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const NarrowPassage& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const ObstacleFree& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const RandomRectangles& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Get the goal.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const RandomRectanglesMultiStartGoal& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const ReedsSheppRandomRectangles& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const RepeatingRectangles& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const StartEnclosure& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
+}
+
+void InteractiveVisualizer::visit([[maybe_unused]] const WallGap& context) const {
+  // Draw the start states.
+  drawStarts();
+  // Draw the goal states.
+  drawGoal();
+  // Draw the boundaries.
+  drawBoundary();
 }
 
 void InteractiveVisualizer::drawStarts() const {
