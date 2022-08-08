@@ -144,10 +144,20 @@ void RandomRectangles::createObstacles() {
         break;
       }
 
-      // this environment does at the moment not support anything other than a sinle state
-      if (obstacle->invalidates(startGoalPair.goal->as<ompl::base::GoalState>()->getState())) {
-        invalidates = true;
+      if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
+        if (obstacle->invalidates(startGoalPair.goal->as<ompl::base::GoalState>()->getState())) {
+          invalidates = true;
+        }
+      } 
+      else if (goalType_ == ompl::base::GoalType::GOAL_STATES) {
+        for (auto i = 0u; i < startGoalPair.goal->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
+          if (obstacle->invalidates(startGoalPair.goal->as<ompl::base::GoalStates>()->getState(i))) {
+            invalidates = true;
+            break;
+          }
+        }
       }
+
       if (invalidates) {
         break;
       }
