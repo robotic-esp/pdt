@@ -192,7 +192,6 @@ ompl::base::ProblemDefinitionPtr BaseContext::instantiateNthProblemDefinition(co
   problemDefinition->setOptimizationObjective(objective_);
 
   // Set the start state in the problem definition.
-  problemDefinition->clearStartStates();
   for (auto s: startGoalPairs_[n].start){
     problemDefinition->addStartState(s);
   }
@@ -226,19 +225,19 @@ std::vector<ompl::base::ScopedState<>> BaseContext::parseSpecifiedStates(const s
 }
 
 std::vector<ompl::base::ScopedState<>> BaseContext::generateRandomStates(const std::string &key) const{
-  const std::size_t numStates = config_->get<std::size_t>(key + "numGenerated");
+  const std::size_t numStates = config_->get<std::size_t>(key + "/numGenerated");
   std::vector<ompl::base::ScopedState<>> states;
 
   for (auto i=0u; i<numStates; ++i){
     ompl::base::ScopedState<> s(spaceInfo_);
-    if (config_->get<std::string>(key + "generativeModel") == "uniform"){
+    if (config_->get<std::string>(key + "/generativeModel") == "uniform"){
       do{
         s.random();
       } while (!spaceInfo_->isValid(s.get()));
     }
-    else if (config_->get<std::string>(key + "generativeModel") == "subregion"){
-      const auto low = config_->get<std::vector<double>>(key + "generator/lowerBounds");
-      const auto high = config_->get<std::vector<double>>(key + "generator/upperBounds");
+    else if (config_->get<std::string>(key + "/generativeModel") == "subregion"){
+      const auto low = config_->get<std::vector<double>>(key + "/generator/lowerBounds");
+      const auto high = config_->get<std::vector<double>>(key + "/generator/upperBounds");
 
       ompl::base::RealVectorStateSpace samplingStateSpace(static_cast<unsigned int>(dimensionality_));
       ompl::base::RealVectorBounds bounds(static_cast<unsigned int>(dimensionality_));
@@ -264,31 +263,31 @@ std::vector<ompl::base::ScopedState<>> BaseContext::generateRandomStates(const s
 std::vector<StartGoalPair> BaseContext::parseMultiqueryStartGoalPairs() const{
   std::vector<StartGoalPair> pairs;
 
-  const std::string baseKey = "context/" + name_ + "/";
+  const std::string baseKey = "context/" + name_;
 
   // Sanity checks
-  if (!config_->contains(baseKey + "starts")){
+  if (!config_->contains(baseKey + "/starts")){
     throw std::runtime_error("No starts specified.");
   }
-  if (!config_->contains(baseKey + "starts/type")){
+  if (!config_->contains(baseKey + "/starts/type")){
     throw std::runtime_error("No start type specified.");
   }
 
-  if (!config_->contains(baseKey + "goals")){
+  if (!config_->contains(baseKey + "/goals")){
     throw std::runtime_error("No goals specified.");
   }
 
-  if (!config_->contains(baseKey + "goals/type")){
+  if (!config_->contains(baseKey + "/goals/type")){
     throw std::runtime_error("No goals type specified.");
   }
 
   // read starts from config
   std::vector<ompl::base::ScopedState<>> startStates;
-  if (config_->get<std::string>(baseKey + "starts/type") == "specified"){
+  if (config_->get<std::string>(baseKey + "/starts/type") == "specified"){
     startStates = parseSpecifiedStates(baseKey + "starts/states");
   }
-  else if (config_->get<std::string>(baseKey + "starts/type") == "generated"){
-    startStates = generateRandomStates(baseKey + "starts/");
+  else if (config_->get<std::string>(baseKey + "/starts/type") == "generated"){
+    startStates = generateRandomStates(baseKey + "/starts");
   }
   else{
     throw std::runtime_error("Start type not supported. Must be either 'specified' or 'generated'.");
@@ -304,15 +303,15 @@ std::vector<StartGoalPair> BaseContext::parseMultiqueryStartGoalPairs() const{
   std::vector<std::shared_ptr<ompl::base::Goal>> goals;
 
   std::vector<ompl::base::ScopedState<>> goalStates;
-  if (config_->get<std::string>(baseKey + "goals/type") == "specified"){
-    goalStates = parseSpecifiedStates(baseKey + "goals/states");
+  if (config_->get<std::string>(baseKey + "/goals/type") == "specified"){
+    goalStates = parseSpecifiedStates(baseKey + "/goals/states");
   }
-  else if(config_->get<std::string>(baseKey + "goals/type") == "generated"){
-    goalStates = generateRandomStates(baseKey + "goals/");
+  else if(config_->get<std::string>(baseKey + "/goals/type") == "generated"){
+    goalStates = generateRandomStates(baseKey + "/goals");
   }
-  else if(config_->get<std::string>(baseKey + "goals/type") == "followStarts"){
+  else if(config_->get<std::string>(baseKey + "/goals/type") == "followStarts"){
     // the goal of the first query is the start of the next query.
-    const std::size_t numGoals = config_->get<std::size_t>(baseKey + "goals/numGenerated");
+    const std::size_t numGoals = config_->get<std::size_t>(baseKey + "/goals/numGenerated");
     for (auto i=0u; i<numGoals; ++i){
       if (i+1 < starts.size()){
         for (const auto tmp: starts[i+1]){
@@ -329,12 +328,12 @@ std::vector<StartGoalPair> BaseContext::parseMultiqueryStartGoalPairs() const{
     }
   }
   else{
-    throw std::runtime_error("Goal type not supported. Must be either 'specified', 'generated', or 'folowStarts'.");
+    throw std::runtime_error("Goal type not supported. Must be either 'specified', 'generated', or 'followStarts'.");
   }
 
   for (const auto &state: goalStates){
-    auto goal = std::make_shared<ompl::base::GoalStates>(spaceInfo_);
-    goal->as<ompl::base::GoalStates>()->addState(state);
+    auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+    goal->as<ompl::base::GoalState>()->setState(state);
     goals.emplace_back(goal);
   }
 

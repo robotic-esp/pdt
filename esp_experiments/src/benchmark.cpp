@@ -75,7 +75,7 @@ bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext> &co
   const auto status = planner->solve(ompl::base::timedPlannerTerminationCondition(runtime));
 
   if (!status) {
-    std::cout << "Failed" << std::endl;
+    std::cout << "Failed." << std::endl;
     return false;
   } else {
     std::cout << "OK." << std::endl;
@@ -104,7 +104,7 @@ int main(const int argc, const char **argv) {
     if (!checkContextValidity(context, contextCheckingRuntime)) {
       std::cout << "No solution found after " << contextCheckingRuntime << "s by RRT-Connect. "
                 << "This problem definition may not be solvable. Rerun with different seed or "
-                   "check starts and goals."
+                   "check starts and goals, or disable problem validation."
                 << std::endl;
       return 0;
     }
