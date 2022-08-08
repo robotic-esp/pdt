@@ -65,8 +65,8 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionPlotter::createMedianInitialSoluti
   // Add the initial solution plots.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     axis->addPlot(createMedianInitialSolutionPlot(name));
-    axis->addPlot(createMedianInitialSolutionDurationCIPlot(name));
-    axis->addPlot(createMedianInitialSolutionCostCIPlot(name));
+    axis->addPlot(createMedianInitialSolutionDurationCiPlot(name));
+    axis->addPlot(createMedianInitialSolutionCostCiPlot(name));
   }
 
   return axis;
@@ -79,8 +79,8 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionPlotter::createMedianInitialSoluti
 
   // Add the initial solution plots.
   axis->addPlot(createMedianInitialSolutionPlot(plannerName));
-  axis->addPlot(createMedianInitialSolutionDurationCIPlot(plannerName));
-  axis->addPlot(createMedianInitialSolutionCostCIPlot(plannerName));
+  axis->addPlot(createMedianInitialSolutionDurationCiPlot(plannerName));
+  axis->addPlot(createMedianInitialSolutionCostCiPlot(plannerName));
 
   return axis;
 }
@@ -147,7 +147,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionDurationCIPlot(
+std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionDurationCiPlot(
     const std::string& plannerName) const {
   // Totally misusing the table class for reading in values from csvs...
   // Load the median initial solution.
@@ -182,7 +182,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionCostCIPlot(
+std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionCostCiPlot(
     const std::string& plannerName) const {
   // Totally misusing the table class for reading in values from csvs...
   // Load the median initial solution.

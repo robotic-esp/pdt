@@ -191,12 +191,12 @@ std::string PopulationStatistics::percentileKey(const double percentile) const {
   return key.str();
 }
 
-const PopulationStatistics::ConfidenceIntervalIterator PopulationStatistics::begin(
+PopulationStatistics::ConfidenceIntervalIterator PopulationStatistics::begin(
     const double percentile) const {
-  return ConfidenceIntervalIterator(this, percentile, 0u);
+  return ConfidenceIntervalIterator(this, percentile, 0);
 }
 
-const PopulationStatistics::ConfidenceIntervalIterator PopulationStatistics::end(
+PopulationStatistics::ConfidenceIntervalIterator PopulationStatistics::end(
     const double percentile) const {
   return ConfidenceIntervalIterator(this, percentile);
 }
@@ -207,7 +207,7 @@ PopulationStatistics::ConfidenceIntervalIterator::ConfidenceIntervalIterator(
     percentile_(percentile),
     centreIdx_(parent_->estimatePercentileAsIndex(percentile_)),
     maxDereferenceOffset_(std::max(centreIdx_, parent_->getSampleSize() - 1u - centreIdx_)) {
-  *this += static_cast<difference_type>(offset);
+  *this += offset;
 }
 
 PopulationStatistics::ConfidenceIntervalIterator::ConfidenceIntervalIterator(
@@ -241,13 +241,13 @@ PopulationStatistics::ConfidenceIntervalIterator::pointer
 
 PopulationStatistics::ConfidenceIntervalIterator& PopulationStatistics::ConfidenceIntervalIterator::
 operator++() {
-  *this += static_cast<difference_type>(1u);
+  *this += 1;
   return *this;
 }
 
 PopulationStatistics::ConfidenceIntervalIterator& PopulationStatistics::ConfidenceIntervalIterator::
 operator--() {
-  *this += -static_cast<difference_type>(1u);
+  *this += -1;
   return *this;
 }
 
@@ -263,7 +263,7 @@ operator+=(const difference_type delta) {
       throw std::out_of_range(msg);
     }
   } else {
-    if (static_cast<std::size_t>(std::abs(delta)) > maxDereferenceOffset_ - offset_ + 1u) {
+    if (static_cast<std::size_t>(delta) > maxDereferenceOffset_ - offset_ + 1u) {
       // Moving beyond end(), i.e., to an offset_ beyond maxDereferenceOffset_ + 1.
       auto msg = "Attempting to move ConfidenceIntervalIterator from " + std::to_string(offset_) +
                  " by "s + std::to_string(delta) + " which would be more than end()."s;
@@ -275,7 +275,7 @@ operator+=(const difference_type delta) {
   if (delta < 0) {
     offset_ = offset_ - static_cast<std::size_t>(std::abs(delta));
   } else {
-    offset_ = offset_ + static_cast<std::size_t>(std::abs(delta));
+    offset_ = offset_ + static_cast<std::size_t>(delta);
   }
 
   // Offsets are valid until _both_ indices are at the limit in order to support asymmetric centre

@@ -822,7 +822,6 @@ double Statistics::getMedianInitialSolutionCost(const PlannerResults& results) c
 
 std::vector<double> Statistics::getNthCosts(const PlannerResults& results, const std::size_t n,
                                             const std::vector<double>& durations) const {
-  // Note that n is taken as an interpolation between the bounding integer indices
   if (durations.empty()) {
     auto msg = "Expected at least one duration."s;
     throw std::runtime_error(msg);

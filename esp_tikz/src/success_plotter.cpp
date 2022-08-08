@@ -66,20 +66,20 @@ std::shared_ptr<PgfAxis> SuccessPlotter::createSuccessAxis() const {
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("successPlots/plotConfidenceIntervalInAllPlots")) {
-      std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
-      bool successCI = true;
+      std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
+      bool successCi = true;
       try {
-        upperCI = createSuccessUpperCIPlot(name);
-        lowerCI = createSuccessLowerCIPlot(name);
-        fillCI = createSuccessFillCIPlot(name);
+        upperCi = createSuccessUpperCiPlot(name);
+        lowerCi = createSuccessLowerCiPlot(name);
+        fillCi = createSuccessFillCiPlot(name);
       } catch (const std::runtime_error& e) {
         // If the above methods throw, the corresponding plots should not be added.
-        successCI = false;
+        successCi = false;
       }
-      if (successCI) {
-        axis->addPlot(upperCI);
-        axis->addPlot(lowerCI);
-        axis->addPlot(fillCI);
+      if (successCi) {
+        axis->addPlot(upperCi);
+        axis->addPlot(lowerCi);
+        axis->addPlot(fillCi);
       }
     }
 
@@ -96,20 +96,20 @@ std::shared_ptr<PgfAxis> SuccessPlotter::createSuccessAxis(const std::string& pl
 
   // First the lower and upper confidence bounds, if desired.
   if (config_->get<bool>("successPlots/plotConfidenceIntervalInAllPlots")) {
-    std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
-    bool successCI = true;
+    std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
+    bool successCi = true;
     try {
-      upperCI = createSuccessUpperCIPlot(plannerName);
-      lowerCI = createSuccessLowerCIPlot(plannerName);
-      fillCI = createSuccessFillCIPlot(plannerName);
+      upperCi = createSuccessUpperCiPlot(plannerName);
+      lowerCi = createSuccessLowerCiPlot(plannerName);
+      fillCi = createSuccessFillCiPlot(plannerName);
     } catch (const std::runtime_error& e) {
       // If the above methods throw, the corresponding plots should not be added.
-      successCI = false;
+      successCi = false;
     }
-    if (successCI) {
-      axis->addPlot(upperCI);
-      axis->addPlot(lowerCI);
-      axis->addPlot(fillCI);
+    if (successCi) {
+      axis->addPlot(upperCi);
+      axis->addPlot(lowerCi);
+      axis->addPlot(fillCi);
     }
   }
 
@@ -193,7 +193,7 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessPlot(const std::string& pl
   return plot;
 }
 
-std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessUpperCIPlot(
+std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table =
@@ -205,7 +205,7 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessUpperCIPlot(
   table->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
 
   if (table->empty()) {
-    throw std::runtime_error("Cannot create UpperCI for success plot of '"s + plannerName + "'.");
+    throw std::runtime_error("Cannot create upper CI for success plot of '"s + plannerName + "'.");
   }
 
   // Multiply the cdf values by 100 to get the percentage.
@@ -229,7 +229,7 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessUpperCIPlot(
   return plot;
 }
 
-std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessLowerCIPlot(
+std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table =
@@ -241,7 +241,7 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessLowerCIPlot(
   table->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
 
   if (table->empty()) {
-    throw std::runtime_error("Cannot create LowerCI for success plot of '"s + plannerName + "'.");
+    throw std::runtime_error("Cannot create lower CI for success plot of '"s + plannerName + "'.");
   }
 
   // Multiply the cdf values by 100 to get the percentage.
@@ -265,7 +265,7 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessLowerCIPlot(
   return plot;
 }
 
-std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessFillCIPlot(
+std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween = std::make_shared<PgfFillBetween>(plannerName + "SuccessUpperConfidence",

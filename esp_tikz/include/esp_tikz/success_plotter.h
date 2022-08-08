@@ -68,9 +68,9 @@ class SuccessPlotter : public LatexPlotter {
 
  private:
   std::shared_ptr<PgfPlot> createSuccessPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createSuccessUpperCIPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createSuccessLowerCIPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createSuccessFillCIPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createSuccessUpperCiPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createSuccessLowerCiPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createSuccessFillCiPlot(const std::string& plannerName) const;
 
   void setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 

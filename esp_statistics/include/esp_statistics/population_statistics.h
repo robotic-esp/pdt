@@ -119,8 +119,8 @@ class PopulationStatistics {
   std::string percentileKey(double percentile) const;
 
   // Iterator interface for finding a specified CI for a percentile.
-  const ConfidenceIntervalIterator begin(const double percentile) const;
-  const ConfidenceIntervalIterator end(const double percentile) const;
+  ConfidenceIntervalIterator begin(const double percentile) const;
+  ConfidenceIntervalIterator end(const double percentile) const;
 
   std::shared_ptr<Configuration> config_;
   INDEX_ROUNDING round_;
