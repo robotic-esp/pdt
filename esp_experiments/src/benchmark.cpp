@@ -102,9 +102,13 @@ int main(const int argc, const char **argv) {
       config->get<bool>("experiment/validateProblemDefinition")) {
     const double contextCheckingRuntime = config->get<double>("experiment/validateProblemDuration");
     if (!checkContextValidity(context, contextCheckingRuntime)) {
-      std::cout << "No solution found after " << contextCheckingRuntime << "s by RRT-Connect. "
-                << "This problem definition may not be solvable. Rerun with different seed or "
-                   "check starts and goals, or disable problem validation."
+      std::cout << "This problem definition may not be solveable since RRT-Connect did not find a "
+                   "solution in "
+                << contextCheckingRuntime
+                << "s. Please check the start and goal states, use a different pseudorandom seed "
+                   "if the problem was randomly generated, and/or increase the validation time "
+                   "('experiment/validateProblemDuration'). You may also disable this problem "
+                   "definition validation ('experiment/validateProblemDefinition')."
                 << std::endl;
       return 0;
     }
