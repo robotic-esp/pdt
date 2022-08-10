@@ -115,7 +115,9 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
   // Set up the space info.
   spaceInfo_->setup();
 
-  startGoalPairs_ = makeStartGoalPair();
+  if (!generateQueriesBeforeObstacles) {
+    startGoalPairs_ = makeStartGoalPair();
+  }
 }
 
 ompl::base::RealVectorBounds ReedsSheppRandomRectangles::getBoundaries() const {
