@@ -78,6 +78,26 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
     bounds_.high.at(dim) = 0.5 * sideLengths.at(dim);
   }
 
+  bool generateQueriesBeforeObstacles = false;
+
+  // If we only specify one single start, we first place that start/goal pair, and then generate
+  // valid obstacles around them.
+  if (config_->contains("context/" + name_ + "/start")) {
+    generateQueriesBeforeObstacles = true;
+  } else if (config_->get<std::string>("context/" + name + "/starts/type") == "specified") {
+    if (config_->get<std::size_t>("context/" + name + "/starts/numGenerated") == 1) {
+      generateQueriesBeforeObstacles = true;
+    } else {
+      throw std::runtime_error(
+          "Context error. Multiple specified starts/goals are not supported for this context at "
+          "the moment.");
+    }
+  }
+
+  if (generateQueriesBeforeObstacles) {
+    startGoalPairs_ = makeStartGoalPair();
+  }
+
   // Create the obstacles and add them to the validity checker.
   createObstacles();
 
@@ -94,7 +114,7 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
 
   // Set up the space info.
   spaceInfo_->setup();
-  
+
   startGoalPairs_ = makeStartGoalPair();
 }
 
@@ -108,7 +128,7 @@ void ReedsSheppRandomRectangles::accept(const ContextVisitor& visitor) const {
 
 void ReedsSheppRandomRectangles::createObstacles() {
   // Instantiate obstacles.
-  for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
+  while (obstacles_.size() < numRectangles_) {
     // Create a random anchor (uniform).
     ompl::base::ScopedState<> anchor(realVectorSubspaceInfo_);
     anchor.random();
@@ -118,9 +138,54 @@ void ReedsSheppRandomRectangles::createObstacles() {
     for (std::size_t j = 0; j < 2u; ++j) {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
+
     auto obstacle =
         std::make_shared<Hyperrectangle<BaseObstacle>>(realVectorSubspaceInfo_, anchor, widths);
-    obstacles_.emplace_back(obstacle);
+
+    auto validityChecker = std::make_shared<ReedsSheppValidityChecker>(spaceInfo_);
+    validityChecker->addObstacle(obstacle);
+
+    // Add this to the obstacles if it doesn't invalidate the start or goal state.
+    bool invalidates = false;
+    for (const auto& startGoalPair : startGoalPairs_) {
+      for (const auto& start : startGoalPair.start) {
+        if (!validityChecker->isValid(start.get())) {
+          invalidates = true;
+          // Break out of inner for loop over starts
+          break;
+        }
+      }
+      if (invalidates) {
+        // Break out of outer for loop over start-goal pairs
+        break;
+      }
+
+      if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
+        if (!validityChecker->isValid(
+                startGoalPair.goal->as<ompl::base::GoalState>()->getState())) {
+          invalidates = true;
+        }
+      } else if (goalType_ == ompl::base::GoalType::GOAL_STATES) {
+        for (auto i = 0u; i < startGoalPair.goal->as<ompl::base::GoalStates>()->getStateCount();
+             ++i) {
+          if (!validityChecker->isValid(
+                  startGoalPair.goal->as<ompl::base::GoalStates>()->getState(i))) {
+            invalidates = true;
+            // Break out of inner for loop over goals
+            break;
+          }
+        }
+      }
+
+      if (invalidates) {
+        // Break out of outer for loop over start-goal pairs
+        break;
+      }
+    }
+
+    if (!invalidates) {
+      obstacles_.emplace_back(obstacle);
+    }
   }
 }
 

@@ -120,9 +120,6 @@ void RandomRectanglesMultiStartGoal::accept(const ContextVisitor& visitor) const
 }
 
 void RandomRectanglesMultiStartGoal::createObstacles() {
-  // Create a goal to make sure the obstacles don't invalidate it.
-  const auto &goal = startGoalPairs_[0].goal;
-
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
     // Create a random anchor (uniform).
@@ -144,6 +141,7 @@ void RandomRectanglesMultiStartGoal::createObstacles() {
     }
     if (!invalidates && (goalType_ == ompl::base::GoalType::GOAL_STATE ||
                          goalType_ == ompl::base::GoalType::GOAL_STATES)) {
+      const auto& goal = startGoalPairs_[0].goal;
       if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
         invalidates = obstacle->invalidates(goal->as<ompl::base::GoalState>()->getState());
         break;

@@ -212,6 +212,13 @@ std::vector<ompl::base::ScopedState<>> BaseContext::parseSpecifiedStates(const s
   const auto positions = config_->get<std::vector<std::vector<double>>>(key);
 
   for (const auto &s: positions){
+    // ensure that the dimensionality works
+    if (s.size() != dimensionality_) {
+      OMPL_ERROR("%s: Dimensionality of problem and of state specification does not match.",
+                 name_.c_str());
+      throw std::runtime_error("Context error.");
+    }
+
     // Allocate a state and fill the state's coordinates.
     ompl::base::ScopedState<> state(spaceInfo_);
     for (auto i = 0u; i < dimensionality_; ++i) {
@@ -236,6 +243,12 @@ std::vector<ompl::base::ScopedState<>> BaseContext::generateRandomStates(const s
       } while (!spaceInfo_->isValid(s.get()));
     }
     else if (config_->get<std::string>(key + "/generativeModel") == "subregion"){
+      if (spaceInfo_->getStateSpace()->getType() != ompl::base::STATE_SPACE_REAL_VECTOR) {
+        OMPL_ERROR("%s: Subregion currently only supports RealVectorStateSpace.",
+                 name_.c_str());
+        throw std::runtime_error("Context error.");
+      }
+
       const auto low = config_->get<std::vector<double>>(key + "/generator/lowerBounds");
       const auto high = config_->get<std::vector<double>>(key + "/generator/upperBounds");
 

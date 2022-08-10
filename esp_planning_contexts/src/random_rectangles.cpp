@@ -132,15 +132,18 @@ void RandomRectangles::createObstacles() {
 
     auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths);
 
+    // Add this to the obstacles if it doesn't invalidate the start or goal state.
     bool invalidates = false;
     for (const auto& startGoalPair : startGoalPairs_) {
       for (const auto& start : startGoalPair.start) {
         if (obstacle->invalidates(start)) {
           invalidates = true;
+          // Break out of inner for loop over starts
           break;
         }
       }
       if (invalidates) {
+        // Break out of outer for loop over start-goal pairs
         break;
       }
 
@@ -153,12 +156,14 @@ void RandomRectangles::createObstacles() {
         for (auto i = 0u; i < startGoalPair.goal->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
           if (obstacle->invalidates(startGoalPair.goal->as<ompl::base::GoalStates>()->getState(i))) {
             invalidates = true;
+            // Break out of inner for loop over goals
             break;
           }
         }
       }
 
       if (invalidates) {
+        // Break out of outer for loop over start-goal pairs
         break;
       }
     }
