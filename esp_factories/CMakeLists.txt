@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(esp_factories)
 
 # Find the dependencies of this library.
+set_package_properties(Boost PROPERTIES
+  URL "https://boost.org"
+  PURPOSE "Provides standardized libraries, such as program options, filesystem I/O, etc.")
 find_package(Boost 1.58 REQUIRED COMPONENTS system)
 
 # Specify the library as a target.

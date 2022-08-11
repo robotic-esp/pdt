@@ -1,7 +1,21 @@
 # ESP OMPL TOOLS
 # Authors: Jonathan Gammell, Marlin Strub
+message(STATUS "CMake ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.10)
 project(esp_ompl_tools)
+
+# Display compiler and build info.
+message(STATUS "Configuring ESP OMPL TOOLS for ${CMAKE_BUILD_TYPE} mode.")
+message(STATUS "Compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+
+# CMake includes
+include(FeatureSummary)
+# include(GNUInstallDirs)
+
+# CMake paths
+set(CMAKE_MODULE_PATH
+    "${CMAKE_MODULE_PATH}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
 # Enforce out-of-source builds.
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
@@ -17,15 +31,14 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 
 # Let the user specify the path to the OMPL library they want to compile with.
+set_package_properties(ompl PROPERTIES
+   URL "https://ompl.kavrakilab.org"
+   PURPOSE "The Open Motion Plannig Library (OMPL) on which ESP_OMPL_TOOLS builds.")
 if(NOT ESP_OMPL_TOOLS_OMPL_DIR)
   find_package(ompl REQUIRED)
 else()
   find_package(ompl REQUIRED PATHS ${ESP_OMPL_TOOLS_OMPL_DIR} NO_DEFAULT_PATH)
 endif()
-
-# Display compiler and build info.
-message(STATUS "Configuring ESP OMPL TOOLS for ${CMAKE_BUILD_TYPE} mode.")
-message(STATUS "Compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
 # Add json as a thirdparty project.
 set(JSON_BuildTests OFF CACHE INTERNAL "") # Don't build the tests for json.
@@ -58,6 +71,7 @@ if(ESP_OMPL_TOOLS_OPEN_RAVE)
 endif()
 
 # Add the local libraries & executables.
+add_subdirectory(docs)
 add_subdirectory(esp_common)
 add_subdirectory(esp_configuration)
 add_subdirectory(esp_experiments)
@@ -84,3 +98,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(test/esp_configuration)
   add_subdirectory(test/esp_optimization_objectives)
 endif()
+
+# Helpful, but too noisy to leave on by default at the moment
+# feature_summary(DESCRIPTION INCLUDE_QUIET_PACKAGES WHAT ALL)
