@@ -43,6 +43,7 @@
 #include <vector>
 
 #include "esp_configuration/configuration.h"
+#include "esp_statistics/population_statistics.h"
 
 namespace esp {
 
@@ -60,7 +61,7 @@ class PlannerResults {
 
   // Access to measured runs.
   void addMeasuredRun(const PlannerResult& run);
-  const PlannerResult& getMeasuredRun(std::size_t i) const;
+  const PlannerResult& getMeasuredRun(const std::size_t i) const;
   void clearMeasuredRuns();
   std::size_t numMeasuredRuns() const;
 
@@ -71,24 +72,24 @@ class PlannerResults {
 
 class Statistics {
  public:
-  Statistics(const std::shared_ptr<Configuration>& config, const std::experimental::filesystem::path &resultsPath, bool forceComputation = false);
+  Statistics(const std::shared_ptr<Configuration>& config, const std::experimental::filesystem::path &resultsPath, const bool forceComputation);
   ~Statistics() = default;
 
   std::experimental::filesystem::path extractMedians(
-      const std::string& plannerName, std::size_t confidence = 99u,
+      const std::string& plannerName, const double confidence,
       const std::vector<double>& binDurations = {}) const;
 
   std::experimental::filesystem::path extractCostPercentiles(
-      const std::string& plannerName, std::set<double> percentile,
+      const std::string& plannerName, const std::set<double>& percentile,
       const std::vector<double>& binDurations = {}) const;
 
-  std::experimental::filesystem::path extractMedianInitialSolution(
-      const std::string& plannerName, std::size_t confidence = 99u) const;
+  std::experimental::filesystem::path extractMedianInitialSolution(const std::string& plannerName,
+                                                                   const double confidence) const;
 
-  std::experimental::filesystem::path extractInitialSolutionDurationCdf(
-      const std::string& plannerName) const;
+  std::experimental::filesystem::path extractInitialSolutionDurationEdf(
+      const std::string& plannerName, const double confidence) const;
 
-  std::experimental::filesystem::path extractInitialSolutionDurationPdf(
+  std::experimental::filesystem::path extractInitialSolutionDurationHistogram(
       const std::string& plannerName, const std::vector<double>& binDurations = {}) const;
 
   std::experimental::filesystem::path extractInitialSolutions(const std::string& plannerName) const;
@@ -131,34 +132,25 @@ class Statistics {
   // The identifying header line that starts each file produced by this class.
   std::string createHeader(const std::string& statisticType, const std::string& plannerName) const;
 
-  // Get the median confidence interval.
-  struct ConfidenceInterval {
-    // The lower and upper bounds are zero-based indices. If I have 10 measurements in a sorted
-    // vector, e.g.,
-    //   v = { 0.1 0.3 0.4 0.5 0.8 0.9 1.1 1.3 1.7 1.9 },
-    // then lower and upper bound indices of 1 and 8, respectively, mean that the median is with
-    // <probability> certainty between v[1] and v[8].
-    std::size_t lower{0u}, upper{0u};
-    float probability{0.0f};
-  };
-  ConfidenceInterval getMedianConfidenceInterval(std::size_t confidence) const;
-
-  std::vector<double> getMedianCosts(const PlannerResults& results,
-                                     const std::vector<double>& durations) const;
-  std::vector<double> getNthCosts(const PlannerResults& results, std::size_t n,
+  std::vector<double> getPercentileCosts(const PlannerResults& results, const double percentile,
+                                         const std::vector<double>& durations) const;
+  std::vector<double> getNthCosts(const PlannerResults& results, const std::size_t n,
                                   const std::vector<double>& durations) const;
 
   double getMedianInitialSolutionDuration(const PlannerResults& results) const;
   double getMedianInitialSolutionCost(const PlannerResults& results) const;
 
-  double getNthInitialSolutionDuration(const PlannerResults& results, std::size_t n) const;
-  double getNthInitialSolutionCost(const PlannerResults& results, std::size_t n) const;
+  double getNthInitialSolutionDuration(const PlannerResults& results, const std::size_t n) const;
+  double getNthInitialSolutionCost(const PlannerResults& results, const std::size_t n) const;
 
   std::vector<double> getInitialSolutionDurations(const PlannerResults& results) const;
   std::vector<double> getInitialSolutionCosts(const PlannerResults& results) const;
 
+  double getNthValue(std::vector<double>* values, const std::size_t n) const;
+
   std::shared_ptr<Configuration> config_;
   const std::experimental::filesystem::path statisticsDirectory_;
+  PopulationStatistics populationStats_;
 
   // When this is false, all extractions check if the file they would creat exists. If it does, the
   // path to the file is returned instead of recomputing.

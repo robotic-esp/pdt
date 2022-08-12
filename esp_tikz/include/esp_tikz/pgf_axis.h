@@ -83,7 +83,6 @@ class PgfAxis {
 
  public:
   struct {
-    std::string string() const;
     // General options.
     std::string at{"(0cm, 0cm)"};
     std::string anchor{""};

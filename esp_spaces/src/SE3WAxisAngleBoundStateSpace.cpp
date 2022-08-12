@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, University of Toronto
+ *  Copyright (c) 2020, University of Oxford
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the University of Toronto nor the names of its
+ *   * Neither the name of the Rice University nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,51 +32,16 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+/* Author: Marlin Strub */
 
-#pragma once
+#include "esp_spaces/SE3WAxisAngleBoundStateSpace.h"
 
-#include <experimental/filesystem>
-#include <memory>
-#include <string>
+ompl::base::State *esp::ompltools::SE3WAxisAngleBoundStateSpace::allocState() const {
+  auto *state = new StateType();
+  allocStateComponents(state);
+  return state;
+}
 
-#include "esp_configuration/configuration.h"
-#include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
-
-namespace esp {
-
-namespace ompltools {
-
-class InitialSolutionScatterPlotter : public LatexPlotter {
- public:
-  InitialSolutionScatterPlotter(const std::shared_ptr<const Configuration>& config,
-                                const Statistics& stats);
-  ~InitialSolutionScatterPlotter() = default;
-
-  // Creates a pgf axis that hold the initial solution scatter plot of all planners.
-  std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis() const;
-
-  // Creates a pgf axis that hold the initial solution scatter plot of the specified planner.
-  std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis(
-      const std::string& plannerName) const;
-
-  // Creates a tikz picture that contains the initial solution scatter plot of all planners.
-  std::experimental::filesystem::path createInitialSolutionScatterPicture() const;
-
-  // Creates a tikz picture that contains the initial solution scatter plot axis of all planners.
-  std::experimental::filesystem::path createInitialSolutionScatterPicture(
-      const std::string& plannerName) const;
-
- private:
-  std::shared_ptr<PgfPlot> createInitialSolutionScatterPlot(
-      const std::string& plannerName) const;
-
-  void setInitialSolutionScatterAxisOptions(std::shared_ptr<PgfAxis> axis) const;
-
-  const Statistics& stats_;
-};
-
-}  // namespace ompltools
-
-}  // namespace esp
+void esp::ompltools::SE3WAxisAngleBoundStateSpace::freeState(ompl::base::State *state) const {
+  ompl::base::CompoundStateSpace::freeState(state);
+}

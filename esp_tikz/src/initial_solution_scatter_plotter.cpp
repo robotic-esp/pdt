@@ -91,7 +91,7 @@ fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture() co
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                     fs::path("tikz/all_planners_initial_solution_pdf_plot.tikz");
+                     fs::path("tikz/all_planners_initial_solution_histogram_plot.tikz");
   picture.write(picturePath);
   return picturePath;
 }
@@ -104,7 +104,7 @@ fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture(
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                     fs::path("tikz/"s + plannerName + "_initial_solution_pdf_plot.tikz"s);
+                     fs::path("tikz/"s + plannerName + "_initial_solution_histogram_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;
 }

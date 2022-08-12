@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(esp_factories)
 
 # Find the dependencies of this library.
+set_package_properties(Boost PROPERTIES
+  URL "https://boost.org"
+  PURPOSE "Provides standardized libraries, such as program options, filesystem I/O, etc.")
 find_package(Boost 1.58 REQUIRED COMPONENTS system)
 
 # Specify the library as a target.
@@ -28,7 +31,8 @@ target_link_libraries(esp_factories
   ${OMPL_LIBRARIES}
   esp_common
   esp_configuration
-  esp_planning_contexts)
+  esp_planning_contexts
+  esp_spaces)
 
 # Add esp_open_rave as a link targets if requested.
 if(ESP_OMPL_TOOLS_OPEN_RAVE)

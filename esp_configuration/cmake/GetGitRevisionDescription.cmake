@@ -88,6 +88,9 @@ endfunction()
 
 function(git_describe _var)
 	if(NOT GIT_FOUND)
+    set_package_properties(Git PROPERTIES
+      URL "https://git-scm.com/"
+      PURPOSE "Information on the status of the working copy.")
 		find_package(Git QUIET)
 	endif()
 	get_git_head_revision(refspec hash)
@@ -137,6 +140,9 @@ endfunction()
 
 function(git_local_changes _var)
 	if(NOT GIT_FOUND)
+    set_package_properties(Git PROPERTIES
+      URL "https://git-scm.com/"
+      PURPOSE "Information on the status of the working copy.")
 		find_package(Git QUIET)
 	endif()
 	get_git_head_revision(refspec hash)

@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/initial_solution_duration_pdf_plotter.h"
+#include "esp_tikz/initial_solution_duration_histogram_plotter.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -54,19 +54,19 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-InitialSolutionDurationPdfPlotter::InitialSolutionDurationPdfPlotter(
+InitialSolutionDurationHistogramPlotter::InitialSolutionDurationHistogramPlotter(
     const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfAxis()
-    const {
+std::shared_ptr<PgfAxis>
+InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramAxis() const {
   axis_ = std::make_shared<PgfAxis>();
-  setInitialSolutionDurationPdfAxisOptions(axis_);
+  setInitialSolutionDurationHistogramAxisOptions(axis_);
 
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
-    auto plot = createInitialSolutionDurationPdfPlot(name);
+    auto plot = createInitialSolutionDurationHistogramPlot(name);
     plot->options.fillOpacity = config_->get<float>("initialSolutionPlots/combinedFillOpacity");
     plot->options.lineWidth = config_->get<double>("initialSolutionPlots/lineWidth");
     axis_->addPlot(plot);
@@ -75,47 +75,51 @@ std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutio
   return axis_;
 }
 
-std::shared_ptr<PgfAxis> InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfAxis(
+std::shared_ptr<PgfAxis>
+InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramAxis(
     const std::string& plannerName) const {
   axis_ = std::make_shared<PgfAxis>();
-  setInitialSolutionDurationPdfAxisOptions(axis_);
+  setInitialSolutionDurationHistogramAxisOptions(axis_);
   axis_->options.name = plannerName + "ISDPA"s;
-  axis_->addPlot(createInitialSolutionDurationPdfPlot(plannerName));
+  axis_->addPlot(createInitialSolutionDurationHistogramPlot(plannerName));
   return axis_;
 }
 
-fs::path InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPicture() const {
+fs::path InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramPicture()
+    const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  axis_ = createInitialSolutionDurationPdfAxis();
+  axis_ = createInitialSolutionDurationHistogramAxis();
   picture.addAxis(axis_);
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                     fs::path("tikz/all_planners_initial_solution_pdf_plot.tikz");
+                     fs::path("tikz/all_planners_initial_solution_histogram_plot.tikz");
   picture.write(picturePath);
   return picturePath;
 }
 
-fs::path InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPicture(
+fs::path InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  axis_ = createInitialSolutionDurationPdfAxis(plannerName);
+  axis_ = createInitialSolutionDurationHistogramAxis(plannerName);
   picture.addAxis(axis_);
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                     fs::path("tikz/"s + plannerName + "_initial_solution_pdf_plot.tikz"s);
+                     fs::path("tikz/"s + plannerName + "_initial_solution_histogram_plot.tikz"s);
   picture.write(picturePath);
   return picturePath;
 }
 
-std::shared_ptr<PgfPlot> InitialSolutionDurationPdfPlotter::createInitialSolutionDurationPdfPlot(
+std::shared_ptr<PgfPlot>
+InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramPlot(
     const std::string& plannerName) const {
   // Load the data into a pgf table.
-  auto table = std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationPdf(plannerName),
-                                          "bin begin durations", "bin counts");
+  auto table =
+      std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationHistogram(plannerName),
+                                 "bin begin durations", "bin counts");
 
   // This table should not clean its data (or should it?).
   table->setCleanData(false);
@@ -135,18 +139,18 @@ std::shared_ptr<PgfPlot> InitialSolutionDurationPdfPlotter::createInitialSolutio
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.mark = "\"none\"";
   plot->options.lineWidth = 0.0;
-  plot->options.namePath = plannerName + "InitialSolutionDurationPdf"s;
+  plot->options.namePath = plannerName + "InitialSolutionDurationHistogram"s;
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.fill = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
 
   return plot;
 }
 
-void InitialSolutionDurationPdfPlotter::setInitialSolutionDurationPdfAxisOptions(
+void InitialSolutionDurationHistogramPlotter::setInitialSolutionDurationHistogramAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.height = config_->get<std::string>("initialSolutionPlots/axisHeight");
   axis->options.width = config_->get<std::string>("initialSolutionPlots/axisWidth");
-  axis->options.name = "InitialSolutionDurationPdfAxis"s;
+  axis->options.name = "InitialSolutionDurationHistogramAxis"s;
   axis->options.xlog = config_->get<bool>("initialSolutionPlots/xlog");
   axis->options.ymin = 0.0;
   axis->options.enlargeYLimits = "upper";

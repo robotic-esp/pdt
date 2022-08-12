@@ -58,31 +58,6 @@ MedianInitialSolutionPlotter::MedianInitialSolutionPlotter(
   minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 
-// The lookup table for confidence intervals.
-struct Interval {
-  std::size_t lower{0u}, upper{0u};
-  float probability{0.0f};
-};
-static const std::map<std::size_t, std::map<std::size_t, Interval>> medianConfidenceIntervals = {
-    {10u, {{95u, {1u, 8u, 0.9511f}}, {99u, {0u, 9u, 0.9910f}}}},
-    {50u, {{95u, {18u, 32u, 0.9511f}}, {99u, {15u, 34u, 0.9910f}}}},
-    {100u, {{95u, {40u, 60u, 0.9540f}}, {99u, {37u, 63u, 0.9907f}}}},
-    {200u, {{95u, {86u, 114u, 0.9520f}}, {99u, {81u, 118u, 0.9906f}}}},
-    {250u, {{95u, {110u, 141u, 0.9503f}}, {99u, {104u, 145u, 0.9900f}}}},
-    {300u, {{95u, {133u, 167u, 0.9502f}}, {99u, {127u, 172u, 0.9903f}}}},
-    {400u, {{95u, {179u, 219u, 0.9522f}}, {99u, {174u, 226u, 0.9907f}}}},
-    {500u, {{95u, {228u, 272u, 0.9508f}}, {99u, {221u, 279u, 0.9905f}}}},
-    {600u, {{95u, {274u, 323u, 0.9508f}}, {99u, {267u, 331u, 0.9907f}}}},
-    {700u, {{95u, {324u, 376u, 0.9517f}}, {99u, {314u, 383u, 0.9901f}}}},
-    {800u, {{95u, {371u, 427u, 0.9511f}}, {99u, {363u, 436u, 0.9900f}}}},
-    {900u, {{95u, {420u, 479u, 0.9503f}}, {99u, {410u, 488u, 0.9904f}}}},
-    {1000u, {{95u, {469u, 531u, 0.9500f}}, {99u, {458u, 531u, 0.9905f}}}},
-    {2000u, {{95u, {955u, 1043u, 0.9504f}}, {99u, {940u, 1056u, 0.9901f}}}},
-    {5000u, {{95u, {2429u, 2568u, 0.9503f}}, {99u, {2406u, 2589u, 0.9901f}}}},
-    {10000u, {{95u, {4897u, 5094u, 0.9500f}}, {99u, {4869u, 5127u, 0.9900f}}}},
-    {100000u, {{95u, {49687u, 50307u, 0.9500f}}, {99u, {49588u, 50403u, 0.9900f}}}},
-    {1000000u, {{95u, {499018u, 500978u, 0.9500f}}, {99u, {498707u, 501283u, 0.9900f}}}}};
-
 std::shared_ptr<PgfAxis> MedianInitialSolutionPlotter::createMedianInitialSolutionAxis() const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialSolutionAxisOptions(axis);
@@ -90,8 +65,8 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionPlotter::createMedianInitialSoluti
   // Add the initial solution plots.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     axis->addPlot(createMedianInitialSolutionPlot(name));
-    axis->addPlot(createMedianInitialSolutionDurationCIPlot(name));
-    axis->addPlot(createMedianInitialSolutionCostCIPlot(name));
+    axis->addPlot(createMedianInitialSolutionDurationCiPlot(name));
+    axis->addPlot(createMedianInitialSolutionCostCiPlot(name));
   }
 
   return axis;
@@ -104,8 +79,8 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionPlotter::createMedianInitialSoluti
 
   // Add the initial solution plots.
   axis->addPlot(createMedianInitialSolutionPlot(plannerName));
-  axis->addPlot(createMedianInitialSolutionDurationCIPlot(plannerName));
-  axis->addPlot(createMedianInitialSolutionCostCIPlot(plannerName));
+  axis->addPlot(createMedianInitialSolutionDurationCiPlot(plannerName));
+  axis->addPlot(createMedianInitialSolutionCostCiPlot(plannerName));
 
   return axis;
 }
@@ -159,7 +134,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
   // Load the median initial duration and cost into a table.
   auto table = std::make_shared<PgfTable>(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<std::size_t>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Create the plot.
@@ -172,21 +147,20 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionDurationCIPlot(
+std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionDurationCiPlot(
     const std::string& plannerName) const {
   // Totally misusing the table class for reading in values from csvs...
   // Load the median initial solution.
   PgfTable medianInitialSolution(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<std::size_t>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Load the duration confidence interval.
-  PgfTable interval(
-      stats_.extractMedianInitialSolution(
-          plannerName, config_->get<std::size_t>("medianInitialSolutionPlots/confidence")),
-      "lower initial solution duration confidence bound",
-      "upper initial solution duration confidence bound");
+  PgfTable interval(stats_.extractMedianInitialSolution(
+                        plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
+                    "lower initial solution duration confidence bound",
+                    "upper initial solution duration confidence bound");
 
   double medianCost = medianInitialSolution.getRow(0u).at(1u);
   double lowerDurationBound = interval.getRow(0u).at(0u);
@@ -208,21 +182,20 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionCostCIPlot(
+std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionCostCiPlot(
     const std::string& plannerName) const {
   // Totally misusing the table class for reading in values from csvs...
   // Load the median initial solution.
   PgfTable medianInitialSolution(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<std::size_t>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Load the duration confidence interval.
-  PgfTable interval(
-      stats_.extractMedianInitialSolution(
-          plannerName, config_->get<std::size_t>("medianInitialSolutionPlots/confidence")),
-      "lower initial solution cost confidence bound",
-      "upper initial solution cost confidence bound");
+  PgfTable interval(stats_.extractMedianInitialSolution(
+                        plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
+                    "lower initial solution cost confidence bound",
+                    "upper initial solution cost confidence bound");
 
   double medianDuration = medianInitialSolution.getRow(0u).at(0u);
   double lowerCostBound = interval.getRow(0u).at(0u);

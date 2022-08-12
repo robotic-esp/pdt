@@ -41,7 +41,6 @@
 #include <ompl/base/spaces/ReedsSheppStateSpace.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
-#include <ompl/base/spaces/SE3WAxisAngleBoundStateSpace.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
 
 #include "nlohmann/json.hpp"
@@ -50,6 +49,7 @@
 #include "esp_planning_contexts/all_contexts.h"
 
 #ifdef ESP_OMPL_TOOLS_OPEN_RAVE
+#include "esp_spaces/SE3WAxisAngleBoundStateSpace.h"
 #include "esp_open_rave/open_rave_manipulator.h"
 #include "esp_open_rave/open_rave_r3.h"
 #include "esp_open_rave/open_rave_r3xso2.h"
@@ -214,7 +214,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
       try {
         // Allocate a real vector state space.
         // The state space bounds are set in the context.
-        auto stateSpace = std::make_shared<ompl::base::SE3WAxisAngleBoundStateSpace>();
+        auto stateSpace = std::make_shared<SE3WAxisAngleBoundStateSpace>();
         stateSpace->setMaxRotation(config_->get<double>(parentKey + "/maxRotation"));
 
         // Allocate the state information for this space.

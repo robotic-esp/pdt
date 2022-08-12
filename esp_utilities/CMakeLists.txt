@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(esp_utilities)
 
 # Find the dependencies of this library.
+set_package_properties(Eigen3 PROPERTIES
+  URL "http://eigen.tuxfamily.org"
+  PURPOSE "A general linear algebra library.")
 find_package(Eigen3 REQUIRED)
 
 # Specify the library as a target.

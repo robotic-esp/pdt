@@ -70,9 +70,9 @@ class MedianInitialSolutionPlotter : public LatexPlotter {
 
  private:
   std::shared_ptr<PgfPlot> createMedianInitialSolutionPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionDurationCIPlot(
+  std::shared_ptr<PgfPlot> createMedianInitialSolutionDurationCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionCostCIPlot(
+  std::shared_ptr<PgfPlot> createMedianInitialSolutionCostCiPlot(
       const std::string& plannerName) const;
 
   void setMedianInitialSolutionAxisOptions(std::shared_ptr<PgfAxis> axis) const;

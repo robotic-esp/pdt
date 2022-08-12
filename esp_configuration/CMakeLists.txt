@@ -13,6 +13,9 @@ configure_file(src/version.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/version.cpp @ONLY)
 configure_file(src/directory.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/directory.cpp @ONLY)
 
 # Find the dependencies of this library.
+set_package_properties(Boost PROPERTIES
+  URL "https://boost.org"
+  PURPOSE "Provides standardized libraries, such as program options, filesystem I/O, etc.")
 find_package(Boost 1.58 REQUIRED COMPONENTS program_options)
 
 # Specify the library as a target.
