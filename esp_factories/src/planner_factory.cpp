@@ -101,6 +101,35 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
           config_->get<double>(optionsKey + "/truncationParameter"));
       return {planner, PLANNER_TYPE::ABITSTAR};
     }
+    case PLANNER_TYPE::AITSTAR: {
+      // Allocate and configure a TBD* planner.
+      auto planner = std::make_shared<ompl::geometric::AITstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      planner->enablePruning(config_->get<bool>(optionsKey + "/enablePruning"));
+      planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
+      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
+      planner->trackApproximateSolutions(
+          config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
+      return {planner, PLANNER_TYPE::AITSTAR};
+    }
+    case PLANNER_TYPE::BITSTAR: {
+      // Allocate and configure a BIT* planner.
+      auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
+      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      planner->setName(plannerName);
+      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
+      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
+      planner->setSamplesPerBatch(config_->get<unsigned>(optionsKey + "/samplesPerBatch"));
+      planner->setPruning(config_->get<bool>(optionsKey + "/enablePruning"));
+      planner->setPruneThresholdFraction(config_->get<double>(optionsKey + "/pruningThreshold"));
+      planner->setDropSamplesOnPrune(config_->get<bool>(optionsKey + "/dropSamplesOnPrune"));
+      planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
+      planner->setStopOnSolnImprovement(
+          config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
+      return {planner, PLANNER_TYPE::BITSTAR};
+    }
     case PLANNER_TYPE::EIRMSTAR: {
       // Allocate and configure an EIRM* planner.
       auto planner = std::make_shared<ompl::geometric::EIRMstar>(context_->getSpaceInformation());
@@ -131,35 +160,6 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
       planner->trackApproximateSolutions(
           config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
       return {planner, PLANNER_TYPE::EITSTAR};
-    }
-    case PLANNER_TYPE::AITSTAR: {
-      // Allocate and configure a TBD* planner.
-      auto planner = std::make_shared<ompl::geometric::AITstar>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
-      planner->setName(plannerName);
-      planner->enablePruning(config_->get<bool>(optionsKey + "/enablePruning"));
-      planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
-      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
-      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
-      planner->trackApproximateSolutions(
-          config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
-      return {planner, PLANNER_TYPE::AITSTAR};
-    }
-    case PLANNER_TYPE::BITSTAR: {
-      // Allocate and configure a BIT* planner.
-      auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
-      planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
-      planner->setName(plannerName);
-      planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
-      planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
-      planner->setSamplesPerBatch(config_->get<unsigned>(optionsKey + "/samplesPerBatch"));
-      planner->setPruning(config_->get<bool>(optionsKey + "/enablePruning"));
-      planner->setPruneThresholdFraction(config_->get<double>(optionsKey + "/pruningThreshold"));
-      planner->setDropSamplesOnPrune(config_->get<bool>(optionsKey + "/dropSamplesOnPrune"));
-      planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
-      planner->setStopOnSolnImprovement(
-          config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
-      return {planner, PLANNER_TYPE::BITSTAR};
     }
     case PLANNER_TYPE::FMTSTAR: {
       // Allocate and configure an FMT* planner.
