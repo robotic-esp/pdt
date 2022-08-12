@@ -949,7 +949,7 @@ std::array<float, 4u> InteractiveVisualizer::interpolateColors(const float* colo
   return color;
 }
 
-void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iteration) const {
+void InteractiveVisualizer::drawPlannerSpecificVisualizations(const std::size_t iteration) const {
   switch (plannerType_) {
     case PLANNER_TYPE::BITSTAR:
     case PLANNER_TYPE::ABITSTAR: {
@@ -969,7 +969,7 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iterat
   }
 }
 
-void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iteration) const {
+void InteractiveVisualizer::drawBITstarSpecificVisualizations(const std::size_t iteration) const {
   // Get the BIT* specific data.
   auto bitstarData =
       std::dynamic_pointer_cast<const BITstarData>(getPlannerSpecificData(iteration));
@@ -1043,7 +1043,7 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
   }
 }
 
-void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iteration) const {
+void InteractiveVisualizer::drawAITstarSpecificVisualizations(const std::size_t iteration) const {
   // Get the TBD* specific data.
   auto aitstarData =
       std::dynamic_pointer_cast<const AITstarData>(getPlannerSpecificData(iteration));
@@ -1160,7 +1160,7 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
   }
 }
 
-void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iteration) const {
+void InteractiveVisualizer::drawEITstarSpecificVisualizations(const std::size_t iteration) const {
   // Get the EIT* specific data.
   auto eitstarData =
       std::dynamic_pointer_cast<const EITstarData>(getPlannerSpecificData(iteration));
@@ -1543,7 +1543,7 @@ std::vector<Eigen::Vector3f> InteractiveVisualizer::getEdges3D(std::size_t itera
   return edges;
 }
 
-std::vector<Eigen::Vector2f> InteractiveVisualizer::getPath2D(std::size_t iteration) const {
+std::vector<Eigen::Vector2f> InteractiveVisualizer::getPath2D(const std::size_t iteration) const {
   std::vector<Eigen::Vector2f> points{};
   auto solution = getSolutionPath(iteration);
   if (solution != nullptr) {
@@ -1557,7 +1557,7 @@ std::vector<Eigen::Vector2f> InteractiveVisualizer::getPath2D(std::size_t iterat
   return points;
 }
 
-std::vector<Eigen::Vector3f> InteractiveVisualizer::getPath3D(std::size_t iteration) const {
+std::vector<Eigen::Vector3f> InteractiveVisualizer::getPath3D(const std::size_t iteration) const {
   std::vector<Eigen::Vector3f> points{};
   auto solution = getSolutionPath(iteration);
   if (solution != nullptr) {
@@ -1571,7 +1571,7 @@ std::vector<Eigen::Vector3f> InteractiveVisualizer::getPath3D(std::size_t iterat
   return points;
 }
 
-std::vector<Eigen::Vector3f> InteractiveVisualizer::getPathSE2(std::size_t iteration) const {
+std::vector<Eigen::Vector3f> InteractiveVisualizer::getPathSE2(const std::size_t iteration) const {
   std::vector<Eigen::Vector3f> states{};
   auto solution = getSolutionPath(iteration);
   if (solution != nullptr) {

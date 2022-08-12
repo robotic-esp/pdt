@@ -121,7 +121,7 @@ void BaseVisualizer::setPlanner(
 }
 
 std::shared_ptr<const ompl::base::PlannerData> BaseVisualizer::getPlannerData(
-    std::size_t iteration) const {
+    const std::size_t iteration) const {
   std::scoped_lock lock(plannerDataMutex_);
   if (iteration >= plannerData_.size()) {
     std::cout << "Requested iteration: " << iteration << ", available: " << plannerData_.size()
@@ -132,7 +132,7 @@ std::shared_ptr<const ompl::base::PlannerData> BaseVisualizer::getPlannerData(
 }
 
 std::shared_ptr<const PlannerSpecificData> BaseVisualizer::getPlannerSpecificData(
-    std::size_t iteration) const {
+    const std::size_t iteration) const {
   std::scoped_lock lock(plannerSpecificDataMutex_);
   if (iteration >= plannerSpecificData_.size()) {
     std::cout << "Requested iteration: " << iteration
@@ -143,7 +143,7 @@ std::shared_ptr<const PlannerSpecificData> BaseVisualizer::getPlannerSpecificDat
   return plannerSpecificData_.at(iteration);
 }
 
-const ompl::base::PathPtr BaseVisualizer::getSolutionPath(std::size_t iteration) const {
+const ompl::base::PathPtr BaseVisualizer::getSolutionPath(const std::size_t iteration) const {
   std::scoped_lock lock(solutionPathsMutex_);
   if (iteration >= solutionPaths_.size()) {
     std::cout << "Requested iteration: " << iteration << ", available: " << plannerData_.size()
@@ -153,7 +153,7 @@ const ompl::base::PathPtr BaseVisualizer::getSolutionPath(std::size_t iteration)
   return solutionPaths_.at(iteration);
 }
 
-ompl::base::Cost BaseVisualizer::getSolutionCost(std::size_t iteration) const {
+ompl::base::Cost BaseVisualizer::getSolutionCost(const std::size_t iteration) const {
   std::scoped_lock lock(solutionCostsMutex_);
   if (iteration >= solutionCosts_.size()) {
     std::cout << "Requested iteration: " << iteration << ", available: " << plannerData_.size()
@@ -163,7 +163,7 @@ ompl::base::Cost BaseVisualizer::getSolutionCost(std::size_t iteration) const {
   return solutionCosts_.at(iteration);
 }
 
-time::Duration BaseVisualizer::getIterationDuration(std::size_t iteration) const {
+time::Duration BaseVisualizer::getIterationDuration(const std::size_t iteration) const {
   std::scoped_lock lock(durationsMutex_);
   if (iteration >= plannerData_.size()) {
     throw std::runtime_error(
@@ -172,7 +172,7 @@ time::Duration BaseVisualizer::getIterationDuration(std::size_t iteration) const
   return durations_.at(iteration);
 }
 
-time::Duration BaseVisualizer::getTotalElapsedDuration(std::size_t iteration) const {
+time::Duration BaseVisualizer::getTotalElapsedDuration(const std::size_t iteration) const {
   std::scoped_lock lock(durationsMutex_, setupDurationMutex_);
   if (iteration >= durations_.size()) {
     throw std::runtime_error(

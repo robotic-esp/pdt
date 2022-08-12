@@ -92,17 +92,17 @@ class InteractiveVisualizer : public BaseVisualizer,
   void logCost();
 
   // Highlevel drawing.
-  void drawVerticesAndEdges(std::size_t iteration);
-  void drawVertices(std::size_t iteration);
-  void drawEdges(std::size_t iteration);
-  void drawSolution(std::size_t iteration);
-  void drawStateIds(std::size_t iteration);
+  void drawVerticesAndEdges(const std::size_t iteration);
+  void drawVertices(const std::size_t iteration);
+  void drawEdges(const std::size_t iteration);
+  void drawSolution(const std::size_t iteration);
+  void drawStateIds(const std::size_t iteration);
 
   // Planner specific visualizations.
-  void drawPlannerSpecificVisualizations(std::size_t iteration) const;
-  void drawBITstarSpecificVisualizations(std::size_t iteration) const;
-  void drawAITstarSpecificVisualizations(std::size_t iteration) const;
-  void drawEITstarSpecificVisualizations(std::size_t iteration) const;
+  void drawPlannerSpecificVisualizations(const std::size_t iteration) const;
+  void drawBITstarSpecificVisualizations(const std::size_t iteration) const;
+  void drawAITstarSpecificVisualizations(const std::size_t iteration) const;
+  void drawEITstarSpecificVisualizations(const std::size_t iteration) const;
 
   // Lowlevel drawing.
   void drawRectangle(const std::vector<float>& midpoint, const std::vector<float>& widths,
@@ -167,16 +167,16 @@ class InteractiveVisualizer : public BaseVisualizer,
 
   // Helpers.
   std::pair<std::vector<Eigen::Vector2f>, std::vector<Eigen::Vector2f>> getVerticesAndEdges2D(
-      std::size_t iteration) const;
+      const std::size_t iteration) const;
   std::pair<std::vector<Eigen::Vector3f>, std::vector<Eigen::Vector3f>> getVerticesAndEdges3D(
-      std::size_t iteration) const;
-  std::vector<Eigen::Vector2f> getVertices2D(std::size_t iteration) const;
-  std::vector<Eigen::Vector3f> getVertices3D(std::size_t iteration) const;
-  std::vector<Eigen::Vector2f> getEdges2D(std::size_t iteration) const;
-  std::vector<Eigen::Vector3f> getEdges3D(std::size_t iteration) const;
-  std::vector<Eigen::Vector2f> getPath2D(std::size_t iteration) const;
-  std::vector<Eigen::Vector3f> getPath3D(std::size_t iteration) const;
-  std::vector<Eigen::Vector3f> getPathSE2(std::size_t iteration) const;
+      const std::size_t iteration) const;
+  std::vector<Eigen::Vector2f> getVertices2D(const std::size_t iteration) const;
+  std::vector<Eigen::Vector3f> getVertices3D(const std::size_t iteration) const;
+  std::vector<Eigen::Vector2f> getEdges2D(const std::size_t iteration) const;
+  std::vector<Eigen::Vector3f> getEdges3D(const std::size_t iteration) const;
+  std::vector<Eigen::Vector2f> getPath2D(const std::size_t iteration) const;
+  std::vector<Eigen::Vector3f> getPath3D(const std::size_t iteration) const;
+  std::vector<Eigen::Vector3f> getPathSE2(const std::size_t iteration) const;
 
   // The bounds of the context (the real-vector part of it).
   ompl::base::RealVectorBounds bounds_;

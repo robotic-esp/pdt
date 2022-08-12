@@ -74,12 +74,12 @@ class BaseVisualizer {
 
  protected:
   // Make data available to derived classes.
-  std::shared_ptr<const ompl::base::PlannerData> getPlannerData(std::size_t iteration) const;
-  std::shared_ptr<const PlannerSpecificData> getPlannerSpecificData(std::size_t iteration) const;
-  time::Duration getIterationDuration(std::size_t iteration) const;
-  const ompl::base::PathPtr getSolutionPath(std::size_t iteration) const;
-  ompl::base::Cost getSolutionCost(std::size_t iteration) const;
-  time::Duration getTotalElapsedDuration(std::size_t iteration) const;
+  std::shared_ptr<const ompl::base::PlannerData> getPlannerData(const std::size_t iteration) const;
+  std::shared_ptr<const PlannerSpecificData> getPlannerSpecificData(const std::size_t iteration) const;
+  time::Duration getIterationDuration(const std::size_t iteration) const;
+  const ompl::base::PathPtr getSolutionPath(const std::size_t iteration) const;
+  ompl::base::Cost getSolutionCost(const std::size_t iteration) const;
+  time::Duration getTotalElapsedDuration(const std::size_t iteration) const;
   std::size_t getQueryNumber(const std::size_t iteration) const;
 
   // The current context.
