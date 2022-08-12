@@ -225,16 +225,18 @@ void InteractiveVisualizer::run() {
     if (pangolin::Pushed(optionTikzshot)) {
       if (optionDrawPlannerSpecificData) {
         tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                               getQueryNumber(displayIteration_),
                                getSolutionPath(displayIteration_),
                                getPlannerSpecificData(displayIteration_),
                                getIterationDuration(displayIteration_).count(),
-                               getTotalElapsedDuration(displayIteration_).count(),
+                               timeAtCurrentQuery,
                                getSolutionCost(displayIteration_).value());
       } else {
         tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                               getQueryNumber(displayIteration_),
                                getSolutionPath(displayIteration_), nullptr,
                                getIterationDuration(displayIteration_).count(),
-                               getTotalElapsedDuration(displayIteration_).count(),
+                               timeAtCurrentQuery,
                                getSolutionCost(displayIteration_).value());
       }
     }
@@ -285,16 +287,18 @@ void InteractiveVisualizer::run() {
                   static_cast<unsigned>(iterationToPlayTo_));
         if (optionDrawPlannerSpecificData) {
           tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                                 getQueryNumber(displayIteration_),
                                  getSolutionPath(displayIteration_),
                                  getPlannerSpecificData(displayIteration_),
                                  getIterationDuration(displayIteration_).count(),
-                                 getTotalElapsedDuration(displayIteration_).count(),
+                                 timeAtCurrentQuery,
                                  getSolutionCost(displayIteration_).value());
         } else {
           tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                                 getQueryNumber(displayIteration_),
                                  getSolutionPath(displayIteration_), nullptr,
                                  getIterationDuration(displayIteration_).count(),
-                                 getTotalElapsedDuration(displayIteration_).count(),
+                                 timeAtCurrentQuery,
                                  getSolutionCost(displayIteration_).value());
         }
         incrementIteration();
