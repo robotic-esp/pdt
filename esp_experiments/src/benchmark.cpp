@@ -360,10 +360,8 @@ int main(const int argc, const char **argv) {
   }
   
   // Add the result path to the experiment.
-  std::cout << "A" << std::endl;
   config->add<std::vector<std::string>>("experiment/results", resultPaths);
   config->add<std::string>("experiment/experimentDirectory", fs::absolute(experimentDirectory).string());
-  std::cout << "A" << std::endl;
 
   // dump the complete config to make sure that we can produce the report once we ran the experiment
   auto configPath = experimentDirectory / "config.json"s;

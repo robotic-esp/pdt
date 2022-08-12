@@ -456,7 +456,7 @@ fs::path ExperimentReport::compileReport() const {
   // these plots can be quite large, pdflatex has run into memory issues. Lualatex should be
   // available with all major tex distributions.
   auto reportPath =
-      fs::path(config_->get<std::string>("experiment/results")).parent_path() / "report.tex";
+      fs::path(config_->get<std::string>("experiment/experimentDirectory")) / "report.tex";
   auto currentPath = fs::current_path();
   auto cmd = "cd \""s + reportPath.parent_path().string() +
              "\" && lualatex --interaction=nonstopmode --shell-escape \""s + reportPath.string() +
