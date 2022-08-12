@@ -8,7 +8,10 @@
                 "name": "SPARS2"
             },
             "options": {
-                "none": true
+              "stretchFactor": 3.0,
+              "sparseDeltaFraction": 0.25,
+              "denseDeltaFraction": 0.001,
+              "maxFailures": 5000
             }
         }
     }

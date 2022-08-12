@@ -271,6 +271,10 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
           std::make_shared<ompl::geometric::SPARStwo>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
+      planner->setStretchFactor(config_->get<double>(optionsKey + "/stretchFactor"));
+      planner->setSparseDeltaFraction(config_->get<double>(optionsKey + "/sparseDeltaFraction"));
+      planner->setDenseDeltaFraction(config_->get<double>(optionsKey + "/denseDeltaFraction"));
+      planner->setMaxFailures(config_->get<unsigned>(optionsKey + "/maxFailures"));
       return {planner, PLANNER_TYPE::SPARStwo};
     }
     default: { throw std::runtime_error("Planner '"s + plannerName + "' is of unknown type."s); }
