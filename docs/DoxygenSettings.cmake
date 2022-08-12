@@ -33,6 +33,11 @@ set(DOXYGEN_EXCLUDE
   "${PROJECT_SOURCE_DIR}/docs/"
   "${PROJECT_SOURCE_DIR}/thirdparty/"
   "${PROJECT_SOURCE_DIR}/scripts/matlab/")
+if(NOT ESP_OMPL_TOOLS_OPEN_RAVE)
+  set(DOXYGEN_EXCLUDE
+    ${DOXYGEN_EXCLUDE}
+    "${PROJECT_SOURCE_DIR}/esp_open_rave/")
+endif()
 set(DOXYGEN_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/parameters/demo/") # This won't work, but I wish it did
 set(DOXYGEN_EXAMPLE_RECURSIVE YES)
 set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${PROJECT_SOURCE_DIR}/readme.md")

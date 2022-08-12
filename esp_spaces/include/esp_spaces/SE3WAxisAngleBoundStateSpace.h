@@ -98,12 +98,12 @@ class SE3WAxisAngleBoundStateSpace : public ompl::base::CompoundStateSpace {
 
   ~SE3WAxisAngleBoundStateSpace() override = default;
 
-  /** \copydoc RealVectorStateSpace::setBounds() */
+  /** Same as ompl::base::RealVectorStateSpace::setBounds() */
   void setBounds(const ompl::base::RealVectorBounds &bounds) {
     as<ompl::base::RealVectorStateSpace>(0)->setBounds(bounds);
   }
 
-  /** \copydoc RealVectorStateSpace::getBounds() */
+  /** Same as ompl::base::RealVectorStateSpace::getBounds() */
   const ompl::base::RealVectorBounds &getBounds() const {
     return as<ompl::base::RealVectorStateSpace>(0)->getBounds();
   }

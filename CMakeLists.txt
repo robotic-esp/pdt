@@ -68,6 +68,7 @@ option(ESP_OMPL_TOOLS_OPEN_RAVE "Enable OpenRAVE integration." OFF)
 if(ESP_OMPL_TOOLS_OPEN_RAVE)
   add_definitions(-DESP_OMPL_TOOLS_OPEN_RAVE)
   add_subdirectory(esp_open_rave)
+  # See docs/DoxygenSettings.cmake for conditional Doxygen inclusion.
 endif()
 
 # Add the local libraries & executables.
