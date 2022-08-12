@@ -1,0 +1,36 @@
+{
+    "experiment": {
+        "executable": "benchmark",
+        "planners": [
+            "defaultLazyPRMstar",
+            "defaultRRTConnect",
+            "defaultEIRMstar"
+        ],
+        "context": "defaultRandomRectangles2D",
+        "numRuns": 100,
+        "logFrequency": 10000,
+        "loadDefaultContextConfig": true,
+        "loadDefaultPlannerConfig": true,
+        "loadDefaultObjectiveConfig": true,
+        "report": {
+            "automatic": true,
+            "verboseCompilation": false
+        },
+	"regenerateQueries": false
+    },
+    "context": {
+        "defaultRandomRectangles2D":{
+            "goalType": "GoalState",
+            "starts": {
+                "type": "generated",
+                "numGenerated": 50,
+                "generativeModel": "uniform"
+            },
+            "goals": {
+                "type": "generated",
+                "numGenerated": 50,
+                "generativeModel": "uniform"
+            }
+        }
+    }
+}
