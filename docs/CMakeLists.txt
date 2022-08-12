@@ -19,6 +19,10 @@ if (TARGET Doxygen::doxygen)
     "${PROJECT_SOURCE_DIR}"
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
     COMMENT "Generating API documentation with Doxygen")
+  add_custom_command(TARGET docs_doxygen POST_BUILD
+    COMMAND echo
+    COMMAND echo "  Doxygen API documentation: file://${CMAKE_CURRENT_BINARY_DIR}/html/index.html"
+    COMMAND echo)
 
   # Add to high-level target
   add_dependencies(docs docs_doxygen)
@@ -31,6 +35,12 @@ if (TARGET Doxygen::doxygen)
       COMMAND Doxygen::dot "${DEPENDENCY_GRAPHVIZ_OUTPUT}.dot" -Tsvg -o "${DEPENDENCY_GRAPHVIZ_OUTPUT}.svg" -Tpng -o "${DEPENDENCY_GRAPHVIZ_OUTPUT}.png"
       WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
       COMMENT "Generating project dependency graph with CMake")
+    add_custom_command(TARGET docs_graphviz POST_BUILD
+      COMMAND echo
+      COMMAND echo "  Project dependency graph: file://${DEPENDENCY_GRAPHVIZ_OUTPUT}.dot"
+      COMMAND echo "                            file://${DEPENDENCY_GRAPHVIZ_OUTPUT}.svg"
+      COMMAND echo "                            file://${DEPENDENCY_GRAPHVIZ_OUTPUT}.png"
+      COMMAND echo)
     
       # Add to high-level target
     add_dependencies(docs docs_graphviz)

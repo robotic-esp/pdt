@@ -5,7 +5,7 @@
 # Project options https://doxygen.org/manual/config.html#config_project
 set(DOXYGEN_PROJECT_NAME "ESP OMPL Tools")
 set(DOXYGEN_PROJECT_BRIEF "Tools for developing and testing planning algorithms in OMPL")
-#set(DOXYGEN_PROJECT_LOGO "${CMAKE_CURRENT_SOURCE_DIR}/esp.png") # Needs to be < 55x200
+set(DOXYGEN_PROJECT_LOGO "${CMAKE_CURRENT_SOURCE_DIR}/esp.png")
 set(DOXYGEN_BUILTIN_STL_SUPPORT YES)
 # set(DOXYGEN_NUM_PROC_THREADS 0) # Documented as experimental
 
@@ -47,8 +47,12 @@ set(DOXYGEN_REFERENCES_LINK_SOURCE NO) # Link references to the documentation no
 
 # HTML output options https://doxygen.nl/manual/config.html#config_html
 set(DOXYGEN_GENERATE_HTML YES)
-# set(DOXYGEN_HTML_FOOTER "${CMAKE_CURRENT_SOURCE_DIR}/footer.html")
-# set(DOXYGEN_HTML_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/header.html")
+# Generate the header/footer/stylesheet from your current settings, and then edit them as desired:
+#   doxygen -w html new_header.html new_footer.html new_stylesheet.css YourDoxygenConfigFile
+# Add a link back to home in the ESP logo.
+set(DOXYGEN_HTML_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/esp_header.html")
+# Append to the default CSS to make the header/footer Oxford blue with white text.
+set(DOXYGEN_HTML_EXTRA_STYLESHEET "${CMAKE_CURRENT_SOURCE_DIR}/esp_stylesheet.css")
 set(DOXYGEN_HTML_COLORSTYLE_HUE 212)
 set(DOXYGEN_HTML_COLORSTYLE_SAT 100)
 set(DOXYGEN_HTML_COLORSTYLE_GAMMA 100)

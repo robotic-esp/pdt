@@ -77,6 +77,14 @@ sudo apt install imagemagick
 
 If you get an error during report compilation related to "operation not allowed by the security policy `PDF'", then see you need to [change your GhostScript security policy](https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion).
 
+#### Doxygen and Graphviz
+
+Doxygen and Graphviz are only necessary if you want to generate documentation. The code will compile without it.
+```bash
+sudo apt install doxygen graphviz xdot
+```
+The program `xdot` is not strictly necessary, but is a useful lightweight viewer for `.dot` files.
+
 
 ### ESP OMPL TOOLS
 
@@ -88,6 +96,11 @@ cd esp_ompl_tools
 mkdir build && cd build
 cmake ..
 make
+```
+
+If you have Doxygen installed, you can also build the documentation
+```bash
+make docs
 ```
 
 ## Reproducible research with ESP OMPL TOOLS
