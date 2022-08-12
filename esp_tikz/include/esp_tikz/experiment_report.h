@@ -45,7 +45,7 @@
 #include "esp_configuration/configuration.h"
 #include "esp_statistics/statistics.h"
 #include "esp_tikz/cost_percentile_evolution_plotter.h"
-#include "esp_tikz/initial_solution_duration_pdf_plotter.h"
+#include "esp_tikz/initial_solution_duration_histogram_plotter.h"
 #include "esp_tikz/initial_solution_scatter_plotter.h"
 #include "esp_tikz/latex_plotter.h"
 #include "esp_tikz/median_cost_evolution_plotter.h"
@@ -86,7 +86,7 @@ class ExperimentReport {
   // Plotters.
   LatexPlotter latexPlotter_;
   CostPercentileEvolutionPlotter costPercentileEvolutionPlotter_;
-  InitialSolutionDurationPdfPlotter initialSolutionDurationPdfPlotter_;
+  InitialSolutionDurationHistogramPlotter initialSolutionDurationHistogramPlotter_;
   InitialSolutionScatterPlotter initialSolutionScatterPlotter_;
   MedianCostEvolutionPlotter medianCostEvolutionPlotter_;
   MedianInitialSolutionPlotter medianInitialSolutionPlotter_;

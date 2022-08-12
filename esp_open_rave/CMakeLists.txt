@@ -5,8 +5,17 @@ project(esp_open_rave)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Find the dependencies of this library.
+set_package_properties(OpenRAVE PROPERTIES
+  URL "http://openrave.org/"
+  PURPOSE "A 3D environment to simulate robotic systems, including manipulation arms and mobile platforms.")
 find_package(OpenRAVE REQUIRED)
+set_package_properties(Boost PROPERTIES
+  URL "https://boost.org"
+  PURPOSE "Provides standardized libraries, such as program options, filesystem I/O, etc.")
 find_package(Boost 1.58 REQUIRED COMPONENTS system)
+set_package_properties(Threads PROPERTIES
+  URL "https://en.wikipedia.org/wiki/POSIX_Threads"
+  PURPOSE "A standard multithreading library.")
 find_package(Threads REQUIRED)
 
 # Specify the library as a target.

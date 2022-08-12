@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(esp_visualization)
 
 # Find the dependencies for this library.
+set_package_properties(Pangolin PROPERTIES
+  URL "https://github.com/stevenlovegrove/Pangolin"
+  PURPOSE "A GUI for a basic visualizer.")
 find_package(Pangolin REQUIRED)
 
 # Make the path to the source directory available in code.

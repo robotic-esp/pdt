@@ -3,6 +3,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(esp_experiments)
 
+set_package_properties(Boost PROPERTIES
+  URL "https://boost.org"
+  PURPOSE "Provides standardized libraries, such as program options, filesystem I/O, etc.")
 find_package(Boost 1.58 REQUIRED COMPONENTS program_options thread)
 include_directories(${Boost_INCLUDE_DIR})
 

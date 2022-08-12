@@ -68,11 +68,11 @@ class MedianCostEvolutionPlotter : public LatexPlotter {
 
  private:
   std::shared_ptr<PgfPlot> createMedianCostEvolutionPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionUpperCIPlot(
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionUpperCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionLowerCIPlot(
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionLowerCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionFillCIPlot(
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionFillCiPlot(
       const std::string& plannerName) const;
 
   void setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;

@@ -67,7 +67,8 @@ void Configuration::clear() {
   accessedParameters_.clear();
 }
 
-void Configuration::load(const fs::path& config) {
+// Full namespace on the parameter to keep Doxygen happy
+void Configuration::load(const std::experimental::filesystem::path& config) {
   if (!fs::exists(config)) {
     OMPL_ERROR("Cannot find provided configuration file at %s", config.c_str());
     throw std::ios_base::failure("Cannot find config file.");

@@ -139,6 +139,7 @@ class BaseContext {
   ompl::base::OptimizationObjectivePtr objective_{};
 
   /** \brief The goal specification of the planning problem. */
+  /** \todo Consider removing this variable and instead calling StartGoalPair.goal.getType() */
   ompl::base::GoalType goalType_{ompl::base::GoalType::GOAL_ANY};
 
   /** \brief The start/goal pair for the planning problem. */
