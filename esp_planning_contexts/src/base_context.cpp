@@ -232,6 +232,10 @@ std::vector<ompl::base::ScopedState<>> BaseContext::parseSpecifiedStates(const s
 }
 
 std::vector<ompl::base::ScopedState<>> BaseContext::generateRandomStates(const std::string &key) const{
+  if (!spaceInfo_->isSetup()){
+    throw std::runtime_error("GenerateRandomStates() called before spaceInfo is setup.");
+  }
+
   const std::size_t numStates = config_->get<std::size_t>(key + "/numGenerated");
   std::vector<ompl::base::ScopedState<>> states;
 

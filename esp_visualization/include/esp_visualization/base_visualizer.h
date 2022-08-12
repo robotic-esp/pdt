@@ -80,6 +80,7 @@ class BaseVisualizer {
   const ompl::base::PathPtr getSolutionPath(std::size_t iteration) const;
   ompl::base::Cost getSolutionCost(std::size_t iteration) const;
   time::Duration getTotalElapsedDuration(std::size_t iteration) const;
+  std::size_t getQueryNumber(const std::size_t iteration) const;
 
   // The current context.
   std::shared_ptr<BaseContext> context_{};
@@ -138,6 +139,10 @@ class BaseVisualizer {
   // The costs of the solution paths.
   std::vector<ompl::base::Cost> solutionCosts_{};
   mutable std::mutex solutionCostsMutex_{};
+
+  // The querynumber corresponding to the current iteration.
+  std::vector<std::size_t> queryNumbers_{};
+  mutable std::mutex queryNumbersMutex_{};
 
   // The thread that creates the data, i.e., solves the given planning problem.
   std::thread dataThread_{};

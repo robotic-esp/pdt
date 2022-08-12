@@ -70,7 +70,10 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
 
   // If we only specify one single start, we first place that start/goal pair, and then generate
   // valid obstacles around them.
-  if (config_->contains("context/" + name_ + "/start")) {
+  if (config_->contains("context/" + name_ + "/starts")) {
+    generateQueriesBeforeObstacles = false;
+  }
+  else if (config_->contains("context/" + name_ + "/start")) {
     generateQueriesBeforeObstacles = true;
   } else if (config_->get<std::string>("context/" + name + "/starts/type") == "specified") {
     if (config_->get<std::size_t>("context/" + name + "/starts/numGenerated") == 1) {
