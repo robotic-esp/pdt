@@ -95,9 +95,36 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
   std::vector<double> openRaveState =
       config->get<std::vector<double>>("context/" + context->getName() + "/start");
 
+  double timePerQuery = 0.;
+  if (config->contains("experiment/time")){
+    timePerQuery = config->get<double>("experiment/time");
+  }
+
   double totalSolveDuration = 0.0;
+  std::size_t queryNumber = 0u;
+  double currentIterationStartTime = 0.0;
+
   // Work it.
   while (true) {
+    if (planner->getProblemDefinition()->hasExactSolution() && 
+        (timePerQuery <= 0.0 ||
+           (timePerQuery > 0.0 &&
+           totalSolveDuration - currentIterationStartTime > timePerQuery))){
+
+      planner->clearQuery();
+      queryNumber++;
+
+      if (queryNumber >= context->getNumQueries()){
+        queryNumber--;
+      }
+
+      auto p = context->instantiateNthProblemDefinition(queryNumber);
+      planner->setProblemDefinition(p);
+      currentIterationStartTime = totalSolveDuration;
+
+      std::cout << "Query: " << queryNumber << std::endl;
+    }
+
     // Work on the problem.
     planner->solve(config->get<double>("experiment/visualizationInterval"));
 
@@ -162,9 +189,36 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
   // Create the vector to hold the current state.
   OpenRAVE::Transform raveState;
 
+  double timePerQuery = 0.;
+  if (config->contains("experiment/time")){
+    timePerQuery = config->get<double>("experiment/time");
+  }
+
   double totalSolveDuration = 0.0;
+  std::size_t queryNumber = 0u;
+  double currentIterationStartTime = 0.0;
+
   // Work it.
   while (true) {
+    if (planner->getProblemDefinition()->hasExactSolution() && 
+        (timePerQuery <= 0.0 ||
+           (timePerQuery > 0.0 &&
+           totalSolveDuration - currentIterationStartTime > timePerQuery))){
+
+      planner->clearQuery();
+      queryNumber++;
+
+      if (queryNumber >= context->getNumQueries()){
+        queryNumber--;
+      }
+
+      auto p = context->instantiateNthProblemDefinition(queryNumber);
+      planner->setProblemDefinition(p);
+      currentIterationStartTime = totalSolveDuration;
+
+      std::cout << "Query: " << queryNumber << std::endl;
+    }
+
     // Work on the problem.
     planner->solve(config->get<double>("experiment/visualizationInterval"));
 
@@ -233,9 +287,36 @@ void planR3(std::shared_ptr<esp::ompltools::Configuration> config,
   OpenRAVE::Transform raveState;
   raveState.identity();
 
+  double timePerQuery = 0.;
+  if (config->contains("experiment/time")){
+    timePerQuery = config->get<double>("experiment/time");
+  }
+
   double totalSolveDuration = 0.0;
+  std::size_t queryNumber = 0u;
+  double currentIterationStartTime = 0.0;
+
   // Work it.
   while (true) {
+    if (planner->getProblemDefinition()->hasExactSolution() && 
+        (timePerQuery <= 0.0 ||
+           (timePerQuery > 0.0 &&
+           totalSolveDuration - currentIterationStartTime > timePerQuery))){
+
+      planner->clearQuery();
+      queryNumber++;
+
+      if (queryNumber >= context->getNumQueries()){
+        queryNumber--;
+      }
+
+      auto p = context->instantiateNthProblemDefinition(queryNumber);
+      planner->setProblemDefinition(p);
+      currentIterationStartTime = totalSolveDuration;
+
+      std::cout << "Query: " << queryNumber << std::endl;
+    }
+
     // Work on the problem.
     planner->solve(config->get<double>("experiment/visualizationInterval"));
 
@@ -300,9 +381,36 @@ void planR3xSO2(std::shared_ptr<esp::ompltools::Configuration> config,
   OpenRAVE::Transform raveState;
   raveState.identity();
 
+  double timePerQuery = 0.;
+  if (config->contains("experiment/time")){
+    timePerQuery = config->get<double>("experiment/time");
+  }
+
   double totalSolveDuration = 0.0;
+  std::size_t queryNumber = 0u;
+  double currentIterationStartTime = 0.0;
+
   // Work it.
   while (true) {
+    if (planner->getProblemDefinition()->hasExactSolution() && 
+        (timePerQuery <= 0.0 ||
+           (timePerQuery > 0.0 &&
+           totalSolveDuration - currentIterationStartTime > timePerQuery))){
+
+      planner->clearQuery();
+      queryNumber++;
+
+      if (queryNumber >= context->getNumQueries()){
+        queryNumber--;
+      }
+
+      auto p = context->instantiateNthProblemDefinition(queryNumber);
+      planner->setProblemDefinition(p);
+      currentIterationStartTime = totalSolveDuration;
+
+      std::cout << "Query: " << queryNumber << std::endl;
+    }
+
     // Work on the problem.
     planner->solve(config->get<double>("experiment/visualizationInterval"));
 
