@@ -69,9 +69,6 @@ bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext> &co
 
   const std::size_t numQueries = context->getNumQueries();
   for (auto n=0u; n<numQueries; ++n){
-    std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' '
-              << "Query " << n+1 << "/" << numQueries << std::flush;
-
     auto planner = std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
 
     const auto p = context->instantiateNthProblemDefinition(n);
@@ -82,10 +79,9 @@ bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext> &co
     if (!status) {
       std::cout << "Failed on query " << n << "." << std::endl;
       return false;
-    } else {
-      std::cout << "OK." << std::endl;
     }
   }
+  std::cout << "OK." << std::endl;
   std::cout << std::endl;
 
   return true;
@@ -106,7 +102,14 @@ int main(const int argc, const char **argv) {
 
   if (config->contains("experiment/validateProblemDefinition") &&
       config->get<bool>("experiment/validateProblemDefinition")) {
-    const double contextCheckingRuntime = config->get<double>("experiment/validateProblemDuration");
+    double contextCheckingRuntime = 10.0;
+    if (config->contains("experiment/validateProblemDuration")){
+      double contextCheckingRuntime = config->get<double>("experiment/validateProblemDuration");
+    }
+    else{
+      std::cout << "Parameter 'experiment/validateProblemDuration' not defined, using default value of "
+        << contextCheckingRuntime << "s." << std::endl;
+    }
     if (!checkContextValidity(context, contextCheckingRuntime)) {
       std::cout << "This problem definition may not be solveable since RRT-Connect did not find a "
                    "solution in "
@@ -227,9 +230,10 @@ int main(const int argc, const char **argv) {
        context->regenerateQueries();
     }
 
+    // If multiple starts/goal queries are defined (i.e. we evaluate a multiquery setting),
+    // the planners run _all_ queries before the next planner runs the _same_ queries.
     for (const auto &plannerName : plannerNames) {
       // Allocate the planner.
-      context->instantiateNthProblemDefinition(0u);
       auto [planner, plannerType] = plannerFactory.create(plannerName);
 
       // Set it up.
@@ -269,7 +273,8 @@ int main(const int argc, const char **argv) {
         // Create the performance log.
         const fs::path path = (fs::absolute(experimentDirectory) / ("raw/results_" + std::to_string(n) + ".csv"s));
 
-        if (std::find(resultPaths.begin(), resultPaths.end(), path.string()) == resultPaths.end()){
+        // The path only needs to be appended once.
+        if (n == 0u){
           resultPaths.emplace_back(path.string());
         }
 
