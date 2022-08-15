@@ -104,7 +104,7 @@ int main(const int argc, const char **argv) {
       config->get<bool>("experiment/validateProblemDefinition")) {
     double contextCheckingRuntime = 10.0;
     if (config->contains("experiment/validateProblemDuration")){
-      double contextCheckingRuntime = config->get<double>("experiment/validateProblemDuration");
+      contextCheckingRuntime = config->get<double>("experiment/validateProblemDuration");
     }
     else{
       std::cout << "Parameter 'experiment/validateProblemDuration' not defined, using default value of "

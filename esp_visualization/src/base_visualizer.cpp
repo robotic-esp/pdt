@@ -243,22 +243,21 @@ void BaseVisualizer::createData() {
     // Create a new iteration if we we're viewing one thats uncomfortably close.
     if (displayIteration_ + iterationBuffer_ > largestIteration_) {
       /* 
-       * There are two cases under which we continue to the next query:
+       * If we are not at the last query, there are two cases under which we continue to the next query:
        * - The time per query is smaller than 0, and the planner found a solution
        * - the time per query is larger than 0, the planner found a solution, and the 
        *   time used for the current query is larger than the allowed time budget
+       *
+       * If we arrived at the last query, we run that one indefinitely.
        */
-      if (planner_->getProblemDefinition()->hasExactSolution() && 
+      if (queryNumber + 1 < context_->getNumQueries() && 
+          planner_->getProblemDefinition()->hasExactSolution() && 
           (timePerQuery <= 0 ||
              (timePerQuery > 0 &&
              getTotalElapsedDuration(displayIteration_).count() - currentIterationStartTime > timePerQuery))){
-
+          
           planner_->clearQuery();
           queryNumber++;
-
-          if (queryNumber >= context_->getNumQueries()){
-            queryNumber--;
-          }
 
           auto p = context_->instantiateNthProblemDefinition(queryNumber);
           //auto p = context_->instantiateNewProblemDefinition();

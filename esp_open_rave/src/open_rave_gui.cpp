@@ -106,17 +106,14 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Work it.
   while (true) {
-    if (planner->getProblemDefinition()->hasExactSolution() && 
+    if (queryNumber + 1 < context->getNumQueries() &&
+        planner->getProblemDefinition()->hasExactSolution() && 
         (timePerQuery <= 0.0 ||
            (timePerQuery > 0.0 &&
            totalSolveDuration - currentIterationStartTime > timePerQuery))){
 
       planner->clearQuery();
       queryNumber++;
-
-      if (queryNumber >= context->getNumQueries()){
-        queryNumber--;
-      }
 
       auto p = context->instantiateNthProblemDefinition(queryNumber);
       planner->setProblemDefinition(p);
@@ -200,17 +197,14 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Work it.
   while (true) {
-    if (planner->getProblemDefinition()->hasExactSolution() && 
+    if (queryNumber + 1 < context->getNumQueries() &&
+        planner->getProblemDefinition()->hasExactSolution() && 
         (timePerQuery <= 0.0 ||
            (timePerQuery > 0.0 &&
            totalSolveDuration - currentIterationStartTime > timePerQuery))){
 
       planner->clearQuery();
       queryNumber++;
-
-      if (queryNumber >= context->getNumQueries()){
-        queryNumber--;
-      }
 
       auto p = context->instantiateNthProblemDefinition(queryNumber);
       planner->setProblemDefinition(p);
@@ -298,17 +292,14 @@ void planR3(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Work it.
   while (true) {
-    if (planner->getProblemDefinition()->hasExactSolution() && 
+    if (queryNumber + 1 < context->getNumQueries() &&
+        planner->getProblemDefinition()->hasExactSolution() && 
         (timePerQuery <= 0.0 ||
            (timePerQuery > 0.0 &&
            totalSolveDuration - currentIterationStartTime > timePerQuery))){
 
       planner->clearQuery();
       queryNumber++;
-
-      if (queryNumber >= context->getNumQueries()){
-        queryNumber--;
-      }
 
       auto p = context->instantiateNthProblemDefinition(queryNumber);
       planner->setProblemDefinition(p);
@@ -392,17 +383,14 @@ void planR3xSO2(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Work it.
   while (true) {
-    if (planner->getProblemDefinition()->hasExactSolution() && 
+    if (queryNumber + 1 < context->getNumQueries() &&
+        planner->getProblemDefinition()->hasExactSolution() && 
         (timePerQuery <= 0.0 ||
            (timePerQuery > 0.0 &&
            totalSolveDuration - currentIterationStartTime > timePerQuery))){
 
       planner->clearQuery();
       queryNumber++;
-
-      if (queryNumber >= context->getNumQueries()){
-        queryNumber--;
-      }
 
       auto p = context->instantiateNthProblemDefinition(queryNumber);
       planner->setProblemDefinition(p);
