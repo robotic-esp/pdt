@@ -3,8 +3,7 @@
         "executable": "benchmark",
         "planners": [
             "defaultLazyPRMstar",
-            "defaultRRTConnect",
-            "defaultEIRMstar"
+            "defaultRRTConnect"
         ],
         "context": "defaultRandomRectangles2D",
         "numRuns": 100,
@@ -12,6 +11,8 @@
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true,
         "loadDefaultObjectiveConfig": true,
+        "validateProblemDefinition": true,
+        "validateProblemDuration": 10.0,
         "report": {
             "automatic": true,
             "verboseCompilation": false
