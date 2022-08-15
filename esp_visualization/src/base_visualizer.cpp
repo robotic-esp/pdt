@@ -256,7 +256,7 @@ void BaseVisualizer::createData() {
              (timePerQuery > 0 &&
              getTotalElapsedDuration(displayIteration_).count() - currentIterationStartTime > timePerQuery))){
         planner_->clearQuery();
-        queryNumber++;
+        ++queryNumber;
 
         const auto problemDefinition = context_->instantiateNthProblemDefinition(queryNumber);
         planner_->setProblemDefinition(problemDefinition);
