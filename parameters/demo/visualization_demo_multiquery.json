@@ -1,12 +1,12 @@
 {
     "experiment": {
         "executable": "visualization",
-        "planner": "defaultEITstar",
-        "context": "RandomRectangles2D",
+        "planner": "defaultRRTConnect",
+        "context": "MultiqueryRandomRectangles2D",
         "useOnlyThisConfig": false
     },
     "context": {
-        "RandomRectangles2D": {
+        "MultiqueryRandomRectangles2D": {
             "type": "RandomRectangles",
             "objective": "defaultPathLength",
             "maxTime": 0.1,

@@ -68,16 +68,16 @@ bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext> &co
   std::cout << "Validating problem definition... ";
 
   const std::size_t numQueries = context->getNumQueries();
-  for (auto n=0u; n<numQueries; ++n){
+  for (auto i=0u; i<numQueries; ++i){
     auto planner = std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
 
-    const auto p = context->instantiateNthProblemDefinition(n);
-    planner->setProblemDefinition(p);
+    const auto problemDefinition = context->instantiateNthProblemDefinition(i);
+    planner->setProblemDefinition(problemDefinition);
 
     const auto status = planner->solve(ompl::base::timedPlannerTerminationCondition(runtime));
 
     if (!status) {
-      std::cout << "Failed on query " << n << "." << std::endl;
+      std::cout << "Failed on query " << i << "." << std::endl;
       return false;
     }
   }
@@ -225,8 +225,10 @@ int main(const int argc, const char **argv) {
     auto plannerNames = config->get<std::vector<std::string>>("experiment/planners");
     std::random_shuffle(plannerNames.begin(), plannerNames.end());
 
-    // regenerate the start/goal pairs if so desired
-    if (config->contains("experiment/regenerateQueries") && config->get<bool>("experiment/regenerateQueries")){
+    // In a multiquery setting: regenerate the start/goal pairs if so desired
+    if (i > 0 && 
+        config->contains("experiment/regenerateQueries") && 
+        config->get<bool>("experiment/regenerateQueries")){
        context->regenerateQueries();
     }
 
@@ -241,17 +243,15 @@ int main(const int argc, const char **argv) {
       planner->setup();
       const auto setupDuration = esp::ompltools::time::Clock::now() - setupStartTime;
 
-      for (auto n=0u; n<numQueries; ++n){
+      for (auto j=0u; j<numQueries; ++j){
         // Only the first run contains the time needed for the setup of the planner.
         // We need to do this such that planners that compute some information beforehand do not have an unfair
         // advantage in the logged times.
-        const double firstQueryMultiplier = (n == 0u);
+        const double firstQueryMultiplier = (j == 0u);
 
         // Create the logger for this run.
         esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
                                               config->get<double>("experiment/logFrequency"));
-
-        planner->clearQuery();
 
         // The following results in more consistent measurements. I don't fully understand why, but it
         // seems to be connected to creating a separate thread.
@@ -266,15 +266,17 @@ int main(const int argc, const char **argv) {
           hotpath.get();
         }
 
+        planner->clearQuery();
+
         // get the problem settng for the nth query, and hand it over to the planner.
-        const auto p = context->instantiateNthProblemDefinition(n);
-        planner->setProblemDefinition(p);
+        const auto problemDefinition = context->instantiateNthProblemDefinition(j);
+        planner->setProblemDefinition(problemDefinition);
 
         // Create the performance log.
-        const fs::path path = (fs::absolute(experimentDirectory) / ("raw/results_" + std::to_string(n) + ".csv"s));
+        const fs::path path = (fs::absolute(experimentDirectory) / ("raw/results_" + std::to_string(j) + ".csv"s));
 
         // The path only needs to be appended once.
-        if (n == 0u){
+        if (j == 0u){
           resultPaths.emplace_back(path.string());
         }
 
@@ -407,7 +409,8 @@ int main(const int argc, const char **argv) {
   // Generate the report.
   fs::path reportPath;
   if (stats.size() == 0u){
-    std::cout << "No statistics were generated, thus no report can be compiled." << std::endl;
+    throw std::runtime_error(
+        "No statistics were generated, thus no report can be compiled.");
   }
   else if(stats.size() == 1u){ // Single query report
     esp::ompltools::ExperimentReport report(config, stats[0u]);

@@ -67,7 +67,8 @@ int main(const int argc, const char** argv) {
 
   // Generate the report.
   if (stats.size() == 0u){
-    std::cout << "No statistics were generated, thus no report can be compiled." << std::endl;
+    throw std::runtime_error(
+        "No statistics were generated, thus no report can be compiled.");
   }
   else if(stats.size() == 1u){ // Single query report
     esp::ompltools::ExperimentReport report(config, stats[0u]);

@@ -95,7 +95,7 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
   std::vector<double> openRaveState =
       config->get<std::vector<double>>("context/" + context->getName() + "/start");
 
-  double timePerQuery = 0.;
+  double timePerQuery = 0.0;
   if (config->contains("experiment/time")){
     timePerQuery = config->get<double>("experiment/time");
   }
@@ -113,10 +113,10 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
            totalSolveDuration - currentIterationStartTime > timePerQuery))){
 
       planner->clearQuery();
-      queryNumber++;
+      ++queryNumber;
 
-      auto p = context->instantiateNthProblemDefinition(queryNumber);
-      planner->setProblemDefinition(p);
+      const auto problemDefinition = context->instantiateNthProblemDefinition(queryNumber);
+      planner->setProblemDefinition(problemDefinition);
       currentIterationStartTime = totalSolveDuration;
 
       std::cout << "Query: " << queryNumber << std::endl;
@@ -186,7 +186,7 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
   // Create the vector to hold the current state.
   OpenRAVE::Transform raveState;
 
-  double timePerQuery = 0.;
+  double timePerQuery = 0.0;
   if (config->contains("experiment/time")){
     timePerQuery = config->get<double>("experiment/time");
   }
@@ -204,10 +204,10 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
            totalSolveDuration - currentIterationStartTime > timePerQuery))){
 
       planner->clearQuery();
-      queryNumber++;
+      ++queryNumber;
 
-      auto p = context->instantiateNthProblemDefinition(queryNumber);
-      planner->setProblemDefinition(p);
+      const auto problemDefinition = context->instantiateNthProblemDefinition(queryNumber);
+      planner->setProblemDefinition(problemDefinition);
       currentIterationStartTime = totalSolveDuration;
 
       std::cout << "Query: " << queryNumber << std::endl;
@@ -281,7 +281,7 @@ void planR3(std::shared_ptr<esp::ompltools::Configuration> config,
   OpenRAVE::Transform raveState;
   raveState.identity();
 
-  double timePerQuery = 0.;
+  double timePerQuery = 0.0;
   if (config->contains("experiment/time")){
     timePerQuery = config->get<double>("experiment/time");
   }
@@ -299,10 +299,10 @@ void planR3(std::shared_ptr<esp::ompltools::Configuration> config,
            totalSolveDuration - currentIterationStartTime > timePerQuery))){
 
       planner->clearQuery();
-      queryNumber++;
+      ++queryNumber;
 
-      auto p = context->instantiateNthProblemDefinition(queryNumber);
-      planner->setProblemDefinition(p);
+      const auto problemDefinition = context->instantiateNthProblemDefinition(queryNumber);
+      planner->setProblemDefinition(problemDefinition);
       currentIterationStartTime = totalSolveDuration;
 
       std::cout << "Query: " << queryNumber << std::endl;
@@ -372,7 +372,7 @@ void planR3xSO2(std::shared_ptr<esp::ompltools::Configuration> config,
   OpenRAVE::Transform raveState;
   raveState.identity();
 
-  double timePerQuery = 0.;
+  double timePerQuery = 0.0;
   if (config->contains("experiment/time")){
     timePerQuery = config->get<double>("experiment/time");
   }
@@ -390,10 +390,10 @@ void planR3xSO2(std::shared_ptr<esp::ompltools::Configuration> config,
            totalSolveDuration - currentIterationStartTime > timePerQuery))){
 
       planner->clearQuery();
-      queryNumber++;
+      ++queryNumber;
 
-      auto p = context->instantiateNthProblemDefinition(queryNumber);
-      planner->setProblemDefinition(p);
+      const auto problemDefinition = context->instantiateNthProblemDefinition(queryNumber);
+      planner->setProblemDefinition(problemDefinition);
       currentIterationStartTime = totalSolveDuration;
 
       std::cout << "Query: " << queryNumber << std::endl;

@@ -165,7 +165,7 @@ ompl::base::Cost BaseVisualizer::getSolutionCost(const std::size_t iteration) co
 
 time::Duration BaseVisualizer::getIterationDuration(const std::size_t iteration) const {
   std::scoped_lock lock(durationsMutex_);
-  if (iteration >= plannerData_.size()) {
+  if (iteration >= durations_.size()) {
     throw std::runtime_error(
         "Requested iteration duration of iteration that has not yet been processed");
   }
@@ -185,9 +185,9 @@ time::Duration BaseVisualizer::getTotalElapsedDuration(const std::size_t iterati
 
 std::size_t BaseVisualizer::getQueryNumber(const std::size_t iteration) const {
   std::scoped_lock lock(queryNumbersMutex_);
-  if (iteration >= plannerData_.size()) {
+  if (iteration >= queryNumbers_.size()) {
     throw std::runtime_error(
-        "Requested iteration duration of iteration that has not yet been processed");
+        "Requested query number of an iteration that has not yet been processed");
   }
   return queryNumbers_.at(iteration);
 }
@@ -231,10 +231,10 @@ void BaseVisualizer::createData() {
 
   std::size_t queryNumber = 0;
 
-  auto p = context_->instantiateNthProblemDefinition(queryNumber);
-
   planner_->clear();
-  planner_->setProblemDefinition(p);
+
+  const auto problemDefinition = context_->instantiateNthProblemDefinition(queryNumber);
+  planner_->setProblemDefinition(problemDefinition);
 
   double currentIterationStartTime = 0.;
 
@@ -255,16 +255,15 @@ void BaseVisualizer::createData() {
           (timePerQuery <= 0 ||
              (timePerQuery > 0 &&
              getTotalElapsedDuration(displayIteration_).count() - currentIterationStartTime > timePerQuery))){
-          
-          planner_->clearQuery();
-          queryNumber++;
+        planner_->clearQuery();
+        queryNumber++;
 
-          auto p = context_->instantiateNthProblemDefinition(queryNumber);
-          //auto p = context_->instantiateNewProblemDefinition();
-          planner_->setProblemDefinition(p);
+        const auto problemDefinition = context_->instantiateNthProblemDefinition(queryNumber);
+        planner_->setProblemDefinition(problemDefinition);
 
-          currentIterationStartTime = getTotalElapsedDuration(displayIteration_).count();
+        currentIterationStartTime = getTotalElapsedDuration(displayIteration_).count();
       }
+        
 
       // Create a termination condition that stops the planner after one iteration.
       ompl::base::IterationTerminationCondition terminationCondition(1u);
@@ -278,12 +277,12 @@ void BaseVisualizer::createData() {
       auto plannerData = std::make_shared<ompl::base::PlannerData>(context_->getSpaceInformation());
       planner_->getPlannerData(*plannerData);
 
-      {  // Store the iteration duration.
+      {  // Store the duration.
         std::scoped_lock lock(durationsMutex_);
         durations_.emplace_back(iterationDuration);
       }
 
-      {  // Store the iteration number.
+      {  // Store the query number.
         std::scoped_lock lock(queryNumbersMutex_);
         queryNumbers_.emplace_back(queryNumber);
       }

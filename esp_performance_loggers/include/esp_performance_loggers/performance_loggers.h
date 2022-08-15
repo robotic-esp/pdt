@@ -206,6 +206,11 @@ class ResultLog {
     // Create parent directories, if needed.
     fs::create_directories(filepath_.parent_path());
 
+    if (std::experimental::filesystem::exists(filepath_)){
+      fs::permissions(filepath_, fs::perms::owner_read | fs::perms::owner_write |
+                                     fs::perms::group_read | fs::perms::others_read);
+    }
+
     // Open the file.
     std::ofstream filestream;
     filestream.open(filepath_.string(), std::ofstream::out | std::ofstream::app);
@@ -216,6 +221,10 @@ class ResultLog {
       auto msg = "Could not open results file at "s + filepath_.string() + "."s;
       throw std::ios_base::failure(msg);
     }
+
+    // Set the permissions to read only.
+    fs::permissions(filepath_,
+                    fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
   };
 
   fs::path getFilePath() const { return fs::absolute(filepath_); }
@@ -241,6 +250,10 @@ class ResultLog {
 
     // Close the file:
     filestream.close();
+
+    // This file should not accidentally be written to.
+    fs::permissions(filepath_,
+                    fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
   }
 
  private:

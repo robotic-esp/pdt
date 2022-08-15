@@ -132,15 +132,15 @@ class BaseVisualizer {
   time::Duration setupDuration_{};
   mutable std::mutex setupDurationMutex_{};
 
-  // The solution paths.
+  // The solution paths, indexed by the iteration.
   std::vector<ompl::base::PathPtr> solutionPaths_{};
   mutable std::mutex solutionPathsMutex_{};
 
-  // The costs of the solution paths.
+  // The costs of the solution paths, indexed by the iteration.
   std::vector<ompl::base::Cost> solutionCosts_{};
   mutable std::mutex solutionCostsMutex_{};
 
-  // The querynumber corresponding to the current iteration.
+  // The query-numbers, indexed by the iteration.
   std::vector<std::size_t> queryNumbers_{};
   mutable std::mutex queryNumbersMutex_{};
 

@@ -2,10 +2,10 @@
     "experiment": {
         "executable": "benchmark",
         "planners": [
-            "defaultLazyPRMstar",
-            "defaultRRTConnect"
+            "defaultRRTConnect",
+            "defaultLazyPRMstar"
         ],
-        "context": "defaultRandomRectangles2D",
+        "context": "MultiqueryRandomRectangles2D",
         "numRuns": 100,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
@@ -20,7 +20,12 @@
 	"regenerateQueries": false
     },
     "context": {
-        "defaultRandomRectangles2D":{
+        "MultiqueryRandomRectangles2D": {
+            "type": "RandomRectangles",
+            "objective": "initialSolutionPathLength",
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : [ 1, 1 ],
             "goalType": "GoalState",
             "starts": {
                 "type": "generated",
@@ -31,7 +36,11 @@
                 "type": "generated",
                 "numGenerated": 50,
                 "generativeModel": "uniform"
-            }
+            },
+            "collisionCheckResolution": 0.000005,
+            "numObstacles": 20,
+            "maxSideLength": 0.2,
+            "minSideLength": 0.1
         }
     }
 }
