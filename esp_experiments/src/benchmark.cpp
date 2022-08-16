@@ -212,6 +212,16 @@ int main(const int argc, const char **argv) {
 
   std::vector<std::string> resultPaths;
 
+  // Preallocate the paths of the files we are about to create
+  for (auto i=0u; i<numQueries; ++i){
+    const fs::path path = (fs::absolute(experimentDirectory) / ("raw/results_" + std::to_string(i) + ".csv"s));
+    resultPaths.emplace_back(path.string());
+  }
+  
+  // Add the result path to the experiment.
+  config->add<std::vector<std::string>>("experiment/results", resultPaths);
+  config->add<std::string>("experiment/experimentDirectory", fs::absolute(experimentDirectory).string());
+
   // Compute the total number of runs.
   const auto totalNumberOfRuns =
       config->get<std::size_t>("experiment/numRuns") *
@@ -238,17 +248,7 @@ int main(const int argc, const char **argv) {
       // Allocate the planner.
       auto [planner, plannerType] = plannerFactory.create(plannerName);
 
-      // Set it up.
-      const auto setupStartTime = esp::ompltools::time::Clock::now();
-      planner->setup();
-      const auto setupDuration = esp::ompltools::time::Clock::now() - setupStartTime;
-
       for (auto j=0u; j<numQueries; ++j){
-        // Only the first run contains the time needed for the setup of the planner.
-        // We need to do this such that planners that compute some information beforehand do not have an unfair
-        // advantage in the logged times.
-        const double firstQueryMultiplier = (j == 0u);
-
         // Create the logger for this run.
         esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
                                               config->get<double>("experiment/logFrequency"));
@@ -266,25 +266,30 @@ int main(const int argc, const char **argv) {
           hotpath.get();
         }
 
-        planner->clearQuery();
+        esp::ompltools::time::Duration querySetupDuration;;
 
-        // get the problem settng for the nth query, and hand it over to the planner.
-        const auto problemDefinition = context->instantiateNthProblemDefinition(j);
-        planner->setProblemDefinition(problemDefinition);
+        if (j == 0){
+          // Set the planner up. The PlannerFactory starts the planner with the 0th query.
+          const auto setupStartTime = esp::ompltools::time::Clock::now();
+          planner->setup();
+          querySetupDuration = esp::ompltools::time::Clock::now() - setupStartTime;
+        }
+        else {
+          planner->clearQuery();
 
-        // Create the performance log.
-        const fs::path path = (fs::absolute(experimentDirectory) / ("raw/results_" + std::to_string(j) + ".csv"s));
+          // get the problem settng for the nth query, and hand it over to the planner.
+          const auto problemDefinition = context->instantiateNthProblemDefinition(j);
+          planner->setProblemDefinition(problemDefinition);
 
-        // The path only needs to be appended once.
-        if (j == 0u){
-          resultPaths.emplace_back(path.string());
+          querySetupDuration = std::chrono::seconds{0};
         }
 
-        esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(path);
+        // Create the performance log.
+        esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(resultPaths[j]);
 
         // Compute the duration we have left for solving.
         const auto maxSolveDuration =
-            esp::ompltools::time::seconds(context->getMaxSolveDuration() - setupDuration*firstQueryMultiplier);
+            esp::ompltools::time::seconds(context->getMaxSolveDuration() - querySetupDuration);
         const std::chrono::microseconds idle(1000000u /
                                              config->get<std::size_t>("experiment/logFrequency"));
 
@@ -298,7 +303,7 @@ int main(const int argc, const char **argv) {
         // Log the intermediate best costs.
         do {
           addMeasurementStart = esp::ompltools::time::Clock::now();
-          logger.addMeasurement(firstQueryMultiplier*setupDuration + (addMeasurementStart - solveStartTime),
+          logger.addMeasurement(querySetupDuration + (addMeasurementStart - solveStartTime),
                                 esp::ompltools::utilities::getBestCost(planner, plannerType));
 
           // Stop logging intermediate best costs if the planner overshoots.
@@ -316,7 +321,7 @@ int main(const int argc, const char **argv) {
 
         // Get the final runtime.
         const auto totalDuration =
-            firstQueryMultiplier*setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
+            querySetupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
 
         // Store the final cost.
         const auto problem = planner->getProblemDefinition();
@@ -365,10 +370,6 @@ int main(const int argc, const char **argv) {
       }
     }
   }
-  
-  // Add the result path to the experiment.
-  config->add<std::vector<std::string>>("experiment/results", resultPaths);
-  config->add<std::string>("experiment/experimentDirectory", fs::absolute(experimentDirectory).string());
 
   // dump the complete config to make sure that we can produce the report once we ran the experiment
   auto configPath = experimentDirectory / "config.json"s;
