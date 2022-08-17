@@ -224,7 +224,7 @@ void BaseVisualizer::createData() {
     }
   }
 
-  double timePerQuery = 0.;
+  double timePerQuery = 0.0;
   if (config_->contains("experiment/time")){
     timePerQuery = config_->get<double>("experiment/time");
   }
@@ -236,7 +236,7 @@ void BaseVisualizer::createData() {
   const auto problemDefinition = context_->instantiateNthProblemDefinition(queryNumber);
   planner_->setProblemDefinition(problemDefinition);
 
-  double currentIterationStartTime = 0.;
+  double currentIterationStartTime = 0.0;
 
   while (dataThreadStopSignal_.wait_for(std::chrono::nanoseconds(1)) ==
          std::future_status::timeout) {
@@ -251,17 +251,15 @@ void BaseVisualizer::createData() {
        * If we arrived at the last query, we run that one indefinitely.
        */
       if (queryNumber + 1 < context_->getNumQueries() && 
-          planner_->getProblemDefinition()->hasExactSolution() && 
-          (timePerQuery <= 0 ||
-             (timePerQuery > 0 &&
-             getTotalElapsedDuration(displayIteration_).count() - currentIterationStartTime > timePerQuery))){
+          ((planner_->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
+           (largestIteration_ > 0 && getTotalElapsedDuration(largestIteration_).count() - currentIterationStartTime > timePerQuery))){
         planner_->clearQuery();
         ++queryNumber;
 
         const auto problemDefinition = context_->instantiateNthProblemDefinition(queryNumber);
         planner_->setProblemDefinition(problemDefinition);
 
-        currentIterationStartTime = getTotalElapsedDuration(displayIteration_).count();
+        currentIterationStartTime = getTotalElapsedDuration(largestIteration_).count();
       }
         
 

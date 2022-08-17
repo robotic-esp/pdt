@@ -79,19 +79,32 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
   }
 
   bool generateQueriesBeforeObstacles = false;
-
   // If we only specify one single start, we first place that start/goal pair, and then generate
   // valid obstacles around them.
-  if (config_->contains("context/" + name_ + "/start")) {
-    generateQueriesBeforeObstacles = true;
-  } else if (config_->get<std::string>("context/" + name + "/starts/type") == "specified") {
-    if (config_->get<std::size_t>("context/" + name + "/starts/numGenerated") == 1) {
-      generateQueriesBeforeObstacles = true;
-    } else {
-      throw std::runtime_error(
+  if (config_->contains("context/" + name_ + "/starts")) {
+    if (config_->get<std::string>("context/" + name + "/starts/type") == "specified") {
+      if (config_->get<std::size_t>("context/" + name + "/starts/numGenerated") == 1) {
+        generateQueriesBeforeObstacles = true;
+      } else {
+        throw std::runtime_error(
           "Context error. Multiple specified starts/goals are not supported for this context at "
           "the moment.");
+      }
     }
+    else if (config_->get<std::string>("context/" + name + "/starts/type") == "generated"){
+      generateQueriesBeforeObstacles = false;
+    }
+    else{
+      throw std::runtime_error(
+        "Context error. The only start types that are currently supported are 'specified' and 'generated'.");
+    }
+  }
+  else if (config_->contains("context/" + name_ + "/start")) {
+    generateQueriesBeforeObstacles = true;
+  } 
+  else{
+    throw std::runtime_error(
+      "Context error. Neither 'start' nor 'starts' specified.");
   }
 
   if (generateQueriesBeforeObstacles) {

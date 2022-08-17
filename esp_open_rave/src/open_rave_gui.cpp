@@ -106,11 +106,9 @@ void planManipulator(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Work it.
   while (true) {
-    if (queryNumber + 1 < context->getNumQueries() &&
-        planner->getProblemDefinition()->hasExactSolution() && 
-        (timePerQuery <= 0.0 ||
-           (timePerQuery > 0.0 &&
-           totalSolveDuration - currentIterationStartTime > timePerQuery))){
+    if (queryNumber + 1 < context->getNumQueries() && 
+        ((planner->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
+         totalSolveDuration - currentIterationStartTime > timePerQuery)){
 
       planner->clearQuery();
       ++queryNumber;
@@ -197,11 +195,9 @@ void planMover(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Work it.
   while (true) {
-    if (queryNumber + 1 < context->getNumQueries() &&
-        planner->getProblemDefinition()->hasExactSolution() && 
-        (timePerQuery <= 0.0 ||
-           (timePerQuery > 0.0 &&
-           totalSolveDuration - currentIterationStartTime > timePerQuery))){
+    if (queryNumber + 1 < context->getNumQueries() && 
+        ((planner->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
+         totalSolveDuration - currentIterationStartTime > timePerQuery)){
 
       planner->clearQuery();
       ++queryNumber;
@@ -292,11 +288,9 @@ void planR3(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Work it.
   while (true) {
-    if (queryNumber + 1 < context->getNumQueries() &&
-        planner->getProblemDefinition()->hasExactSolution() && 
-        (timePerQuery <= 0.0 ||
-           (timePerQuery > 0.0 &&
-           totalSolveDuration - currentIterationStartTime > timePerQuery))){
+    if (queryNumber + 1 < context->getNumQueries() && 
+        ((planner->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
+         totalSolveDuration - currentIterationStartTime > timePerQuery)){
 
       planner->clearQuery();
       ++queryNumber;
@@ -383,11 +377,9 @@ void planR3xSO2(std::shared_ptr<esp::ompltools::Configuration> config,
 
   // Work it.
   while (true) {
-    if (queryNumber + 1 < context->getNumQueries() &&
-        planner->getProblemDefinition()->hasExactSolution() && 
-        (timePerQuery <= 0.0 ||
-           (timePerQuery > 0.0 &&
-           totalSolveDuration - currentIterationStartTime > timePerQuery))){
+    if (queryNumber + 1 < context->getNumQueries() && 
+        ((planner->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
+         totalSolveDuration - currentIterationStartTime > timePerQuery)){
 
       planner->clearQuery();
       ++queryNumber;

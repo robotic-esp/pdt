@@ -285,7 +285,9 @@ int main(const int argc, const char **argv) {
         }
 
         // Create the performance log.
-        esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(resultPaths[j]);
+        // If it's not the first query, and not the first planner (i.e. we are not running this query for the first time),
+        // tell the log to expect to append to the existing file.
+        esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(resultPaths[j], i!=0u || plannerName != plannerNames.front());
 
         // Compute the duration we have left for solving.
         const auto maxSolveDuration =

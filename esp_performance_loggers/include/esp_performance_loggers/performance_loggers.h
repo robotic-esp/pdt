@@ -202,11 +202,17 @@ template <class Logger>
 class ResultLog {
 
  public:
-  ResultLog(const std::experimental::filesystem::path& filepath) : filepath_(filepath) {
+  ResultLog(const std::experimental::filesystem::path& filepath, const bool append) : filepath_(filepath) {
     // Create parent directories, if needed.
     fs::create_directories(filepath_.parent_path());
 
-    if (std::experimental::filesystem::exists(filepath_)){
+    if (append){
+      if (!std::experimental::filesystem::exists(filepath_)){
+        auto msg = "Attempting to append to file, but the file does not exist.";
+        throw std::ios_base::failure(msg);
+      }
+
+      // In case we want to append to the file, we need to set write access-permissions again.
       fs::permissions(filepath_, fs::perms::owner_read | fs::perms::owner_write |
                                      fs::perms::group_read | fs::perms::others_read);
     }

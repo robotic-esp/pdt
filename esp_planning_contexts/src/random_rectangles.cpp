@@ -80,8 +80,12 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
           "the moment.");
       }
     }
-    else{
+    else if (config_->get<std::string>("context/" + name + "/starts/type") == "generated"){
       generateQueriesBeforeObstacles = false;
+    }
+    else{
+      throw std::runtime_error(
+        "Context error. The only start types that are currently supported are 'specified' and 'generated'.");
     }
   }
   else if (config_->contains("context/" + name_ + "/start")) {
