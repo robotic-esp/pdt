@@ -343,8 +343,8 @@ int main(const int argc, const char **argv) {
           querySetupDuration = std::chrono::seconds{0};
         }
 
-        // Create the performance log.
-        // If it's not the first query, and not the first planner (i.e. we are not running this query for the first time),
+        // Create the performance log:
+        // If it's not the first time we run this query (i.e. not the first run, and not the first planner), 
         // tell the log to expect to append to the existing file.
         esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(resultPaths[j], i!=0u || plannerName != plannerNames.front());
 
