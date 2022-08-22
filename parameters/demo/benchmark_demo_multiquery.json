@@ -11,8 +11,9 @@
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true,
         "loadDefaultObjectiveConfig": true,
-        "validateProblemDefinition": true,
-        "validateProblemDuration": 10.0,
+        "validateProblemDefinitions": true,
+        "validateProblemDefinitionsDuration": 10.0,
+        "validateProblemDefinitionsPlanner": "defaultRRTConnect",
         "report": {
             "automatic": true,
             "verboseCompilation": false

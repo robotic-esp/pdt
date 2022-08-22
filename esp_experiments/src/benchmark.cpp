@@ -41,6 +41,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <tuple>
 
 #include <experimental/filesystem>
 
@@ -61,29 +62,105 @@
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-// Function to check if the start/goal query we are looking at is actually valid.
-// To that end, we run an RRTConnect planner on the problem for 10s.
-bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext> &context,
-                          const double runtime) {
-  std::cout << "Validating problem definition... ";
+constexpr auto barWidth = 36;
 
-  const std::size_t numQueries = context->getNumQueries();
-  for (auto i=0u; i<numQueries; ++i){
-    auto planner = std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
-
-    const auto problemDefinition = context->instantiateNthProblemDefinition(i);
-    planner->setProblemDefinition(problemDefinition);
-
-    const auto status = planner->solve(ompl::base::timedPlannerTerminationCondition(runtime));
-
-    if (!status) {
-      std::cout << "Failed on query " << i << "." << std::endl;
-      return false;
+// Function to break a long message across multiple lines at spaces
+std::string linebreak(const std::string &in, const size_t lineWidth)
+{
+  std::string out = in;
+  std::string::size_type curLength = 0u;
+  for (std::string::size_type i = 0u; i < in.size(); ++i) {
+    if (curLength == lineWidth) {
+      if (in[i] == ' ') {
+        out[i] = '\n';
+        curLength = 0u;
+      } else {
+        for (std::string::size_type j = i - 1u; j >= 1u; --j) {
+          if (out[j] == ' ') {
+            out[j] = '\n';
+            curLength = i - j;
+            break;
+          }
+        }
+      }
+    } else {
+      ++curLength;
     }
   }
-  std::cout << "OK." << std::endl;
-  std::cout << std::endl;
+  return out;
+}
 
+// Function to check if the ProblemDefinitions defined by the Context is actually valid.
+bool checkContextValidity(const std::shared_ptr<esp::ompltools::Configuration> &config, const std::shared_ptr<esp::ompltools::BaseContext> &context) {
+  std::cout << "\nContext validation\n";
+  if (config->contains("experiment/validateProblemDefinitions") &&
+      config->get<bool>("experiment/validateProblemDefinitions")) {
+    const std::size_t numQueries = context->getNumQueries();
+    double runtime = 10.0;
+    if (config->contains("experiment/validateProblemDefinitionsDuration")){
+      runtime = config->get<double>("experiment/validateProblemDefinitionsDuration");
+    }
+    std::string validPlannerName = "defaultRRTConnect";
+    if (config->contains("experiment/validateProblemDefinitionsPlanner")){
+      validPlannerName = config->get<std::string>("experiment/validateProblemDefinitionsPlanner");
+    }
+
+    std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+              << std::setfill('.') << "Planner" << std::setw(20) << std::right
+              << validPlannerName << '\n';
+    std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+              << std::setfill('.') << "Time per ProblemDefinition" << std::setw(20) << std::right
+              << runtime << " s\n";
+    std::cout << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
+              << std::left << std::setw(barWidth) << std::setfill('.') << '|' << std::right
+              << std::fixed << std::setw(6) << std::setfill(' ') << std::setprecision(2) << 0.0
+              << " %" << std::flush;
+
+    esp::ompltools::PlannerFactory plannerFactory(config, context);
+    std::shared_ptr<ompl::base::Planner> validPlanner;
+    std::tie(validPlanner, std::ignore) = plannerFactory.create(validPlannerName);
+
+    for (auto i=0u; i<numQueries; ++i) {
+      const auto problemDefinition = context->instantiateNthProblemDefinition(i);
+      validPlanner->clear();
+      validPlanner->setProblemDefinition(problemDefinition);
+
+      validPlanner->solve(ompl::base::timedPlannerTerminationCondition(runtime));
+
+      const auto progress = static_cast<float>(i + 1u) / static_cast<float>(numQueries);
+      std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
+                  << (std::ceil(progress * barWidth) != barWidth
+                          ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
+                          : std::setw(static_cast<int>(std::ceil(progress * barWidth) - 1u)))
+                  << std::setfill('.') << (i + 1u != numQueries ? '|' : '.') << std::right
+                  << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
+                  << std::setfill('.') << '.' << std::right;
+                  if (problemDefinition->hasExactSolution()) {
+                     std::cout << std::fixed << std::setw(6) << std::setfill(' ')
+                               << std::setprecision(2) << progress * 100.0f << " %";
+                  } else {
+                    std::cout << "Failed !";
+                  }
+                  std::cout << std::flush;
+      if (!problemDefinition->hasExactSolution()) {
+        auto msg = "This context may not be solveable since "s + validPlannerName
+                   + " did not find a solution to the ompl::base::ProblemDefinition for query "s
+                   + std::to_string(i) + " in "s + std::to_string(runtime) + "s. Please check "s
+                   + "the start and goal states, use a different pseudorandom seed if the "s
+                   + "problem was randomly generated, and/or increase the validation time "s
+                   + "('experiment/validateProblemDefinitionsDuration'). You may also choose to "s
+                   + "disable this validation if you know your context is valid "s
+                   + "('experiment/validateProblemDefinitions')."s;
+        std::cout << "\n\n" << linebreak(msg, 80u) << "\n\n";
+        return false;
+      }
+    }
+  } else {
+    std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
+                  << std::setw(static_cast<int>(std::ceil(barWidth) - 1u))
+                  << std::setfill('.') << '.' << std::right << "Skipped";
+  }
+  std::cout << '\n';
   return true;
 }
 
@@ -99,29 +176,6 @@ int main(const int argc, const char **argv) {
   // Create the context for this experiment.
   esp::ompltools::ContextFactory contextFactory(config);
   auto context = contextFactory.create(config->get<std::string>("experiment/context"));
-
-  if (config->contains("experiment/validateProblemDefinition") &&
-      config->get<bool>("experiment/validateProblemDefinition")) {
-    double contextCheckingRuntime = 10.0;
-    if (config->contains("experiment/validateProblemDuration")){
-      contextCheckingRuntime = config->get<double>("experiment/validateProblemDuration");
-    }
-    else{
-      std::cout << "Parameter 'experiment/validateProblemDuration' not defined, using default value of "
-        << contextCheckingRuntime << "s." << std::endl;
-    }
-    if (!checkContextValidity(context, contextCheckingRuntime)) {
-      std::cout << "This problem definition may not be solveable since RRT-Connect did not find a "
-                   "solution in "
-                << contextCheckingRuntime
-                << "s. Please check the start and goal states, use a different pseudorandom seed "
-                   "if the problem was randomly generated, and/or increase the validation time "
-                   "('experiment/validateProblemDuration'). You may also disable this problem "
-                   "definition validation ('experiment/validateProblemDefinition')."
-                << std::endl;
-      return 0;
-    }
-  }
 
   const std::size_t numQueries = context->getNumQueries();
 
@@ -145,9 +199,6 @@ int main(const int argc, const char **argv) {
             << std::setfill('.') << "Number of runs per planner" << std::setw(20) << std::right
             << config->get<std::size_t>("experiment/numRuns") << '\n';
   std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
-            << std::setfill('.') << "Number of queries" << std::setw(20) << std::right
-            << numQueries << '\n';
-  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
             << std::setfill('.') << "Maximum time per run" << std::setw(20) << std::right
             << context->getMaxSolveDuration().count() << " s\n";
   std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
@@ -165,9 +216,12 @@ int main(const int argc, const char **argv) {
 
   // Print some info about the context of this benchmark.
   std::cout << "\nContext parameters\n";
-  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
-            << std::setfill('.') << "Context name" << std::setw(20) << std::right
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(20)
+            << std::setfill('.') << "Context name" << std::setw(30) << std::right
             << config->get<std::string>("experiment/context") << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Number of queries" << std::setw(20) << std::right
+            << numQueries << '\n';
   std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
             << std::setfill('.') << "Problem dimension" << std::setw(20) << std::right
             << context->getDimension() << '\n';
@@ -192,6 +246,10 @@ int main(const int argc, const char **argv) {
   std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
             << std::setfill('.') << "Cost threshold" << std::setw(20) << std::right
             << context->getObjective()->getCostThreshold() << '\n';
+
+  if (!checkContextValidity(config, context)) {
+      return 0;
+  }
 
   // Setup the results table.
   std::cout << "\nTesting planners\n";
@@ -342,7 +400,6 @@ int main(const int argc, const char **argv) {
         // Compute the progress.
         ++currentRun;
         const auto progress = static_cast<float>(currentRun) / static_cast<float>(totalNumberOfRuns);
-        constexpr auto barWidth = 36;
 
         // estimate how much time is left by extrapolating from the time spent so far.
         // This is more accurate than subtracting the time used so far from the worst case total time
@@ -453,4 +510,3 @@ int main(const int argc, const char **argv) {
 
   return 0;
 }
-
