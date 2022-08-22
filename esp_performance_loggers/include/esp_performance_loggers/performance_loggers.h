@@ -206,13 +206,17 @@ class ResultLog {
     // Create parent directories, if needed.
     fs::create_directories(filepath_.parent_path());
 
-    if (append){
-      if (!std::experimental::filesystem::exists(filepath_)){
-        auto msg = "Attempting to append to file, but the file does not exist.";
-        throw std::ios_base::failure(msg);
-      }
+    // Assert user intent
+    if (!append && std::experimental::filesystem::exists(filepath_)) {
+      auto msg = "Told to create a new file where one already exists.";
+      throw std::ios_base::failure(msg);
+    } else if (append && !std::experimental::filesystem::exists(filepath_)) {
+      auto msg = "Told to append to a file that does not exist.";
+      throw std::ios_base::failure(msg);
+    }
 
-      // In case we want to append to the file, we need to set write access-permissions again.
+    if (append) {
+      // In order to append to the file, we need to set write access-permissions again.
       fs::permissions(filepath_, fs::perms::owner_read | fs::perms::owner_write |
                                      fs::perms::group_read | fs::perms::others_read);
     }

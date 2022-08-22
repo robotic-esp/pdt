@@ -245,8 +245,6 @@ int main(const int argc, const char **argv) {
     // If multiple starts/goal queries are defined (i.e. we evaluate a multiquery setting),
     // the planners run _all_ queries before the next planner runs the _same_ queries.
     for (const auto &plannerName : plannerNames) {
-      // Allocate the planner.
-      auto [planner, plannerType] = plannerFactory.create(plannerName);
 
       for (auto j=0u; j<numQueries; ++j){
         // Create the logger for this run.
@@ -266,8 +264,11 @@ int main(const int argc, const char **argv) {
           hotpath.get();
         }
 
-        esp::ompltools::time::Duration querySetupDuration;;
+        // Allocate the planner.
+        auto [planner, plannerType] = plannerFactory.create(plannerName);
 
+        // Prepare the planner for this query.
+        esp::ompltools::time::Duration querySetupDuration;;
         if (j == 0){
           // Set the planner up. The PlannerFactory starts the planner with the 0th query.
           const auto setupStartTime = esp::ompltools::time::Clock::now();
@@ -452,3 +453,4 @@ int main(const int argc, const char **argv) {
 
   return 0;
 }
+
