@@ -3,6 +3,7 @@ project(esp_statistics)
 
 # Specify this library as a target.
 add_library(esp_statistics
+  src/multi_query_statistics.cpp
   src/statistics.cpp
   src/population_statistics.cpp)
 

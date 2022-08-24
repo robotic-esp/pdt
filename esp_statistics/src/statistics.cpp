@@ -681,6 +681,39 @@ fs::path Statistics::extractInitialSolutions(const std::string& plannerName) con
   return filepath;  // Note: std::ofstream is a big boy and closes itself upon destruction.
 }
 
+fs::path Statistics::extractFinalSolutions(const std::string& plannerName) const{
+  // Check if the file already exists.
+  fs::path filepath = statisticsDirectory_ / (plannerName + "_final_solutions.csv"s);
+  if (fs::exists(filepath) && !forceComputation_) {
+    return filepath;
+  }
+
+  auto durations = getLastSolutionDurations(results_.at(plannerName));
+  auto costs = getLastSolutionCosts(results_.at(plannerName));
+
+  // Write to file.
+  std::ofstream filestream(filepath.string());
+  if (filestream.fail()) {
+    auto msg = "Cannot write final solutions for '"s + plannerName + "' to '"s +
+               filepath.string() + "'."s;
+    throw std::ios_base::failure(msg);
+  }
+
+  filestream << createHeader("Final solutions", plannerName);
+  filestream << std::setprecision(21);
+  filestream << "durations";
+  for (const auto duration : durations) {
+    filestream << ',' << duration;
+  }
+  filestream << "\ncosts";
+  for (const auto cost : costs) {
+    filestream << ',' << cost;
+  }
+  filestream << '\n';
+
+  return filepath;
+}
+
 std::string Statistics::createHeader(const std::string& statisticType,
                                      const std::string& plannerName) const {
   std::stringstream stream;
@@ -868,6 +901,19 @@ std::vector<double> Statistics::getInitialSolutionDurations(const PlannerResults
   return initialDurations;
 }
 
+std::vector<double> Statistics::getLastSolutionDurations(const PlannerResults& results) const {
+  // Get the durations of the initial solutions of all runs.
+  std::vector<double> lastDurations{};
+  lastDurations.reserve(results.numMeasuredRuns());
+  for (auto run = 0u; run < results.numMeasuredRuns(); ++run) {
+    // Get the durations and costs of this run.
+    const auto& measuredRun = results.getMeasuredRun(run);
+    lastDurations.emplace_back(measuredRun.back().first);
+  }
+
+  return lastDurations;
+}
+
 std::vector<double> Statistics::getInitialSolutionCosts(const PlannerResults& results) const {
   // Get the costs of the initial solutions of all runs.
   std::vector<double> initialCosts{};
@@ -891,6 +937,19 @@ std::vector<double> Statistics::getInitialSolutionCosts(const PlannerResults& re
   }
 
   return initialCosts;
+}
+
+std::vector<double> Statistics::getLastSolutionCosts(const PlannerResults& results) const {
+  // Get the durations of the initial solutions of all runs.
+  std::vector<double> lastCosts{};
+  lastCosts.reserve(results.numMeasuredRuns());
+  for (auto run = 0u; run < results.numMeasuredRuns(); ++run) {
+    // Get the durations and costs of this run.
+    const auto& measuredRun = results.getMeasuredRun(run);
+    lastCosts.emplace_back(measuredRun.back().second);
+  }
+
+  return lastCosts;
 }
 
 double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,

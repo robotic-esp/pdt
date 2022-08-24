@@ -70,7 +70,11 @@ class PlannerResults {
   mutable std::vector<PlannerResult> interpolatedRuns_{};
 };
 
+class MultiQueryStatistics;
+
 class Statistics {
+  friend MultiQueryStatistics;
+
  public:
   Statistics(const std::shared_ptr<Configuration>& config, const std::experimental::filesystem::path &resultsPath, const bool forceComputation);
   ~Statistics() = default;
@@ -93,6 +97,7 @@ class Statistics {
       const std::string& plannerName, const std::vector<double>& binDurations = {}) const;
 
   std::experimental::filesystem::path extractInitialSolutions(const std::string& plannerName) const;
+  std::experimental::filesystem::path extractFinalSolutions(const std::string& plannerName) const;
 
   std::size_t getNumRunsPerPlanner() const;
 
@@ -145,6 +150,9 @@ class Statistics {
 
   std::vector<double> getInitialSolutionDurations(const PlannerResults& results) const;
   std::vector<double> getInitialSolutionCosts(const PlannerResults& results) const;
+
+  std::vector<double> getLastSolutionDurations(const PlannerResults& results) const;
+  std::vector<double> getLastSolutionCosts(const PlannerResults& results) const;
 
   double getNthValue(std::vector<double>* values, const std::size_t n) const;
 
