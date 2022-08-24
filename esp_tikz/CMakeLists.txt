@@ -3,6 +3,7 @@ project(esp_tikz)
 
 # Specify the library as a target.
 add_library(esp_tikz
+  src/base_report.cpp
   src/cost_percentile_evolution_plotter.cpp
   src/experiment_report.cpp
   src/kpi_table.cpp
