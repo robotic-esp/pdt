@@ -252,7 +252,7 @@ void BaseVisualizer::createData() {
        */
       if (queryNumber + 1 < context_->getNumQueries() && 
           ((planner_->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
-           (largestIteration_ > 0 && getTotalElapsedDuration(largestIteration_).count() - currentIterationStartTime > timePerQuery))){
+           (largestIteration_ > 0 && timePerQuery > 0.0 && getTotalElapsedDuration(largestIteration_).count() - currentIterationStartTime > timePerQuery))){
         planner_->clearQuery();
         ++queryNumber;
 
