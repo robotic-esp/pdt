@@ -2,8 +2,9 @@
     "experiment": {
         "executable": "visualization",
         "planner": "defaultRRTConnect",
-        "context": "MultiqueryRandomRectangles2D",
-        "useOnlyThisConfig": false
+        "context": "MultiqueryWallGap2D",
+        "useOnlyThisConfig": false,
+	"time": 0.0
     },
     "context": {
         "MultiqueryRandomRectangles2D": {
@@ -27,6 +28,37 @@
             "numObstacles": 20,
             "maxSideLength": 0.2,
             "minSideLength": 0.1
+        },
+	"MultiqueryWallGap2D": {
+            "type": "WallGap",
+            "objective": "defaultPathLength",
+            "starts": {
+                "type": "generated",
+                "numGenerated": 50,
+                "generativeModel": "subregion",
+	    	"generator": {
+		    "lowerBounds": [ 0.3, -0.5],
+		    "upperBounds": [ 0.5,  0]
+	    	}
+            },
+            "goals": {
+                "type": "generated",
+                "numGenerated": 50,
+                "generativeModel": "subregion",
+	    	"generator": {
+		    "lowerBounds": [-0.5, -0.5],
+		    "upperBounds": [ -0.3,  0]
+	    	}
+            },
+            "goalType": "GoalState",
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : [ 1, 1 ],
+            "collisionCheckResolution": 0.000005,
+            "wallWidth": 0.8,
+            "wallThickness": 0.2,
+            "gapOffset": 0.1,
+            "gapWidth": 0.04
         }
     }
 }
