@@ -242,7 +242,20 @@ int main(const int argc, const char **argv) {
                               problem->getSolutionPath()->cost(context->getObjective()));
       } else {
         logger.addMeasurement(totalDuration,
-                              ompl::base::Cost(std::numeric_limits<double>::infinity()));
+                              ompl::base::Cost(context->getObjective()->infiniteCost()));
+      }
+
+      // Anytime planners can stop early, e.g. if they know that they found the optimal solution.
+      // Thus, we need to add an additional final measurement point at the maximum runtime.
+      const auto maxRunDuration = context->getMaxSolveDuration();
+      if (totalDuration < maxRunDuration) {
+        if (problem->hasExactSolution()) {
+          logger.addMeasurement(maxRunDuration,
+                                problem->getSolutionPath()->cost(context->getObjective()));
+        } else {
+          logger.addMeasurement(maxRunDuration,
+                                ompl::base::Cost(context->getObjective()->infiniteCost()));
+        }
       }
 
       // Add this run to the log and report it to the console.

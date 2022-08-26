@@ -119,6 +119,13 @@ Y LinearInterpolator<X, Y>::operator()(X x) const {
   // Get the sandwiching iterators.
   auto lower = data_.lower_bound(x);
   auto upper = data_.upper_bound(x);
+
+  // the lower iterator is smaller equal, the upper is _greater_.
+  // Thus we can check if we can simply return the lower iterator here.
+  if (std::abs(lower->first - x) < 1e-6){
+    return lower->second;
+  }
+
   if (lower == data_.end() || upper == data_.end()) {
     auto msg = std::string("Interpolator refuses to extrapolate.");
     throw std::runtime_error(msg);
