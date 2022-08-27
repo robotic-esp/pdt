@@ -61,7 +61,7 @@ enum class PLANNER_TYPE {
   RRTCONNECT,
   RRTSHARP,
   RRTSTAR,
-  SPARStwo,
+  SPARSTWO,
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
@@ -80,7 +80,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
                                                {PLANNER_TYPE::RRTCONNECT, "RRTConnect"},
                                                {PLANNER_TYPE::RRTSHARP, "RRTsharp"},
                                                {PLANNER_TYPE::RRTSTAR, "RRTstar"},
-                                               {PLANNER_TYPE::SPARStwo, "SPARStwo"},
+                                               {PLANNER_TYPE::SPARSTWO, "SPARStwo"},
                                            })
 
 }  // namespace ompltools

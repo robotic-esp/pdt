@@ -70,14 +70,14 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     case PLANNER_TYPE::AITSTAR: {
       return planner->as<ompl::geometric::AITstar>()->bestCost();
     }
+    case PLANNER_TYPE::BITSTAR: {
+      return planner->as<ompl::geometric::BITstar>()->bestCost();
+    }
     case PLANNER_TYPE::EIRMSTAR: {
       return planner->as<ompl::geometric::EIRMstar>()->bestCost();
     }
     case PLANNER_TYPE::EITSTAR: {
       return planner->as<ompl::geometric::EITstar>()->bestCost();
-    }
-    case PLANNER_TYPE::BITSTAR: {
-      return planner->as<ompl::geometric::BITstar>()->bestCost();
     }
     case PLANNER_TYPE::FMTSTAR: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
@@ -106,7 +106,7 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
     case PLANNER_TYPE::RRTSTAR: {
       return planner->as<ompl::geometric::RRTstar>()->bestCost();
     }
-    case PLANNER_TYPE::SPARStwo: {
+    case PLANNER_TYPE::SPARSTWO: {
       return planner->as<ompl::geometric::SPARStwo>()->bestCost();
     }
     default: {
