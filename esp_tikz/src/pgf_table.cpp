@@ -114,7 +114,7 @@ void PgfTable::loadFromPath(const std::experimental::filesystem::path& path,
         }
       } catch (const std::invalid_argument& e) {
         auto msg = "Pgf Table cannot convert entry '"s + row.at(i) + "' from file '"s +
-                   path.string() + "' to double."s;
+                   path.string() + "' to double:\n    "s + e.what();
         throw std::invalid_argument(msg);
       }
     }

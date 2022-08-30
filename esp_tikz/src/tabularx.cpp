@@ -108,7 +108,7 @@ void TabularX::loadFromPath(const std::experimental::filesystem::path& path,
         data_.back().emplace_back(std::stod(row.at(i)));
       } catch (const std::invalid_argument& e) {
         auto msg = "TabularX cannot convert entry '"s + row.at(i) + "' from file '"s +
-                   path.string() + "' to double."s;
+                   path.string() + "' to double:\n    "s + e.what();
         throw std::invalid_argument(msg);
       }
     }

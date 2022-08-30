@@ -77,7 +77,9 @@ bool ContextValidityCheckerGNAT::isValid(const ompl::base::State* state) const {
         return true;
       }
     } catch (const std::out_of_range& e) {
-      throw std::out_of_range("Nearest neighbour lookup for antiobstacles returned invalid index.");
+      std::string msg = "Nearest neighbour lookup for antiobstacles returned invalid index:\n    ";
+      msg += e.what();
+      throw std::out_of_range(msg);
     }
   }
 
@@ -90,7 +92,9 @@ bool ContextValidityCheckerGNAT::isValid(const ompl::base::State* state) const {
         return false;
       }
     } catch (const std::out_of_range& e) {
-      throw std::out_of_range("Nearest neighbour lookup for obstacles returned invalid index.");
+      std::string msg = "Nearest neighbour lookup for obstacles returned invalid index:\n    ";
+      msg +=  e.what();
+      throw std::out_of_range(msg);
     }
   }
 
