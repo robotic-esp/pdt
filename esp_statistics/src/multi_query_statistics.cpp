@@ -146,21 +146,21 @@ void MultiQueryStatistics::computeCumulativeMetricsForPlanner(
   std::vector<double> upperCostBounds;
 
   // merge together the stuff that is computed in the separate statistics
-  for (std::size_t i=0; i<numQueries_; ++i){
+  for (auto i=0u; i<numQueries_; ++i){
     // Get the median initial solution duration.
-    double medianDuration = stats_[i].getMedianInitialSolutionDuration(stats_[i].results_.at(plannerName));
+    const double medianDuration = stats_[i].getMedianInitialSolutionDuration(stats_[i].results_.at(plannerName));
 
     // Get the median initial solution cost.
-    double medianCost = stats_[i].getMedianInitialSolutionCost(stats_[i].results_.at(plannerName));
+    const double medianCost = stats_[i].getMedianInitialSolutionCost(stats_[i].results_.at(plannerName));
 
     // Get the interval for the upper and lower bounds.
-    auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
+    const auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
 
     // Get the upper and lower confidence bounds on the median initial solution duration and cost.
-    auto lowerDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.lower);
-    auto upperDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.upper);
-    auto lowerCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.lower);
-    auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.upper);
+    const auto lowerDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.lower);
+    const auto upperDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.upper);
+    const auto lowerCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.lower);
+    const auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.upper);
 
     // save the results
     medianDurations.emplace_back(medianDuration);
@@ -181,16 +181,16 @@ void MultiQueryStatistics::computeCumulativeMetricsForPlanner(
   std::vector<double> lciCumulativeCost;
 
   // sum median/limits
-  for (std::size_t i=0; i<numQueries_; ++i){
+  for (auto i=0u; i<numQueries_; ++i){
     // Get the median initial solution duration.
 
-    double medianDuration = medianDurations[i];
-    double lcDuration = lowerDurationBounds[i];
+    const double medianDuration = medianDurations[i];
+    const double lcDuration = lowerDurationBounds[i];
     double ucDuration = upperDurationBounds[i];
 
-    double medianCost = medianCosts[i];
-    double lcCost = lowerCostBounds[i];
-    double ucCost = upperCostBounds[i];
+    const double medianCost = medianCosts[i];
+    const double lcCost = lowerCostBounds[i];
+    const double ucCost = upperCostBounds[i];
 
     if (i == 0){
       medianCumulativeDuration.push_back(medianDuration);
@@ -245,16 +245,16 @@ void MultiQueryStatistics::computeCumulativeFinalCost(
   std::vector<double> upperCostBounds;
 
   // merge together the stuff that is computed in the separate statistics
-  for (std::size_t i=0; i<numQueries_; ++i){
+  for (auto i=0u; i<numQueries_; ++i){
     // Get the median initial solution cost.
-    double medianCost = stats_[i].getMedianFinalCost((plannerName));
+    const double medianCost = stats_[i].getMedianFinalCost((plannerName));
 
     // Get the interval for the upper and lower bounds.
-    auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
+    const auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
 
     // Get the upper and lower confidence bounds on the median initial solution duration and cost.
-    auto lowerCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.lower, {stats_[i].defaultMedianBinDurations_.back()}).back();
-    auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
+    const auto lowerCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.lower, {stats_[i].defaultMedianBinDurations_.back()}).back();
+    const auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
 
     // save the results
     medianCosts.emplace_back(medianCost);
@@ -275,13 +275,13 @@ void MultiQueryStatistics::computeCumulativeFinalCost(
   std::vector<double> lciCumulativeCost;
 
   // sum median/limits
-  for (std::size_t i=0; i<numQueries_; ++i){
+  for (auto i=0u; i<numQueries_; ++i){
     // Get the median initial solution duration.
-    double medianCost = medianCosts[i];
-    double lcCost = lowerCostBounds[i];
-    double ucCost = upperCostBounds[i];
+    const double medianCost = medianCosts[i];
+    const double lcCost = lowerCostBounds[i];
+    const double ucCost = upperCostBounds[i];
 
-    if (i == 0){
+    if (i == 0u){
       medianCumulativeCost.push_back(medianCost);
       uciCumulativeCost.push_back(ucCost);
       lciCumulativeCost.push_back(lcCost);
@@ -323,21 +323,21 @@ fs::path MultiQueryStatistics::extractMedianInitialSolutionPerQuery(
   std::vector<double> upperCostBounds;
 
   // merge together the stuff that is computed in the separate statistics
-  for (std::size_t i=0; i<numQueries_; ++i){
+  for (auto i=0u; i<numQueries_; ++i){
     // Get the median initial solution duration.
-    double medianDuration = stats_[i].getMedianInitialSolutionDuration(stats_[i].results_.at(plannerName));
+    const double medianDuration = stats_[i].getMedianInitialSolutionDuration(stats_[i].results_.at(plannerName));
 
     // Get the median initial solution cost.
-    double medianCost = stats_[i].getMedianInitialSolutionCost(stats_[i].results_.at(plannerName));
+    const double medianCost = stats_[i].getMedianInitialSolutionCost(stats_[i].results_.at(plannerName));
 
     // Get the interval for the upper and lower bounds.
-    auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
+    const auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
 
     // Get the upper and lower confidence bounds on the median initial solution duration and cost.
-    auto lowerDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.lower);
-    auto upperDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.upper);
-    auto lowerCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.lower);
-    auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.upper);
+    const auto lowerDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.lower);
+    const auto upperDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.upper);
+    const auto lowerCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.lower);
+    const auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.upper);
 
     // save the results
     medianDurations.emplace_back(medianDuration);
@@ -370,7 +370,9 @@ fs::path MultiQueryStatistics::extractMedianInitialSolutionPerQuery(
       plannerName);
 
   filestream << "query number";
-  for (std::size_t i=0; i<numQueries_; ++i) {filestream << std::setprecision(21) << "," << std::to_string(i+1);}
+  for (auto i=0u; i<numQueries_; ++i) {
+    filestream << std::setprecision(21) << "," << std::to_string(i+1);
+  }
 
   // this would be nicer by implementing a operator<< for vector<double>
   writeVectorToFile(filestream, "\nmedian initial solution duration", medianDurations);
@@ -403,21 +405,21 @@ fs::path MultiQueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
   std::vector<double> upperCostBounds;
 
   // merge together the stuff that is computed in the separate statistics
-  for (std::size_t i=0; i<numQueries_; ++i){
+  for (auto i=0u; i<numQueries_; ++i){
     // Get the median initial solution duration.
-    double medianDuration = stats_[i].getMedianInitialSolutionDuration(stats_[i].results_.at(plannerName));
+    const double medianDuration = stats_[i].getMedianInitialSolutionDuration(stats_[i].results_.at(plannerName));
 
     // Get the median initial solution cost.
-    double medianCost = stats_[i].getMedianInitialSolutionCost(stats_[i].results_.at(plannerName));
+    const double medianCost = stats_[i].getMedianInitialSolutionCost(stats_[i].results_.at(plannerName));
 
     // Get the interval for the upper and lower bounds.
-    auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
+    const auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
 
     // Get the upper and lower confidence bounds on the median initial solution duration and cost.
-    auto lowerDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.lower);
-    auto upperDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.upper);
-    auto lowerCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.lower);
-    auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.upper);
+    const auto lowerDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.lower);
+    const auto upperDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.upper);
+    const auto lowerCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.lower);
+    const auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.upper);
 
     // save the results
     medianDurations.emplace_back(medianDuration);
@@ -438,18 +440,18 @@ fs::path MultiQueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
   std::vector<double> lciCumulativeCost;
 
   // sum median/limits
-  for (std::size_t i=0; i<numQueries_; ++i){
+  for (auto i=0u; i<numQueries_; ++i){
     // Get the median initial solution duration.
 
-    double medianDuration = medianDurations[i];
-    double lcDuration = lowerDurationBounds[i];
-    double ucDuration = upperDurationBounds[i];
+    const double medianDuration = medianDurations[i];
+    const double lcDuration = lowerDurationBounds[i];
+    const double ucDuration = upperDurationBounds[i];
 
-    double medianCost = medianCosts[i];
-    double lcCost = lowerCostBounds[i];
-    double ucCost = upperCostBounds[i];
+    const double medianCost = medianCosts[i];
+    const double lcCost = lowerCostBounds[i];
+    const double ucCost = upperCostBounds[i];
 
-    if (i == 0){
+    if (i == 0u){
       medianCumulativeDuration.push_back(medianDuration);
       uciCumulativeDuration.push_back(ucDuration);
       lciCumulativeDuration.push_back(lcDuration);
@@ -506,7 +508,7 @@ fs::path MultiQueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
       plannerName);
 
   filestream << "query number";
-  for (std::size_t i=0; i<numQueries_; ++i) {
+  for (auto i=0u; i<numQueries_; ++i) {
     filestream << std::setprecision(21) << "," << std::to_string(i+1);
   }
 
@@ -535,16 +537,16 @@ fs::path MultiQueryStatistics::extractMedianFinalSolutionPerQuery(
   std::vector<double> upperCostBounds;
 
   // merge together the stuff that is computed in the separate statistics
-  for (std::size_t i=0; i<numQueries_; ++i){
+  for (auto i=0u; i<numQueries_; ++i){
     // Get the median initial solution cost.
-    double medianCost = stats_[i].getMedianFinalCost((plannerName));
+    const double medianCost = stats_[i].getMedianFinalCost((plannerName));
 
     // Get the interval for the upper and lower bounds.
-    auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
+    const auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
 
     // Get the upper and lower confidence bounds on the median initial solution duration and cost.
-    auto lowerCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.lower, {stats_[i].defaultMedianBinDurations_.back()}).back();
-    auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
+    const auto lowerCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.lower, {stats_[i].defaultMedianBinDurations_.back()}).back();
+    const auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
 
     // save the results
     medianCosts.emplace_back(medianCost);
@@ -573,7 +575,9 @@ fs::path MultiQueryStatistics::extractMedianFinalSolutionPerQuery(
       plannerName);
 
   filestream << "query number";
-  for (std::size_t i=0; i<numQueries_; ++i) {filestream << std::setprecision(21) << "," << std::to_string(i+1);}
+  for (auto i=0u; i<numQueries_; ++i) {
+    filestream << std::setprecision(21) << "," << std::to_string(i+1);
+  }
 
   // this would be nicer by implementing a operator<< for vector<double>
   writeVectorToFile(filestream, "\nmedian last solution cost", medianCosts);
@@ -598,16 +602,16 @@ fs::path MultiQueryStatistics::extractMedianCumulativeFinalCostPerQuery(
   std::vector<double> upperCostBounds;
 
   // merge together the stuff that is computed in the separate statistics
-  for (std::size_t i=0; i<numQueries_; ++i){
+  for (auto i=0u; i<numQueries_; ++i){
     // Get the median initial solution cost.
-    double medianCost = stats_[i].getMedianFinalCost(plannerName);
+    const double medianCost = stats_[i].getMedianFinalCost(plannerName);
 
     // Get the interval for the upper and lower bounds.
-    auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
+    const auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
 
     // Get the upper and lower confidence bounds on the median initial solution duration and cost.
-    auto lowerCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.lower, {stats_[i].defaultMedianBinDurations_.back()}).back();
-    auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
+    const auto lowerCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.lower, {stats_[i].defaultMedianBinDurations_.back()}).back();
+    const auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
 
     // save the results
     medianCosts.emplace_back(medianCost);
@@ -620,11 +624,11 @@ fs::path MultiQueryStatistics::extractMedianCumulativeFinalCostPerQuery(
   std::vector<double> lciCumulativeCost;
 
   // sum median/limits
-  for (std::size_t i=0; i<numQueries_; ++i){
+  for (auto i=0u; i<numQueries_; ++i){
     // Get the median initial solution duration.
-    double medianCost = medianCosts[i];
-    double lcCost = lowerCostBounds[i];
-    double ucCost = upperCostBounds[i];
+    const double medianCost = medianCosts[i];
+    const double lcCost = lowerCostBounds[i];
+    const double ucCost = upperCostBounds[i];
 
     if (i == 0){
       medianCumulativeCost.push_back(medianCost);
@@ -645,7 +649,6 @@ fs::path MultiQueryStatistics::extractMedianCumulativeFinalCostPerQuery(
       maxCumulativeCost_ = uciCumulativeCost.back();
     }
   }
-
   
   // Write to file.
   std::ofstream filestream(filepath.string());
@@ -660,7 +663,7 @@ fs::path MultiQueryStatistics::extractMedianCumulativeFinalCostPerQuery(
       plannerName);
 
   filestream << "query number";
-  for (std::size_t i=0; i<numQueries_; ++i) {
+  for (auto i=0u; i<numQueries_; ++i) {
     filestream << std::setprecision(21) << "," << std::to_string(i+1);
   }
 
@@ -684,12 +687,12 @@ fs::path MultiQueryStatistics::extractFinalSolutionPerQuery(
   std::vector<double> queryCosts{};
   std::vector<double> queryDurations{};
 
-  std::size_t cnt = 0;
+  std::size_t cnt = 0u;
   for (const auto &stat: stats_){
     auto durations = stat.getLastSolutionDurations(stat.results_.at(plannerName));
     auto costs = stat.getLastSolutionCosts(stat.results_.at(plannerName));
 
-    for (std::size_t i=0; i<durations.size(); ++i){
+    for (auto i=0u; i<durations.size(); ++i){
       queryDurations.push_back(durations[i]);
       queryCosts.push_back(costs[i]);
       queryNumber.push_back(cnt);
@@ -706,7 +709,7 @@ fs::path MultiQueryStatistics::extractFinalSolutionPerQuery(
     throw std::ios_base::failure(msg);
   }
 
-  filestream << stats_[0].createHeader(
+  filestream << stats_[0u].createHeader(
       "Final solutions "s,
       plannerName);
 
@@ -738,11 +741,11 @@ std::experimental::filesystem::path MultiQueryStatistics::extractSuccessPerQuery
 
   for (const auto t: times){
     std::vector<double> tmp;
-    for (std::size_t i=0; i<numQueries_; ++i){
+    for (auto i=0u; i<numQueries_; ++i){
       // Get the median initial solution duration.
-      auto durations = stats_[i].getInitialSolutionDurations(stats_[i].results_.at(plannerName));
+      const auto durations = stats_[i].getInitialSolutionDurations(stats_[i].results_.at(plannerName));
 
-      unsigned int successfulRuns = 0u;
+      auto successfulRuns = 0u;
       for (const auto &duration: durations){
         if (duration < t){
           ++successfulRuns;
@@ -762,19 +765,19 @@ std::experimental::filesystem::path MultiQueryStatistics::extractSuccessPerQuery
     throw std::ios_base::failure(msg);
   }
 
-  filestream << stats_[0].createHeader(
+  filestream << stats_[0u].createHeader(
       "Success rate",
       plannerName);
 
   filestream << "query number";
-  for (std::size_t i=0; i<numQueries_; ++i) {
+  for (auto i=0u; i<numQueries_; ++i) {
     filestream << std::setprecision(21) << "," << std::to_string(i+1);
   }
 
   // this would be nicer by implementing a operator<< for vector<double>
-  unsigned int cnt = 0;
+  auto cnt = 0u;
   for (const auto f: timeFractions){
-    writeVectorToFile(filestream, "\nsuccess rate at " + std::to_string(int(100*f)) + " percent", successRate[cnt]);
+    writeVectorToFile(filestream, "\nsuccess rate at " + std::to_string(static_cast<int>(100.0*f)) + " percent", successRate[cnt]);
     ++cnt;
   }
 
@@ -812,7 +815,6 @@ double MultiQueryStatistics::getMaxCumulativeCost() const{
 double MultiQueryStatistics::getMaxNonInfCumulativeCost() const{
   return maxNonInfCumulativeCost_;
 }
-
 
 double MultiQueryStatistics::getMinCumulativeInitialSolutionCost(const std::string& plannerName) const{
   return minCumulativeInitialSolutionCosts_.at(plannerName);
