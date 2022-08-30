@@ -307,7 +307,7 @@ void MultiQueryStatistics::computeCumulativeFinalCost(
 }
 
 fs::path MultiQueryStatistics::extractMedianInitialSolutionPerQuery(
-      const std::string& plannerName, double confidence) const{
+      const std::string& plannerName, const double confidence) const{
   // Check if the file already exists.
   fs::path filepath = statisticsDirectory_ / (plannerName + "_median_initial_solutions_per_query.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
@@ -387,7 +387,7 @@ fs::path MultiQueryStatistics::extractMedianInitialSolutionPerQuery(
 }
 
 fs::path MultiQueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
-    const std::string& plannerName, double confidence) const{
+    const std::string& plannerName, const double confidence) const{
   // Check if the file already exists.
   fs::path filepath = statisticsDirectory_ / (plannerName + "_median_cumulative_initial_solutions_per_query.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
@@ -523,7 +523,7 @@ fs::path MultiQueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
 }
 
 fs::path MultiQueryStatistics::extractMedianFinalSolutionPerQuery(
-      const std::string& plannerName, double confidence) const{
+      const std::string& plannerName, const double confidence) const{
   // Check if the file already exists.
   fs::path filepath = statisticsDirectory_ / (plannerName + "_median_final_solutions_per_query.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
@@ -586,7 +586,7 @@ fs::path MultiQueryStatistics::extractMedianFinalSolutionPerQuery(
 }
 
 fs::path MultiQueryStatistics::extractMedianCumulativeFinalCostPerQuery(
-    const std::string& plannerName, double confidence) const{
+    const std::string& plannerName, const double confidence) const{
   // Check if the file already exists.
   fs::path filepath = statisticsDirectory_ / (plannerName + "_median_cumulative_final_solutions_per_query.csv"s);
   if (fs::exists(filepath) && !forceComputation_) {
@@ -671,11 +671,6 @@ fs::path MultiQueryStatistics::extractMedianCumulativeFinalCostPerQuery(
 
   return filepath;
 }
-
-/*std::experimental::filesystem::path MultiQueryStatistics::extractMedianCumulativeInitialCostPerQuery(
-      const std::string& plannerName, std::size_t confidence) const {
-
-}*/
 
 fs::path MultiQueryStatistics::extractFinalSolutionPerQuery(
       const std::string& plannerName) const{

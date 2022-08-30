@@ -58,17 +58,17 @@ class MultiQueryStatistics {
   ~MultiQueryStatistics() = default;
 
   std::experimental::filesystem::path extractMedianInitialSolutionPerQuery(
-      const std::string& plannerName, double confidence = 0.99) const;
+      const std::string& plannerName, const double confidence = 0.99) const;
   std::experimental::filesystem::path extractMedianFinalSolutionPerQuery(
-      const std::string& plannerName, double confidence = 0.99) const;
+      const std::string& plannerName, const double confidence = 0.99) const;
 
   std::experimental::filesystem::path extractMedianCumulativeInitialSolutionPerQuery(
-      const std::string& plannerName, double confidence = 0.99) const;
+      const std::string& plannerName, const double confidence = 0.99) const;
 
   std::experimental::filesystem::path extractMedianCumulativeInitialCostPerQuery(
-      const std::string& plannerName, double confidence = 0.99) const;
+      const std::string& plannerName, const double confidence = 0.99) const;
   std::experimental::filesystem::path extractMedianCumulativeFinalCostPerQuery(
-      const std::string& plannerName, double confidence = 0.99) const;
+      const std::string& plannerName, const double confidence = 0.99) const;
 
   std::experimental::filesystem::path extractFinalSolutionPerQuery(
       const std::string& plannerName) const;
