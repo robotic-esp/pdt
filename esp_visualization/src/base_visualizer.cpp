@@ -324,20 +324,18 @@ void BaseVisualizer::createData() {
               planner_->as<ompl::geometric::EITstar>()->getReverseQueue());
 
           // Store the next forward edge.
-          try {
+          if (!planner_->as<ompl::geometric::EITstar>()->isForwardQueueEmpty()) {
             eitstarData->setNextForwardEdge(
                 planner_->as<ompl::geometric::EITstar>()->getNextForwardEdge());
-          } catch (const std::out_of_range &e) {
-            // Throws if there is no forward edge. This is fine, the edge is default constructed.
           }
+          // No else, the edge is default constructed.
 
           // Store the next reverse edge.
-          try {
+          if (!planner_->as<ompl::geometric::EITstar>()->isReverseQueueEmpty()) {
             eitstarData->setNextReverseEdge(
                 planner_->as<ompl::geometric::EITstar>()->getNextReverseEdge());
-          } catch (const std::out_of_range &e) {
-            // Throws if there is no forward edge. This is fine, the edge is default constructed.
           }
+          // No else, the edge is default constructed.
 
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
