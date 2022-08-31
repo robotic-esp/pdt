@@ -56,7 +56,7 @@ void PgfPlot::setPlottable(const std::shared_ptr<PlottableInterface>& plottable)
 }
 
 std::string PgfPlot::string() const {
-  if (!plottable_) {
+  if (empty()) {
     return {};
   }
   std::ostringstream stream{};
@@ -111,6 +111,10 @@ std::string PgfPlot::string() const {
     stream << "\\addlegendentry{" << legend_ << "}\n";
   }
   return stream.str();
+}
+
+bool PgfPlot::empty() const {
+  return static_cast<bool>(plottable_);
 }
 
 }  // namespace ompltools

@@ -51,8 +51,7 @@ namespace fs = std::experimental::filesystem;
 
 MedianCostEvolutionPlotter::MedianCostEvolutionPlotter(
     const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
-    LatexPlotter(config),
-    stats_(stats) {
+    LatexPlotter(config), stats_(stats) {
   // Compute the duration bin size.
   auto contextName = config_->get<std::string>("experiment/context");
   std::size_t numBins = static_cast<std::size_t>(
@@ -81,7 +80,7 @@ std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAx
         std::shared_ptr<PgfPlot> upperCi = createMedianCostEvolutionUpperCiPlot(name);
         std::shared_ptr<PgfPlot> lowerCi = createMedianCostEvolutionLowerCiPlot(name);
         std::shared_ptr<PgfPlot> fillCi = createMedianCostEvolutionFillCiPlot(name);
-        if (upperCi && lowerCi && fillCi) {
+        if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
           axis->addPlot(upperCi);
           axis->addPlot(lowerCi);
           axis->addPlot(fillCi);
@@ -106,7 +105,7 @@ std::shared_ptr<PgfAxis> MedianCostEvolutionPlotter::createMedianCostEvolutionAx
   std::shared_ptr<PgfPlot> upperCi = createMedianCostEvolutionUpperCiPlot(plannerName);
   std::shared_ptr<PgfPlot> lowerCi = createMedianCostEvolutionLowerCiPlot(plannerName);
   std::shared_ptr<PgfPlot> fillCi = createMedianCostEvolutionFillCiPlot(plannerName);
-  if (upperCi && lowerCi && fillCi) {
+  if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
     axis->addPlot(upperCi);
     axis->addPlot(lowerCi);
     axis->addPlot(fillCi);
@@ -207,11 +206,8 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUp
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return nullptr;
+    return std::make_shared<PgfPlot>();
   }
-
-  // Replace the infinite values with very high values, otherwise they're not plotted.
-  table->replaceInCodomain(std::numeric_limits<double>::infinity(), 3 * stats_.getMaxNonInfCost());
 
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
@@ -244,7 +240,7 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionLo
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return nullptr;
+    return std::make_shared<PgfPlot>();
   }
 
   // Create the plot and set the options.
