@@ -84,7 +84,7 @@ void PgfTable::loadFromPath(const std::experimental::filesystem::path& path,
       continue;  // Skipping comments.
     }
     std::string rowName;
-    double unused;
+    double unused = std::numeric_limits<double>::signaling_NaN();
     if (boost::conversion::try_lexical_convert<double>(row.at(0), unused)) {
       auto msg = "Pgf Table encountered unnamed row in '"s + path.string() +
                  "'. The first entry in every row is expected to be a string."s;
