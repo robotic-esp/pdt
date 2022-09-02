@@ -305,6 +305,9 @@ int main(const int argc, const char **argv) {
     // the planners run _all_ queries before the next planner runs the _same_ queries.
     for (const auto &plannerName : plannerNames) {
 
+      // Allocate the planner.
+      auto [planner, plannerType] = plannerFactory.create(plannerName);
+
       for (auto j=0u; j<numQueries; ++j){
         // Create the logger for this run.
         esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
@@ -322,9 +325,6 @@ int main(const int argc, const char **argv) {
           });
           hotpath.get();
         }
-
-        // Allocate the planner.
-        auto [planner, plannerType] = plannerFactory.create(plannerName);
 
         // Prepare the planner for this query.
         esp::ompltools::time::Duration querySetupDuration;;
