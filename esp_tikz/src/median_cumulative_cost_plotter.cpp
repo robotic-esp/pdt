@@ -56,7 +56,8 @@ MedianCumulativeCostPlotter::MedianCumulativeCostPlotter(
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
-std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCostAxis(const bool initial) const {
+std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCostAxis(
+    const bool initial) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianCumulativeCostAxisOptions(axis);
 
@@ -124,13 +125,12 @@ fs::path MedianCumulativeCostPlotter::createMedianCumulativeCostPicture(const bo
 
   // Generate the tikz file.
   fs::path picturePath;
-  if (initial){
-   picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                     fs::path("tikz/all_planners_median_cumulative_cost_plot.tikz");
-  }
-  else{
-   picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                     fs::path("tikz/all_planners_median_cumulative_final_cost_plot.tikz");
+  if (initial) {
+    picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
+                  fs::path("tikz/all_planners_median_cumulative_cost_plot.tikz");
+  } else {
+    picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
+                  fs::path("tikz/all_planners_median_cumulative_final_cost_plot.tikz");
   }
   picture.write(picturePath);
   return picturePath;
@@ -145,11 +145,10 @@ fs::path MedianCumulativeCostPlotter::createMedianCumulativeCostPicture(
 
   // Generate the tikz file.
   fs::path picturePath;
-  if (initial){
+  if (initial) {
     picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                   fs::path("tikz/"s + plannerName + "_median_cumulative_cost_plot.tikz"s);
-  }
-  else{
+  } else {
     picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                   fs::path("tikz/"s + plannerName + "_median_cumulative_final_cost_plot.tikz"s);
   }
@@ -157,12 +156,13 @@ fs::path MedianCumulativeCostPlotter::createMedianCumulativeCostPicture(
   return picturePath;
 }
 
-void MedianCumulativeCostPlotter::setMedianCumulativeCostAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+void MedianCumulativeCostPlotter::setMedianCumulativeCostAxisOptions(
+    std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianCumulativeCostPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianCumulativeCostPlots/axisHeight");
-  //axis->options.xmax = maxCostToBePlotted_;
+  // axis->options.xmax = maxCostToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCumulativeCost();
-  //axis->options.xlog = config_->get<bool>("medianCumulativeCostPlots/xlog");
+  // axis->options.xlog = config_->get<bool>("medianCumulativeCostPlots/xlog");
   axis->options.ylog = true;
   axis->options.xminorgrids = config_->get<bool>("medianCumulativeCostPlots/xminorgrids");
   axis->options.xmajorgrids = config_->get<bool>("medianCumulativeCostPlots/xmajorgrids");
@@ -176,16 +176,18 @@ void MedianCumulativeCostPlotter::setMedianCumulativeCostAxisOptions(std::shared
 
 std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCostPlot(
     const std::string& plannerName, const bool initial) const {
-
   // Get the table from the appropriate file.
   std::shared_ptr<PgfTable> table;
-  if(initial){
-    table =
-      std::make_shared<PgfTable>(stats_.extractMedianCumulativeInitialSolutionPerQuery(plannerName), "query number", "cumulative median initial solution cost");
-  }
-  else{
-    table =
-      std::make_shared<PgfTable>(stats_.extractMedianCumulativeFinalCostPerQuery(plannerName), "query number", "cumulative median final solution cost");
+  if (initial) {
+    table = std::make_shared<PgfTable>(
+        stats_.extractMedianCumulativeInitialSolutionPerQuery(
+            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+        "query number", "cumulative median initial solution cost");
+  } else {
+    table = std::make_shared<PgfTable>(
+        stats_.extractMedianCumulativeFinalCostPerQuery(
+            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+        "query number", "cumulative median final solution cost");
   }
 
   // Remove all nans from the table.
@@ -206,12 +208,16 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
   std::shared_ptr<PgfTable> table;
-  if(initial){
-    table = std::make_shared<PgfTable>(stats_.extractMedianCumulativeInitialSolutionPerQuery(plannerName), "query number", "upper cumulative initial solution cost confidence bound");
-  }
-  else{
-    table =
-      std::make_shared<PgfTable>(stats_.extractMedianCumulativeFinalCostPerQuery(plannerName), "query number", "upper cumulative final solution cost confidence bound");
+  if (initial) {
+    table = std::make_shared<PgfTable>(
+        stats_.extractMedianCumulativeInitialSolutionPerQuery(
+            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+        "query number", "upper cumulative initial solution cost confidence bound");
+  } else {
+    table = std::make_shared<PgfTable>(
+        stats_.extractMedianCumulativeFinalCostPerQuery(
+            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+        "query number", "upper cumulative final solution cost confidence bound");
   }
 
   // Remove all nans from the table.
@@ -223,16 +229,20 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
-  table->replaceInCodomain(std::numeric_limits<double>::infinity(), 3 * stats_.getMaxNonInfCumulativeCost());
+  table->replaceInCodomain(std::numeric_limits<double>::infinity(),
+                           3 * stats_.getMaxNonInfCumulativeCost());
 
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianCumulativeCostPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth =
+      config_->get<double>("medianCumulativeCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolutionUpperConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("medianCumulativeCostPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("medianCumulativeCostPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity =
+      config_->get<float>("medianCumulativeCostPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianCumulativeCostPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -241,12 +251,16 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
   std::shared_ptr<PgfTable> table;
-  if(initial){
-    table = std::make_shared<PgfTable>(stats_.extractMedianCumulativeInitialSolutionPerQuery(plannerName), "query number", "lower cumulative initial solution cost confidence bound");
-  }
-  else{
-    table =
-      std::make_shared<PgfTable>(stats_.extractMedianCumulativeFinalCostPerQuery(plannerName), "query number", "lower cumulative final solution cost confidence bound");
+  if (initial) {
+    table = std::make_shared<PgfTable>(
+        stats_.extractMedianCumulativeInitialSolutionPerQuery(
+            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+        "query number", "lower cumulative initial solution cost confidence bound");
+  } else {
+    table = std::make_shared<PgfTable>(
+        stats_.extractMedianCumulativeFinalCostPerQuery(
+            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+        "query number", "lower cumulative final solution cost confidence bound");
   }
 
   // Remove all nans from the table.
@@ -260,11 +274,14 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianCumulativeCostPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth =
+      config_->get<double>("medianCumulativeCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolutionLowerConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("medianCumulativeCostPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("medianCumulativeCostPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity =
+      config_->get<float>("medianCumulativeCostPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianCumulativeCostPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -279,7 +296,8 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
-  plot->options.fillOpacity = config_->get<float>("medianCumulativeCostPlots/confidenceIntervalFillOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianCumulativeCostPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
 
   return plot;

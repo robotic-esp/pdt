@@ -57,14 +57,16 @@ MedianCumulativeDurationPlotter::MedianCumulativeDurationPlotter(
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
-std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulativeDurationAxis() const {
+std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulativeDurationAxis()
+    const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianCumulativeDurationAxisOptions(axis);
 
   // Fill the axis with the median cost plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
-    if (config_->get<bool>("medianCumulativeInitialDurationPlots/plotConfidenceIntervalInAllPlots")) {
+    if (config_->get<bool>(
+            "medianCumulativeInitialDurationPlots/plotConfidenceIntervalInAllPlots")) {
       std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
       bool successCI = true;
       try {
@@ -144,17 +146,23 @@ fs::path MedianCumulativeDurationPlotter::createMedianCumulativeDurationPicture(
   return picturePath;
 }
 
-void MedianCumulativeDurationPlotter::setMedianCumulativeDurationAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+void MedianCumulativeDurationPlotter::setMedianCumulativeDurationAxisOptions(
+    std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianCumulativeInitialDurationPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("medianCumulativeInitialDurationPlots/axisHeight");
-  //axis->options.xmax = maxDurationToBePlotted_;
+  axis->options.height =
+      config_->get<std::string>("medianCumulativeInitialDurationPlots/axisHeight");
+  // axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCumulativeDuration();
-  //axis->options.xlog = config_->get<bool>("medianCumulativeInitialDurationPlots/xlog");
+  // axis->options.xlog = config_->get<bool>("medianCumulativeInitialDurationPlots/xlog");
   axis->options.ylog = true;
-  axis->options.xminorgrids = config_->get<bool>("medianCumulativeInitialDurationPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("medianCumulativeInitialDurationPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("medianCumulativeInitialDurationPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("medianCumulativeInitialDurationPlots/ymajorgrids");
+  axis->options.xminorgrids =
+      config_->get<bool>("medianCumulativeInitialDurationPlots/xminorgrids");
+  axis->options.xmajorgrids =
+      config_->get<bool>("medianCumulativeInitialDurationPlots/xmajorgrids");
+  axis->options.yminorgrids =
+      config_->get<bool>("medianCumulativeInitialDurationPlots/yminorgrids");
+  axis->options.ymajorgrids =
+      config_->get<bool>("medianCumulativeInitialDurationPlots/ymajorgrids");
   axis->options.xlabel = "Query Number"s;
   axis->options.ylabel = "\\footnotesize Cumulative Duration [s]"s;
   axis->options.ylabelAbsolute = true;
@@ -163,10 +171,11 @@ void MedianCumulativeDurationPlotter::setMedianCumulativeDurationAxisOptions(std
 
 std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulativeDurationPlot(
     const std::string& plannerName) const {
-
   // Get the table from the appropriate file.
-  auto table =
-      std::make_shared<PgfTable>(stats_.extractMedianCumulativeInitialSolutionPerQuery(plannerName), "query number", "cumulative median initial solution duration");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedianCumulativeInitialSolutionPerQuery(
+          plannerName, config_->get<double>("medianCumulativeInitialDurationPlots/confidence")),
+      "query number", "cumulative median initial solution duration");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -185,8 +194,10 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
 std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulativeDurationUpperCIPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(stats_.extractMedianCumulativeInitialSolutionPerQuery(plannerName), "query number",
-                                          "upper cumulative initial solution duration confidence bound");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedianCumulativeInitialSolutionPerQuery(
+          plannerName, config_->get<double>("medianCumulativeInitialDurationPlots/confidence")),
+      "query number", "upper cumulative initial solution duration confidence bound");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -197,16 +208,20 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
-  table->replaceInCodomain(std::numeric_limits<double>::infinity(), 3 * stats_.getMaxNonInfCumulativeDuration());
+  table->replaceInCodomain(std::numeric_limits<double>::infinity(),
+                           3 * stats_.getMaxNonInfCumulativeDuration());
 
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianCumulativeInitialDurationPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth =
+      config_->get<double>("medianCumulativeInitialDurationPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCumulativeInitialDurationUpperConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity =
+      config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -214,8 +229,10 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
 std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulativeDurationLowerCIPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(stats_.extractMedianCumulativeInitialSolutionPerQuery(plannerName), "query number",
-                                          "lower cumulative initial solution duration confidence bound");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedianCumulativeInitialSolutionPerQuery(
+          plannerName, config_->get<double>("medianCumulativeInitialDurationPlots/confidence")),
+      "query number", "lower cumulative initial solution duration confidence bound");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -228,11 +245,14 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianCumulativeInitialDurationPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth =
+      config_->get<double>("medianCumulativeInitialDurationPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCumulativeInitialDurationLowerConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity =
+      config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -240,14 +260,15 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
 std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulativeDurationFillCIPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
-  auto fillBetween =
-      std::make_shared<PgfFillBetween>(plannerName + "MedianCumulativeInitialDurationUpperConfidence",
-                                       plannerName + "MedianCumulativeInitialDurationLowerConfidence");
+  auto fillBetween = std::make_shared<PgfFillBetween>(
+      plannerName + "MedianCumulativeInitialDurationUpperConfidence",
+      plannerName + "MedianCumulativeInitialDurationLowerConfidence");
 
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
-  plot->options.fillOpacity = config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
 
   return plot;

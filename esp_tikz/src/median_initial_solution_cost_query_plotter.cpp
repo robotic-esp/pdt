@@ -57,7 +57,8 @@ MedianInitialSolutionCostQueryPlotter::MedianInitialSolutionCostQueryPlotter(
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
-std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostAxis() const {
+std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostAxis()
+    const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialCostAxisOptions(axis);
 
@@ -144,12 +145,13 @@ fs::path MedianInitialSolutionCostQueryPlotter::createMedianInitialCostPicture(
   return picturePath;
 }
 
-void MedianInitialSolutionCostQueryPlotter::setMedianInitialCostAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+void MedianInitialSolutionCostQueryPlotter::setMedianInitialCostAxisOptions(
+    std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianInitialCostPerQueryPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianInitialCostPerQueryPlots/axisHeight");
-  //axis->options.xmax = maxCostToBePlotted_;
+  // axis->options.xmax = maxCostToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
-  //axis->options.xlog = config_->get<bool>("medianInitialCostPerQueryPlots/xlog");
+  // axis->options.xlog = config_->get<bool>("medianInitialCostPerQueryPlots/xlog");
   axis->options.ylog = true;
   axis->options.xminorgrids = config_->get<bool>("medianInitialCostPerQueryPlots/xminorgrids");
   axis->options.xmajorgrids = config_->get<bool>("medianInitialCostPerQueryPlots/xmajorgrids");
@@ -163,10 +165,11 @@ void MedianInitialSolutionCostQueryPlotter::setMedianInitialCostAxisOptions(std:
 
 std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostPlot(
     const std::string& plannerName) const {
-
   // Get the table from the appropriate file.
-  auto table =
-      std::make_shared<PgfTable>(stats_.extractMedianInitialSolutionPerQuery(plannerName), "query number", "median initial solution cost");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedianInitialSolutionPerQuery(
+          plannerName, config_->get<double>("medianInitialCostPerQueryPlots/confidence")),
+      "query number", "median initial solution cost");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -185,8 +188,10 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInit
 std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostUpperCIPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(stats_.extractMedianInitialSolutionPerQuery(plannerName), "query number",
-                                          "upper initial solution cost confidence bound");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedianInitialSolutionPerQuery(
+          plannerName, config_->get<double>("medianInitialCostPerQueryPlots/confidence")),
+      "query number", "upper initial solution cost confidence bound");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -202,11 +207,14 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInit
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianInitialCostPerQueryPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth =
+      config_->get<double>("medianInitialCostPerQueryPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianInitialCostPerQueryUpperConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity =
+      config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -214,8 +222,10 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInit
 std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostLowerCIPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(stats_.extractMedianInitialSolutionPerQuery(plannerName), "query number",
-                                          "lower initial solution cost confidence bound");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedianInitialSolutionPerQuery(
+          plannerName, config_->get<double>("medianInitialCostPerQueryPlots/confidence")),
+      "query number", "lower initial solution cost confidence bound");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -228,11 +238,14 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInit
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianInitialCostPerQueryPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth =
+      config_->get<double>("medianInitialCostPerQueryPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianInitialCostPerQueryLowerConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity =
+      config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -247,7 +260,8 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInit
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
-  plot->options.fillOpacity = config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalFillOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
 
   return plot;

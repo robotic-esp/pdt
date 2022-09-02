@@ -144,12 +144,13 @@ fs::path MedianFinalSolutionCostQueryPlotter::createMedianFinalCostPicture(
   return picturePath;
 }
 
-void MedianFinalSolutionCostQueryPlotter::setMedianFinalCostAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+void MedianFinalSolutionCostQueryPlotter::setMedianFinalCostAxisOptions(
+    std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianFinalCostPerQueryPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianFinalCostPerQueryPlots/axisHeight");
-  //axis->options.xmax = maxCostToBePlotted_;
+  // axis->options.xmax = maxCostToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
-  //axis->options.xlog = config_->get<bool>("medianFinalCostPerQueryPlots/xlog");
+  // axis->options.xlog = config_->get<bool>("medianFinalCostPerQueryPlots/xlog");
   axis->options.ylog = true;
   axis->options.xminorgrids = config_->get<bool>("medianFinalCostPerQueryPlots/xminorgrids");
   axis->options.xmajorgrids = config_->get<bool>("medianFinalCostPerQueryPlots/xmajorgrids");
@@ -163,10 +164,11 @@ void MedianFinalSolutionCostQueryPlotter::setMedianFinalCostAxisOptions(std::sha
 
 std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostPlot(
     const std::string& plannerName) const {
-
   // Get the table from the appropriate file.
-  auto table =
-      std::make_shared<PgfTable>(stats_.extractMedianFinalSolutionPerQuery(plannerName), "query number", "median last solution cost");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedianFinalSolutionPerQuery(
+          plannerName, config_->get<double>("medianFinalCostPerQueryPlots/confidence")),
+      "query number", "median last solution cost");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -185,8 +187,10 @@ std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
 std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostUpperCIPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(stats_.extractMedianFinalSolutionPerQuery(plannerName), "query number",
-                                          "upper last solution cost confidence bound");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedianFinalSolutionPerQuery(
+          plannerName, config_->get<double>("medianFinalCostPerQueryPlots/confidence")),
+      "query number", "upper last solution cost confidence bound");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -202,11 +206,14 @@ std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianFinalCostPerQueryPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth =
+      config_->get<double>("medianFinalCostPerQueryPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianFinalCostPerQueryUpperConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity =
+      config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -214,8 +221,10 @@ std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
 std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostLowerCIPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(stats_.extractMedianFinalSolutionPerQuery(plannerName), "query number",
-                                          "lower last solution cost confidence bound");
+  auto table = std::make_shared<PgfTable>(
+      stats_.extractMedianFinalSolutionPerQuery(
+          plannerName, config_->get<double>("medianFinalCostPerQueryPlots/confidence")),
+      "query number", "lower last solution cost confidence bound");
 
   // Remove all nans from the table.
   table->removeRowIfDomainIsNan();
@@ -228,11 +237,14 @@ std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianFinalCostPerQueryPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth =
+      config_->get<double>("medianFinalCostPerQueryPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianFinalCostPerQueryLowerConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity =
+      config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -247,7 +259,8 @@ std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
-  plot->options.fillOpacity = config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
 
   return plot;

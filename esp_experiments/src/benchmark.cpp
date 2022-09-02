@@ -480,7 +480,7 @@ int main(const int argc, const char **argv) {
     reportPath = report.compileReport();
   }
   else{ // Multiquery report
-    esp::ompltools::MultiqueryStatistics mqstats(config, stats);
+    esp::ompltools::MultiqueryStatistics mqstats(config, stats, true);
 
     esp::ompltools::MultiqueryReport report(config, mqstats);
     report.generateReport();

@@ -13,7 +13,6 @@ add_library(esp_tikz
   src/median_cost_evolution_plotter.cpp
   src/median_cumulative_cost_plotter.cpp
   src/median_cumulative_duration_plotter.cpp
-  src/median_cost_evolution_plotter.cpp
   src/median_initial_solution_plotter.cpp
   src/median_initial_solution_query_plotter.cpp
   src/median_initial_solution_cost_query_plotter.cpp
