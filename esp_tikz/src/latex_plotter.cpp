@@ -95,12 +95,8 @@ void LatexPlotter::stack(const std::vector<std::shared_ptr<PgfAxis>>& axes) cons
   if (axes.empty()) {
     return;
   }
-  axes.at(0u)->options.xlabel = "{\\empty}";
-  axes.at(0u)->options.xticklabel = "{\\empty}";
-  for (std::size_t i = 1u; i < axes.size(); ++i) {
-    axes.at(i)->options.at = "($("s + axes.at(i - 1u)->options.name + ".south) - (0.0em, 0.6em)$)"s;
-    axes.at(i)->options.anchor = "north";
-    // Romve the xlabel and xticklabel from the axes
+  for (std::size_t i = 0u; i < axes.size(); ++i) {
+    // Remove the xlabel and xticklabel from the axes
     if (i < axes.size() - 2u) {
       axes.at(i)->options.xlabel = "{\\empty}";
       axes.at(i)->options.xticklabel = "{\\empty}";
@@ -110,6 +106,10 @@ void LatexPlotter::stack(const std::vector<std::shared_ptr<PgfAxis>>& axes) cons
         axes.at(i)->options.xticklabel = "{\\empty}";
       }
     }
+  }
+  for (std::size_t i = 1u; i < axes.size(); ++i) {
+    axes.at(i)->options.at = "($("s + axes.at(i - 1u)->options.name + ".south) - (0.0em, 0.6em)$)"s;
+    axes.at(i)->options.anchor = "north";
   }
 }
 
