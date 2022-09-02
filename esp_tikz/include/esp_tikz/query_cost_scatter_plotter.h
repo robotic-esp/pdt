@@ -41,7 +41,7 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/multi_query_statistics.h"
+#include "esp_statistics/multiquery_statistics.h"
 #include "esp_tikz/latex_plotter.h"
 
 namespace esp {
@@ -51,7 +51,7 @@ namespace ompltools {
 class QueryCostScatterPlotter : public LatexPlotter {
  public:
   QueryCostScatterPlotter(const std::shared_ptr<const Configuration>& config,
-                                    const MultiQueryStatistics& stats);
+                                    const MultiqueryStatistics& stats);
   ~QueryCostScatterPlotter() = default;
 
   // Creates a pgf axis that hold the initial solution duration pdf of all planners.
@@ -74,7 +74,7 @@ class QueryCostScatterPlotter : public LatexPlotter {
 
   void setQueryCostScatterAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  const MultiQueryStatistics& stats_;
+  const MultiqueryStatistics& stats_;
 };
 
 }  // namespace ompltools

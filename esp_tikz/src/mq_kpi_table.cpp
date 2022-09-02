@@ -40,7 +40,7 @@ Algorithm | t_cum, init,min | t_cum,init,med | t_cum,init,max | c_cum,init,min |
  */
 
 #include "esp_tikz/mq_kpi_table.h"
-#include "esp_statistics/multi_query_statistics.h"
+#include "esp_statistics/multiquery_statistics.h"
 
 #include <fstream>
 #include <iomanip>
@@ -52,7 +52,7 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MqKpiTable::MqKpiTable(const std::shared_ptr<const Configuration>& config, const MultiQueryStatistics& stats) :
+MqKpiTable::MqKpiTable(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     config_(config),
     stats_(stats) {
   options.rowSep = "\\\\[0.5em]"s;

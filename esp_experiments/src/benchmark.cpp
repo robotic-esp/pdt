@@ -56,7 +56,7 @@
 #include "esp_planning_contexts/all_contexts.h"
 #include "esp_statistics/statistics.h"
 #include "esp_tikz/experiment_report.h"
-#include "esp_tikz/multi_query_report.h"
+#include "esp_tikz/multiquery_report.h"
 #include "esp_time/time.h"
 #include "esp_utilities/get_best_cost.h"
 
@@ -480,9 +480,9 @@ int main(const int argc, const char **argv) {
     reportPath = report.compileReport();
   }
   else{ // Multiquery report
-    esp::ompltools::MultiQueryStatistics mqstats(config, stats);
+    esp::ompltools::MultiqueryStatistics mqstats(config, stats);
 
-    esp::ompltools::MultiQueryReport report(config, mqstats);
+    esp::ompltools::MultiqueryReport report(config, mqstats);
     report.generateReport();
     reportPath = report.compileReport();
   }

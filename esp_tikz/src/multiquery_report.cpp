@@ -34,7 +34,7 @@
 
 // Authors: Valentin Hartmann
 
-#include "esp_tikz/multi_query_report.h"
+#include "esp_tikz/multiquery_report.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -61,8 +61,8 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MultiQueryReport::MultiQueryReport(const std::shared_ptr<Configuration>& config,
-                                   const MultiQueryStatistics& stats) :
+MultiqueryReport::MultiqueryReport(const std::shared_ptr<Configuration>& config,
+                                   const MultiqueryStatistics& stats) :
     BaseReport(config),
     medianCumulativeCostPlotter_(config, stats),
     medianCumulativeDurationPlotter_(config, stats),
@@ -74,7 +74,7 @@ MultiQueryReport::MultiQueryReport(const std::shared_ptr<Configuration>& config,
     stats_(stats) {
 }
 
-fs::path MultiQueryReport::generateReport() {
+fs::path MultiqueryReport::generateReport() {
   auto reportPath =
       fs::path(config_->get<std::string>("experiment/experimentDirectory")) / "report.tex"s;
   // Open the filestream.
@@ -111,7 +111,7 @@ fs::path MultiQueryReport::generateReport() {
   return reportPath;
 }
 
-std::stringstream MultiQueryReport::overview() const {
+std::stringstream MultiqueryReport::overview() const {
   std::stringstream overview;
 
   // We often refer to the planner names, this reference just makes it more convenient.
@@ -322,7 +322,7 @@ std::stringstream MultiQueryReport::overview() const {
   return overview;
 }
 
-std::stringstream MultiQueryReport::individualResults() const {
+std::stringstream MultiqueryReport::individualResults() const {
   std::stringstream results;
 
   // Create a section for every planner.

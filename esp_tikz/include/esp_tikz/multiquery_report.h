@@ -43,7 +43,7 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/multi_query_statistics.h"
+#include "esp_statistics/multiquery_statistics.h"
 #include "esp_tikz/base_report.h"
 #include "esp_tikz/median_cumulative_cost_plotter.h"
 #include "esp_tikz/median_cumulative_duration_plotter.h"
@@ -59,10 +59,10 @@ namespace esp {
 
 namespace ompltools {
 
-class MultiQueryReport : public BaseReport{
+class MultiqueryReport : public BaseReport{
  public:
-  MultiQueryReport(const std::shared_ptr<Configuration>& config, const MultiQueryStatistics& stats);
-  ~MultiQueryReport() = default;
+  MultiqueryReport(const std::shared_ptr<Configuration>& config, const MultiqueryStatistics& stats);
+  ~MultiqueryReport() = default;
 
   std::experimental::filesystem::path generateReport() override;
 
@@ -79,7 +79,7 @@ class MultiQueryReport : public BaseReport{
   QueryCostScatterPlotter queryCostScatterPlotter_;
   SuccessRateQueryPlotter successRateQueryPlotter_;
 
-  const MultiQueryStatistics& stats_;
+  const MultiqueryStatistics& stats_;
 };
 
 }  // namespace ompltools
