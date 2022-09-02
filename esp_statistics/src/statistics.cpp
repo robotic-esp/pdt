@@ -681,39 +681,6 @@ fs::path Statistics::extractInitialSolutions(const std::string& plannerName) con
   return filepath;  // Note: std::ofstream is a big boy and closes itself upon destruction.
 }
 
-fs::path Statistics::extractFinalSolutions(const std::string& plannerName) const{
-  // Check if the file already exists.
-  fs::path filepath = statisticsDirectory_ / (plannerName + "_final_solutions.csv"s);
-  if (fs::exists(filepath) && !forceComputation_) {
-    return filepath;
-  }
-
-  auto durations = getLastSolutionDurations(results_.at(plannerName));
-  auto costs = getLastSolutionCosts(results_.at(plannerName));
-
-  // Write to file.
-  std::ofstream filestream(filepath.string());
-  if (filestream.fail()) {
-    auto msg = "Cannot write final solutions for '"s + plannerName + "' to '"s +
-               filepath.string() + "'."s;
-    throw std::ios_base::failure(msg);
-  }
-
-  filestream << createHeader("Final solutions", plannerName);
-  filestream << std::setprecision(21);
-  filestream << "durations";
-  for (const auto duration : durations) {
-    filestream << ',' << duration;
-  }
-  filestream << "\ncosts";
-  for (const auto cost : costs) {
-    filestream << ',' << cost;
-  }
-  filestream << '\n';
-
-  return filepath;
-}
-
 std::string Statistics::createHeader(const std::string& statisticType,
                                      const std::string& plannerName) const {
   std::stringstream stream;
