@@ -70,10 +70,10 @@ class PlannerResults {
   mutable std::vector<PlannerResult> interpolatedRuns_{};
 };
 
-class MultiQueryStatistics;
+class MultiqueryStatistics;
 
 class Statistics {
-  friend MultiQueryStatistics;
+  friend MultiqueryStatistics;
 
  public:
   Statistics(const std::shared_ptr<Configuration>& config, const std::experimental::filesystem::path &resultsPath, const bool forceComputation);

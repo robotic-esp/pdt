@@ -41,7 +41,7 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/multi_query_statistics.h"
+#include "esp_statistics/multiquery_statistics.h"
 #include "esp_tikz/latex_plotter.h"
 #include "esp_tikz/pgf_axis.h"
 
@@ -51,7 +51,7 @@ namespace ompltools {
 
 class MedianInitialSolutionQueryPlotter : public LatexPlotter {
  public:
-  MedianInitialSolutionQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiQueryStatistics& stats);
+  MedianInitialSolutionQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
   ~MedianInitialSolutionQueryPlotter() = default;
 
   // Creates a pgf axis that holds the median cost at binned durations for all planners.
@@ -77,7 +77,7 @@ class MedianInitialSolutionQueryPlotter : public LatexPlotter {
 
   void setMedianInitialDurationAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  const MultiQueryStatistics& stats_;
+  const MultiqueryStatistics& stats_;
 };
 
 }  // namespace ompltools

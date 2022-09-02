@@ -34,7 +34,7 @@
 
 // Authors: Valentin Hartmann
 
-#include "esp_statistics/multi_query_statistics.h"
+#include "esp_statistics/multiquery_statistics.h"
 
 #include <algorithm>
 #include <cassert>
@@ -60,7 +60,7 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MultiQueryStatistics::MultiQueryStatistics(const std::shared_ptr<Configuration>& config,
+MultiqueryStatistics::MultiqueryStatistics(const std::shared_ptr<Configuration>& config,
     const std::vector<Statistics> &stats,
     bool forceComputation) :
     config_(config),
@@ -135,7 +135,7 @@ MultiQueryStatistics::MultiQueryStatistics(const std::shared_ptr<Configuration>&
   }
 }
 
-void MultiQueryStatistics::computeCumulativeMetricsForPlanner(
+void MultiqueryStatistics::computeCumulativeMetricsForPlanner(
     const std::string& plannerName, double confidence) const{
   std::vector<double> medianDurations;
   std::vector<double> lowerDurationBounds;
@@ -238,7 +238,7 @@ void MultiQueryStatistics::computeCumulativeMetricsForPlanner(
 
 }
 
-void MultiQueryStatistics::computeCumulativeFinalCost(
+void MultiqueryStatistics::computeCumulativeFinalCost(
       const std::string& plannerName, double confidence) const{
   std::vector<double> medianCosts;
   std::vector<double> lowerCostBounds;
@@ -306,7 +306,7 @@ void MultiQueryStatistics::computeCumulativeFinalCost(
   maxCumulativeFinalCosts_[plannerName] = uciCumulativeCost.back();
 }
 
-fs::path MultiQueryStatistics::extractMedianInitialSolutionPerQuery(
+fs::path MultiqueryStatistics::extractMedianInitialSolutionPerQuery(
       const std::string& plannerName, const double confidence) const{
   // Check if the file already exists.
   fs::path filepath = statisticsDirectory_ / (plannerName + "_median_initial_solutions_per_query.csv"s);
@@ -386,7 +386,7 @@ fs::path MultiQueryStatistics::extractMedianInitialSolutionPerQuery(
   return filepath;
 }
 
-fs::path MultiQueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
+fs::path MultiqueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
     const std::string& plannerName, const double confidence) const{
   // Check if the file already exists.
   fs::path filepath = statisticsDirectory_ / (plannerName + "_median_cumulative_initial_solutions_per_query.csv"s);
@@ -522,7 +522,7 @@ fs::path MultiQueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
   return filepath;
 }
 
-fs::path MultiQueryStatistics::extractMedianFinalSolutionPerQuery(
+fs::path MultiqueryStatistics::extractMedianFinalSolutionPerQuery(
       const std::string& plannerName, const double confidence) const{
   // Check if the file already exists.
   fs::path filepath = statisticsDirectory_ / (plannerName + "_median_final_solutions_per_query.csv"s);
@@ -585,7 +585,7 @@ fs::path MultiQueryStatistics::extractMedianFinalSolutionPerQuery(
   return filepath;
 }
 
-fs::path MultiQueryStatistics::extractMedianCumulativeFinalCostPerQuery(
+fs::path MultiqueryStatistics::extractMedianCumulativeFinalCostPerQuery(
     const std::string& plannerName, const double confidence) const{
   // Check if the file already exists.
   fs::path filepath = statisticsDirectory_ / (plannerName + "_median_cumulative_final_solutions_per_query.csv"s);
@@ -672,7 +672,7 @@ fs::path MultiQueryStatistics::extractMedianCumulativeFinalCostPerQuery(
   return filepath;
 }
 
-fs::path MultiQueryStatistics::extractFinalSolutionPerQuery(
+fs::path MultiqueryStatistics::extractFinalSolutionPerQuery(
       const std::string& plannerName) const{
   // Check if the file already exists.
   fs::path filepath = statisticsDirectory_ / (plannerName + "_final_solution_per_query.csv"s);
@@ -718,7 +718,7 @@ fs::path MultiQueryStatistics::extractFinalSolutionPerQuery(
   return filepath;
 }
 
-std::experimental::filesystem::path MultiQueryStatistics::extractSuccessPerQuery(
+std::experimental::filesystem::path MultiqueryStatistics::extractSuccessPerQuery(
     const std::string& plannerName) const{
   // Check if the file already exists.
   fs::path filepath = statisticsDirectory_ / (plannerName + "_success_rate_per_query.csv"s);
@@ -781,74 +781,74 @@ std::experimental::filesystem::path MultiQueryStatistics::extractSuccessPerQuery
   return filepath;
 }
 
-double MultiQueryStatistics::getMaxDuration() const{
+double MultiqueryStatistics::getMaxDuration() const{
   return maxDuration_;
 }
 
-double MultiQueryStatistics::getMaxNonInfInitialDuration() const{
+double MultiqueryStatistics::getMaxNonInfInitialDuration() const{
   return maxNonInfInitialDuration_;
 }
 
-double MultiQueryStatistics::getMaxCumulativeDuration() const{
+double MultiqueryStatistics::getMaxCumulativeDuration() const{
   return maxCumulativeDuration_;
 }
 
-double MultiQueryStatistics::getMaxNonInfCumulativeDuration() const{
+double MultiqueryStatistics::getMaxNonInfCumulativeDuration() const{
   return maxNonInfCumulativeDuration_;
 }
 
-double MultiQueryStatistics::getMaxCost() const{
+double MultiqueryStatistics::getMaxCost() const{
   return maxCost_;
 }
 
-double MultiQueryStatistics::getMaxNonInfCost() const{
+double MultiqueryStatistics::getMaxNonInfCost() const{
   return maxNonInfCost_;
 }
 
-double MultiQueryStatistics::getMaxCumulativeCost() const{
+double MultiqueryStatistics::getMaxCumulativeCost() const{
   return maxCumulativeCost_;
 }
 
-double MultiQueryStatistics::getMaxNonInfCumulativeCost() const{
+double MultiqueryStatistics::getMaxNonInfCumulativeCost() const{
   return maxNonInfCumulativeCost_;
 }
 
 
-double MultiQueryStatistics::getMinCumulativeInitialSolutionCost(const std::string& plannerName) const{
+double MultiqueryStatistics::getMinCumulativeInitialSolutionCost(const std::string& plannerName) const{
   return minCumulativeInitialSolutionCosts_.at(plannerName);
 }
-double MultiQueryStatistics::getMedianCumulativeInitialSolutionCost(const std::string& plannerName) const{
+double MultiqueryStatistics::getMedianCumulativeInitialSolutionCost(const std::string& plannerName) const{
   return medianCumulativeInitialSolutionCosts_.at(plannerName);
 }
-double MultiQueryStatistics::getMaxCumulativeInitialSolutionCost(const std::string& plannerName) const{
+double MultiqueryStatistics::getMaxCumulativeInitialSolutionCost(const std::string& plannerName) const{
   return maxCumulativeInitialSolutionCosts_.at(plannerName);
 }
 
-double MultiQueryStatistics::getMinCumulativeInitialSolutionDuration(const std::string& plannerName) const{
+double MultiqueryStatistics::getMinCumulativeInitialSolutionDuration(const std::string& plannerName) const{
   return minCumulativeInitialSolutionDurations_.at(plannerName);
 
 }
-double MultiQueryStatistics::getMedianCumulativeInitialSolutionDuration(const std::string& plannerName) const{
+double MultiqueryStatistics::getMedianCumulativeInitialSolutionDuration(const std::string& plannerName) const{
   return medianCumulativeInitialSolutionDurations_.at(plannerName);
 }
 
-double MultiQueryStatistics::getMaxCumulativeNonInfInitialSolutionDuration(const std::string& plannerName) const{
+double MultiqueryStatistics::getMaxCumulativeNonInfInitialSolutionDuration(const std::string& plannerName) const{
   return maxCumulativeNonInfInitialSolutionDurations_.at(plannerName);
 }
-double MultiQueryStatistics::getMaxCumulativeInitialSolutionDuration(const std::string& plannerName) const{
+double MultiqueryStatistics::getMaxCumulativeInitialSolutionDuration(const std::string& plannerName) const{
   return maxCumulativeInitialSolutionDurations_.at(plannerName);
 }
 
-double MultiQueryStatistics::getSuccessRate(const std::string& plannerName) const{
+double MultiqueryStatistics::getSuccessRate(const std::string& plannerName) const{
   return successRates_.at(plannerName);
 }
-double MultiQueryStatistics::getMinCumulativeFinalCost(const std::string& plannerName) const{
+double MultiqueryStatistics::getMinCumulativeFinalCost(const std::string& plannerName) const{
   return minCumulativeFinalCosts_.at(plannerName);
 }
-double MultiQueryStatistics::getMedianCumulativeFinalCost(const std::string& plannerName) const{
+double MultiqueryStatistics::getMedianCumulativeFinalCost(const std::string& plannerName) const{
   return medianCumulativeFinalCosts_.at(plannerName);
 }
-double MultiQueryStatistics::getMaxCumulativeFinalCost(const std::string& plannerName) const{
+double MultiqueryStatistics::getMaxCumulativeFinalCost(const std::string& plannerName) const{
   return maxCumulativeFinalCosts_.at(plannerName);
 }
 }  // namespace ompltools

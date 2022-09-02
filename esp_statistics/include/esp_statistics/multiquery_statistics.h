@@ -51,11 +51,11 @@ namespace esp {
 
 namespace ompltools {
 
-class MultiQueryStatistics {
+class MultiqueryStatistics {
  public:
-  MultiQueryStatistics(const std::shared_ptr<Configuration>& config, const std::vector<Statistics> &stats,
+  MultiqueryStatistics(const std::shared_ptr<Configuration>& config, const std::vector<Statistics> &stats,
       bool forceComputation = false);
-  ~MultiQueryStatistics() = default;
+  ~MultiqueryStatistics() = default;
 
   std::experimental::filesystem::path extractMedianInitialSolutionPerQuery(
       const std::string& plannerName, const double confidence = 0.99) const;
@@ -171,7 +171,7 @@ class MultiQueryStatistics {
 };
 
 template<class T>
-std::ofstream& MultiQueryStatistics::writeVectorToFile(std::ofstream &filestream, 
+std::ofstream& MultiqueryStatistics::writeVectorToFile(std::ofstream &filestream, 
     const std::string &name, const std::vector<T> &values) const{
   filestream << name;
   for (auto val: values) {

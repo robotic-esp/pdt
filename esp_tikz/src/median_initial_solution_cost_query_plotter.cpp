@@ -50,7 +50,7 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 MedianInitialSolutionCostQueryPlotter::MedianInitialSolutionCostQueryPlotter(
-    const std::shared_ptr<const Configuration>& config, const MultiQueryStatistics& stats) :
+    const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   // Compute the duration bin size.

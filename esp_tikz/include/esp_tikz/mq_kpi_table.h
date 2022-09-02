@@ -41,7 +41,7 @@
 #include "esp_configuration/configuration.h"
 #include "esp_tikz/tabularx.h"
 #include "esp_statistics/statistics.h"
-#include "esp_statistics/multi_query_statistics.h"
+#include "esp_statistics/multiquery_statistics.h"
 
 namespace esp {
 
@@ -49,7 +49,7 @@ namespace ompltools {
 
 class MqKpiTable : public TabularX {
  public:
-  MqKpiTable(const std::shared_ptr<const Configuration>& config, const MultiQueryStatistics& stats);
+  MqKpiTable(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
   ~MqKpiTable() = default;
 
   void addKpi(const std::string& plannerName, const std::string& plannerPlotName);
@@ -59,7 +59,7 @@ class MqKpiTable : public TabularX {
  private:
   std::vector<std::string> plannerNames_{};
   const std::shared_ptr<const Configuration> config_;
-  const MultiQueryStatistics& stats_;
+  const MultiqueryStatistics& stats_;
 };
 
 }  // namespace ompltools
