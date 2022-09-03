@@ -137,16 +137,12 @@ std::stringstream MultiqueryReport::overview() const {
               "information about the "
               "experiment setup. ";
 
-  const auto thresholdKey =
-      "objective/"s + config_->get<std::string>("context/" + config_->get<std::string>("experiment/context") + "/objective") + "/solvedCost";
-
   if (config_->get<std::string>("context/" + config_->get<std::string>("experiment/context") + "/starts/type") == "specified"){
     overview << "Start/goals: prespecified.";
   }
   else{
     overview << "Start/goals: " << config_->get<std::string>("context/"+config_->get<std::string>("experiment/context")+"/starts/generativeModel") << " sampled.";
   }
-  //overview << "Cost threshold: " << config_->get<unsigned int>(thresholdKey) << "\n";
 
   // Create the results summary section.
   overview << "\\subsection{Results Summary}\\label{sec:overview-results-summary}\n";
@@ -158,165 +154,135 @@ std::stringstream MultiqueryReport::overview() const {
   overview << mqKpiTable.string() << '\n';
 
   overview << "\\subsection{" << "Initial solution time" << "}\\label{sec:" << "soltime" << "}\n";
-  {
-    auto medianQueryDurationAxis = medianInitialDurationQueryPlotter_.createMedianInitialDurationAxis();
-    auto medianCumulativeDurationAxis = medianCumulativeDurationPlotter_.createMedianCumulativeDurationAxis();
-    auto legend =
-        latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("experiment/planners"));
+  auto legend =
+      latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("experiment/planners"));
+
+  auto medianQueryDurationAxis = medianInitialDurationQueryPlotter_.createMedianInitialDurationAxis();
+  auto medianCumulativeDurationAxis = medianCumulativeDurationPlotter_.createMedianCumulativeDurationAxis();
+
+  // Stack the axes
+  latexPlotter_.stack(medianQueryDurationAxis, medianCumulativeDurationAxis, legend);
+
+  overview << "\\begin{center}\n\\input{"
+          << latexPlotter_.createPicture(medianQueryDurationAxis, medianCumulativeDurationAxis, legend).string()
+          << "}\n\\captionof{figure}{\\footnotesize (Top) Median duration per query of the initial solution of "
+          << "all planners with "
+          << 100.0 * config_->get<double>("medianInitialDurationPlots/confidence")
+          << "\\% confidence interval. "
+          << "(Bottom) Cumulative median duration per query of the initial solution of "
+          << "all planners with "
+          << 100.0 * config_->get<double>("medianCumulativeInitialDurationPlots/confidence")
+          << "\\% confidence interval. "
+          << "}\\end{center}\n";
+
+  auto medianQueryInitialCostAxis = medianInitialCostQueryPlotter_.createMedianInitialCostAxis();
+  auto medianCumulativeInitialCostAxis = medianCumulativeCostPlotter_.createMedianCumulativeCostAxis();
+
+  // Stack the axes
+  latexPlotter_.stack(medianQueryInitialCostAxis, medianCumulativeInitialCostAxis, legend);
+
+  overview << "\n\\pagebreak\n";
+  overview << "\\subsection{" << "Initial solution cost" << "}\\label{sec:" << "cost" << "}\n";
+  overview << "\\begin{center}\n\\input{"
+          << latexPlotter_.createPicture(medianQueryInitialCostAxis, medianCumulativeInitialCostAxis, legend).string()
+          << "}\n\\captionof{figure}{\\footnotesize (Top) Median initial cost per query for "
+          << "all planners" << " with "
+          << 100.0 * config_->get<double>("medianInitialCostPerQueryPlots/confidence")
+          << "\\% confidence interval. "
+          << "(Bottom) Cumulative median cost per query of the initial solution of "
+          << "all planners with "
+          << 100.0 * config_->get<double>("medianCumulativeCostPlots/confidence")
+          << "\\% confidence interval. "
+          << "}\\end{center}\n";
+
+  auto medianQueryLastCostAxis = medianFinalCostQueryPlotter_.createMedianFinalCostAxis();
+  auto medianCumulativeLastCostAxis = medianCumulativeCostPlotter_.createMedianCumulativeCostAxis(false);
+
+  medianCumulativeLastCostAxis->options.name += "_final";
+
+  // Stack the axes
+  latexPlotter_.stack(medianQueryLastCostAxis, medianCumulativeLastCostAxis, legend);
+
+  overview << "\\subsection{" << "Final solution cost" << "}\\label{sec:" << "cost" << "}\n";
+  overview << "\\begin{center}\n\\input{"
+          << latexPlotter_.createPicture(medianQueryLastCostAxis, medianCumulativeLastCostAxis, legend).string()
+          << "}\n\\captionof{figure}{\\footnotesize (Top) Median final cost per query for "
+          << "all planners" << " with "
+          << 100.0 * config_->get<double>("medianFinalCostPerQueryPlots/confidence")
+          << "\\% confidence interval. "
+          << "(Bottom) Cumulative median cost per query of the final solution of "
+          << "all planners with "
+          << 100.0 * config_->get<double>("medianCumulativeCostPlots/confidence")
+          << "\\% confidence interval. "
+          << "}\\end{center}\n";
+
+  auto successRateQueryAxis = successRateQueryPlotter_.createSuccessRateQueryAxis();
+
+  // Stack the axes
+  latexPlotter_.stack(successRateQueryAxis, legend);
+
+  overview << "\\subsection{" << "Success Rates" << "}\\label{sec:succ" << "}\n";
+  overview << "\\begin{center}\n\\input{"
+          << latexPlotter_.createPicture(successRateQueryAxis, legend).string()
+          << "}\n\\captionof{figure}{\\footnotesize Success rate "
+          << " of all planners" << " at "
+          << "the maximum solve time.} \\end{center}\n";
+
+  auto successRateHalfTimeQueryAxis = successRateQueryPlotter_.createSuccessRateQueryAxis(50);
+
+  // Stack the axes
+  latexPlotter_.stack(successRateHalfTimeQueryAxis, legend);
+
+  overview << "\\begin{center}\n\\input{"
+          << latexPlotter_.createPicture(successRateHalfTimeQueryAxis, legend).string()
+          << "}\n\\captionof{figure}{\\footnotesize Success rate "
+          << " of all planners" << " at "
+          << "50\\% of the maximal solve time.} \\end{center}\n";
+
+  overview << "\n\\pagebreak\n";
+  overview << "\\subsection{" << "Breakout cost convergence plots" << "}\\label{sec:" << "cost" << "}\n";
+  const unsigned int numCostPlots = 10;
+  for (auto i=0u; i<numCostPlots; ++i){
+    const auto n = static_cast<unsigned int>(std::floor(static_cast<double>(i*(stats_.getNumQueries()-1)) / static_cast<double>(numCostPlots-1)));
+
+    auto nthQueryStatistics = stats_.getQueryStatistics(n);
+    MedianCostEvolutionPlotter medianCostEvolutionPlotter(config_, nthQueryStatistics);
+    MedianInitialSolutionPlotter medianInitialSolutionPlotter(config_, nthQueryStatistics);
+    SuccessPlotter successPlotter(config_, nthQueryStatistics);
+
+    auto medianCostEvolutionAxis = medianCostEvolutionPlotter.createMedianCostEvolutionAxis();
+    auto medianInitialSolutionAxis = medianInitialSolutionPlotter.createMedianInitialSolutionAxis();
+    auto successAxis = successPlotter.createSuccessAxis();
+
+    medianCostEvolutionAxis->options.name += std::to_string(n);
+
+    // Merge the intial solution axis into the cost evolution axis.
+    medianCostEvolutionAxis->mergePlots(medianInitialSolutionAxis);
+
+    // Align the success and median cost evolution axes.
+    latexPlotter_.alignAbszissen(successAxis, medianCostEvolutionAxis);
 
     // Stack the axes
-    latexPlotter_.stack(medianQueryDurationAxis, medianCumulativeDurationAxis, legend);
+    latexPlotter_.stack(successAxis, medianCostEvolutionAxis, legend);
 
-    overview << "\\begin{center}\n\\input{"
-            << latexPlotter_.createPicture(medianQueryDurationAxis, medianCumulativeDurationAxis, legend).string()
-            << "}\n\\captionof{figure}{\\footnotesize (Top) Median duration per query of the initial solution of "
-            << "all planners with "
-            << 100.0 * config_->get<double>("medianInitialDurationPlots/confidence")
-            << "\\% confidence interval. "
-            << "(Bottom) Cumulative median duration per query of the initial solution of "
-            << "all planners with "
-            << 100.0 * config_->get<double>("medianCumulativeInitialDurationPlots/confidence")
-            << "\\% confidence interval. "
-            << "}\\end{center}\n";
-  }
+    overview << "\\subsubsection{Query " << std::to_string(n) << "}\n";
 
-  {
-    auto medianQueryCostAxis = medianInitialCostQueryPlotter_.createMedianInitialCostAxis();
-    auto medianCumulativeCostAxis = medianCumulativeCostPlotter_.createMedianCumulativeCostAxis();
-    auto legend =
-        latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("experiment/planners"));
-
-    // Stack the axes
-    latexPlotter_.stack(medianQueryCostAxis, medianCumulativeCostAxis, legend);
-
-
-    overview << "\n\\pagebreak\n";
-    overview << "\\subsection{" << "Initial solution cost" << "}\\label{sec:" << "cost" << "}\n";
-    overview << "\\begin{center}\n\\input{"
-            << latexPlotter_.createPicture(medianQueryCostAxis, medianCumulativeCostAxis, legend).string()
-            //<< medianCumulativeCostPlotter_.createMedianCumulativeCostPicture().string()
-            << "}\n\\captionof{figure}{\\footnotesize (Top) Median initial cost per query for "
-            << "all planners" << " with "
-            << 100.0 * config_->get<double>("medianInitialCostPerQueryPlots/confidence")
-            << "\\% confidence interval. "
-            << "(Bottom) Cumulative median cost per query of the initial solution of "
-            << "all planners with "
-            << 100.0 * config_->get<double>("medianCumulativeCostPlots/confidence")
-            << "\\% confidence interval. "
-            << "}\\end{center}\n";
-  }
-
-  {
-    auto medianQueryCostAxis = medianFinalCostQueryPlotter_.createMedianFinalCostAxis();
-    auto medianCumulativeCostAxis = medianCumulativeCostPlotter_.createMedianCumulativeCostAxis(false);
-    auto legend =
-        latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("experiment/planners"));
-
-    medianCumulativeCostAxis->options.name += "_final";
-
-    // Stack the axes
-    latexPlotter_.stack(medianQueryCostAxis, medianCumulativeCostAxis, legend);
-
-    overview << "\\subsection{" << "Final solution cost" << "}\\label{sec:" << "cost" << "}\n";
-    overview << "\\begin{center}\n\\input{"
-            << latexPlotter_.createPicture(medianQueryCostAxis, medianCumulativeCostAxis, legend).string()
-            //<< medianCumulativeCostPlotter_.createMedianCumulativeCostPicture().string()
-            << "}\n\\captionof{figure}{\\footnotesize (Top) Median final cost per query for "
-            << "all planners" << " with "
-            << 100.0 * config_->get<double>("medianFinalCostPerQueryPlots/confidence")
-            << "\\% confidence interval. "
-            << "(Bottom) Cumulative median cost per query of the final solution of "
-            << "all planners with "
-            << 100.0 * config_->get<double>("medianCumulativeCostPlots/confidence")
-            << "\\% confidence interval. "
-            << "}\\end{center}\n";
-  }
-
-  {
-    auto successRateQueryAxis = successRateQueryPlotter_.createSuccessRateQueryAxis();
-
-    // Create the legend axis.
-    auto legend =
-        latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("experiment/planners"));
-
-    // Stack the axes
-    latexPlotter_.stack(successRateQueryAxis, legend);
-
-    overview << "\\subsection{" << "Success Rates" << "}\\label{sec:succ" << "}\n";
-    overview << "\\begin{center}\n\\input{"
-            << latexPlotter_.createPicture(successRateQueryAxis, legend).string()
-            << "}\n\\captionof{figure}{\\footnotesize Success rate "
-            << " of all planners" << " at "
-            << "the maximum solve time.} \\end{center}\n";
-  }
-
-  {
-    auto successRateQueryAxis = successRateQueryPlotter_.createSuccessRateQueryAxis(50);
-
-    // Create the legend axis.
-    auto legend =
-        latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("experiment/planners"));
-
-    // Stack the axes
-    latexPlotter_.stack(successRateQueryAxis, legend);
-
-    overview << "\\begin{center}\n\\input{"
-            << latexPlotter_.createPicture(successRateQueryAxis, legend).string()
-            << "}\n\\captionof{figure}{\\footnotesize Success rate "
-            << " of all planners" << " at "
-            << "50\\% of the maximal solve time.} \\end{center}\n";
-  }
-
-  {
-    overview << "\n\\pagebreak\n";
-    overview << "\\subsection{" << "Breakout cost convergence plots" << "}\\label{sec:" << "cost" << "}\n";
-    const unsigned int numCostPlots = 10;
-    for (auto i=0u; i<numCostPlots; ++i){
-      const auto n = static_cast<unsigned int>(std::floor(static_cast<double>(i*(stats_.getNumQueries()-1)) / static_cast<double>(numCostPlots-1)));
-
-      auto tmp = stats_.getQueryStatistics(n);
-      MedianCostEvolutionPlotter medianCostEvolutionPlotter(config_, tmp);
-      MedianInitialSolutionPlotter medianInitialSolutionPlotter(config_, tmp);
-      SuccessPlotter successPlotter(config_, tmp);
-
-      auto medianCostEvolutionAxis = medianCostEvolutionPlotter.createMedianCostEvolutionAxis();
-      auto medianInitialSolutionAxis = medianInitialSolutionPlotter.createMedianInitialSolutionAxis();
-      auto successAxis = successPlotter.createSuccessAxis();
-
-      medianCostEvolutionAxis->options.name += std::to_string(n);
-
-      // Merge the intial solution axis into the cost evolution axis.
-      medianCostEvolutionAxis->mergePlots(medianInitialSolutionAxis);
-
-      // Align the success and median cost evolution axes.
-      latexPlotter_.alignAbszissen(successAxis, medianCostEvolutionAxis);
-
-      // Create the legend axis.
-      auto legend =
-          latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("experiment/planners"));
-
-      // Stack the axes
-      latexPlotter_.stack(successAxis, medianCostEvolutionAxis, legend);
-
-      overview << "\\subsubsection{Query " << std::to_string(n) << "}\n";
-
-      // Create the KPI table.
-      KpiTable kpiTable(config_, tmp);
-      for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
-        kpiTable.addKpi(name, plotPlannerNames_.at(name));
-      }
-      overview << kpiTable.string() << '\n';
-
-      overview << "\\begin{center}\n\\input{"
-              << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
-              << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
-                 "at any given time. (Bottom) Median cost evolution for query "
-              << std::to_string(n) + " of all planners" << " with "
-              << 100.0 * config_->get<double>("medianCostPlots/confidence")
-              << "\\% confidence interval.} \\end{center}\n";
-
-      overview << "\n\\pagebreak\n";
+    // Create the KPI table.
+    KpiTable kpiTable(config_, tmp);
+    for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
+      kpiTable.addKpi(name, plotPlannerNames_.at(name));
     }
+    overview << kpiTable.string() << '\n';
+
+    overview << "\\begin{center}\n\\input{"
+            << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
+            << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
+               "at any given time. (Bottom) Median cost evolution for query "
+            << std::to_string(n) + " of all planners" << " with "
+            << 100.0 * config_->get<double>("medianCostPlots/confidence")
+            << "\\% confidence interval.} \\end{center}\n";
+
+    overview << "\n\\pagebreak\n";
   }
 
   return overview;
