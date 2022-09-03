@@ -176,7 +176,7 @@ std::stringstream MultiqueryReport::overview() const {
           << "}\\end{center}\n";
 
   auto medianQueryInitialCostAxis = medianInitialCostQueryPlotter_.createMedianInitialCostAxis();
-  auto medianCumulativeInitialCostAxis = medianCumulativeCostPlotter_.createMedianCumulativeCostAxis();
+  auto medianCumulativeInitialCostAxis = medianCumulativeCostPlotter_.createMedianCumulativeCostAxis(true);
 
   // Stack the axes
   latexPlotter_.stack(medianQueryInitialCostAxis, medianCumulativeInitialCostAxis, legend);
