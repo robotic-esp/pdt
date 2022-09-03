@@ -268,7 +268,7 @@ std::stringstream MultiqueryReport::overview() const {
     overview << "\\subsubsection{Query " << std::to_string(n) << "}\n";
 
     // Create the KPI table.
-    KpiTable kpiTable(config_, tmp);
+    KpiTable kpiTable(config_, nthQueryStatistics);
     for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
       kpiTable.addKpi(name, plotPlannerNames_.at(name));
     }

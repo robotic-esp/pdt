@@ -72,7 +72,7 @@ class MedianCumulativeCostPlotter : public LatexPlotter {
       const std::string& plannerName, const bool initial=true) const;
   std::shared_ptr<PgfPlot> createMedianCumulativeCostLowerCIPlot(
       const std::string& plannerName, const bool initial=true) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeCostFillCIPlot(
+  std::shared_ptr<PgfPlot> createMedianCumulativeCostFillCiPlot(
       const std::string& plannerName) const;
 
   void setMedianCumulativeCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;

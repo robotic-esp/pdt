@@ -72,7 +72,7 @@ class MedianInitialSolutionQueryPlotter : public LatexPlotter {
       const std::string& plannerName) const;
   std::shared_ptr<PgfPlot> createMedianInitialDurationLowerCIPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialDurationFillCIPlot(
+  std::shared_ptr<PgfPlot> createMedianInitialDurationFillCiPlot(
       const std::string& plannerName) const;
 
   void setMedianInitialDurationAxisOptions(std::shared_ptr<PgfAxis> axis) const;

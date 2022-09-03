@@ -71,7 +71,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
       try {
         upperCI = createMedianInitialDurationUpperCIPlot(name);
         lowerCI = createMedianInitialDurationLowerCIPlot(name);
-        fillCI = createMedianInitialDurationFillCIPlot(name);
+        fillCI = createMedianInitialDurationFillCiPlot(name);
       } catch (const std::runtime_error& e) {
         // If the above methods throw, the corresponding plots should not be added.
         successCI = false;
@@ -102,7 +102,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
   try {
     upperCI = createMedianInitialDurationUpperCIPlot(plannerName);
     lowerCI = createMedianInitialDurationLowerCIPlot(plannerName);
-    fillCI = createMedianInitialDurationFillCIPlot(plannerName);
+    fillCI = createMedianInitialDurationFillCiPlot(plannerName);
   } catch (const std::runtime_error& e) {
     // If the above methods throw, the corresponding plots should not be added.
     successCI = false;
@@ -250,7 +250,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialD
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialDurationFillCIPlot(
+std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialDurationFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =

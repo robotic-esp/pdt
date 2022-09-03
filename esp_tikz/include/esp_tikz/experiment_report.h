@@ -64,7 +64,7 @@ class ExperimentReport : public BaseReport {
   ExperimentReport(const std::shared_ptr<Configuration>& config, const Statistics& stats);
   ~ExperimentReport() = default;
 
-  std::experimental::filesystem::path generateReport();
+  std::experimental::filesystem::path generateReport() override;
 
  private:
   std::stringstream overview() const;

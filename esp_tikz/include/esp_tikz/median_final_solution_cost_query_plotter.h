@@ -72,7 +72,7 @@ class MedianFinalSolutionCostQueryPlotter : public LatexPlotter {
       const std::string& plannerName) const;
   std::shared_ptr<PgfPlot> createMedianFinalCostLowerCIPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianFinalCostFillCIPlot(
+  std::shared_ptr<PgfPlot> createMedianFinalCostFillCiPlot(
       const std::string& plannerName) const;
 
   void setMedianFinalCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;

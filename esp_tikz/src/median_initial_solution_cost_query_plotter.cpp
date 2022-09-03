@@ -71,7 +71,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInit
       try {
         upperCI = createMedianInitialCostUpperCIPlot(name);
         lowerCI = createMedianInitialCostLowerCIPlot(name);
-        fillCI = createMedianInitialCostFillCIPlot(name);
+        fillCI = createMedianInitialCostFillCiPlot(name);
       } catch (const std::runtime_error& e) {
         // If the above methods throw, the corresponding plots should not be added.
         successCI = false;
@@ -102,7 +102,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInit
   try {
     upperCI = createMedianInitialCostUpperCIPlot(plannerName);
     lowerCI = createMedianInitialCostLowerCIPlot(plannerName);
-    fillCI = createMedianInitialCostFillCIPlot(plannerName);
+    fillCI = createMedianInitialCostFillCiPlot(plannerName);
   } catch (const std::runtime_error& e) {
     // If the above methods throw, the corresponding plots should not be added.
     successCI = false;
@@ -250,7 +250,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInit
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostFillCIPlot(
+std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =

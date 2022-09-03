@@ -72,7 +72,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulative
       try {
         upperCI = createMedianCumulativeDurationUpperCIPlot(name);
         lowerCI = createMedianCumulativeDurationLowerCIPlot(name);
-        fillCI = createMedianCumulativeDurationFillCIPlot(name);
+        fillCI = createMedianCumulativeDurationFillCiPlot(name);
       } catch (const std::runtime_error& e) {
         // If the above methods throw, the corresponding plots should not be added.
         successCI = false;
@@ -103,7 +103,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulative
   try {
     upperCI = createMedianCumulativeDurationUpperCIPlot(plannerName);
     lowerCI = createMedianCumulativeDurationLowerCIPlot(plannerName);
-    fillCI = createMedianCumulativeDurationFillCIPlot(plannerName);
+    fillCI = createMedianCumulativeDurationFillCiPlot(plannerName);
   } catch (const std::runtime_error& e) {
     // If the above methods throw, the corresponding plots should not be added.
     successCI = false;
@@ -257,7 +257,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulativeDurationFillCIPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulativeDurationFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween = std::make_shared<PgfFillBetween>(
