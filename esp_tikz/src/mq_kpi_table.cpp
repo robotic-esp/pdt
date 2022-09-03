@@ -115,7 +115,7 @@ std::string MqKpiTable::string() const {
   stream << std::fixed;
   stream << "{\\tiny\n";
   stream << "\\setlength{\\tabcolsep}{0.8em}\n";
-  stream << "\\begin{tabularx}{\\textwidth}[c]{XcccccccccX}\\toprule\n";
+  stream << "\\begin{tabularx}{\\textwidth}[c]{Xcccccccccc}\\toprule\n";
   stream << "Planner " << options.colSep << " \\(t_\\mathrm{c, init}^\\mathrm{min}\\) "
          << options.colSep << " \\(t_\\mathrm{c, init}^\\mathrm{med}\\) " << options.colSep
          << " \\(t_\\mathrm{c, init}^\\mathrm{max}\\) " << options.colSep
