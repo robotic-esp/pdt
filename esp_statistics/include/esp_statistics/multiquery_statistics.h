@@ -110,13 +110,7 @@ class MultiqueryStatistics {
   double getMedianCumulativeFinalCost(const std::string& plannerName) const;
   double getMaxCumulativeFinalCost(const std::string& plannerName) const;
 
-  Statistics getQueryStatistics(const unsigned int i) const {
-    if (i >= stats_.size()){
-      throw std::runtime_error("i is too large");
-    }
-
-    return stats_[i];
-  }
+  Statistics getQueryStatistics(const unsigned int i) const;
 
  private:
   void computeCumulativeMetricsForPlanner(
@@ -158,10 +152,10 @@ class MultiqueryStatistics {
   mutable double maxNonInfInitialDuration_{std::numeric_limits<double>::lowest()};
 
   mutable double maxCumulativeDuration_{std::numeric_limits<double>::lowest()};
-  mutable double maxNonInfCumulativeDuration_{0.};
+  mutable double maxNonInfCumulativeDuration_{0.0};
 
   mutable double maxCumulativeCost_{std::numeric_limits<double>::lowest()};
-  mutable double maxNonInfCumulativeCost_{0.};
+  mutable double maxNonInfCumulativeCost_{0.0};
 
   std::size_t numQueries_{0u};
 
@@ -174,8 +168,9 @@ template<class T>
 std::ofstream& MultiqueryStatistics::writeVectorToFile(std::ofstream &filestream, 
     const std::string &name, const std::vector<T> &values) const{
   filestream << name;
-  for (auto val: values) {
-    filestream << std::setprecision(21) << "," << val;
+  filestream << std::setprecision(21u);
+  for (const auto &val: values) {
+    filestream << "," << val;
   }
 
   return filestream; // this enables using this in a series of chained operations

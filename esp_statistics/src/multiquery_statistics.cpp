@@ -784,6 +784,14 @@ std::experimental::filesystem::path MultiqueryStatistics::extractSuccessPerQuery
   return filepath;
 }
 
+Statistics MultiqueryStatistics::getQueryStatistics(const unsigned int i) const {
+  if (i >= stats_.size()){
+    throw std::runtime_error("i is too large");
+  }
+
+  return stats_[i];
+}
+
 double MultiqueryStatistics::getMaxDuration() const{
   return maxDuration_;
 }
