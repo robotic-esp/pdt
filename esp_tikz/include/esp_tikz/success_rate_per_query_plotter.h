@@ -55,27 +55,30 @@ class SuccessRateQueryPlotter : public LatexPlotter {
   ~SuccessRateQueryPlotter() = default;
 
   // Creates a pgf axis that holds the median cost at binned durations for all planners.
-  std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(const unsigned int percentage=100) const;
+  std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(const unsigned int percentage) const;
 
   // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
   std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(
-      const std::string& plannerName, const unsigned int percentage=100) const;
+      const std::string& plannerName, const unsigned int percentage) const;
 
   // Creates a tikz picture that contains the median cost axis of all planners.
-  std::experimental::filesystem::path createSuccessRateQueryPicture() const;
+  std::experimental::filesystem::path createSuccessRateQueryPicture(const unsigned int percentage) const;
 
   // Creates a tikz picture that contains the median cost axis of the specified planner.
-  std::experimental::filesystem::path createSuccessRateQueryPicture(const std::string& plannerName) const;
+  std::experimental::filesystem::path createSuccessRateQueryPicture(const std::string& plannerName, const unsigned int percentage) const;
 
  private:
-  std::shared_ptr<PgfPlot> createSuccessRateQuery25PercentPlot(
+  std::shared_ptr<PgfPlot> createSuccessRateQueryPercentPlot(
+      const std::string& plannerName, const unsigned int percentage) const;
+
+  /*std::shared_ptr<PgfPlot> createSuccessRateQuery25PercentPlot(
       const std::string& plannerName) const;
   std::shared_ptr<PgfPlot> createSuccessRateQuery50PercentPlot(
       const std::string& plannerName) const;
   std::shared_ptr<PgfPlot> createSuccessRateQuery75PercentPlot(
       const std::string& plannerName) const;
   std::shared_ptr<PgfPlot> createSuccessRateQuery100PercentPlot(
-      const std::string& plannerName) const;
+      const std::string& plannerName) const;*/
 
   void setSuccessRateQueryAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 

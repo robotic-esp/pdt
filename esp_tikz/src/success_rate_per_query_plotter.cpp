@@ -59,7 +59,7 @@ SuccessRateQueryPlotter::SuccessRateQueryPlotter(
 
 std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
     const unsigned int percentage) const {
-  if (percentage != 100 && percentage != 75 && percentage != 50 && percentage != 25){
+  if (percentage != 100u && percentage != 75u && percentage != 50u && percentage != 25u){
     throw std::runtime_error("Invalid percentage in success per query plotter.");
   }
 
@@ -70,12 +70,7 @@ std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     std::shared_ptr<PgfPlot> plt;
 
-    switch(percentage){
-      case 25: plt = createSuccessRateQuery25PercentPlot(name); break;
-      case 50: plt = createSuccessRateQuery50PercentPlot(name); break;
-      case 75: plt = createSuccessRateQuery75PercentPlot(name); break;
-      case 100: plt = createSuccessRateQuery100PercentPlot(name); break;
-    }
+    plt = createSuccessRateQueryPercentPlot(name, percentage);
 
     axis->addPlot(plt);
   }
@@ -86,7 +81,7 @@ std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
 
 std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
     const std::string& plannerName, const unsigned int percentage) const {
-  if (percentage != 100 && percentage != 75 && percentage != 50 && percentage != 25){
+  if (percentage != 100u && percentage != 75u && percentage != 50u && percentage != 25u){
     throw std::runtime_error("Invalid percentage in success per query plotter.");
   }
 
@@ -95,12 +90,7 @@ std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
 
   std::shared_ptr<PgfPlot> plt;
 
-  switch(percentage){
-    case 25: plt = createSuccessRateQuery25PercentPlot(plannerName); break;
-    case 50: plt = createSuccessRateQuery50PercentPlot(plannerName); break;
-    case 75: plt = createSuccessRateQuery75PercentPlot(plannerName); break;
-    case 100: plt = createSuccessRateQuery100PercentPlot(plannerName); break;
-  }
+  plt = createSuccessRateQueryPercentPlot(plannerName, percentage);
 
   axis->addPlot(plt);
 
@@ -109,29 +99,29 @@ std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
   return axis;
 }
 
-fs::path SuccessRateQueryPlotter::createSuccessRateQueryPicture() const {
+fs::path SuccessRateQueryPlotter::createSuccessRateQueryPicture(const unsigned int percentage) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  auto axis = createSuccessRateQueryAxis();
+  auto axis = createSuccessRateQueryAxis(percentage);
   picture.addAxis(axis);
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                     fs::path("tikz/all_success_rate_query_plot.tikz");
+                     fs::path("tikz/all_success_rate_query_plot_" + std::to_string(percentage) + "_percent.tikz");
   picture.write(picturePath);
   return picturePath;
 }
 
 fs::path SuccessRateQueryPlotter::createSuccessRateQueryPicture(
-    const std::string& plannerName) const {
+    const std::string& plannerName, const unsigned int percentage) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  auto axis = createSuccessRateQueryAxis(plannerName);
+  auto axis = createSuccessRateQueryAxis(plannerName, percentage);
   picture.addAxis(axis);
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                     fs::path("tikz/"s + plannerName + "_success_rate_query_plot.tikz"s);
+                     fs::path("tikz/"s + plannerName + "_success_rate_query_plot_" + std::to_string(percentage) + "_percent.tikz"s);
   picture.write(picturePath);
   return picturePath;
 }
@@ -152,6 +142,29 @@ void SuccessRateQueryPlotter::setSuccessRateQueryAxisOptions(std::shared_ptr<Pgf
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
+std::shared_ptr<PgfPlot> SuccessRateQueryPlotter::createSuccessRateQueryPercentPlot(
+    const std::string& plannerName, const unsigned int percentage) const {
+
+  const auto percentString = std::to_string(percentage);
+
+  // Get the table from the appropriate file.
+  auto table =
+      std::make_shared<PgfTable>(stats_.extractSuccessPerQuery(plannerName), "query number", "success rate at " + percentString + " percent");
+
+  // Remove all nans from the table.
+  //table->removeRowIfDomainIsNan();
+  //table->removeRowIfCodomainIsNan();
+
+  // Create the plot and set the options.
+  auto plot = std::make_shared<PgfPlot>(table);
+  plot->options.markSize = 0.0;
+  plot->options.lineWidth = config_->get<double>("successRatePlots/lineWidth");
+  plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
+  plot->options.namePath = plannerName + "SuccessRatePerQuery"s + percentString;
+
+  return plot;
+}
+/*
 std::shared_ptr<PgfPlot> SuccessRateQueryPlotter::createSuccessRateQuery25PercentPlot(
     const std::string& plannerName) const {
 
@@ -234,7 +247,7 @@ std::shared_ptr<PgfPlot> SuccessRateQueryPlotter::createSuccessRateQuery100Perce
   plot->options.namePath = plannerName + "SuccessRatePerQuery100"s;
 
   return plot;
-}
+}*/
 
 }  // namespace ompltools
 

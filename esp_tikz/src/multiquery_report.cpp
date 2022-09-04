@@ -216,7 +216,7 @@ std::stringstream MultiqueryReport::overview() const {
           << "\\% confidence interval. "
           << "}\\end{center}\n";
 
-  auto successRateQueryAxis = successRateQueryPlotter_.createSuccessRateQueryAxis();
+  auto successRateQueryAxis = successRateQueryPlotter_.createSuccessRateQueryAxis(100u);
 
   // Stack the axes
   latexPlotter_.stack(successRateQueryAxis, legend);
@@ -228,7 +228,7 @@ std::stringstream MultiqueryReport::overview() const {
           << " of all planners" << " at "
           << "the maximum solve time.} \\end{center}\n";
 
-  auto successRateHalfTimeQueryAxis = successRateQueryPlotter_.createSuccessRateQueryAxis(50);
+  auto successRateHalfTimeQueryAxis = successRateQueryPlotter_.createSuccessRateQueryAxis(50u);
 
   // Stack the axes
   latexPlotter_.stack(successRateHalfTimeQueryAxis, legend);
