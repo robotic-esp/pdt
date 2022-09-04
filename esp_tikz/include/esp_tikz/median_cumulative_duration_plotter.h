@@ -68,9 +68,9 @@ class MedianCumulativeDurationPlotter : public LatexPlotter {
 
  private:
   std::shared_ptr<PgfPlot> createMedianCumulativeDurationPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeDurationUpperCIPlot(
+  std::shared_ptr<PgfPlot> createMedianCumulativeDurationUpperCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeDurationLowerCIPlot(
+  std::shared_ptr<PgfPlot> createMedianCumulativeDurationLowerCiPlot(
       const std::string& plannerName) const;
   std::shared_ptr<PgfPlot> createMedianCumulativeDurationFillCiPlot(
       const std::string& plannerName) const;

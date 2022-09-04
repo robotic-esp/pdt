@@ -66,20 +66,20 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianInitialDurationPlots/plotConfidenceIntervalInAllPlots")) {
-      std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
-      bool successCI = true;
+      std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
+      bool successCi = true;
       try {
-        upperCI = createMedianInitialDurationUpperCIPlot(name);
-        lowerCI = createMedianInitialDurationLowerCIPlot(name);
-        fillCI = createMedianInitialDurationFillCiPlot(name);
+        upperCi = createMedianInitialDurationUpperCiPlot(name);
+        lowerCi = createMedianInitialDurationLowerCiPlot(name);
+        fillCi = createMedianInitialDurationFillCiPlot(name);
       } catch (const std::runtime_error& e) {
         // If the above methods throw, the corresponding plots should not be added.
-        successCI = false;
+        successCi = false;
       }
-      if (successCI) {
-        axis->addPlot(upperCI);
-        axis->addPlot(lowerCI);
-        axis->addPlot(fillCI);
+      if (successCi) {
+        axis->addPlot(upperCi);
+        axis->addPlot(lowerCi);
+        axis->addPlot(fillCi);
       }
     }
 
@@ -97,20 +97,20 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
   setMedianInitialDurationAxisOptions(axis);
 
   // Add all the the median cost evolution plots.
-  std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
-  bool successCI = true;
+  std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
+  bool successCi = true;
   try {
-    upperCI = createMedianInitialDurationUpperCIPlot(plannerName);
-    lowerCI = createMedianInitialDurationLowerCIPlot(plannerName);
-    fillCI = createMedianInitialDurationFillCiPlot(plannerName);
+    upperCi = createMedianInitialDurationUpperCiPlot(plannerName);
+    lowerCi = createMedianInitialDurationLowerCiPlot(plannerName);
+    fillCi = createMedianInitialDurationFillCiPlot(plannerName);
   } catch (const std::runtime_error& e) {
     // If the above methods throw, the corresponding plots should not be added.
-    successCI = false;
+    successCi = false;
   }
-  if (successCI) {
-    axis->addPlot(upperCI);
-    axis->addPlot(lowerCI);
-    axis->addPlot(fillCI);
+  if (successCi) {
+    axis->addPlot(upperCi);
+    axis->addPlot(lowerCi);
+    axis->addPlot(fillCi);
   }
   axis->addPlot(createMedianInitialDurationPlot(plannerName));
   axis->options.name = plannerName + "MedianInitialDurationAxis";
@@ -185,7 +185,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialD
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialDurationUpperCIPlot(
+std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialDurationUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -219,7 +219,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialD
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialDurationLowerCIPlot(
+std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialDurationLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(

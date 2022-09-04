@@ -65,20 +65,20 @@ std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCost
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianCumulativeCostPlots/plotConfidenceIntervalInAllPlots")) {
-      std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
-      bool successCI = true;
+      std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
+      bool successCi = true;
       try {
-        upperCI = createMedianCumulativeCostUpperCIPlot(name, initial);
-        lowerCI = createMedianCumulativeCostLowerCIPlot(name, initial);
-        fillCI = createMedianCumulativeCostFillCiPlot(name);
+        upperCi = createMedianCumulativeCostUpperCiPlot(name, initial);
+        lowerCi = createMedianCumulativeCostLowerCiPlot(name, initial);
+        fillCi = createMedianCumulativeCostFillCiPlot(name);
       } catch (const std::runtime_error& e) {
         // If the above methods throw, the corresponding plots should not be added.
-        successCI = false;
+        successCi = false;
       }
-      if (successCI) {
-        axis->addPlot(upperCI);
-        axis->addPlot(lowerCI);
-        axis->addPlot(fillCI);
+      if (successCi) {
+        axis->addPlot(upperCi);
+        axis->addPlot(lowerCi);
+        axis->addPlot(fillCi);
       }
     }
 
@@ -96,20 +96,20 @@ std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCost
   setMedianCumulativeCostAxisOptions(axis);
 
   // Add all the the median cost evolution plots.
-  std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
-  bool successCI = true;
+  std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
+  bool successCi = true;
   try {
-    upperCI = createMedianCumulativeCostUpperCIPlot(plannerName, initial);
-    lowerCI = createMedianCumulativeCostLowerCIPlot(plannerName, initial);
-    fillCI = createMedianCumulativeCostFillCiPlot(plannerName);
+    upperCi = createMedianCumulativeCostUpperCiPlot(plannerName, initial);
+    lowerCi = createMedianCumulativeCostLowerCiPlot(plannerName, initial);
+    fillCi = createMedianCumulativeCostFillCiPlot(plannerName);
   } catch (const std::runtime_error& e) {
     // If the above methods throw, the corresponding plots should not be added.
-    successCI = false;
+    successCi = false;
   }
-  if (successCI) {
-    axis->addPlot(upperCI);
-    axis->addPlot(lowerCI);
-    axis->addPlot(fillCI);
+  if (successCi) {
+    axis->addPlot(upperCi);
+    axis->addPlot(lowerCi);
+    axis->addPlot(fillCi);
   }
   axis->addPlot(createMedianCumulativeCostPlot(plannerName, initial));
   axis->options.name = plannerName + "MedianCumulativeCostAxis";
@@ -204,7 +204,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCostUpperCIPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCostUpperCiPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
   std::shared_ptr<PgfTable> table;
@@ -247,7 +247,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCostLowerCIPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCostLowerCiPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
   std::shared_ptr<PgfTable> table;

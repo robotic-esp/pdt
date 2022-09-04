@@ -65,20 +65,20 @@ std::shared_ptr<PgfAxis> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianFinalCostPerQueryPlots/plotConfidenceIntervalInAllPlots")) {
-      std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
-      bool successCI = true;
+      std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
+      bool successCi = true;
       try {
-        upperCI = createMedianFinalCostUpperCIPlot(name);
-        lowerCI = createMedianFinalCostLowerCIPlot(name);
-        fillCI = createMedianFinalCostFillCiPlot(name);
+        upperCi = createMedianFinalCostUpperCiPlot(name);
+        lowerCi = createMedianFinalCostLowerCiPlot(name);
+        fillCi = createMedianFinalCostFillCiPlot(name);
       } catch (const std::runtime_error& e) {
         // If the above methods throw, the corresponding plots should not be added.
-        successCI = false;
+        successCi = false;
       }
-      if (successCI) {
-        axis->addPlot(upperCI);
-        axis->addPlot(lowerCI);
-        axis->addPlot(fillCI);
+      if (successCi) {
+        axis->addPlot(upperCi);
+        axis->addPlot(lowerCi);
+        axis->addPlot(fillCi);
       }
     }
 
@@ -96,20 +96,20 @@ std::shared_ptr<PgfAxis> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   setMedianFinalCostAxisOptions(axis);
 
   // Add all the the median cost evolution plots.
-  std::shared_ptr<PgfPlot> upperCI, lowerCI, fillCI;
-  bool successCI = true;
+  std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
+  bool successCi = true;
   try {
-    upperCI = createMedianFinalCostUpperCIPlot(plannerName);
-    lowerCI = createMedianFinalCostLowerCIPlot(plannerName);
-    fillCI = createMedianFinalCostFillCiPlot(plannerName);
+    upperCi = createMedianFinalCostUpperCiPlot(plannerName);
+    lowerCi = createMedianFinalCostLowerCiPlot(plannerName);
+    fillCi = createMedianFinalCostFillCiPlot(plannerName);
   } catch (const std::runtime_error& e) {
     // If the above methods throw, the corresponding plots should not be added.
-    successCI = false;
+    successCi = false;
   }
-  if (successCI) {
-    axis->addPlot(upperCI);
-    axis->addPlot(lowerCI);
-    axis->addPlot(fillCI);
+  if (successCi) {
+    axis->addPlot(upperCi);
+    axis->addPlot(lowerCi);
+    axis->addPlot(fillCi);
   }
   axis->addPlot(createMedianFinalCostPlot(plannerName));
   axis->options.name = plannerName + "MedianFinalCostAxis";
@@ -184,7 +184,7 @@ std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostUpperCIPlot(
+std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -218,7 +218,7 @@ std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostLowerCIPlot(
+std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(

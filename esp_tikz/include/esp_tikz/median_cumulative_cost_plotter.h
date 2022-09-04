@@ -68,9 +68,9 @@ class MedianCumulativeCostPlotter : public LatexPlotter {
 
  private:
   std::shared_ptr<PgfPlot> createMedianCumulativeCostPlot(const std::string& plannerName, const bool initial) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeCostUpperCIPlot(
+  std::shared_ptr<PgfPlot> createMedianCumulativeCostUpperCiPlot(
       const std::string& plannerName, const bool initial) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeCostLowerCIPlot(
+  std::shared_ptr<PgfPlot> createMedianCumulativeCostLowerCiPlot(
       const std::string& plannerName, const bool initial) const;
   std::shared_ptr<PgfPlot> createMedianCumulativeCostFillCiPlot(
       const std::string& plannerName) const;

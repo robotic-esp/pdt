@@ -68,9 +68,9 @@ class MedianInitialSolutionQueryPlotter : public LatexPlotter {
 
  private:
   std::shared_ptr<PgfPlot> createMedianInitialDurationPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialDurationUpperCIPlot(
+  std::shared_ptr<PgfPlot> createMedianInitialDurationUpperCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialDurationLowerCIPlot(
+  std::shared_ptr<PgfPlot> createMedianInitialDurationLowerCiPlot(
       const std::string& plannerName) const;
   std::shared_ptr<PgfPlot> createMedianInitialDurationFillCiPlot(
       const std::string& plannerName) const;
