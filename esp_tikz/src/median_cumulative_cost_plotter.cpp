@@ -225,7 +225,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    throw std::runtime_error("Cannot create UpperCI plot of '"s + plannerName + "'.");
+    return std::make_shared<PgfPlot>();
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
@@ -268,7 +268,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    throw std::runtime_error("Cannot create LowerCI plot of '"s + plannerName + "'.");
+    return std::make_shared<PgfPlot>();
   }
 
   // Create the plot and set the options.
