@@ -113,18 +113,20 @@ std::string MqKpiTable::string() const {
 
   std::stringstream stream;
   stream << std::fixed;
+  stream << "\\begin{table}[!h]\n";
+  stream << "\\caption{Summary of cumulative solution durations and costs, and average planner success.}";
   stream << "{\\tiny\n";
   stream << "\\setlength{\\tabcolsep}{0.8em}\n";
   stream << "\\begin{tabularx}{\\textwidth}[c]{Xcccccccccc}\\toprule\n";
-  stream << "Planner " << options.colSep << " \\(t_\\mathrm{c, init}^\\mathrm{min}\\) "
-         << options.colSep << " \\(t_\\mathrm{c, init}^\\mathrm{med}\\) " << options.colSep
-         << " \\(t_\\mathrm{c, init}^\\mathrm{max}\\) " << options.colSep
-         << " \\(c_\\mathrm{c, init}^\\mathrm{min}\\) " << options.colSep
-         << " \\(c_\\mathrm{c, init}^\\mathrm{med}\\) " << options.colSep
-         << " \\(c_\\mathrm{c, init}^\\mathrm{max}\\) " << options.colSep
-         << " \\(c_\\mathrm{c, final}^\\mathrm{min}\\) " << options.colSep
-         << " \\(c_\\mathrm{c, final}^\\mathrm{med}\\) " << options.colSep
-         << " \\(c_\\mathrm{c, final}^\\mathrm{max}\\) " << options.colSep
+  stream << "Planner " << options.colSep << " \\(t_{\\Sigma\\mathrm{init}}^\\mathrm{min}\\) "
+         << options.colSep << " \\(t_{\\Sigma\\mathrm{init}}^\\mathrm{med}\\) " << options.colSep
+         << " \\(t_{\\Sigma\\mathrm{init}}^\\mathrm{max}\\) " << options.colSep
+         << " \\(c_{\\Sigma\\mathrm{init}}^\\mathrm{min}\\) " << options.colSep
+         << " \\(c_{\\Sigma\\mathrm{init}}^\\mathrm{med}\\) " << options.colSep
+         << " \\(c_{\\Sigma\\mathrm{init}}^\\mathrm{max}\\) " << options.colSep
+         << " \\(c_{\\Sigma\\mathrm{final}}^\\mathrm{min}\\) " << options.colSep
+         << " \\(c_{\\Sigma\\mathrm{final}}^\\mathrm{med}\\) " << options.colSep
+         << " \\(c_{\\Sigma\\mathrm{final}}^\\mathrm{max}\\) " << options.colSep
          << "Avg.\\newline Succ." << options.rowSep << "\\midrule\n";
   for (std::size_t row = 0u; row < data_.at(0u).size(); ++row) {
     stream << plannerNames_.at(row) << options.colSep << ' ';
@@ -151,6 +153,7 @@ std::string MqKpiTable::string() const {
     }
   }
   stream << "\\bottomrule\n\\end{tabularx}\n}";
+  stream << "\\end{table}";
 
   return stream.str();
 }
