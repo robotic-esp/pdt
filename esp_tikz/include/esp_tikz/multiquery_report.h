@@ -51,7 +51,6 @@
 #include "esp_tikz/median_initial_solution_cost_query_plotter.h"
 #include "esp_tikz/median_final_solution_cost_query_plotter.h"
 #include "esp_tikz/success_rate_per_query_plotter.h"
-#include "esp_tikz/query_cost_scatter_plotter.h"
 #include "esp_tikz/latex_plotter.h"
 #include "esp_tikz/tikz_picture.h"
 
@@ -76,7 +75,6 @@ class MultiqueryReport : public BaseReport{
   MedianInitialSolutionQueryPlotter medianInitialDurationQueryPlotter_;
   MedianInitialSolutionCostQueryPlotter medianInitialCostQueryPlotter_;
   MedianFinalSolutionCostQueryPlotter medianFinalCostQueryPlotter_;
-  QueryCostScatterPlotter queryCostScatterPlotter_;
   SuccessRateQueryPlotter successRateQueryPlotter_;
 
   const MultiqueryStatistics& stats_;

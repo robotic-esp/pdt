@@ -24,7 +24,6 @@ add_library(esp_tikz
   src/pgf_fillbetween.cpp
   src/pgf_plot.cpp
   src/pgf_table.cpp
-  src/query_cost_scatter_plotter.cpp
   src/success_plotter.cpp
   src/success_rate_per_query_plotter.cpp
   src/tabularx.cpp

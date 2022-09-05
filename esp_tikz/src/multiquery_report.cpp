@@ -69,7 +69,6 @@ MultiqueryReport::MultiqueryReport(const std::shared_ptr<Configuration>& config,
     medianInitialDurationQueryPlotter_(config, stats),
     medianInitialCostQueryPlotter_(config, stats),
     medianFinalCostQueryPlotter_(config, stats),
-    queryCostScatterPlotter_(config, stats),
     successRateQueryPlotter_(config, stats),
     stats_(stats) {
 }
