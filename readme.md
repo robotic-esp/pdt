@@ -192,11 +192,23 @@ Turn on the verbose compilation in the benchmark configuration `.json` file. If 
 
 ## Formatting code
 
-Before submitting code to OMPL Tools, please format your code using:
+Before submitting code to OMPL Tools, please format your code with `clang-format`. You can format a specific file with
 
 ```bash
 clang-format -i ./path/to/file
 ```
+
+or you can use
+
+```bash
+git clang-format -f
+```
+
+to format all lines in all files that changed between the current working directory and the last commit. You can likely also configure your editor to run `clang-format` for you, e.g., whenever you save a C++ file.
+
+## Static analysis tools
+
+Please consider using static analysis tools, such as `clang-tidy`, when working in OMPL Tools. We currently use `clang-tidy`s default configuration.
 
 ## Backlog
 
