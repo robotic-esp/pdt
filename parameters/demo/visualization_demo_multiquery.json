@@ -4,7 +4,7 @@
         "planner": "defaultRRTConnect",
         "context": "MultiqueryWallGap2D",
         "useOnlyThisConfig": false,
-	"time": 0.0
+        "time": 0.0
     },
     "context": {
         "MultiqueryRandomRectangles2D": {
@@ -29,26 +29,26 @@
             "maxSideLength": 0.2,
             "minSideLength": 0.1
         },
-	"MultiqueryWallGap2D": {
+        "MultiqueryWallGap2D": {
             "type": "WallGap",
             "objective": "defaultPathLength",
             "starts": {
                 "type": "generated",
                 "numGenerated": 50,
                 "generativeModel": "subregion",
-	    	"generator": {
-		    "lowerBounds": [ 0.3, -0.5],
-		    "upperBounds": [ 0.5,  0]
-	    	}
+                "generator": {
+                    "lowerBounds": [ 0.3, -0.5],
+                    "upperBounds": [ 0.5,  0]
+                }
             },
             "goals": {
                 "type": "generated",
                 "numGenerated": 50,
                 "generativeModel": "subregion",
-	    	"generator": {
-		    "lowerBounds": [-0.5, -0.5],
-		    "upperBounds": [ -0.3,  0]
-	    	}
+                "generator": {
+                    "lowerBounds": [-0.5, -0.5],
+                    "upperBounds": [ -0.3,  0]
+                }
             },
             "goalType": "GoalState",
             "maxTime": 0.1,
