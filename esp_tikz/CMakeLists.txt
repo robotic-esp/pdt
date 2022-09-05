@@ -16,7 +16,7 @@ add_library(esp_tikz
   src/median_initial_solution_plotter.cpp
   src/median_initial_solution_query_plotter.cpp
   src/median_initial_solution_cost_query_plotter.cpp
-  src/median_final_solution_cost_query_plotter.cpp
+  src/median_final_cost_query_plotter.cpp
   src/multiquery_report.cpp
   src/overview_plotter.cpp
   src/latex_plotter.cpp

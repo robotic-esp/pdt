@@ -32,50 +32,50 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Valentin Hartmann
+// Authors: Marlin Strub
 
 #pragma once
 
 #include <experimental/filesystem>
 #include <memory>
-#include <set>
-#include <sstream>
 #include <string>
 
 #include "esp_configuration/configuration.h"
 #include "esp_statistics/multiquery_statistics.h"
-#include "esp_tikz/base_report.h"
-#include "esp_tikz/median_cumulative_cost_plotter.h"
-#include "esp_tikz/median_cumulative_duration_plotter.h"
-#include "esp_tikz/median_initial_solution_query_plotter.h"
-#include "esp_tikz/median_initial_solution_cost_query_plotter.h"
-#include "esp_tikz/median_final_cost_query_plotter.h"
-#include "esp_tikz/success_rate_per_query_plotter.h"
 #include "esp_tikz/latex_plotter.h"
-#include "esp_tikz/tikz_picture.h"
+#include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class MultiqueryReport : public BaseReport{
+class MedianFinalCostQueryPlotter : public LatexPlotter {
  public:
-  MultiqueryReport(const std::shared_ptr<Configuration>& config, const MultiqueryStatistics& stats);
-  ~MultiqueryReport() = default;
+  MedianFinalCostQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~MedianFinalCostQueryPlotter() = default;
 
-  std::experimental::filesystem::path generateReport() override;
+  // Creates a pgf axis that holds the median cost at binned durations for all planners.
+  std::shared_ptr<PgfAxis> createMedianFinalCostAxis() const;
+
+  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
+  std::shared_ptr<PgfAxis> createMedianFinalCostAxis(const std::string& plannerName) const;
+
+  // Creates a tikz picture that contains the median cost axis of all planners.
+  std::experimental::filesystem::path createMedianFinalCostPicture() const;
+
+  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  std::experimental::filesystem::path createMedianFinalCostPicture(const std::string& plannerName) const;
 
  private:
-  std::stringstream overview() const;
-  std::stringstream individualResults() const;
+  std::shared_ptr<PgfPlot> createMedianFinalCostPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianFinalCostUpperCiPlot(
+      const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianFinalCostLowerCiPlot(
+      const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianFinalCostFillCiPlot(
+      const std::string& plannerName) const;
 
-  // Plotters.
-  MedianCumulativeCostPlotter medianCumulativeCostPlotter_;
-  MedianCumulativeDurationPlotter medianCumulativeDurationPlotter_;
-  MedianInitialSolutionQueryPlotter medianInitialDurationQueryPlotter_;
-  MedianInitialSolutionCostQueryPlotter medianInitialCostQueryPlotter_;
-  MedianFinalCostQueryPlotter medianFinalCostQueryPlotter_;
-  SuccessRateQueryPlotter successRateQueryPlotter_;
+  void setMedianFinalCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
   const MultiqueryStatistics& stats_;
 };

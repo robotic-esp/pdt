@@ -158,23 +158,7 @@ class MultiqueryStatistics {
   mutable double maxNonInfCumulativeCost_{0.0};
 
   std::size_t numQueries_{0u};
-
-  template<class T>
-  std::ofstream& writeVectorToFile(std::ofstream &filestream, 
-      const std::string &name, const std::vector<T> &values) const;
 };
-
-template<class T>
-std::ofstream& MultiqueryStatistics::writeVectorToFile(std::ofstream &filestream, 
-    const std::string &name, const std::vector<T> &values) const{
-  filestream << name;
-  filestream << std::setprecision(21u);
-  for (const auto &val: values) {
-    filestream << "," << val;
-  }
-
-  return filestream; // this enables using this in a series of chained operations
-}
 
 }  // namespace ompltools
 

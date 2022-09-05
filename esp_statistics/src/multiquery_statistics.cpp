@@ -52,6 +52,7 @@
 #pragma GCC diagnostic pop
 
 #include "esp_statistics/linear_interpolator.h"
+#include "esp_utilities/write_vector_to_file.h"
 
 namespace esp {
 
@@ -375,13 +376,13 @@ fs::path MultiqueryStatistics::extractMedianInitialSolutionPerQuery(
   }
 
   // this would be nicer by implementing a operator<< for vector<double>
-  writeVectorToFile(filestream, "\nmedian initial solution duration", medianDurations);
-  writeVectorToFile(filestream, "\nlower initial solution duration confidence bound", lowerDurationBounds);
-  writeVectorToFile(filestream, "\nupper initial solution duration confidence bound", upperDurationBounds);
+  utilities::writeVectorToFile(filestream, "\nmedian initial solution duration", medianDurations);
+  utilities::writeVectorToFile(filestream, "\nlower initial solution duration confidence bound", lowerDurationBounds);
+  utilities::writeVectorToFile(filestream, "\nupper initial solution duration confidence bound", upperDurationBounds);
 
-  writeVectorToFile(filestream, "\nmedian initial solution cost", medianCosts);
-  writeVectorToFile(filestream, "\nlower initial solution cost confidence bound", lowerCostBounds);
-  writeVectorToFile(filestream, "\nupper initial solution cost confidence bound", upperCostBounds);
+  utilities::writeVectorToFile(filestream, "\nmedian initial solution cost", medianCosts);
+  utilities::writeVectorToFile(filestream, "\nlower initial solution cost confidence bound", lowerCostBounds);
+  utilities::writeVectorToFile(filestream, "\nupper initial solution cost confidence bound", upperCostBounds);
   
   filestream << '\n';
 
@@ -513,13 +514,13 @@ fs::path MultiqueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
   }
 
   // this would be nicer by implementing a operator<< for vector<double>
-  writeVectorToFile(filestream, "\ncumulative median initial solution duration", medianCumulativeDuration);
-  writeVectorToFile(filestream, "\nlower cumulative initial solution duration confidence bound", lciCumulativeDuration);
-  writeVectorToFile(filestream, "\nupper cumulative initial solution duration confidence bound", uciCumulativeDuration);
+  utilities::writeVectorToFile(filestream, "\ncumulative median initial solution duration", medianCumulativeDuration);
+  utilities::writeVectorToFile(filestream, "\nlower cumulative initial solution duration confidence bound", lciCumulativeDuration);
+  utilities::writeVectorToFile(filestream, "\nupper cumulative initial solution duration confidence bound", uciCumulativeDuration);
 
-  writeVectorToFile(filestream, "\ncumulative median initial solution cost", medianCumulativeCost);
-  writeVectorToFile(filestream, "\nlower cumulative initial solution cost confidence bound", lciCumulativeCost);
-  writeVectorToFile(filestream, "\nupper cumulative initial solution cost confidence bound", uciCumulativeCost);
+  utilities::writeVectorToFile(filestream, "\ncumulative median initial solution cost", medianCumulativeCost);
+  utilities::writeVectorToFile(filestream, "\nlower cumulative initial solution cost confidence bound", lciCumulativeCost);
+  utilities::writeVectorToFile(filestream, "\nupper cumulative initial solution cost confidence bound", uciCumulativeCost);
 
   return filepath;
 }
@@ -580,9 +581,9 @@ fs::path MultiqueryStatistics::extractMedianFinalSolutionPerQuery(
   }
 
   // this would be nicer by implementing a operator<< for vector<double>
-  writeVectorToFile(filestream, "\nmedian last solution cost", medianCosts);
-  writeVectorToFile(filestream, "\nlower last solution cost confidence bound", lowerCostBounds);
-  writeVectorToFile(filestream, "\nupper last solution cost confidence bound", upperCostBounds);
+  utilities::writeVectorToFile(filestream, "\nmedian last solution cost", medianCosts);
+  utilities::writeVectorToFile(filestream, "\nlower last solution cost confidence bound", lowerCostBounds);
+  utilities::writeVectorToFile(filestream, "\nupper last solution cost confidence bound", upperCostBounds);
   
   filestream << '\n';
 
@@ -668,9 +669,9 @@ fs::path MultiqueryStatistics::extractMedianCumulativeFinalCostPerQuery(
   }
 
   // this would be nicer by implementing a operator<< for vector<double>
-  writeVectorToFile(filestream, "\ncumulative median final solution cost", medianCumulativeCost);
-  writeVectorToFile(filestream, "\nlower cumulative final solution cost confidence bound", lciCumulativeCost);
-  writeVectorToFile(filestream, "\nupper cumulative final solution cost confidence bound", uciCumulativeCost);
+  utilities::writeVectorToFile(filestream, "\ncumulative median final solution cost", medianCumulativeCost);
+  utilities::writeVectorToFile(filestream, "\nlower cumulative final solution cost confidence bound", lciCumulativeCost);
+  utilities::writeVectorToFile(filestream, "\nupper cumulative final solution cost confidence bound", uciCumulativeCost);
 
   return filepath;
 }
@@ -714,9 +715,9 @@ fs::path MultiqueryStatistics::extractFinalSolutionPerQuery(
       plannerName);
 
   // this would be nicer by implementing a operator<< for vector<double>
-  writeVectorToFile(filestream, "Query number", queryNumber);
-  writeVectorToFile(filestream, "\nFinal solution duration", queryDurations);
-  writeVectorToFile(filestream, "\nFinal solution cost", queryCosts);
+  utilities::writeVectorToFile(filestream, "Query number", queryNumber);
+  utilities::writeVectorToFile(filestream, "\nFinal solution duration", queryDurations);
+  utilities::writeVectorToFile(filestream, "\nFinal solution cost", queryCosts);
 
   return filepath;
 }
@@ -777,7 +778,7 @@ std::experimental::filesystem::path MultiqueryStatistics::extractSuccessPerQuery
   // this would be nicer by implementing a operator<< for vector<double>
   auto cnt = 0u;
   for (const auto f: timeFractions){
-    writeVectorToFile(filestream, "\nsuccess rate at " + std::to_string(static_cast<int>(100.0*f)) + " percent", successRate[cnt]);
+    utilities::writeVectorToFile(filestream, "\nsuccess rate at " + std::to_string(static_cast<int>(100.0*f)) + " percent", successRate[cnt]);
     ++cnt;
   }
 

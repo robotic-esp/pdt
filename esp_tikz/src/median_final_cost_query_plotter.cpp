@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/median_final_solution_cost_query_plotter.h"
+#include "esp_tikz/median_final_cost_query_plotter.h"
 
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"
@@ -49,7 +49,7 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianFinalSolutionCostQueryPlotter::MedianFinalSolutionCostQueryPlotter(
+MedianFinalCostQueryPlotter::MedianFinalCostQueryPlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
@@ -57,7 +57,7 @@ MedianFinalSolutionCostQueryPlotter::MedianFinalSolutionCostQueryPlotter(
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
-std::shared_ptr<PgfAxis> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostAxis() const {
+std::shared_ptr<PgfAxis> MedianFinalCostQueryPlotter::createMedianFinalCostAxis() const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianFinalCostAxisOptions(axis);
 
@@ -90,7 +90,7 @@ std::shared_ptr<PgfAxis> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostAxis(
+std::shared_ptr<PgfAxis> MedianFinalCostQueryPlotter::createMedianFinalCostAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianFinalCostAxisOptions(axis);
@@ -117,7 +117,7 @@ std::shared_ptr<PgfAxis> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   return axis;
 }
 
-fs::path MedianFinalSolutionCostQueryPlotter::createMedianFinalCostPicture() const {
+fs::path MedianFinalCostQueryPlotter::createMedianFinalCostPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   auto axis = createMedianFinalCostAxis();
@@ -130,7 +130,7 @@ fs::path MedianFinalSolutionCostQueryPlotter::createMedianFinalCostPicture() con
   return picturePath;
 }
 
-fs::path MedianFinalSolutionCostQueryPlotter::createMedianFinalCostPicture(
+fs::path MedianFinalCostQueryPlotter::createMedianFinalCostPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -144,7 +144,7 @@ fs::path MedianFinalSolutionCostQueryPlotter::createMedianFinalCostPicture(
   return picturePath;
 }
 
-void MedianFinalSolutionCostQueryPlotter::setMedianFinalCostAxisOptions(
+void MedianFinalCostQueryPlotter::setMedianFinalCostAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianFinalCostPerQueryPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianFinalCostPerQueryPlots/axisHeight");
@@ -157,12 +157,12 @@ void MedianFinalSolutionCostQueryPlotter::setMedianFinalCostAxisOptions(
   axis->options.yminorgrids = config_->get<bool>("medianFinalCostPerQueryPlots/yminorgrids");
   axis->options.ymajorgrids = config_->get<bool>("medianFinalCostPerQueryPlots/ymajorgrids");
   axis->options.xlabel = "Query Number"s;
-  axis->options.ylabel = "Final Solution Cost [s]"s;
+  axis->options.ylabel = "Final Cost [s]"s;
   axis->options.ylabelAbsolute = true;
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostPlot(
+std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -184,7 +184,7 @@ std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostUpperCiPlot(
+std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -218,7 +218,7 @@ std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostLowerCiPlot(
+std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -249,7 +249,7 @@ std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalC
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianFinalSolutionCostQueryPlotter::createMedianFinalCostFillCiPlot(
+std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =

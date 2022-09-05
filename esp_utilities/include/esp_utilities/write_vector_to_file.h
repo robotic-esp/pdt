@@ -32,53 +32,35 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Valentin Hartmann
 
 #pragma once
 
-#include <experimental/filesystem>
-#include <memory>
+#include <iomanip>
+#include <iostream>
 #include <string>
-
-#include "esp_configuration/configuration.h"
-#include "esp_statistics/multiquery_statistics.h"
-#include "esp_tikz/latex_plotter.h"
-#include "esp_tikz/pgf_axis.h"
+#include <vector>
+#include <fstream>
 
 namespace esp {
 
 namespace ompltools {
 
-class MedianFinalSolutionCostQueryPlotter : public LatexPlotter {
- public:
-  MedianFinalSolutionCostQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
-  ~MedianFinalSolutionCostQueryPlotter() = default;
+namespace utilities {
 
-  // Creates a pgf axis that holds the median cost at binned durations for all planners.
-  std::shared_ptr<PgfAxis> createMedianFinalCostAxis() const;
+template<class T>
+std::ofstream& writeVectorToFile(std::ofstream &filestream, 
+    const std::string &name, const std::vector<T> &values){
+  filestream << name;
+  filestream << std::setprecision(21u);
+  for (const auto &val: values) {
+    filestream << "," << val;
+  }
 
-  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianFinalCostAxis(const std::string& plannerName) const;
+  return filestream; // this enables using this in a series of chained operations
+}
 
-  // Creates a tikz picture that contains the median cost axis of all planners.
-  std::experimental::filesystem::path createMedianFinalCostPicture() const;
-
-  // Creates a tikz picture that contains the median cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianFinalCostPicture(const std::string& plannerName) const;
-
- private:
-  std::shared_ptr<PgfPlot> createMedianFinalCostPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianFinalCostUpperCiPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianFinalCostLowerCiPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianFinalCostFillCiPlot(
-      const std::string& plannerName) const;
-
-  void setMedianFinalCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
-
-  const MultiqueryStatistics& stats_;
-};
+}  // namespace utilities
 
 }  // namespace ompltools
 
