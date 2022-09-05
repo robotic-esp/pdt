@@ -71,15 +71,6 @@ class SuccessRateQueryPlotter : public LatexPlotter {
   std::shared_ptr<PgfPlot> createSuccessRateQueryPercentPlot(
       const std::string& plannerName, const unsigned int percentage) const;
 
-  /*std::shared_ptr<PgfPlot> createSuccessRateQuery25PercentPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createSuccessRateQuery50PercentPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createSuccessRateQuery75PercentPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createSuccessRateQuery100PercentPlot(
-      const std::string& plannerName) const;*/
-
   void setSuccessRateQueryAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
   const MultiqueryStatistics& stats_;
