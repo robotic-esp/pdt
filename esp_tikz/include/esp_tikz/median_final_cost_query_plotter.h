@@ -54,16 +54,16 @@ class MedianFinalCostQueryPlotter : public LatexPlotter {
   MedianFinalCostQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
   ~MedianFinalCostQueryPlotter() = default;
 
-  // Creates a pgf axis that holds the median cost at binned durations for all planners.
+  // Creates a pgf axis that holds the median final cost at each query for all planners.
   std::shared_ptr<PgfAxis> createMedianFinalCostAxis() const;
 
-  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
+  // Creates a pgf axis that holds the median final cost at each query for the specified planner.
   std::shared_ptr<PgfAxis> createMedianFinalCostAxis(const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the median cost axis of all planners.
+  // Creates a tikz picture that contains the median final cost axis of all planners.
   std::experimental::filesystem::path createMedianFinalCostPicture() const;
 
-  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  // Creates a tikz picture that contains the median final cost axis of the specified planner.
   std::experimental::filesystem::path createMedianFinalCostPicture(const std::string& plannerName) const;
 
  private:

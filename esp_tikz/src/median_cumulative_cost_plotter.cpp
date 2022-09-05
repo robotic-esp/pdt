@@ -61,7 +61,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCost
   auto axis = std::make_shared<PgfAxis>();
   setMedianCumulativeCostAxisOptions(axis);
 
-  // Fill the axis with the median cost plots of all planners.
+  // Fill the axis with the median cumulative cost plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianCumulativeCostPlots/plotConfidenceIntervalInAllPlots")) {
@@ -82,7 +82,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCost
       }
     }
 
-    // Then the median cost evolution.
+    // Then the median cumulative cost.
     axis->addPlot(createMedianCumulativeCostPlot(name, initial));
   }
   axis->options.name = "AllPlannersMedianCumulativeCostAxis";
@@ -95,7 +95,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCost
   auto axis = std::make_shared<PgfAxis>();
   setMedianCumulativeCostAxisOptions(axis);
 
-  // Add all the the median cost evolution plots.
+  // Add all the the median cumulative cost plots.
   std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
   bool successCi = true;
   try {

@@ -53,7 +53,6 @@ MedianCumulativeDurationPlotter::MedianCumulativeDurationPlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
-  // Compute the duration bin size.
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
@@ -62,7 +61,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulative
   auto axis = std::make_shared<PgfAxis>();
   setMedianCumulativeDurationAxisOptions(axis);
 
-  // Fill the axis with the median cost plots of all planners.
+  // Fill the axis with the median cuulative duration plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>(
@@ -84,7 +83,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulative
       }
     }
 
-    // Then the median cost evolution.
+    // Then the median cumulative duration.
     axis->addPlot(createMedianCumulativeDurationPlot(name));
   }
   axis->options.name = "AllPlannersMedianCumulativeDurationAxis";
@@ -97,7 +96,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulative
   auto axis = std::make_shared<PgfAxis>();
   setMedianCumulativeDurationAxisOptions(axis);
 
-  // Add all the the median cost evolution plots.
+  // Add all the the median cumulative duration plots.
   std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
   bool successCi = true;
   try {
@@ -153,7 +152,6 @@ void MedianCumulativeDurationPlotter::setMedianCumulativeDurationAxisOptions(
       config_->get<std::string>("medianCumulativeInitialDurationPlots/axisHeight");
   // axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCumulativeDuration();
-  // axis->options.xlog = config_->get<bool>("medianCumulativeInitialDurationPlots/xlog");
   axis->options.ylog = true;
   axis->options.xminorgrids =
       config_->get<bool>("medianCumulativeInitialDurationPlots/xminorgrids");

@@ -53,8 +53,6 @@ MedianInitialSolutionCostQueryPlotter::MedianInitialSolutionCostQueryPlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
-  // Compute the duration bin size.
-  auto contextName = config_->get<std::string>("experiment/context");
 }
 
 std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostAxis()
@@ -62,7 +60,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInit
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialCostAxisOptions(axis);
 
-  // Fill the axis with the median cost plots of all planners.
+  // Fill the axis with the median initial cost plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianInitialCostPerQueryPlots/plotConfidenceIntervalInAllPlots")) {
@@ -83,7 +81,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInit
       }
     }
 
-    // Then the median cost evolution.
+    // Then the median initial cost.
     axis->addPlot(createMedianInitialCostPlot(name));
   }
   axis->options.name = "AllPlannersMedianInitialCostAxis";
@@ -96,7 +94,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInit
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialCostAxisOptions(axis);
 
-  // Add all the the median cost evolution plots.
+  // Add all the the median initial cost plots.
   std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
   bool successCi = true;
   try {
@@ -151,7 +149,6 @@ void MedianInitialSolutionCostQueryPlotter::setMedianInitialCostAxisOptions(
   axis->options.height = config_->get<std::string>("medianInitialCostPerQueryPlots/axisHeight");
   // axis->options.xmax = maxCostToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
-  // axis->options.xlog = config_->get<bool>("medianInitialCostPerQueryPlots/xlog");
   axis->options.ylog = true;
   axis->options.xminorgrids = config_->get<bool>("medianInitialCostPerQueryPlots/xminorgrids");
   axis->options.xmajorgrids = config_->get<bool>("medianInitialCostPerQueryPlots/xmajorgrids");

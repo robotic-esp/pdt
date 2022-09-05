@@ -54,17 +54,17 @@ class SuccessRateQueryPlotter : public LatexPlotter {
   SuccessRateQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
   ~SuccessRateQueryPlotter() = default;
 
-  // Creates a pgf axis that holds the median cost at binned durations for all planners.
+  // Creates a pgf axis that holds the success rate at a given percentage of the total time for all planners.
   std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(const unsigned int percentage) const;
 
-  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
+  // Creates a pgf axis that holds the success rate at a given percentage of the total time for the specified planner.
   std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(
       const std::string& plannerName, const unsigned int percentage) const;
 
-  // Creates a tikz picture that contains the median cost axis of all planners.
+  // Creates a tikz picture that contains the success rate axis of all planners.
   std::experimental::filesystem::path createSuccessRateQueryPicture(const unsigned int percentage) const;
 
-  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  // Creates a tikz picture that contains the success rate axis of the specified planner.
   std::experimental::filesystem::path createSuccessRateQueryPicture(const std::string& plannerName, const unsigned int percentage) const;
 
  private:

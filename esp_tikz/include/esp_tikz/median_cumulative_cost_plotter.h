@@ -54,16 +54,18 @@ class MedianCumulativeCostPlotter : public LatexPlotter {
   MedianCumulativeCostPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
   ~MedianCumulativeCostPlotter() = default;
 
-  // Creates a pgf axis that holds the median cost at binned durations for all planners.
+  // Creates a pgf axis that holds the median cumulative cost at either the first 
+  // or the last solution (indicated by initial) at each query for all planners.
   std::shared_ptr<PgfAxis> createMedianCumulativeCostAxis(const bool initial) const;
 
-  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
+  // Creates a pgf axis that holds the median cumulative cost at either the first
+  // or the last solution (indicated by the parameter initial) for the specified planner.
   std::shared_ptr<PgfAxis> createMedianCumulativeCostAxis(const std::string& plannerName, const bool initial) const;
 
-  // Creates a tikz picture that contains the median cost axis of all planners.
+  // Creates a tikz picture that contains the median cumulative cost axis of all planners.
   std::experimental::filesystem::path createMedianCumulativeCostPicture(const bool initial) const;
 
-  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  // Creates a tikz picture that contains the median cumulative cost axis of the specified planner.
   std::experimental::filesystem::path createMedianCumulativeCostPicture(const std::string& plannerName, const bool initial) const;
 
  private:

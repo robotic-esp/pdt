@@ -53,7 +53,6 @@ SuccessRateQueryPlotter::SuccessRateQueryPlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
-  // Compute the duration bin size.
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
@@ -66,7 +65,7 @@ std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
   auto axis = std::make_shared<PgfAxis>();
   setSuccessRateQueryAxisOptions(axis);
 
-  // Fill the axis with the median cost plots of all planners.
+  // Fill the axis with the success rate plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     std::shared_ptr<PgfPlot> plt;
 
@@ -150,10 +149,6 @@ std::shared_ptr<PgfPlot> SuccessRateQueryPlotter::createSuccessRateQueryPercentP
   // Get the table from the appropriate file.
   auto table =
       std::make_shared<PgfTable>(stats_.extractSuccessPerQuery(plannerName), "query number", "success rate at " + percentString + " percent");
-
-  // Remove all nans from the table.
-  //table->removeRowIfDomainIsNan();
-  //table->removeRowIfCodomainIsNan();
 
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);

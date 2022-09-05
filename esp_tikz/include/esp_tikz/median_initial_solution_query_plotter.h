@@ -54,16 +54,16 @@ class MedianInitialSolutionQueryPlotter : public LatexPlotter {
   MedianInitialSolutionQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
   ~MedianInitialSolutionQueryPlotter() = default;
 
-  // Creates a pgf axis that holds the median cost at binned durations for all planners.
+  // Creates a pgf axis that holds the median initial solution duration per query for all planners.
   std::shared_ptr<PgfAxis> createMedianInitialDurationAxis() const;
 
-  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
+  // Creates a pgf axis that holds the median initial solution durations for the specified planner.
   std::shared_ptr<PgfAxis> createMedianInitialDurationAxis(const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the median cost axis of all planners.
+  // Creates a tikz picture that contains the median initial solution duration axis of all planners.
   std::experimental::filesystem::path createMedianInitialDurationPicture() const;
 
-  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  // Creates a tikz picture that contains the median initial solution duration axis of the specified planner.
   std::experimental::filesystem::path createMedianInitialDurationPicture(const std::string& plannerName) const;
 
  private:

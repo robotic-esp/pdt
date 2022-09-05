@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Valentin Hartmann
 
 /*
 Algorithm | t_cum, init,min | t_cum,init,med | t_cum,init,max | c_cum,init,min | c_cum,init,med | c_cum,init,max | c_cum,fin,min
@@ -91,7 +91,7 @@ std::string MqKpiTable::string() const {
     return {};
   }
 
-  // Figure out which values are the best.
+  // Figure out which values are the best to maek them bold in the report
   std::map<std::size_t, std::pair<std::size_t, double>> best{};  // col, {row, val}.
   for (std::size_t col = 0u; col < data_.size(); ++col) {
     if (col != data_.size() - 1u) {

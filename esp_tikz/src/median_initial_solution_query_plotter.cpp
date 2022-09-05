@@ -53,8 +53,6 @@ MedianInitialSolutionQueryPlotter::MedianInitialSolutionQueryPlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
-  // Compute the duration bin size.
-  auto contextName = config_->get<std::string>("experiment/context");
 }
 
 std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialDurationAxis()
@@ -62,7 +60,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialDurationAxisOptions(axis);
 
-  // Fill the axis with the median cost plots of all planners.
+  // Fill the axis with the median initial solution duration plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianInitialDurationPlots/plotConfidenceIntervalInAllPlots")) {
@@ -83,7 +81,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
       }
     }
 
-    // Then the median cost evolution.
+    // Then the median initial solution duration per query.
     axis->addPlot(createMedianInitialDurationPlot(name));
   }
   axis->options.name = "AllPlannersMedianInitialDurationAxis";
@@ -96,7 +94,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialDurationAxisOptions(axis);
 
-  // Add all the the median cost evolution plots.
+  // Add all the the median initial solution duration plots.
   std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
   bool successCi = true;
   try {
@@ -151,7 +149,6 @@ void MedianInitialSolutionQueryPlotter::setMedianInitialDurationAxisOptions(
   axis->options.height = config_->get<std::string>("medianInitialDurationPlots/axisHeight");
   // axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymax = stats_.getMaxDuration();
-  // axis->options.xlog = config_->get<bool>("medianInitialDurationPlots/xlog");
   axis->options.ylog = true;
   axis->options.xminorgrids = config_->get<bool>("medianInitialDurationPlots/xminorgrids");
   axis->options.xmajorgrids = config_->get<bool>("medianInitialDurationPlots/xmajorgrids");

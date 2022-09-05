@@ -53,15 +53,13 @@ MedianFinalCostQueryPlotter::MedianFinalCostQueryPlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
-  // Compute the duration bin size.
-  auto contextName = config_->get<std::string>("experiment/context");
 }
 
 std::shared_ptr<PgfAxis> MedianFinalCostQueryPlotter::createMedianFinalCostAxis() const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianFinalCostAxisOptions(axis);
 
-  // Fill the axis with the median cost plots of all planners.
+  // Fill the axis with the median final cost plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianFinalCostPerQueryPlots/plotConfidenceIntervalInAllPlots")) {
@@ -82,7 +80,7 @@ std::shared_ptr<PgfAxis> MedianFinalCostQueryPlotter::createMedianFinalCostAxis(
       }
     }
 
-    // Then the median cost evolution.
+    // Then the median final cost per query.
     axis->addPlot(createMedianFinalCostPlot(name));
   }
   axis->options.name = "AllPlannersMedianFinalCostAxis";
@@ -95,7 +93,7 @@ std::shared_ptr<PgfAxis> MedianFinalCostQueryPlotter::createMedianFinalCostAxis(
   auto axis = std::make_shared<PgfAxis>();
   setMedianFinalCostAxisOptions(axis);
 
-  // Add all the the median cost evolution plots.
+  // Add all the the median final cost plots.
   std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
   bool successCi = true;
   try {
