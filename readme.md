@@ -192,7 +192,7 @@ Turn on the verbose compilation in the benchmark configuration `.json` file. If 
 
 ## Formatting code
 
-Before submitting code to OMPL Tools, please format your code with `clang-format`. You can format a specific file with
+We format our code on a style based on [Google's style guide](https://google.github.io/styleguide/cppguide.html). A good way to ensure that your contribution conforms to this style is to run `clang-format` on it before committing. You can format a specific file with
 
 ```bash
 clang-format -i ./path/to/file
