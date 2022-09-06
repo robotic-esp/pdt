@@ -64,17 +64,10 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianInitialDurationPlots/plotConfidenceIntervalInAllPlots")) {
-      std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
-      bool successCi = true;
-      try {
-        upperCi = createMedianInitialDurationUpperCiPlot(name);
-        lowerCi = createMedianInitialDurationLowerCiPlot(name);
-        fillCi = createMedianInitialDurationFillCiPlot(name);
-      } catch (const std::runtime_error& e) {
-        // If the above methods throw, the corresponding plots should not be added.
-        successCi = false;
-      }
-      if (successCi) {
+      std::shared_ptr<PgfPlot> upperCi = createMedianInitialDurationUpperCiPlot(name);
+      std::shared_ptr<PgfPlot> lowerCi = createMedianInitialDurationLowerCiPlot(name);
+      std::shared_ptr<PgfPlot> fillCi = createMedianInitialDurationFillCiPlot(name);
+      if (upperCi != nullptr && lowerCi != nullptr && fillCi != nullptr){
         axis->addPlot(upperCi);
         axis->addPlot(lowerCi);
         axis->addPlot(fillCi);
@@ -95,17 +88,10 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
   setMedianInitialDurationAxisOptions(axis);
 
   // Add all the the median initial solution duration plots.
-  std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
-  bool successCi = true;
-  try {
-    upperCi = createMedianInitialDurationUpperCiPlot(plannerName);
-    lowerCi = createMedianInitialDurationLowerCiPlot(plannerName);
-    fillCi = createMedianInitialDurationFillCiPlot(plannerName);
-  } catch (const std::runtime_error& e) {
-    // If the above methods throw, the corresponding plots should not be added.
-    successCi = false;
-  }
-  if (successCi) {
+  std::shared_ptr<PgfPlot> upperCi = createMedianInitialDurationUpperCiPlot(plannerName);
+  std::shared_ptr<PgfPlot> lowerCi = createMedianInitialDurationLowerCiPlot(plannerName);
+  std::shared_ptr<PgfPlot> fillCi = createMedianInitialDurationFillCiPlot(plannerName);
+  if (upperCi != nullptr && lowerCi != nullptr && fillCi != nullptr){
     axis->addPlot(upperCi);
     axis->addPlot(lowerCi);
     axis->addPlot(fillCi);
@@ -195,7 +181,8 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialD
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return std::make_shared<PgfPlot>();
+    return nullptr;
+    //return std::make_shared<PgfPlot>();
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
@@ -229,7 +216,8 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialD
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return std::make_shared<PgfPlot>();
+    return nullptr;
+    //return std::make_shared<PgfPlot>();
   }
 
   // Create the plot and set the options.

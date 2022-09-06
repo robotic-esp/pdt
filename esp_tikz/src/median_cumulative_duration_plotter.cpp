@@ -66,17 +66,10 @@ std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulative
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>(
             "medianCumulativeInitialDurationPlots/plotConfidenceIntervalInAllPlots")) {
-      std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
-      bool successCi = true;
-      try {
-        upperCi = createMedianCumulativeDurationUpperCiPlot(name);
-        lowerCi = createMedianCumulativeDurationLowerCiPlot(name);
-        fillCi = createMedianCumulativeDurationFillCiPlot(name);
-      } catch (const std::runtime_error& e) {
-        // If the above methods throw, the corresponding plots should not be added.
-        successCi = false;
-      }
-      if (successCi) {
+      std::shared_ptr<PgfPlot> upperCi = createMedianCumulativeDurationUpperCiPlot(name);
+      std::shared_ptr<PgfPlot> lowerCi = createMedianCumulativeDurationLowerCiPlot(name);
+      std::shared_ptr<PgfPlot> fillCi = createMedianCumulativeDurationFillCiPlot(name);
+      if (upperCi != nullptr && lowerCi != nullptr && fillCi != nullptr){
         axis->addPlot(upperCi);
         axis->addPlot(lowerCi);
         axis->addPlot(fillCi);
@@ -97,17 +90,10 @@ std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulative
   setMedianCumulativeDurationAxisOptions(axis);
 
   // Add all the the median cumulative duration plots.
-  std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
-  bool successCi = true;
-  try {
-    upperCi = createMedianCumulativeDurationUpperCiPlot(plannerName);
-    lowerCi = createMedianCumulativeDurationLowerCiPlot(plannerName);
-    fillCi = createMedianCumulativeDurationFillCiPlot(plannerName);
-  } catch (const std::runtime_error& e) {
-    // If the above methods throw, the corresponding plots should not be added.
-    successCi = false;
-  }
-  if (successCi) {
+  std::shared_ptr<PgfPlot> upperCi = createMedianCumulativeDurationUpperCiPlot(plannerName);
+  std::shared_ptr<PgfPlot> lowerCi = createMedianCumulativeDurationLowerCiPlot(plannerName);
+  std::shared_ptr<PgfPlot> fillCi = createMedianCumulativeDurationFillCiPlot(plannerName);
+  if (upperCi != nullptr && lowerCi != nullptr && fillCi != nullptr){
     axis->addPlot(upperCi);
     axis->addPlot(lowerCi);
     axis->addPlot(fillCi);
@@ -202,7 +188,8 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return std::make_shared<PgfPlot>();
+    return nullptr;
+    //return std::make_shared<PgfPlot>();
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
@@ -237,7 +224,8 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return std::make_shared<PgfPlot>();
+    return nullptr;
+    //return std::make_shared<PgfPlot>();
   }
 
   // Create the plot and set the options.

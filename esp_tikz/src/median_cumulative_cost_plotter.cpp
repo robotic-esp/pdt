@@ -65,17 +65,10 @@ std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCost
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianCumulativeCostPlots/plotConfidenceIntervalInAllPlots")) {
-      std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
-      bool successCi = true;
-      try {
-        upperCi = createMedianCumulativeCostUpperCiPlot(name, initial);
-        lowerCi = createMedianCumulativeCostLowerCiPlot(name, initial);
-        fillCi = createMedianCumulativeCostFillCiPlot(name);
-      } catch (const std::runtime_error& e) {
-        // If the above methods throw, the corresponding plots should not be added.
-        successCi = false;
-      }
-      if (successCi) {
+      std::shared_ptr<PgfPlot> upperCi = createMedianCumulativeCostUpperCiPlot(name, initial);
+      std::shared_ptr<PgfPlot> lowerCi = createMedianCumulativeCostLowerCiPlot(name, initial);
+      std::shared_ptr<PgfPlot> fillCi = createMedianCumulativeCostFillCiPlot(name);
+      if (upperCi != nullptr && lowerCi != nullptr && fillCi != nullptr){
         axis->addPlot(upperCi);
         axis->addPlot(lowerCi);
         axis->addPlot(fillCi);
@@ -96,17 +89,10 @@ std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCost
   setMedianCumulativeCostAxisOptions(axis);
 
   // Add all the the median cumulative cost plots.
-  std::shared_ptr<PgfPlot> upperCi, lowerCi, fillCi;
-  bool successCi = true;
-  try {
-    upperCi = createMedianCumulativeCostUpperCiPlot(plannerName, initial);
-    lowerCi = createMedianCumulativeCostLowerCiPlot(plannerName, initial);
-    fillCi = createMedianCumulativeCostFillCiPlot(plannerName);
-  } catch (const std::runtime_error& e) {
-    // If the above methods throw, the corresponding plots should not be added.
-    successCi = false;
-  }
-  if (successCi) {
+  std::shared_ptr<PgfPlot> upperCi = createMedianCumulativeCostUpperCiPlot(plannerName, initial);
+  std::shared_ptr<PgfPlot> lowerCi = createMedianCumulativeCostLowerCiPlot(plannerName, initial);
+  std::shared_ptr<PgfPlot> fillCi = createMedianCumulativeCostFillCiPlot(plannerName);
+  if (upperCi != nullptr && lowerCi != nullptr && fillCi != nullptr){
     axis->addPlot(upperCi);
     axis->addPlot(lowerCi);
     axis->addPlot(fillCi);
@@ -225,7 +211,8 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return std::make_shared<PgfPlot>();
+    return nullptr;
+    //return std::make_shared<PgfPlot>();
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
@@ -238,7 +225,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   plot->options.lineWidth =
       config_->get<double>("medianCumulativeCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
-  plot->options.namePath = plannerName + "MedianCostEvolutionUpperConfidence"s;
+  plot->options.namePath = plannerName + "MedianCumulativeCostUpperConfidence"s;
   plot->options.drawOpacity =
       config_->get<float>("medianCumulativeCostPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
@@ -268,7 +255,8 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return std::make_shared<PgfPlot>();
+    return nullptr;
+    //return std::make_shared<PgfPlot>();
   }
 
   // Create the plot and set the options.
@@ -277,7 +265,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   plot->options.lineWidth =
       config_->get<double>("medianCumulativeCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
-  plot->options.namePath = plannerName + "MedianCostEvolutionLowerConfidence"s;
+  plot->options.namePath = plannerName + "MedianCumulativeCostLowerConfidence"s;
   plot->options.drawOpacity =
       config_->get<float>("medianCumulativeCostPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
@@ -290,8 +278,8 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =
-      std::make_shared<PgfFillBetween>(plannerName + "MedianCostEvolutionUpperConfidence",
-                                       plannerName + "MedianCostEvolutionLowerConfidence");
+      std::make_shared<PgfFillBetween>(plannerName + "MedianCumulativeCostUpperConfidence",
+                                       plannerName + "MedianCumulativeCostLowerConfidence");
 
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(fillBetween);
