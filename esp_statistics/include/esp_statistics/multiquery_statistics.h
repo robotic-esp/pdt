@@ -113,10 +113,12 @@ class MultiqueryStatistics {
   Statistics getQueryStatistics(const unsigned int i) const;
 
  private:
+  // the confidence we use here is fairly arbitrary. We need some interval which we use
+  // to compute the max values.
   void computeCumulativeMetricsForPlanner(
-      const std::string& plannerName, double confidence = 0.99) const;
+      const std::string& plannerName, double confidence = 0.99);
   void computeCumulativeFinalCost(
-      const std::string& plannerName, double confidence = 0.99) const;
+      const std::string& plannerName, double confidence = 0.99);
 
   std::shared_ptr<Configuration> config_;
   const std::experimental::filesystem::path statisticsDirectory_;
@@ -129,33 +131,33 @@ class MultiqueryStatistics {
   std::vector<Statistics> stats_;
 
   // Planner specific min and max values.
-  mutable std::map<std::string, double> medianCumulativeInitialSolutionCosts_{};
-  mutable std::map<std::string, double> minCumulativeInitialSolutionCosts_{};
-  mutable std::map<std::string, double> maxCumulativeInitialSolutionCosts_{};
+  std::map<std::string, double> medianCumulativeInitialSolutionCosts_{};
+  std::map<std::string, double> minCumulativeInitialSolutionCosts_{};
+  std::map<std::string, double> maxCumulativeInitialSolutionCosts_{};
 
-  mutable std::map<std::string, double> medianCumulativeFinalCosts_{};
-  mutable std::map<std::string, double> minCumulativeFinalCosts_{};
-  mutable std::map<std::string, double> maxCumulativeFinalCosts_{};
-  mutable std::map<std::string, double> maxCumulativeNonInfCosts_{};
+  std::map<std::string, double> medianCumulativeFinalCosts_{};
+  std::map<std::string, double> minCumulativeFinalCosts_{};
+  std::map<std::string, double> maxCumulativeFinalCosts_{};
+  std::map<std::string, double> maxCumulativeNonInfCosts_{};
 
-  mutable std::map<std::string, double> medianCumulativeInitialSolutionDurations_{};
-  mutable std::map<std::string, double> minCumulativeInitialSolutionDurations_{};
-  mutable std::map<std::string, double> maxCumulativeInitialSolutionDurations_{};
-  mutable std::map<std::string, double> maxCumulativeNonInfInitialSolutionDurations_{};
+  std::map<std::string, double> medianCumulativeInitialSolutionDurations_{};
+  std::map<std::string, double> minCumulativeInitialSolutionDurations_{};
+  std::map<std::string, double> maxCumulativeInitialSolutionDurations_{};
+  std::map<std::string, double> maxCumulativeNonInfInitialSolutionDurations_{};
 
   std::map<std::string, double> successRates_{};
 
-  mutable double maxCost_{std::numeric_limits<double>::lowest()};
-  mutable double maxNonInfCost_{std::numeric_limits<double>::lowest()};
+  double maxCost_{std::numeric_limits<double>::lowest()};
+  double maxNonInfCost_{std::numeric_limits<double>::lowest()};
 
-  mutable double maxDuration_{std::numeric_limits<double>::lowest()};
-  mutable double maxNonInfInitialDuration_{std::numeric_limits<double>::lowest()};
+  double maxDuration_{std::numeric_limits<double>::lowest()};
+  double maxNonInfInitialDuration_{std::numeric_limits<double>::lowest()};
 
-  mutable double maxCumulativeDuration_{std::numeric_limits<double>::lowest()};
-  mutable double maxNonInfCumulativeDuration_{0.0};
+  double maxCumulativeDuration_{std::numeric_limits<double>::lowest()};
+  double maxNonInfCumulativeDuration_{0.0};
 
-  mutable double maxCumulativeCost_{std::numeric_limits<double>::lowest()};
-  mutable double maxNonInfCumulativeCost_{0.0};
+  double maxCumulativeCost_{std::numeric_limits<double>::lowest()};
+  double maxNonInfCumulativeCost_{0.0};
 
   std::size_t numQueries_{0u};
 };

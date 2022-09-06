@@ -137,7 +137,7 @@ MultiqueryStatistics::MultiqueryStatistics(const std::shared_ptr<Configuration>&
 }
 
 void MultiqueryStatistics::computeCumulativeMetricsForPlanner(
-    const std::string& plannerName, double confidence) const{
+    const std::string& plannerName, double confidence) {
   std::vector<double> medianDurations;
   std::vector<double> lowerDurationBounds;
   std::vector<double> upperDurationBounds;
@@ -236,11 +236,10 @@ void MultiqueryStatistics::computeCumulativeMetricsForPlanner(
   medianCumulativeInitialSolutionDurations_[plannerName] = medianCumulativeDuration.back();
   minCumulativeInitialSolutionDurations_[plannerName] = lciCumulativeDuration.back();
   maxCumulativeInitialSolutionDurations_[plannerName] = uciCumulativeDuration.back();
-
 }
 
 void MultiqueryStatistics::computeCumulativeFinalCost(
-      const std::string& plannerName, double confidence) const{
+      const std::string& plannerName, double confidence) {
   std::vector<double> medianCosts;
   std::vector<double> lowerCostBounds;
   std::vector<double> upperCostBounds;
@@ -348,14 +347,6 @@ fs::path MultiqueryStatistics::extractMedianInitialSolutionPerQuery(
     medianCosts.emplace_back(medianCost);
     lowerCostBounds.emplace_back(lowerCostBound);
     upperCostBounds.emplace_back(upperCostBound);
-
-    if (std::isfinite(upperCostBound) &&  upperCostBound > maxNonInfCost_){
-      maxNonInfCost_ = upperCostBound;
-    }
-
-    if (upperCostBound > maxCost_){
-      maxCost_ = upperCostBound;
-    }
   }
 
   // Write to file.
@@ -470,32 +461,8 @@ fs::path MultiqueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
       uciCumulativeCost.push_back(uciCumulativeCost.back() + ucCost);
       lciCumulativeCost.push_back(lciCumulativeCost.back() + lcCost);
     }
-
-    if (std::isfinite(uciCumulativeCost.back()) && uciCumulativeCost.back() > maxNonInfCumulativeCost_){
-      maxNonInfCumulativeCost_ = uciCumulativeCost.back();
-    }
-
-    if (uciCumulativeCost.back() > maxCumulativeCost_){
-      maxCumulativeCost_ = uciCumulativeCost.back();
-    }
-
-    if (std::isfinite(uciCumulativeDuration.back()) && uciCumulativeDuration.back() > maxNonInfCumulativeDuration_){
-      maxNonInfCumulativeDuration_ = uciCumulativeDuration.back();
-    }
-
-    if (uciCumulativeDuration.back() > maxCumulativeDuration_){
-      maxCumulativeDuration_ = uciCumulativeDuration.back();
-    }
   }
 
-  minCumulativeInitialSolutionCosts_[plannerName] = lciCumulativeCost[0];
-  maxCumulativeInitialSolutionCosts_[plannerName] = uciCumulativeCost[0];
-  minCumulativeFinalCosts_[plannerName] = lciCumulativeCost.back();
-  maxCumulativeFinalCosts_[plannerName] = uciCumulativeCost.back();
-
-  minCumulativeInitialSolutionDurations_[plannerName] = lciCumulativeDuration.back();
-  maxCumulativeInitialSolutionDurations_[plannerName] = uciCumulativeDuration.back();
-  
   // Write to file.
   std::ofstream filestream(filepath.string());
   if (filestream.fail()) {
@@ -553,14 +520,6 @@ fs::path MultiqueryStatistics::extractMedianFinalSolutionPerQuery(
     medianCosts.emplace_back(medianCost);
     lowerCostBounds.emplace_back(lowerCostBound);
     upperCostBounds.emplace_back(upperCostBound);
-
-    if (std::isfinite(upperCostBound) &&  upperCostBound > maxNonInfCost_){
-      maxNonInfCost_ = upperCostBound;
-    }
-
-    if (upperCostBound > maxCost_){
-      maxCost_ = upperCostBound;
-    }
   }
   
   // Write to file.
@@ -640,14 +599,6 @@ fs::path MultiqueryStatistics::extractMedianCumulativeFinalCostPerQuery(
       medianCumulativeCost.push_back(medianCumulativeCost.back() + medianCost);
       uciCumulativeCost.push_back(uciCumulativeCost.back() + ucCost);
       lciCumulativeCost.push_back(lciCumulativeCost.back() + lcCost);
-    }
-
-    if (std::isfinite(uciCumulativeCost.back()) && uciCumulativeCost.back() > maxNonInfCumulativeCost_){
-      maxNonInfCumulativeCost_ = uciCumulativeCost.back();
-    }
-
-    if (uciCumulativeCost.back() > maxCumulativeCost_){
-      maxCumulativeCost_ = uciCumulativeCost.back();
     }
   }
   
