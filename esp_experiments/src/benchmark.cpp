@@ -325,7 +325,7 @@ int main(const int argc, const char **argv) {
             << "Compiling (this may take a couple of minutes)" << std::flush;
 
   // Generate the statistic.
-  esp::ompltools::Statistics stats(config, true);
+  esp::ompltools::Statistics stats(config, false);
 
   // Generate the report.
   esp::ompltools::ExperimentReport report(config, stats);
