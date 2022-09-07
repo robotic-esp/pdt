@@ -60,13 +60,13 @@ SingleQueryReport::SingleQueryReport(const std::shared_ptr<Configuration>& confi
                                    const Statistics& stats) :
     BaseReport(config),
     latexPlotter_(config),
-    queryPercentileCostVsTimeLinePlotter_(config, stats),
-    queryTimeAtFirstHistogramPlotter_(config, stats),
-    queryCostAtFirstVsTimeAtFirstScatterPlotter_(config, stats),
-    queryMedianCostVsTimeLinePlotter_(config, stats),
-    queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_(config, stats),
-    querySolvedVsTimeLinePlotter_(config, stats),
     overviewPlotter_(config, stats),
+    queryCostAtFirstVsTimeAtFirstScatterPlotter_(config, stats),
+    queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_(config, stats),
+    queryMedianCostVsTimeLinePlotter_(config, stats),
+    queryPercentileCostVsTimeLinePlotter_(config, stats),
+    querySolvedVsTimeLinePlotter_(config, stats),
+    queryTimeAtFirstHistogramPlotter_(config, stats),
     stats_(stats) {
 }
 

@@ -63,11 +63,11 @@ namespace fs = std::experimental::filesystem;
 MultiqueryReport::MultiqueryReport(const std::shared_ptr<Configuration>& config,
                                    const MultiqueryStatistics& stats) :
     BaseReport(config),
+    medianCostAtFirstVsQueryLinePlotter_(config, stats),
+    medianCostAtLastVsQueryLinePlotter_(config, stats),
     medianCumulativeCostAtTimeVsQueryLinePlotter_(config, stats),
     medianCumulativeTimeAtFirstVsQueryLinePlotter_(config, stats),
     medianTimeAtFirstVsQueryLinePlotter_(config, stats),
-    medianCostAtFirstVsQueryLinePlotter_(config, stats),
-    medianCostAtLastVsQueryLinePlotter_(config, stats),
     solvedAtTimeVsQueryLinePlotter_(config, stats),
     stats_(stats) {
 }
@@ -244,13 +244,13 @@ std::stringstream MultiqueryReport::overview() const {
     const auto n = static_cast<unsigned int>(std::floor(static_cast<double>(i*(stats_.getNumQueries()-1)) / static_cast<double>(numCostPlots-1)));
 
     auto nthQueryStatistics = stats_.getQueryStatistics(n);
-    QueryMedianCostVsTimeLinePlotter medianCostEvolutionPlotter(config_, nthQueryStatistics);
-    QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter medianInitialSolutionPlotter(config_, nthQueryStatistics);
-    QuerySolvedVsTimeLinePlotter successPlotter(config_, nthQueryStatistics);
+    QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter(config_, nthQueryStatistics);
+    QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(config_, nthQueryStatistics);
+    QuerySolvedVsTimeLinePlotter querySolvedVsTimeLinePlotter(config_, nthQueryStatistics);
 
-    auto medianCostEvolutionAxis = medianCostEvolutionPlotter.createMedianCostEvolutionAxis();
-    auto medianInitialSolutionAxis = medianInitialSolutionPlotter.createMedianInitialSolutionAxis();
-    auto successAxis = successPlotter.createSuccessAxis();
+    auto medianCostEvolutionAxis = queryMedianCostVsTimeLinePlotter.createMedianCostEvolutionAxis();
+    auto medianInitialSolutionAxis = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter.createMedianInitialSolutionAxis();
+    auto successAxis = querySolvedVsTimeLinePlotter.createSuccessAxis();
 
     medianCostEvolutionAxis->options.name += std::to_string(n);
 

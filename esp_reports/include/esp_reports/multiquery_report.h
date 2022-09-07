@@ -70,11 +70,11 @@ class MultiqueryReport : public BaseReport{
   std::stringstream individualResults() const;
 
   // Plotters.
+  MedianCostAtFirstVsQueryLinePlotter medianCostAtFirstVsQueryLinePlotter_;
+  MedianCostAtLastVsQueryLinePlotter medianCostAtLastVsQueryLinePlotter_;
   MedianCumulativeCostAtTimeVsQueryLinePlotter medianCumulativeCostAtTimeVsQueryLinePlotter_;
   MedianCumulativeTimeAtFirstVsQueryLinePlotter medianCumulativeTimeAtFirstVsQueryLinePlotter_;
   MedianTimeAtFirstVsQueryLinePlotter medianTimeAtFirstVsQueryLinePlotter_;
-  MedianCostAtFirstVsQueryLinePlotter medianCostAtFirstVsQueryLinePlotter_;
-  MedianCostAtLastVsQueryLinePlotter medianCostAtLastVsQueryLinePlotter_;
   SolvedAtTimeVsQueryLinePlotter solvedAtTimeVsQueryLinePlotter_;
 
   const MultiqueryStatistics& stats_;
