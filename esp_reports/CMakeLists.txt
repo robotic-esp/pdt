@@ -20,5 +20,6 @@ target_link_libraries(esp_reports
   esp_common
   esp_configuration
   esp_factories
+  esp_plotters
   esp_statistics
   esp_tikz)

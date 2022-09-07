@@ -43,15 +43,15 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
+#include "esp_plotters/median_cumulative_cost_plotter.h"
+#include "esp_plotters/median_cumulative_duration_plotter.h"
+#include "esp_plotters/median_initial_solution_query_plotter.h"
+#include "esp_plotters/median_initial_solution_cost_query_plotter.h"
+#include "esp_plotters/median_final_cost_query_plotter.h"
+#include "esp_plotters/success_rate_per_query_plotter.h"
+#include "esp_plotters/latex_plotter.h"
 #include "esp_reports/base_report.h"
 #include "esp_statistics/multiquery_statistics.h"
-#include "esp_tikz/median_cumulative_cost_plotter.h"
-#include "esp_tikz/median_cumulative_duration_plotter.h"
-#include "esp_tikz/median_initial_solution_query_plotter.h"
-#include "esp_tikz/median_initial_solution_cost_query_plotter.h"
-#include "esp_tikz/median_final_cost_query_plotter.h"
-#include "esp_tikz/success_rate_per_query_plotter.h"
-#include "esp_tikz/latex_plotter.h"
 #include "esp_tikz/tikz_picture.h"
 
 namespace esp {

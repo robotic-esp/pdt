@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/cost_percentile_evolution_plotter.h"
+#include "esp_plotters/cost_percentile_evolution_plotter.h"
 
 #include <iomanip>
 

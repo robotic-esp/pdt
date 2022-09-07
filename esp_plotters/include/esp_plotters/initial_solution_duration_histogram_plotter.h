@@ -37,47 +37,48 @@
 #pragma once
 
 #include <experimental/filesystem>
+#include <limits>
 #include <memory>
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/multiquery_statistics.h"
-#include "esp_tikz/latex_plotter.h"
-#include "esp_tikz/pgf_axis.h"
+#include "esp_plotters/latex_plotter.h"
+#include "esp_statistics/statistics.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class MedianInitialSolutionQueryPlotter : public LatexPlotter {
+class InitialSolutionDurationHistogramPlotter : public LatexPlotter {
  public:
-  MedianInitialSolutionQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
-  ~MedianInitialSolutionQueryPlotter() = default;
+  InitialSolutionDurationHistogramPlotter(const std::shared_ptr<const Configuration>& config,
+                                          const Statistics& stats);
+  ~InitialSolutionDurationHistogramPlotter() = default;
 
-  // Creates a pgf axis that holds the median initial solution duration per query for all planners.
-  std::shared_ptr<PgfAxis> createMedianInitialDurationAxis() const;
+  // Creates a pgf axis that hold the initial solution duration histogram of all planners.
+  std::shared_ptr<PgfAxis> createInitialSolutionDurationHistogramAxis() const;
 
-  // Creates a pgf axis that holds the median initial solution durations for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianInitialDurationAxis(const std::string& plannerName) const;
+  // Creates a pgf axis that hold the initial solution duration histogram of the specified planner.
+  std::shared_ptr<PgfAxis> createInitialSolutionDurationHistogramAxis(
+      const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the median initial solution duration axis of all planners.
-  std::experimental::filesystem::path createMedianInitialDurationPicture() const;
+  // Creates a tikz picture that contains the initial solution duration histogram axis of all
+  // planners.
+  std::experimental::filesystem::path createInitialSolutionDurationHistogramPicture() const;
 
-  // Creates a tikz picture that contains the median initial solution duration axis of the specified planner.
-  std::experimental::filesystem::path createMedianInitialDurationPicture(const std::string& plannerName) const;
+  // Creates a tikz picture that contains the initial solution duration histogram axis of all
+  // planners.
+  std::experimental::filesystem::path createInitialSolutionDurationHistogramPicture(
+      const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createMedianInitialDurationPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialDurationUpperCiPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialDurationLowerCiPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialDurationFillCiPlot(
+  std::shared_ptr<PgfPlot> createInitialSolutionDurationHistogramPlot(
       const std::string& plannerName) const;
 
-  void setMedianInitialDurationAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setInitialSolutionDurationHistogramAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  const MultiqueryStatistics& stats_;
+  mutable std::shared_ptr<PgfAxis> axis_;
+  const Statistics& stats_;
 };
 
 }  // namespace ompltools

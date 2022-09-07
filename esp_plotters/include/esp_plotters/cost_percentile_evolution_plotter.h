@@ -41,43 +41,38 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/multiquery_statistics.h"
-#include "esp_tikz/latex_plotter.h"
+#include "esp_plotters/latex_plotter.h"
+#include "esp_statistics/statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class SuccessRateQueryPlotter : public LatexPlotter {
+class CostPercentileEvolutionPlotter : public LatexPlotter {
  public:
-  SuccessRateQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
-  ~SuccessRateQueryPlotter() = default;
+  CostPercentileEvolutionPlotter(const std::shared_ptr<const Configuration>& config,
+                                 const Statistics& stats);
+  ~CostPercentileEvolutionPlotter() = default;
 
-  // Creates a pgf axis that holds the success rate at a given percentage of the total time for all planners.
-  // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
-  std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(const unsigned int percentage) const;
+  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
+  std::shared_ptr<PgfAxis> createCostPercentileEvolutionAxis(const std::string& plannerName) const;
 
-  // Creates a pgf axis that holds the success rate at a given percentage of the total time for the specified planner.
-  // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
-  std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(
-      const std::string& plannerName, const unsigned int percentage) const;
-
-  // Creates a tikz picture that contains the success rate axis of all planners.
-  // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
-  std::experimental::filesystem::path createSuccessRateQueryPicture(const unsigned int percentage) const;
-
-  // Creates a tikz picture that contains the success rate axis of the specified planner.
-  // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
-  std::experimental::filesystem::path createSuccessRateQueryPicture(const std::string& plannerName, const unsigned int percentage) const;
+  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  std::experimental::filesystem::path createCostPercentileEvolutionPicture(
+      const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createSuccessRateQueryPercentPlot(
-      const std::string& plannerName, const unsigned int percentage) const;
+  std::shared_ptr<PgfPlot> createCostPercentileEvolutionPlot(const std::string& plannerName,
+                                                             double percentile) const;
 
-  void setSuccessRateQueryAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setCostPercentileEvolutionAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  const MultiqueryStatistics& stats_;
+  const std::set<double> percentiles_{0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99};
+  std::vector<double> binnedDurations_{};
+  double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
+
+  const Statistics& stats_;
 };
 
 }  // namespace ompltools

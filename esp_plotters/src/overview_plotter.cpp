@@ -34,14 +34,14 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/overview_plotter.h"
+#include "esp_plotters/overview_plotter.h"
 
-#include "esp_tikz/median_cost_evolution_plotter.h"
+#include "esp_plotters/median_cost_evolution_plotter.h"
+#include "esp_plotters/success_plotter.h"
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"
 #include "esp_tikz/pgf_plot.h"
 #include "esp_tikz/pgf_table.h"
-#include "esp_tikz/success_plotter.h"
 #include "esp_tikz/tikz_picture.h"
 
 namespace esp {

@@ -37,48 +37,47 @@
 #pragma once
 
 #include <experimental/filesystem>
-#include <limits>
 #include <memory>
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
+#include "esp_plotters/latex_plotter.h"
+#include "esp_statistics/multiquery_statistics.h"
+#include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class InitialSolutionDurationHistogramPlotter : public LatexPlotter {
+class SuccessRateQueryPlotter : public LatexPlotter {
  public:
-  InitialSolutionDurationHistogramPlotter(const std::shared_ptr<const Configuration>& config,
-                                          const Statistics& stats);
-  ~InitialSolutionDurationHistogramPlotter() = default;
+  SuccessRateQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~SuccessRateQueryPlotter() = default;
 
-  // Creates a pgf axis that hold the initial solution duration histogram of all planners.
-  std::shared_ptr<PgfAxis> createInitialSolutionDurationHistogramAxis() const;
+  // Creates a pgf axis that holds the success rate at a given percentage of the total time for all planners.
+  // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
+  std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(const unsigned int percentage) const;
 
-  // Creates a pgf axis that hold the initial solution duration histogram of the specified planner.
-  std::shared_ptr<PgfAxis> createInitialSolutionDurationHistogramAxis(
-      const std::string& plannerName) const;
+  // Creates a pgf axis that holds the success rate at a given percentage of the total time for the specified planner.
+  // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
+  std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(
+      const std::string& plannerName, const unsigned int percentage) const;
 
-  // Creates a tikz picture that contains the initial solution duration histogram axis of all
-  // planners.
-  std::experimental::filesystem::path createInitialSolutionDurationHistogramPicture() const;
+  // Creates a tikz picture that contains the success rate axis of all planners.
+  // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
+  std::experimental::filesystem::path createSuccessRateQueryPicture(const unsigned int percentage) const;
 
-  // Creates a tikz picture that contains the initial solution duration histogram axis of all
-  // planners.
-  std::experimental::filesystem::path createInitialSolutionDurationHistogramPicture(
-      const std::string& plannerName) const;
+  // Creates a tikz picture that contains the success rate axis of the specified planner.
+  // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
+  std::experimental::filesystem::path createSuccessRateQueryPicture(const std::string& plannerName, const unsigned int percentage) const;
 
  private:
-  std::shared_ptr<PgfPlot> createInitialSolutionDurationHistogramPlot(
-      const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createSuccessRateQueryPercentPlot(
+      const std::string& plannerName, const unsigned int percentage) const;
 
-  void setInitialSolutionDurationHistogramAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setSuccessRateQueryAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  mutable std::shared_ptr<PgfAxis> axis_;
-  const Statistics& stats_;
+  const MultiqueryStatistics& stats_;
 };
 
 }  // namespace ompltools

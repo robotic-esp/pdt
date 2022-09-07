@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Valentin Hartmann
 
 #pragma once
 
@@ -41,46 +41,43 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
+#include "esp_plotters/latex_plotter.h"
+#include "esp_statistics/multiquery_statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class MedianInitialSolutionPlotter : public LatexPlotter {
+class MedianCumulativeDurationPlotter : public LatexPlotter {
  public:
-  MedianInitialSolutionPlotter(const std::shared_ptr<const Configuration>& config,
-                               const Statistics& stats);
-  ~MedianInitialSolutionPlotter() = default;
+  MedianCumulativeDurationPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~MedianCumulativeDurationPlotter() = default;
 
-  // Creates a pgf axis that holds the median cost at binned durations for all planners.
-  std::shared_ptr<PgfAxis> createMedianInitialSolutionAxis() const;
+  // Creates a pgf axis that holds the median cumulative duration to find the initial solution at each query.
+  std::shared_ptr<PgfAxis> createMedianCumulativeDurationAxis() const;
 
-  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianInitialSolutionAxis(const std::string& plannerName) const;
+  // Creates a pgf axis that holds the median cumulative duration to find the initial solution at each query for the specified planner.
+  std::shared_ptr<PgfAxis> createMedianCumulativeDurationAxis(const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the median cost axis of all planners.
-  std::experimental::filesystem::path createMedianInitialSolutionPicture() const;
+  // Creates a tikz picture that contains the median cumulative duration to find the initial solution of all planners.
+  std::experimental::filesystem::path createMedianCumulativeDurationPicture() const;
 
-  // Creates a tikz picture that contains the median cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianInitialSolutionPicture(
-      const std::string& plannerName) const;
+  // Creates a tikz picture that contains the median cumulative duration to find the initial solution the specified planner.
+  std::experimental::filesystem::path createMedianCumulativeDurationPicture(const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionDurationCiPlot(
+  std::shared_ptr<PgfPlot> createMedianCumulativeDurationPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianCumulativeDurationUpperCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionCostCiPlot(
+  std::shared_ptr<PgfPlot> createMedianCumulativeDurationLowerCiPlot(
+      const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianCumulativeDurationFillCiPlot(
       const std::string& plannerName) const;
 
-  void setMedianInitialSolutionAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setMedianCumulativeDurationAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
-  double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
-
-  const Statistics& stats_;
+  const MultiqueryStatistics& stats_;
 };
 
 }  // namespace ompltools

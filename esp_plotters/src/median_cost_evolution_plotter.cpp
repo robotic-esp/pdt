@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/median_cost_evolution_plotter.h"
+#include "esp_plotters/median_cost_evolution_plotter.h"
 
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"

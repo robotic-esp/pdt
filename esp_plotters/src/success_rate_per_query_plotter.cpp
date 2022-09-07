@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/success_rate_per_query_plotter.h"
+#include "esp_plotters/success_rate_per_query_plotter.h"
 
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"

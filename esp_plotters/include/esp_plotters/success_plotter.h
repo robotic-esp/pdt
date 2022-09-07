@@ -41,38 +41,41 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
+#include "esp_plotters/latex_plotter.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
+#include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class InitialSolutionScatterPlotter : public LatexPlotter {
+class SuccessPlotter : public LatexPlotter {
  public:
-  InitialSolutionScatterPlotter(const std::shared_ptr<const Configuration>& config,
-                                const Statistics& stats);
-  ~InitialSolutionScatterPlotter() = default;
+  SuccessPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
+  ~SuccessPlotter() = default;
 
-  // Creates a pgf axis that hold the initial solution scatter plot of all planners.
-  std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis() const;
+  // Creates a pgf axis that holds the success percentage over time for all planners.
+  std::shared_ptr<PgfAxis> createSuccessAxis() const;
 
-  // Creates a pgf axis that hold the initial solution scatter plot of the specified planner.
-  std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis(
-      const std::string& plannerName) const;
+  // Creates a pgf axis that holds the success percentage over time for the specified planner.
+  std::shared_ptr<PgfAxis> createSuccessAxis(const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the initial solution scatter plot of all planners.
-  std::experimental::filesystem::path createInitialSolutionScatterPicture() const;
+  // Creates a tikz picture that contains the success axis of all planners.
+  std::experimental::filesystem::path createSuccessPicture() const;
 
-  // Creates a tikz picture that contains the initial solution scatter plot axis of all planners.
-  std::experimental::filesystem::path createInitialSolutionScatterPicture(
-      const std::string& plannerName) const;
+  // Creates a tikz picture that contains the success axis of the specified planner.
+  std::experimental::filesystem::path createSuccessPicture(const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createInitialSolutionScatterPlot(
-      const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createSuccessPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createSuccessUpperCiPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createSuccessLowerCiPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createSuccessFillCiPlot(const std::string& plannerName) const;
 
-  void setInitialSolutionScatterAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+
+  double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
+  double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
 
   const Statistics& stats_;
 };

@@ -41,8 +41,8 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
+#include "esp_plotters/latex_plotter.h"
 #include "esp_statistics/multiquery_statistics.h"
-#include "esp_tikz/latex_plotter.h"
 #include "esp_tikz/pgf_axis.h"
 
 namespace esp {

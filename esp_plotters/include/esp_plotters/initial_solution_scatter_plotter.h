@@ -41,45 +41,38 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
+#include "esp_plotters/latex_plotter.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
-#include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class MedianCostEvolutionPlotter : public LatexPlotter {
+class InitialSolutionScatterPlotter : public LatexPlotter {
  public:
-  MedianCostEvolutionPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
-  ~MedianCostEvolutionPlotter() = default;
+  InitialSolutionScatterPlotter(const std::shared_ptr<const Configuration>& config,
+                                const Statistics& stats);
+  ~InitialSolutionScatterPlotter() = default;
 
-  // Creates a pgf axis that holds the median cost at binned durations for all planners.
-  std::shared_ptr<PgfAxis> createMedianCostEvolutionAxis() const;
+  // Creates a pgf axis that hold the initial solution scatter plot of all planners.
+  std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis() const;
 
-  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianCostEvolutionAxis(const std::string& plannerName) const;
+  // Creates a pgf axis that hold the initial solution scatter plot of the specified planner.
+  std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis(
+      const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the median cost axis of all planners.
-  std::experimental::filesystem::path createMedianCostEvolutionPicture() const;
+  // Creates a tikz picture that contains the initial solution scatter plot of all planners.
+  std::experimental::filesystem::path createInitialSolutionScatterPicture() const;
 
-  // Creates a tikz picture that contains the median cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianCostEvolutionPicture(const std::string& plannerName) const;
+  // Creates a tikz picture that contains the initial solution scatter plot axis of all planners.
+  std::experimental::filesystem::path createInitialSolutionScatterPicture(
+      const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionUpperCiPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionLowerCiPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionFillCiPlot(
+  std::shared_ptr<PgfPlot> createInitialSolutionScatterPlot(
       const std::string& plannerName) const;
 
-  void setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
-
-  std::vector<double> binnedDurations_{};
-  double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
-  double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
+  void setInitialSolutionScatterAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
   const Statistics& stats_;
 };

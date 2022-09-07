@@ -41,26 +41,43 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
+#include "esp_plotters/latex_plotter.h"
+#include "esp_statistics/multiquery_statistics.h"
+#include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class OverviewPlotter : public LatexPlotter {
+class MedianInitialSolutionCostQueryPlotter : public LatexPlotter {
  public:
-  OverviewPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
-  ~OverviewPlotter() = default;
+  MedianInitialSolutionCostQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~MedianInitialSolutionCostQueryPlotter() = default;
 
-  // Creates a combined tikz picture with success and median costs of all planners.
-  std::experimental::filesystem::path createCombinedPicture() const;
+  // Creates a pgf axis that holds the median cost of the initial solutions at each query for all planners.
+  std::shared_ptr<PgfAxis> createMedianInitialCostAxis() const;
 
-  // Creates a combined tikz picture with success and median costs of the specified planner.
-  std::experimental::filesystem::path createCombinedPicture(const std::string& plannerName) const;
+  // Creates a pgf axis that holds the median cost of the initial solutions at each query for the specified planner.
+  std::shared_ptr<PgfAxis> createMedianInitialCostAxis(const std::string& plannerName) const;
+
+  // Creates a tikz picture that contains the median initial cost axis of all planners.
+  std::experimental::filesystem::path createMedianInitialCostPicture() const;
+
+  // Creates a tikz picture that contains the median initial cost axis of the specified planner.
+  std::experimental::filesystem::path createMedianInitialCostPicture(const std::string& plannerName) const;
 
  private:
-  const Statistics& stats_;
+  std::shared_ptr<PgfPlot> createMedianInitialCostPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianInitialCostUpperCiPlot(
+      const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianInitialCostLowerCiPlot(
+      const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianInitialCostFillCiPlot(
+      const std::string& plannerName) const;
+
+  void setMedianInitialCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+
+  const MultiqueryStatistics& stats_;
 };
 
 }  // namespace ompltools

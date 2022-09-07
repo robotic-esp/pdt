@@ -41,43 +41,47 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/multiquery_statistics.h"
-#include "esp_tikz/latex_plotter.h"
+#include "esp_plotters/latex_plotter.h"
+#include "esp_statistics/statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class MedianInitialSolutionCostQueryPlotter : public LatexPlotter {
+class MedianCostEvolutionPlotter : public LatexPlotter {
  public:
-  MedianInitialSolutionCostQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
-  ~MedianInitialSolutionCostQueryPlotter() = default;
+  MedianCostEvolutionPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
+  ~MedianCostEvolutionPlotter() = default;
 
-  // Creates a pgf axis that holds the median cost of the initial solutions at each query for all planners.
-  std::shared_ptr<PgfAxis> createMedianInitialCostAxis() const;
+  // Creates a pgf axis that holds the median cost at binned durations for all planners.
+  std::shared_ptr<PgfAxis> createMedianCostEvolutionAxis() const;
 
-  // Creates a pgf axis that holds the median cost of the initial solutions at each query for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianInitialCostAxis(const std::string& plannerName) const;
+  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
+  std::shared_ptr<PgfAxis> createMedianCostEvolutionAxis(const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the median initial cost axis of all planners.
-  std::experimental::filesystem::path createMedianInitialCostPicture() const;
+  // Creates a tikz picture that contains the median cost axis of all planners.
+  std::experimental::filesystem::path createMedianCostEvolutionPicture() const;
 
-  // Creates a tikz picture that contains the median initial cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianInitialCostPicture(const std::string& plannerName) const;
+  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  std::experimental::filesystem::path createMedianCostEvolutionPicture(const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createMedianInitialCostPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialCostUpperCiPlot(
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionUpperCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialCostLowerCiPlot(
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionLowerCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialCostFillCiPlot(
+  std::shared_ptr<PgfPlot> createMedianCostEvolutionFillCiPlot(
       const std::string& plannerName) const;
 
-  void setMedianInitialCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  const MultiqueryStatistics& stats_;
+  std::vector<double> binnedDurations_{};
+  double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
+  double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
+
+  const Statistics& stats_;
 };
 
 }  // namespace ompltools
