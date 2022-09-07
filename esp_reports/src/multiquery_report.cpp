@@ -45,7 +45,7 @@
 #include "esp_factories/context_factory.h"
 #include "esp_plotters/query_median_cost_at_first_vs_median_time_at_first_point_plotter.h"
 #include "esp_plotters/query_median_cost_vs_time_line_plotter.h"
-#include "esp_plotters/query_solved_vs_time_line_plotter.h"
+#include "esp_plotters/query_success_vs_time_line_plotter.h"
 #include "esp_tikz/kpi_table.h"
 #include "esp_tikz/mq_kpi_table.h"
 #include "esp_tikz/pgf_axis.h"
@@ -65,10 +65,10 @@ MultiqueryReport::MultiqueryReport(const std::shared_ptr<Configuration>& config,
     BaseReport(config),
     medianCostAtFirstVsQueryLinePlotter_(config, stats),
     medianCostAtLastVsQueryLinePlotter_(config, stats),
-    medianCumulativeCostAtTimeVsQueryLinePlotter_(config, stats),
-    medianCumulativeTimeAtFirstVsQueryLinePlotter_(config, stats),
+    medianSummedCostAtTimeVsQueryLinePlotter_(config, stats),
+    medianSummedTimeAtFirstVsQueryLinePlotter_(config, stats),
     medianTimeAtFirstVsQueryLinePlotter_(config, stats),
-    solvedAtTimeVsQueryLinePlotter_(config, stats),
+    successAtTimeVsQueryLinePlotter_(config, stats),
     stats_(stats) {
 }
 
@@ -156,7 +156,7 @@ std::stringstream MultiqueryReport::overview() const {
       latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("experiment/planners"));
 
   auto medianQueryDurationAxis = medianTimeAtFirstVsQueryLinePlotter_.createMedianInitialDurationAxis();
-  auto medianCumulativeDurationAxis = medianCumulativeTimeAtFirstVsQueryLinePlotter_.createMedianCumulativeDurationAxis();
+  auto medianCumulativeDurationAxis = medianSummedTimeAtFirstVsQueryLinePlotter_.createMedianCumulativeDurationAxis();
 
   // Stack the axes
   latexPlotter_.stack(medianQueryDurationAxis, medianCumulativeDurationAxis, legend);
@@ -174,7 +174,7 @@ std::stringstream MultiqueryReport::overview() const {
           << "}\\end{center}\n";
 
   auto medianQueryInitialCostAxis = medianCostAtFirstVsQueryLinePlotter_.createMedianInitialCostAxis();
-  auto medianCumulativeInitialCostAxis = medianCumulativeCostAtTimeVsQueryLinePlotter_.createMedianCumulativeCostAxis(true);
+  auto medianCumulativeInitialCostAxis = medianSummedCostAtTimeVsQueryLinePlotter_.createMedianCumulativeCostAxis(true);
 
   // Stack the axes
   latexPlotter_.stack(medianQueryInitialCostAxis, medianCumulativeInitialCostAxis, legend);
@@ -194,7 +194,7 @@ std::stringstream MultiqueryReport::overview() const {
           << "}\\end{center}\n";
 
   auto medianQueryLastCostAxis = medianCostAtLastVsQueryLinePlotter_.createMedianFinalCostAxis();
-  auto medianCumulativeLastCostAxis = medianCumulativeCostAtTimeVsQueryLinePlotter_.createMedianCumulativeCostAxis(false);
+  auto medianCumulativeLastCostAxis = medianSummedCostAtTimeVsQueryLinePlotter_.createMedianCumulativeCostAxis(false);
 
   medianCumulativeLastCostAxis->options.name += "_final";
 
@@ -214,7 +214,7 @@ std::stringstream MultiqueryReport::overview() const {
           << "\\% confidence interval. "
           << "}\\end{center}\n";
 
-  auto successRateQueryAxis = solvedAtTimeVsQueryLinePlotter_.createSuccessRateQueryAxis(100u);
+  auto successRateQueryAxis = successAtTimeVsQueryLinePlotter_.createSuccessRateQueryAxis(100u);
 
   // Stack the axes
   latexPlotter_.stack(successRateQueryAxis, legend);
@@ -226,7 +226,7 @@ std::stringstream MultiqueryReport::overview() const {
           << " of all planners" << " at "
           << "the maximum solve time.} \\end{center}\n";
 
-  auto successRateHalfTimeQueryAxis = solvedAtTimeVsQueryLinePlotter_.createSuccessRateQueryAxis(50u);
+  auto successRateHalfTimeQueryAxis = successAtTimeVsQueryLinePlotter_.createSuccessRateQueryAxis(50u);
 
   // Stack the axes
   latexPlotter_.stack(successRateHalfTimeQueryAxis, legend);
@@ -246,7 +246,7 @@ std::stringstream MultiqueryReport::overview() const {
     auto nthQueryStatistics = stats_.getQueryStatistics(n);
     QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter(config_, nthQueryStatistics);
     QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(config_, nthQueryStatistics);
-    QuerySolvedVsTimeLinePlotter querySolvedVsTimeLinePlotter(config_, nthQueryStatistics);
+    QuerySuccessVsTimeLinePlotter querySolvedVsTimeLinePlotter(config_, nthQueryStatistics);
 
     auto medianCostEvolutionAxis = queryMedianCostVsTimeLinePlotter.createMedianCostEvolutionAxis();
     auto medianInitialSolutionAxis = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter.createMedianInitialSolutionAxis();

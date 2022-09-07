@@ -65,7 +65,7 @@ SingleQueryReport::SingleQueryReport(const std::shared_ptr<Configuration>& confi
     queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_(config, stats),
     queryMedianCostVsTimeLinePlotter_(config, stats),
     queryPercentileCostVsTimeLinePlotter_(config, stats),
-    querySolvedVsTimeLinePlotter_(config, stats),
+    querySuccessVsTimeLinePlotter_(config, stats),
     queryTimeAtFirstHistogramPlotter_(config, stats),
     stats_(stats) {
 }
@@ -143,7 +143,7 @@ std::stringstream SingleQueryReport::overview() const {
   // Create all axes to be displayed in the results summary.
   auto medianCostEvolutionAxis = queryMedianCostVsTimeLinePlotter_.createMedianCostEvolutionAxis();
   auto medianInitialSolutionAxis = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_.createMedianInitialSolutionAxis();
-  auto successAxis = querySolvedVsTimeLinePlotter_.createSuccessAxis();
+  auto successAxis = querySuccessVsTimeLinePlotter_.createSuccessAxis();
   // Merge the intial solution axis into the cost evolution axis.
   medianCostEvolutionAxis->mergePlots(medianInitialSolutionAxis);
 
@@ -210,7 +210,7 @@ std::stringstream SingleQueryReport::individualResults() const {
     results << "\\subsection{Initial Solutions}\\label{sec:" << name << "-initial-solution}\n";
 
     // Overlay the histogram with the edf for the first initial durations plot.
-    auto edf = querySolvedVsTimeLinePlotter_.createSuccessAxis(name);
+    auto edf = querySuccessVsTimeLinePlotter_.createSuccessAxis(name);
     edf->options.xmin = stats_.getMinInitialSolutionDuration(name);
     edf->options.xmax = config_->get<double>(
         "context/"s + config_->get<std::string>("experiment/context") + "/maxTime");

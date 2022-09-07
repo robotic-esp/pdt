@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_plotters/query_solved_vs_time_line_plotter.h"
+#include "esp_plotters/query_success_vs_time_line_plotter.h"
 
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"
@@ -49,7 +49,7 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-QuerySolvedVsTimeLinePlotter::QuerySolvedVsTimeLinePlotter(const std::shared_ptr<const Configuration>& config,
+QuerySuccessVsTimeLinePlotter::QuerySuccessVsTimeLinePlotter(const std::shared_ptr<const Configuration>& config,
                                const Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
@@ -58,7 +58,7 @@ QuerySolvedVsTimeLinePlotter::QuerySolvedVsTimeLinePlotter(const std::shared_ptr
   minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 
-std::shared_ptr<PgfAxis> QuerySolvedVsTimeLinePlotter::createSuccessAxis() const {
+std::shared_ptr<PgfAxis> QuerySuccessVsTimeLinePlotter::createSuccessAxis() const {
   auto axis = std::make_shared<PgfAxis>();
   setSuccessAxisOptions(axis);
 
@@ -90,7 +90,7 @@ std::shared_ptr<PgfAxis> QuerySolvedVsTimeLinePlotter::createSuccessAxis() const
   return axis;
 }
 
-std::shared_ptr<PgfAxis> QuerySolvedVsTimeLinePlotter::createSuccessAxis(const std::string& plannerName) const {
+std::shared_ptr<PgfAxis> QuerySuccessVsTimeLinePlotter::createSuccessAxis(const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setSuccessAxisOptions(axis);
 
@@ -118,7 +118,7 @@ std::shared_ptr<PgfAxis> QuerySolvedVsTimeLinePlotter::createSuccessAxis(const s
   return axis;
 }
 
-fs::path QuerySolvedVsTimeLinePlotter::createSuccessPicture() const {
+fs::path QuerySuccessVsTimeLinePlotter::createSuccessPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   picture.addAxis(createSuccessAxis());
@@ -130,7 +130,7 @@ fs::path QuerySolvedVsTimeLinePlotter::createSuccessPicture() const {
   return picturePath;
 }
 
-fs::path QuerySolvedVsTimeLinePlotter::createSuccessPicture(const std::string& plannerName) const {
+fs::path QuerySuccessVsTimeLinePlotter::createSuccessPicture(const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   picture.addAxis(createSuccessAxis(plannerName));
@@ -142,7 +142,7 @@ fs::path QuerySolvedVsTimeLinePlotter::createSuccessPicture(const std::string& p
   return picturePath;
 }
 
-void QuerySolvedVsTimeLinePlotter::setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+void QuerySuccessVsTimeLinePlotter::setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const {
   axis->options.name = "SuccessAxis";
   axis->options.width = config_->get<std::string>("successPlots/axisWidth");
   axis->options.height = config_->get<std::string>("successPlots/axisHeight");
@@ -162,7 +162,7 @@ void QuerySolvedVsTimeLinePlotter::setSuccessAxisOptions(std::shared_ptr<PgfAxis
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessPlot(const std::string& plannerName) const {
+std::shared_ptr<PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessPlot(const std::string& plannerName) const {
   // Store the initial solution edf in a pgf table.
   auto table =
       std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationEdf(
@@ -193,7 +193,7 @@ std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessPlot(const s
   return plot;
 }
 
-std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessUpperCiPlot(
+std::shared_ptr<PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table =
@@ -229,7 +229,7 @@ std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessUpperCiPlot(
   return plot;
 }
 
-std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessLowerCiPlot(
+std::shared_ptr<PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table =
@@ -265,7 +265,7 @@ std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessLowerCiPlot(
   return plot;
 }
 
-std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessFillCiPlot(
+std::shared_ptr<PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween = std::make_shared<PgfFillBetween>(plannerName + "SuccessUpperConfidence",

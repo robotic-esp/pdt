@@ -49,7 +49,7 @@
 #include "esp_plotters/query_median_cost_at_first_vs_median_time_at_first_point_plotter.h"
 #include "esp_plotters/query_median_cost_vs_time_line_plotter.h"
 #include "esp_plotters/query_percentile_cost_vs_time_line_plotter.h"
-#include "esp_plotters/query_solved_vs_time_line_plotter.h"
+#include "esp_plotters/query_success_vs_time_line_plotter.h"
 #include "esp_plotters/query_time_at_first_histogram_plotter.h"
 #include "esp_reports/base_report.h"
 #include "esp_statistics/statistics.h"
@@ -77,7 +77,7 @@ class SingleQueryReport : public BaseReport {
   QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_;
   QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter_;
   QueryPercentileCostVsTimeLinePlotter queryPercentileCostVsTimeLinePlotter_;
-  QuerySolvedVsTimeLinePlotter querySolvedVsTimeLinePlotter_;
+  QuerySuccessVsTimeLinePlotter querySuccessVsTimeLinePlotter_;
   QueryTimeAtFirstHistogramPlotter queryTimeAtFirstHistogramPlotter_;
 
   const Statistics& stats_;

@@ -49,10 +49,10 @@ namespace esp {
 
 namespace ompltools {
 
-class MedianCumulativeCostAtTimeVsQueryLinePlotter : public LatexPlotter {
+class MedianSummedCostAtTimeVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianCumulativeCostAtTimeVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
-  ~MedianCumulativeCostAtTimeVsQueryLinePlotter() = default;
+  MedianSummedCostAtTimeVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~MedianSummedCostAtTimeVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median cumulative cost at either the first 
   // or the last solution (indicated by initial) at each query for all planners.

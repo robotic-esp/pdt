@@ -37,7 +37,7 @@
 #include "esp_plotters/overview_plotter.h"
 
 #include "esp_plotters/query_median_cost_vs_time_line_plotter.h"
-#include "esp_plotters/query_solved_vs_time_line_plotter.h"
+#include "esp_plotters/query_success_vs_time_line_plotter.h"
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"
 #include "esp_tikz/pgf_plot.h"
@@ -59,7 +59,7 @@ OverviewPlotter::OverviewPlotter(const std::shared_ptr<const Configuration>& con
 
 fs::path OverviewPlotter::createCombinedPicture() const {
   // Create the success axis and override some options.
-  QuerySolvedVsTimeLinePlotter successPlotter(config_, stats_);
+  QuerySuccessVsTimeLinePlotter successPlotter(config_, stats_);
   auto successAxis = successPlotter.createSuccessAxis();
   successAxis->options.name = "AllPlannersCombinedSuccessAxis"s;
   successAxis->options.xlabel = "{\\empty}"s;
@@ -89,7 +89,7 @@ fs::path OverviewPlotter::createCombinedPicture() const {
 
 fs::path OverviewPlotter::createCombinedPicture(const std::string& plannerName) const {
   // Create the success axis and override some options.
-  QuerySolvedVsTimeLinePlotter successPlotter(config_, stats_);
+  QuerySuccessVsTimeLinePlotter successPlotter(config_, stats_);
   auto successAxis = successPlotter.createSuccessAxis(plannerName);
   successAxis->options.name = plannerName + "CombinedSuccessAxis"s;
   successAxis->options.xlabel = "{\\empty}"s;
