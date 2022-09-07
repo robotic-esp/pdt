@@ -3,20 +3,20 @@ project(esp_plotters)
 
 # Specify the library as a target.
 add_library(esp_plotters
-  src/cost_percentile_evolution_plotter.cpp
-  src/initial_solution_duration_histogram_plotter.cpp
-  src/initial_solution_scatter_plotter.cpp
-  src/median_cost_evolution_plotter.cpp
-  src/median_cumulative_cost_plotter.cpp
-  src/median_cumulative_duration_plotter.cpp
-  src/median_initial_solution_plotter.cpp
-  src/median_initial_solution_query_plotter.cpp
-  src/median_initial_solution_cost_query_plotter.cpp
-  src/median_final_cost_query_plotter.cpp
+  src/query_percentile_cost_vs_time_line_plotter.cpp
+  src/query_time_at_first_histogram_plotter.cpp
+  src/query_cost_at_first_vs_time_at_first_scatter_plotter.cpp
+  src/query_median_cost_vs_time_line_plotter.cpp
+  src/median_cumulative_cost_at_time_vs_query_line_plotter.cpp
+  src/median_cumulative_time_at_first_vs_query_line_plotter.cpp
+  src/query_median_cost_at_first_vs_median_time_at_first_point_plotter.cpp
+  src/median_time_at_first_vs_query_line_plotter.cpp
+  src/median_cost_at_first_vs_query_line_plotter.cpp
+  src/median_cost_at_last_vs_query_line_plotter.cpp
   src/overview_plotter.cpp
   src/latex_plotter.cpp
-  src/success_plotter.cpp
-  src/success_rate_per_query_plotter.cpp)
+  src/query_solved_vs_time_line_plotter.cpp
+  src/solved_at_time_vs_query_line_plotter.cpp)
 
 # Specify the include directories for this target.
 target_include_directories(esp_plotters

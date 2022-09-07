@@ -43,12 +43,12 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_plotters/median_cumulative_cost_plotter.h"
-#include "esp_plotters/median_cumulative_duration_plotter.h"
-#include "esp_plotters/median_initial_solution_query_plotter.h"
-#include "esp_plotters/median_initial_solution_cost_query_plotter.h"
-#include "esp_plotters/median_final_cost_query_plotter.h"
-#include "esp_plotters/success_rate_per_query_plotter.h"
+#include "esp_plotters/median_cumulative_cost_at_time_vs_query_line_plotter.h"
+#include "esp_plotters/median_cumulative_time_at_first_vs_query_line_plotter.h"
+#include "esp_plotters/median_time_at_first_vs_query_line_plotter.h"
+#include "esp_plotters/median_cost_at_first_vs_query_line_plotter.h"
+#include "esp_plotters/median_cost_at_last_vs_query_line_plotter.h"
+#include "esp_plotters/solved_at_time_vs_query_line_plotter.h"
 #include "esp_plotters/latex_plotter.h"
 #include "esp_reports/base_report.h"
 #include "esp_statistics/multiquery_statistics.h"

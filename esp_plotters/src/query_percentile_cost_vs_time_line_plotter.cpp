@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_plotters/cost_percentile_evolution_plotter.h"
+#include "esp_plotters/query_percentile_cost_vs_time_line_plotter.h"
 
 #include <iomanip>
 

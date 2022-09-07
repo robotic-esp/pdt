@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_plotters/initial_solution_duration_histogram_plotter.h"
+#include "esp_plotters/query_cost_at_first_vs_time_at_first_scatter_plotter.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -54,43 +54,40 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-InitialSolutionDurationHistogramPlotter::InitialSolutionDurationHistogramPlotter(
+InitialSolutionScatterPlotter::InitialSolutionScatterPlotter(
     const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<PgfAxis>
-InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramAxis() const {
-  axis_ = std::make_shared<PgfAxis>();
-  setInitialSolutionDurationHistogramAxisOptions(axis_);
+std::shared_ptr<PgfAxis> InitialSolutionScatterPlotter::createInitialSolutionScatterAxis()
+    const {
+  auto axis = std::make_shared<PgfAxis>();
+  setInitialSolutionScatterAxisOptions(axis);
 
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
-    auto plot = createInitialSolutionDurationHistogramPlot(name);
-    plot->options.fillOpacity = config_->get<float>("initialSolutionPlots/combinedFillOpacity");
-    plot->options.lineWidth = config_->get<double>("initialSolutionPlots/lineWidth");
-    axis_->addPlot(plot);
+    auto plot = createInitialSolutionScatterPlot(name);
+    plot->options.fillOpacity = config_->get<float>("initialSolutionScatterPlots/combinedFillOpacity");
+    plot->options.lineWidth = config_->get<double>("initialSolutionScatterPlots/lineWidth");
+    axis->addPlot(plot);
   }
 
-  return axis_;
+  return axis;
 }
 
-std::shared_ptr<PgfAxis>
-InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramAxis(
+std::shared_ptr<PgfAxis> InitialSolutionScatterPlotter::createInitialSolutionScatterAxis(
     const std::string& plannerName) const {
-  axis_ = std::make_shared<PgfAxis>();
-  setInitialSolutionDurationHistogramAxisOptions(axis_);
-  axis_->options.name = plannerName + "ISDPA"s;
-  axis_->addPlot(createInitialSolutionDurationHistogramPlot(plannerName));
-  return axis_;
+  auto axis = std::make_shared<PgfAxis>();
+  setInitialSolutionScatterAxisOptions(axis);
+  axis->options.name = plannerName + "InitialSolutionScatterAxis"s;
+  axis->addPlot(createInitialSolutionScatterPlot(plannerName));
+  return axis;
 }
 
-fs::path InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramPicture()
-    const {
+fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  axis_ = createInitialSolutionDurationHistogramAxis();
-  picture.addAxis(axis_);
+  picture.addAxis(createInitialSolutionScatterAxis());
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
@@ -99,12 +96,11 @@ fs::path InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationH
   return picturePath;
 }
 
-fs::path InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramPicture(
+fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
-  axis_ = createInitialSolutionDurationHistogramAxis(plannerName);
-  picture.addAxis(axis_);
+  picture.addAxis(createInitialSolutionScatterAxis(plannerName));
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
@@ -113,53 +109,40 @@ fs::path InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationH
   return picturePath;
 }
 
-std::shared_ptr<PgfPlot>
-InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramPlot(
+std::shared_ptr<PgfPlot> InitialSolutionScatterPlotter::createInitialSolutionScatterPlot(
     const std::string& plannerName) const {
   // Load the data into a pgf table.
-  auto table =
-      std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationHistogram(plannerName),
-                                 "bin begin durations", "bin counts");
+  auto table = std::make_shared<PgfTable>(stats_.extractInitialSolutions(plannerName),
+                                          "durations", "costs");
 
   // This table should not clean its data (or should it?).
   table->setCleanData(false);
 
-  // We need extra data points to make this look like a proper histogram.
-  auto firstRow = table->getRow(0u);
-  auto lastRow = table->getRow(table->getNumRows() - 1u);
-  table->prependRow({firstRow.at(0u), 0.0});
-  table->appendRow({lastRow.at(0u), 0.0});
-
-  // This is a bit of a hack, but I don't see an elegant way of doing this given the class architecture.
-  if (!std::isfinite(axis_->options.ymax) || axis_->options.ymax < table->getMaxValueInCol(1u)) {
-    axis_->options.ymax = table->getMaxValueInCol(1u);
-  }
-
   // Create the plot.
   auto plot = std::make_shared<PgfPlot>(table);
-  plot->options.mark = "\"none\"";
-  plot->options.lineWidth = 0.0;
-  plot->options.namePath = plannerName + "InitialSolutionDurationHistogram"s;
+  plot->options.markSize = config_->get<double>("initialSolutionScatterPlots/markSize");
+  plot->options.mark = "x";
+  plot->options.lineWidth = 0.1;
+  plot->options.constPlot = false;
+  plot->options.onlyMarks = true;
+  plot->options.namePath = plannerName + "InitialSolutionScatterPlotlineWidth"s;
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
-  plot->options.fill = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
 
   return plot;
 }
 
-void InitialSolutionDurationHistogramPlotter::setInitialSolutionDurationHistogramAxisOptions(
+void InitialSolutionScatterPlotter::setInitialSolutionScatterAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
-  axis->options.height = config_->get<std::string>("initialSolutionPlots/axisHeight");
-  axis->options.width = config_->get<std::string>("initialSolutionPlots/axisWidth");
-  axis->options.name = "InitialSolutionDurationHistogramAxis"s;
-  axis->options.xlog = config_->get<bool>("initialSolutionPlots/xlog");
-  axis->options.ymin = 0.0;
-  axis->options.enlargeYLimits = "upper";
-  axis->options.xminorgrids = config_->get<bool>("initialSolutionPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("initialSolutionPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("initialSolutionPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("initialSolutionPlots/ymajorgrids");
+  axis->options.height = config_->get<std::string>("initialSolutionScatterPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("initialSolutionScatterPlots/axisWidth");
+  axis->options.name = "InitialSolutionScatterAxis"s;
+  axis->options.xlog = config_->get<bool>("initialSolutionScatterPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("initialSolutionScatterPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("initialSolutionScatterPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("initialSolutionScatterPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("initialSolutionScatterPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]";
-  axis->options.ylabel = "Counts";
+  axis->options.ylabel = "Cost";
   axis->options.ylabelAbsolute = true;
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }

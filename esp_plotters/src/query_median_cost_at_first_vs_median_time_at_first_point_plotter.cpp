@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_plotters/median_initial_solution_plotter.h"
+#include "esp_plotters/query_median_cost_at_first_vs_median_time_at_first_point_plotter.h"
 
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"

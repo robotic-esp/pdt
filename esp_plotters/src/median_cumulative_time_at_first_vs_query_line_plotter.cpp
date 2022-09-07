@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_plotters/median_cumulative_duration_plotter.h"
+#include "esp_plotters/median_cumulative_time_at_first_vs_query_line_plotter.h"
 
 #include "esp_tikz/pgf_axis.h"
 #include "esp_tikz/pgf_fillbetween.h"

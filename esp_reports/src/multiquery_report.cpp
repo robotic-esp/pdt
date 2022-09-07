@@ -43,9 +43,9 @@
 #include <ompl/util/Console.h>
 
 #include "esp_factories/context_factory.h"
-#include "esp_plotters/median_cost_evolution_plotter.h"
-#include "esp_plotters/median_initial_solution_plotter.h"
-#include "esp_plotters/success_plotter.h"
+#include "esp_plotters/query_median_cost_vs_time_line_plotter.h"
+#include "esp_plotters/query_median_cost_at_first_vs_median_time_at_first_point_plotter.h"
+#include "esp_plotters/query_solved_vs_time_line_plotter.h"
 #include "esp_tikz/kpi_table.h"
 #include "esp_tikz/mq_kpi_table.h"
 #include "esp_tikz/pgf_axis.h"
