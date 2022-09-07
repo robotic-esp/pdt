@@ -137,7 +137,7 @@ MultiqueryStatistics::MultiqueryStatistics(const std::shared_ptr<Configuration>&
 }
 
 void MultiqueryStatistics::computeCumulativeMetricsForPlanner(
-    const std::string& plannerName, double confidence) {
+    const std::string& plannerName) {
   std::vector<double> medianDurations;
   std::vector<double> lowerDurationBounds;
   std::vector<double> upperDurationBounds;
@@ -145,6 +145,10 @@ void MultiqueryStatistics::computeCumulativeMetricsForPlanner(
   std::vector<double> medianCosts;
   std::vector<double> lowerCostBounds;
   std::vector<double> upperCostBounds;
+
+  // the confidence intervals we use here come from where the maximum values are used
+  const double initial_duration_confidence = config_->get<double>("medianCumulativeInitialDurationPlots/confidence");
+  const double initial_cost_confidence = config_->get<double>("medianCumulativeCostPlots/confidence");
 
   // merge together the stuff that is computed in the separate statistics
   for (auto i=0u; i<numQueries_; ++i){
@@ -155,13 +159,14 @@ void MultiqueryStatistics::computeCumulativeMetricsForPlanner(
     const double medianCost = stats_[i].getMedianInitialSolutionCost(stats_[i].results_.at(plannerName));
 
     // Get the interval for the upper and lower bounds.
-    const auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
+    const auto initial_duration_interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, initial_duration_confidence);
+    const auto initial_cost_interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, initial_cost_confidence);
 
     // Get the upper and lower confidence bounds on the median initial solution duration and cost.
-    const auto lowerDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.lower);
-    const auto upperDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), interval.upper);
-    const auto lowerCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.lower);
-    const auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.upper);
+    const auto lowerDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), initial_duration_interval.lower);
+    const auto upperDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), initial_duration_interval.upper);
+    const auto lowerCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), initial_cost_interval.lower);
+    const auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), initial_cost_interval.upper);
 
     // save the results
     medianDurations.emplace_back(medianDuration);
@@ -239,10 +244,13 @@ void MultiqueryStatistics::computeCumulativeMetricsForPlanner(
 }
 
 void MultiqueryStatistics::computeCumulativeFinalCost(
-      const std::string& plannerName, double confidence) {
+      const std::string& plannerName) {
   std::vector<double> medianCosts;
   std::vector<double> lowerCostBounds;
   std::vector<double> upperCostBounds;
+
+  // the confidence intervals we use here come from where the maximum values are used
+  const double final_cost_confidence = config_->get<double>("medianFinalCostPerQueryPlots/confidence");
 
   // merge together the stuff that is computed in the separate statistics
   for (auto i=0u; i<numQueries_; ++i){
@@ -250,11 +258,11 @@ void MultiqueryStatistics::computeCumulativeFinalCost(
     const double medianCost = stats_[i].getMedianFinalCost((plannerName));
 
     // Get the interval for the upper and lower bounds.
-    const auto interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, confidence);
+    const auto final_cost_interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, final_cost_confidence);
 
     // Get the upper and lower confidence bounds on the median initial solution duration and cost.
-    const auto lowerCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.lower, {stats_[i].defaultMedianBinDurations_.back()}).back();
-    const auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
+    const auto lowerCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), final_cost_interval.lower, {stats_[i].defaultMedianBinDurations_.back()}).back();
+    const auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), final_cost_interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
 
     // save the results
     medianCosts.emplace_back(medianCost);

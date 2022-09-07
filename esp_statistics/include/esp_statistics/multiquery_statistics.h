@@ -113,12 +113,8 @@ class MultiqueryStatistics {
   Statistics getQueryStatistics(const unsigned int i) const;
 
  private:
-  // the confidence we use here is fairly arbitrary. We need some interval which we use
-  // to compute the max values.
-  void computeCumulativeMetricsForPlanner(
-      const std::string& plannerName, double confidence = 0.99);
-  void computeCumulativeFinalCost(
-      const std::string& plannerName, double confidence = 0.99);
+  void computeCumulativeMetricsForPlanner(const std::string& plannerName);
+  void computeCumulativeFinalCost(const std::string& plannerName);
 
   std::shared_ptr<Configuration> config_;
   const std::experimental::filesystem::path statisticsDirectory_;
