@@ -82,7 +82,7 @@ fs::path MultiqueryReport::generateReport() {
 
   // Check on the failbit.
   if (report.fail() == true) {
-    auto msg = "ExperimentReport failed to create a report at '" + reportPath.string() + "'."s;
+    auto msg = "MultiQueryReport failed to create a report at '" + reportPath.string() + "'."s;
     throw std::ios_base::failure(msg);
   }
 

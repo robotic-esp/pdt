@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/experiment_report.h"
+#include "esp_tikz/single_query_report.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -56,7 +56,7 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
+SingleQueryReport::SingleQueryReport(const std::shared_ptr<Configuration>& config,
                                    const Statistics& stats) :
     BaseReport(config),
     latexPlotter_(config),
@@ -70,7 +70,7 @@ ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
     stats_(stats) {
 }
 
-fs::path ExperimentReport::generateReport() {
+fs::path SingleQueryReport::generateReport() {
   auto reportPath =
       fs::path(config_->get<std::string>("experiment/experimentDirectory")) / "report.tex"s;
   // Open the filestream.
@@ -79,7 +79,7 @@ fs::path ExperimentReport::generateReport() {
 
   // Check on the failbit.
   if (report.fail() == true) {
-    auto msg = "ExperimentReport failed to create a report at '" + reportPath.string() + "'."s;
+    auto msg = "SingleQueryReport failed to create a report at '" + reportPath.string() + "'."s;
     throw std::ios_base::failure(msg);
   }
 
@@ -107,7 +107,7 @@ fs::path ExperimentReport::generateReport() {
   return reportPath;
 }
 
-std::stringstream ExperimentReport::overview() const {
+std::stringstream SingleQueryReport::overview() const {
   std::stringstream overview;
   // We often refer to the planner names, this reference just makes it more convenient.
   const auto& plannerNames = config_->get<std::vector<std::string>>("experiment/planners");
@@ -196,7 +196,7 @@ std::stringstream ExperimentReport::overview() const {
   return overview;
 }
 
-std::stringstream ExperimentReport::individualResults() const {
+std::stringstream SingleQueryReport::individualResults() const {
   std::stringstream results;
 
   // Create a section for every planner.

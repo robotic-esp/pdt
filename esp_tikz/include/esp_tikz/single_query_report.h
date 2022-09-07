@@ -59,10 +59,10 @@ namespace esp {
 
 namespace ompltools {
 
-class ExperimentReport : public BaseReport {
+class SingleQueryReport : public BaseReport {
  public:
-  ExperimentReport(const std::shared_ptr<Configuration>& config, const Statistics& stats);
-  ~ExperimentReport() = default;
+  SingleQueryReport(const std::shared_ptr<Configuration>& config, const Statistics& stats);
+  ~SingleQueryReport() = default;
 
   std::experimental::filesystem::path generateReport() override;
 

@@ -44,7 +44,7 @@
 
 #include "esp_configuration/configuration.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/experiment_report.h"
+#include "esp_tikz/single_query_report.h"
 
 using namespace std::string_literals;
 
@@ -71,7 +71,7 @@ int main(const int argc, const char** argv) {
         "No statistics were generated, thus no report can be compiled.");
   }
   else if(stats.size() == 1u){ // Single query report
-    esp::ompltools::ExperimentReport report(config, stats[0u]);
+    esp::ompltools::SingleQueryReport report(config, stats[0u]);
     report.generateReport();
     report.compileReport();
   }

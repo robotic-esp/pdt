@@ -5,7 +5,6 @@ project(esp_tikz)
 add_library(esp_tikz
   src/base_report.cpp
   src/cost_percentile_evolution_plotter.cpp
-  src/experiment_report.cpp
   src/kpi_table.cpp
   src/mq_kpi_table.cpp
   src/initial_solution_duration_histogram_plotter.cpp
@@ -24,6 +23,7 @@ add_library(esp_tikz
   src/pgf_fillbetween.cpp
   src/pgf_plot.cpp
   src/pgf_table.cpp
+  src/single_query_report.cpp
   src/success_plotter.cpp
   src/success_rate_per_query_plotter.cpp
   src/tabularx.cpp
