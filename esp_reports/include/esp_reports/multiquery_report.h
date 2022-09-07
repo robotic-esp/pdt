@@ -1,8 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014-2017     University of Toronto
- *  Copyright (c) 2018-present  University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -15,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the names of the copyright holders nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -33,56 +32,54 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Valentin Hartmann
 
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <vector>
+#pragma once
 
 #include <experimental/filesystem>
+#include <memory>
+#include <set>
+#include <sstream>
+#include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_reports/single_query_report.h"
-#include "esp_statistics/statistics.h"
+#include "esp_plotters/median_cumulative_cost_plotter.h"
+#include "esp_plotters/median_cumulative_duration_plotter.h"
+#include "esp_plotters/median_initial_solution_query_plotter.h"
+#include "esp_plotters/median_initial_solution_cost_query_plotter.h"
+#include "esp_plotters/median_final_cost_query_plotter.h"
+#include "esp_plotters/success_rate_per_query_plotter.h"
+#include "esp_plotters/latex_plotter.h"
+#include "esp_reports/base_report.h"
+#include "esp_statistics/multiquery_statistics.h"
+#include "esp_tikz/tikz_picture.h"
 
-using namespace std::string_literals;
+namespace esp {
 
-int main(const int argc, const char** argv) {
-  // Read the config files.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+namespace ompltools {
 
-  std::cout << "\nReport\n"
-            << std::setw(2u) << std::setfill(' ') << ' '
-            << "Compiling (this may take a couple of minutes)" << std::flush;
+class MultiqueryReport : public BaseReport{
+ public:
+  MultiqueryReport(const std::shared_ptr<Configuration>& config, const MultiqueryStatistics& stats);
+  ~MultiqueryReport() = default;
 
-  const std::vector<std::string> resultPaths = config->get<std::vector<std::string>>("experiment/results");
+  std::experimental::filesystem::path generateReport() override;
 
-  // Generate the statistic.
-  std::vector<esp::ompltools::Statistics> stats;
+ private:
+  std::stringstream overview() const;
+  std::stringstream individualResults() const;
 
-  for (const auto &path: resultPaths){
-    stats.push_back(esp::ompltools::Statistics(config, path, true));
-  }
+  // Plotters.
+  MedianCumulativeCostPlotter medianCumulativeCostPlotter_;
+  MedianCumulativeDurationPlotter medianCumulativeDurationPlotter_;
+  MedianInitialSolutionQueryPlotter medianInitialDurationQueryPlotter_;
+  MedianInitialSolutionCostQueryPlotter medianInitialCostQueryPlotter_;
+  MedianFinalCostQueryPlotter medianFinalCostQueryPlotter_;
+  SuccessRateQueryPlotter successRateQueryPlotter_;
 
-  // Generate the report.
-  if (stats.size() == 0u){
-    throw std::runtime_error(
-        "No statistics were generated, thus no report can be compiled.");
-  }
-  else if(stats.size() == 1u){ // Single query report
-    esp::ompltools::SingleQueryReport report(config, stats[0u]);
-    report.generateReport();
-    report.compileReport();
-  }
-  else{ // Multiquery report
+  const MultiqueryStatistics& stats_;
+};
 
-  }
-  
-  // Inform that we are done compiling the report.
-  std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
-            << std::setfill(' ') << ' ' << "Compilation done\n"
-            << std::flush;
+}  // namespace ompltools
 
-  return 0;
-}
+}  // namespace esp

@@ -54,9 +54,9 @@
 #include "esp_factories/planner_factory.h"
 #include "esp_performance_loggers/performance_loggers.h"
 #include "esp_planning_contexts/all_contexts.h"
+#include "esp_reports/multiquery_report.h"
+#include "esp_reports/single_query_report.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/experiment_report.h"
-#include "esp_tikz/multiquery_report.h"
 #include "esp_time/time.h"
 #include "esp_utilities/get_best_cost.h"
 
@@ -475,7 +475,7 @@ int main(const int argc, const char **argv) {
         "No statistics were generated, thus no report can be compiled.");
   }
   else if(stats.size() == 1u){ // Single query report
-    esp::ompltools::ExperimentReport report(config, stats[0u]);
+    esp::ompltools::SingleQueryReport report(config, stats[0u]);
     report.generateReport();
     reportPath = report.compileReport();
   }

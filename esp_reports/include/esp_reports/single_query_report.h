@@ -1,8 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014-2017     University of Toronto
- *  Copyright (c) 2018-present  University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -15,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the names of the copyright holders nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -35,54 +34,55 @@
 
 // Authors: Marlin Strub
 
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <vector>
+#pragma once
 
 #include <experimental/filesystem>
+#include <memory>
+#include <set>
+#include <sstream>
+#include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_reports/single_query_report.h"
+#include "esp_plotters/cost_percentile_evolution_plotter.h"
+#include "esp_plotters/initial_solution_duration_histogram_plotter.h"
+#include "esp_plotters/initial_solution_scatter_plotter.h"
+#include "esp_plotters/latex_plotter.h"
+#include "esp_plotters/median_cost_evolution_plotter.h"
+#include "esp_plotters/median_initial_solution_plotter.h"
+#include "esp_plotters/overview_plotter.h"
+#include "esp_plotters/success_plotter.h"
+#include "esp_reports/base_report.h"
 #include "esp_statistics/statistics.h"
+#include "esp_tikz/tikz_picture.h"
 
-using namespace std::string_literals;
+namespace esp {
 
-int main(const int argc, const char** argv) {
-  // Read the config files.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+namespace ompltools {
 
-  std::cout << "\nReport\n"
-            << std::setw(2u) << std::setfill(' ') << ' '
-            << "Compiling (this may take a couple of minutes)" << std::flush;
+class SingleQueryReport : public BaseReport {
+ public:
+  SingleQueryReport(const std::shared_ptr<Configuration>& config, const Statistics& stats);
+  ~SingleQueryReport() = default;
 
-  const std::vector<std::string> resultPaths = config->get<std::vector<std::string>>("experiment/results");
+  std::experimental::filesystem::path generateReport() override;
 
-  // Generate the statistic.
-  std::vector<esp::ompltools::Statistics> stats;
+ private:
+  std::stringstream overview() const;
+  std::stringstream individualResults() const;
 
-  for (const auto &path: resultPaths){
-    stats.push_back(esp::ompltools::Statistics(config, path, true));
-  }
+  // Plotters.
+  LatexPlotter latexPlotter_;
+  CostPercentileEvolutionPlotter costPercentileEvolutionPlotter_;
+  InitialSolutionDurationHistogramPlotter initialSolutionDurationHistogramPlotter_;
+  InitialSolutionScatterPlotter initialSolutionScatterPlotter_;
+  MedianCostEvolutionPlotter medianCostEvolutionPlotter_;
+  MedianInitialSolutionPlotter medianInitialSolutionPlotter_;
+  SuccessPlotter successPlotter_;
+  OverviewPlotter overviewPlotter_;
 
-  // Generate the report.
-  if (stats.size() == 0u){
-    throw std::runtime_error(
-        "No statistics were generated, thus no report can be compiled.");
-  }
-  else if(stats.size() == 1u){ // Single query report
-    esp::ompltools::SingleQueryReport report(config, stats[0u]);
-    report.generateReport();
-    report.compileReport();
-  }
-  else{ // Multiquery report
+  const Statistics& stats_;
+};
 
-  }
-  
-  // Inform that we are done compiling the report.
-  std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
-            << std::setfill(' ') << ' ' << "Compilation done\n"
-            << std::flush;
+}  // namespace ompltools
 
-  return 0;
-}
+}  // namespace esp

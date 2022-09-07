@@ -1,8 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014-2017     University of Toronto
- *  Copyright (c) 2018-present  University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -15,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the names of the copyright holders nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -35,54 +34,60 @@
 
 // Authors: Marlin Strub
 
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <vector>
+#pragma once
 
 #include <experimental/filesystem>
+#include <memory>
+#include <set>
+#include <sstream>
+#include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_reports/single_query_report.h"
-#include "esp_statistics/statistics.h"
+#include "esp_plotters/latex_plotter.h"
 
-using namespace std::string_literals;
+namespace esp {
 
-int main(const int argc, const char** argv) {
-  // Read the config files.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+namespace ompltools {
 
-  std::cout << "\nReport\n"
-            << std::setw(2u) << std::setfill(' ') << ' '
-            << "Compiling (this may take a couple of minutes)" << std::flush;
+class BaseReport {
+ public:
+  BaseReport(const std::shared_ptr<Configuration>& config);
+  ~BaseReport() = default;
 
-  const std::vector<std::string> resultPaths = config->get<std::vector<std::string>>("experiment/results");
+  virtual std::experimental::filesystem::path generateReport() = 0;
+  std::experimental::filesystem::path compileReport() const;
 
-  // Generate the statistic.
-  std::vector<esp::ompltools::Statistics> stats;
+ protected:
+  std::stringstream preamble() const;
+  std::stringstream appendix() const;
 
-  for (const auto &path: resultPaths){
-    stats.push_back(esp::ompltools::Statistics(config, path, true));
-  }
+  const std::set<std::string> requirePackages_{"luatex85", "shellesc"};
+  const std::set<std::string> usePackages_{"appendix", "booktabs",  "caption",
+                                           "listings", "microtype", "tabularx",
+                                           "tikz",     "pgfplots",  "xcolor"};
+  const std::set<std::string> lstSet_{};
+  const std::set<std::string> tikzLibraries_{"calc", "plotmarks", "external"};
+  const std::set<std::string> pgfLibraries_{"fillbetween"};
+  const std::set<std::string> pgfPlotsset_{"compat=1.15"};
 
-  // Generate the report.
-  if (stats.size() == 0u){
-    throw std::runtime_error(
-        "No statistics were generated, thus no report can be compiled.");
-  }
-  else if(stats.size() == 1u){ // Single query report
-    esp::ompltools::SingleQueryReport report(config, stats[0u]);
-    report.generateReport();
-    report.compileReport();
-  }
-  else{ // Multiquery report
+  std::string experimentName_{};
+  std::map<std::string, std::string> plotPlannerNames_{};
 
-  }
-  
-  // Inform that we are done compiling the report.
-  std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
-            << std::setfill(' ') << ' ' << "Compilation done\n"
-            << std::flush;
+  // Plotters.
+  LatexPlotter latexPlotter_;
 
-  return 0;
-}
+  // Colors.
+  std::map<std::string, std::array<int, 3>> espColors_{};
+
+  const std::shared_ptr<const Configuration> config_;
+
+  // Helper to replace _ with \_, see [1].
+  void findAndReplaceAll(std::string* string, const std::string& key,
+                         const std::string& replacement) const;
+};
+
+}  // namespace ompltools
+
+}  // namespace esp
+
+// [1] https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c/
