@@ -62,8 +62,9 @@ class BaseReport {
   std::stringstream appendix() const;
 
   const std::set<std::string> requirePackages_{"luatex85", "shellesc"};
-  const std::set<std::string> usePackages_{"appendix", "booktabs", "caption",  "listings",
-                                           "tabularx", "tikz",     "pgfplots", "xcolor"};
+  const std::set<std::string> usePackages_{"appendix", "booktabs",  "caption",
+                                           "listings", "microtype", "tabularx",
+                                           "tikz",     "pgfplots",  "xcolor"};
   const std::set<std::string> lstSet_{};
   const std::set<std::string> tikzLibraries_{"calc", "plotmarks", "external"};
   const std::set<std::string> pgfLibraries_{"fillbetween"};
