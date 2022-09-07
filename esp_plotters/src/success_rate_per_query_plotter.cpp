@@ -67,11 +67,7 @@ std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
 
   // Fill the axis with the success rate plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
-    std::shared_ptr<PgfPlot> plt;
-
-    plt = createSuccessRateQueryPercentPlot(name, percentage);
-
-    axis->addPlot(plt);
+    axis->addPlot(createSuccessRateQueryPercentPlot(name, percentage));
   }
   axis->options.name = "AllPlannersSuccessRateQueryAxis" + std::to_string(percentage);
 
@@ -87,11 +83,7 @@ std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
   auto axis = std::make_shared<PgfAxis>();
   setSuccessRateQueryAxisOptions(axis);
 
-  std::shared_ptr<PgfPlot> plt;
-
-  plt = createSuccessRateQueryPercentPlot(plannerName, percentage);
-
-  axis->addPlot(plt);
+  axis->addPlot(createSuccessRateQueryPercentPlot(plannerName, percentage));
 
   axis->options.name = plannerName + "SuccessRateQueryAxis" + std::to_string(percentage);
 
