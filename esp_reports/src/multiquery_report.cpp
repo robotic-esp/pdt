@@ -34,7 +34,7 @@
 
 // Authors: Valentin Hartmann
 
-#include "esp_tikz/multiquery_report.h"
+#include "esp_reports//multiquery_report.h"
 
 #include <stdlib.h>
 #include <algorithm>

@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/single_query_report.h"
+#include "esp_reports//single_query_report.h"
 
 #include <stdlib.h>
 #include <algorithm>

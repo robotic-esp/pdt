@@ -43,8 +43,8 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
+#include "esp_reports/base_report.h"
 #include "esp_statistics/multiquery_statistics.h"
-#include "esp_tikz/base_report.h"
 #include "esp_tikz/median_cumulative_cost_plotter.h"
 #include "esp_tikz/median_cumulative_duration_plotter.h"
 #include "esp_tikz/median_initial_solution_query_plotter.h"

@@ -23,7 +23,7 @@ target_link_libraries(benchmark
   esp_factories
   esp_planning_contexts
   esp_performance_loggers
-  esp_tikz
+  esp_reports
   esp_time
   esp_utilities
   ${Boost_LIBRARIES})
@@ -38,8 +38,8 @@ target_link_libraries(benchmark_report
   esp_ompl_tools
   PUBLIC
   esp_configuration
-  esp_statistics
-  esp_tikz)
+  esp_reports
+  esp_statistics)
 
 # Specify the collision_detection_test executable target.
 add_executable(collision_detection_test

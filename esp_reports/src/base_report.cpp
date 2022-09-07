@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/base_report.h"
+#include "esp_reports/base_report.h"
 
 #include <stdlib.h>
 #include <algorithm>

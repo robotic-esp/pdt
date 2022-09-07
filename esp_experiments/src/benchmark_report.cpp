@@ -43,8 +43,8 @@
 #include <experimental/filesystem>
 
 #include "esp_configuration/configuration.h"
+#include "esp_reports/single_query_report.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/single_query_report.h"
 
 using namespace std::string_literals;
 

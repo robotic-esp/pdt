@@ -54,9 +54,9 @@
 #include "esp_factories/planner_factory.h"
 #include "esp_performance_loggers/performance_loggers.h"
 #include "esp_planning_contexts/all_contexts.h"
+#include "esp_reports/multiquery_report.h"
+#include "esp_reports/single_query_report.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/multiquery_report.h"
-#include "esp_tikz/single_query_report.h"
 #include "esp_time/time.h"
 #include "esp_utilities/get_best_cost.h"
 

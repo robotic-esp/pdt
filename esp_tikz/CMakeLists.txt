@@ -3,7 +3,6 @@ project(esp_tikz)
 
 # Specify the library as a target.
 add_library(esp_tikz
-  src/base_report.cpp
   src/cost_percentile_evolution_plotter.cpp
   src/kpi_table.cpp
   src/mq_kpi_table.cpp
@@ -16,14 +15,12 @@ add_library(esp_tikz
   src/median_initial_solution_query_plotter.cpp
   src/median_initial_solution_cost_query_plotter.cpp
   src/median_final_cost_query_plotter.cpp
-  src/multiquery_report.cpp
   src/overview_plotter.cpp
   src/latex_plotter.cpp
   src/pgf_axis.cpp
   src/pgf_fillbetween.cpp
   src/pgf_plot.cpp
   src/pgf_table.cpp
-  src/single_query_report.cpp
   src/success_plotter.cpp
   src/success_rate_per_query_plotter.cpp
   src/tabularx.cpp
