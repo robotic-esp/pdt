@@ -49,13 +49,13 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianInitialSolutionQueryPlotter::MedianInitialSolutionQueryPlotter(
+MedianTimeAtFirstVsQueryLinePlotter::MedianTimeAtFirstVsQueryLinePlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialDurationAxis()
+std::shared_ptr<PgfAxis> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationAxis()
     const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialDurationAxisOptions(axis);
@@ -82,7 +82,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialDurationAxis(
+std::shared_ptr<PgfAxis> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialDurationAxisOptions(axis);
@@ -102,7 +102,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionQueryPlotter::createMedianInitialD
   return axis;
 }
 
-fs::path MedianInitialSolutionQueryPlotter::createMedianInitialDurationPicture() const {
+fs::path MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   auto axis = createMedianInitialDurationAxis();
@@ -115,7 +115,7 @@ fs::path MedianInitialSolutionQueryPlotter::createMedianInitialDurationPicture()
   return picturePath;
 }
 
-fs::path MedianInitialSolutionQueryPlotter::createMedianInitialDurationPicture(
+fs::path MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -129,7 +129,7 @@ fs::path MedianInitialSolutionQueryPlotter::createMedianInitialDurationPicture(
   return picturePath;
 }
 
-void MedianInitialSolutionQueryPlotter::setMedianInitialDurationAxisOptions(
+void MedianTimeAtFirstVsQueryLinePlotter::setMedianInitialDurationAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianInitialDurationPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianInitialDurationPlots/axisHeight");
@@ -146,7 +146,7 @@ void MedianInitialSolutionQueryPlotter::setMedianInitialDurationAxisOptions(
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialDurationPlot(
+std::shared_ptr<PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -168,7 +168,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialD
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialDurationUpperCiPlot(
+std::shared_ptr<PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -203,7 +203,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialD
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialDurationLowerCiPlot(
+std::shared_ptr<PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -235,7 +235,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialD
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionQueryPlotter::createMedianInitialDurationFillCiPlot(
+std::shared_ptr<PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =

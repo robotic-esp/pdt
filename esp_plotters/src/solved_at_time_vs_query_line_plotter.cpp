@@ -49,14 +49,14 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-SuccessRateQueryPlotter::SuccessRateQueryPlotter(
+SolvedAtTimeVsQueryLinePlotter::SolvedAtTimeVsQueryLinePlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
-std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
+std::shared_ptr<PgfAxis> SolvedAtTimeVsQueryLinePlotter::createSuccessRateQueryAxis(
     const unsigned int percentage) const {
   if (percentage != 100u && percentage != 75u && percentage != 50u && percentage != 25u){
     throw std::runtime_error("Invalid percentage in success per query plotter.");
@@ -74,7 +74,7 @@ std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
   return axis;
 }
 
-std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
+std::shared_ptr<PgfAxis> SolvedAtTimeVsQueryLinePlotter::createSuccessRateQueryAxis(
     const std::string& plannerName, const unsigned int percentage) const {
   if (percentage != 100u && percentage != 75u && percentage != 50u && percentage != 25u){
     throw std::runtime_error("Invalid percentage in success per query plotter.");
@@ -90,7 +90,7 @@ std::shared_ptr<PgfAxis> SuccessRateQueryPlotter::createSuccessRateQueryAxis(
   return axis;
 }
 
-fs::path SuccessRateQueryPlotter::createSuccessRateQueryPicture(const unsigned int percentage) const {
+fs::path SolvedAtTimeVsQueryLinePlotter::createSuccessRateQueryPicture(const unsigned int percentage) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   auto axis = createSuccessRateQueryAxis(percentage);
@@ -103,7 +103,7 @@ fs::path SuccessRateQueryPlotter::createSuccessRateQueryPicture(const unsigned i
   return picturePath;
 }
 
-fs::path SuccessRateQueryPlotter::createSuccessRateQueryPicture(
+fs::path SolvedAtTimeVsQueryLinePlotter::createSuccessRateQueryPicture(
     const std::string& plannerName, const unsigned int percentage) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -117,7 +117,7 @@ fs::path SuccessRateQueryPlotter::createSuccessRateQueryPicture(
   return picturePath;
 }
 
-void SuccessRateQueryPlotter::setSuccessRateQueryAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+void SolvedAtTimeVsQueryLinePlotter::setSuccessRateQueryAxisOptions(std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("successRatePlots/axisWidth");
   axis->options.height = config_->get<std::string>("successRatePlots/axisHeight");
   axis->options.ymin = 0.;
@@ -133,7 +133,7 @@ void SuccessRateQueryPlotter::setSuccessRateQueryAxisOptions(std::shared_ptr<Pgf
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> SuccessRateQueryPlotter::createSuccessRateQueryPercentPlot(
+std::shared_ptr<PgfPlot> SolvedAtTimeVsQueryLinePlotter::createSuccessRateQueryPercentPlot(
     const std::string& plannerName, const unsigned int percentage) const {
 
   const auto percentString = std::to_string(percentage);

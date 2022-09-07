@@ -72,12 +72,12 @@ class SingleQueryReport : public BaseReport {
 
   // Plotters.
   LatexPlotter latexPlotter_;
-  CostPercentileEvolutionPlotter costPercentileEvolutionPlotter_;
-  InitialSolutionDurationHistogramPlotter initialSolutionDurationHistogramPlotter_;
-  InitialSolutionScatterPlotter initialSolutionScatterPlotter_;
-  MedianCostEvolutionPlotter medianCostEvolutionPlotter_;
-  MedianInitialSolutionPlotter medianInitialSolutionPlotter_;
-  SuccessPlotter successPlotter_;
+  QueryPercentileCostVsTimeLinePlotter queryPercentileCostVsTimeLinePlotter_;
+  QueryTimeAtFirstHistogramPlotter queryTimeAtFirstHistogramPlotter_;
+  QueryCostAtFirstVsTimeAtFirstScatterPlotter queryCostAtFirstVsTimeAtFirstScatterPlotter_;
+  QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter_;
+  QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_;
+  QuerySolvedVsTimeLinePlotter querySolvedVsTimeLinePlotter_;
   OverviewPlotter overviewPlotter_;
 
   const Statistics& stats_;

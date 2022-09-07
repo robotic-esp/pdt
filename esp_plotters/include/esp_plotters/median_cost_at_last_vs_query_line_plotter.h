@@ -49,10 +49,10 @@ namespace esp {
 
 namespace ompltools {
 
-class MedianFinalCostQueryPlotter : public LatexPlotter {
+class MedianCostAtLastVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianFinalCostQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
-  ~MedianFinalCostQueryPlotter() = default;
+  MedianCostAtLastVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~MedianCostAtLastVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median final cost at each query for all planners.
   std::shared_ptr<PgfAxis> createMedianFinalCostAxis() const;

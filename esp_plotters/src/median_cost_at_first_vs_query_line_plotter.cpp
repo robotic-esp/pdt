@@ -49,13 +49,13 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianInitialSolutionCostQueryPlotter::MedianInitialSolutionCostQueryPlotter(
+MedianCostAtFirstVsQueryLinePlotter::MedianCostAtFirstVsQueryLinePlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostAxis()
+std::shared_ptr<PgfAxis> MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostAxis()
     const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialCostAxisOptions(axis);
@@ -82,7 +82,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInit
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostAxis(
+std::shared_ptr<PgfAxis> MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialCostAxisOptions(axis);
@@ -102,7 +102,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionCostQueryPlotter::createMedianInit
   return axis;
 }
 
-fs::path MedianInitialSolutionCostQueryPlotter::createMedianInitialCostPicture() const {
+fs::path MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   auto axis = createMedianInitialCostAxis();
@@ -115,7 +115,7 @@ fs::path MedianInitialSolutionCostQueryPlotter::createMedianInitialCostPicture()
   return picturePath;
 }
 
-fs::path MedianInitialSolutionCostQueryPlotter::createMedianInitialCostPicture(
+fs::path MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -129,7 +129,7 @@ fs::path MedianInitialSolutionCostQueryPlotter::createMedianInitialCostPicture(
   return picturePath;
 }
 
-void MedianInitialSolutionCostQueryPlotter::setMedianInitialCostAxisOptions(
+void MedianCostAtFirstVsQueryLinePlotter::setMedianInitialCostAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianInitialCostPerQueryPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianInitialCostPerQueryPlots/axisHeight");
@@ -146,7 +146,7 @@ void MedianInitialSolutionCostQueryPlotter::setMedianInitialCostAxisOptions(
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostPlot(
+std::shared_ptr<PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -168,7 +168,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInit
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostUpperCiPlot(
+std::shared_ptr<PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -203,7 +203,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInit
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostLowerCiPlot(
+std::shared_ptr<PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -235,7 +235,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInit
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionCostQueryPlotter::createMedianInitialCostFillCiPlot(
+std::shared_ptr<PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =

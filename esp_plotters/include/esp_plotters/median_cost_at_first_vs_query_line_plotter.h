@@ -49,10 +49,10 @@ namespace esp {
 
 namespace ompltools {
 
-class MedianInitialSolutionCostQueryPlotter : public LatexPlotter {
+class MedianCostAtFirstVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianInitialSolutionCostQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
-  ~MedianInitialSolutionCostQueryPlotter() = default;
+  MedianCostAtFirstVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~MedianCostAtFirstVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median cost of the initial solutions at each query for all planners.
   std::shared_ptr<PgfAxis> createMedianInitialCostAxis() const;

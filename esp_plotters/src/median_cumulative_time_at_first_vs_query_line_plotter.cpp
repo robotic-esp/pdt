@@ -49,14 +49,14 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianCumulativeDurationPlotter::MedianCumulativeDurationPlotter(
+MedianCumulativeTimeAtFirstVsQueryLinePlotter::MedianCumulativeTimeAtFirstVsQueryLinePlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
-std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulativeDurationAxis()
+std::shared_ptr<PgfAxis> MedianCumulativeTimeAtFirstVsQueryLinePlotter::createMedianCumulativeDurationAxis()
     const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianCumulativeDurationAxisOptions(axis);
@@ -84,7 +84,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulative
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulativeDurationAxis(
+std::shared_ptr<PgfAxis> MedianCumulativeTimeAtFirstVsQueryLinePlotter::createMedianCumulativeDurationAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianCumulativeDurationAxisOptions(axis);
@@ -104,7 +104,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeDurationPlotter::createMedianCumulative
   return axis;
 }
 
-fs::path MedianCumulativeDurationPlotter::createMedianCumulativeDurationPicture() const {
+fs::path MedianCumulativeTimeAtFirstVsQueryLinePlotter::createMedianCumulativeDurationPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   auto axis = createMedianCumulativeDurationAxis();
@@ -117,7 +117,7 @@ fs::path MedianCumulativeDurationPlotter::createMedianCumulativeDurationPicture(
   return picturePath;
 }
 
-fs::path MedianCumulativeDurationPlotter::createMedianCumulativeDurationPicture(
+fs::path MedianCumulativeTimeAtFirstVsQueryLinePlotter::createMedianCumulativeDurationPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -131,7 +131,7 @@ fs::path MedianCumulativeDurationPlotter::createMedianCumulativeDurationPicture(
   return picturePath;
 }
 
-void MedianCumulativeDurationPlotter::setMedianCumulativeDurationAxisOptions(
+void MedianCumulativeTimeAtFirstVsQueryLinePlotter::setMedianCumulativeDurationAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianCumulativeInitialDurationPlots/axisWidth");
   axis->options.height =
@@ -153,7 +153,7 @@ void MedianCumulativeDurationPlotter::setMedianCumulativeDurationAxisOptions(
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulativeDurationPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeTimeAtFirstVsQueryLinePlotter::createMedianCumulativeDurationPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -175,7 +175,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulativeDurationUpperCiPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeTimeAtFirstVsQueryLinePlotter::createMedianCumulativeDurationUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -211,7 +211,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulativeDurationLowerCiPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeTimeAtFirstVsQueryLinePlotter::createMedianCumulativeDurationLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -243,7 +243,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulative
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeDurationPlotter::createMedianCumulativeDurationFillCiPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeTimeAtFirstVsQueryLinePlotter::createMedianCumulativeDurationFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween = std::make_shared<PgfFillBetween>(

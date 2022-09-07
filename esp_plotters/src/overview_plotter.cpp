@@ -59,14 +59,14 @@ OverviewPlotter::OverviewPlotter(const std::shared_ptr<const Configuration>& con
 
 fs::path OverviewPlotter::createCombinedPicture() const {
   // Create the success axis and override some options.
-  SuccessPlotter successPlotter(config_, stats_);
+  QuerySolvedVsTimeLinePlotter successPlotter(config_, stats_);
   auto successAxis = successPlotter.createSuccessAxis();
   successAxis->options.name = "AllPlannersCombinedSuccessAxis"s;
   successAxis->options.xlabel = "{\\empty}"s;
   successAxis->options.xticklabel = "{\\empty}"s;
 
   // Create the median cost axis and override some options.
-  MedianCostEvolutionPlotter medianCostPlotter(config_, stats_);
+  QueryMedianCostVsTimeLinePlotter medianCostPlotter(config_, stats_);
   auto medianCostAxis = medianCostPlotter.createMedianCostEvolutionAxis();
   medianCostAxis->options.at = "($(AllPlannersCombinedSuccessAxis.south) - (0.0em, 0.3em)$)";
   medianCostAxis->options.anchor = "north";
@@ -89,14 +89,14 @@ fs::path OverviewPlotter::createCombinedPicture() const {
 
 fs::path OverviewPlotter::createCombinedPicture(const std::string& plannerName) const {
   // Create the success axis and override some options.
-  SuccessPlotter successPlotter(config_, stats_);
+  QuerySolvedVsTimeLinePlotter successPlotter(config_, stats_);
   auto successAxis = successPlotter.createSuccessAxis(plannerName);
   successAxis->options.name = plannerName + "CombinedSuccessAxis"s;
   successAxis->options.xlabel = "{\\empty}"s;
   successAxis->options.xticklabel = "{\\empty}"s;
 
   // Create the median cost axis and override some options.
-  MedianCostEvolutionPlotter medianCostPlotter(config_, stats_);
+  QueryMedianCostVsTimeLinePlotter medianCostPlotter(config_, stats_);
   auto medianCostAxis = medianCostPlotter.createMedianCostEvolutionAxis(plannerName);
   medianCostAxis->options.at =
       "($("s + plannerName + "CombinedSuccessAxis.south) - (0.0em, 0.3em)$)"s;

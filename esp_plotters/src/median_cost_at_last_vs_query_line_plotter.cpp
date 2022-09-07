@@ -49,13 +49,13 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianFinalCostQueryPlotter::MedianFinalCostQueryPlotter(
+MedianCostAtLastVsQueryLinePlotter::MedianCostAtLastVsQueryLinePlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<PgfAxis> MedianFinalCostQueryPlotter::createMedianFinalCostAxis() const {
+std::shared_ptr<PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostAxis() const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianFinalCostAxisOptions(axis);
 
@@ -81,7 +81,7 @@ std::shared_ptr<PgfAxis> MedianFinalCostQueryPlotter::createMedianFinalCostAxis(
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianFinalCostQueryPlotter::createMedianFinalCostAxis(
+std::shared_ptr<PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianFinalCostAxisOptions(axis);
@@ -101,7 +101,7 @@ std::shared_ptr<PgfAxis> MedianFinalCostQueryPlotter::createMedianFinalCostAxis(
   return axis;
 }
 
-fs::path MedianFinalCostQueryPlotter::createMedianFinalCostPicture() const {
+fs::path MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   auto axis = createMedianFinalCostAxis();
@@ -114,7 +114,7 @@ fs::path MedianFinalCostQueryPlotter::createMedianFinalCostPicture() const {
   return picturePath;
 }
 
-fs::path MedianFinalCostQueryPlotter::createMedianFinalCostPicture(
+fs::path MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -128,7 +128,7 @@ fs::path MedianFinalCostQueryPlotter::createMedianFinalCostPicture(
   return picturePath;
 }
 
-void MedianFinalCostQueryPlotter::setMedianFinalCostAxisOptions(
+void MedianCostAtLastVsQueryLinePlotter::setMedianFinalCostAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianFinalCostPerQueryPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianFinalCostPerQueryPlots/axisHeight");
@@ -146,7 +146,7 @@ void MedianFinalCostQueryPlotter::setMedianFinalCostAxisOptions(
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostPlot(
+std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -168,7 +168,7 @@ std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostPlot(
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostUpperCiPlot(
+std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -203,7 +203,7 @@ std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostUpper
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostLowerCiPlot(
+std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<PgfTable>(
@@ -235,7 +235,7 @@ std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostLower
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianFinalCostQueryPlotter::createMedianFinalCostFillCiPlot(
+std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =

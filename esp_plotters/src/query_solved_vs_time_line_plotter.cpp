@@ -49,7 +49,7 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-SuccessPlotter::SuccessPlotter(const std::shared_ptr<const Configuration>& config,
+QuerySolvedVsTimeLinePlotter::QuerySolvedVsTimeLinePlotter(const std::shared_ptr<const Configuration>& config,
                                const Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
@@ -58,7 +58,7 @@ SuccessPlotter::SuccessPlotter(const std::shared_ptr<const Configuration>& confi
   minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 
-std::shared_ptr<PgfAxis> SuccessPlotter::createSuccessAxis() const {
+std::shared_ptr<PgfAxis> QuerySolvedVsTimeLinePlotter::createSuccessAxis() const {
   auto axis = std::make_shared<PgfAxis>();
   setSuccessAxisOptions(axis);
 
@@ -90,7 +90,7 @@ std::shared_ptr<PgfAxis> SuccessPlotter::createSuccessAxis() const {
   return axis;
 }
 
-std::shared_ptr<PgfAxis> SuccessPlotter::createSuccessAxis(const std::string& plannerName) const {
+std::shared_ptr<PgfAxis> QuerySolvedVsTimeLinePlotter::createSuccessAxis(const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setSuccessAxisOptions(axis);
 
@@ -118,7 +118,7 @@ std::shared_ptr<PgfAxis> SuccessPlotter::createSuccessAxis(const std::string& pl
   return axis;
 }
 
-fs::path SuccessPlotter::createSuccessPicture() const {
+fs::path QuerySolvedVsTimeLinePlotter::createSuccessPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   picture.addAxis(createSuccessAxis());
@@ -130,7 +130,7 @@ fs::path SuccessPlotter::createSuccessPicture() const {
   return picturePath;
 }
 
-fs::path SuccessPlotter::createSuccessPicture(const std::string& plannerName) const {
+fs::path QuerySolvedVsTimeLinePlotter::createSuccessPicture(const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   picture.addAxis(createSuccessAxis(plannerName));
@@ -142,7 +142,7 @@ fs::path SuccessPlotter::createSuccessPicture(const std::string& plannerName) co
   return picturePath;
 }
 
-void SuccessPlotter::setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+void QuerySolvedVsTimeLinePlotter::setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const {
   axis->options.name = "SuccessAxis";
   axis->options.width = config_->get<std::string>("successPlots/axisWidth");
   axis->options.height = config_->get<std::string>("successPlots/axisHeight");
@@ -162,7 +162,7 @@ void SuccessPlotter::setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const 
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessPlot(const std::string& plannerName) const {
+std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessPlot(const std::string& plannerName) const {
   // Store the initial solution edf in a pgf table.
   auto table =
       std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationEdf(
@@ -193,7 +193,7 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessPlot(const std::string& pl
   return plot;
 }
 
-std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessUpperCiPlot(
+std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table =
@@ -229,7 +229,7 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessUpperCiPlot(
   return plot;
 }
 
-std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessLowerCiPlot(
+std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table =
@@ -265,7 +265,7 @@ std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessLowerCiPlot(
   return plot;
 }
 
-std::shared_ptr<PgfPlot> SuccessPlotter::createSuccessFillCiPlot(
+std::shared_ptr<PgfPlot> QuerySolvedVsTimeLinePlotter::createSuccessFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween = std::make_shared<PgfFillBetween>(plannerName + "SuccessUpperConfidence",

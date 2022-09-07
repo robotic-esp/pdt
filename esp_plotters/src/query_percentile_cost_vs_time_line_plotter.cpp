@@ -51,7 +51,7 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-CostPercentileEvolutionPlotter::CostPercentileEvolutionPlotter(
+QueryPercentileCostVsTimeLinePlotter::QueryPercentileCostVsTimeLinePlotter(
     const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
@@ -70,7 +70,7 @@ CostPercentileEvolutionPlotter::CostPercentileEvolutionPlotter(
   maxDurationToBePlotted_ = binnedDurations_.back();
 }
 
-std::shared_ptr<PgfAxis> CostPercentileEvolutionPlotter::createCostPercentileEvolutionAxis(
+std::shared_ptr<PgfAxis> QueryPercentileCostVsTimeLinePlotter::createCostPercentileEvolutionAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setCostPercentileEvolutionAxisOptions(axis);
@@ -84,7 +84,7 @@ std::shared_ptr<PgfAxis> CostPercentileEvolutionPlotter::createCostPercentileEvo
   return axis;
 }
 
-fs::path CostPercentileEvolutionPlotter::createCostPercentileEvolutionPicture(
+fs::path QueryPercentileCostVsTimeLinePlotter::createCostPercentileEvolutionPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -97,7 +97,7 @@ fs::path CostPercentileEvolutionPlotter::createCostPercentileEvolutionPicture(
   return picturePath;
 }
 
-void CostPercentileEvolutionPlotter::setCostPercentileEvolutionAxisOptions(
+void QueryPercentileCostVsTimeLinePlotter::setCostPercentileEvolutionAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("costPercentileEvolutionPlots/axisWidth");
   axis->options.height = config_->get<std::string>("costPercentileEvolutionPlots/axisHeight");
@@ -115,7 +115,7 @@ void CostPercentileEvolutionPlotter::setCostPercentileEvolutionAxisOptions(
   axis->options.legendStyle = "font=\\footnotesize, legend cell align=left, legend columns=-1";
 }
 
-std::shared_ptr<PgfPlot> CostPercentileEvolutionPlotter::createCostPercentileEvolutionPlot(
+std::shared_ptr<PgfPlot> QueryPercentileCostVsTimeLinePlotter::createCostPercentileEvolutionPlot(
     const std::string& plannerName, double percentile) const {
   // This cannot be applied to planners that aren't anytime.
   if (!stats_.getConfig()->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {

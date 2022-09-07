@@ -49,10 +49,10 @@ namespace esp {
 
 namespace ompltools {
 
-class SuccessRateQueryPlotter : public LatexPlotter {
+class SolvedAtTimeVsQueryLinePlotter : public LatexPlotter {
  public:
-  SuccessRateQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
-  ~SuccessRateQueryPlotter() = default;
+  SolvedAtTimeVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~SolvedAtTimeVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the success rate at a given percentage of the total time for all planners.
   // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.

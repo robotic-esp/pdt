@@ -49,14 +49,14 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianCumulativeCostPlotter::MedianCumulativeCostPlotter(
+MedianCumulativeCostAtTimeVsQueryLinePlotter::MedianCumulativeCostAtTimeVsQueryLinePlotter(
     const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
-std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCostAxis(
+std::shared_ptr<PgfAxis> MedianCumulativeCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostAxis(
     const bool initial) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianCumulativeCostAxisOptions(axis);
@@ -83,7 +83,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCost
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCostAxis(
+std::shared_ptr<PgfAxis> MedianCumulativeCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostAxis(
     const std::string& plannerName, const bool initial) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianCumulativeCostAxisOptions(axis);
@@ -103,7 +103,7 @@ std::shared_ptr<PgfAxis> MedianCumulativeCostPlotter::createMedianCumulativeCost
   return axis;
 }
 
-fs::path MedianCumulativeCostPlotter::createMedianCumulativeCostPicture(const bool initial) const {
+fs::path MedianCumulativeCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPicture(const bool initial) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   auto axis = createMedianCumulativeCostAxis(initial);
@@ -122,7 +122,7 @@ fs::path MedianCumulativeCostPlotter::createMedianCumulativeCostPicture(const bo
   return picturePath;
 }
 
-fs::path MedianCumulativeCostPlotter::createMedianCumulativeCostPicture(
+fs::path MedianCumulativeCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPicture(
     const std::string& plannerName, const bool initial) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -142,7 +142,7 @@ fs::path MedianCumulativeCostPlotter::createMedianCumulativeCostPicture(
   return picturePath;
 }
 
-void MedianCumulativeCostPlotter::setMedianCumulativeCostAxisOptions(
+void MedianCumulativeCostAtTimeVsQueryLinePlotter::setMedianCumulativeCostAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianCumulativeCostPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianCumulativeCostPlots/axisHeight");
@@ -160,7 +160,7 @@ void MedianCumulativeCostPlotter::setMedianCumulativeCostAxisOptions(
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCostPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
   std::shared_ptr<PgfTable> table;
@@ -190,7 +190,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCostUpperCiPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostUpperCiPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
   std::shared_ptr<PgfTable> table;
@@ -234,7 +234,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCostLowerCiPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostLowerCiPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
   std::shared_ptr<PgfTable> table;
@@ -274,7 +274,7 @@ std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCost
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCumulativeCostPlotter::createMedianCumulativeCostFillCiPlot(
+std::shared_ptr<PgfPlot> MedianCumulativeCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =

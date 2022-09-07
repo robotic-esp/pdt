@@ -49,10 +49,10 @@ namespace esp {
 
 namespace ompltools {
 
-class SuccessPlotter : public LatexPlotter {
+class QuerySolvedVsTimeLinePlotter : public LatexPlotter {
  public:
-  SuccessPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
-  ~SuccessPlotter() = default;
+  QuerySolvedVsTimeLinePlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
+  ~QuerySolvedVsTimeLinePlotter() = default;
 
   // Creates a pgf axis that holds the success percentage over time for all planners.
   std::shared_ptr<PgfAxis> createSuccessAxis() const;

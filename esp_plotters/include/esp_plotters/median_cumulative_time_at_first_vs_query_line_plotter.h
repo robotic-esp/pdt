@@ -49,10 +49,10 @@ namespace esp {
 
 namespace ompltools {
 
-class MedianCumulativeDurationPlotter : public LatexPlotter {
+class MedianCumulativeTimeAtFirstVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianCumulativeDurationPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
-  ~MedianCumulativeDurationPlotter() = default;
+  MedianCumulativeTimeAtFirstVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~MedianCumulativeTimeAtFirstVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median cumulative duration to find the initial solution at each query.
   std::shared_ptr<PgfAxis> createMedianCumulativeDurationAxis() const;

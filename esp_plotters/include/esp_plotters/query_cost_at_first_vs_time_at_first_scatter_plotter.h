@@ -48,11 +48,11 @@ namespace esp {
 
 namespace ompltools {
 
-class InitialSolutionScatterPlotter : public LatexPlotter {
+class QueryCostAtFirstVsTimeAtFirstScatterPlotter : public LatexPlotter {
  public:
-  InitialSolutionScatterPlotter(const std::shared_ptr<const Configuration>& config,
+  QueryCostAtFirstVsTimeAtFirstScatterPlotter(const std::shared_ptr<const Configuration>& config,
                                 const Statistics& stats);
-  ~InitialSolutionScatterPlotter() = default;
+  ~QueryCostAtFirstVsTimeAtFirstScatterPlotter() = default;
 
   // Creates a pgf axis that hold the initial solution scatter plot of all planners.
   std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis() const;

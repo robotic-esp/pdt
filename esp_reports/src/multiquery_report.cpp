@@ -63,12 +63,12 @@ namespace fs = std::experimental::filesystem;
 MultiqueryReport::MultiqueryReport(const std::shared_ptr<Configuration>& config,
                                    const MultiqueryStatistics& stats) :
     BaseReport(config),
-    medianCumulativeCostPlotter_(config, stats),
-    medianCumulativeDurationPlotter_(config, stats),
-    medianInitialDurationQueryPlotter_(config, stats),
-    medianInitialCostQueryPlotter_(config, stats),
-    medianFinalCostQueryPlotter_(config, stats),
-    successRateQueryPlotter_(config, stats),
+    medianCumulativeCostAtTimeVsQueryLinePlotter_(config, stats),
+    medianCumulativeTimeAtFirstVsQueryLinePlotter_(config, stats),
+    medianTimeAtFirstVsQueryLinePlotter_(config, stats),
+    medianCostAtFirstVsQueryLinePlotter_(config, stats),
+    medianCostAtLastVsQueryLinePlotter_(config, stats),
+    solvedAtTimeVsQueryLinePlotter_(config, stats),
     stats_(stats) {
 }
 
@@ -155,8 +155,8 @@ std::stringstream MultiqueryReport::overview() const {
   auto legend =
       latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("experiment/planners"));
 
-  auto medianQueryDurationAxis = medianInitialDurationQueryPlotter_.createMedianInitialDurationAxis();
-  auto medianCumulativeDurationAxis = medianCumulativeDurationPlotter_.createMedianCumulativeDurationAxis();
+  auto medianQueryDurationAxis = medianTimeAtFirstVsQueryLinePlotter_.createMedianInitialDurationAxis();
+  auto medianCumulativeDurationAxis = medianCumulativeTimeAtFirstVsQueryLinePlotter_.createMedianCumulativeDurationAxis();
 
   // Stack the axes
   latexPlotter_.stack(medianQueryDurationAxis, medianCumulativeDurationAxis, legend);
@@ -173,8 +173,8 @@ std::stringstream MultiqueryReport::overview() const {
           << "\\% confidence interval. "
           << "}\\end{center}\n";
 
-  auto medianQueryInitialCostAxis = medianInitialCostQueryPlotter_.createMedianInitialCostAxis();
-  auto medianCumulativeInitialCostAxis = medianCumulativeCostPlotter_.createMedianCumulativeCostAxis(true);
+  auto medianQueryInitialCostAxis = medianCostAtFirstVsQueryLinePlotter_.createMedianInitialCostAxis();
+  auto medianCumulativeInitialCostAxis = medianCumulativeCostAtTimeVsQueryLinePlotter_.createMedianCumulativeCostAxis(true);
 
   // Stack the axes
   latexPlotter_.stack(medianQueryInitialCostAxis, medianCumulativeInitialCostAxis, legend);
@@ -193,8 +193,8 @@ std::stringstream MultiqueryReport::overview() const {
           << "\\% confidence interval. "
           << "}\\end{center}\n";
 
-  auto medianQueryLastCostAxis = medianFinalCostQueryPlotter_.createMedianFinalCostAxis();
-  auto medianCumulativeLastCostAxis = medianCumulativeCostPlotter_.createMedianCumulativeCostAxis(false);
+  auto medianQueryLastCostAxis = medianCostAtLastVsQueryLinePlotter_.createMedianFinalCostAxis();
+  auto medianCumulativeLastCostAxis = medianCumulativeCostAtTimeVsQueryLinePlotter_.createMedianCumulativeCostAxis(false);
 
   medianCumulativeLastCostAxis->options.name += "_final";
 
@@ -214,7 +214,7 @@ std::stringstream MultiqueryReport::overview() const {
           << "\\% confidence interval. "
           << "}\\end{center}\n";
 
-  auto successRateQueryAxis = successRateQueryPlotter_.createSuccessRateQueryAxis(100u);
+  auto successRateQueryAxis = solvedAtTimeVsQueryLinePlotter_.createSuccessRateQueryAxis(100u);
 
   // Stack the axes
   latexPlotter_.stack(successRateQueryAxis, legend);
@@ -226,7 +226,7 @@ std::stringstream MultiqueryReport::overview() const {
           << " of all planners" << " at "
           << "the maximum solve time.} \\end{center}\n";
 
-  auto successRateHalfTimeQueryAxis = successRateQueryPlotter_.createSuccessRateQueryAxis(50u);
+  auto successRateHalfTimeQueryAxis = solvedAtTimeVsQueryLinePlotter_.createSuccessRateQueryAxis(50u);
 
   // Stack the axes
   latexPlotter_.stack(successRateHalfTimeQueryAxis, legend);
@@ -244,9 +244,9 @@ std::stringstream MultiqueryReport::overview() const {
     const auto n = static_cast<unsigned int>(std::floor(static_cast<double>(i*(stats_.getNumQueries()-1)) / static_cast<double>(numCostPlots-1)));
 
     auto nthQueryStatistics = stats_.getQueryStatistics(n);
-    MedianCostEvolutionPlotter medianCostEvolutionPlotter(config_, nthQueryStatistics);
-    MedianInitialSolutionPlotter medianInitialSolutionPlotter(config_, nthQueryStatistics);
-    SuccessPlotter successPlotter(config_, nthQueryStatistics);
+    QueryMedianCostVsTimeLinePlotter medianCostEvolutionPlotter(config_, nthQueryStatistics);
+    QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter medianInitialSolutionPlotter(config_, nthQueryStatistics);
+    QuerySolvedVsTimeLinePlotter successPlotter(config_, nthQueryStatistics);
 
     auto medianCostEvolutionAxis = medianCostEvolutionPlotter.createMedianCostEvolutionAxis();
     auto medianInitialSolutionAxis = medianInitialSolutionPlotter.createMedianInitialSolutionAxis();
@@ -298,7 +298,7 @@ std::stringstream MultiqueryReport::individualResults() const {
 
     results << "\\subsection{Duration per Query}\\label{sec:" << name << "-query-duration}\n";
     results << "\\begin{center}\n\\input{"
-            << medianInitialDurationQueryPlotter_.createMedianInitialDurationPicture(name).string()
+            << medianTimeAtFirstVsQueryLinePlotter_.createMedianInitialDurationPicture(name).string()
             << "}\n\\captionof{figure}{\\footnotesize (Top) Median duration per query of the initial solution of "
             << plotPlannerNames_.at(name) << " with "
             << 100.0 * config_->get<double>("medianInitialDurationPlots/confidence")

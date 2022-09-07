@@ -49,10 +49,10 @@ namespace esp {
 
 namespace ompltools {
 
-class MedianInitialSolutionQueryPlotter : public LatexPlotter {
+class MedianTimeAtFirstVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianInitialSolutionQueryPlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
-  ~MedianInitialSolutionQueryPlotter() = default;
+  MedianTimeAtFirstVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~MedianTimeAtFirstVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median initial solution duration per query for all planners.
   std::shared_ptr<PgfAxis> createMedianInitialDurationAxis() const;

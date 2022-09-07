@@ -49,7 +49,7 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MedianInitialSolutionPlotter::MedianInitialSolutionPlotter(
+QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(
     const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
@@ -58,7 +58,7 @@ MedianInitialSolutionPlotter::MedianInitialSolutionPlotter(
   minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 
-std::shared_ptr<PgfAxis> MedianInitialSolutionPlotter::createMedianInitialSolutionAxis() const {
+std::shared_ptr<PgfAxis> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionAxis() const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialSolutionAxisOptions(axis);
 
@@ -72,7 +72,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionPlotter::createMedianInitialSoluti
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianInitialSolutionPlotter::createMedianInitialSolutionAxis(
+std::shared_ptr<PgfAxis> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setMedianInitialSolutionAxisOptions(axis);
@@ -85,7 +85,7 @@ std::shared_ptr<PgfAxis> MedianInitialSolutionPlotter::createMedianInitialSoluti
   return axis;
 }
 
-fs::path MedianInitialSolutionPlotter::createMedianInitialSolutionPicture() const {
+fs::path QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   picture.addAxis(createMedianInitialSolutionAxis());
@@ -97,7 +97,7 @@ fs::path MedianInitialSolutionPlotter::createMedianInitialSolutionPicture() cons
   return picturePath;
 }
 
-fs::path MedianInitialSolutionPlotter::createMedianInitialSolutionPicture(
+fs::path QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -110,7 +110,7 @@ fs::path MedianInitialSolutionPlotter::createMedianInitialSolutionPicture(
   return picturePath;
 }
 
-void MedianInitialSolutionPlotter::setMedianInitialSolutionAxisOptions(
+void QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::setMedianInitialSolutionAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.name = "MedianCostAxis";
   axis->options.width = config_->get<std::string>("medianInitialSolutionPlots/axisWidth");
@@ -129,7 +129,7 @@ void MedianInitialSolutionPlotter::setMedianInitialSolutionAxisOptions(
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionPlot(
+std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionPlot(
     const std::string& plannerName) const {
   // Load the median initial duration and cost into a table.
   auto table = std::make_shared<PgfTable>(
@@ -147,7 +147,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionDurationCiPlot(
+std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionDurationCiPlot(
     const std::string& plannerName) const {
   // Totally misusing the table class for reading in values from csvs...
   // Load the median initial solution.
@@ -182,7 +182,7 @@ std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSoluti
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianInitialSolutionPlotter::createMedianInitialSolutionCostCiPlot(
+std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionCostCiPlot(
     const std::string& plannerName) const {
   // Totally misusing the table class for reading in values from csvs...
   // Load the median initial solution.

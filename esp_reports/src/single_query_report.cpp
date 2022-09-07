@@ -60,12 +60,12 @@ SingleQueryReport::SingleQueryReport(const std::shared_ptr<Configuration>& confi
                                    const Statistics& stats) :
     BaseReport(config),
     latexPlotter_(config),
-    costPercentileEvolutionPlotter_(config, stats),
-    initialSolutionDurationHistogramPlotter_(config, stats),
-    initialSolutionScatterPlotter_(config, stats),
-    medianCostEvolutionPlotter_(config, stats),
-    medianInitialSolutionPlotter_(config, stats),
-    successPlotter_(config, stats),
+    queryPercentileCostVsTimeLinePlotter_(config, stats),
+    queryTimeAtFirstHistogramPlotter_(config, stats),
+    queryCostAtFirstVsTimeAtFirstScatterPlotter_(config, stats),
+    queryMedianCostVsTimeLinePlotter_(config, stats),
+    queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_(config, stats),
+    querySolvedVsTimeLinePlotter_(config, stats),
     overviewPlotter_(config, stats),
     stats_(stats) {
 }
@@ -141,9 +141,9 @@ std::stringstream SingleQueryReport::overview() const {
   overview << kpiTable.string() << '\n';
 
   // Create all axes to be displayed in the results summary.
-  auto medianCostEvolutionAxis = medianCostEvolutionPlotter_.createMedianCostEvolutionAxis();
-  auto medianInitialSolutionAxis = medianInitialSolutionPlotter_.createMedianInitialSolutionAxis();
-  auto successAxis = successPlotter_.createSuccessAxis();
+  auto medianCostEvolutionAxis = queryMedianCostVsTimeLinePlotter_.createMedianCostEvolutionAxis();
+  auto medianInitialSolutionAxis = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_.createMedianInitialSolutionAxis();
+  auto successAxis = querySolvedVsTimeLinePlotter_.createSuccessAxis();
   // Merge the intial solution axis into the cost evolution axis.
   medianCostEvolutionAxis->mergePlots(medianInitialSolutionAxis);
 
@@ -181,7 +181,7 @@ std::stringstream SingleQueryReport::overview() const {
   std::vector<std::shared_ptr<PgfAxis>> initialSolutionDurationHistogramAxes{};
   for (const auto& name : plannerNames) {
     initialSolutionDurationHistogramAxes.emplace_back(
-        initialSolutionDurationHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name));
+        queryTimeAtFirstHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name));
   }
   latexPlotter_.alignAbszissen(initialSolutionDurationHistogramAxes);
   latexPlotter_.alignOrdinates(initialSolutionDurationHistogramAxes);
@@ -210,13 +210,13 @@ std::stringstream SingleQueryReport::individualResults() const {
     results << "\\subsection{Initial Solutions}\\label{sec:" << name << "-initial-solution}\n";
 
     // Overlay the histogram with the edf for the first initial durations plot.
-    auto edf = successPlotter_.createSuccessAxis(name);
+    auto edf = querySolvedVsTimeLinePlotter_.createSuccessAxis(name);
     edf->options.xmin = stats_.getMinInitialSolutionDuration(name);
     edf->options.xmax = config_->get<double>(
         "context/"s + config_->get<std::string>("experiment/context") + "/maxTime");
     edf->options.ytickPos = "left";
     auto histo =
-        initialSolutionDurationHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name);
+        queryTimeAtFirstHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name);
     histo->overlay(edf.get());
     for (const auto& plot : histo->getPlots()) {
       plot->options.drawOpacity = 0.2f;
@@ -224,10 +224,10 @@ std::stringstream SingleQueryReport::individualResults() const {
     }
 
     // Create the scatter axis of all initial solutions.
-    auto scatter = initialSolutionScatterPlotter_.createInitialSolutionScatterAxis(name);
+    auto scatter = queryCostAtFirstVsTimeAtFirstScatterPlotter_.createInitialSolutionScatterAxis(name);
 
     // Create a median plot of all initial solutions.
-    auto median = medianInitialSolutionPlotter_.createMedianInitialSolutionAxis(name);
+    auto median = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_.createMedianInitialSolutionAxis(name);
     for (const auto& plot : median->getPlots()) {
       plot->options.markSize = 2.0;
       plot->options.lineWidth = 1.0;
@@ -268,9 +268,9 @@ std::stringstream SingleQueryReport::individualResults() const {
     // Show the cost evolution plots for anytime planners.
     if (config_->get<bool>("planner/"s + name + "/isAnytime"s)) {
       // Cost evolution plots.
-      auto medianEvolution = medianCostEvolutionPlotter_.createMedianCostEvolutionAxis(name);
+      auto medianEvolution = queryMedianCostVsTimeLinePlotter_.createMedianCostEvolutionAxis(name);
       auto percentileEvolution =
-          costPercentileEvolutionPlotter_.createCostPercentileEvolutionAxis(name);
+          queryPercentileCostVsTimeLinePlotter_.createCostPercentileEvolutionAxis(name);
       medianEvolution->matchAbszisse(*percentileEvolution);
       latexPlotter_.stack(medianEvolution, percentileEvolution);
 

@@ -54,14 +54,14 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-InitialSolutionDurationHistogramPlotter::InitialSolutionDurationHistogramPlotter(
+QueryTimeAtFirstHistogramPlotter::QueryTimeAtFirstHistogramPlotter(
     const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
 std::shared_ptr<PgfAxis>
-InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramAxis() const {
+QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramAxis() const {
   axis_ = std::make_shared<PgfAxis>();
   setInitialSolutionDurationHistogramAxisOptions(axis_);
 
@@ -76,7 +76,7 @@ InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramA
 }
 
 std::shared_ptr<PgfAxis>
-InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramAxis(
+QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramAxis(
     const std::string& plannerName) const {
   axis_ = std::make_shared<PgfAxis>();
   setInitialSolutionDurationHistogramAxisOptions(axis_);
@@ -85,7 +85,7 @@ InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramA
   return axis_;
 }
 
-fs::path InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramPicture()
+fs::path QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPicture()
     const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -99,7 +99,7 @@ fs::path InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationH
   return picturePath;
 }
 
-fs::path InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramPicture(
+fs::path QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -114,7 +114,7 @@ fs::path InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationH
 }
 
 std::shared_ptr<PgfPlot>
-InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramPlot(
+QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPlot(
     const std::string& plannerName) const {
   // Load the data into a pgf table.
   auto table =
@@ -146,7 +146,7 @@ InitialSolutionDurationHistogramPlotter::createInitialSolutionDurationHistogramP
   return plot;
 }
 
-void InitialSolutionDurationHistogramPlotter::setInitialSolutionDurationHistogramAxisOptions(
+void QueryTimeAtFirstHistogramPlotter::setInitialSolutionDurationHistogramAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.height = config_->get<std::string>("initialSolutionPlots/axisHeight");
   axis->options.width = config_->get<std::string>("initialSolutionPlots/axisWidth");
