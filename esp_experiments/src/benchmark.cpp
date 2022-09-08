@@ -304,27 +304,27 @@ int main(const int argc, const char **argv) {
     // If multiple starts/goal queries are defined (i.e. we evaluate a multiquery setting),
     // the planners run _all_ queries before the next planner runs the _same_ queries.
     for (const auto &plannerName : plannerNames) {
+      // Allocate and run a dummy planner before allocating the actual planner.
+      // This results in more consistent measurements. I don't fully understand why, but it
+      // seems to be connected to running the planner in a separate thread.
+      {
+        auto reconciler =
+            std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
+        reconciler->setName("ReconcilingPlanner");
+        reconciler->setProblemDefinition(context->instantiateNewProblemDefinition());
+        auto hotpath = std::async(std::launch::async, [&reconciler]() {
+          reconciler->solve(ompl::base::timedPlannerTerminationCondition(0.0));
+        });
+        hotpath.get();
+      }
 
-      // Allocate the planner.
+      // Allocate the planner to be tested.
       auto [planner, plannerType] = plannerFactory.create(plannerName);
 
       for (auto j=0u; j<numQueries; ++j){
         // Create the logger for this run.
         esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
                                               config->get<double>("experiment/logFrequency"));
-
-        // The following results in more consistent measurements. I don't fully understand why, but it
-        // seems to be connected to creating a separate thread.
-        {
-          auto reconciler =
-              std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
-          reconciler->setName("ReconcilingPlanner");
-          reconciler->setProblemDefinition(context->instantiateNewProblemDefinition());
-          auto hotpath = std::async(std::launch::async, [&reconciler]() {
-            reconciler->solve(ompl::base::timedPlannerTerminationCondition(0.0));
-          });
-          hotpath.get();
-        }
 
         // Prepare the planner for this query.
         esp::ompltools::time::Duration querySetupDuration;;
