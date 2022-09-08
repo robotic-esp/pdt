@@ -6,7 +6,7 @@
             "defaultLazyPRMstar"
         ],
         "context": "MultiqueryWallGap2D",
-        "numRuns": 100,
+        "numRuns": 50,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true,
@@ -27,15 +27,15 @@
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
-            "goalType": "GoalState",
             "starts": {
                 "type": "generated",
-                "numGenerated": 50,
+                "numGenerated": 10,
                 "generativeModel": "uniform"
             },
+            "goalType": "GoalState",
             "goals": {
                 "type": "generated",
-                "numGenerated": 50,
+                "numGenerated": 10,
                 "generativeModel": "uniform"
             },
             "collisionCheckResolution": 0.000005,
@@ -46,28 +46,28 @@
         "MultiqueryWallGap2D": {
             "type": "WallGap",
             "objective": "defaultPathLength",
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : [ 1, 1 ],
             "starts": {
                 "type": "generated",
-                "numGenerated": 50,
+                "numGenerated": 10,
                 "generativeModel": "subregion",
                 "generator": {
                     "lowerBounds": [ 0.3, -0.5],
                     "upperBounds": [ 0.5,  0]
                 }
             },
+            "goalType": "GoalState",
             "goals": {
                 "type": "generated",
-                "numGenerated": 50,
+                "numGenerated": 10,
                 "generativeModel": "subregion",
                 "generator": {
                     "lowerBounds": [-0.5, -0.5],
                     "upperBounds": [ -0.3,  0]
                 }
             },
-            "goalType": "GoalState",
-            "maxTime": 0.1,
-            "dimensions": 2,
-            "boundarySideLengths" : [ 1, 1 ],
             "collisionCheckResolution": 0.000005,
             "wallWidth": 0.8,
             "wallThickness": 0.2,
