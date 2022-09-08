@@ -239,7 +239,12 @@ std::stringstream MultiqueryReport::overview() const {
 
   overview << "\n\\pagebreak\n";
   overview << "\\subsection{" << "Breakout cost convergence plots" << "}\\label{sec:" << "cost" << "}\n";
-  const unsigned int numCostPlots = 10;
+
+  const auto maxBreakoutPlots = 10u;
+  auto numCostPlots = stats_.getNumQueries();
+  if (numCostPlots > maxBreakoutPlots){
+    numCostPlots = maxBreakoutPlots;
+  }
   for (auto i=0u; i<numCostPlots; ++i){
     const auto n = static_cast<unsigned int>(std::floor(static_cast<double>(i*(stats_.getNumQueries()-1)) / static_cast<double>(numCostPlots-1)));
 
