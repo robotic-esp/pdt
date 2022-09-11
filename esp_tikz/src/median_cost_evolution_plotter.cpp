@@ -209,6 +209,9 @@ std::shared_ptr<PgfPlot> MedianCostEvolutionPlotter::createMedianCostEvolutionUp
     return std::make_shared<PgfPlot>();
   }
 
+  // Replace the infinite values with very high values, otherwise they're not plotted.
+  table->replaceInCodomain(std::numeric_limits<double>::infinity(), 3 * stats_.getMaxNonInfCost());
+
   // Create the plot and set the options.
   auto plot = std::make_shared<PgfPlot>(table);
   plot->options.mark = "\"none\""s;

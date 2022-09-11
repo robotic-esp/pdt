@@ -114,7 +114,7 @@ std::string PgfPlot::string() const {
 }
 
 bool PgfPlot::empty() const {
-  return static_cast<bool>(plottable_);
+  return !static_cast<bool>(plottable_);
 }
 
 }  // namespace ompltools
