@@ -164,6 +164,7 @@ std::shared_ptr<PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitia
   plot->options.lineWidth = config_->get<double>("medianInitialDurationPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianInitialDuration"s;
+  plot->options.constPlot = false;
 
   return plot;
 }
@@ -199,6 +200,7 @@ std::shared_ptr<PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitia
       config_->get<float>("medianInitialDurationPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
       config_->get<float>("medianInitialDurationPlots/confidenceIntervalFillOpacity");
+  plot->options.constPlot = false;
 
   return plot;
 }
@@ -231,6 +233,7 @@ std::shared_ptr<PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitia
       config_->get<float>("medianInitialDurationPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
       config_->get<float>("medianInitialDurationPlots/confidenceIntervalFillOpacity");
+  plot->options.constPlot = false;
 
   return plot;
 }

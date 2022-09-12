@@ -164,6 +164,7 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   plot->options.lineWidth = config_->get<double>("medianFinalCostPerQueryPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianFinalCostPerQuery"s;
+  plot->options.constPlot = false;
 
   return plot;
 }
@@ -199,6 +200,7 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
       config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
       config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
+  plot->options.constPlot = false;
 
   return plot;
 }
@@ -231,6 +233,7 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
       config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
       config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
+  plot->options.constPlot = false;
 
   return plot;
 }
@@ -248,6 +251,7 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   plot->options.fillOpacity =
       config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
+  plot->options.constPlot = false;
 
   return plot;
 }

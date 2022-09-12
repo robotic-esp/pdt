@@ -164,6 +164,7 @@ std::shared_ptr<PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitia
   plot->options.lineWidth = config_->get<double>("medianInitialCostPerQueryPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianInitialCostPerQuery"s;
+  plot->options.constPlot = false;
 
   return plot;
 }
@@ -200,6 +201,8 @@ std::shared_ptr<PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitia
   plot->options.fillOpacity =
       config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalFillOpacity");
 
+  plot->options.constPlot = false;
+
   return plot;
 }
 
@@ -231,6 +234,7 @@ std::shared_ptr<PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitia
       config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
       config_->get<float>("medianInitialCostPerQueryPlots/confidenceIntervalFillOpacity");
+  plot->options.constPlot = false;
 
   return plot;
 }
