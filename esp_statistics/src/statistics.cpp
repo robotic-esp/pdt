@@ -54,6 +54,7 @@
 #pragma GCC diagnostic pop
 
 #include "esp_statistics/linear_interpolator.h"
+#include "esp_utilities/write_vector_to_file.h"
 
 namespace esp {
 
@@ -392,22 +393,10 @@ fs::path Statistics::extractMedians(const std::string& plannerName, const double
   filestream << createHeader("Median with "s + std::to_string(confidence) + "% confidence bounds"s,
                              plannerName);
   filestream << std::setprecision(21);
-  filestream << "durations";
-  for (const auto duration : durations) {
-    filestream << ',' << duration;
-  }
-  filestream << "\nmedian costs";
-  for (const auto cost : medianCosts) {
-    filestream << ',' << cost;
-  }
-  filestream << "\nlower confidence bound";
-  for (const auto cost : lowerCosts) {
-    filestream << ',' << cost;
-  }
-  filestream << "\nupper confidence bound";
-  for (const auto cost : upperCosts) {
-    filestream << ',' << cost;
-  }
+  utilities::writeVectorToFile(filestream, "durations", durations);
+  utilities::writeVectorToFile(filestream, "\nmedian costs", medianCosts);
+  utilities::writeVectorToFile(filestream, "\nlower confidence bound", lowerCosts);
+  utilities::writeVectorToFile(filestream, "\nupper confidence bound", upperCosts);
   filestream << '\n';
 
   return filepath;  // Note: std::ofstream closes itself upon destruction.
@@ -453,15 +442,12 @@ fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
 
   filestream << createHeader("Binned percentiles", plannerName);
   filestream << std::setprecision(21);
-  filestream << "durations";
-  for (const auto duration : durations) {
-    filestream << ',' << duration;
-  }
+  utilities::writeVectorToFile(filestream, "durations", durations);
+
   for (const auto& [percentile, costs] : percentileCosts) {
-    filestream << std::setprecision(3) << "\npercentile" << percentile << std::setprecision(21);
-    for (const auto cost : costs) {
-      filestream << ',' << cost;
-    }
+    std::stringstream stream;
+    stream << std::setprecision(3) << "\npercentile" << percentile;
+    utilities::writeVectorToFile(filestream, stream.str(), costs);
   }
   filestream << '\n';
 
@@ -635,14 +621,8 @@ fs::path Statistics::extractInitialSolutionDurationHistogram(
 
   filestream << createHeader("Initial solution duration histogram", plannerName);
   filestream << std::setprecision(21);
-  filestream << "bin begin durations";
-  for (const auto duration : bins) {
-    filestream << ',' << duration;
-  }
-  filestream << "\nbin counts";
-  for (const auto count : binCounts) {
-    filestream << ',' << count;
-  }
+  utilities::writeVectorToFile(filestream, "bin begin durations", bins);
+  utilities::writeVectorToFile(filestream, "\nbin counts", binCounts);
   filestream << '\n';
 
   return filepath;  // Note: std::ofstream is a big boy and closes itself upon destruction.
@@ -668,14 +648,8 @@ fs::path Statistics::extractInitialSolutions(const std::string& plannerName) con
 
   filestream << createHeader("Initial solutions", plannerName);
   filestream << std::setprecision(21);
-  filestream << "durations";
-  for (const auto duration : durations) {
-    filestream << ',' << duration;
-  }
-  filestream << "\ncosts";
-  for (const auto cost : costs) {
-    filestream << ',' << cost;
-  }
+  utilities::writeVectorToFile(filestream, "durations", durations);
+  utilities::writeVectorToFile(filestream, "\ncosts", costs);
   filestream << '\n';
 
   return filepath;  // Note: std::ofstream is a big boy and closes itself upon destruction.
