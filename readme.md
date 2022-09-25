@@ -15,7 +15,7 @@ First install the dependencies of [OMPL](http://ompl.kavrakilab.org/):
 ```bash
 sudo apt update
 sudo apt upgrade
-sudo apt install cmake
+sudo apt install build-essential cmake
 sudo apt install libboost-all-dev
 sudo apt install libeigen3-dev
 sudo apt install libode-dev # optional
@@ -45,7 +45,7 @@ Follow the installation guide of the [official repo](https://github.com/stevenlo
 
 You then need to install it. From within the Pangolin directory:
 ```bash
-cmake --install build
+sudo cmake --install build
 ```
 
 #### FFmpeg
@@ -61,7 +61,7 @@ sudo apt install ffmpeg
 The automatic report generation relies on LuaLaTeX to dynamically allocate as much memory as needed. The infallible wisdom of the internet suggests that all major LaTeX distributions include LuaLaTeX, so I figured this is not too much of an additional dependency.
 
 ```bash
-sudo apt install texlive-latex-base texlive-luatex
+sudo apt install texlive-latex-base texlive-latex-extra texlive-luatex
 ```
 
 If running `which lualatex` echoes a path, you should be good to go, otherwise install lualatex.
