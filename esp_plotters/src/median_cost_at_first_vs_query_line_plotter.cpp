@@ -67,7 +67,7 @@ std::shared_ptr<PgfAxis> MedianCostAtFirstVsQueryLinePlotter::createMedianInitia
       std::shared_ptr<PgfPlot> upperCi = createMedianInitialCostUpperCiPlot(name);
       std::shared_ptr<PgfPlot> lowerCi = createMedianInitialCostLowerCiPlot(name);
       std::shared_ptr<PgfPlot> fillCi = createMedianInitialCostFillCiPlot(name);
-      if (upperCi != nullptr && lowerCi != nullptr && fillCi != nullptr){
+      if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
         axis->addPlot(upperCi);
         axis->addPlot(lowerCi);
         axis->addPlot(fillCi);
@@ -91,7 +91,7 @@ std::shared_ptr<PgfAxis> MedianCostAtFirstVsQueryLinePlotter::createMedianInitia
   std::shared_ptr<PgfPlot> upperCi = createMedianInitialCostUpperCiPlot(plannerName);
   std::shared_ptr<PgfPlot> lowerCi = createMedianInitialCostLowerCiPlot(plannerName);
   std::shared_ptr<PgfPlot> fillCi = createMedianInitialCostFillCiPlot(plannerName);
-  if (upperCi != nullptr && lowerCi != nullptr && fillCi != nullptr){
+  if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
     axis->addPlot(upperCi);
     axis->addPlot(lowerCi);
     axis->addPlot(fillCi);
@@ -182,8 +182,7 @@ std::shared_ptr<PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitia
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return nullptr;
-    //return std::make_shared<PgfPlot>();
+    return std::make_shared<PgfPlot>();
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
@@ -219,8 +218,7 @@ std::shared_ptr<PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitia
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return nullptr;
-    //return std::make_shared<PgfPlot>();
+    return std::make_shared<PgfPlot>();
   }
 
   // Create the plot and set the options.

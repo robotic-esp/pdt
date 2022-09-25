@@ -69,7 +69,7 @@ std::shared_ptr<PgfAxis> QuerySuccessVsTimeLinePlotter::createSuccessAxis() cons
       std::shared_ptr<PgfPlot> upperCi = createSuccessUpperCiPlot(name);
       std::shared_ptr<PgfPlot> lowerCi = createSuccessLowerCiPlot(name);
       std::shared_ptr<PgfPlot> fillCi = createSuccessFillCiPlot(name);
-      if (upperCi && lowerCi && fillCi) {
+      if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
         axis->addPlot(upperCi);
         axis->addPlot(lowerCi);
         axis->addPlot(fillCi);
@@ -92,7 +92,7 @@ std::shared_ptr<PgfAxis> QuerySuccessVsTimeLinePlotter::createSuccessAxis(const 
     std::shared_ptr<PgfPlot> upperCi = createSuccessUpperCiPlot(plannerName);
     std::shared_ptr<PgfPlot> lowerCi = createSuccessLowerCiPlot(plannerName);
     std::shared_ptr<PgfPlot> fillCi = createSuccessFillCiPlot(plannerName);
-    if (upperCi && lowerCi && fillCi) {
+    if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
       axis->addPlot(upperCi);
       axis->addPlot(lowerCi);
       axis->addPlot(fillCi);
@@ -191,7 +191,7 @@ std::shared_ptr<PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessUpperCiPlot
   table->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
 
   if (table->empty()) {
-    return nullptr;
+    return std::make_shared<PgfPlot>();
   }
 
   // Multiply the cdf values by 100 to get the percentage.
@@ -227,7 +227,7 @@ std::shared_ptr<PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessLowerCiPlot
   table->removeRowIfDomainEquals(std::numeric_limits<double>::infinity());
 
   if (table->empty()) {
-    return nullptr;
+    return std::make_shared<PgfPlot>();
   }
 
   // Multiply the cdf values by 100 to get the percentage.

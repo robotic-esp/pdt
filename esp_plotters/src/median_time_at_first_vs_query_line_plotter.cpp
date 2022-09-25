@@ -67,7 +67,7 @@ std::shared_ptr<PgfAxis> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitia
       std::shared_ptr<PgfPlot> upperCi = createMedianInitialDurationUpperCiPlot(name);
       std::shared_ptr<PgfPlot> lowerCi = createMedianInitialDurationLowerCiPlot(name);
       std::shared_ptr<PgfPlot> fillCi = createMedianInitialDurationFillCiPlot(name);
-      if (upperCi != nullptr && lowerCi != nullptr && fillCi != nullptr){
+      if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
         axis->addPlot(upperCi);
         axis->addPlot(lowerCi);
         axis->addPlot(fillCi);
@@ -91,7 +91,7 @@ std::shared_ptr<PgfAxis> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitia
   std::shared_ptr<PgfPlot> upperCi = createMedianInitialDurationUpperCiPlot(plannerName);
   std::shared_ptr<PgfPlot> lowerCi = createMedianInitialDurationLowerCiPlot(plannerName);
   std::shared_ptr<PgfPlot> fillCi = createMedianInitialDurationFillCiPlot(plannerName);
-  if (upperCi != nullptr && lowerCi != nullptr && fillCi != nullptr){
+  if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
     axis->addPlot(upperCi);
     axis->addPlot(lowerCi);
     axis->addPlot(fillCi);
@@ -182,8 +182,7 @@ std::shared_ptr<PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitia
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return nullptr;
-    //return std::make_shared<PgfPlot>();
+    return std::make_shared<PgfPlot>();
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
@@ -218,8 +217,7 @@ std::shared_ptr<PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitia
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return nullptr;
-    //return std::make_shared<PgfPlot>();
+    return std::make_shared<PgfPlot>();
   }
 
   // Create the plot and set the options.
