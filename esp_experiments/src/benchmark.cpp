@@ -478,7 +478,7 @@ int main(const int argc, const char **argv) {
   std::vector<esp::ompltools::Statistics> stats;
 
   for (const auto &path: resultPaths){
-    stats.push_back(esp::ompltools::Statistics(config, path, false));
+    stats.push_back(esp::ompltools::Statistics(config, path, true));
   }
 
   // Generate the report.
