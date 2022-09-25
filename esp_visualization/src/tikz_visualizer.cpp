@@ -132,6 +132,14 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
     }
   }
 
+  const auto startGoalPair = context_->getNthStartGoalPair(0);
+
+  // Draw the start states.
+  drawStartStates(startGoalPair.start);
+
+  // Draw the goal states.
+  drawGoal(startGoalPair.goal);
+
   // Draw the solution path.
   drawSolution(path);
 
@@ -288,155 +296,71 @@ void TikzVisualizer::logToFrameTimes(const std::experimental::filesystem::path& 
 void TikzVisualizer::visit(const CentreSquare& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const DividingWalls& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const DoubleEnclosure& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const FlankingGap& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const FourRooms& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const GoalEnclosure& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const NarrowPassage& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const ObstacleFree& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const RandomRectangles& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartStates(context.getStartStates());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const ReedsSheppRandomRectangles& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const RepeatingRectangles& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const StartEnclosure& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const WallGap& context) const {
   // Draw the boundary.
   drawBoundary(context);
-
-  // Draw the start states.
-  drawStartState(context.getStartState());
-
-  // Draw the goal states.
-  drawGoal(context.createGoal());
 }
 
 void TikzVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
@@ -528,7 +452,7 @@ void TikzVisualizer::drawStartState(
 }
 
 void TikzVisualizer::drawStartStates(
-    const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states) const {
+    const std::vector<ompl::base::ScopedState<>>& states) const {
   for (const auto& state : states) {
     drawStartState(state);
   }

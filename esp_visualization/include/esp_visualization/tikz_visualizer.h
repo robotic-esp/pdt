@@ -107,7 +107,7 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
   void drawStartVertex(const ompl::base::PlannerDataVertex& vertex) const;
   void drawStartState(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const;
   void drawStartStates(
-      const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states) const;
+      const std::vector<ompl::base::ScopedState<>>& states) const;
   void drawGoalVertex(const ompl::base::PlannerDataVertex& vertex) const;
   void drawGoalState(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const;
   void drawGoalStates(

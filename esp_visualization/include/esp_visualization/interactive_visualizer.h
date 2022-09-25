@@ -97,7 +97,6 @@ class InteractiveVisualizer : public BaseVisualizer,
   void drawEdges(std::size_t iteration);
   void drawSolution(std::size_t iteration);
   void drawStateIds(std::size_t iteration);
-  void drawGoal();
 
   // Planner specific visualizations.
   void drawPlannerSpecificVisualizations(std::size_t iteration) const;
@@ -113,6 +112,7 @@ class InteractiveVisualizer : public BaseVisualizer,
                        const float* faceColor, const float* edgeColor) const;
   void drawRectangle3D(const std::vector<float>& midpoint, const std::vector<float>& widths,
                        const float* faceColor, const float* edgeColor) const;
+  void drawStarts() const;
   void drawGoal() const;
   void drawBoundary() const;
   void drawPoint(const Eigen::Vector2f& point, const float* color, float size) const;
@@ -122,7 +122,7 @@ class InteractiveVisualizer : public BaseVisualizer,
   void drawPoints(const std::vector<Eigen::Vector2f>& points, const float* color, float size) const;
   void drawPoints(const std::vector<Eigen::Vector3f>& points, const float* color, float size) const;
   void drawPoints(
-      const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states,
+      const std::vector<ompl::base::ScopedState<>>& states,
       const float* color, float size) const;
   void drawLines(const std::vector<Eigen::Vector2f>& points, float width, const float* color,
                  float alpha = 1.0) const;

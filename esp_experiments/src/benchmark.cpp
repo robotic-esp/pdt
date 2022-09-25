@@ -61,6 +61,30 @@
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
+// Function to check if the start/goal query we are looking at is actually valid.
+// To that end, we run an RRTConnect planner on the problem for 10s.
+bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext> &context,
+                          const double runtime) {
+  std::cout << "Validating problem definition... ";
+
+  const auto p = context->instantiateNewProblemDefinition();
+
+  auto planner = std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
+  planner->setProblemDefinition(p);
+
+  const auto status = planner->solve(ompl::base::timedPlannerTerminationCondition(runtime));
+
+  if (!status) {
+    std::cout << "Failed." << std::endl;
+    return false;
+  } else {
+    std::cout << "OK." << std::endl;
+  }
+  std::cout << std::endl;
+
+  return true;
+}
+
 int main(const int argc, const char **argv) {
   // Read the config files.
   auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
@@ -73,6 +97,22 @@ int main(const int argc, const char **argv) {
   // Create the context for this experiment.
   esp::ompltools::ContextFactory contextFactory(config);
   auto context = contextFactory.create(config->get<std::string>("experiment/context"));
+
+  if (config->contains("experiment/validateProblemDefinition") &&
+      config->get<bool>("experiment/validateProblemDefinition")) {
+    const double contextCheckingRuntime = config->get<double>("experiment/validateProblemDuration");
+    if (!checkContextValidity(context, contextCheckingRuntime)) {
+      std::cout << "This problem definition may not be solveable since RRT-Connect did not find a "
+                   "solution in "
+                << contextCheckingRuntime
+                << "s. Please check the start and goal states, use a different pseudorandom seed "
+                   "if the problem was randomly generated, and/or increase the validation time "
+                   "('experiment/validateProblemDuration'). You may also disable this problem "
+                   "definition validation ('experiment/validateProblemDefinition')."
+                << std::endl;
+      return 0;
+    }
+  }
 
   // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
@@ -152,7 +192,8 @@ int main(const int argc, const char **argv) {
   // Create the directory for the results of this experiment to live in.
   fs::path experimentDirectory(fs::path(config->get<std::string>("experiment/baseDirectory")) /
                                experimentName);
-  config->add<std::string>("experiment/experimentDirectory", fs::absolute(experimentDirectory).string());
+  config->add<std::string>("experiment/experimentDirectory",
+                           fs::absolute(experimentDirectory).string());
 
   // Create the performance log.
   esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(experimentDirectory /

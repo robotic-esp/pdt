@@ -64,17 +64,13 @@ class RandomRectanglesMultiStartGoal : public RealVectorGeometricContext {
   /** \brief The destructor. */
   virtual ~RandomRectanglesMultiStartGoal() = default;
 
-  /** \brief Instantiate a problem definition for this context. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const override;
-
-  /** \brief Return a copy of the start state. */
-  std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>> getStartStates() const;
-
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
 
  protected:
+  /** \brief Return a start/goal pair. */
+  virtual std::vector<StartGoalPair> makeStartGoalPair() const override;
+
   /** \brief Create the obstacles. */
   void createObstacles();
 
@@ -95,9 +91,6 @@ class RandomRectanglesMultiStartGoal : public RealVectorGeometricContext {
 
   /** \brief The random number generator. */
   ompl::RNG rng_{};
-
-  /** \brief The start states. */
-  std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>> startStates_{};
 };
 
 }  // namespace ompltools

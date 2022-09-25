@@ -69,22 +69,15 @@ class OpenRaveSE3 : public OpenRaveBaseContext {
               const std::shared_ptr<const Configuration>& config, const std::string& name);
   virtual ~OpenRaveSE3();
 
-  /** \brief Instantiate a problem definition for this context. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const override;
-
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::SE3StateSpace> getStartState() const;
-
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override final;
 
  private:
+  /** \brief Return a start/goal pair. */
+  virtual std::vector<StartGoalPair> makeStartGoalPair() const override;
+
   /** \brief Create a new goal. */
   std::shared_ptr<ompl::base::Goal> createGoal() const;
-
-  /** \brief The start state. */
-  ompl::base::ScopedState<ompl::base::SE3StateSpace> startState_;
 };
 
 }  // namespace ompltools

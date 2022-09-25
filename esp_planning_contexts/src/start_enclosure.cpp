@@ -55,24 +55,7 @@ StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformatio
     RealVectorGeometricContext(spaceInfo, config, name),
     startOutsideWidth_(config->get<double>("context/" + name + "/startOutsideWidth")),
     startInsideWidth_(config->get<double>("context/" + name + "/startInsideWidth")),
-    startGapWidth_(config->get<double>("context/" + name + "/startGapWidth")),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
-  // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
-
-  // Assert configuration sanity.
-  if (config->get<std::vector<double>>("context/" + name + "/start").size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
-  if (config->get<std::vector<double>>("context/" + name + "/goal").size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
+    startGapWidth_(config->get<double>("context/" + name + "/startGapWidth")){
   if (startInsideWidth_ > startOutsideWidth_) {
     OMPL_ERROR("%s: Start inside width is greater than start outside width.", name.c_str());
     throw std::runtime_error("Context error.");
@@ -101,38 +84,7 @@ StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformatio
   // Set up the space info.
   spaceInfo_->setup();
 
-  // Fill the start and goal states' coordinates.
-  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
-  }
-}
-
-ompl::base::ProblemDefinitionPtr StartEnclosure::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
-
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
-
-  // Return the new definition.
-  return problemDefinition;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> StartEnclosure::getStartState() const {
-  return startState_;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> StartEnclosure::getGoalState() const {
-  return goalState_;
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void StartEnclosure::accept(const ContextVisitor& visitor) const {

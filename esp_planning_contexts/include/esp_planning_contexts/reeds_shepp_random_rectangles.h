@@ -64,13 +64,6 @@ class ReedsSheppRandomRectangles : public BaseContext {
   /** \brief The destructor. */
   virtual ~ReedsSheppRandomRectangles() = default;
 
-  /** \brief Instantiate a problem definition for this context. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const override;
-
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::SE2StateSpace> getStartState() const;
-
   /** \brief Return a copy of the bounds. */
   ompl::base::RealVectorBounds getBoundaries() const;
 
@@ -107,9 +100,6 @@ class ReedsSheppRandomRectangles : public BaseContext {
 
   /** \brief The random number generator. */
   ompl::RNG rng_{};
-
-  /** \brief The start state. */
-  ompl::base::ScopedState<ompl::base::SE2StateSpace> startState_;
 
   /** \brief The space information about the real vector component of the state space. */
   std::shared_ptr<ompl::base::SpaceInformation> realVectorSubspaceInfo_{};

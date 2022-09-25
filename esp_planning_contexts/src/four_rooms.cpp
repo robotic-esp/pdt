@@ -47,25 +47,10 @@ FourRooms::FourRooms(const std::shared_ptr<ompl::base::SpaceInformation>& spaceI
                      const std::shared_ptr<const Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
-    gapWidth_(config->get<double>("context/" + name + "/gapWidth")),
-    startState_(spaceInfo) {
-  // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
-
+    gapWidth_(config->get<double>("context/" + name + "/gapWidth")){
   // Assert configuration sanity.
   if (dimensionality_ != 2u) {
     OMPL_ERROR("%s: Currently only implemented for two dimensional state spaces.", name.c_str());
-    throw std::runtime_error("Context error.");
-  }
-  if (startPosition.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of start specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
-  if (goalPosition.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
-               name.c_str());
     throw std::runtime_error("Context error.");
   }
   if (wallThickness_ < 0.0) {
@@ -96,31 +81,7 @@ FourRooms::FourRooms(const std::shared_ptr<ompl::base::SpaceInformation>& spaceI
   // Set up the space info.
   spaceInfo_->setup();
 
-  // Fill the start and goal states' coordinates.
-  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = startPosition.at(i);
-  }
-}
-
-ompl::base::ProblemDefinitionPtr FourRooms::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
-
-  // Set the goal for the problem definition.
-  problemDefinition->setGoal(createGoal());
-
-  // Return the new definition.
-  return problemDefinition;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> FourRooms::getStartState() const {
-  return startState_;
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void FourRooms::accept(const ContextVisitor& visitor) const {

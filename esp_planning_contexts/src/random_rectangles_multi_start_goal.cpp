@@ -58,7 +58,10 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
     minSideLength_(config->get<double>("context/" + name + "/minSideLength")),
     maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
-    numStarts_(config->get<std::size_t>("context/" + name + "/numStarts")) {
+    numStarts_(config->get<std::size_t>("context/" + name + "/numStarts")),
+    numGoals_(config->get<std::size_t>("context/" + name + "/numGoals")) {
+  startGoalPairs_ = makeStartGoalPair();
+
   // Assert configuration sanity.
   if (numStarts_ == 0u) {
     OMPL_ERROR("%s: Must at least have one start.", name.c_str());
@@ -72,12 +75,6 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
     OMPL_ERROR("%s: Specified min side length is greater than specified max side length.",
                name.c_str());
     throw std::runtime_error("Context error.");
-  }
-
-  // Create the start states.
-  for (std::size_t i = 0u; i < numStarts_; ++i) {
-    startStates_.emplace_back(spaceInfo_);
-    startStates_.back().random();
   }
 
   // Create the validity checker.
@@ -96,28 +93,26 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
   spaceInfo_->setup();
 }
 
-ompl::base::ProblemDefinitionPtr RandomRectanglesMultiStartGoal::instantiateNewProblemDefinition()
-    const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // Set the start states in the problem definition.
-  for (const auto& startState : startStates_) {
-    problemDefinition->addStartState(startState);
+std::vector<StartGoalPair> RandomRectanglesMultiStartGoal::makeStartGoalPair() const{
+  if (config_->contains("context/" + name_ + "/starts")) {
+    OMPL_ERROR("MultiStartGoal context does not support multiple queries.");
+    throw std::runtime_error("Context error.");
   }
 
-  // Set the goal.
-  problemDefinition->setGoal(createGoal());
+  // Fill the start and goal states' coordinates.
+  std::vector<ompl::base::ScopedState<>> startStates;
 
-  return problemDefinition;
-}
+  // Create the start states.
+  for (std::size_t i = 0u; i < numStarts_; ++i) {
+    startStates.emplace_back(spaceInfo_);
+    startStates.back().random();
+  }
 
-std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>
-RandomRectanglesMultiStartGoal::getStartStates() const {
-  return startStates_;
+  StartGoalPair pair;
+  pair.start = startStates;
+  pair.goal = createGoal();
+
+  return {pair};
 }
 
 void RandomRectanglesMultiStartGoal::accept(const ContextVisitor& visitor) const {
@@ -125,9 +120,6 @@ void RandomRectanglesMultiStartGoal::accept(const ContextVisitor& visitor) const
 }
 
 void RandomRectanglesMultiStartGoal::createObstacles() {
-  // Create a goal to make sure the obstacles don't invalidate it.
-  auto goal = createGoal();
-
   // Instantiate obstacles.
   for (int i = 0; i < static_cast<int>(numRectangles_); ++i) {
     // Create a random anchor (uniform).
@@ -141,7 +133,7 @@ void RandomRectanglesMultiStartGoal::createObstacles() {
     bool invalidates = false;
     auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths);
     // Add this to the obstacles if it doesn't invalidate the start or goal states.
-    for (const auto& start : startStates_) {
+    for (const auto& start : startGoalPairs_[0].start) {
       if (obstacle->invalidates(start)) {
         invalidates = true;
         break;
@@ -149,6 +141,7 @@ void RandomRectanglesMultiStartGoal::createObstacles() {
     }
     if (!invalidates && (goalType_ == ompl::base::GoalType::GOAL_STATE ||
                          goalType_ == ompl::base::GoalType::GOAL_STATES)) {
+      const auto& goal = startGoalPairs_[0].goal;
       if (goalType_ == ompl::base::GoalType::GOAL_STATE) {
         invalidates = obstacle->invalidates(goal->as<ompl::base::GoalState>()->getState());
         break;

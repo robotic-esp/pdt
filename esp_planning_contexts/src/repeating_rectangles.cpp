@@ -110,26 +110,7 @@ RepeatingRectangles::RepeatingRectangles(
     const std::shared_ptr<const Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     numObsPerDim_(config->get<std::size_t>("context/" + name + "/numObstaclesPerDim")),
-    obsWidth_(config->get<double>("context/" + name + "/obstacleWidth")),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
-  // Get the start and goal positions.
-  auto startPosition = config_->get<std::vector<double>>("context/" + name + "/start");
-  auto goalPosition = config_->get<std::vector<double>>("context/" + name + "/goal");
-
-  // Assert configuration sanity.
-  if (startPosition.size() != dimensionality_) {
-    OMPL_ERROR(
-        "%s: Dimensionality of problem (%zu) and of start specification (%zu) does not match.",
-        name.c_str(), dimensionality_, startPosition.size());
-    throw std::runtime_error("Context error.");
-  }
-  if (goalPosition.size() != dimensionality_) {
-    OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
-               name.c_str());
-    throw std::runtime_error("Context error.");
-  }
-
+    obsWidth_(config->get<double>("context/" + name + "/obstacleWidth")){
   // Get the state space bounds.
   auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
   for (auto i = 1u; i < dimensionality_; ++i) {
@@ -156,40 +137,7 @@ RepeatingRectangles::RepeatingRectangles(
   // Set up the space info.
   spaceInfo_->setup();
 
-  // Fill the start and goal states' coordinates.
-  for (auto i = 0u; i < spaceInfo_->getStateDimension(); ++i) {
-    startState_[i] = startPosition.at(i);
-    goalState_[i] = goalPosition.at(i);
-  }
-}
-
-ompl::base::ProblemDefinitionPtr RepeatingRectangles::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
-
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
-
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
-
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
-
-  // Return the new definition.
-  return problemDefinition;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RepeatingRectangles::getStartState()
-    const {
-  return startState_;
-}
-
-ompl::base::ScopedState<ompl::base::RealVectorStateSpace> RepeatingRectangles::getGoalState()
-    const {
-  return goalState_;
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 void RepeatingRectangles::accept(const ContextVisitor& visitor) const {

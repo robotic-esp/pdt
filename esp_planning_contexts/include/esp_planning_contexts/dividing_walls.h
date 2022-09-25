@@ -59,13 +59,6 @@ class DividingWalls : public RealVectorGeometricContext {
   DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                 const std::shared_ptr<const Configuration>& config, const std::string& name);
 
-  /** \brief Instantiate a problem definition for this context. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const override;
-
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
-
   /** \brief Accept a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
 
@@ -87,9 +80,6 @@ class DividingWalls : public RealVectorGeometricContext {
 
   /** \brief The widths of the gaps. */
   std::vector<double> gapWidths_;
-
-  /** \brief The start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState_;
 };
 
 }  // namespace ompltools

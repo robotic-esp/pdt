@@ -67,25 +67,12 @@ class OpenRaveManipulator : public OpenRaveBaseContext {
                       const std::shared_ptr<const Configuration>& config, const std::string& name);
   virtual ~OpenRaveManipulator();
 
-  /** \brief Instantiate a problem definition for this context. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const override;
-
-  /** \brief Return a copy of the start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getStartState() const;
-
-  /** \brief Return a copy of the goal state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> getGoalState() const;
-
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override final;
 
  private:
-  /** \brief The start state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState_;
-
-  /** \brief The goal state. */
-  ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState_;
+  /** \brief Return a start/goal pair. */
+  virtual std::vector<StartGoalPair> makeStartGoalPair() const override;
 };
 
 }  // namespace ompltools

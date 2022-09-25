@@ -341,10 +341,12 @@ void InteractiveVisualizer::run() {
       drawSolution(displayIteration_);
     }
 
-    // Draw the context.
-    if (optionDrawContext) {
-      context_->accept(*this);
-    }
+    // Draw the start states.
+    drawStarts();
+    // Draw the goal states.
+    drawGoal();
+    // Draw the boundaries.
+    drawBoundary();
 
     // Draw the state ids.
     if (optionDrawStateIds) {
@@ -491,134 +493,58 @@ void InteractiveVisualizer::drawStateIds(std::size_t iteration) {
   }
 }
 
-void InteractiveVisualizer::visit(const CentreSquare& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const CentreSquare& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const DividingWalls& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const DividingWalls& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const DoubleEnclosure& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const DoubleEnclosure& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const FlankingGap& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const FlankingGap& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const FourRooms& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const FourRooms& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const GoalEnclosure& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const GoalEnclosure& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const NarrowPassage& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const NarrowPassage& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const ObstacleFree& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const ObstacleFree& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const RandomRectangles& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Get the goal.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const RandomRectangles& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const {
-  // Draw the start states.
-  drawPoints(context.getStartStates(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const ReedsSheppRandomRectangles& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const ReedsSheppRandomRectangles& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const RepeatingRectangles& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const RepeatingRectangles& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const StartEnclosure& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const StartEnclosure& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const WallGap& context) const {
-  // Draw the start states.
-  drawPoint(context.getStartState(), green, 4.0);
-  // Draw the goal states.
-  drawGoal();
-  // Draw the boundaries.
-  drawBoundary();
+void InteractiveVisualizer::visit(const WallGap& /* context */) const {
+}
+
+void InteractiveVisualizer::drawStarts() const {
+  const auto &starts = context_->getNthStartGoalPair(0).start;
+
+  for (const auto& start: starts){
+    drawPoint(start, green, 4.0);
+  }
 }
 
 void InteractiveVisualizer::drawGoal() const {
-  const auto goal = context_->createGoal();
+  const auto goal = context_->getNthStartGoalPair(0).goal;
 
   switch (goal->getType()) {
     case ompl::base::GoalType::GOAL_STATE: {
@@ -801,7 +727,7 @@ void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector3f>& point
 }
 
 void InteractiveVisualizer::drawPoints(
-    const std::vector<ompl::base::ScopedState<ompl::base::RealVectorStateSpace>>& states,
+    const std::vector<ompl::base::ScopedState<>>& states,
     const float* color, float size) const {
   if (states.front().getSpace()->getDimension() == 2u) {
     std::vector<Eigen::Vector2f> points;

@@ -58,27 +58,7 @@ namespace ompltools {
 OpenRaveR3xSO2::OpenRaveR3xSO2(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                                const std::shared_ptr<const Configuration>& config,
                                const std::string& name) :
-    OpenRaveBaseContext(spaceInfo, config, name),
-    startState_(spaceInfo),
-    goalState_(spaceInfo) {
-  // Get the start and goal positions.
-  auto startPosition = config->get<std::vector<double>>("context/" + name + "/start");  // x y z yaw
-  auto goalPosition = config->get<std::vector<double>>("context/" + name + "/goal");    // x y z yaw
-
-  // Set the start position.
-  startState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[0] =
-      startPosition.at(0u);
-  startState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[1] =
-      startPosition.at(1u);
-  startState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[2] =
-      startPosition.at(2u);
-  startState_->as<ompl::base::SO2StateSpace::StateType>(1u)->value = startPosition.at(3u);
-
-  // Set the goal position.
-  goalState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[0] = goalPosition.at(0u);
-  goalState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[1] = goalPosition.at(1u);
-  goalState_->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[2] = goalPosition.at(2u);
-  goalState_->as<ompl::base::SO2StateSpace::StateType>(1u)->value = goalPosition.at(3u);
+    OpenRaveBaseContext(spaceInfo, config, name){
 
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
@@ -128,37 +108,50 @@ OpenRaveR3xSO2::OpenRaveR3xSO2(const std::shared_ptr<ompl::base::SpaceInformatio
 
   // Setup the space info.
   spaceInfo_->setup();
+
+  startGoalPairs_ = makeStartGoalPair();
 }
 
 OpenRaveR3xSO2::~OpenRaveR3xSO2() {
   OpenRAVE::RaveDestroy();
 }
 
-ompl::base::ProblemDefinitionPtr OpenRaveR3xSO2::instantiateNewProblemDefinition() const {
-  // Instantiate a new problem definition.
-  auto problemDefinition = std::make_shared<ompl::base::ProblemDefinition>(spaceInfo_);
+std::vector<StartGoalPair> OpenRaveR3xSO2::makeStartGoalPair() const{
+  if (config_->contains("context/" + name_ + "/starts")) {
+    OMPL_ERROR("OpenRaveR3xSO2 context does not support multiple queries.");
+    throw std::runtime_error("Context error.");
+  }
 
-  // Set the objective.
-  problemDefinition->setOptimizationObjective(objective_);
+  ompl::base::ScopedState<ompl::base::CompoundStateSpace> startState(spaceInfo_);
+  ompl::base::ScopedState<ompl::base::CompoundStateSpace> goalState(spaceInfo_);
 
-  // Set the start state in the problem definition.
-  problemDefinition->addStartState(startState_);
+  // Get the start and goal positions.
+  const auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");  // x y z yaw
+  const auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");    // x y z yaw
 
-  // Create a goal for the problem definition.
-  auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
-  goal->setState(goalState_);
-  problemDefinition->setGoal(goal);
+  for (auto i=0u; i<3; ++i){
+    // Set the real component of the start position.
+    startState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[i] =
+      startPosition.at(i);
+    
+    // Set the real component of the goal position.
+    goalState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[i] = goalPosition.at(i);
+  }
+  
+  // Set the SO2-component of the start position.
+  startState->as<ompl::base::SO2StateSpace::StateType>(1u)->value = startPosition.at(3u);
 
-  // Return the new definition.
-  return problemDefinition;
-}
+  // Set the sO2-component of the goal position.
+  goalState->as<ompl::base::SO2StateSpace::StateType>(1u)->value = goalPosition.at(3u);
 
-ompl::base::ScopedState<ompl::base::CompoundStateSpace> OpenRaveR3xSO2::getStartState() const {
-  return startState_;
-}
+  StartGoalPair pair;
+  pair.start = {startState};
 
-ompl::base::ScopedState<ompl::base::CompoundStateSpace> OpenRaveR3xSO2::getGoalState() const {
-  return goalState_;
+  const auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
+  goal->setState(goalState);
+  pair.goal = goal;
+
+  return {pair};
 }
 
 void OpenRaveR3xSO2::accept(const ContextVisitor& visitor) const {

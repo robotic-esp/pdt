@@ -56,6 +56,12 @@ namespace esp {
 
 namespace ompltools {
 
+/** \brief Struct defining the start/end points of a planning problem. */
+struct StartGoalPair {
+  std::vector<ompl::base::ScopedState<>> start;
+  std::shared_ptr<ompl::base::Goal> goal;                                                                                                  
+};
+
 /** \brief The base class for an experiment */
 class BaseContext {
  public:
@@ -74,15 +80,23 @@ class BaseContext {
   /** \brief Returns the dimension of the state space. */
   std::size_t getDimension() const;
 
+  /** \brief Returns the number of start/goal queries for this context. */
+  std::size_t getNumQueries() const;
+
   /** \brief Returns the optimization objective of this context. */
   ompl::base::OptimizationObjectivePtr getObjective() const;
 
   /** \brief Returns the maximum duration to solve this context. */
   time::Duration getMaxSolveDuration() const;
 
-  /** \brief Return a newly generated problem definition */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition()
-      const = 0;
+  /** \brief Returns the start/goal pair. */
+  StartGoalPair getNthStartGoalPair(const std::size_t n) const;
+
+  /** \brief Return a newly generated problem definition. Equivalent to  instantiateNthNewProblemDefinition(0u). */
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition() const;
+
+  /** \brief Return a newly generated problem definition for the n-th query. */
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNthProblemDefinition(const std::size_t n) const;
 
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const = 0;
@@ -96,7 +110,22 @@ class BaseContext {
   /** \brief Create a goal. */
   virtual std::shared_ptr<ompl::base::Goal> createGoal() const = 0;
 
+  /** \brief Regenerates the queries: In case they are generated randomly, this gives a new set of queries.*/
+  void regenerateQueries();
+
  protected:
+  /** \brief Loads the specified or randomly generates the start/goal pairs (depending on the config file). */
+  virtual std::vector<StartGoalPair> makeStartGoalPair() const;
+
+  /** \brief Parse start and goal specification used for multiquery benchmarking. */
+  std::vector<StartGoalPair> parseMultiqueryStartGoalPairs() const;
+
+  /** \brief Parse explicitly specified starts/goals. */
+  std::vector<ompl::base::ScopedState<>> parseSpecifiedStates(const std::string &key) const;
+
+  /** \brief Generate randomly sampled starts/goals. */
+  std::vector<ompl::base::ScopedState<>> generateRandomStates(const std::string &key) const;
+
   /** \brief The space information associated with this context. */
   ompl::base::SpaceInformationPtr spaceInfo_{};
 
@@ -110,7 +139,11 @@ class BaseContext {
   ompl::base::OptimizationObjectivePtr objective_{};
 
   /** \brief The goal specification of the planning problem. */
+  /** \todo Consider removing this variable and instead calling StartGoalPair.goal.getType() */
   ompl::base::GoalType goalType_{ompl::base::GoalType::GOAL_ANY};
+
+  /** \brief The start/goal pair for the planning problem. */
+  std::vector<StartGoalPair> startGoalPairs_{};
 
   /** \brief The maximum duration to solve this context. */
   time::Duration maxSolveDuration_{};
