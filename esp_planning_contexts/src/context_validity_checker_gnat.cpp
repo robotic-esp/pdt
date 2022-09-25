@@ -40,6 +40,8 @@ namespace esp {
 
 namespace ompltools {
 
+using namespace std::string_literals;
+
 ContextValidityCheckerGNAT::ContextValidityCheckerGNAT(
     const ompl::base::SpaceInformationPtr& spaceInfo) :
     ContextValidityChecker(spaceInfo) {
@@ -77,7 +79,8 @@ bool ContextValidityCheckerGNAT::isValid(const ompl::base::State* state) const {
         return true;
       }
     } catch (const std::out_of_range& e) {
-      throw std::out_of_range("Nearest neighbour lookup for antiobstacles returned invalid index.");
+      auto msg = "Nearest neighbour lookup for antiobstacles returned invalid index:\n    "s + e.what();
+      throw std::out_of_range(msg);
     }
   }
 
@@ -90,7 +93,8 @@ bool ContextValidityCheckerGNAT::isValid(const ompl::base::State* state) const {
         return false;
       }
     } catch (const std::out_of_range& e) {
-      throw std::out_of_range("Nearest neighbour lookup for obstacles returned invalid index.");
+      auto msg = "Nearest neighbour lookup for obstacles returned invalid index:\n    "s + e.what();
+      throw std::out_of_range(msg);
     }
   }
 

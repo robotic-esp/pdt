@@ -59,6 +59,26 @@ class PlannerSpecificData {
   ompl::base::SpaceInformationPtr spaceInfo_{};
 };
 
+class LazyPRMstarData: public PlannerSpecificData {
+ public:
+  LazyPRMstarData(const ompl::base::SpaceInformationPtr& spaceInfo) :
+      PlannerSpecificData(spaceInfo) {}
+
+  using Edge = std::pair<ompl::base::PlannerDataVertex,ompl::base::PlannerDataVertex >;
+
+  // getter
+  std::vector<Edge> getValidEdges() const;
+  std::vector<std::size_t> getNewEdgeIndices() const;
+
+  // setter
+  void setValidEdges(const std::vector<Edge> &edges);
+  void setNewEdgeIndices(const std::vector<std::size_t> &newEdges);
+
+ private:
+  std::vector<Edge> validEdges_{};
+  std::vector<std::size_t> newEdgeIndices_{};
+};
+
 class BITstarData : public PlannerSpecificData {
  public:
   using BITstarEdge = std::pair<std::shared_ptr<const ompl::geometric::BITstar::Vertex>,

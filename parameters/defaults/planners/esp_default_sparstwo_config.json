@@ -1,0 +1,18 @@
+{
+    "planner": {
+        "defaultSPARStwo": {
+            "type": "SPARStwo",
+            "isAnytime": true,
+            "report": {
+                "color": "espred",
+                "name": "SPARS2"
+            },
+            "options": {
+              "stretchFactor": 3.0,
+              "sparseDeltaFraction": 0.25,
+              "denseDeltaFraction": 0.001,
+              "maxFailures": 5000
+            }
+        }
+    }
+}

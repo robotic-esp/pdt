@@ -43,6 +43,7 @@
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/prm/LazyPRMstar.h>
 
 #include "esp_time/time.h"
 
@@ -372,24 +373,33 @@ void BaseVisualizer::createData() {
               planner_->as<ompl::geometric::EITstar>()->getReverseQueue());
 
           // Store the next forward edge.
-          try {
+          if (!planner_->as<ompl::geometric::EITstar>()->isForwardQueueEmpty()) {
             eitstarData->setNextForwardEdge(
                 planner_->as<ompl::geometric::EITstar>()->getNextForwardEdge());
-          } catch (const std::out_of_range &e) {
-            // Throws if there is no forward edge. This is fine, the edge is default constructed.
           }
+          // No else, the edge is default constructed.
 
           // Store the next reverse edge.
-          try {
+          if (!planner_->as<ompl::geometric::EITstar>()->isReverseQueueEmpty()) {
             eitstarData->setNextReverseEdge(
                 planner_->as<ompl::geometric::EITstar>()->getNextReverseEdge());
-          } catch (const std::out_of_range &e) {
-            // Throws if there is no forward edge. This is fine, the edge is default constructed.
           }
+          // No else, the edge is default constructed.
 
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
           plannerSpecificData_.emplace_back(eitstarData);
+          break;
+        }
+        case PLANNER_TYPE::LAZYPRMSTAR: {
+          auto lPRMstarData = std::make_shared<LazyPRMstarData>(context_->getSpaceInformation());
+
+          lPRMstarData->setValidEdges(
+              planner_->as<ompl::geometric::LazyPRMstar>()->getValidEdges());
+
+          // Store the data.
+          std::scoped_lock lock(plannerSpecificDataMutex_);
+          plannerSpecificData_.emplace_back(lPRMstarData);
           break;
         }
         default:

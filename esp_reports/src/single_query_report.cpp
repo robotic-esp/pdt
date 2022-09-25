@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_reports//single_query_report.h"
+#include "esp_reports/single_query_report.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -68,7 +68,7 @@ SingleQueryReport::SingleQueryReport(const std::shared_ptr<Configuration>& confi
     querySuccessVsTimeLinePlotter_(config, stats),
     queryTimeAtFirstHistogramPlotter_(config, stats),
     stats_(stats) {
-}
+  }
 
 fs::path SingleQueryReport::generateReport() {
   auto reportPath =

@@ -307,19 +307,19 @@ int main(const int argc, const char **argv) {
       // Allocate and run a dummy planner before allocating the actual planner.
       // This results in more consistent measurements. I don't fully understand why, but it
       // seems to be connected to running the planner in a separate thread.
-      {
-        auto reconciler =
-            std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
-        reconciler->setName("ReconcilingPlanner");
-        reconciler->setProblemDefinition(context->instantiateNewProblemDefinition());
-        auto hotpath = std::async(std::launch::async, [&reconciler]() {
-          reconciler->solve(ompl::base::timedPlannerTerminationCondition(0.0));
-        });
-        hotpath.get();
-      }
+        {
+          auto reconciler =
+              std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
+          reconciler->setName("ReconcilingPlanner");
+          reconciler->setProblemDefinition(context->instantiateNewProblemDefinition());
+          auto hotpath = std::async(std::launch::async, [&reconciler]() {
+            reconciler->solve(ompl::base::timedPlannerTerminationCondition(0.0));
+          });
+          hotpath.get();
+        }
 
       // Allocate the planner to be tested.
-      auto [planner, plannerType] = plannerFactory.create(plannerName);
+        auto [planner, plannerType] = plannerFactory.create(plannerName);
 
       for (auto j=0u; j<numQueries; ++j){
         // Create the logger for this run.
@@ -392,7 +392,20 @@ int main(const int argc, const char **argv) {
                                 problem->getSolutionPath()->cost(context->getObjective()));
         } else {
           logger.addMeasurement(totalDuration,
-                                ompl::base::Cost(std::numeric_limits<double>::infinity()));
+                              ompl::base::Cost(context->getObjective()->infiniteCost()));
+      }
+
+      // Anytime planners can stop early, e.g. if they know that they found the optimal solution.
+      // Thus, we need to add an additional final measurement point at the maximum runtime.
+      const auto maxRunDuration = context->getMaxSolveDuration();
+      if (totalDuration < maxRunDuration) {
+        if (problem->hasExactSolution()) {
+          logger.addMeasurement(maxRunDuration,
+                                problem->getSolutionPath()->cost(context->getObjective()));
+        } else {
+          logger.addMeasurement(maxRunDuration,
+                                ompl::base::Cost(context->getObjective()->infiniteCost()));
+        }
         }
 
         // Add this run to the log and report it to the console.
@@ -465,7 +478,7 @@ int main(const int argc, const char **argv) {
   std::vector<esp::ompltools::Statistics> stats;
 
   for (const auto &path: resultPaths){
-    stats.push_back(esp::ompltools::Statistics(config, path, true));
+    stats.push_back(esp::ompltools::Statistics(config, path, false));
   }
 
   // Generate the report.

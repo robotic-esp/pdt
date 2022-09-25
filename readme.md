@@ -192,11 +192,41 @@ Turn on the verbose compilation in the benchmark configuration `.json` file. If 
 
 ## Formatting code
 
-Before submitting code to OMPL Tools, please format your code using:
+We format our code on a style based on [Google's style guide](https://google.github.io/styleguide/cppguide.html). A good way to ensure that your contribution conforms to this style is to run `clang-format` on it before committing. You can format a specific file with
 
 ```bash
 clang-format -i ./path/to/file
 ```
+
+or you can use
+
+```bash
+git clang-format -f
+```
+
+to format all lines in all files that changed between the current working directory and the last commit. You can likely also configure your editor to run `clang-format` for you, e.g., whenever you save a C++ file.
+
+## Statically analysing code
+
+Please consider using static analysis tools, such as `clang-tidy`, when working in OMPL Tools. On Ubuntu `clang-tidy` can be installed from the repos (`sudo apt install clang-tidy`). Good editors can be configured to automatically run `clang-tidy` and visualize its output directly in your code. We recommend this workflow, as it doesn't require you to remember to run `clang-tidy`.
+
+Alternatively, you can also run `clang-tidy` from the terminal. You can use it out of the box on a single file, but this requires you to specify the included directories, linked libraries, and compiler flags on the command line. For example
+
+```bash
+clang-tidy test.cpp -- -Imy_project/include -DMY_DEFINES ...
+```
+
+You could run `clang-tidy` like this on all files in the project, but you would have to find the correct includes, libraries, and flags for each file.
+
+A less cumbersome way to run `clang-tidy` on a whole project is to let your build system generate a compile commands database for you and run `clang-tidy` from the folder in which this file is generated. In our case, you can tell CMake to generate this database by adding `-DCMAKE_EXPORT_COMPILE_COMMANDS=TRUE` to your call to `cmake`. You can then run `clang-tidy` on all files in the project by invoking `run-clang-tidy` from the folder in which the database is generated (CMake calls this file `compile_commands.json` and it is typically generated in the `build` folder).
+
+```bash
+cd /path/to/esp_ompl_tools/build
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=TRUE .. 
+run-clang-tidy
+```
+
+The `run-clang-tidy` executable is included in the `clang-tidy` package installed with `sudo apt install clang-tidy`.
 
 ## Backlog
 
