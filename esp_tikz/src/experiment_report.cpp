@@ -75,9 +75,9 @@ ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
 
   // Get the plot planner names.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
-    try {
+    if (config_->contains("planner/" + name + "/report/name")) {
       plotPlannerNames_[name] = config_->get<std::string>("planner/" + name + "/report/name");
-    } catch (const std::invalid_argument& e) {
+    } else {
       plotPlannerNames_[name] = name;
     }
   }

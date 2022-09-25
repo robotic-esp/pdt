@@ -1,0 +1,25 @@
+{
+    "planner": {
+        "defaultEIRMstar": {
+            "type": "EIRMstar",
+            "isAnytime": true,
+            "report": {
+                "color": "espdarkgreen",
+                "name": "EIRM*"
+            },
+            "options": {
+                "batchSize": 100,
+                "radiusFactor": 1.001,
+                "repairFactor": 1.2,
+                "useKNearest": true,
+                "enablePruning": false,
+                "startGoalPruningThreshold": 50000,
+                "trackApproximateSolutions": false,
+                "repairReverseSearchTreeUponCollisionDetection": false,
+                "collisionDetectionOnReverseSearch": true,
+                "numInitialCollisionChecks": 1,
+                "resetSuboptimalityFactorOnEveryApproximation": false
+            }
+        }
+    }
+}

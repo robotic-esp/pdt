@@ -56,6 +56,7 @@ class PgfPlot {
   void setPlottable(const std::shared_ptr<PlottableInterface>& plottable);
 
   std::string string() const;
+  bool empty() const;
 
  private:
   std::shared_ptr<PlottableInterface> plottable_{};

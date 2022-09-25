@@ -103,6 +103,7 @@ class InteractiveVisualizer : public BaseVisualizer,
   void drawBITstarSpecificVisualizations(const std::size_t iteration) const;
   void drawAITstarSpecificVisualizations(const std::size_t iteration) const;
   void drawEITstarSpecificVisualizations(const std::size_t iteration) const;
+  void drawLazyPRMstarSpecificVisualizations(const std::size_t iteration) const;
 
   // Lowlevel drawing.
   void drawRectangle(const std::vector<float>& midpoint, const std::vector<float>& widths,

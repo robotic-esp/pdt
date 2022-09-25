@@ -40,6 +40,7 @@
 #include <cmath>
 #include <fstream>
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
@@ -82,16 +83,14 @@ void PgfTable::loadFromPath(const std::experimental::filesystem::path& path,
     if (row.at(0).find('#') != std::string::npos) {
       continue;  // Skipping comments.
     }
-    std::string rowName{"invalid row"};
-    try {  // This *should* throw, we expect a row name at first position.
-      std::stod(row.at(0));
-    } catch (const std::invalid_argument& e) {
-      rowName = row.at(0);
-    }
-    if (rowName == "invalid row"s) {
+    std::string rowName;
+    double unused = std::numeric_limits<double>::signaling_NaN();
+    if (boost::conversion::try_lexical_convert<double>(row.at(0), unused)) {
       auto msg = "Pgf Table encountered unnamed row in '"s + path.string() +
                  "'. The first entry in every row is expected to be a string."s;
       throw std::invalid_argument(msg);
+    } else { 
+      rowName = row.at(0);
     }
     if (rowName != domain && rowName != codomain) {
       continue;  // Skipping rows that aren't of interest.
@@ -115,7 +114,7 @@ void PgfTable::loadFromPath(const std::experimental::filesystem::path& path,
         }
       } catch (const std::invalid_argument& e) {
         auto msg = "Pgf Table cannot convert entry '"s + row.at(i) + "' from file '"s +
-                   path.string() + "' to double."s;
+                   path.string() + "' to double:\n    "s + e.what();
         throw std::invalid_argument(msg);
       }
     }
