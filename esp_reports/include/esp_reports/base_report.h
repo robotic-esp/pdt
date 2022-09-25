@@ -38,52 +38,56 @@
 
 #include <experimental/filesystem>
 #include <memory>
+#include <set>
+#include <sstream>
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
-#include "esp_tikz/pgf_axis.h"
+#include "esp_plotters/latex_plotter.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class MedianCostEvolutionPlotter : public LatexPlotter {
+class BaseReport {
  public:
-  MedianCostEvolutionPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
-  ~MedianCostEvolutionPlotter() = default;
+  BaseReport(const std::shared_ptr<Configuration>& config);
+  ~BaseReport() = default;
 
-  // Creates a pgf axis that holds the median cost at binned durations for all planners.
-  std::shared_ptr<PgfAxis> createMedianCostEvolutionAxis() const;
+  virtual std::experimental::filesystem::path generateReport() = 0;
+  std::experimental::filesystem::path compileReport() const;
 
-  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianCostEvolutionAxis(const std::string& plannerName) const;
+ protected:
+  std::stringstream preamble() const;
+  std::stringstream appendix() const;
 
-  // Creates a tikz picture that contains the median cost axis of all planners.
-  std::experimental::filesystem::path createMedianCostEvolutionPicture() const;
+  const std::set<std::string> requirePackages_{"luatex85", "shellesc"};
+  const std::set<std::string> usePackages_{"appendix", "booktabs",  "caption",
+                                           "listings", "microtype", "tabularx",
+                                           "tikz",     "pgfplots",  "xcolor"};
+  const std::set<std::string> lstSet_{};
+  const std::set<std::string> tikzLibraries_{"calc", "plotmarks", "external"};
+  const std::set<std::string> pgfLibraries_{"fillbetween"};
+  const std::set<std::string> pgfPlotsset_{"compat=1.15"};
 
-  // Creates a tikz picture that contains the median cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianCostEvolutionPicture(const std::string& plannerName) const;
+  std::string experimentName_{};
+  std::map<std::string, std::string> plotPlannerNames_{};
 
- private:
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionUpperCiPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionLowerCiPlot(
-      const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionFillCiPlot(
-      const std::string& plannerName) const;
+  // Plotters.
+  LatexPlotter latexPlotter_;
 
-  void setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  // Colors.
+  std::map<std::string, std::array<int, 3>> espColors_{};
 
-  std::vector<double> binnedDurations_{};
-  double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
-  double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
+  const std::shared_ptr<const Configuration> config_;
 
-  const Statistics& stats_;
+  // Helper to replace _ with \_, see [1].
+  void findAndReplaceAll(std::string* string, const std::string& key,
+                         const std::string& replacement) const;
 };
 
 }  // namespace ompltools
 
 }  // namespace esp
+
+// [1] https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c/

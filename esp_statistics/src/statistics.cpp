@@ -868,6 +868,19 @@ std::vector<double> Statistics::getInitialSolutionDurations(const PlannerResults
   return initialDurations;
 }
 
+std::vector<double> Statistics::getLastSolutionDurations(const PlannerResults& results) const {
+  // Get the durations of the initial solutions of all runs.
+  std::vector<double> lastDurations{};
+  lastDurations.reserve(results.numMeasuredRuns());
+  for (auto run = 0u; run < results.numMeasuredRuns(); ++run) {
+    // Get the durations and costs of this run.
+    const auto& measuredRun = results.getMeasuredRun(run);
+    lastDurations.emplace_back(measuredRun.back().first);
+  }
+
+  return lastDurations;
+}
+
 std::vector<double> Statistics::getInitialSolutionCosts(const PlannerResults& results) const {
   // Get the costs of the initial solutions of all runs.
   std::vector<double> initialCosts{};
@@ -891,6 +904,19 @@ std::vector<double> Statistics::getInitialSolutionCosts(const PlannerResults& re
   }
 
   return initialCosts;
+}
+
+std::vector<double> Statistics::getLastSolutionCosts(const PlannerResults& results) const {
+  // Get the durations of the initial solutions of all runs.
+  std::vector<double> lastCosts{};
+  lastCosts.reserve(results.numMeasuredRuns());
+  for (auto run = 0u; run < results.numMeasuredRuns(); ++run) {
+    // Get the durations and costs of this run.
+    const auto& measuredRun = results.getMeasuredRun(run);
+    lastCosts.emplace_back(measuredRun.back().second);
+  }
+
+  return lastCosts;
 }
 
 double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,

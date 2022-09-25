@@ -1,8 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014-2017     University of Toronto
- *  Copyright (c) 2018-present  University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -15,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the names of the copyright holders nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -35,54 +34,47 @@
 
 // Authors: Marlin Strub
 
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <vector>
+#pragma once
 
 #include <experimental/filesystem>
+#include <memory>
+#include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_reports/single_query_report.h"
+#include "esp_plotters/latex_plotter.h"
 #include "esp_statistics/statistics.h"
+#include "esp_tikz/pgf_axis.h"
 
-using namespace std::string_literals;
+namespace esp {
 
-int main(const int argc, const char** argv) {
-  // Read the config files.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+namespace ompltools {
 
-  std::cout << "\nReport\n"
-            << std::setw(2u) << std::setfill(' ') << ' '
-            << "Compiling (this may take a couple of minutes)" << std::flush;
+class QueryPercentileCostVsTimeLinePlotter : public LatexPlotter {
+ public:
+  QueryPercentileCostVsTimeLinePlotter(const std::shared_ptr<const Configuration>& config,
+                                 const Statistics& stats);
+  ~QueryPercentileCostVsTimeLinePlotter() = default;
 
-  const std::vector<std::string> resultPaths = config->get<std::vector<std::string>>("experiment/results");
+  // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
+  std::shared_ptr<PgfAxis> createCostPercentileEvolutionAxis(const std::string& plannerName) const;
 
-  // Generate the statistic.
-  std::vector<esp::ompltools::Statistics> stats;
+  // Creates a tikz picture that contains the median cost axis of the specified planner.
+  std::experimental::filesystem::path createCostPercentileEvolutionPicture(
+      const std::string& plannerName) const;
 
-  for (const auto &path: resultPaths){
-    stats.push_back(esp::ompltools::Statistics(config, path, true));
-  }
+ private:
+  std::shared_ptr<PgfPlot> createCostPercentileEvolutionPlot(const std::string& plannerName,
+                                                             double percentile) const;
 
-  // Generate the report.
-  if (stats.size() == 0u){
-    throw std::runtime_error(
-        "No statistics were generated, thus no report can be compiled.");
-  }
-  else if(stats.size() == 1u){ // Single query report
-    esp::ompltools::SingleQueryReport report(config, stats[0u]);
-    report.generateReport();
-    report.compileReport();
-  }
-  else{ // Multiquery report
+  void setCostPercentileEvolutionAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  }
-  
-  // Inform that we are done compiling the report.
-  std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
-            << std::setfill(' ') << ' ' << "Compilation done\n"
-            << std::flush;
+  const std::set<double> percentiles_{0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99};
+  std::vector<double> binnedDurations_{};
+  double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
 
-  return 0;
-}
+  const Statistics& stats_;
+};
+
+}  // namespace ompltools
+
+}  // namespace esp

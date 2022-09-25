@@ -42,18 +42,18 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
+#include "esp_plotters/latex_plotter.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class InitialSolutionDurationHistogramPlotter : public LatexPlotter {
+class QueryTimeAtFirstHistogramPlotter : public LatexPlotter {
  public:
-  InitialSolutionDurationHistogramPlotter(const std::shared_ptr<const Configuration>& config,
+  QueryTimeAtFirstHistogramPlotter(const std::shared_ptr<const Configuration>& config,
                                           const Statistics& stats);
-  ~InitialSolutionDurationHistogramPlotter() = default;
+  ~QueryTimeAtFirstHistogramPlotter() = default;
 
   // Creates a pgf axis that hold the initial solution duration histogram of all planners.
   std::shared_ptr<PgfAxis> createInitialSolutionDurationHistogramAxis() const;

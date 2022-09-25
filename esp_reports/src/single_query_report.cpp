@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/experiment_report.h"
+#include "esp_reports/single_query_report.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -56,52 +56,21 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-ExperimentReport::ExperimentReport(const std::shared_ptr<Configuration>& config,
+SingleQueryReport::SingleQueryReport(const std::shared_ptr<Configuration>& config,
                                    const Statistics& stats) :
+    BaseReport(config),
     latexPlotter_(config),
-    costPercentileEvolutionPlotter_(config, stats),
-    initialSolutionDurationHistogramPlotter_(config, stats),
-    initialSolutionScatterPlotter_(config, stats),
-    medianCostEvolutionPlotter_(config, stats),
-    medianInitialSolutionPlotter_(config, stats),
-    successPlotter_(config, stats),
     overviewPlotter_(config, stats),
-    config_(config),
+    queryCostAtFirstVsTimeAtFirstScatterPlotter_(config, stats),
+    queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_(config, stats),
+    queryMedianCostVsTimeLinePlotter_(config, stats),
+    queryPercentileCostVsTimeLinePlotter_(config, stats),
+    querySuccessVsTimeLinePlotter_(config, stats),
+    queryTimeAtFirstHistogramPlotter_(config, stats),
     stats_(stats) {
-  // Latex doesn't like unescaped underscores in text mode.
-  experimentName_ = config_->get<std::string>("experiment/name");
-  findAndReplaceAll(&experimentName_, "_", "\\_");
-  experimentName_ = "\\texttt{"s + experimentName_ + "}"s;
-
-  // Get the plot planner names.
-  for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
-    if (config_->contains("planner/" + name + "/report/name")) {
-      plotPlannerNames_[name] = config_->get<std::string>("planner/" + name + "/report/name");
-    } else {
-      plotPlannerNames_[name] = name;
-    }
   }
 
-  // Load the colors from the config.
-  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("colors/espblack"));
-  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("colors/espwhite"));
-  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("colors/espgray"));
-  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("colors/espblue"));
-  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("colors/esplightblue"));
-  espColors_.emplace("espdarkblue", config_->get<std::array<int, 3>>("colors/espdarkblue"));
-  espColors_.emplace("espred", config_->get<std::array<int, 3>>("colors/espred"));
-  espColors_.emplace("esplightred", config_->get<std::array<int, 3>>("colors/esplightred"));
-  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("colors/espdarkred"));
-  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("colors/espyellow"));
-  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("colors/espgreen"));
-  espColors_.emplace("esplightgreen", config_->get<std::array<int, 3>>("colors/esplightgreen"));
-  espColors_.emplace("espdarkgreen", config_->get<std::array<int, 3>>("colors/espdarkgreen"));
-  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("colors/esppurple"));
-  espColors_.emplace("esplightpurple", config_->get<std::array<int, 3>>("colors/esplightpurple"));
-  espColors_.emplace("espdarkpurple", config_->get<std::array<int, 3>>("colors/espdarkpurple"));
-}
-
-fs::path ExperimentReport::generateReport() {
+fs::path SingleQueryReport::generateReport() {
   auto reportPath =
       fs::path(config_->get<std::string>("experiment/experimentDirectory")) / "report.tex"s;
   // Open the filestream.
@@ -110,7 +79,7 @@ fs::path ExperimentReport::generateReport() {
 
   // Check on the failbit.
   if (report.fail() == true) {
-    auto msg = "ExperimentReport failed to create a report at '" + reportPath.string() + "'."s;
+    auto msg = "SingleQueryReport failed to create a report at '" + reportPath.string() + "'."s;
     throw std::ios_base::failure(msg);
   }
 
@@ -138,101 +107,7 @@ fs::path ExperimentReport::generateReport() {
   return reportPath;
 }
 
-std::stringstream ExperimentReport::preamble() const {
-  std::stringstream preamble;
-  // First we need the 'Required' packages.
-  for (const auto& package : requirePackages_) {
-    preamble << "\\RequirePackage{" << package << "}\n";
-  }
-
-  // We're ready to declare the document class.
-  preamble << "\\documentclass[titlepage]{article}\n";
-
-  // Now we load the 'used' packages.
-  preamble << "% This report uses the following packages:\n";
-  for (const auto& package : usePackages_) {
-    preamble << "\\usepackage{" << package << "}\n";
-  }
-
-  // Now we load the used tikz libraries.
-  preamble << "% This report uses the following TikZ libraries:\n";
-  for (const auto& library : tikzLibraries_) {
-    preamble << "\\usetikzlibrary{" << library << "}\n";
-  }
-
-  // We activate externalization for the tikz figures.
-  preamble
-      << "\\immediate\\write18{mkdir -p tikz-externalized}\n"
-      << "\\tikzexternalize[prefix=tikz-externalized/]\n"
-      << "\\tikzset{external/system call/.add={}{; convert -density 600 -flatten \"\\image.pdf\" "
-         "\"\\image-600.png\"}}\n";
-
-  // Now we load the used pgf libraries.
-  preamble << "% This report uses the following PGFPlots libraries:\n";
-  for (const auto& library : pgfLibraries_) {
-    preamble << "\\usepgfplotslibrary{" << library << "}\n";
-  }
-
-  // Set the desired listings options.
-  preamble << "% This report sets the following listings options:\n";
-  for (const auto& option : lstSet_) {
-    preamble << "\\lstset{" << option << "}\n";
-  }
-
-  // Set the desired pgfplots options.
-  preamble << "% This report sets the following PGFPlots options:\n";
-  for (const auto& option : pgfPlotsset_) {
-    preamble << "\\pgfplotsset{" << option << "}\n";
-  }
-
-  // Define a nicer listing for JSON.
-  preamble << "\\lstdefinelanguage{json}{%\n"
-              "basicstyle={\\normalfont\\ttfamily},%\n"
-              "stringstyle=\\color{black!90},%\n"
-              "numbers=left,%\n"
-              "numberstyle=\\scriptsize,%\n"
-              "stepnumber=1,%\n"
-              "numbersep=8pt,%\n"
-              "showstringspaces=false,%\n"
-              "breaklines=true,%\n"
-              "backgroundcolor=\\color{gray!10},%\n"
-              "string=[s]{\"}{\"},%\n"
-              "comment=[l]{:\\ \"},%\n"
-              "morecomment=[l]{:\"},%\n"
-              "literate=%\n"
-              "  *{0}{{{\\color{black!70}0}}}{1}%\n"
-              "  {1}{{{\\color{black!70}1}}}{1}%\n"
-              "  {2}{{{\\color{black!70}2}}}{1}%\n"
-              "  {3}{{{\\color{black!70}3}}}{1}%\n"
-              "  {4}{{{\\color{black!70}4}}}{1}%\n"
-              "  {5}{{{\\color{black!70}5}}}{1}%\n"
-              "  {6}{{{\\color{black!70}6}}}{1}%\n"
-              "  {7}{{{\\color{black!70}7}}}{1}%\n"
-              "  {8}{{{\\color{black!70}8}}}{1}%\n"
-              "  {9}{{{\\color{black!70}9}}}{1}}%\n";
-  preamble << "\\lstset{language=json}\n";
-
-  // Include the colors.
-  for (const auto& [name, values] : espColors_) {
-    preamble << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
-             << values[2u] << "}\n";
-  }
-
-  // Create the title.
-  preamble << "\\title{\\bfseries\\LARGE Experiment \\\\ " << experimentName_ << "}\n";
-
-  // Create the author.
-  preamble << "\\author{ESP OMPLTools}\n";
-
-  // Set the when this report was compiled.
-  preamble << "\\date{\\today}\n";
-
-  // That's it, let's separate the preamble with an extra newline.
-  preamble << '\n';
-  return preamble;
-}
-
-std::stringstream ExperimentReport::overview() const {
+std::stringstream SingleQueryReport::overview() const {
   std::stringstream overview;
   // We often refer to the planner names, this reference just makes it more convenient.
   const auto& plannerNames = config_->get<std::vector<std::string>>("experiment/planners");
@@ -266,9 +141,9 @@ std::stringstream ExperimentReport::overview() const {
   overview << kpiTable.string() << '\n';
 
   // Create all axes to be displayed in the results summary.
-  auto medianCostEvolutionAxis = medianCostEvolutionPlotter_.createMedianCostEvolutionAxis();
-  auto medianInitialSolutionAxis = medianInitialSolutionPlotter_.createMedianInitialSolutionAxis();
-  auto successAxis = successPlotter_.createSuccessAxis();
+  auto medianCostEvolutionAxis = queryMedianCostVsTimeLinePlotter_.createMedianCostEvolutionAxis();
+  auto medianInitialSolutionAxis = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_.createMedianInitialSolutionAxis();
+  auto successAxis = querySuccessVsTimeLinePlotter_.createSuccessAxis();
   // Merge the intial solution axis into the cost evolution axis.
   medianCostEvolutionAxis->mergePlots(medianInitialSolutionAxis);
 
@@ -306,7 +181,7 @@ std::stringstream ExperimentReport::overview() const {
   std::vector<std::shared_ptr<PgfAxis>> initialSolutionDurationHistogramAxes{};
   for (const auto& name : plannerNames) {
     initialSolutionDurationHistogramAxes.emplace_back(
-        initialSolutionDurationHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name));
+        queryTimeAtFirstHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name));
   }
   latexPlotter_.alignAbszissen(initialSolutionDurationHistogramAxes);
   latexPlotter_.alignOrdinates(initialSolutionDurationHistogramAxes);
@@ -321,7 +196,7 @@ std::stringstream ExperimentReport::overview() const {
   return overview;
 }
 
-std::stringstream ExperimentReport::individualResults() const {
+std::stringstream SingleQueryReport::individualResults() const {
   std::stringstream results;
 
   // Create a section for every planner.
@@ -335,13 +210,13 @@ std::stringstream ExperimentReport::individualResults() const {
     results << "\\subsection{Initial Solutions}\\label{sec:" << name << "-initial-solution}\n";
 
     // Overlay the histogram with the edf for the first initial durations plot.
-    auto edf = successPlotter_.createSuccessAxis(name);
+    auto edf = querySuccessVsTimeLinePlotter_.createSuccessAxis(name);
     edf->options.xmin = stats_.getMinInitialSolutionDuration(name);
     edf->options.xmax = config_->get<double>(
         "context/"s + config_->get<std::string>("experiment/context") + "/maxTime");
     edf->options.ytickPos = "left";
     auto histo =
-        initialSolutionDurationHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name);
+        queryTimeAtFirstHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name);
     histo->overlay(edf.get());
     for (const auto& plot : histo->getPlots()) {
       plot->options.drawOpacity = 0.2f;
@@ -349,10 +224,10 @@ std::stringstream ExperimentReport::individualResults() const {
     }
 
     // Create the scatter axis of all initial solutions.
-    auto scatter = initialSolutionScatterPlotter_.createInitialSolutionScatterAxis(name);
+    auto scatter = queryCostAtFirstVsTimeAtFirstScatterPlotter_.createInitialSolutionScatterAxis(name);
 
     // Create a median plot of all initial solutions.
-    auto median = medianInitialSolutionPlotter_.createMedianInitialSolutionAxis(name);
+    auto median = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_.createMedianInitialSolutionAxis(name);
     for (const auto& plot : median->getPlots()) {
       plot->options.markSize = 2.0;
       plot->options.lineWidth = 1.0;
@@ -393,9 +268,9 @@ std::stringstream ExperimentReport::individualResults() const {
     // Show the cost evolution plots for anytime planners.
     if (config_->get<bool>("planner/"s + name + "/isAnytime"s)) {
       // Cost evolution plots.
-      auto medianEvolution = medianCostEvolutionPlotter_.createMedianCostEvolutionAxis(name);
+      auto medianEvolution = queryMedianCostVsTimeLinePlotter_.createMedianCostEvolutionAxis(name);
       auto percentileEvolution =
-          costPercentileEvolutionPlotter_.createCostPercentileEvolutionAxis(name);
+          queryPercentileCostVsTimeLinePlotter_.createCostPercentileEvolutionAxis(name);
       medianEvolution->matchAbszisse(*percentileEvolution);
       latexPlotter_.stack(medianEvolution, percentileEvolution);
 
@@ -418,71 +293,6 @@ std::stringstream ExperimentReport::individualResults() const {
   }
 
   return results;
-}
-
-std::stringstream ExperimentReport::appendix() const {
-  std::stringstream appendix;
-  appendix << "\n\\pagebreak\n";
-  appendix << "\\begin{appendices}\n";
-  // At the configuration section.
-  appendix << "\\section{Configuration}\\label{sec:configuration}\n";
-
-  // Report the configuration of the experiment first.
-  appendix << "\\subsection{Experiment}\\label{sec:experiment-configuration}\n";
-  appendix << "\\begin{lstlisting}\n" << config_->dump("experiment") << "\\end{lstlisting}\n";
-
-  // Report the configuration of the context second.
-  appendix << "\\subsection{" << config_->get<std::string>("experiment/context")
-           << "}\\label{sec:context-configuration}\n";
-  appendix << "\\begin{lstlisting}\n"
-           << config_->dump("context/" + config_->get<std::string>("experiment/context"))
-           << "\\end{lstlisting}\n";
-
-  // Report the configuration of all planners.
-  for (const auto& plannerName : config_->get<std::vector<std::string>>("experiment/planners")) {
-    appendix << "\\subsection{" << plotPlannerNames_.at(plannerName)
-             << "}\\label{sec:" << plannerName << "-configuration}\n";
-    appendix << "\\begin{lstlisting}\n"
-             << config_->dump("planner/" + plannerName) << "\\end{lstlisting}\n";
-  }
-
-  appendix << "\\end{appendices}\n";
-
-  return appendix;
-}
-
-fs::path ExperimentReport::compileReport() const {
-  // Compiling with lualatex is slower than pdflatex but has dynamic memory allocation. Since
-  // these plots can be quite large, pdflatex has run into memory issues. Lualatex should be
-  // available with all major tex distributions.
-  auto reportPath =
-      fs::path(config_->get<std::string>("experiment/experimentDirectory")) / "report.tex";
-  auto currentPath = fs::current_path();
-  auto cmd = "cd \""s + reportPath.parent_path().string() +
-             "\" && lualatex --interaction=nonstopmode --shell-escape \""s + reportPath.string() +
-             "\""s;
-  if (!config_->get<bool>("experiment/report/verboseCompilation")) {
-    cmd += " > /dev/null";
-  }
-  cmd += " && cd \""s + currentPath.string() + '\"';
-  int retval = std::system(cmd.c_str());
-  retval = std::system(cmd.c_str());  //  We compile the report twice to get the references right.
-  (void)retval;                       // Get rid of warning for unused variable.
-  return fs::path(reportPath).replace_extension(".pdf");
-}
-
-void ExperimentReport::findAndReplaceAll(std::string* string, const std::string& key,
-                                         const std::string& replacement) const {
-  // Get the first occurrence.
-  size_t pos = string->find(key);
-
-  // Repeat till end is reached.
-  while (pos != std::string::npos) {
-    // Replace this occurrence of Sub String.
-    string->replace(pos, key.size(), replacement);
-    // Get the next occurrence from the current position.
-    pos = string->find(key, pos + replacement.size());
-  }
 }
 
 }  // namespace ompltools

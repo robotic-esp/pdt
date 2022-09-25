@@ -43,69 +43,46 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
+#include "esp_plotters/latex_plotter.h"
+#include "esp_plotters/overview_plotter.h"
+#include "esp_plotters/query_cost_at_first_vs_time_at_first_scatter_plotter.h"
+#include "esp_plotters/query_median_cost_at_first_vs_median_time_at_first_point_plotter.h"
+#include "esp_plotters/query_median_cost_vs_time_line_plotter.h"
+#include "esp_plotters/query_percentile_cost_vs_time_line_plotter.h"
+#include "esp_plotters/query_success_vs_time_line_plotter.h"
+#include "esp_plotters/query_time_at_first_histogram_plotter.h"
+#include "esp_reports/base_report.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/cost_percentile_evolution_plotter.h"
-#include "esp_tikz/initial_solution_duration_histogram_plotter.h"
-#include "esp_tikz/initial_solution_scatter_plotter.h"
-#include "esp_tikz/latex_plotter.h"
-#include "esp_tikz/median_cost_evolution_plotter.h"
-#include "esp_tikz/median_initial_solution_plotter.h"
-#include "esp_tikz/overview_plotter.h"
-#include "esp_tikz/success_plotter.h"
 #include "esp_tikz/tikz_picture.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class ExperimentReport {
+class SingleQueryReport : public BaseReport {
  public:
-  ExperimentReport(const std::shared_ptr<Configuration>& config, const Statistics& stats);
-  ~ExperimentReport() = default;
+  SingleQueryReport(const std::shared_ptr<Configuration>& config, const Statistics& stats);
+  ~SingleQueryReport() = default;
 
-  std::experimental::filesystem::path generateReport();
-  std::experimental::filesystem::path compileReport() const;
+  std::experimental::filesystem::path generateReport() override;
 
  private:
-  std::stringstream preamble() const;
   std::stringstream overview() const;
   std::stringstream individualResults() const;
-  std::stringstream appendix() const;
-
-  const std::set<std::string> requirePackages_{"luatex85", "shellesc"};
-  const std::set<std::string> usePackages_{"appendix", "booktabs", "caption",  "listings",
-                                           "tabularx", "tikz",     "pgfplots", "xcolor"};
-  const std::set<std::string> lstSet_{};
-  const std::set<std::string> tikzLibraries_{"calc", "plotmarks", "external"};
-  const std::set<std::string> pgfLibraries_{"fillbetween"};
-  const std::set<std::string> pgfPlotsset_{"compat=1.15"};
-
-  std::string experimentName_{};
-  std::map<std::string, std::string> plotPlannerNames_{};
 
   // Plotters.
   LatexPlotter latexPlotter_;
-  CostPercentileEvolutionPlotter costPercentileEvolutionPlotter_;
-  InitialSolutionDurationHistogramPlotter initialSolutionDurationHistogramPlotter_;
-  InitialSolutionScatterPlotter initialSolutionScatterPlotter_;
-  MedianCostEvolutionPlotter medianCostEvolutionPlotter_;
-  MedianInitialSolutionPlotter medianInitialSolutionPlotter_;
-  SuccessPlotter successPlotter_;
   OverviewPlotter overviewPlotter_;
+  QueryCostAtFirstVsTimeAtFirstScatterPlotter queryCostAtFirstVsTimeAtFirstScatterPlotter_;
+  QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_;
+  QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter_;
+  QueryPercentileCostVsTimeLinePlotter queryPercentileCostVsTimeLinePlotter_;
+  QuerySuccessVsTimeLinePlotter querySuccessVsTimeLinePlotter_;
+  QueryTimeAtFirstHistogramPlotter queryTimeAtFirstHistogramPlotter_;
 
-  // Colors.
-  std::map<std::string, std::array<int, 3>> espColors_{};
-
-  const std::shared_ptr<const Configuration> config_;
   const Statistics& stats_;
-
-  // Helper to replace _ with \_, see [1].
-  void findAndReplaceAll(std::string* string, const std::string& key,
-                         const std::string& replacement) const;
 };
 
 }  // namespace ompltools
 
 }  // namespace esp
-
-// [1] https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c/

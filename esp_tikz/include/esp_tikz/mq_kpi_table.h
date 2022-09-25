@@ -1,8 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014-2017     University of Toronto
- *  Copyright (c) 2018-present  University of Oxford
+ *  Copyright (c) 2014, University of Toronto
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -15,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the names of the copyright holders nor the names of its
+ *   * Neither the name of the University of Toronto nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -33,56 +32,36 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Valentin Hartmann
 
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <vector>
+#pragma once
 
 #include <experimental/filesystem>
 
 #include "esp_configuration/configuration.h"
-#include "esp_reports/single_query_report.h"
+#include "esp_tikz/tabularx.h"
 #include "esp_statistics/statistics.h"
+#include "esp_statistics/multiquery_statistics.h"
 
-using namespace std::string_literals;
+namespace esp {
 
-int main(const int argc, const char** argv) {
-  // Read the config files.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+namespace ompltools {
 
-  std::cout << "\nReport\n"
-            << std::setw(2u) << std::setfill(' ') << ' '
-            << "Compiling (this may take a couple of minutes)" << std::flush;
+class MqKpiTable : public TabularX {
+ public:
+  MqKpiTable(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~MqKpiTable() = default;
 
-  const std::vector<std::string> resultPaths = config->get<std::vector<std::string>>("experiment/results");
+  void addKpi(const std::string& plannerName, const std::string& plannerPlotName);
 
-  // Generate the statistic.
-  std::vector<esp::ompltools::Statistics> stats;
+  std::string string() const;
 
-  for (const auto &path: resultPaths){
-    stats.push_back(esp::ompltools::Statistics(config, path, true));
-  }
+ private:
+  std::vector<std::string> plannerNames_{};
+  const std::shared_ptr<const Configuration> config_;
+  const MultiqueryStatistics& stats_;
+};
 
-  // Generate the report.
-  if (stats.size() == 0u){
-    throw std::runtime_error(
-        "No statistics were generated, thus no report can be compiled.");
-  }
-  else if(stats.size() == 1u){ // Single query report
-    esp::ompltools::SingleQueryReport report(config, stats[0u]);
-    report.generateReport();
-    report.compileReport();
-  }
-  else{ // Multiquery report
+}  // namespace ompltools
 
-  }
-  
-  // Inform that we are done compiling the report.
-  std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
-            << std::setfill(' ') << ' ' << "Compilation done\n"
-            << std::flush;
-
-  return 0;
-}
+}  // namespace esp

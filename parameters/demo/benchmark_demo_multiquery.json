@@ -3,10 +3,12 @@
         "executable": "benchmark",
         "planners": [
             "defaultRRTConnect",
-            "defaultLazyPRMstar"
+            "defaultEITstar",
+            "defaultLazyPRMstar",
+            "defaultEIRMstar"
         ],
-        "context": "MultiqueryRandomRectangles2D",
-        "numRuns": 100,
+        "context": "MultiqueryWallGap2D",
+        "numRuns": 50,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
         "loadDefaultPlannerConfig": true,
@@ -18,7 +20,7 @@
             "automatic": true,
             "verboseCompilation": false
         },
-	"regenerateQueries": false
+        "regenerateQueries": false
     },
     "context": {
         "MultiqueryRandomRectangles2D": {
@@ -27,21 +29,52 @@
             "maxTime": 0.1,
             "dimensions": 2,
             "boundarySideLengths" : [ 1, 1 ],
-            "goalType": "GoalState",
             "starts": {
                 "type": "generated",
-                "numGenerated": 50,
+                "numGenerated": 10,
                 "generativeModel": "uniform"
             },
+            "goalType": "GoalState",
             "goals": {
                 "type": "generated",
-                "numGenerated": 50,
+                "numGenerated": 10,
                 "generativeModel": "uniform"
             },
             "collisionCheckResolution": 0.000005,
             "numObstacles": 20,
             "maxSideLength": 0.2,
             "minSideLength": 0.1
+        },
+        "MultiqueryWallGap2D": {
+            "type": "WallGap",
+            "objective": "defaultPathLength",
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : [ 1, 1 ],
+            "starts": {
+                "type": "generated",
+                "numGenerated": 10,
+                "generativeModel": "subregion",
+                "generator": {
+                    "lowerBounds": [ 0.3, -0.5],
+                    "upperBounds": [ 0.5,  0]
+                }
+            },
+            "goalType": "GoalState",
+            "goals": {
+                "type": "generated",
+                "numGenerated": 10,
+                "generativeModel": "subregion",
+                "generator": {
+                    "lowerBounds": [-0.5, -0.5],
+                    "upperBounds": [ -0.3,  0]
+                }
+            },
+            "collisionCheckResolution": 0.000005,
+            "wallWidth": 0.8,
+            "wallThickness": 0.2,
+            "gapOffset": 0.1,
+            "gapWidth": 0.04
         }
     }
 }

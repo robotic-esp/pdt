@@ -3,6 +3,7 @@ project(esp_statistics)
 
 # Specify this library as a target.
 add_library(esp_statistics
+  src/multiquery_statistics.cpp
   src/statistics.cpp
   src/population_statistics.cpp)
 
@@ -18,4 +19,5 @@ target_link_libraries(esp_statistics
   esp_ompl_tools
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_configuration)
+  esp_configuration
+  esp_utilities)

@@ -41,19 +41,19 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
+#include "esp_plotters/latex_plotter.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
 #include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class MedianInitialSolutionPlotter : public LatexPlotter {
+class QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter : public LatexPlotter {
  public:
-  MedianInitialSolutionPlotter(const std::shared_ptr<const Configuration>& config,
+  QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(const std::shared_ptr<const Configuration>& config,
                                const Statistics& stats);
-  ~MedianInitialSolutionPlotter() = default;
+  ~QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter() = default;
 
   // Creates a pgf axis that holds the median cost at binned durations for all planners.
   std::shared_ptr<PgfAxis> createMedianInitialSolutionAxis() const;

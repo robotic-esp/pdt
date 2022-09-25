@@ -41,40 +41,43 @@
 #include <string>
 
 #include "esp_configuration/configuration.h"
-#include "esp_statistics/statistics.h"
-#include "esp_tikz/latex_plotter.h"
+#include "esp_plotters/latex_plotter.h"
+#include "esp_statistics/multiquery_statistics.h"
+#include "esp_tikz/pgf_axis.h"
 
 namespace esp {
 
 namespace ompltools {
 
-class InitialSolutionScatterPlotter : public LatexPlotter {
+class MedianCostAtFirstVsQueryLinePlotter : public LatexPlotter {
  public:
-  InitialSolutionScatterPlotter(const std::shared_ptr<const Configuration>& config,
-                                const Statistics& stats);
-  ~InitialSolutionScatterPlotter() = default;
+  MedianCostAtFirstVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  ~MedianCostAtFirstVsQueryLinePlotter() = default;
 
-  // Creates a pgf axis that hold the initial solution scatter plot of all planners.
-  std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis() const;
+  // Creates a pgf axis that holds the median cost of the initial solutions at each query for all planners.
+  std::shared_ptr<PgfAxis> createMedianInitialCostAxis() const;
 
-  // Creates a pgf axis that hold the initial solution scatter plot of the specified planner.
-  std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis(
-      const std::string& plannerName) const;
+  // Creates a pgf axis that holds the median cost of the initial solutions at each query for the specified planner.
+  std::shared_ptr<PgfAxis> createMedianInitialCostAxis(const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the initial solution scatter plot of all planners.
-  std::experimental::filesystem::path createInitialSolutionScatterPicture() const;
+  // Creates a tikz picture that contains the median initial cost axis of all planners.
+  std::experimental::filesystem::path createMedianInitialCostPicture() const;
 
-  // Creates a tikz picture that contains the initial solution scatter plot axis of all planners.
-  std::experimental::filesystem::path createInitialSolutionScatterPicture(
-      const std::string& plannerName) const;
+  // Creates a tikz picture that contains the median initial cost axis of the specified planner.
+  std::experimental::filesystem::path createMedianInitialCostPicture(const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createInitialSolutionScatterPlot(
+  std::shared_ptr<PgfPlot> createMedianInitialCostPlot(const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianInitialCostUpperCiPlot(
+      const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianInitialCostLowerCiPlot(
+      const std::string& plannerName) const;
+  std::shared_ptr<PgfPlot> createMedianInitialCostFillCiPlot(
       const std::string& plannerName) const;
 
-  void setInitialSolutionScatterAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setMedianInitialCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
 
-  const Statistics& stats_;
+  const MultiqueryStatistics& stats_;
 };
 
 }  // namespace ompltools

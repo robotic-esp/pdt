@@ -34,7 +34,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_tikz/initial_solution_scatter_plotter.h"
+#include "esp_plotters/query_cost_at_first_vs_time_at_first_scatter_plotter.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -54,13 +54,13 @@ namespace ompltools {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-InitialSolutionScatterPlotter::InitialSolutionScatterPlotter(
+QueryCostAtFirstVsTimeAtFirstScatterPlotter::QueryCostAtFirstVsTimeAtFirstScatterPlotter(
     const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<PgfAxis> InitialSolutionScatterPlotter::createInitialSolutionScatterAxis()
+std::shared_ptr<PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterAxis()
     const {
   auto axis = std::make_shared<PgfAxis>();
   setInitialSolutionScatterAxisOptions(axis);
@@ -75,7 +75,7 @@ std::shared_ptr<PgfAxis> InitialSolutionScatterPlotter::createInitialSolutionSca
   return axis;
 }
 
-std::shared_ptr<PgfAxis> InitialSolutionScatterPlotter::createInitialSolutionScatterAxis(
+std::shared_ptr<PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<PgfAxis>();
   setInitialSolutionScatterAxisOptions(axis);
@@ -84,7 +84,7 @@ std::shared_ptr<PgfAxis> InitialSolutionScatterPlotter::createInitialSolutionSca
   return axis;
 }
 
-fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture() const {
+fs::path QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterPicture() const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
   picture.addAxis(createInitialSolutionScatterAxis());
@@ -96,7 +96,7 @@ fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture() co
   return picturePath;
 }
 
-fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture(
+fs::path QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
   TikzPicture picture(config_);
@@ -109,7 +109,7 @@ fs::path InitialSolutionScatterPlotter::createInitialSolutionScatterPicture(
   return picturePath;
 }
 
-std::shared_ptr<PgfPlot> InitialSolutionScatterPlotter::createInitialSolutionScatterPlot(
+std::shared_ptr<PgfPlot> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterPlot(
     const std::string& plannerName) const {
   // Load the data into a pgf table.
   auto table = std::make_shared<PgfTable>(stats_.extractInitialSolutions(plannerName),
@@ -131,7 +131,7 @@ std::shared_ptr<PgfPlot> InitialSolutionScatterPlotter::createInitialSolutionSca
   return plot;
 }
 
-void InitialSolutionScatterPlotter::setInitialSolutionScatterAxisOptions(
+void QueryCostAtFirstVsTimeAtFirstScatterPlotter::setInitialSolutionScatterAxisOptions(
     std::shared_ptr<PgfAxis> axis) const {
   axis->options.height = config_->get<std::string>("initialSolutionScatterPlots/axisHeight");
   axis->options.width = config_->get<std::string>("initialSolutionScatterPlots/axisWidth");
