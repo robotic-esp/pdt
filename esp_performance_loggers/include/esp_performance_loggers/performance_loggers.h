@@ -202,9 +202,24 @@ template <class Logger>
 class ResultLog {
 
  public:
-  ResultLog(const std::experimental::filesystem::path& filepath) : filepath_(filepath) {
+  ResultLog(const std::experimental::filesystem::path& filepath, const bool append) : filepath_(filepath) {
     // Create parent directories, if needed.
     fs::create_directories(filepath_.parent_path());
+
+    // Assert user intent
+    if (!append && std::experimental::filesystem::exists(filepath_)) {
+      auto msg = "Told to create a new file where one already exists.";
+      throw std::ios_base::failure(msg);
+    } else if (append && !std::experimental::filesystem::exists(filepath_)) {
+      auto msg = "Told to append to a file that does not exist.";
+      throw std::ios_base::failure(msg);
+    }
+
+    if (append) {
+      // In order to append to the file, we need to set write access-permissions again.
+      fs::permissions(filepath_, fs::perms::owner_read | fs::perms::owner_write |
+                                     fs::perms::group_read | fs::perms::others_read);
+    }
 
     // Open the file.
     std::ofstream filestream;
@@ -216,7 +231,6 @@ class ResultLog {
       auto msg = "Could not open results file at "s + filepath_.string() + "."s;
       throw std::ios_base::failure(msg);
     }
-    
 
     // Set the permissions to read only.
     fs::permissions(filepath_,

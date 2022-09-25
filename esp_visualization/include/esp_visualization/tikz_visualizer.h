@@ -61,15 +61,16 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
                  const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE>& plannerPair);
   ~TikzVisualizer() = default;
 
-  void render(const ompl::base::PlannerData& plannerData, std::size_t iteration,
+  void render(const ompl::base::PlannerData& plannerData, const std::size_t iteration,
+              const std::size_t queryNumber,
               const ompl::base::PathPtr path,
               const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData,
-              double iterationTime, double totalTime, double solutionCost);
+              const double iterationTime, const double totalTime, const double solutionCost);
 
  private:
   // Compile a picture to a standalone document.
   std::experimental::filesystem::path compile(const std::experimental::filesystem::path& texPath,
-                                              double cost, double time);
+                                              const double cost, const double time, const std::size_t queryNumber);
 
   // Log to the frame times file.
   void logToFrameTimes(const std::experimental::filesystem::path& pngPath, double iterationTime);

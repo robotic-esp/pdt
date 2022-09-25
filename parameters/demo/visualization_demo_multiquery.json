@@ -1,0 +1,32 @@
+{
+    "experiment": {
+        "executable": "visualization",
+        "planner": "defaultRRTConnect",
+        "context": "MultiqueryRandomRectangles2D",
+        "useOnlyThisConfig": false
+    },
+    "context": {
+        "MultiqueryRandomRectangles2D": {
+            "type": "RandomRectangles",
+            "objective": "defaultPathLength",
+            "maxTime": 0.1,
+            "dimensions": 2,
+            "boundarySideLengths" : [ 1, 1 ],
+            "goalType": "GoalState",
+            "starts": {
+                "type": "generated",
+                "numGenerated": 50,
+                "generativeModel": "uniform"
+            },
+            "goals": {
+                "type": "generated",
+                "numGenerated": 50,
+                "generativeModel": "uniform"
+            },
+            "collisionCheckResolution": 0.000005,
+            "numObstacles": 20,
+            "maxSideLength": 0.2,
+            "minSideLength": 0.1
+        }
+    }
+}

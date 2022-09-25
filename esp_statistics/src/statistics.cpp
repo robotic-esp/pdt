@@ -126,7 +126,7 @@ std::size_t PlannerResults::numMeasuredRuns() const {
   return measuredRuns_.size();
 }
 
-Statistics::Statistics(const std::shared_ptr<Configuration>& config, const bool forceComputation) :
+Statistics::Statistics(const std::shared_ptr<Configuration>& config, const fs::path &resultsPath, const bool forceComputation) :
     config_(config),
     statisticsDirectory_(fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                          "statistics/"),
@@ -137,9 +137,6 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, const bool 
     forceComputation_(forceComputation) {
   // Create the statistics directory.
   fs::create_directories(statisticsDirectory_);
-
-  // Get the results path.
-  fs::path resultsPath = config_->get<std::string>("experiment/results");
 
   // Open the results file.
   std::ifstream filestream(resultsPath.string());

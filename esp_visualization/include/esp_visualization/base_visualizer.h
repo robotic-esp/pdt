@@ -74,12 +74,13 @@ class BaseVisualizer {
 
  protected:
   // Make data available to derived classes.
-  std::shared_ptr<const ompl::base::PlannerData> getPlannerData(std::size_t iteration) const;
-  std::shared_ptr<const PlannerSpecificData> getPlannerSpecificData(std::size_t iteration) const;
-  time::Duration getIterationDuration(std::size_t iteration) const;
-  const ompl::base::PathPtr getSolutionPath(std::size_t iteration) const;
-  ompl::base::Cost getSolutionCost(std::size_t iteration) const;
-  time::Duration getTotalElapsedDuration(std::size_t iteration) const;
+  std::shared_ptr<const ompl::base::PlannerData> getPlannerData(const std::size_t iteration) const;
+  std::shared_ptr<const PlannerSpecificData> getPlannerSpecificData(const std::size_t iteration) const;
+  time::Duration getIterationDuration(const std::size_t iteration) const;
+  const ompl::base::PathPtr getSolutionPath(const std::size_t iteration) const;
+  ompl::base::Cost getSolutionCost(const std::size_t iteration) const;
+  time::Duration getTotalElapsedDuration(const std::size_t iteration) const;
+  std::size_t getQueryNumber(const std::size_t iteration) const;
 
   // The current context.
   std::shared_ptr<BaseContext> context_{};
@@ -131,13 +132,17 @@ class BaseVisualizer {
   time::Duration setupDuration_{};
   mutable std::mutex setupDurationMutex_{};
 
-  // The solution paths.
+  // The solution paths, indexed by the iteration.
   std::vector<ompl::base::PathPtr> solutionPaths_{};
   mutable std::mutex solutionPathsMutex_{};
 
-  // The costs of the solution paths.
+  // The costs of the solution paths, indexed by the iteration.
   std::vector<ompl::base::Cost> solutionCosts_{};
   mutable std::mutex solutionCostsMutex_{};
+
+  // The query-numbers, indexed by the iteration.
+  std::vector<std::size_t> queryNumbers_{};
+  mutable std::mutex queryNumbersMutex_{};
 
   // The thread that creates the data, i.e., solves the given planning problem.
   std::thread dataThread_{};

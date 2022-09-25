@@ -56,13 +56,28 @@ int main(const int argc, const char** argv) {
             << std::setw(2u) << std::setfill(' ') << ' '
             << "Compiling (this may take a couple of minutes)" << std::flush;
 
-  // Get the statistics.
-  esp::ompltools::Statistics stats(config, true);
+  const std::vector<std::string> resultPaths = config->get<std::vector<std::string>>("experiment/results");
 
-  // Create the report.
-  esp::ompltools::ExperimentReport report(config, stats);
-  report.generateReport();
-  report.compileReport();
+  // Generate the statistic.
+  std::vector<esp::ompltools::Statistics> stats;
+
+  for (const auto &path: resultPaths){
+    stats.push_back(esp::ompltools::Statistics(config, path, true));
+  }
+
+  // Generate the report.
+  if (stats.size() == 0u){
+    throw std::runtime_error(
+        "No statistics were generated, thus no report can be compiled.");
+  }
+  else if(stats.size() == 1u){ // Single query report
+    esp::ompltools::ExperimentReport report(config, stats[0u]);
+    report.generateReport();
+    report.compileReport();
+  }
+  else{ // Multiquery report
+
+  }
   
   // Inform that we are done compiling the report.
   std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)

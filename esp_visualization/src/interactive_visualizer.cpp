@@ -195,8 +195,24 @@ void InteractiveVisualizer::run() {
   std::this_thread::sleep_for(std::chrono::milliseconds(10u));
 
   while (!pangolin::ShouldQuit()) {
+    // Compute the time spent at current query by finding the iteration at which we started
+    // with the current query, and taking the difference in total times.
+    // This could be done much more efficiently.
+    double timeAtCurrentQuery = getTotalElapsedDuration(displayIteration_).count();
+    const std::size_t queryNumber = getQueryNumber(displayIteration_);
+
+    if (queryNumber > 0u){
+      for(std::size_t i=displayIteration_; i>=1u; --i){
+        if (BaseVisualizer::getQueryNumber(i) != queryNumber){
+          timeAtCurrentQuery -= getTotalElapsedDuration(i).count();
+          break;
+        }
+      }
+    }
     if (displayIteration_ != lastDisplayIteration_) {
       std::cout << "Iteration: " << displayIteration_
+                << ", query: " << getQueryNumber(displayIteration_)
+                << ", time: " << timeAtCurrentQuery
                 << ", time: " << getTotalElapsedDuration(displayIteration_).count()
                 << ", cost: " << getSolutionCost(displayIteration_).value() << '\n';
       lastDisplayIteration_ = displayIteration_;
@@ -209,16 +225,18 @@ void InteractiveVisualizer::run() {
     if (pangolin::Pushed(optionTikzshot)) {
       if (optionDrawPlannerSpecificData) {
         tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                               getQueryNumber(displayIteration_),
                                getSolutionPath(displayIteration_),
                                getPlannerSpecificData(displayIteration_),
                                getIterationDuration(displayIteration_).count(),
-                               getTotalElapsedDuration(displayIteration_).count(),
+                               timeAtCurrentQuery,
                                getSolutionCost(displayIteration_).value());
       } else {
         tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                               getQueryNumber(displayIteration_),
                                getSolutionPath(displayIteration_), nullptr,
                                getIterationDuration(displayIteration_).count(),
-                               getTotalElapsedDuration(displayIteration_).count(),
+                               timeAtCurrentQuery,
                                getSolutionCost(displayIteration_).value());
       }
     }
@@ -269,16 +287,18 @@ void InteractiveVisualizer::run() {
                   static_cast<unsigned>(iterationToPlayTo_));
         if (optionDrawPlannerSpecificData) {
           tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                                 getQueryNumber(displayIteration_),
                                  getSolutionPath(displayIteration_),
                                  getPlannerSpecificData(displayIteration_),
                                  getIterationDuration(displayIteration_).count(),
-                                 getTotalElapsedDuration(displayIteration_).count(),
+                                 timeAtCurrentQuery,
                                  getSolutionCost(displayIteration_).value());
         } else {
           tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
+                                 getQueryNumber(displayIteration_),
                                  getSolutionPath(displayIteration_), nullptr,
                                  getIterationDuration(displayIteration_).count(),
-                                 getTotalElapsedDuration(displayIteration_).count(),
+                                 timeAtCurrentQuery,
                                  getSolutionCost(displayIteration_).value());
         }
         incrementIteration();
@@ -536,7 +556,7 @@ void InteractiveVisualizer::visit(const WallGap& /* context */) const {
 }
 
 void InteractiveVisualizer::drawStarts() const {
-  const auto &starts = context_->getNthStartGoalPair(0).start;
+  const auto &starts = context_->getNthStartGoalPair(BaseVisualizer::getQueryNumber(displayIteration_)).start;
 
   for (const auto& start: starts){
     drawPoint(start, green, 4.0);
@@ -544,7 +564,7 @@ void InteractiveVisualizer::drawStarts() const {
 }
 
 void InteractiveVisualizer::drawGoal() const {
-  const auto goal = context_->getNthStartGoalPair(0).goal;
+  const auto &goal = context_->getNthStartGoalPair(BaseVisualizer::getQueryNumber(displayIteration_)).goal;
 
   switch (goal->getType()) {
     case ompl::base::GoalType::GOAL_STATE: {
@@ -933,7 +953,7 @@ std::array<float, 4u> InteractiveVisualizer::interpolateColors(const float* colo
   return color;
 }
 
-void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iteration) const {
+void InteractiveVisualizer::drawPlannerSpecificVisualizations(const std::size_t iteration) const {
   switch (plannerType_) {
     case PLANNER_TYPE::BITSTAR:
     case PLANNER_TYPE::ABITSTAR: {
@@ -957,7 +977,7 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(std::size_t iterat
   }
 }
 
-void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iteration) const {
+void InteractiveVisualizer::drawBITstarSpecificVisualizations(const std::size_t iteration) const {
   // Get the BIT* specific data.
   auto bitstarData =
       std::dynamic_pointer_cast<const BITstarData>(getPlannerSpecificData(iteration));
@@ -1031,7 +1051,7 @@ void InteractiveVisualizer::drawBITstarSpecificVisualizations(std::size_t iterat
   }
 }
 
-void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iteration) const {
+void InteractiveVisualizer::drawAITstarSpecificVisualizations(const std::size_t iteration) const {
   // Get the TBD* specific data.
   auto aitstarData =
       std::dynamic_pointer_cast<const AITstarData>(getPlannerSpecificData(iteration));
@@ -1148,7 +1168,7 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(std::size_t iterat
   }
 }
 
-void InteractiveVisualizer::drawEITstarSpecificVisualizations(std::size_t iteration) const {
+void InteractiveVisualizer::drawEITstarSpecificVisualizations(const std::size_t iteration) const {
   // Get the EIT* specific data.
   auto eitstarData =
       std::dynamic_pointer_cast<const EITstarData>(getPlannerSpecificData(iteration));
@@ -1555,7 +1575,7 @@ std::vector<Eigen::Vector3f> InteractiveVisualizer::getEdges3D(std::size_t itera
   return edges;
 }
 
-std::vector<Eigen::Vector2f> InteractiveVisualizer::getPath2D(std::size_t iteration) const {
+std::vector<Eigen::Vector2f> InteractiveVisualizer::getPath2D(const std::size_t iteration) const {
   std::vector<Eigen::Vector2f> points{};
   auto solution = getSolutionPath(iteration);
   if (solution != nullptr) {
@@ -1569,7 +1589,7 @@ std::vector<Eigen::Vector2f> InteractiveVisualizer::getPath2D(std::size_t iterat
   return points;
 }
 
-std::vector<Eigen::Vector3f> InteractiveVisualizer::getPath3D(std::size_t iteration) const {
+std::vector<Eigen::Vector3f> InteractiveVisualizer::getPath3D(const std::size_t iteration) const {
   std::vector<Eigen::Vector3f> points{};
   auto solution = getSolutionPath(iteration);
   if (solution != nullptr) {
@@ -1583,7 +1603,7 @@ std::vector<Eigen::Vector3f> InteractiveVisualizer::getPath3D(std::size_t iterat
   return points;
 }
 
-std::vector<Eigen::Vector3f> InteractiveVisualizer::getPathSE2(std::size_t iteration) const {
+std::vector<Eigen::Vector3f> InteractiveVisualizer::getPathSE2(const std::size_t iteration) const {
   std::vector<Eigen::Vector3f> states{};
   auto solution = getSolutionPath(iteration);
   if (solution != nullptr) {

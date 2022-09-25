@@ -78,10 +78,11 @@ TikzVisualizer::TikzVisualizer(
   espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("colors/espdarkred"));
 }
 
-void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::size_t iteration,
+void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, const std::size_t iteration,
+                            const std::size_t queryNumber,
                             const ompl::base::PathPtr path,
                             const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData,
-                            double iterationTime, double totalTime, double solutionCost) {
+                            const double iterationTime, const double totalTime, const double solutionCost) {
   if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR &&
       context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_SE2) {
     OMPL_ERROR("Tikz visualizer can only visualize 2d real vector or se2 contexts.");
@@ -132,7 +133,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
     }
   }
 
-  const auto startGoalPair = context_->getNthStartGoalPair(0);
+  const auto startGoalPair = context_->getNthStartGoalPair(queryNumber);
 
   // Draw the start states.
   drawStartStates(startGoalPair.start);
@@ -173,7 +174,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
   picture_.write(texPath);
 
   // Compile the exported file.
-  auto pngPath = compile(texPath, solutionCost, totalTime);
+  auto pngPath = compile(texPath, solutionCost, totalTime, queryNumber);
 
   // Log the duration to the frame times file.
   logToFrameTimes(pngPath, iterationTime);
@@ -189,7 +190,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, std::siz
 }
 
 std::experimental::filesystem::path TikzVisualizer::compile(
-    const std::experimental::filesystem::path& texPath, double cost, double time) {
+    const std::experimental::filesystem::path& texPath, const double cost, const double time, const std::size_t queryNumber) {
   // Get the current path.
   auto currentPath = std::experimental::filesystem::current_path();
 
@@ -238,18 +239,19 @@ std::experimental::filesystem::path TikzVisualizer::compile(
              << "}\n";
 
   // Create the document.
+  standalone.precision(3);
   standalone << "\n\\begin{document}\n"
              << "\\pagecolor{white}\n"
              << "\\begin{minipage}{10cm}\n"
              << "\n\\noindent\\Huge\\vphantom{pP}\\textbf{"
              << config_->get<std::string>("planner/" + name_ + "/report/name")
-             << "}\\vphantom{pP}\\\\\\LARGE Cost: ";
+             << "}\\vphantom{pP}\\\\\\LARGE Query: " << queryNumber << ", Time: " << time << "s, Cost: ";
   if (std::isfinite(cost)) {
     standalone << cost;
   } else {
     standalone << "$\\infty$";
   }
-  standalone << ", Time: " << time << "s\\\\\n\\resizebox*{10cm}{10cm}{%\n"
+  standalone << "\\\\\n\\resizebox*{10cm}{10cm}{%\n"
              << "\\noindent\\input{" << (currentPath / texPath).string() << "}%\n"
              << "}\n\\end{minipage}\n"
              << "\\end{document}";

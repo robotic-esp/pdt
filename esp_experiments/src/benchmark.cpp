@@ -41,6 +41,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <tuple>
 
 #include <experimental/filesystem>
 
@@ -61,27 +62,105 @@
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-// Function to check if the start/goal query we are looking at is actually valid.
-// To that end, we run an RRTConnect planner on the problem for 10s.
-bool checkContextValidity(const std::shared_ptr<esp::ompltools::BaseContext> &context,
-                          const double runtime) {
-  std::cout << "Validating problem definition... ";
+constexpr auto barWidth = 36;
 
-  const auto p = context->instantiateNewProblemDefinition();
-
-  auto planner = std::make_shared<ompl::geometric::RRTConnect>(context->getSpaceInformation());
-  planner->setProblemDefinition(p);
-
-  const auto status = planner->solve(ompl::base::timedPlannerTerminationCondition(runtime));
-
-  if (!status) {
-    std::cout << "Failed." << std::endl;
-    return false;
-  } else {
-    std::cout << "OK." << std::endl;
+// Function to break a long message across multiple lines at spaces
+std::string linebreak(const std::string &in, const size_t lineWidth)
+{
+  std::string out = in;
+  std::string::size_type curLength = 0u;
+  for (std::string::size_type i = 0u; i < in.size(); ++i) {
+    if (curLength == lineWidth) {
+      if (in[i] == ' ') {
+        out[i] = '\n';
+        curLength = 0u;
+      } else {
+        for (std::string::size_type j = i - 1u; j >= 1u; --j) {
+          if (out[j] == ' ') {
+            out[j] = '\n';
+            curLength = i - j;
+            break;
+          }
+        }
+      }
+    } else {
+      ++curLength;
+    }
   }
-  std::cout << std::endl;
+  return out;
+}
 
+// Function to check if the ProblemDefinitions defined by the Context is actually valid.
+bool checkContextValidity(const std::shared_ptr<esp::ompltools::Configuration> &config, const std::shared_ptr<esp::ompltools::BaseContext> &context) {
+  std::cout << "\nContext validation\n";
+  if (config->contains("experiment/validateProblemDefinitions") &&
+      config->get<bool>("experiment/validateProblemDefinitions")) {
+    const std::size_t numQueries = context->getNumQueries();
+    double runtime = 10.0;
+    if (config->contains("experiment/validateProblemDefinitionsDuration")){
+      runtime = config->get<double>("experiment/validateProblemDefinitionsDuration");
+    }
+    std::string validPlannerName = "defaultRRTConnect";
+    if (config->contains("experiment/validateProblemDefinitionsPlanner")){
+      validPlannerName = config->get<std::string>("experiment/validateProblemDefinitionsPlanner");
+    }
+
+    std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+              << std::setfill('.') << "Planner" << std::setw(20) << std::right
+              << validPlannerName << '\n';
+    std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+              << std::setfill('.') << "Time per ProblemDefinition" << std::setw(20) << std::right
+              << runtime << " s\n";
+    std::cout << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
+              << std::left << std::setw(barWidth) << std::setfill('.') << '|' << std::right
+              << std::fixed << std::setw(6) << std::setfill(' ') << std::setprecision(2) << 0.0
+              << " %" << std::flush;
+
+    esp::ompltools::PlannerFactory plannerFactory(config, context);
+    std::shared_ptr<ompl::base::Planner> validPlanner;
+    std::tie(validPlanner, std::ignore) = plannerFactory.create(validPlannerName);
+
+    for (auto i=0u; i<numQueries; ++i) {
+      const auto problemDefinition = context->instantiateNthProblemDefinition(i);
+      validPlanner->clear();
+      validPlanner->setProblemDefinition(problemDefinition);
+
+      validPlanner->solve(ompl::base::timedPlannerTerminationCondition(runtime));
+
+      const auto progress = static_cast<float>(i + 1u) / static_cast<float>(numQueries);
+      std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
+                  << (std::ceil(progress * barWidth) != barWidth
+                          ? std::setw(static_cast<int>(std::ceil(progress * barWidth)))
+                          : std::setw(static_cast<int>(std::ceil(progress * barWidth) - 1u)))
+                  << std::setfill('.') << (i + 1u != numQueries ? '|' : '.') << std::right
+                  << std::setw(barWidth - static_cast<int>(std::ceil(progress * barWidth)))
+                  << std::setfill('.') << '.' << std::right;
+                  if (problemDefinition->hasExactSolution()) {
+                     std::cout << std::fixed << std::setw(6) << std::setfill(' ')
+                               << std::setprecision(2) << progress * 100.0f << " %";
+                  } else {
+                    std::cout << "Failed !";
+                  }
+                  std::cout << std::flush;
+      if (!problemDefinition->hasExactSolution()) {
+        auto msg = "This context may not be solveable since "s + validPlannerName
+                   + " did not find a solution to the ompl::base::ProblemDefinition for query "s
+                   + std::to_string(i) + " in "s + std::to_string(runtime) + "s. Please check "s
+                   + "the start and goal states, use a different pseudorandom seed if the "s
+                   + "problem was randomly generated, and/or increase the validation time "s
+                   + "('experiment/validateProblemDefinitionsDuration'). You may also choose to "s
+                   + "disable this validation if you know your context is valid "s
+                   + "('experiment/validateProblemDefinitions')."s;
+        std::cout << "\n\n" << linebreak(msg, 80u) << "\n\n";
+        return false;
+      }
+    }
+  } else {
+    std::cout << '\r' << std::setw(2) << std::setfill(' ') << std::right << ' ' << "Progress"
+                  << std::setw(static_cast<int>(std::ceil(barWidth) - 1u))
+                  << std::setfill('.') << '.' << std::right << "Skipped";
+  }
+  std::cout << '\n';
   return true;
 }
 
@@ -98,21 +177,7 @@ int main(const int argc, const char **argv) {
   esp::ompltools::ContextFactory contextFactory(config);
   auto context = contextFactory.create(config->get<std::string>("experiment/context"));
 
-  if (config->contains("experiment/validateProblemDefinition") &&
-      config->get<bool>("experiment/validateProblemDefinition")) {
-    const double contextCheckingRuntime = config->get<double>("experiment/validateProblemDuration");
-    if (!checkContextValidity(context, contextCheckingRuntime)) {
-      std::cout << "This problem definition may not be solveable since RRT-Connect did not find a "
-                   "solution in "
-                << contextCheckingRuntime
-                << "s. Please check the start and goal states, use a different pseudorandom seed "
-                   "if the problem was randomly generated, and/or increase the validation time "
-                   "('experiment/validateProblemDuration'). You may also disable this problem "
-                   "definition validation ('experiment/validateProblemDefinition')."
-                << std::endl;
-      return 0;
-    }
-  }
+  const std::size_t numQueries = context->getNumQueries();
 
   // Create a planner factory for planners in this context.
   esp::ompltools::PlannerFactory plannerFactory(config, context);
@@ -120,7 +185,8 @@ int main(const int argc, const char **argv) {
   // Print some basic info about this benchmark.
   auto estimatedRuntime = config->get<std::size_t>("experiment/numRuns") *
                           config->get<std::vector<std::string>>("experiment/planners").size() *
-                          context->getMaxSolveDuration();
+                          context->getMaxSolveDuration() * 
+                          numQueries;
   auto estimatedDoneBy =
       esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
           std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
@@ -150,9 +216,12 @@ int main(const int argc, const char **argv) {
 
   // Print some info about the context of this benchmark.
   std::cout << "\nContext parameters\n";
-  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
-            << std::setfill('.') << "Context name" << std::setw(20) << std::right
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(20)
+            << std::setfill('.') << "Context name" << std::setw(30) << std::right
             << config->get<std::string>("experiment/context") << '\n';
+  std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
+            << std::setfill('.') << "Number of queries" << std::setw(20) << std::right
+            << numQueries << '\n';
   std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
             << std::setfill('.') << "Problem dimension" << std::setw(20) << std::right
             << context->getDimension() << '\n';
@@ -178,6 +247,10 @@ int main(const int argc, const char **argv) {
             << std::setfill('.') << "Cost threshold" << std::setw(20) << std::right
             << context->getObjective()->getCostThreshold() << '\n';
 
+  if (!checkContextValidity(config, context)) {
+      return 0;
+  }
+
   // Setup the results table.
   std::cout << "\nTesting planners\n";
   for (const auto &plannerName : config->get<std::vector<std::string>>("experiment/planners")) {
@@ -195,26 +268,43 @@ int main(const int argc, const char **argv) {
   config->add<std::string>("experiment/experimentDirectory",
                            fs::absolute(experimentDirectory).string());
 
-  // Create the performance log.
-  esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(experimentDirectory /
-                                                                    "results.csv"s);
+  std::vector<std::string> resultPaths;
+
+  // Preallocate the paths of the files we are about to create
+  for (auto i=0u; i<numQueries; ++i){
+    const fs::path path = (fs::absolute(experimentDirectory) / ("raw/results_" + std::to_string(i) + ".csv"s));
+    resultPaths.emplace_back(path.string());
+  }
 
   // Add the result path to the experiment.
-  config->add<std::string>("experiment/results", results.getFilePath());
+  config->add<std::vector<std::string>>("experiment/results", resultPaths);
+  config->add<std::string>("experiment/experimentDirectory", fs::absolute(experimentDirectory).string());
 
   // Compute the total number of runs.
   const auto totalNumberOfRuns =
       config->get<std::size_t>("experiment/numRuns") *
-      config->get<std::vector<std::string>>("experiment/planners").size();
+      config->get<std::vector<std::string>>("experiment/planners").size() * 
+      numQueries;
   auto currentRun = 0u;
 
   // May the best planner win.
-  for (std::size_t i = 0; i < config->get<std::size_t>("experiment/numRuns"); ++i) {
+  for (auto i = 0u; i < config->get<std::size_t>("experiment/numRuns"); ++i) {
     // Randomly shuffle the planners.
     auto plannerNames = config->get<std::vector<std::string>>("experiment/planners");
     std::random_shuffle(plannerNames.begin(), plannerNames.end());
 
+    // In a multiquery setting: regenerate the start/goal pairs if so desired
+    if (i > 0 && 
+        config->contains("experiment/regenerateQueries") && 
+        config->get<bool>("experiment/regenerateQueries")){
+       context->regenerateQueries();
+    }
+
+    // If multiple starts/goal queries are defined (i.e. we evaluate a multiquery setting),
+    // the planners run _all_ queries before the next planner runs the _same_ queries.
     for (const auto &plannerName : plannerNames) {
+
+      for (auto j=0u; j<numQueries; ++j){
       // Create the logger for this run.
       esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
                                             config->get<double>("experiment/logFrequency"));
@@ -235,14 +325,32 @@ int main(const int argc, const char **argv) {
       // Allocate the planner.
       auto [planner, plannerType] = plannerFactory.create(plannerName);
 
-      // Set it up.
+        // Prepare the planner for this query.
+        esp::ompltools::time::Duration querySetupDuration;;
+        if (j == 0){
+          // Set the planner up. The PlannerFactory starts the planner with the 0th query.
       const auto setupStartTime = esp::ompltools::time::Clock::now();
       planner->setup();
-      const auto setupDuration = esp::ompltools::time::Clock::now() - setupStartTime;
+          querySetupDuration = esp::ompltools::time::Clock::now() - setupStartTime;
+        }
+        else {
+          planner->clearQuery();
+
+          // get the problem settng for the nth query, and hand it over to the planner.
+          const auto problemDefinition = context->instantiateNthProblemDefinition(j);
+          planner->setProblemDefinition(problemDefinition);
+
+          querySetupDuration = std::chrono::seconds{0};
+        }
+
+        // Create the performance log:
+        // If it's not the first time we run this query (i.e. not the first run, and not the first planner), 
+        // tell the log to expect to append to the existing file.
+        esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(resultPaths[j], i!=0u || plannerName != plannerNames.front());
 
       // Compute the duration we have left for solving.
       const auto maxSolveDuration =
-          esp::ompltools::time::seconds(context->getMaxSolveDuration() - setupDuration);
+            esp::ompltools::time::seconds(context->getMaxSolveDuration() - querySetupDuration);
       const std::chrono::microseconds idle(1000000u /
                                            config->get<std::size_t>("experiment/logFrequency"));
 
@@ -256,7 +364,7 @@ int main(const int argc, const char **argv) {
       // Log the intermediate best costs.
       do {
         addMeasurementStart = esp::ompltools::time::Clock::now();
-        logger.addMeasurement(setupDuration + (addMeasurementStart - solveStartTime),
+          logger.addMeasurement(querySetupDuration + (addMeasurementStart - solveStartTime),
                               esp::ompltools::utilities::getBestCost(planner, plannerType));
 
         // Stop logging intermediate best costs if the planner overshoots.
@@ -274,7 +382,7 @@ int main(const int argc, const char **argv) {
 
       // Get the final runtime.
       const auto totalDuration =
-          setupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
+            querySetupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
 
       // Store the final cost.
       const auto problem = planner->getProblemDefinition();
@@ -305,7 +413,6 @@ int main(const int argc, const char **argv) {
       // Compute the progress.
       ++currentRun;
       const auto progress = static_cast<float>(currentRun) / static_cast<float>(totalNumberOfRuns);
-      constexpr auto barWidth = 36;
 
       // estimate how much time is left by extrapolating from the time spent so far.
       // This is more accurate than subtracting the time used so far from the worst case total time
@@ -334,6 +441,7 @@ int main(const int argc, const char **argv) {
       }
       std::cout << std::flush;
     }
+  }
   }
 
   // dump the complete config to make sure that we can produce the report once we ran the experiment
@@ -366,12 +474,26 @@ int main(const int argc, const char **argv) {
             << "Compiling (this may take a couple of minutes)" << std::flush;
 
   // Generate the statistic.
-  esp::ompltools::Statistics stats(config, false);
+  std::vector<esp::ompltools::Statistics> stats;
+
+  for (const auto &path: resultPaths){
+    stats.push_back(esp::ompltools::Statistics(config, path, false));
+  }
 
   // Generate the report.
-  esp::ompltools::ExperimentReport report(config, stats);
+  fs::path reportPath;
+  if (stats.size() == 0u){
+    throw std::runtime_error(
+        "No statistics were generated, thus no report can be compiled.");
+  }
+  else if(stats.size() == 1u){ // Single query report
+    esp::ompltools::ExperimentReport report(config, stats[0u]);
   report.generateReport();
-  auto reportPath = report.compileReport();
+    reportPath = report.compileReport();
+  }
+  else{ // Multiquery report
+
+  }
 
   // Inform that we are done compiling the report.
   std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
@@ -389,7 +511,7 @@ int main(const int argc, const char **argv) {
               esp::ompltools::time::toDateString(experimentEndTime).c_str());
   OMPL_INFORM("Duration of experiment: '%s'",
               esp::ompltools::time::toDurationString(experimentDuration).c_str());
-  OMPL_INFORM("Wrote results to '%s'", results.getFilePath().c_str());
+  OMPL_INFORM("Wrote results to '%s'", experimentDirectory.string());
 
   // Inform where we wrote the report to.
   std::cout << std::setw(2u) << std::setfill(' ') << ' ' << "Location " << reportPath << "\n\n";
