@@ -3,7 +3,9 @@
         "executable": "benchmark",
         "planners": [
             "defaultRRTConnect",
-            "defaultLazyPRMstar"
+            "defaultEITstar",
+            "defaultLazyPRMstar",
+            "defaultEIRMstar"
         ],
         "context": "MultiqueryWallGap2D",
         "numRuns": 50,
