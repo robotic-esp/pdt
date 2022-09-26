@@ -76,7 +76,8 @@ class Statistics {
   friend MultiqueryStatistics;
 
  public:
-  Statistics(const std::shared_ptr<Configuration>& config, const std::experimental::filesystem::path &resultsPath, const bool forceComputation);
+  Statistics(const std::shared_ptr<Configuration>& config,
+             const std::experimental::filesystem::path& resultsPath, const bool forceComputation);
   ~Statistics() = default;
 
   std::experimental::filesystem::path extractMedians(
@@ -133,6 +134,9 @@ class Statistics {
   std::shared_ptr<Configuration> getConfig() const;
 
  private:
+  // Extracts the query-number from the results-path.
+  std::string getQueryNumberFromPath(const std::experimental::filesystem::path& resultsPath) const;
+
   // The identifying header line that starts each file produced by this class.
   std::string createHeader(const std::string& statisticType, const std::string& plannerName) const;
 
