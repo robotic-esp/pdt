@@ -478,7 +478,7 @@ int main(const int argc, const char **argv) {
   std::vector<esp::ompltools::Statistics> stats;
 
   for (const auto &path: resultPaths){
-    stats.push_back(esp::ompltools::Statistics(config, path, true));
+    stats.push_back(esp::ompltools::Statistics(config, path, false));
   }
 
   // Generate the report.
@@ -493,7 +493,7 @@ int main(const int argc, const char **argv) {
     reportPath = report.compileReport();
   }
   else{ // Multiquery report
-    esp::ompltools::MultiqueryStatistics mqstats(config, stats, true);
+    esp::ompltools::MultiqueryStatistics mqstats(config, stats, false);
 
     esp::ompltools::MultiqueryReport report(config, mqstats);
     report.generateReport();
