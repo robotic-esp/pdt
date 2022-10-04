@@ -131,7 +131,7 @@ Statistics::Statistics(const std::shared_ptr<Configuration>& config, const fs::p
                        const bool forceComputation) :
     config_(config),
     statisticsDirectory_(fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                         ("statistics/query_" + getQueryNumberFromPath(resultsPath) + "/")),
+                         ("statistics/" + resultsPath.stem().string() + "/")),
 
     // Our sorting in this class is already assuming we are minimizing cost, so rounding an index up
     // is conservative.
@@ -655,13 +655,6 @@ fs::path Statistics::extractInitialSolutions(const std::string& plannerName) con
   filestream << '\n';
 
   return filepath;  // Note: std::ofstream is a big boy and closes itself upon destruction.
-}
-
-std::string Statistics::getQueryNumberFromPath(
-    const std::experimental::filesystem::path& resultsPath) const {
-  std::string filename = resultsPath.stem();  // Gives the name of the file without extension.
-  std::size_t offset = 8;                     // length of the string "results_"
-  return filename.substr(offset, filename.length());
 }
 
 std::string Statistics::createHeader(const std::string& statisticType,
