@@ -39,7 +39,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 OpenRaveBaseValidityChecker::OpenRaveBaseValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo,
@@ -57,6 +57,6 @@ OpenRAVE::EnvironmentBasePtr OpenRaveBaseValidityChecker::getOpenRaveEnvironment
   return environment_;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

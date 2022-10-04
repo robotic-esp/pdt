@@ -16,7 +16,7 @@ target_include_directories(esp_statistics
 # Specify the link targets for this library.
 target_link_libraries(esp_statistics
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   ${OMPL_LIBRARIES}
   esp_configuration

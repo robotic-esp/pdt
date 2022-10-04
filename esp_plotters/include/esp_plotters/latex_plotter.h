@@ -44,7 +44,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class LatexPlotter {
  public:
@@ -146,6 +146,6 @@ std::experimental::filesystem::path LatexPlotter::createPicture(Axes... args) co
   return path;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

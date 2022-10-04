@@ -58,7 +58,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 
@@ -282,6 +282,6 @@ std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> PlannerFactory::cr
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

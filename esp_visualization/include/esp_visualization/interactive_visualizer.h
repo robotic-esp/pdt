@@ -54,7 +54,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class InteractiveVisualizer : public BaseVisualizer,
                               public ContextVisitor,
@@ -190,6 +190,6 @@ class InteractiveVisualizer : public BaseVisualizer,
   std::shared_ptr<const Configuration> config_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

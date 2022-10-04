@@ -46,7 +46,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief A planning context to plugin to the OpenRave simulator. */
 class OpenRaveKneeGoal : public ompl::base::GoalSpace {
@@ -65,6 +65,6 @@ class OpenRaveKneeGoal : public ompl::base::GoalSpace {
   mutable unsigned int numSampledGoals_{0u};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

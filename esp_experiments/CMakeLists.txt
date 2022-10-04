@@ -16,7 +16,7 @@ add_executable(benchmark
 # Specify the link targets for the benchmark target.
 target_link_libraries(benchmark
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   ${OMPL_LIBRARIES}
   esp_configuration
@@ -35,7 +35,7 @@ add_executable(benchmark_report
 # Specify the link targets for the benchmark_report target.
 target_link_libraries(benchmark_report
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   esp_configuration
   esp_reports
@@ -48,7 +48,7 @@ add_executable(collision_detection_test
 # Specify the link targets for the collision_detection_test target.
 target_link_libraries(collision_detection_test
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   ${OMPL_LIBRARIES}
   esp_configuration
@@ -63,7 +63,7 @@ add_executable(visualization
 # Specify the link targets for the visualization target.
 target_link_libraries(visualization
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   ${Pangolin_LIBRARIES}
   ${OMPL_LIBRARIES}
@@ -81,7 +81,7 @@ add_executable(objective_sanity_check
 
 target_link_libraries(objective_sanity_check
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   esp_configuration
   esp_factories

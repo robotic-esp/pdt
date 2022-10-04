@@ -44,7 +44,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 /** \brief A state space representing SE(3) with a rotation bound defined by axis angle. */
 class SE3WAxisAngleBoundStateSpace : public ompl::base::CompoundStateSpace {
  public:
@@ -121,6 +121,6 @@ class SE3WAxisAngleBoundStateSpace : public ompl::base::CompoundStateSpace {
   void freeState(ompl::base::State *state) const override;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

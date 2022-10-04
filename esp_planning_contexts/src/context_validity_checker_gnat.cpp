@@ -39,7 +39,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 
@@ -145,6 +145,6 @@ void ContextValidityCheckerGNAT::addAntiObstacles(
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

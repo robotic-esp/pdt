@@ -37,12 +37,12 @@
 
 #include "esp_spaces/SE3WAxisAngleBoundStateSpace.h"
 
-ompl::base::State *esp::ompltools::SE3WAxisAngleBoundStateSpace::allocState() const {
+ompl::base::State *esp::pdt::SE3WAxisAngleBoundStateSpace::allocState() const {
   auto *state = new StateType();
   allocStateComponents(state);
   return state;
 }
 
-void esp::ompltools::SE3WAxisAngleBoundStateSpace::freeState(ompl::base::State *state) const {
+void esp::pdt::SE3WAxisAngleBoundStateSpace::freeState(ompl::base::State *state) const {
   ompl::base::CompoundStateSpace::freeState(state);
 }

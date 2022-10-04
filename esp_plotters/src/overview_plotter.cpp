@@ -47,7 +47,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -116,6 +116,6 @@ fs::path OverviewPlotter::createCombinedPicture(const std::string& plannerName) 
   return picturePath;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

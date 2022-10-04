@@ -14,7 +14,7 @@ target_include_directories(esp_spaces
 # Specify the link targets for this target.
 target_link_libraries(esp_spaces
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   ${OMPL_LIBRARIES}
   esp_configuration)

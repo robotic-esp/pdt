@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 ObstacleFree::ObstacleFree(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                            const std::shared_ptr<const Configuration>& config,
@@ -74,6 +74,6 @@ void ObstacleFree::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

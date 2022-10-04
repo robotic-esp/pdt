@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
@@ -164,6 +164,6 @@ void RandomRectanglesMultiStartGoal::createObstacles() {
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

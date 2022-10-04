@@ -43,7 +43,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 PotentialFieldOptimizationObjective::PotentialFieldOptimizationObjective(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
@@ -118,6 +118,6 @@ void PotentialFieldOptimizationObjective::accept(const ObjectiveVisitor& visitor
   visitor.visit(*this);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

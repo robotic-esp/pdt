@@ -43,7 +43,7 @@ using namespace std::string_literals;
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 OpenRaveR3ValidityChecker::OpenRaveR3ValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo,
@@ -98,6 +98,6 @@ double OpenRaveR3ValidityChecker::clearance(const ompl::base::State* state) cons
   return collisionReport_->minDistance;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

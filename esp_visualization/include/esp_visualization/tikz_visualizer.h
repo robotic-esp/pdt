@@ -53,7 +53,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
  public:
@@ -150,6 +150,6 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
   std::ofstream frameTimes_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -51,7 +51,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                            const std::shared_ptr<const Configuration>& config,
@@ -97,6 +97,6 @@ void CentreSquare::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -43,7 +43,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 NLOHMANN_JSON_SERIALIZE_ENUM(ompl::base::GoalType,
                              {
@@ -57,6 +57,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(ompl::base::GoalType,
                                  {ompl::base::GoalType::GOAL_SPACE, "GoalSpace"},
                              });
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

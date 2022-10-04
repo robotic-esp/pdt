@@ -56,7 +56,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -121,8 +121,8 @@ std::stringstream MultiqueryReport::overview() const {
 
   // Provide some basic info about this experiment.
   overview << "\\section{" << "Overview" << "}\\label{sec:" << "all" << "}\n";
-  overview << "This report was automatically generated using ESP "
-              "OMPLtools. It presents the results "
+  overview << "This report was automatically generated using Planner "
+              "Developer Tools (PDT). It presents the results "
               "for the "
            << experimentName_ << " experiment, which executed "
            << config_->get<std::size_t>("experiment/numRuns") << " runs of "
@@ -314,6 +314,6 @@ std::stringstream MultiqueryReport::individualResults() const {
   return results;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

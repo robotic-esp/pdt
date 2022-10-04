@@ -53,7 +53,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class BinaryMap : public BaseObstacle {
  public:
@@ -94,6 +94,6 @@ class BinaryMap : public BaseObstacle {
   Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> obsData_{0, 0};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

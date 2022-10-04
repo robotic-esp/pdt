@@ -39,7 +39,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 ContextValidityChecker::ContextValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo) :
     ompl::base::StateValidityChecker(spaceInfo) {
@@ -106,6 +106,6 @@ std::vector<std::shared_ptr<BaseAntiObstacle>> ContextValidityChecker::getAntiOb
   return antiObstacles_;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

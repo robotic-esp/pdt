@@ -56,7 +56,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 // The base class for a visualizer.
 class BaseVisualizer {
@@ -153,6 +153,6 @@ class BaseVisualizer {
   std::future<void> dataThreadStopSignal_{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

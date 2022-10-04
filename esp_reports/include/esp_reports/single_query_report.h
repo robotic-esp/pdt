@@ -58,7 +58,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class SingleQueryReport : public BaseReport {
  public:
@@ -84,6 +84,6 @@ class SingleQueryReport : public BaseReport {
   const Statistics& stats_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

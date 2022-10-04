@@ -92,7 +92,7 @@ std::string linebreak(const std::string &in, const size_t lineWidth)
 }
 
 // Function to check if the ProblemDefinitions defined by the Context is actually valid.
-bool checkContextValidity(const std::shared_ptr<esp::ompltools::Configuration> &config, const std::shared_ptr<esp::ompltools::BaseContext> &context) {
+bool checkContextValidity(const std::shared_ptr<esp::pdt::Configuration> &config, const std::shared_ptr<esp::pdt::BaseContext> &context) {
   std::cout << "\nContext validation\n";
   if (config->contains("experiment/validateProblemDefinitions") &&
       config->get<bool>("experiment/validateProblemDefinitions")) {
@@ -117,7 +117,7 @@ bool checkContextValidity(const std::shared_ptr<esp::ompltools::Configuration> &
               << std::fixed << std::setw(6) << std::setfill(' ') << std::setprecision(2) << 0.0
               << " %" << std::flush;
 
-    esp::ompltools::PlannerFactory plannerFactory(config, context);
+    esp::pdt::PlannerFactory plannerFactory(config, context);
     std::shared_ptr<ompl::base::Planner> validPlanner;
     std::tie(validPlanner, std::ignore) = plannerFactory.create(validPlannerName);
 
@@ -167,21 +167,21 @@ bool checkContextValidity(const std::shared_ptr<esp::ompltools::Configuration> &
 
 int main(const int argc, const char **argv) {
   // Read the config files.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+  auto config = std::make_shared<esp::pdt::Configuration>(argc, argv);
   config->registerAsExperiment();
 
   // Record the experiment start time.
   auto experimentStartTime = std::chrono::system_clock::now();
-  auto experimentStartTimeString = esp::ompltools::time::toDateString(experimentStartTime);
+  auto experimentStartTimeString = esp::pdt::time::toDateString(experimentStartTime);
 
   // Create the context for this experiment.
-  esp::ompltools::ContextFactory contextFactory(config);
+  esp::pdt::ContextFactory contextFactory(config);
   auto context = contextFactory.create(config->get<std::string>("experiment/context"));
 
   const std::size_t numQueries = context->getNumQueries();
 
   // Create a planner factory for planners in this context.
-  esp::ompltools::PlannerFactory plannerFactory(config, context);
+  esp::pdt::PlannerFactory plannerFactory(config, context);
 
   // Print some basic info about this benchmark.
   auto estimatedRuntime = config->get<std::size_t>("experiment/numRuns") *
@@ -189,8 +189,8 @@ int main(const int argc, const char **argv) {
                           context->getMaxSolveDuration() * 
                           numQueries;
   auto estimatedDoneBy =
-      esp::ompltools::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
-          std::chrono::time_point_cast<esp::ompltools::time::Duration>(experimentStartTime) +
+      esp::pdt::time::toDateString(std::chrono::time_point_cast<std::chrono::nanoseconds>(
+          std::chrono::time_point_cast<esp::pdt::time::Duration>(experimentStartTime) +
           estimatedRuntime));
   std::cout << "\nBenchmark parameters\n";
   std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
@@ -207,7 +207,7 @@ int main(const int argc, const char **argv) {
             << config->get<std::size_t>("experiment/logFrequency") << " Hz\n";
   std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
             << std::setfill('.') << "Expected runtime no more than" << std::setw(20) << std::right
-            << esp::ompltools::time::toDurationString(estimatedRuntime) << " HH:MM:SS\n";
+            << esp::pdt::time::toDurationString(estimatedRuntime) << " HH:MM:SS\n";
   std::cout << std::setw(2) << std::setfill(' ') << ' ' << std::left << std::setw(30)
             << std::setfill('.') << "Expected to be done before" << std::setw(20) << std::right
             << estimatedDoneBy << " YYYY-MM-DD_HH-MM-SS\n";
@@ -323,16 +323,16 @@ int main(const int argc, const char **argv) {
 
       for (auto j=0u; j<numQueries; ++j){
         // Create the logger for this run.
-        esp::ompltools::TimeCostLogger logger(context->getMaxSolveDuration(),
+        esp::pdt::TimeCostLogger logger(context->getMaxSolveDuration(),
                                               config->get<double>("experiment/logFrequency"));
 
         // Prepare the planner for this query.
-        esp::ompltools::time::Duration querySetupDuration;;
+        esp::pdt::time::Duration querySetupDuration;;
         if (j == 0){
           // Set the planner up. The PlannerFactory starts the planner with the 0th query.
-          const auto setupStartTime = esp::ompltools::time::Clock::now();
+          const auto setupStartTime = esp::pdt::time::Clock::now();
           planner->setup();
-          querySetupDuration = esp::ompltools::time::Clock::now() - setupStartTime;
+          querySetupDuration = esp::pdt::time::Clock::now() - setupStartTime;
         }
         else {
           planner->clearQuery();
@@ -347,29 +347,29 @@ int main(const int argc, const char **argv) {
         // Create the performance log:
         // If it's not the first time we run this query (i.e. not the first run, and not the first planner), 
         // tell the log to expect to append to the existing file.
-        esp::ompltools::ResultLog<esp::ompltools::TimeCostLogger> results(resultPaths[j], i!=0u || plannerName != plannerNames.front());
+        esp::pdt::ResultLog<esp::pdt::TimeCostLogger> results(resultPaths[j], i!=0u || plannerName != plannerNames.front());
 
         // Compute the duration we have left for solving.
         const auto maxSolveDuration =
-            esp::ompltools::time::seconds(context->getMaxSolveDuration() - querySetupDuration);
+            esp::pdt::time::seconds(context->getMaxSolveDuration() - querySetupDuration);
         const std::chrono::microseconds idle(1000000u /
                                              config->get<std::size_t>("experiment/logFrequency"));
 
         // Solve the problem on a separate thread.
-        esp::ompltools::time::Clock::time_point addMeasurementStart;
-        const auto solveStartTime = esp::ompltools::time::Clock::now();
+        esp::pdt::time::Clock::time_point addMeasurementStart;
+        const auto solveStartTime = esp::pdt::time::Clock::now();
         std::future<void> future = std::async(std::launch::async, [&planner, &maxSolveDuration]() {
           planner->solve(maxSolveDuration);
         });
 
         // Log the intermediate best costs.
         do {
-          addMeasurementStart = esp::ompltools::time::Clock::now();
+          addMeasurementStart = esp::pdt::time::Clock::now();
           logger.addMeasurement(querySetupDuration + (addMeasurementStart - solveStartTime),
-                                esp::ompltools::utilities::getBestCost(planner, plannerType));
+                                esp::pdt::utilities::getBestCost(planner, plannerType));
 
           // Stop logging intermediate best costs if the planner overshoots.
-          if (esp::ompltools::time::seconds(addMeasurementStart - solveStartTime) >
+          if (esp::pdt::time::seconds(addMeasurementStart - solveStartTime) >
               maxSolveDuration) {
             break;
           }
@@ -383,7 +383,7 @@ int main(const int argc, const char **argv) {
 
         // Get the final runtime.
         const auto totalDuration =
-            querySetupDuration + (esp::ompltools::time::Clock::now() - solveStartTime);
+            querySetupDuration + (esp::pdt::time::Clock::now() - solveStartTime);
 
         // Store the final cost.
         const auto problem = planner->getProblemDefinition();
@@ -422,7 +422,7 @@ int main(const int argc, const char **argv) {
         const auto extrapolatedRuntime = timeSoFar / progress;
         const auto estimatedTimeString =
             " (est. time left: "s +
-            esp::ompltools::time::toDurationString(
+            esp::pdt::time::toDurationString(
                 std::chrono::ceil<std::chrono::seconds>(extrapolatedRuntime - timeSoFar)) +
             ")"s;
 
@@ -451,14 +451,14 @@ int main(const int argc, const char **argv) {
 
   // Register the end time of the experiment.
   auto experimentEndTime = std::chrono::system_clock::now();
-  auto experimentEndTimeString = esp::ompltools::time::toDateString(experimentEndTime);
-  esp::ompltools::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
+  auto experimentEndTimeString = esp::pdt::time::toDateString(experimentEndTime);
+  esp::pdt::time::Duration experimentDuration = experimentEndTime - experimentStartTime;
 
   // Report the elapsed time and some statistics.
   std::cout << '\n'
             << std::setw(2u) << std::setfill(' ') << ' ' << std::setw(30) << std::setfill('.')
             << std::left << "Elapsed time" << std::setw(20) << std::right
-            << esp::ompltools::time::toDurationString(experimentEndTime - experimentStartTime)
+            << esp::pdt::time::toDurationString(experimentEndTime - experimentStartTime)
             << " HH:MM:SS\n"
             << std::setw(2u) << std::setfill(' ') << ' ' << std::setw(30) << std::setfill('.')
             << std::left << "Number of checked motions" << std::setw(20) << std::right
@@ -475,10 +475,10 @@ int main(const int argc, const char **argv) {
             << "Compiling (this may take a couple of minutes)" << std::flush;
 
   // Generate the statistic.
-  std::vector<esp::ompltools::Statistics> stats;
+  std::vector<esp::pdt::Statistics> stats;
 
   for (const auto &path: resultPaths){
-    stats.push_back(esp::ompltools::Statistics(config, path, false));
+    stats.push_back(esp::pdt::Statistics(config, path, false));
   }
 
   // Generate the report.
@@ -488,14 +488,14 @@ int main(const int argc, const char **argv) {
         "No statistics were generated, thus no report can be compiled.");
   }
   else if(stats.size() == 1u){ // Single query report
-    esp::ompltools::SingleQueryReport report(config, stats[0u]);
+    esp::pdt::SingleQueryReport report(config, stats[0u]);
     report.generateReport();
     reportPath = report.compileReport();
   }
   else{ // Multiquery report
-    esp::ompltools::MultiqueryStatistics mqstats(config, stats, false);
+    esp::pdt::MultiqueryStatistics mqstats(config, stats, false);
 
-    esp::ompltools::MultiqueryReport report(config, mqstats);
+    esp::pdt::MultiqueryReport report(config, mqstats);
     report.generateReport();
     reportPath = report.compileReport();
   }
@@ -511,11 +511,11 @@ int main(const int argc, const char **argv) {
   ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_INFO);
   ompl::msg::useOutputHandler(&log);
   OMPL_INFORM("Start of experiment: '%s'",
-              esp::ompltools::time::toDateString(experimentStartTime).c_str());
+              esp::pdt::time::toDateString(experimentStartTime).c_str());
   OMPL_INFORM("End of experiment: '%s'",
-              esp::ompltools::time::toDateString(experimentEndTime).c_str());
+              esp::pdt::time::toDateString(experimentEndTime).c_str());
   OMPL_INFORM("Duration of experiment: '%s'",
-              esp::ompltools::time::toDurationString(experimentDuration).c_str());
+              esp::pdt::time::toDurationString(experimentDuration).c_str());
   OMPL_INFORM("Wrote results to '%s'", experimentDirectory.string());
 
   // Inform where we wrote the report to.

@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief An experiment with a singularly placed square obstacle*/
 class GoalEnclosure : public RealVectorGeometricContext {
@@ -79,6 +79,6 @@ class GoalEnclosure : public RealVectorGeometricContext {
   double goalGapWidth_{0.0};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

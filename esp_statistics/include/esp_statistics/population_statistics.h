@@ -43,7 +43,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 struct ConfidenceInterval {
   // The lower and upper bounds are zero-based indices. If I have 10 measurements in a sorted
   // vector, e.g.,
@@ -127,6 +127,6 @@ class PopulationStatistics {
   INDEX_ROUNDING round_;
   std::size_t sampleSize_{0u};
 };
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -52,7 +52,7 @@ using namespace std::string_literals;
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
@@ -271,6 +271,6 @@ std::vector<std::shared_ptr<BaseAntiObstacle>> ReedsSheppRandomRectangles::getAn
   return {};
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

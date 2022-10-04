@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class MultiqueryStatistics {
  public:
@@ -159,6 +159,6 @@ class MultiqueryStatistics {
   std::size_t numQueries_{0u};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

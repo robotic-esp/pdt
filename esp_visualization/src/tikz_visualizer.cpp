@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 
@@ -740,6 +740,6 @@ void TikzVisualizer::drawEllipse(double cost) const {
   picture_.addText(ellipseCommand.str());
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

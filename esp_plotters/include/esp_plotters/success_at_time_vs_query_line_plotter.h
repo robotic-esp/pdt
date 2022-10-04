@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class SuccessAtTimeVsQueryLinePlotter : public LatexPlotter {
  public:
@@ -81,6 +81,6 @@ class SuccessAtTimeVsQueryLinePlotter : public LatexPlotter {
   const MultiqueryStatistics& stats_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

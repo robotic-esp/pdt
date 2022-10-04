@@ -54,7 +54,7 @@ using namespace std::string_literals;
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 OpenRaveManipulator::OpenRaveManipulator(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
@@ -148,6 +148,6 @@ void OpenRaveManipulator::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

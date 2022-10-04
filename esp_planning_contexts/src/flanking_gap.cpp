@@ -42,7 +42,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 FlankingGap::FlankingGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                          const std::shared_ptr<const Configuration>& config,
@@ -148,6 +148,6 @@ void FlankingGap::createAntiObstacles() {
       std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, anchor, widths));
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

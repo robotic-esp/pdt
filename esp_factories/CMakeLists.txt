@@ -25,7 +25,7 @@ target_include_directories(esp_factories SYSTEM
 # Specify the link targets for this target.
 target_link_libraries(esp_factories
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
@@ -35,7 +35,7 @@ target_link_libraries(esp_factories
   esp_spaces)
 
 # Add esp_open_rave as a link targets if requested.
-if(ESP_OMPL_TOOLS_OPEN_RAVE)
+if(PDT_OPEN_RAVE)
   target_link_libraries(esp_factories
     PUBLIC
     esp_open_rave)

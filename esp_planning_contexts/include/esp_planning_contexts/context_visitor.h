@@ -39,7 +39,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 // Forward declarations.
 class CentreSquare;
@@ -90,6 +90,6 @@ class ContextVisitor {
   }
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

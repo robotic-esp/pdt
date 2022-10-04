@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                                const std::shared_ptr<const Configuration>& config,
@@ -126,6 +126,6 @@ void StartEnclosure::createAntiObstacles() {
       spaceInfo_, startGapAnchor, startGapWidths));
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

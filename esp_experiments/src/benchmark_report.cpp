@@ -50,7 +50,7 @@ using namespace std::string_literals;
 
 int main(const int argc, const char** argv) {
   // Read the config files.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+  auto config = std::make_shared<esp::pdt::Configuration>(argc, argv);
 
   std::cout << "\nReport\n"
             << std::setw(2u) << std::setfill(' ') << ' '
@@ -59,10 +59,10 @@ int main(const int argc, const char** argv) {
   const std::vector<std::string> resultPaths = config->get<std::vector<std::string>>("experiment/results");
 
   // Generate the statistic.
-  std::vector<esp::ompltools::Statistics> stats;
+  std::vector<esp::pdt::Statistics> stats;
 
   for (const auto &path: resultPaths){
-    stats.push_back(esp::ompltools::Statistics(config, path, true));
+    stats.push_back(esp::pdt::Statistics(config, path, true));
   }
 
   // Generate the report.
@@ -71,7 +71,7 @@ int main(const int argc, const char** argv) {
         "No statistics were generated, thus no report can be compiled.");
   }
   else if(stats.size() == 1u){ // Single query report
-    esp::ompltools::SingleQueryReport report(config, stats[0u]);
+    esp::pdt::SingleQueryReport report(config, stats[0u]);
     report.generateReport();
     report.compileReport();
   }

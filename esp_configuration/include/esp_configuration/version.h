@@ -39,7 +39,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 struct Version {
   static const std::string GIT_SHA1;
@@ -47,6 +47,6 @@ struct Version {
   static const std::string GIT_STATUS;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

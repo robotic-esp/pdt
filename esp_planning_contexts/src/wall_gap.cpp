@@ -42,7 +42,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                  const std::shared_ptr<const Configuration>& config, const std::string& name) :
@@ -148,6 +148,6 @@ void WallGap::createObstacles() {
       std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor_up, widths_up));
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

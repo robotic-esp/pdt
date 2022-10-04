@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class BaseReport {
  public:
@@ -87,7 +87,7 @@ class BaseReport {
                          const std::string& replacement) const;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp
 

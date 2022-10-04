@@ -46,7 +46,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class PgfAxis {
  public:
@@ -159,6 +159,6 @@ void PgfAxis::mergePlots(Axes... args) {
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

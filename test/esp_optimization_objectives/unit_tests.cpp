@@ -48,7 +48,7 @@
 #include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
 
 using namespace std::string_literals;
-using namespace esp::ompltools;
+using namespace esp::pdt;
 using namespace ompl::base;
 namespace fs = std::experimental::filesystem;
 

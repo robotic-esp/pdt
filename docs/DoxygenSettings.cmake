@@ -3,7 +3,7 @@
 # Preferring defaults whenever in doubt.
 
 # Project options https://doxygen.org/manual/config.html#config_project
-set(DOXYGEN_PROJECT_NAME "ESP OMPL Tools")
+set(DOXYGEN_PROJECT_NAME "Planner Developer Tools (PDT)")
 set(DOXYGEN_PROJECT_BRIEF "Tools for developing and testing planning algorithms in OMPL")
 set(DOXYGEN_PROJECT_LOGO "${CMAKE_CURRENT_SOURCE_DIR}/esp.png")
 set(DOXYGEN_BUILTIN_STL_SUPPORT YES)
@@ -33,7 +33,7 @@ set(DOXYGEN_EXCLUDE
   "${PROJECT_SOURCE_DIR}/docs/"
   "${PROJECT_SOURCE_DIR}/thirdparty/"
   "${PROJECT_SOURCE_DIR}/scripts/matlab/")
-if(NOT ESP_OMPL_TOOLS_OPEN_RAVE)
+if(NOT PDT_OPEN_RAVE)
   set(DOXYGEN_EXCLUDE
     ${DOXYGEN_EXCLUDE}
     "${PROJECT_SOURCE_DIR}/esp_open_rave/")
@@ -82,7 +82,7 @@ set(DOXYGEN_MATHJAX_EXTENSIONS "TeX/AMSmath;TeX/AMSsymbols")
 set(DOXYGEN_MACRO_EXPANSION YES)
 
 # External refernece options https://doxygen.nl/manual/config.html#config_external
-set(DOXYGEN_GENERATE_TAGFILE "${CMAKE_CURRENT_BINARY_DIR}/html/esp_ompl_tools.tag")
+set(DOXYGEN_GENERATE_TAGFILE "${CMAKE_CURRENT_BINARY_DIR}/html/pdt.tag")
 
 # Dot tool options https://doxygen.nl/manual/config.html#config_dot
 set(DOXYGEN_HIDE_UNDOC_RELATIONS NO)

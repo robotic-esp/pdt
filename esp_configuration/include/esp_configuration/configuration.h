@@ -53,7 +53,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 namespace json = nlohmann;
 
@@ -218,6 +218,6 @@ void Configuration::registerAccess(const std::string& key, const T& value,
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

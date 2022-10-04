@@ -55,7 +55,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief Struct defining the start/end points of a planning problem. */
 struct StartGoalPair {
@@ -153,6 +153,6 @@ class BaseContext {
   const std::shared_ptr<const Configuration> config_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

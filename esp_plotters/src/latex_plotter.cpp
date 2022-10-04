@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -180,6 +180,6 @@ fs::path LatexPlotter::compileStandalonePdf(const fs::path& tikzPicture) const {
   return path;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -49,7 +49,7 @@
 #include "esp_common/context_type.h"
 #include "esp_planning_contexts/all_contexts.h"
 
-#ifdef ESP_OMPL_TOOLS_OPEN_RAVE
+#ifdef PDT_OPEN_RAVE
 #include "esp_spaces/SE3WAxisAngleBoundStateSpace.h"
 #include "esp_open_rave/open_rave_manipulator.h"
 #include "esp_open_rave/open_rave_r3.h"
@@ -59,7 +59,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 
@@ -157,7 +157,7 @@ std::shared_ptr<BaseContext> ContextFactory::create(const std::string& contextNa
         throw std::runtime_error(msg);
       }
     }
-#ifdef ESP_OMPL_TOOLS_OPEN_RAVE
+#ifdef PDT_OPEN_RAVE
     case CONTEXT_TYPE::OPEN_RAVE_MANIPULATOR: {
       try {
         // Allocate a real vector state space.
@@ -340,6 +340,6 @@ std::shared_ptr<ompl::base::SpaceInformation> ContextFactory::createReedsSheppSp
   return std::make_shared<ompl::base::SpaceInformation>(stateSpace);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

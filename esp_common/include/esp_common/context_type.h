@@ -44,7 +44,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 enum class CONTEXT_TYPE {
   CENTRE_SQUARE,
@@ -93,6 +93,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(CONTEXT_TYPE,
                                  {CONTEXT_TYPE::WALL_GAP, "WallGap"},
                              })
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

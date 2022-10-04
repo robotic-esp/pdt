@@ -46,7 +46,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 // Reciprocal obstacle clearance optimization objective.
 class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostIntegralObjective,
@@ -80,6 +80,6 @@ class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostInt
   mutable std::vector<double> heuristicSampleFactors_{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

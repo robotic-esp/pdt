@@ -27,7 +27,7 @@ target_include_directories(esp_optimization_objectives SYSTEM
 # Specify the link targets for this target.
 target_link_libraries(esp_optimization_objectives
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   ${EIGEN3_LIBRARIES}
   ${OMPL_LIBRARIES}

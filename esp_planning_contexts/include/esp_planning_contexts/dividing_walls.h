@@ -51,7 +51,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
  * a multiple homotopy-class experiment that scales to N dimensions. */
@@ -83,6 +83,6 @@ class DividingWalls : public RealVectorGeometricContext {
   std::vector<double> gapWidths_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

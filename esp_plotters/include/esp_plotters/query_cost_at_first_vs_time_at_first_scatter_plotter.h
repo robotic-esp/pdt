@@ -47,7 +47,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class QueryCostAtFirstVsTimeAtFirstScatterPlotter : public LatexPlotter {
  public:
@@ -78,6 +78,6 @@ class QueryCostAtFirstVsTimeAtFirstScatterPlotter : public LatexPlotter {
   const Statistics& stats_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

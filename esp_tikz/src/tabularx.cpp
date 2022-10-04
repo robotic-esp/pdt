@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -220,6 +220,6 @@ std::string TabularX::string() const {
   return stream.str();
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

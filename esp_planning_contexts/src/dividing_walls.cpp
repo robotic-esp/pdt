@@ -46,7 +46,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                              const std::shared_ptr<const Configuration>& config,
@@ -158,6 +158,6 @@ void DividingWalls::createAntiObstacles() {
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

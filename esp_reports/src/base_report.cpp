@@ -45,7 +45,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -170,7 +170,7 @@ std::stringstream BaseReport::preamble() const {
   preamble << "\\title{\\bfseries\\LARGE Experiment \\\\ " << experimentName_ << "}\n";
 
   // Create the author.
-  preamble << "\\author{ESP OMPLTools}\n";
+  preamble << "\\author{Planner Developer Tools (PDT)}\n";
 
   // Set the when this report was compiled.
   preamble << "\\date{\\today}\n";
@@ -245,6 +245,6 @@ void BaseReport::findAndReplaceAll(std::string* string, const std::string& key,
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

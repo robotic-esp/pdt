@@ -49,7 +49,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief An experiment with a singularly placed square obstacle*/
 class CentreSquare : public RealVectorGeometricContext {
@@ -62,6 +62,6 @@ class CentreSquare : public RealVectorGeometricContext {
   virtual void accept(const ContextVisitor& visitor) const override;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

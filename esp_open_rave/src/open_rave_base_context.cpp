@@ -53,7 +53,7 @@ using namespace std::string_literals;
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 OpenRaveBaseContext::OpenRaveBaseContext(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
@@ -73,6 +73,6 @@ std::shared_ptr<ompl::base::Goal> OpenRaveBaseContext::createGoal() const {
   return std::make_shared<ompl::base::GoalState>(spaceInfo_);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

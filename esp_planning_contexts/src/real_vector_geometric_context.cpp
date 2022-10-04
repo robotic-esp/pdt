@@ -44,7 +44,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 RealVectorGeometricContext::RealVectorGeometricContext(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
@@ -135,6 +135,6 @@ std::shared_ptr<ompl::base::Goal> RealVectorGeometricContext::createGoal() const
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

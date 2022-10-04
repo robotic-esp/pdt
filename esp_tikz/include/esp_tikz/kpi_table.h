@@ -45,7 +45,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class KpiTable : public TabularX {
  public:
@@ -62,6 +62,6 @@ class KpiTable : public TabularX {
   const Statistics& stats_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

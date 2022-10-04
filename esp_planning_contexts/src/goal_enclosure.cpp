@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 GoalEnclosure::GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                              const std::shared_ptr<const Configuration>& config,
@@ -131,6 +131,6 @@ void GoalEnclosure::createAntiObstacles() {
       spaceInfo_, goalGapMidpoint, goalGapWidths));
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

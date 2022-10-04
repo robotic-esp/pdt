@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class ContextValidityCheckerRepeatingRectangles : public ContextValidityChecker {
  public:
@@ -96,6 +96,6 @@ class RepeatingRectangles : public RealVectorGeometricContext {
   double obsWidth_{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

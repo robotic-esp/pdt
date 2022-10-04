@@ -52,7 +52,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief An experiment with a singularly placed square obstacle*/
 class ReedsSheppRandomRectangles : public BaseContext {
@@ -106,6 +106,6 @@ class ReedsSheppRandomRectangles : public BaseContext {
   std::shared_ptr<ompl::base::SpaceInformation> realVectorSubspaceInfo_{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -39,7 +39,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class BaseObstacle;
 class BaseAntiObstacle;
@@ -59,6 +59,6 @@ class ObstacleVisitor {
   void visit(const T&) const {}
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

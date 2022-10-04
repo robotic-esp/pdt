@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 
@@ -260,6 +260,6 @@ std::string PgfAxis::string() const {
   return stream.str();
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

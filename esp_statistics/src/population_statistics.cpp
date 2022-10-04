@@ -43,7 +43,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 
@@ -319,6 +319,6 @@ bool PopulationStatistics::ConfidenceIntervalIterator::operator!=(
   return !(*this == other);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

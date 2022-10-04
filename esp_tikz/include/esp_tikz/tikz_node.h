@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class TikzNode {
  public:
@@ -63,6 +63,6 @@ private:
   std::string label_{""};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

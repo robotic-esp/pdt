@@ -46,7 +46,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 namespace {
 
@@ -58,7 +58,7 @@ constexpr double ALLOC_SAFETY_FACTOR = 10.0;
 // Convenience namespace.
 namespace fs = std::experimental::filesystem;
 
-TimeCostLogger::TimeCostLogger(const esp::ompltools::time::Duration& maxDuration,
+TimeCostLogger::TimeCostLogger(const esp::pdt::time::Duration& maxDuration,
                                double logFrequency) :
   allocSize_(static_cast<std::size_t>(
                std::ceil(ALLOC_SAFETY_FACTOR *
@@ -67,7 +67,7 @@ TimeCostLogger::TimeCostLogger(const esp::ompltools::time::Duration& maxDuration
   measurements_.reserve(allocSize_);
 }
 
-void TimeCostLogger::addMeasurement(const esp::ompltools::time::Duration& duration,
+void TimeCostLogger::addMeasurement(const esp::pdt::time::Duration& duration,
                                     const ompl::base::Cost& cost) {
   measurements_.emplace_back(duration, cost);
 }
@@ -115,10 +115,10 @@ TimeIterationCostLogger::TimeIterationCostLogger(double runTimeSeconds,
                           (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
-TimeIterationCostLogger::TimeIterationCostLogger(const esp::ompltools::time::Duration& runTime,
+TimeIterationCostLogger::TimeIterationCostLogger(const esp::pdt::time::Duration& runTime,
                                                  unsigned int recordPeriodMicrosecond) {
   allocSize_ =
-    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * esp::ompltools::time::seconds(runTime) /
+    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * esp::pdt::time::seconds(runTime) /
                           (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
@@ -138,7 +138,7 @@ std::string TimeIterationCostLogger::output(const std::string& labelPrefix) {
   // Write the time first:
   rval << labelPrefix << ", ";
   for (unsigned int i = 0u; i < data_.size(); ++i) {
-    rval << std::setprecision(21) << esp::ompltools::time::seconds(std::get<0u>(data_.at(i)));
+    rval << std::setprecision(21) << esp::pdt::time::seconds(std::get<0u>(data_.at(i)));
     if (i != data_.size() - 1u) {
       rval << ", ";
     }
@@ -180,10 +180,10 @@ IterationCostLogger::IterationCostLogger(double runTimeSeconds,
                           (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
-IterationCostLogger::IterationCostLogger(const esp::ompltools::time::Duration& runTime,
+IterationCostLogger::IterationCostLogger(const esp::pdt::time::Duration& runTime,
                                          unsigned int recordPeriodMicrosecond) {
   allocSize_ =
-    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * esp::ompltools::time::seconds(runTime) /
+    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * esp::pdt::time::seconds(runTime) /
                           (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
@@ -254,7 +254,7 @@ std::string TargetTimeResults::output(const std::string& labelPrefix) {
   // the time
   rval << labelPrefix << ", ";
   for (unsigned int i = 0u; i < data_.size(); ++i) {
-    rval << std::setprecision(21) << esp::ompltools::time::seconds(data_.at(i).second);
+    rval << std::setprecision(21) << esp::pdt::time::seconds(data_.at(i).second);
     if (i != data_.size() - 1u) {
       rval << ", ";
     }
@@ -265,6 +265,6 @@ std::string TargetTimeResults::output(const std::string& labelPrefix) {
   return rval.str();
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

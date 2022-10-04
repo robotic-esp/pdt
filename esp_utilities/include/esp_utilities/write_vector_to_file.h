@@ -45,7 +45,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 namespace utilities {
 
@@ -63,6 +63,6 @@ std::ofstream& writeVectorToFile(std::ofstream &filestream,
 
 }  // namespace utilities
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 OpenRaveKneeGoal::OpenRaveKneeGoal(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                                    const std::shared_ptr<const Configuration>& config,
@@ -68,6 +68,6 @@ void OpenRaveKneeGoal::sampleGoal(ompl::base::State* st) const {
   ++numSampledGoals_;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

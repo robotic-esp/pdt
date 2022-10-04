@@ -22,7 +22,7 @@ target_include_directories(esp_tikz
 # Specify the link targets for this target.
 target_link_libraries(esp_tikz
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   esp_common
   esp_configuration

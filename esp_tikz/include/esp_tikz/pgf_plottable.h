@@ -42,7 +42,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class PlottableInterface {
  public:
@@ -51,6 +51,6 @@ class PlottableInterface {
   virtual std::string string() const = 0;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

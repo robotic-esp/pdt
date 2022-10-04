@@ -18,7 +18,7 @@ target_include_directories(esp_performance_loggers SYSTEM
 # Specify the link targets for this library.
 target_link_libraries(esp_performance_loggers
   PRIVATE
-  esp_ompl_tools
+  pdt
   stdc++fs
   PUBLIC
   ${OMPL_LIBRARIES}

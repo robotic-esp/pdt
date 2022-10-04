@@ -42,7 +42,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                              const std::shared_ptr<const Configuration>& config,
@@ -141,6 +141,6 @@ void NarrowPassage::createObstacles() {
       std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, upperAnchor, upperWidths));
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -46,7 +46,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 ContextValidityCheckerRepeatingRectangles::ContextValidityCheckerRepeatingRectangles(
     const ompl::base::SpaceInformationPtr& spaceInfo, const std::size_t numObsPerDim,
@@ -196,6 +196,6 @@ void RepeatingRectangles::createObstacles() {
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

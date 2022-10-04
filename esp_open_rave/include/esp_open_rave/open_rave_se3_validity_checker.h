@@ -61,7 +61,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class OpenRaveSE3ValidityChecker : public OpenRaveBaseValidityChecker {
  public:
@@ -85,6 +85,6 @@ class OpenRaveSE3ValidityChecker : public OpenRaveBaseValidityChecker {
   mutable OpenRAVE::Transform raveState_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

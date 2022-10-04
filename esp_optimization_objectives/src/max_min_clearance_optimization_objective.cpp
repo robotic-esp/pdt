@@ -43,7 +43,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 MaxMinClearanceOptimizationObjective::MaxMinClearanceOptimizationObjective(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo) :
@@ -128,6 +128,6 @@ void MaxMinClearanceOptimizationObjective::accept(const ObjectiveVisitor& visito
   visitor.visit(*this);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

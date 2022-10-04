@@ -48,7 +48,7 @@ Algorithm | t_cum, init,min | t_cum,init,med | t_cum,init,max | c_cum,init,min |
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -159,6 +159,6 @@ std::string MqKpiTable::string() const {
   return stream.str();
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

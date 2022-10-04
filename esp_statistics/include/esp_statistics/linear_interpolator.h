@@ -43,7 +43,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 // A linear interpolator that handles infinity values.
 template <typename X, typename Y>
@@ -166,6 +166,6 @@ Y LinearInterpolator<X, Y>::operator()(X x) const {
   return yLow + (x - xLow) / (xHigh - xLow) * (yHigh - yLow);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

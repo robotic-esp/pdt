@@ -44,7 +44,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 struct PgfFillBetweenOptions {
   std::string string() const;
@@ -65,6 +65,6 @@ class PgfFillBetween : public PlottableInterface {
   } options{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

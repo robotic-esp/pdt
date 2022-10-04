@@ -52,7 +52,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief An experiment with a singularly placed square obstacle*/
 class RandomRectanglesMultiStartGoal : public RealVectorGeometricContext {
@@ -94,6 +94,6 @@ class RandomRectanglesMultiStartGoal : public RealVectorGeometricContext {
   ompl::RNG rng_{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

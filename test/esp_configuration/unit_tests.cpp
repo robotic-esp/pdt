@@ -44,7 +44,7 @@
 #include "esp_configuration/directory.h"
 
 using namespace std::string_literals;
-using namespace esp::ompltools;
+using namespace esp::pdt;
 namespace fs = std::experimental::filesystem;
 
 TEST_CASE("Configuration") {

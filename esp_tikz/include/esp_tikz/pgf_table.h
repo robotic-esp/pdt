@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class PgfTable : public PlottableInterface {
  public:
@@ -110,6 +110,6 @@ class PgfTable : public PlottableInterface {
   } options{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

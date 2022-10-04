@@ -51,7 +51,7 @@ using namespace boost::math::double_constants;
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 SO3WAxisAngleBoundStateSampler::SO3WAxisAngleBoundStateSampler(
     const ompl::base::StateSpace *space) :
     ompl::base::SO3StateSampler(space) {
@@ -98,5 +98,5 @@ double SO3WAxisAngleBoundStateSpace::getMaxRotation() const {
   return maxRotation_;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 }  // namespace esp

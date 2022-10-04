@@ -52,7 +52,7 @@ using namespace std::string_literals;
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                                    const std::shared_ptr<const Configuration>& config,
@@ -189,6 +189,6 @@ void RandomRectangles::createObstacles() {
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

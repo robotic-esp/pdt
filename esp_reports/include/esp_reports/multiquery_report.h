@@ -57,7 +57,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class MultiqueryReport : public BaseReport{
  public:
@@ -81,6 +81,6 @@ class MultiqueryReport : public BaseReport{
   const MultiqueryStatistics& stats_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -46,7 +46,7 @@ target_include_directories(esp_open_rave SYSTEM
 # Specify the link targets for this target.
 target_link_libraries(esp_open_rave
   PRIVATE
-  esp_ompl_tools
+  pdt
   ${OpenRAVE_LIBRARIES}
   ${OpenRAVE_CORE_LIBRARIES}
   Threads::Threads
@@ -62,7 +62,7 @@ add_executable(open_rave_gui
 # Specify the link libraries for the gui target.
 target_link_libraries(open_rave_gui
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   ${Boost_LIBRARIES}
   ${OpenRAVE_LIBRARIES}

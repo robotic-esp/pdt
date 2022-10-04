@@ -47,7 +47,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 // Obstacles are geometric primitives.
 class GeometricShape {
@@ -114,7 +114,7 @@ class BaseAntiObstacle : public GeometricShape {
   virtual bool validates(const ompl::base::ScopedState<> state) const final;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp
 

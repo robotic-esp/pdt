@@ -46,7 +46,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class MqKpiTable : public TabularX {
  public:
@@ -63,6 +63,6 @@ class MqKpiTable : public TabularX {
   const MultiqueryStatistics& stats_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

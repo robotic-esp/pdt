@@ -38,7 +38,7 @@ target_include_directories(esp_configuration SYSTEM
 # Specify the link targets for this target.
 target_link_libraries(esp_configuration
   PRIVATE
-  esp_ompl_tools
+  pdt
   ${Boost_LIBRARIES}
   PUBLIC
   nlohmann_json::nlohmann_json

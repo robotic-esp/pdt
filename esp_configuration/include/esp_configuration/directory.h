@@ -39,12 +39,12 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 struct Directory {
   static const std::experimental::filesystem::path SOURCE;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

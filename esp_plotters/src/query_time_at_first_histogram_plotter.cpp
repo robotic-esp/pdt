@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -165,6 +165,6 @@ void QueryTimeAtFirstHistogramPlotter::setInitialSolutionDurationHistogramAxisOp
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

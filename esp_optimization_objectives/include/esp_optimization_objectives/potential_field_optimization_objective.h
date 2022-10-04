@@ -47,7 +47,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 // Obstacles are geometric primitives.
 class PotentialFieldOptimizationObjective : public ompl::base::StateCostIntegralObjective,
@@ -71,6 +71,6 @@ class PotentialFieldOptimizationObjective : public ompl::base::StateCostIntegral
   const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

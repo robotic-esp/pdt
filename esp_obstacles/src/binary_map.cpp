@@ -46,7 +46,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 BinaryMap::BinaryMap(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
                      const std::string& fullCsvFileName, const bool plotCsv,
@@ -204,6 +204,6 @@ std::string BinaryMap::mfile(const std::string& /*obsColour*/,
   return rval.str();
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

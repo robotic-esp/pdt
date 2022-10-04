@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class ContextValidityChecker : public ompl::base::StateValidityChecker {
  public:
@@ -80,6 +80,6 @@ class ContextValidityChecker : public ompl::base::StateValidityChecker {
   std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

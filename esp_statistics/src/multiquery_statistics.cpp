@@ -57,7 +57,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -822,6 +822,6 @@ double MultiqueryStatistics::getMedianCumulativeFinalCost(const std::string& pla
 double MultiqueryStatistics::getMaxCumulativeFinalCost(const std::string& plannerName) const{
   return maxCumulativeFinalCosts_.at(plannerName);
 }
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

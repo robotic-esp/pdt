@@ -15,7 +15,7 @@ target_include_directories(esp_reports
 # Specify the link targets for this target.
 target_link_libraries(esp_reports
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   esp_common
   esp_configuration

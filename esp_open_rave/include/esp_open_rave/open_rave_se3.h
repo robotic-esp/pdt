@@ -61,7 +61,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief A planning context to plugin to the OpenRave simulator. */
 class OpenRaveSE3 : public OpenRaveBaseContext {
@@ -81,6 +81,6 @@ class OpenRaveSE3 : public OpenRaveBaseContext {
   std::shared_ptr<ompl::base::Goal> createGoal() const;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

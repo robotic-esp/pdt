@@ -39,7 +39,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 // Forward declarations.
 class PotentialFieldOptimizationObjective;
@@ -63,6 +63,6 @@ class ObjectiveVisitor {
   }
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

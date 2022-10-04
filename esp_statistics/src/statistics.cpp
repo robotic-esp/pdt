@@ -59,7 +59,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -931,6 +931,6 @@ double Statistics::getNthValue(std::vector<double>* values, const std::size_t n)
   return *nthIter;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

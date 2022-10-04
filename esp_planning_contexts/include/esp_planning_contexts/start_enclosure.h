@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class StartEnclosure : public RealVectorGeometricContext {
  public:
@@ -78,6 +78,6 @@ class StartEnclosure : public RealVectorGeometricContext {
   double startGapWidth_{0.0};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

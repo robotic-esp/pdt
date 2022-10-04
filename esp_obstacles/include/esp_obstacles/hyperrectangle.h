@@ -51,7 +51,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 // A hyperrectangluar obstacle. Must inherit from BaseObstacle or BaseAntiObstacle.
 // Anchor point is the middle of the rectangle.
@@ -247,6 +247,6 @@ bool Hyperrectangle<T>::operator!=(const Hyperrectangle<T>& rhs) const {
   return !(*this == rhs);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

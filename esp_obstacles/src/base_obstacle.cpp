@@ -39,7 +39,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 GeometricShape::GeometricShape(const ompl::base::SpaceInformationPtr& spaceInfo) :
     spaceInfo_(spaceInfo),
@@ -95,6 +95,6 @@ bool BaseAntiObstacle::validates(const ompl::base::ScopedState<> state) const {
   return validates(state.get());
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

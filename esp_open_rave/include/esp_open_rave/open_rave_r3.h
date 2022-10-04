@@ -59,7 +59,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief A planning context to plugin to the OpenRave simulator. */
 class OpenRaveR3 : public OpenRaveBaseContext {
@@ -76,6 +76,6 @@ class OpenRaveR3 : public OpenRaveBaseContext {
   virtual std::vector<StartGoalPair> makeStartGoalPair() const override;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

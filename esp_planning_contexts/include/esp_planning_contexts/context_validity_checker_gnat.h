@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class ContextValidityCheckerGNAT : public ContextValidityChecker {
  public:
@@ -76,6 +76,6 @@ class ContextValidityCheckerGNAT : public ContextValidityChecker {
       antiObstacleAnchors_{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

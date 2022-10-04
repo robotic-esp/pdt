@@ -39,7 +39,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 std::vector<LazyPRMstarData::Edge> LazyPRMstarData::getValidEdges() const{
   return validEdges_;
@@ -180,6 +180,6 @@ void EITstarData::setNextReverseEdge(const ompl::geometric::eitstar::Edge& edge)
   nextReverseEdge_ = edge;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

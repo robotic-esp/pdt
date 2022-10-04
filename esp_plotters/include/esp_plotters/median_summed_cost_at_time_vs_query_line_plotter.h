@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class MedianSummedCostAtTimeVsQueryLinePlotter : public LatexPlotter {
  public:
@@ -83,6 +83,6 @@ class MedianSummedCostAtTimeVsQueryLinePlotter : public LatexPlotter {
   const MultiqueryStatistics& stats_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

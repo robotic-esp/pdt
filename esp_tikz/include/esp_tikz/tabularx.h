@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class TabularX {
  public:
@@ -90,6 +90,6 @@ class TabularX {
   } options{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

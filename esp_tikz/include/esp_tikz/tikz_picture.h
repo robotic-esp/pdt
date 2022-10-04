@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 struct TikzPictureOptions {
   std::string string() const;
@@ -103,6 +103,6 @@ class TikzPicture {
   const std::shared_ptr<const Configuration> config_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -45,7 +45,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class PgfPlot {
  public:
@@ -91,6 +91,6 @@ class PgfPlot {
   } options{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -49,20 +49,20 @@ using namespace std::string_literals;
 
 int main(const int argc, const char** argv) {
   // Load the config.
-  auto config = std::make_shared<esp::ompltools::Configuration>(argc, argv);
+  auto config = std::make_shared<esp::pdt::Configuration>(argc, argv);
   config->registerAsExperiment();
 
-  auto contextFactory = std::make_shared<esp::ompltools::ContextFactory>(config);
+  auto contextFactory = std::make_shared<esp::pdt::ContextFactory>(config);
   auto context = contextFactory->create(config->get<std::string>("experiment/context"));
 
-  auto plannerFactory = std::make_shared<esp::ompltools::PlannerFactory>(config, context);
+  auto plannerFactory = std::make_shared<esp::pdt::PlannerFactory>(config, context);
   auto [planner, plannerType] =
       plannerFactory->create(config->get<std::string>("experiment/planner"));
 
   // Get the experiment config.
   config->dumpAccessed();
 
-  esp::ompltools::InteractiveVisualizer visualizer(config, context, {planner, plannerType});
+  esp::pdt::InteractiveVisualizer visualizer(config, context, {planner, plannerType});
 
   visualizer.run();
 

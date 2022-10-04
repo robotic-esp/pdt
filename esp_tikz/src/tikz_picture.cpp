@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -161,6 +161,6 @@ void TikzPicture::write(const std::experimental::filesystem::path& path) const {
   texFile << string();
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

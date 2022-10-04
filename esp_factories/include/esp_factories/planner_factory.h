@@ -49,7 +49,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 // A class to create planners from config files.
 class PlannerFactory {
@@ -67,6 +67,6 @@ class PlannerFactory {
   const std::shared_ptr<const BaseContext> context_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

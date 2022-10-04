@@ -44,7 +44,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 namespace utilities {
 
@@ -52,6 +52,6 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
 
 }  // namespace utilities
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

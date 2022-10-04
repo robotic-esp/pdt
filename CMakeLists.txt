@@ -1,11 +1,11 @@
-# ESP OMPL TOOLS
+# Planner Developer Tools (PDT)
 # Authors: Jonathan Gammell, Marlin Strub
 message(STATUS "CMake ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.10)
-project(esp_ompl_tools)
+project(pdt)
 
 # Display compiler and build info.
-message(STATUS "Configuring ESP OMPL TOOLS for ${CMAKE_BUILD_TYPE} mode.")
+message(STATUS "Configuring Planner Developer Tools (PDT) for ${CMAKE_BUILD_TYPE} mode.")
 message(STATUS "Compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
 # CMake includes
@@ -33,11 +33,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/)
 # Let the user specify the path to the OMPL library they want to compile with.
 set_package_properties(ompl PROPERTIES
    URL "https://ompl.kavrakilab.org"
-   PURPOSE "The Open Motion Plannig Library (OMPL) on which ESP_OMPL_TOOLS builds.")
-if(NOT ESP_OMPL_TOOLS_OMPL_DIR)
+   PURPOSE "The Open Motion Plannig Library (OMPL) on which Planner Developer Tools (PDT) builds.")
+if(NOT PDT_OMPL_DIR)
   find_package(ompl REQUIRED)
 else()
-  find_package(ompl REQUIRED PATHS ${ESP_OMPL_TOOLS_OMPL_DIR} NO_DEFAULT_PATH)
+  find_package(ompl REQUIRED PATHS ${PDT_OMPL_DIR} NO_DEFAULT_PATH)
 endif()
 
 # Add json as a thirdparty project.
@@ -46,11 +46,11 @@ set(JSON_Install OFF CACHE INTERNAL "")    # Don't install the json lib.
 add_subdirectory(thirdparty/json)
 
 # Collect all compile flags used for compiling internal libraries. Creating
-# esp_ompl_tools as an empty interface library allows us to specify esp_ompl_tools
+# pdt as an empty interface library allows us to specify pdt
 # as a private dependency for our build targets, which enables all the flags for these
 # targets without propagating them to external targets that depend on them.
-add_library(esp_ompl_tools INTERFACE)
-target_compile_options(esp_ompl_tools
+add_library(pdt INTERFACE)
+target_compile_options(pdt
   INTERFACE 
   -Wall
   -Wextra
@@ -58,15 +58,15 @@ target_compile_options(esp_ompl_tools
   -Werror
   -Wconversion
   -Wsign-conversion)
-target_compile_features(esp_ompl_tools
+target_compile_features(pdt
   INTERFACE
   cxx_std_17)
 
 # Add open-rave integration if requested. This option must be processed before
 # the local libraries as some of them depend on this option.
-option(ESP_OMPL_TOOLS_OPEN_RAVE "Enable OpenRAVE integration." OFF)
-if(ESP_OMPL_TOOLS_OPEN_RAVE)
-  add_definitions(-DESP_OMPL_TOOLS_OPEN_RAVE)
+option(PDT_OPEN_RAVE "Enable OpenRAVE integration." OFF)
+if(PDT_OPEN_RAVE)
+  add_definitions(-DPDT_OPEN_RAVE)
   add_subdirectory(esp_open_rave)
   # See docs/DoxygenSettings.cmake for conditional Doxygen inclusion.
 endif()

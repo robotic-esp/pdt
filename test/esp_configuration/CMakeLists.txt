@@ -9,7 +9,7 @@ add_executable(test_esp_configuration
 target_link_libraries(test_esp_configuration
   PRIVATE
   doctest
-  esp_ompl_tools
+  pdt
   esp_configuration)
   
 list(APPEND CMAKE_MODULE_PATH ${doctest_SOURCE_DIR}/scripts/cmake)

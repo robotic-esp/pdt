@@ -39,13 +39,13 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 struct Fonts {
   static const std::experimental::filesystem::path ROBOTO_REGULAR;
   static const std::experimental::filesystem::path ROBOTO_BOLD;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

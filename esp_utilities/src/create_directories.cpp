@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 void createDirectories(const std::string& fileName) {
   boost::filesystem::path fullPath;
@@ -69,6 +69,6 @@ void createDirectories(const std::string& fileName) {
 }
 
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

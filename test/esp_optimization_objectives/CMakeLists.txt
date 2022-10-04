@@ -21,7 +21,7 @@ target_include_directories(test_esp_optimization_objectives SYSTEM
 target_link_libraries(test_esp_optimization_objectives
   PRIVATE
   doctest
-  esp_ompl_tools
+  pdt
   esp_configuration
   esp_factories
   esp_optimization_objectives)

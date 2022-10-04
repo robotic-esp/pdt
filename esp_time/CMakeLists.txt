@@ -13,4 +13,4 @@ target_include_directories(esp_time
 # Specify the link targets for this target.
 target_link_libraries(esp_time
   PRIVATE
-  esp_ompl_tools)
+  pdt)

@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class BaseOptimizationObjective {
  public:
@@ -52,6 +52,6 @@ class BaseOptimizationObjective {
   virtual void accept(const ObjectiveVisitor& visitor) const = 0;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

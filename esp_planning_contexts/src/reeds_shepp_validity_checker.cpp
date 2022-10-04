@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 ReedsSheppValidityChecker::ReedsSheppValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo) :
@@ -182,6 +182,6 @@ std::vector<std::shared_ptr<BaseObstacle>> ReedsSheppValidityChecker::getObstacl
   return obstacles_;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 BaseVisualizer::BaseVisualizer(
     const std::shared_ptr<Configuration> &config,
@@ -208,16 +208,16 @@ void BaseVisualizer::createData() {
     setupDuration_ = time::Clock::now() - setupStartTime;
 
     if (config_->contains("experiment/seed")) {
-      if (plannerType_ == esp::ompltools::PLANNER_TYPE::BITSTAR) {
+      if (plannerType_ == esp::pdt::PLANNER_TYPE::BITSTAR) {
         planner_->as<ompl::geometric::BITstar>()->setLocalSeed(
             config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::ABITSTAR) {
+      } else if (plannerType_ == esp::pdt::PLANNER_TYPE::ABITSTAR) {
         planner_->as<ompl::geometric::ABITstar>()->setLocalSeed(
             config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::AITSTAR) {
+      } else if (plannerType_ == esp::pdt::PLANNER_TYPE::AITSTAR) {
         planner_->as<ompl::geometric::AITstar>()->setLocalSeed(
         config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == esp::ompltools::PLANNER_TYPE::EITSTAR) {
+      } else if (plannerType_ == esp::pdt::PLANNER_TYPE::EITSTAR) {
         planner_->as<ompl::geometric::EITstar>()->setLocalSeed(
         config_->get<std::size_t>("experiment/seed"));
       }
@@ -418,6 +418,6 @@ void BaseVisualizer::createData() {
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

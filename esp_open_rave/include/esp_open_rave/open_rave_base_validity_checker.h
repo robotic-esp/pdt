@@ -61,7 +61,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class OpenRaveBaseValidityChecker : public ompl::base::StateValidityChecker {
  public:
@@ -97,6 +97,6 @@ class OpenRaveBaseValidityChecker : public ompl::base::StateValidityChecker {
   const std::shared_ptr<const Configuration> config_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

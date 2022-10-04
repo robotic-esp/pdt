@@ -37,7 +37,7 @@ target_include_directories(esp_planning_contexts SYSTEM
 # Specify the link targets for this target.
 target_link_libraries(esp_planning_contexts
   PRIVATE
-  esp_ompl_tools
+  pdt
   ${OpenRAVE_LIBRARIES}
   PUBLIC
   ${OMPL_LIBRARIES}

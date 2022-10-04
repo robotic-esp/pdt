@@ -46,7 +46,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class MaxMinClearanceOptimizationObjective : public ompl::base::OptimizationObjective,
                                              public BaseOptimizationObjective {
@@ -94,6 +94,6 @@ class MaxMinClearanceOptimizationObjective : public ompl::base::OptimizationObje
   const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief An experiment with a singularly placed square obstacle*/
 class ObstacleFree : public RealVectorGeometricContext {
@@ -63,6 +63,6 @@ class ObstacleFree : public RealVectorGeometricContext {
   virtual void accept(const ContextVisitor& visitor) const override;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

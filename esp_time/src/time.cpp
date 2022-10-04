@@ -39,7 +39,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 namespace time {
 
@@ -65,11 +65,11 @@ double seconds(Duration sec) {
 
 }  // namespace time
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp
 
-std::ostream& operator<<(std::ostream& out, const esp::ompltools::time::Duration& duration) {
+std::ostream& operator<<(std::ostream& out, const esp::pdt::time::Duration& duration) {
   std::stringstream stream;
   // Handle the case of time with infinite value.
   if (duration.count() == std::numeric_limits<double>::infinity()) {

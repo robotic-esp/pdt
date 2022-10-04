@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 namespace fs = std::experimental::filesystem;
 
@@ -66,7 +66,7 @@ class NullLogger {
   NullLogger(double /*runTimeSeconds*/, unsigned int /*recordPeriodMicrosecond*/) {
     empty_ = false;
   };
-  NullLogger(const esp::ompltools::time::Duration& /*runTime*/,
+  NullLogger(const esp::pdt::time::Duration& /*runTime*/,
              unsigned int /*recordPeriodMicrosecond*/) {
     empty_ = false;
   };
@@ -95,17 +95,17 @@ class NullLogger {
 /** \brief A vector of time & cost */
 class TimeCostLogger {
  public:
-  using logData = std::pair<const esp::ompltools::time::Duration, const ompl::base::Cost>;
+  using logData = std::pair<const esp::pdt::time::Duration, const ompl::base::Cost>;
 
   /** \brief Constructors */
-  TimeCostLogger(const esp::ompltools::time::Duration& maxDuration, double logFrequency);
+  TimeCostLogger(const esp::pdt::time::Duration& maxDuration, double logFrequency);
 
   /** \brief Output the data with the appropriate label*/
   std::string createLogString(const std::string& labelPrefix) const;
 
   /** \brief std::vector pass-throughs */
   bool empty() const { return measurements_.empty(); }
-  void addMeasurement(const esp::ompltools::time::Duration& duration, const ompl::base::Cost& cost);
+  void addMeasurement(const esp::pdt::time::Duration& duration, const ompl::base::Cost& cost);
   logData lastMeasurement() { return measurements_.back(); };
 
  private:
@@ -120,11 +120,11 @@ class TimeCostLogger {
 class TimeIterationCostLogger {
  public:
   /** \brief Data type */
-  typedef std::tuple<esp::ompltools::time::Duration, unsigned int, double> data_t;
+  typedef std::tuple<esp::pdt::time::Duration, unsigned int, double> data_t;
 
   /** \brief Constructors */
   TimeIterationCostLogger(double runTimeSeconds, unsigned int recordPeriodMicrosecond);
-  TimeIterationCostLogger(const esp::ompltools::time::Duration& runTime,
+  TimeIterationCostLogger(const esp::pdt::time::Duration& runTime,
                           unsigned int recordPeriodMicrosecond);
 
   /** \brief Output the data with the appropriate label*/
@@ -152,7 +152,7 @@ class IterationCostLogger {
   /** \brief Constructors */
   IterationCostLogger(unsigned int numIterations);
   IterationCostLogger(double runTimeSeconds, unsigned int recordPeriodMicrosecond);
-  IterationCostLogger(const esp::ompltools::time::Duration& runTime,
+  IterationCostLogger(const esp::pdt::time::Duration& runTime,
                       unsigned int recordPeriodMicrosecond);
 
   /** \brief Output the data with the appropriate label*/
@@ -176,7 +176,7 @@ class IterationCostLogger {
 class TargetTimeResults {
  public:
   /** \brief Data type */
-  typedef std::pair<double, esp::ompltools::time::Duration> data_t;
+  typedef std::pair<double, esp::pdt::time::Duration> data_t;
 
   /** \brief Constructors */
   TargetTimeResults(unsigned int numTargets);
@@ -271,6 +271,6 @@ class ResultLog {
   std::experimental::filesystem::path filepath_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

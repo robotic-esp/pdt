@@ -47,7 +47,7 @@ Algorithm | t_init,min | t_init,med | t_init,max | c_init,min | c_init,med | c_i
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -155,6 +155,6 @@ std::string KpiTable::string() const {
   return stream.str();
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

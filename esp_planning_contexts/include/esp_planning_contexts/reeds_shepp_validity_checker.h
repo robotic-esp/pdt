@@ -51,7 +51,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class ReedsSheppValidityChecker : public ompl::base::StateValidityChecker {
  public:
@@ -89,6 +89,6 @@ class ReedsSheppValidityChecker : public ompl::base::StateValidityChecker {
   std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

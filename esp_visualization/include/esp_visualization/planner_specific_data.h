@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class PlannerSpecificData {
  public:
@@ -172,6 +172,6 @@ class EITstarData : public PlannerSpecificData {
   ompl::geometric::eitstar::Edge nextReverseEdge_{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

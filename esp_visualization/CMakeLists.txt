@@ -32,7 +32,7 @@ target_include_directories(esp_visualization SYSTEM
 # Specify the link targets for this target.
 target_link_libraries(esp_visualization
   PRIVATE
-  esp_ompl_tools
+  pdt
   PUBLIC
   ${OMPL_LIBRARIES}
   pango_core

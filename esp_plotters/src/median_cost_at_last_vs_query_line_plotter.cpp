@@ -45,7 +45,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -255,6 +255,6 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   return plot;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

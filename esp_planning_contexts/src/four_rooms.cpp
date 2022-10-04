@@ -42,7 +42,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 FourRooms::FourRooms(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                      const std::shared_ptr<const Configuration>& config, const std::string& name) :
@@ -171,6 +171,6 @@ void FourRooms::createAntiObstacles() {
       std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, midpointWest, widthsWest));
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

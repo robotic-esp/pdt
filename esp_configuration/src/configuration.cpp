@@ -50,7 +50,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 // Convenience namespaces.
 using namespace std::string_literals;
@@ -676,6 +676,6 @@ void Configuration::handleSeedSpecification() {
   }
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

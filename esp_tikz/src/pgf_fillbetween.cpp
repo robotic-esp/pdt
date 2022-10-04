@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 PgfFillBetween::PgfFillBetween(const std::string& name1, const std::string& name2) {
   options.name1 = name1;
@@ -58,6 +58,6 @@ std::string PgfFillBetween::string() const {
   return stream.str();
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

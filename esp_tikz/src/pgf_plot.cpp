@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 using namespace std::string_literals;
 
@@ -118,6 +118,6 @@ bool PgfPlot::empty() const {
   return !static_cast<bool>(plottable_);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

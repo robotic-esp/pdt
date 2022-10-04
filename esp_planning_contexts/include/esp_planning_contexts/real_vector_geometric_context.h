@@ -56,7 +56,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 /** \brief The base class for an experiment */
 class RealVectorGeometricContext : public BaseContext {
@@ -94,6 +94,6 @@ class RealVectorGeometricContext : public BaseContext {
   std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

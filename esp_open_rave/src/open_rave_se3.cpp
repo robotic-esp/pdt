@@ -56,7 +56,7 @@ using namespace std::string_literals;
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                          const std::shared_ptr<const Configuration>& config,
@@ -203,6 +203,6 @@ void OpenRaveSE3::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

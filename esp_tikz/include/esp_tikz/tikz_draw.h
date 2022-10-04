@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class TikzDraw {
  public:
@@ -64,6 +64,6 @@ private:
   std::string connection_{""};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

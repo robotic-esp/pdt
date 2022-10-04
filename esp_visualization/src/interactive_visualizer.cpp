@@ -47,7 +47,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 InteractiveVisualizer::InteractiveVisualizer(
     const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
@@ -83,7 +83,7 @@ void InteractiveVisualizer::run() {
   costLog_.SetLabels(std::vector<std::string>({planner_->getName()}));
 
   // Create a window and bind it to the current OpenGL context.
-  pangolin::CreateWindowAndBind("esp ompltools", windowWidth, windowHeight);
+  pangolin::CreateWindowAndBind("pdt", windowWidth, windowHeight);
 
   // Set up a viewport. A viewport is where OpenGL draws to. We can
   // have multiple viewports for different parts of a window. Any draw
@@ -1620,6 +1620,6 @@ std::vector<Eigen::Vector3f> InteractiveVisualizer::getPathSE2(const std::size_t
   return states;
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

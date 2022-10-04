@@ -59,7 +59,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class OpenRaveManipulatorValidityChecker : public OpenRaveBaseValidityChecker {
  public:
@@ -83,6 +83,6 @@ class OpenRaveManipulatorValidityChecker : public OpenRaveBaseValidityChecker {
   mutable std::vector<double> raveState_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

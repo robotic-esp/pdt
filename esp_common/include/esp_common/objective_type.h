@@ -41,7 +41,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 enum class OBJECTIVE_TYPE {
   COSTMAP,
@@ -62,6 +62,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(OBJECTIVE_TYPE,
                                  {OBJECTIVE_TYPE::INVALID, "invalid"},
                              })
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

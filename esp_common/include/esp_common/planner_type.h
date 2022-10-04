@@ -44,7 +44,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 enum class PLANNER_TYPE {
   INVALID,
@@ -84,6 +84,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
                                                {PLANNER_TYPE::SPARSTWO, "SPARStwo"},
                                            })
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

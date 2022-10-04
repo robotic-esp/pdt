@@ -54,7 +54,7 @@ using namespace std::string_literals;
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                          const std::shared_ptr<const Configuration>& config,
@@ -411,6 +411,6 @@ void BaseContext::regenerateQueries(){
   startGoalPairs_ = makeStartGoalPair();
 }
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

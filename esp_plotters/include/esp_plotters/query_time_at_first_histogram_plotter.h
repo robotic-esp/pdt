@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class QueryTimeAtFirstHistogramPlotter : public LatexPlotter {
  public:
@@ -82,6 +82,6 @@ class QueryTimeAtFirstHistogramPlotter : public LatexPlotter {
   const Statistics& stats_;
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

@@ -1,4 +1,4 @@
-# ESP OMPL TOOLS
+# Planner Developer Tools (PDT)
 
 This repository contains tools developed at ESP that aim to facilitate scientifically sound path planning research.
 
@@ -86,13 +86,13 @@ sudo apt install doxygen graphviz xdot
 The program `xdot` is not strictly necessary, but is a useful lightweight viewer for `.dot` files.
 
 
-### ESP OMPL TOOLS
+### Planner Developer Tools (PDT)
 
 This project includes two header-only libraries (N. Lohmann's [JSON](https://github.com/nlohmann/json) and A. Fallah's [CSV-parser](https://github.com/AriaFallah/csv-parser)) as submodules (which is why we need to clone recursively).
 
 ```bash
-git clone --recursive git@github.com:robotic-esp/esp_ompl_tools.git
-cd esp_ompl_tools
+git clone --recursive git@github.com:robotic-esp/pdt.git
+cd pdt
 mkdir build && cd build
 cmake ..
 make
@@ -103,24 +103,24 @@ If you have Doxygen installed, you can also build the documentation
 make docs
 ```
 
-## Reproducible research with ESP OMPL TOOLS
+## Reproducible research with Planner Developer Tools (PDT)
 
 Most sampling-based planning algorithms depend on random numbers and can be configured by parameters (e.g., the connection radius for `RRT*`). Planning contexts depend on parameters as well (e.g, the number and shape of obstacles, the positions of the start and goal states, and the collision detection resolution). The result of an experiment, i.e., of a comparison of the performance of planners in a planning context, depends on the random number seed and all parameters. To reproduce an experiment, the seed and all parameters must be identical.
 
-This is why our tools set all parameters explicitly and keep track of which parameters were set. But because explicitly specifying all parameters by hand for every experiment is tedious, the tools are shipped with a set of default parameters (you can inspect them in `esp_ompl_tools/parameters/defaults/`). The intended way to change a parameter is through a configuration patch. Parameters that are specified in such a patch can extend **and overwrite** the defaults.
+This is why our tools set all parameters explicitly and keep track of which parameters were set. But because explicitly specifying all parameters by hand for every experiment is tedious, the tools are shipped with a set of default parameters (you can inspect them in `pdt/parameters/defaults/`). The intended way to change a parameter is through a configuration patch. Parameters that are specified in such a patch can extend **and overwrite** the defaults.
 
 Regardless of whether a parameter was specified in the defaults or through a patch, all accessed parameters are exported at the end of an experiment. This allows to use the exported configuration as a patch for a new experiment, which ensures that the experiment is run with the same random seed and set of parameters and therefore makes it reproducible.
 
 Note that it is unreasonable to expect the exact same results because they depend on many aspects we cannot control, e.g., the current memory layout of the underlying system.
 
-## Running ESP OMPL TOOLS
+## Running Planner Developer Tools (PDT)
 
 ### Testing the installation
 
 You can test your installation by running two demos. The first one runs a quick benchmark:
 
 ```bash
-cd /path/to/esp_ompl_tools/build
+cd /path/to/pdt/build
 ./bin/benchmark -c ../parameters/demo/benchmark_demo.json
 ```
 
@@ -132,11 +132,11 @@ To test the visualization, you can run:
 ./bin/visualization -c ../parameters/demo/visualization_demo.json
 ```
 
-Feel free to play around by substitution different contexts/planners into these `.json` files. Available options can be taken from the default config files in `esp_ompl_tools/parameters/defaults/`. The recommended way to change a default parameter is to **override** it by placing a parameter with the same name in the configuration provided with the `-c` option.
+Feel free to play around by substitution different contexts/planners into these `.json` files. Available options can be taken from the default config files in `pdt/parameters/defaults/`. The recommended way to change a default parameter is to **override** it by placing a parameter with the same name in the configuration provided with the `-c` option.
 
 ### Benchmark
 
-The tools include an executable called `benchmark`. This executable should be invoked as `benchmark -c path/to/benchmark.json`, where `path/to/benchmark.json` points to a configuration patch. The configuration patch has to specify a family of `"Experiment"` parameters, such as the planners, the planning context, and the number of runs per planner. You can find an example of a suitable configuration patch at `esp_ompl_tools/parameters/demos/benchmark_demo.json`. Notice that you can specify two planners of the same type but different configurations by giving them different names.
+The tools include an executable called `benchmark`. This executable should be invoked as `benchmark -c path/to/benchmark.json`, where `path/to/benchmark.json` points to a configuration patch. The configuration patch has to specify a family of `"Experiment"` parameters, such as the planners, the planning context, and the number of runs per planner. You can find an example of a suitable configuration patch at `pdt/parameters/demos/benchmark_demo.json`. Notice that you can specify two planners of the same type but different configurations by giving them different names.
 
 All experiments get their own folders in `benchmarks/`. The naming convention for the folders is `<date-string>_<context-name>`. The corresponding folder contains various files when the experiment is finished. The most important are
 - `config.json`: All accessed parameters for this experiment;
@@ -163,7 +163,7 @@ When tracking is on, the most recently computed iteration is visualized.
 
 ## The compilation fails because some headers are not found
 
-You have built and installed the ESP version of OMPL, but the compilation fails because it is missing headers? Make sure the correct OMPL is found (`cmake` will report the path of the OMPL it finds). Say you installed the ESP version of OMPL to `/usr/local/`, but also have ROS installed on your system and `cmake` prefers the ROS version. You can specify the path ESP OMPL TOOLS looks for OMPL in the variable `ESP_OMPL_TOOLS_OMPL_DIR`, e.g., by running `cmake -DESP_OMPL_TOOLS_OMPL_DIR=/usr/local`. If you don't define the variable, CMake will look in the standard places.
+You have built and installed the ESP version of OMPL, but the compilation fails because it is missing headers? Make sure the correct OMPL is found (`cmake` will report the path of the OMPL it finds). Say you installed the ESP version of OMPL to `/usr/local/`, but also have ROS installed on your system and `cmake` prefers the ROS version. You can specify the path PDT looks for OMPL in the variable `PDT_OMPL_DIR`, e.g., by running `cmake -DPDT_OMPL_DIR=/usr/local`. If you don't define the variable, CMake will look in the standard places.
 
 ## Executing a program complains about missing symbols
 
@@ -172,7 +172,7 @@ This can happen if the wrong version of OMPL is dynamically linked to your execu
 ```bash
 #!/bin/bash
 export LD_LIBRARY_PATH="/usr/local/lib/:${LD_LIBRARY_PATH}"
-/path/to/esp_ompl_tools/build/bin/benchmark -c /path/to/esp_ompl_tools/parameters/demo/benchmark_demo.json
+/path/to/pdt/build/bin/benchmark -c /path/to/pdt/parameters/demo/benchmark_demo.json
 ```
 
 ## The benchmark report doesn't compile
@@ -208,7 +208,7 @@ to format all lines in all files that changed between the current working direct
 
 ## Statically analysing code
 
-Please consider using static analysis tools, such as `clang-tidy`, when working in OMPL Tools. On Ubuntu `clang-tidy` can be installed from the repos (`sudo apt install clang-tidy`). Good editors can be configured to automatically run `clang-tidy` and visualize its output directly in your code. We recommend this workflow, as it doesn't require you to remember to run `clang-tidy`.
+Please consider using static analysis tools, such as `clang-tidy`, when working in PDT. On Ubuntu `clang-tidy` can be installed from the repos (`sudo apt install clang-tidy`). Good editors can be configured to automatically run `clang-tidy` and visualize its output directly in your code. We recommend this workflow, as it doesn't require you to remember to run `clang-tidy`.
 
 Alternatively, you can also run `clang-tidy` from the terminal. You can use it out of the box on a single file, but this requires you to specify the included directories, linked libraries, and compiler flags on the command line. For example
 
@@ -221,7 +221,7 @@ You could run `clang-tidy` like this on all files in the project, but you would 
 A less cumbersome way to run `clang-tidy` on a whole project is to let your build system generate a compile commands database for you and run `clang-tidy` from the folder in which this file is generated. In our case, you can tell CMake to generate this database by adding `-DCMAKE_EXPORT_COMPILE_COMMANDS=TRUE` to your call to `cmake`. You can then run `clang-tidy` on all files in the project by invoking `run-clang-tidy` from the folder in which the database is generated (CMake calls this file `compile_commands.json` and it is typically generated in the `build` folder).
 
 ```bash
-cd /path/to/esp_ompl_tools/build
+cd /path/to/pdt/build
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=TRUE .. 
 run-clang-tidy
 ```
@@ -230,7 +230,7 @@ The `run-clang-tidy` executable is included in the `clang-tidy` package installe
 
 ## Backlog
 
-### ESP OMPL TOOLS
+### Planner Developer Tools (PDT)
 
 - [ ] Improve visualization tool.
 

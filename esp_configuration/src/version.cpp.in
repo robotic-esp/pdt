@@ -35,18 +35,18 @@
 
 #include "esp_configuration/version.h"
 
-#define ESP_OMPL_TOOLS_VERSION_GIT_SHA1 "@GIT_SHA1@"
-#define ESP_OMPL_TOOLS_VERSION_GIT_REFSPEC "@GIT_REFSPEC@"
-#define ESP_OMPL_TOOLS_VERSION_GIT_STATUS "@GIT_STATUS@"
+#define PDT_VERSION_GIT_SHA1 "@GIT_SHA1@"
+#define PDT_VERSION_GIT_REFSPEC "@GIT_REFSPEC@"
+#define PDT_VERSION_GIT_STATUS "@GIT_STATUS@"
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
-const std::string Version::GIT_SHA1 = ESP_OMPL_TOOLS_VERSION_GIT_SHA1;
-const std::string Version::GIT_REFSPEC = ESP_OMPL_TOOLS_VERSION_GIT_REFSPEC;
-const std::string Version::GIT_STATUS = ESP_OMPL_TOOLS_VERSION_GIT_STATUS;
+const std::string Version::GIT_SHA1 = PDT_VERSION_GIT_SHA1;
+const std::string Version::GIT_REFSPEC = PDT_VERSION_GIT_REFSPEC;
+const std::string Version::GIT_STATUS = PDT_VERSION_GIT_STATUS;
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp

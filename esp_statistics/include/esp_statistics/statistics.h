@@ -48,7 +48,7 @@
 
 namespace esp {
 
-namespace ompltools {
+namespace pdt {
 
 class PlannerResults {
  public:
@@ -202,6 +202,6 @@ class Statistics {
   double maxNonInfInitialSolutionDuration_{std::numeric_limits<double>::lowest()};
 };
 
-}  // namespace ompltools
+}  // namespace pdt
 
 }  // namespace esp
