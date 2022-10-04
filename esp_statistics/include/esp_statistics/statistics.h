@@ -76,7 +76,8 @@ class Statistics {
   friend MultiqueryStatistics;
 
  public:
-  Statistics(const std::shared_ptr<Configuration>& config, const std::experimental::filesystem::path &resultsPath, const bool forceComputation);
+  Statistics(const std::shared_ptr<Configuration>& config,
+             const std::experimental::filesystem::path& resultsPath, const bool forceComputation);
   ~Statistics() = default;
 
   std::experimental::filesystem::path extractMedians(

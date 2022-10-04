@@ -127,10 +127,11 @@ std::size_t PlannerResults::numMeasuredRuns() const {
   return measuredRuns_.size();
 }
 
-Statistics::Statistics(const std::shared_ptr<Configuration>& config, const fs::path &resultsPath, const bool forceComputation) :
+Statistics::Statistics(const std::shared_ptr<Configuration>& config, const fs::path& resultsPath,
+                       const bool forceComputation) :
     config_(config),
     statisticsDirectory_(fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                         "statistics/"),
+                         ("statistics/" + resultsPath.stem().string() + "/")),
 
     // Our sorting in this class is already assuming we are minimizing cost, so rounding an index up
     // is conservative.
@@ -429,7 +430,8 @@ fs::path Statistics::extractCostPercentiles(const std::string& plannerName,
   // Get the percentile costs.
   std::map<double, std::vector<double>> percentileCosts{};
   for (const auto percentile : percentiles) {
-    percentileCosts[percentile] = getPercentileCosts(results_.at(plannerName), percentile, durations);
+    percentileCosts[percentile] =
+        getPercentileCosts(results_.at(plannerName), percentile, durations);
   }
 
   // Write to file.
@@ -778,7 +780,8 @@ std::shared_ptr<Configuration> Statistics::getConfig() const {
   return config_;
 }
 
-std::vector<double> Statistics::getPercentileCosts(const PlannerResults& results, const double percentile,
+std::vector<double> Statistics::getPercentileCosts(const PlannerResults& results,
+                                                   const double percentile,
                                                    const std::vector<double>& durations) const {
   return getNthCosts(results, populationStats_.estimatePercentileAsIndex(percentile), durations);
 }
@@ -907,7 +910,8 @@ double Statistics::getNthInitialSolutionDuration(const PlannerResults& results,
   return getNthValue(&initialDurations, n);
 }
 
-double Statistics::getNthInitialSolutionCost(const PlannerResults& result, const std::size_t n) const {
+double Statistics::getNthInitialSolutionCost(const PlannerResults& result,
+                                             const std::size_t n) const {
   // Get the costs of the initial solutions of all runs.
   auto initialCosts = getInitialSolutionCosts(result);
 
