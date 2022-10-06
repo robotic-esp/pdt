@@ -640,7 +640,7 @@ void Configuration::registerAsExperiment() {
         loadReportConfig(parameters_["experiment"]["report"]["config"].get<std::string>());
       } else {
         OMPL_INFORM("Loading default report config.");
-        loadReportConfig(Directory::SOURCE / "parameters/defaults/esp_default_report_config.json");
+        loadReportConfig(Directory::SOURCE / "parameters/defaults/default_report.json");
       }
     }
   }
