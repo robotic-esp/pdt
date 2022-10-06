@@ -48,7 +48,7 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/StateSpace.h>
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_time/time.h"

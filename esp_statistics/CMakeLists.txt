@@ -19,5 +19,5 @@ target_link_libraries(esp_statistics
   pdt
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_configuration
+  esp_config
   esp_utilities)

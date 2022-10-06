@@ -52,7 +52,7 @@ target_link_libraries(esp_open_rave
   Threads::Threads
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_configuration
+  esp_config
   esp_planning_contexts)
 
 # Specify the gui as a target.
@@ -68,7 +68,7 @@ target_link_libraries(open_rave_gui
   ${OpenRAVE_LIBRARIES}
   ${OpenRAVE_CORE_LIBRARIES}
   ${OMPL_LIBRARIES}
-  esp_configuration
+  esp_config
   esp_factories
   esp_planning_contexts
   esp_open_rave)

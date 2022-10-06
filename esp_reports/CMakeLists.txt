@@ -18,8 +18,8 @@ target_link_libraries(esp_reports
   pdt
   PUBLIC
   esp_common
-  esp_configuration
+  esp_config
   esp_factories
+  esp_pgftikz
   esp_plotters
-  esp_statistics
-  esp_tikz)
+  esp_statistics)

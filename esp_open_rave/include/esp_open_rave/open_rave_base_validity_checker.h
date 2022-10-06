@@ -54,7 +54,7 @@
 #include <openrave-core.h>
 #pragma GCC diagnostic pop
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_obstacles/obstacle_visitor.h"

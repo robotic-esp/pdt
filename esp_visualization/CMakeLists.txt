@@ -41,6 +41,6 @@ target_link_libraries(esp_visualization
   pango_windowing
   esp_common
   esp_factories
-  esp_optimization_objectives
-  esp_planning_contexts
-  esp_tikz)
+  esp_objectives
+  esp_pgftikz
+  esp_planning_contexts)

@@ -42,7 +42,7 @@
 
 #include <experimental/filesystem>
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 #include "esp_reports/single_query_report.h"
 #include "esp_statistics/statistics.h"
 

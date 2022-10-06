@@ -46,9 +46,9 @@
 
 #include "esp_common/goal_type.h"
 #include "esp_common/objective_type.h"
-#include "esp_optimization_objectives/max_min_clearance_optimization_objective.h"
-#include "esp_optimization_objectives/potential_field_optimization_objective.h"
-#include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
+#include "esp_objectives/max_min_clearance_optimization_objective.h"
+#include "esp_objectives/potential_field_optimization_objective.h"
+#include "esp_objectives/reciprocal_clearance_optimization_objective.h"
 
 using namespace std::string_literals;
 

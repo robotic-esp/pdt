@@ -30,7 +30,7 @@ target_link_libraries(esp_factories
   ${Boost_LIBRARIES}
   ${OMPL_LIBRARIES}
   esp_common
-  esp_configuration
+  esp_config
   esp_planning_contexts
   esp_spaces)
 

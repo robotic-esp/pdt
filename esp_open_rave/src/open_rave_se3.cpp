@@ -48,7 +48,7 @@
 
 #include <openrave/environment.h>
 
-#include "esp_configuration/directory.h"
+#include "esp_config/directory.h"
 #include "esp_open_rave/open_rave_knee_goal.h"
 #include "esp_open_rave/open_rave_se3_validity_checker.h"
 

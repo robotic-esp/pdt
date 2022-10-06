@@ -42,7 +42,7 @@
 
 #include <ompl/base/Planner.h>
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 #include "esp_planning_contexts/base_context.h"
 
 #include "esp_common/planner_type.h"

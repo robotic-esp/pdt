@@ -39,8 +39,8 @@
 
 #include <experimental/filesystem>
 
-#include "esp_configuration/configuration.h"
-#include "esp_tikz/tikz_picture.h"
+#include "esp_config/configuration.h"
+#include "esp_pgftikz/tikz_picture.h"
 
 namespace pdt {
 

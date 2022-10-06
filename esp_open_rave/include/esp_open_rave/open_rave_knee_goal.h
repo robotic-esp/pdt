@@ -42,7 +42,7 @@
 #include <ompl/base/goals/GoalSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 
 namespace pdt {
 

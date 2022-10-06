@@ -49,10 +49,10 @@
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/util/Console.h>
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 #include "esp_factories/context_factory.h"
 #include "esp_factories/planner_factory.h"
-#include "esp_performance_loggers/performance_loggers.h"
+#include "esp_loggers/performance_loggers.h"
 #include "esp_planning_contexts/all_contexts.h"
 #include "esp_reports/multiquery_report.h"
 #include "esp_reports/single_query_report.h"

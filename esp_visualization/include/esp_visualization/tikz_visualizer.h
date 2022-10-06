@@ -44,11 +44,11 @@
 
 #include "esp_common/context_type.h"
 #include "esp_common/planner_type.h"
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 #include "esp_obstacles/obstacle_visitor.h"
+#include "esp_pgftikz/tikz_picture.h"
 #include "esp_planning_contexts/all_contexts.h"
 #include "esp_planning_contexts/context_visitor.h"
-#include "esp_tikz/tikz_picture.h"
 #include "esp_visualization/planner_specific_data.h"
 
 namespace pdt {

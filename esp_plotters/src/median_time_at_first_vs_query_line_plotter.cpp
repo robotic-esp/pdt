@@ -37,11 +37,11 @@
 
 #include "esp_plotters/median_time_at_first_vs_query_line_plotter.h"
 
-#include "esp_tikz/pgf_axis.h"
-#include "esp_tikz/pgf_fillbetween.h"
-#include "esp_tikz/pgf_plot.h"
-#include "esp_tikz/pgf_table.h"
-#include "esp_tikz/tikz_picture.h"
+#include "esp_pgftikz/pgf_axis.h"
+#include "esp_pgftikz/pgf_fillbetween.h"
+#include "esp_pgftikz/pgf_plot.h"
+#include "esp_pgftikz/pgf_table.h"
+#include "esp_pgftikz/tikz_picture.h"
 
 namespace pdt {
 

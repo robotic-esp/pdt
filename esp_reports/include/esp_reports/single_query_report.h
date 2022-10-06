@@ -43,7 +43,8 @@
 #include <sstream>
 #include <string>
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
+#include "esp_pgftikz/tikz_picture.h"
 #include "esp_plotters/latex_plotter.h"
 #include "esp_plotters/overview_plotter.h"
 #include "esp_plotters/query_cost_at_first_vs_time_at_first_scatter_plotter.h"
@@ -54,7 +55,6 @@
 #include "esp_plotters/query_time_at_first_histogram_plotter.h"
 #include "esp_reports/base_report.h"
 #include "esp_statistics/statistics.h"
-#include "esp_tikz/tikz_picture.h"
 
 namespace pdt {
 

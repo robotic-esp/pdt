@@ -44,15 +44,15 @@
 #include <ompl/util/Console.h>
 
 #include "esp_factories/context_factory.h"
+#include "esp_pgftikz/kpi_table.h"
+#include "esp_pgftikz/mq_kpi_table.h"
+#include "esp_pgftikz/pgf_axis.h"
+#include "esp_pgftikz/pgf_fillbetween.h"
+#include "esp_pgftikz/pgf_plot.h"
+#include "esp_pgftikz/pgf_table.h"
 #include "esp_plotters/query_median_cost_at_first_vs_median_time_at_first_point_plotter.h"
 #include "esp_plotters/query_median_cost_vs_time_line_plotter.h"
 #include "esp_plotters/query_success_vs_time_line_plotter.h"
-#include "esp_tikz/kpi_table.h"
-#include "esp_tikz/mq_kpi_table.h"
-#include "esp_tikz/pgf_axis.h"
-#include "esp_tikz/pgf_fillbetween.h"
-#include "esp_tikz/pgf_plot.h"
-#include "esp_tikz/pgf_table.h"
 
 namespace pdt {
 

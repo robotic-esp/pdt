@@ -42,7 +42,7 @@ target_link_libraries(esp_planning_contexts
   PUBLIC
   ${OMPL_LIBRARIES}
   esp_common
-  esp_configuration
+  esp_config
+  esp_objectives
   esp_obstacles
-  esp_optimization_objectives
   esp_time)

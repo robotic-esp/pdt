@@ -52,7 +52,7 @@
 #include <openrave-core.h>
 #pragma GCC diagnostic pop
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 #include "esp_planning_contexts/base_context.h"
 #include "esp_planning_contexts/context_visitor.h"
 

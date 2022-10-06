@@ -47,7 +47,7 @@
 
 #include <openrave/environment.h>
 
-#include "esp_configuration/directory.h"
+#include "esp_config/directory.h"
 #include "esp_open_rave/open_rave_r3_validity_checker.h"
 
 using namespace std::string_literals;

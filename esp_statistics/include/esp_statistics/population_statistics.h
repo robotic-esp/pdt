@@ -39,7 +39,7 @@
 
 #include <iterator>
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 
 namespace pdt {
 

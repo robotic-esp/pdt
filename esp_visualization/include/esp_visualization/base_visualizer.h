@@ -49,7 +49,7 @@
 #include <ompl/base/PlannerData.h>
 
 #include "esp_common/planner_type.h"
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 #include "esp_time/time.h"
 #include "esp_visualization/planner_specific_data.h"

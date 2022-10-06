@@ -17,4 +17,4 @@ target_link_libraries(esp_spaces
   pdt
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_configuration)
+  esp_config)

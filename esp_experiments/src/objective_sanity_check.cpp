@@ -40,7 +40,7 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 #include "esp_factories/context_factory.h"
 #include "esp_planning_contexts/all_contexts.h"
 

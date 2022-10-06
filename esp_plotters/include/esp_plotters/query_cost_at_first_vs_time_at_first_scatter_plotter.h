@@ -41,7 +41,7 @@
 #include <memory>
 #include <string>
 
-#include "esp_configuration/configuration.h"
+#include "esp_config/configuration.h"
 #include "esp_plotters/latex_plotter.h"
 #include "esp_statistics/statistics.h"
 

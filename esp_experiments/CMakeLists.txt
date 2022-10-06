@@ -19,10 +19,10 @@ target_link_libraries(benchmark
   pdt
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_configuration
+  esp_config
   esp_factories
   esp_planning_contexts
-  esp_performance_loggers
+  esp_loggers
   esp_reports
   esp_time
   esp_utilities
@@ -37,7 +37,7 @@ target_link_libraries(benchmark_report
   PRIVATE
   pdt
   PUBLIC
-  esp_configuration
+  esp_config
   esp_reports
   esp_statistics)
 
@@ -51,7 +51,7 @@ target_link_libraries(collision_detection_test
   pdt
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_configuration
+  esp_config
   esp_factories
   esp_planning_contexts
   ${Boost_LIBRARIES})
@@ -67,7 +67,7 @@ target_link_libraries(visualization
   PUBLIC
   ${Pangolin_LIBRARIES}
   ${OMPL_LIBRARIES}
-  esp_configuration
+  esp_config
   esp_factories
   esp_planning_contexts
   esp_time
@@ -83,7 +83,7 @@ target_link_libraries(objective_sanity_check
   PRIVATE
   pdt
   PUBLIC
-  esp_configuration
+  esp_config
   esp_factories
   esp_planning_contexts
   ${Boost_LIBRARIES})

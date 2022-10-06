@@ -29,7 +29,7 @@ target_link_libraries(esp_plotters
   pdt
   PUBLIC
   esp_common
-  esp_configuration
+  esp_config
   esp_factories
-  esp_statistics
-  esp_tikz)
+  esp_pgftikz
+  esp_statistics)
