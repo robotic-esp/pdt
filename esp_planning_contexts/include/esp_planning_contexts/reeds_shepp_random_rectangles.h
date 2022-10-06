@@ -50,16 +50,16 @@
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 /** \brief An experiment with a singularly placed square obstacle*/
 class ReedsSheppRandomRectangles : public BaseContext {
  public:
   /** \brief The constructor. */
   ReedsSheppRandomRectangles(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                             const std::shared_ptr<const Configuration>& config,
+                             const std::shared_ptr<const config::Configuration>& config,
                              const std::string& name);
 
   /** \brief The destructor. */
@@ -72,10 +72,10 @@ class ReedsSheppRandomRectangles : public BaseContext {
   virtual void accept(const ContextVisitor& visitor) const override;
 
   /** \brief Get the obstacles. */
-  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const override;
+  virtual std::vector<std::shared_ptr<obstacles::BaseObstacle>> getObstacles() const override;
 
   /** \brief Get the antiobstacles */
-  virtual std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const override;
+  virtual std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> getAntiObstacles() const override;
 
   /** \brief Create the goal. */
   std::shared_ptr<ompl::base::Goal> createGoal() const override;
@@ -88,7 +88,7 @@ class ReedsSheppRandomRectangles : public BaseContext {
   ompl::base::RealVectorBounds bounds_;
 
   /** \brief The obstacles. */
-  std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
+  std::vector<std::shared_ptr<obstacles::BaseObstacle>> obstacles_{};
 
   /** \brief The number of hyper rectangles. */
   std::size_t numRectangles_;
@@ -106,6 +106,6 @@ class ReedsSheppRandomRectangles : public BaseContext {
   std::shared_ptr<ompl::base::SpaceInformation> realVectorSubspaceInfo_{};
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

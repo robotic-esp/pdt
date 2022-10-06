@@ -54,24 +54,24 @@
 #include "esp_time/time.h"
 #include "esp_visualization/planner_specific_data.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace visualization {
 
 // The base class for a visualizer.
 class BaseVisualizer {
  public:
-  BaseVisualizer(const std::shared_ptr<Configuration> &config,
-                 const std::shared_ptr<BaseContext> &context,
-                 const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
+  BaseVisualizer(const std::shared_ptr<config::Configuration> &config,
+                 const std::shared_ptr<planning_contexts::BaseContext> &context,
+                 const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> plannerPair);
   virtual ~BaseVisualizer();
 
  public:
   // Setters for context and planner. These are final because they need to be threadsafe, so
   // care has to be taken when implementing them.
-  virtual void setContext(const std::shared_ptr<RealVectorGeometricContext> &context) final;
+  virtual void setContext(const std::shared_ptr<planning_contexts::RealVectorGeometricContext> &context) final;
   virtual void setPlanner(
-      const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> &plannerPair) final;
+      const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> &plannerPair) final;
 
  protected:
   // Make data available to derived classes.
@@ -84,11 +84,11 @@ class BaseVisualizer {
   std::size_t getQueryNumber(const std::size_t iteration) const;
 
   // The current context.
-  std::shared_ptr<BaseContext> context_{};
+  std::shared_ptr<planning_contexts::BaseContext> context_{};
 
   // The current planner.
   std::shared_ptr<ompl::base::Planner> planner_{};
-  PLANNER_TYPE plannerType_{};
+  common::PLANNER_TYPE plannerType_{};
 
   // The currently viewed and largest iterations.
   std::atomic<std::size_t> displayIteration_{0u};
@@ -112,7 +112,7 @@ class BaseVisualizer {
   void createData();
 
   // The configuration for this visualization.
-  const std::shared_ptr<const Configuration> config_;
+  const std::shared_ptr<const config::Configuration> config_;
 
   // This is how many iterations we'll create ahead of the viewed iteration.
   std::size_t iterationBuffer_{1000u};
@@ -153,6 +153,6 @@ class BaseVisualizer {
   std::future<void> dataThreadStopSignal_{};
 };
 
-}  // namespace pdt
+}  // namespace visualization
 
-}  // namespace esp
+}  // namespace pdt

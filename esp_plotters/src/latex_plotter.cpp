@@ -39,21 +39,21 @@
 
 #include <fstream>
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 std::size_t LatexPlotter::plotId_ = 0u;
 
-LatexPlotter::LatexPlotter(const std::shared_ptr<const Configuration>& config) : config_(config) {
+LatexPlotter::LatexPlotter(const std::shared_ptr<const config::Configuration>& config) : config_(config) {
 }
 
-std::shared_ptr<PgfAxis> LatexPlotter::createLegendAxis(
+std::shared_ptr<pgftikz::PgfAxis> LatexPlotter::createLegendAxis(
     const std::vector<std::string>& plannerNames) const {
-  auto legend = std::make_shared<PgfAxis>();
+  auto legend = std::make_shared<pgftikz::PgfAxis>();
   legend->options.xlog = false;
   legend->options.xmin = 0.0;
   legend->options.xmax = 10.0;
@@ -71,7 +71,7 @@ std::shared_ptr<PgfAxis> LatexPlotter::createLegendAxis(
   return legend;
 }
 
-void LatexPlotter::alignAbszissen(const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
+void LatexPlotter::alignAbszissen(const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const {
   // Align all pairs.
   for (auto a : axes) {
     for (auto b : axes) {
@@ -81,7 +81,7 @@ void LatexPlotter::alignAbszissen(const std::vector<std::shared_ptr<PgfAxis>>& a
   }
 }
 
-void LatexPlotter::alignOrdinates(const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
+void LatexPlotter::alignOrdinates(const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const {
   // Align all pairs.
   for (auto a : axes) {
     for (auto b : axes) {
@@ -91,7 +91,7 @@ void LatexPlotter::alignOrdinates(const std::vector<std::shared_ptr<PgfAxis>>& a
   }
 }
 
-void LatexPlotter::stack(const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
+void LatexPlotter::stack(const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const {
   // Take the first axis as the base, stack the rest underneath.
   if (axes.empty()) {
     return;
@@ -114,9 +114,9 @@ void LatexPlotter::stack(const std::vector<std::shared_ptr<PgfAxis>>& axes) cons
   }
 }
 
-std::shared_ptr<TikzPicture> LatexPlotter::collect(
-    const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
-  auto picture = std::make_shared<TikzPicture>(config_);
+std::shared_ptr<pgftikz::TikzPicture> LatexPlotter::collect(
+    const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const {
+  auto picture = std::make_shared<pgftikz::TikzPicture>(config_);
 
   // Collect the axes in a picture.
   for (const auto& axis : axes) {
@@ -127,7 +127,7 @@ std::shared_ptr<TikzPicture> LatexPlotter::collect(
 }
 
 std::experimental::filesystem::path LatexPlotter::createPicture(
-    const std::vector<std::shared_ptr<PgfAxis>>& axes) const {
+    const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const {
   auto picture = collect(axes);
 
   // Create the name of this picture.
@@ -180,6 +180,6 @@ fs::path LatexPlotter::compileStandalonePdf(const fs::path& tikzPicture) const {
   return path;
 }
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

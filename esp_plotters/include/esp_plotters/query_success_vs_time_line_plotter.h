@@ -46,20 +46,20 @@
 #include "esp_statistics/statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class QuerySuccessVsTimeLinePlotter : public LatexPlotter {
  public:
-  QuerySuccessVsTimeLinePlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
+  QuerySuccessVsTimeLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats);
   ~QuerySuccessVsTimeLinePlotter() = default;
 
   // Creates a pgf axis that holds the success percentage over time for all planners.
-  std::shared_ptr<PgfAxis> createSuccessAxis() const;
+  std::shared_ptr<pgftikz::PgfAxis> createSuccessAxis() const;
 
   // Creates a pgf axis that holds the success percentage over time for the specified planner.
-  std::shared_ptr<PgfAxis> createSuccessAxis(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfAxis> createSuccessAxis(const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the success axis of all planners.
   std::experimental::filesystem::path createSuccessPicture() const;
@@ -68,19 +68,19 @@ class QuerySuccessVsTimeLinePlotter : public LatexPlotter {
   std::experimental::filesystem::path createSuccessPicture(const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createSuccessPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createSuccessUpperCiPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createSuccessLowerCiPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createSuccessFillCiPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createSuccessPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createSuccessUpperCiPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createSuccessLowerCiPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createSuccessFillCiPlot(const std::string& plannerName) const;
 
-  void setSuccessAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setSuccessAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
   double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
   double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
 
-  const Statistics& stats_;
+  const statistics::Statistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

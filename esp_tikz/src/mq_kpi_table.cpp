@@ -46,14 +46,14 @@ Algorithm | t_cum, init,min | t_cum,init,med | t_cum,init,max | c_cum,init,min |
 #include <fstream>
 #include <iomanip>
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MqKpiTable::MqKpiTable(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
+MqKpiTable::MqKpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats) :
     config_(config),
     stats_(stats) {
   options.rowSep = "\\\\[0.5em]"s;
@@ -159,6 +159,6 @@ std::string MqKpiTable::string() const {
   return stream.str();
 }
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

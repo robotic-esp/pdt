@@ -43,32 +43,32 @@
 #include "esp_tikz/pgf_table.h"
 #include "esp_tikz/tikz_picture.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 MedianSummedCostAtTimeVsQueryLinePlotter::MedianSummedCostAtTimeVsQueryLinePlotter(
-    const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
-std::shared_ptr<PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostAxis(
+std::shared_ptr<pgftikz::PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostAxis(
     const bool initial) const {
-  auto axis = std::make_shared<PgfAxis>();
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianCumulativeCostAxisOptions(axis);
 
   // Fill the axis with the median cumulative cost plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianCumulativeCostPlots/plotConfidenceIntervalInAllPlots")) {
-      std::shared_ptr<PgfPlot> upperCi = createMedianCumulativeCostUpperCiPlot(name, initial);
-      std::shared_ptr<PgfPlot> lowerCi = createMedianCumulativeCostLowerCiPlot(name, initial);
-      std::shared_ptr<PgfPlot> fillCi = createMedianCumulativeCostFillCiPlot(name);
+      std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianCumulativeCostUpperCiPlot(name, initial);
+      std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianCumulativeCostLowerCiPlot(name, initial);
+      std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianCumulativeCostFillCiPlot(name);
       if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
         axis->addPlot(upperCi);
         axis->addPlot(lowerCi);
@@ -84,15 +84,15 @@ std::shared_ptr<PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianC
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostAxis(
+std::shared_ptr<pgftikz::PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostAxis(
     const std::string& plannerName, const bool initial) const {
-  auto axis = std::make_shared<PgfAxis>();
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianCumulativeCostAxisOptions(axis);
 
   // Add all the the median cumulative cost plots.
-  std::shared_ptr<PgfPlot> upperCi = createMedianCumulativeCostUpperCiPlot(plannerName, initial);
-  std::shared_ptr<PgfPlot> lowerCi = createMedianCumulativeCostLowerCiPlot(plannerName, initial);
-  std::shared_ptr<PgfPlot> fillCi = createMedianCumulativeCostFillCiPlot(plannerName);
+  std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianCumulativeCostUpperCiPlot(plannerName, initial);
+  std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianCumulativeCostLowerCiPlot(plannerName, initial);
+  std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianCumulativeCostFillCiPlot(plannerName);
   if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
     axis->addPlot(upperCi);
     axis->addPlot(lowerCi);
@@ -106,7 +106,7 @@ std::shared_ptr<PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianC
 
 fs::path MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPicture(const bool initial) const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   auto axis = createMedianCumulativeCostAxis(initial);
   picture.addAxis(axis);
 
@@ -126,7 +126,7 @@ fs::path MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPic
 fs::path MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPicture(
     const std::string& plannerName, const bool initial) const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   auto axis = createMedianCumulativeCostAxis(plannerName, initial);
   picture.addAxis(axis);
 
@@ -144,7 +144,7 @@ fs::path MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPic
 }
 
 void MedianSummedCostAtTimeVsQueryLinePlotter::setMedianCumulativeCostAxisOptions(
-    std::shared_ptr<PgfAxis> axis) const {
+    std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianCumulativeCostPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianCumulativeCostPlots/axisHeight");
   // axis->options.xmax = maxCostToBePlotted_;
@@ -161,17 +161,17 @@ void MedianSummedCostAtTimeVsQueryLinePlotter::setMedianCumulativeCostAxisOption
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPlot(
+std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
-  std::shared_ptr<PgfTable> table;
+  std::shared_ptr<pgftikz::PgfTable> table;
   if (initial) {
-    table = std::make_shared<PgfTable>(
+    table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeInitialSolutionPerQuery(
             plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
         "query number", "cumulative median initial solution cost");
   } else {
-    table = std::make_shared<PgfTable>(
+    table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeFinalCostPerQuery(
             plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
         "query number", "cumulative median final solution cost");
@@ -182,7 +182,7 @@ std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianC
   table->removeRowIfCodomainIsNan();
 
   // Create the plot and set the options.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth = config_->get<double>("medianCumulativeCostPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
@@ -191,17 +191,17 @@ std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianC
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostUpperCiPlot(
+std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostUpperCiPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
-  std::shared_ptr<PgfTable> table;
+  std::shared_ptr<pgftikz::PgfTable> table;
   if (initial) {
-    table = std::make_shared<PgfTable>(
+    table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeInitialSolutionPerQuery(
             plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
         "query number", "upper cumulative initial solution cost confidence bound");
   } else {
-    table = std::make_shared<PgfTable>(
+    table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeFinalCostPerQuery(
             plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
         "query number", "upper cumulative final solution cost confidence bound");
@@ -212,7 +212,7 @@ std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianC
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return std::make_shared<PgfPlot>();
+    return std::make_shared<pgftikz::PgfPlot>();
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
@@ -220,7 +220,7 @@ std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianC
                            3 * stats_.getMaxNonInfCumulativeCost());
 
   // Create the plot and set the options.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth =
       config_->get<double>("medianCumulativeCostPlots/confidenceIntervalLineWidth");
@@ -234,17 +234,17 @@ std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianC
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostLowerCiPlot(
+std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostLowerCiPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
-  std::shared_ptr<PgfTable> table;
+  std::shared_ptr<pgftikz::PgfTable> table;
   if (initial) {
-    table = std::make_shared<PgfTable>(
+    table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeInitialSolutionPerQuery(
             plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
         "query number", "lower cumulative initial solution cost confidence bound");
   } else {
-    table = std::make_shared<PgfTable>(
+    table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeFinalCostPerQuery(
             plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
         "query number", "lower cumulative final solution cost confidence bound");
@@ -255,11 +255,11 @@ std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianC
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return std::make_shared<PgfPlot>();
+    return std::make_shared<pgftikz::PgfPlot>();
   }
 
   // Create the plot and set the options.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth =
       config_->get<double>("medianCumulativeCostPlots/confidenceIntervalLineWidth");
@@ -273,15 +273,15 @@ std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianC
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostFillCiPlot(
+std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =
-      std::make_shared<PgfFillBetween>(plannerName + "MedianCumulativeCostUpperConfidence",
+      std::make_shared<pgftikz::PgfFillBetween>(plannerName + "MedianCumulativeCostUpperConfidence",
                                        plannerName + "MedianCumulativeCostLowerConfidence");
 
   // Create the plot.
-  auto plot = std::make_shared<PgfPlot>(fillBetween);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.fillOpacity =
       config_->get<float>("medianCumulativeCostPlots/confidenceIntervalFillOpacity");
@@ -290,6 +290,6 @@ std::shared_ptr<PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianC
   return plot;
 }
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

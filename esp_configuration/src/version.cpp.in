@@ -39,14 +39,14 @@
 #define PDT_VERSION_GIT_REFSPEC "@GIT_REFSPEC@"
 #define PDT_VERSION_GIT_STATUS "@GIT_STATUS@"
 
-namespace esp {
-
 namespace pdt {
+
+namespace config {
 
 const std::string Version::GIT_SHA1 = PDT_VERSION_GIT_SHA1;
 const std::string Version::GIT_REFSPEC = PDT_VERSION_GIT_REFSPEC;
 const std::string Version::GIT_STATUS = PDT_VERSION_GIT_STATUS;
 
-}  // namespace pdt
+}  // namespace config
 
-}  // namespace esp
+}  // namespace pdt

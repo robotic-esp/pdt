@@ -41,9 +41,9 @@
 #include <string>
 #include <vector>
 
-namespace esp {
-
 namespace pdt {
+
+namespace statistics {
 
 // A linear interpolator that handles infinity values.
 template <typename X, typename Y>
@@ -166,6 +166,6 @@ Y LinearInterpolator<X, Y>::operator()(X x) const {
   return yLow + (x - xLow) / (xHigh - xLow) * (yHigh - yLow);
 }
 
-}  // namespace pdt
+}  // namespace statistics
 
-}  // namespace esp
+}  // namespace pdt

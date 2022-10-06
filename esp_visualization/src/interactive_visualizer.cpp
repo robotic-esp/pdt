@@ -45,13 +45,13 @@
 
 #include "esp_visualization/fonts.h"
 
-namespace esp {
-
 namespace pdt {
 
+namespace visualization {
+
 InteractiveVisualizer::InteractiveVisualizer(
-    const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
-    const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
+    const std::shared_ptr<config::Configuration>& config, const std::shared_ptr<planning_contexts::BaseContext>& context,
+    const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> plannerPair) :
     BaseVisualizer(config, context, plannerPair),
     bounds_(2u),
     tikzVisualizer_(config, context, plannerPair),
@@ -64,8 +64,8 @@ InteractiveVisualizer::InteractiveVisualizer(
   }
 
   // Get the bounds of the real vector part.
-  const auto vectorContext = std::dynamic_pointer_cast<RealVectorGeometricContext>(context_);
-  const auto se2Context = std::dynamic_pointer_cast<ReedsSheppRandomRectangles>(context_);
+  const auto vectorContext = std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
+  const auto se2Context = std::dynamic_pointer_cast<planning_contexts::ReedsSheppRandomRectangles>(context_);
   if (vectorContext) {
     bounds_ = vectorContext->getBoundaries();
   } else if (se2Context) {
@@ -321,7 +321,7 @@ void InteractiveVisualizer::run() {
     // Draw the objective.
     if (optionDrawObjective) {
       if (auto objective =
-              std::dynamic_pointer_cast<BaseOptimizationObjective>(context_->getObjective())) {
+              std::dynamic_pointer_cast<objectives::BaseOptimizationObjective>(context_->getObjective())) {
         objective->accept(*this);
       }
     }
@@ -514,46 +514,46 @@ void InteractiveVisualizer::drawStateIds(std::size_t iteration) {
   }
 }
 
-void InteractiveVisualizer::visit(const CentreSquare& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::CentreSquare& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const DividingWalls& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::DividingWalls& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const DoubleEnclosure& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::DoubleEnclosure& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const FlankingGap& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::FlankingGap& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const FourRooms& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::FourRooms& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const GoalEnclosure& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::GoalEnclosure& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const NarrowPassage& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::NarrowPassage& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const ObstacleFree& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::ObstacleFree& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const RandomRectangles& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::RandomRectangles& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const RandomRectanglesMultiStartGoal& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::RandomRectanglesMultiStartGoal& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const ReedsSheppRandomRectangles& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::ReedsSheppRandomRectangles& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const RepeatingRectangles& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::RepeatingRectangles& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const StartEnclosure& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::StartEnclosure& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const WallGap& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::WallGap& /* context */) const {
 }
 
 void InteractiveVisualizer::drawStarts() const {
@@ -841,7 +841,7 @@ void InteractiveVisualizer::drawCars(const std::vector<Eigen::Vector3f>& states,
   drawPath(points, width, color, alpha);
 }
 
-void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
+void InteractiveVisualizer::visit(const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const {
   const auto anchorCoords = obstacle.getAnchorCoordinates();
   std::vector<float> anchor(anchorCoords.begin(), anchorCoords.end());
   const auto obstacleWidth = obstacle.getWidths();
@@ -849,7 +849,7 @@ void InteractiveVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) 
   drawRectangle(anchor, widths, black, black);
 }
 
-void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
+void InteractiveVisualizer::visit(const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const {
   const auto anchorCoords = antiObstacle.getAnchorCoordinates();
   std::vector<float> anchor(anchorCoords.begin(), anchorCoords.end());
   const auto antiObstacleWidth = antiObstacle.getWidths();
@@ -857,10 +857,10 @@ void InteractiveVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiOb
   drawRectangle(anchor, widths, white, white);
 }
 
-void InteractiveVisualizer::visit(const PotentialFieldOptimizationObjective& objective) const {
+void InteractiveVisualizer::visit(const objectives::PotentialFieldOptimizationObjective& objective) const {
   if (bounds_.low.size() == 2u) {
-    const auto vectorContext = std::dynamic_pointer_cast<RealVectorGeometricContext>(context_);
-    const auto se2Context = std::dynamic_pointer_cast<ReedsSheppRandomRectangles>(context_);
+    const auto vectorContext = std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
+    const auto se2Context = std::dynamic_pointer_cast<planning_contexts::ReedsSheppRandomRectangles>(context_);
     auto boundaries = ompl::base::RealVectorBounds(2u);
 
     if (vectorContext) {
@@ -937,11 +937,11 @@ void InteractiveVisualizer::visit(const PotentialFieldOptimizationObjective& obj
 }
 
 void InteractiveVisualizer::visit(
-    const MaxMinClearanceOptimizationObjective& /* objective */) const {
+    const objectives::MaxMinClearanceOptimizationObjective& /* objective */) const {
 }
 
 void InteractiveVisualizer::visit(
-    const ReciprocalClearanceOptimizationObjective& /* objective */) const {
+    const objectives::ReciprocalClearanceOptimizationObjective& /* objective */) const {
 }
 
 std::array<float, 4u> InteractiveVisualizer::interpolateColors(const float* color1,
@@ -956,20 +956,20 @@ std::array<float, 4u> InteractiveVisualizer::interpolateColors(const float* colo
 
 void InteractiveVisualizer::drawPlannerSpecificVisualizations(const std::size_t iteration) const {
   switch (plannerType_) {
-    case PLANNER_TYPE::BITSTAR:
-    case PLANNER_TYPE::ABITSTAR: {
+    case common::PLANNER_TYPE::BITSTAR:
+    case common::PLANNER_TYPE::ABITSTAR: {
       drawBITstarSpecificVisualizations(iteration);
       return;
     }
-    case PLANNER_TYPE::AITSTAR: {
+    case common::PLANNER_TYPE::AITSTAR: {
       drawAITstarSpecificVisualizations(iteration);
       return;
     }
-    case PLANNER_TYPE::EITSTAR: {
+    case common::PLANNER_TYPE::EITSTAR: {
       drawEITstarSpecificVisualizations(iteration);
       return;
     }
-    case PLANNER_TYPE::LAZYPRMSTAR: {
+    case common::PLANNER_TYPE::LAZYPRMSTAR: {
       drawLazyPRMstarSpecificVisualizations(iteration);
       return;
     }
@@ -1381,8 +1381,8 @@ void InteractiveVisualizer::drawLazyPRMstarSpecificVisualizations(std::size_t it
 std::pair<std::vector<Eigen::Vector2f>, std::vector<Eigen::Vector2f>>
 InteractiveVisualizer::getVerticesAndEdges2D(std::size_t iteration) const {
   const auto& currentPlannerData = getPlannerData(iteration);
-  const auto vectorContext = std::dynamic_pointer_cast<RealVectorGeometricContext>(context_);
-  const auto se2Context = std::dynamic_pointer_cast<ReedsSheppRandomRectangles>(context_);
+  const auto vectorContext = std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
+  const auto se2Context = std::dynamic_pointer_cast<planning_contexts::ReedsSheppRandomRectangles>(context_);
 
   // Get the vertices and edges in the format supported by Panglin.
   std::vector<Eigen::Vector2f> vertices{};
@@ -1620,6 +1620,6 @@ std::vector<Eigen::Vector3f> InteractiveVisualizer::getPathSE2(const std::size_t
   return states;
 }
 
-}  // namespace pdt
+}  // namespace visualization
 
-}  // namespace esp
+}  // namespace pdt

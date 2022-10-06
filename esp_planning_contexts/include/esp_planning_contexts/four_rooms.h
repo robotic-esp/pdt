@@ -49,16 +49,16 @@
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 /** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
  * a multiple homotopy-class experiment that scales to N dimensions. */
 class FourRooms : public RealVectorGeometricContext {
  public:
   FourRooms(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-            const std::shared_ptr<const Configuration>& config, const std::string& name);
+            const std::shared_ptr<const config::Configuration>& config, const std::string& name);
 
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
@@ -77,6 +77,6 @@ class FourRooms : public RealVectorGeometricContext {
   double gapWidth_;
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

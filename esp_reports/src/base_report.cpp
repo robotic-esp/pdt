@@ -43,14 +43,14 @@
 
 #include <ompl/util/Console.h>
 
-namespace esp {
-
 namespace pdt {
+
+namespace reports {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-BaseReport::BaseReport(const std::shared_ptr<Configuration>& config) :
+BaseReport::BaseReport(const std::shared_ptr<config::Configuration>& config) :
     latexPlotter_(config),
     config_(config) {
   // Latex doesn't like unescaped underscores in text mode.
@@ -245,6 +245,6 @@ void BaseReport::findAndReplaceAll(std::string* string, const std::string& key,
   }
 }
 
-}  // namespace pdt
+}  // namespace reports
 
-}  // namespace esp
+}  // namespace pdt

@@ -46,20 +46,20 @@
 #include "esp_statistics/multiquery_statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class MedianTimeAtFirstVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianTimeAtFirstVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  MedianTimeAtFirstVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
   ~MedianTimeAtFirstVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median initial solution duration per query for all planners.
-  std::shared_ptr<PgfAxis> createMedianInitialDurationAxis() const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianInitialDurationAxis() const;
 
   // Creates a pgf axis that holds the median initial solution durations for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianInitialDurationAxis(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianInitialDurationAxis(const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the median initial solution duration axis of all planners.
   std::experimental::filesystem::path createMedianInitialDurationPicture() const;
@@ -68,19 +68,19 @@ class MedianTimeAtFirstVsQueryLinePlotter : public LatexPlotter {
   std::experimental::filesystem::path createMedianInitialDurationPicture(const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createMedianInitialDurationPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialDurationUpperCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialDurationPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialDurationUpperCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialDurationLowerCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialDurationLowerCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialDurationFillCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialDurationFillCiPlot(
       const std::string& plannerName) const;
 
-  void setMedianInitialDurationAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setMedianInitialDurationAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
-  const MultiqueryStatistics& stats_;
+  const statistics::MultiqueryStatistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

@@ -44,13 +44,13 @@
 #include "esp_statistics/statistics.h"
 #include "esp_statistics/multiquery_statistics.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 class MqKpiTable : public TabularX {
  public:
-  MqKpiTable(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  MqKpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
   ~MqKpiTable() = default;
 
   void addKpi(const std::string& plannerName, const std::string& plannerPlotName);
@@ -59,10 +59,10 @@ class MqKpiTable : public TabularX {
 
  private:
   std::vector<std::string> plannerNames_{};
-  const std::shared_ptr<const Configuration> config_;
-  const MultiqueryStatistics& stats_;
+  const std::shared_ptr<const config::Configuration> config_;
+  const statistics::MultiqueryStatistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

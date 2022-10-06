@@ -39,9 +39,9 @@
 
 #include "esp_optimization_objectives/optimization_objective_visitor.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace objectives {
 
 class BaseOptimizationObjective {
  public:
@@ -52,6 +52,6 @@ class BaseOptimizationObjective {
   virtual void accept(const ObjectiveVisitor& visitor) const = 0;
 };
 
-}  // namespace pdt
+}  // namespace objectives
 
-}  // namespace esp
+}  // namespace pdt

@@ -41,14 +41,14 @@
 
 using namespace std::string_literals;
 
-namespace esp {
-
 namespace pdt {
+
+namespace open_rave {
 
 OpenRaveR3ValidityChecker::OpenRaveR3ValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo,
     const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot,
-    const std::shared_ptr<const Configuration>& config) :
+    const std::shared_ptr<const config::Configuration>& config) :
     OpenRaveBaseValidityChecker(spaceInfo, environment, robot, config),
     raveState_() {
   raveState_.identity();
@@ -98,6 +98,6 @@ double OpenRaveR3ValidityChecker::clearance(const ompl::base::State* state) cons
   return collisionReport_->minDistance;
 }
 
-}  // namespace pdt
+}  // namespace open_rave
 
-}  // namespace esp
+}  // namespace pdt

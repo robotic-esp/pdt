@@ -50,15 +50,15 @@
 #include "esp_tikz/pgf_plot.h"
 #include "esp_tikz/pgf_table.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace reports {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-SingleQueryReport::SingleQueryReport(const std::shared_ptr<Configuration>& config,
-                                   const Statistics& stats) :
+SingleQueryReport::SingleQueryReport(const std::shared_ptr<config::Configuration>& config,
+                                   const statistics::Statistics& stats) :
     BaseReport(config),
     latexPlotter_(config),
     overviewPlotter_(config, stats),
@@ -135,7 +135,7 @@ std::stringstream SingleQueryReport::overview() const {
   overview << "\\subsection{Results Summary}\\label{sec:overview-results-summary}\n";
 
   // Create the KPI table.
-  KpiTable kpiTable(config_, stats_);
+  pgftikz::KpiTable kpiTable(config_, stats_);
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     kpiTable.addKpi(name, plotPlannerNames_.at(name));
   }
@@ -179,7 +179,7 @@ std::stringstream SingleQueryReport::overview() const {
   overview << "\\subsection{Initial Solutions}\\label{sec:overview-initial-solutions}\n";
 
   // Collect all initial solution duration histogram plots.
-  std::vector<std::shared_ptr<PgfAxis>> initialSolutionDurationHistogramAxes{};
+  std::vector<std::shared_ptr<pgftikz::PgfAxis>> initialSolutionDurationHistogramAxes{};
   for (const auto& name : plannerNames) {
     initialSolutionDurationHistogramAxes.emplace_back(
         queryTimeAtFirstHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name));
@@ -296,6 +296,6 @@ std::stringstream SingleQueryReport::individualResults() const {
   return results;
 }
 
-}  // namespace pdt
+}  // namespace reports
 
-}  // namespace esp
+}  // namespace pdt

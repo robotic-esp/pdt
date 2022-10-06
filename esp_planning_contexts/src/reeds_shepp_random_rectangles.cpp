@@ -50,13 +50,13 @@
 
 using namespace std::string_literals;
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-    const std::shared_ptr<const Configuration>& config, const std::string& name) :
+    const std::shared_ptr<const config::Configuration>& config, const std::string& name) :
     BaseContext(spaceInfo, config, name),
     bounds_(2u),
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
@@ -156,7 +156,7 @@ void ReedsSheppRandomRectangles::createObstacles() {
     }
 
     auto obstacle =
-        std::make_shared<Hyperrectangle<BaseObstacle>>(realVectorSubspaceInfo_, anchor, widths);
+        std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(realVectorSubspaceInfo_, anchor, widths);
 
     auto validityChecker = std::make_shared<ReedsSheppValidityChecker>(spaceInfo_);
     validityChecker->addObstacle(obstacle);
@@ -262,15 +262,15 @@ std::shared_ptr<ompl::base::Goal> ReedsSheppRandomRectangles::createGoal() const
   }
 }
 
-std::vector<std::shared_ptr<BaseObstacle>> ReedsSheppRandomRectangles::getObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseObstacle>> ReedsSheppRandomRectangles::getObstacles() const {
   return obstacles_;
 }
 
-std::vector<std::shared_ptr<BaseAntiObstacle>> ReedsSheppRandomRectangles::getAntiObstacles()
+std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> ReedsSheppRandomRectangles::getAntiObstacles()
     const {
   return {};
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

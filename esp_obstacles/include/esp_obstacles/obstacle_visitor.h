@@ -37,9 +37,9 @@
 
 #pragma once
 
-namespace esp {
-
 namespace pdt {
+
+namespace obstacles {
 
 class BaseObstacle;
 class BaseAntiObstacle;
@@ -59,6 +59,6 @@ class ObstacleVisitor {
   void visit(const T&) const {}
 };
 
-}  // namespace pdt
+}  // namespace obstacles
 
-}  // namespace esp
+}  // namespace pdt

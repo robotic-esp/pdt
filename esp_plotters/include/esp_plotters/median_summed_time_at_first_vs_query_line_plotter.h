@@ -46,20 +46,20 @@
 #include "esp_statistics/multiquery_statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class MedianSummedTimeAtFirstVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianSummedTimeAtFirstVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  MedianSummedTimeAtFirstVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
   ~MedianSummedTimeAtFirstVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median cumulative duration to find the initial solution at each query.
-  std::shared_ptr<PgfAxis> createMedianCumulativeDurationAxis() const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianCumulativeDurationAxis() const;
 
   // Creates a pgf axis that holds the median cumulative duration to find the initial solution at each query for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianCumulativeDurationAxis(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianCumulativeDurationAxis(const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the median cumulative duration to find the initial solution of all planners.
   std::experimental::filesystem::path createMedianCumulativeDurationPicture() const;
@@ -68,19 +68,19 @@ class MedianSummedTimeAtFirstVsQueryLinePlotter : public LatexPlotter {
   std::experimental::filesystem::path createMedianCumulativeDurationPicture(const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createMedianCumulativeDurationPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeDurationUpperCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeDurationPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeDurationUpperCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeDurationLowerCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeDurationLowerCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeDurationFillCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeDurationFillCiPlot(
       const std::string& plannerName) const;
 
-  void setMedianCumulativeDurationAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setMedianCumulativeDurationAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
-  const MultiqueryStatistics& stats_;
+  const statistics::MultiqueryStatistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

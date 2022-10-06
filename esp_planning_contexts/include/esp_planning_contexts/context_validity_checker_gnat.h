@@ -46,9 +46,9 @@
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_planning_contexts/context_validity_checker.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 class ContextValidityCheckerGNAT : public ContextValidityChecker {
  public:
@@ -59,14 +59,14 @@ class ContextValidityCheckerGNAT : public ContextValidityChecker {
   virtual bool isValid(const ompl::base::State* state) const override;
 
   // Add obstacles.
-  virtual void addObstacle(const std::shared_ptr<BaseObstacle>& obstacle) override;
+  virtual void addObstacle(const std::shared_ptr<obstacles::BaseObstacle>& obstacle) override;
   virtual void addObstacles(
-      const std::vector<std::shared_ptr<BaseObstacle>>& obstacles) override;
+      const std::vector<std::shared_ptr<obstacles::BaseObstacle>>& obstacles) override;
 
   // Add antiobstacles.
-  virtual void addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti) override;
+  virtual void addAntiObstacle(const std::shared_ptr<obstacles::BaseAntiObstacle>& anti) override;
   virtual void addAntiObstacles(
-      const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis) override;
+      const std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>>& antis) override;
 
  private:
   double maxObstacleRadius_{0.0};
@@ -76,6 +76,6 @@ class ContextValidityCheckerGNAT : public ContextValidityChecker {
       antiObstacleAnchors_{};
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

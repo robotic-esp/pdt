@@ -48,13 +48,13 @@
 #include "esp_statistics/statistics.h"
 #include "esp_configuration/configuration.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace statistics {
 
 class MultiqueryStatistics {
  public:
-  MultiqueryStatistics(const std::shared_ptr<Configuration>& config, const std::vector<Statistics> &stats,
+  MultiqueryStatistics(const std::shared_ptr<config::Configuration>& config, const std::vector<Statistics> &stats,
       bool forceComputation);
   ~MultiqueryStatistics() = default;
 
@@ -117,7 +117,7 @@ class MultiqueryStatistics {
   void computeCumulativeMetricsForPlanner(const std::string& plannerName);
   void computeCumulativeFinalCost(const std::string& plannerName);
 
-  std::shared_ptr<Configuration> config_;
+  std::shared_ptr<config::Configuration> config_;
   const std::experimental::filesystem::path statisticsDirectory_;
 
   // When this is false, all extractions check if the file they would creat exists. If it does, the
@@ -159,6 +159,6 @@ class MultiqueryStatistics {
   std::size_t numQueries_{0u};
 };
 
-}  // namespace pdt
+}  // namespace statistics
 
-}  // namespace esp
+}  // namespace pdt

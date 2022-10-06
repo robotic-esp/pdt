@@ -44,9 +44,9 @@
 #include "esp_optimization_objectives/base_optimization_objective.h"
 #include "esp_optimization_objectives/optimization_objective_visitor.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace objectives {
 
 class MaxMinClearanceOptimizationObjective : public ompl::base::OptimizationObjective,
                                              public BaseOptimizationObjective {
@@ -94,6 +94,6 @@ class MaxMinClearanceOptimizationObjective : public ompl::base::OptimizationObje
   const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
 };
 
-}  // namespace pdt
+}  // namespace objectives
 
-}  // namespace esp
+}  // namespace pdt

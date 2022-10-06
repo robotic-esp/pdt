@@ -41,9 +41,10 @@
 
 #include "esp_configuration/configuration.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace statistics {
+
 struct ConfidenceInterval {
   // The lower and upper bounds are zero-based indices. If I have 10 measurements in a sorted
   // vector, e.g.,
@@ -65,7 +66,7 @@ class PopulationStatistics {
   };
 
   // Construct/initialize
-  PopulationStatistics(const std::shared_ptr<Configuration>& config, const INDEX_ROUNDING rounding);
+  PopulationStatistics(const std::shared_ptr<config::Configuration>& config, const INDEX_ROUNDING rounding);
   ~PopulationStatistics() = default;
 
   void setSampleSize(const std::size_t sampleSize);
@@ -123,10 +124,11 @@ class PopulationStatistics {
   ConfidenceIntervalIterator begin(const double percentile) const;
   ConfidenceIntervalIterator end(const double percentile) const;
 
-  std::shared_ptr<Configuration> config_;
+  std::shared_ptr<config::Configuration> config_;
   INDEX_ROUNDING round_;
   std::size_t sampleSize_{0u};
 };
-}  // namespace pdt
 
-}  // namespace esp
+}  // namespace statistics
+
+}  // namespace pdt

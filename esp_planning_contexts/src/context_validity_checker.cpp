@@ -37,9 +37,9 @@
 
 #include "esp_planning_contexts/context_validity_checker.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 ContextValidityChecker::ContextValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo) :
     ompl::base::StateValidityChecker(spaceInfo) {
@@ -80,32 +80,32 @@ double ContextValidityChecker::clearance(const ompl::base::State* state) const {
   return minDistance;
 }
 
-void ContextValidityChecker::addObstacle(const std::shared_ptr<BaseObstacle>& obstacle) {
+void ContextValidityChecker::addObstacle(const std::shared_ptr<obstacles::BaseObstacle>& obstacle) {
   obstacles_.emplace_back(obstacle);
 }
 
 void ContextValidityChecker::addObstacles(
-    const std::vector<std::shared_ptr<BaseObstacle>>& obstacles) {
+    const std::vector<std::shared_ptr<obstacles::BaseObstacle>>& obstacles) {
   obstacles_.insert(obstacles_.end(), obstacles.begin(), obstacles.end());
 }
 
-void ContextValidityChecker::addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti) {
+void ContextValidityChecker::addAntiObstacle(const std::shared_ptr<obstacles::BaseAntiObstacle>& anti) {
   antiObstacles_.emplace_back(anti);
 }
 
 void ContextValidityChecker::addAntiObstacles(
-    const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis) {
+    const std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>>& antis) {
   antiObstacles_.insert(antiObstacles_.end(), antis.begin(), antis.end());
 }
 
-std::vector<std::shared_ptr<BaseObstacle>> ContextValidityChecker::getObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseObstacle>> ContextValidityChecker::getObstacles() const {
   return obstacles_;
 }
 
-std::vector<std::shared_ptr<BaseAntiObstacle>> ContextValidityChecker::getAntiObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> ContextValidityChecker::getAntiObstacles() const {
   return antiObstacles_;
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

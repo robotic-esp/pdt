@@ -54,15 +54,15 @@
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_time/time.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 /** \brief The base class for an experiment */
 class RealVectorGeometricContext : public BaseContext {
  public:
   RealVectorGeometricContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                             const std::shared_ptr<const Configuration>& config,
+                             const std::shared_ptr<const config::Configuration>& config,
                              const std::string& name);
 
   // Use default virtual destructor.
@@ -72,10 +72,10 @@ class RealVectorGeometricContext : public BaseContext {
   const ompl::base::RealVectorBounds& getBoundaries() const;
 
   // Get the obstacles.
-  std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const override;
+  std::vector<std::shared_ptr<obstacles::BaseObstacle>> getObstacles() const override;
 
   // Get the antiobstacles.
-  std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const override;
+  std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> getAntiObstacles() const override;
 
   // Accept a visitor.
   virtual void accept(const ContextVisitor& visitor) const override;
@@ -88,12 +88,12 @@ class RealVectorGeometricContext : public BaseContext {
   ompl::base::RealVectorBounds bounds_;
 
   /** \brief The obstacles. */
-  std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
+  std::vector<std::shared_ptr<obstacles::BaseObstacle>> obstacles_{};
 
   /** \brief The anti obstacles. */
-  std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
+  std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> antiObstacles_{};
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

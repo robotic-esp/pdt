@@ -52,13 +52,13 @@
 
 using namespace std::string_literals;
 
-namespace esp {
-
 namespace pdt {
+
+namespace open_rave {
 
 OpenRaveManipulator::OpenRaveManipulator(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-    const std::shared_ptr<const Configuration>& config, const std::string& name) :
+    const std::shared_ptr<const config::Configuration>& config, const std::string& name) :
     OpenRaveBaseContext(spaceInfo, config, name){
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
@@ -148,6 +148,6 @@ void OpenRaveManipulator::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
-}  // namespace pdt
+}  // namespace open_rave
 
-}  // namespace esp
+}  // namespace pdt

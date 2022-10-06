@@ -59,15 +59,15 @@
 #include "esp_planning_contexts/base_context.h"
 #include "esp_planning_contexts/context_visitor.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace open_rave {
 
 /** \brief A planning context to plugin to the OpenRave simulator. */
 class OpenRaveSE3 : public OpenRaveBaseContext {
  public:
   OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-              const std::shared_ptr<const Configuration>& config, const std::string& name);
+              const std::shared_ptr<const config::Configuration>& config, const std::string& name);
   virtual ~OpenRaveSE3();
 
   /** \brief Accepts a context visitor. */
@@ -81,6 +81,6 @@ class OpenRaveSE3 : public OpenRaveBaseContext {
   std::shared_ptr<ompl::base::Goal> createGoal() const;
 };
 
-}  // namespace pdt
+}  // namespace open_rave
 
-}  // namespace esp
+}  // namespace pdt

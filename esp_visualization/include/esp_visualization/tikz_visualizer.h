@@ -51,15 +51,15 @@
 #include "esp_tikz/tikz_picture.h"
 #include "esp_visualization/planner_specific_data.h"
 
-namespace esp {
-
 namespace pdt {
 
-class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
+namespace visualization {
+
+class TikzVisualizer : public planning_contexts::ContextVisitor, public obstacles::ObstacleVisitor {
  public:
-  TikzVisualizer(const std::shared_ptr<const Configuration>& config,
-                 const std::shared_ptr<BaseContext>& context,
-                 const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE>& plannerPair);
+  TikzVisualizer(const std::shared_ptr<const config::Configuration>& config,
+                 const std::shared_ptr<planning_contexts::BaseContext>& context,
+                 const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE>& plannerPair);
   ~TikzVisualizer() = default;
 
   void render(const ompl::base::PlannerData& plannerData, const std::size_t iteration,
@@ -77,34 +77,34 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
   void logToFrameTimes(const std::experimental::filesystem::path& pngPath, double iterationTime);
 
   // The configuration.
-  const std::shared_ptr<const Configuration> config_;
+  const std::shared_ptr<const config::Configuration> config_;
 
   // The colors.
   std::map<std::string, std::array<int, 3>> espColors_{};
 
   // Implement visualizations of contexts.
-  void visit(const CentreSquare& context) const override;
-  void visit(const DividingWalls& context) const override;
-  void visit(const DoubleEnclosure& context) const override;
-  void visit(const FlankingGap& context) const override;
-  void visit(const FourRooms& context) const override;
-  void visit(const GoalEnclosure& context) const override;
-  void visit(const NarrowPassage& context) const override;
-  void visit(const ObstacleFree& context) const override;
-  void visit(const RandomRectangles& context) const override;
-  void visit(const RandomRectanglesMultiStartGoal& context) const override;
-  void visit(const ReedsSheppRandomRectangles& context) const override;
-  void visit(const RepeatingRectangles& context) const override;
-  void visit(const StartEnclosure& context) const override;
-  void visit(const WallGap& context) const override;
+  void visit(const planning_contexts::CentreSquare& context) const override;
+  void visit(const planning_contexts::DividingWalls& context) const override;
+  void visit(const planning_contexts::DoubleEnclosure& context) const override;
+  void visit(const planning_contexts::FlankingGap& context) const override;
+  void visit(const planning_contexts::FourRooms& context) const override;
+  void visit(const planning_contexts::GoalEnclosure& context) const override;
+  void visit(const planning_contexts::NarrowPassage& context) const override;
+  void visit(const planning_contexts::ObstacleFree& context) const override;
+  void visit(const planning_contexts::RandomRectangles& context) const override;
+  void visit(const planning_contexts::RandomRectanglesMultiStartGoal& context) const override;
+  void visit(const planning_contexts::ReedsSheppRandomRectangles& context) const override;
+  void visit(const planning_contexts::RepeatingRectangles& context) const override;
+  void visit(const planning_contexts::StartEnclosure& context) const override;
+  void visit(const planning_contexts::WallGap& context) const override;
 
   // Implement visualizations of obstacles.
-  void visit(const Hyperrectangle<BaseObstacle>& obstacle) const override;
-  void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;
+  void visit(const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const override;
+  void visit(const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const override;
 
   // Helper functions.
-  void drawBoundary(const RealVectorGeometricContext& context) const;
-  void drawBoundary(const ReedsSheppRandomRectangles& context) const;
+  void drawBoundary(const planning_contexts::RealVectorGeometricContext& context) const;
+  void drawBoundary(const planning_contexts::ReedsSheppRandomRectangles& context) const;
   void drawGoal(const std::shared_ptr<ompl::base::Goal>& context) const;
   void drawStartVertex(const ompl::base::PlannerDataVertex& vertex) const;
   void drawStartState(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const;
@@ -139,17 +139,17 @@ class TikzVisualizer : public ContextVisitor, public ObstacleVisitor {
       const std::shared_ptr<const LazyPRMstarData>& lprmstarData) const;
 
   // Planner and context to be visualized.
-  std::shared_ptr<BaseContext> context_;
-  PLANNER_TYPE plannerType_{PLANNER_TYPE::INVALID};
+  std::shared_ptr<planning_contexts::BaseContext> context_;
+  common::PLANNER_TYPE plannerType_{common::PLANNER_TYPE::INVALID};
   std::string name_{"invalid planner"};
 
   // The tikz picture holding the visualization.
-  mutable TikzPicture picture_;
+  mutable pgftikz::TikzPicture picture_;
 
   // The frame times file.
   std::ofstream frameTimes_;
 };
 
-}  // namespace pdt
+}  // namespace visualization
 
-}  // namespace esp
+}  // namespace pdt

@@ -46,9 +46,9 @@
 #include "esp_tikz/tikz_draw.h"
 #include "esp_tikz/tikz_node.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 struct TikzPictureOptions {
   std::string string() const;
@@ -58,7 +58,7 @@ struct TikzPictureOptions {
 
 class TikzPicture {
  public:
-  TikzPicture(const std::shared_ptr<const Configuration>& config);
+  TikzPicture(const std::shared_ptr<const config::Configuration>& config);
   ~TikzPicture() = default;
 
   // Clears the contents of this picture.
@@ -100,9 +100,9 @@ class TikzPicture {
   std::string clip_{""};
   TikzPictureOptions options_{};
   std::map<std::string, std::array<int, 3>> espColors_{};
-  const std::shared_ptr<const Configuration> config_;
+  const std::shared_ptr<const config::Configuration> config_;
 };
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

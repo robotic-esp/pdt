@@ -44,9 +44,9 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/context_validity_checker_gnat.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 ContextValidityCheckerRepeatingRectangles::ContextValidityCheckerRepeatingRectangles(
     const ompl::base::SpaceInformationPtr& spaceInfo, const std::size_t numObsPerDim,
@@ -108,7 +108,7 @@ bool ContextValidityCheckerRepeatingRectangles::isValid(const ompl::base::State*
 
 RepeatingRectangles::RepeatingRectangles(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-    const std::shared_ptr<const Configuration>& config, const std::string& name) :
+    const std::shared_ptr<const config::Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     numObsPerDim_(config->get<std::size_t>("context/" + name + "/numObstaclesPerDim")),
     obsWidth_(config->get<double>("context/" + name + "/obstacleWidth")){
@@ -192,10 +192,10 @@ void RepeatingRectangles::createObstacles() {
 
     // Add the obstacle.
     obstacles_.emplace_back(
-        std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths));
+        std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, midpoint, widths));
   }
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

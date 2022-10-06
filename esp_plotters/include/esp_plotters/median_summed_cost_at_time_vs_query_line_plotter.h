@@ -46,22 +46,22 @@
 #include "esp_statistics/multiquery_statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class MedianSummedCostAtTimeVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianSummedCostAtTimeVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  MedianSummedCostAtTimeVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
   ~MedianSummedCostAtTimeVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median cumulative cost at either the first 
   // or the last solution (indicated by initial) at each query for all planners.
-  std::shared_ptr<PgfAxis> createMedianCumulativeCostAxis(const bool initial) const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianCumulativeCostAxis(const bool initial) const;
 
   // Creates a pgf axis that holds the median cumulative cost at either the first
   // or the last solution (indicated by the parameter initial) for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianCumulativeCostAxis(const std::string& plannerName, const bool initial) const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianCumulativeCostAxis(const std::string& plannerName, const bool initial) const;
 
   // Creates a tikz picture that contains the median cumulative cost axis of all planners.
   std::experimental::filesystem::path createMedianCumulativeCostPicture(const bool initial) const;
@@ -70,19 +70,19 @@ class MedianSummedCostAtTimeVsQueryLinePlotter : public LatexPlotter {
   std::experimental::filesystem::path createMedianCumulativeCostPicture(const std::string& plannerName, const bool initial) const;
 
  private:
-  std::shared_ptr<PgfPlot> createMedianCumulativeCostPlot(const std::string& plannerName, const bool initial) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeCostUpperCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeCostPlot(const std::string& plannerName, const bool initial) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeCostUpperCiPlot(
       const std::string& plannerName, const bool initial) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeCostLowerCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeCostLowerCiPlot(
       const std::string& plannerName, const bool initial) const;
-  std::shared_ptr<PgfPlot> createMedianCumulativeCostFillCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeCostFillCiPlot(
       const std::string& plannerName) const;
 
-  void setMedianCumulativeCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setMedianCumulativeCostAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
-  const MultiqueryStatistics& stats_;
+  const statistics::MultiqueryStatistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

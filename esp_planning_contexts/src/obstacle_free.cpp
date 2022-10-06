@@ -48,12 +48,12 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/context_validity_checker.h"
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 ObstacleFree::ObstacleFree(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                           const std::shared_ptr<const Configuration>& config,
+                           const std::shared_ptr<const config::Configuration>& config,
                            const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name){
   // Create the validity checker without any obstacles and anti obstacles.
@@ -74,6 +74,6 @@ void ObstacleFree::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

@@ -44,9 +44,9 @@
 #include "esp_optimization_objectives/base_optimization_objective.h"
 #include "esp_optimization_objectives/optimization_objective_visitor.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace objectives {
 
 // Reciprocal obstacle clearance optimization objective.
 class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostIntegralObjective,
@@ -80,6 +80,6 @@ class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostInt
   mutable std::vector<double> heuristicSampleFactors_{};
 };
 
-}  // namespace pdt
+}  // namespace objectives
 
-}  // namespace esp
+}  // namespace pdt

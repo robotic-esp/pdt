@@ -55,13 +55,13 @@
 #include "esp_statistics/multiquery_statistics.h"
 #include "esp_tikz/tikz_picture.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace reports {
 
 class MultiqueryReport : public BaseReport{
  public:
-  MultiqueryReport(const std::shared_ptr<Configuration>& config, const MultiqueryStatistics& stats);
+  MultiqueryReport(const std::shared_ptr<config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
   ~MultiqueryReport() = default;
 
   std::experimental::filesystem::path generateReport() override;
@@ -71,16 +71,16 @@ class MultiqueryReport : public BaseReport{
   std::stringstream individualResults() const;
 
   // Plotters.
-  MedianCostAtFirstVsQueryLinePlotter medianCostAtFirstVsQueryLinePlotter_;
-  MedianCostAtLastVsQueryLinePlotter medianCostAtLastVsQueryLinePlotter_;
-  MedianSummedCostAtTimeVsQueryLinePlotter medianSummedCostAtTimeVsQueryLinePlotter_;
-  MedianSummedTimeAtFirstVsQueryLinePlotter medianSummedTimeAtFirstVsQueryLinePlotter_;
-  MedianTimeAtFirstVsQueryLinePlotter medianTimeAtFirstVsQueryLinePlotter_;
-  SuccessAtTimeVsQueryLinePlotter successAtTimeVsQueryLinePlotter_;
+  plotters::MedianCostAtFirstVsQueryLinePlotter medianCostAtFirstVsQueryLinePlotter_;
+  plotters::MedianCostAtLastVsQueryLinePlotter medianCostAtLastVsQueryLinePlotter_;
+  plotters::MedianSummedCostAtTimeVsQueryLinePlotter medianSummedCostAtTimeVsQueryLinePlotter_;
+  plotters::MedianSummedTimeAtFirstVsQueryLinePlotter medianSummedTimeAtFirstVsQueryLinePlotter_;
+  plotters::MedianTimeAtFirstVsQueryLinePlotter medianTimeAtFirstVsQueryLinePlotter_;
+  plotters::SuccessAtTimeVsQueryLinePlotter successAtTimeVsQueryLinePlotter_;
 
-  const MultiqueryStatistics& stats_;
+  const statistics::MultiqueryStatistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace reports
 
-}  // namespace esp
+}  // namespace pdt

@@ -37,14 +37,14 @@
 
 #include "esp_open_rave/open_rave_base_validity_checker.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace open_rave {
 
 OpenRaveBaseValidityChecker::OpenRaveBaseValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo,
     const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot,
-    const std::shared_ptr<const Configuration>& config) :
+    const std::shared_ptr<const config::Configuration>& config) :
     ompl::base::StateValidityChecker(spaceInfo),
     environment_(environment),
     robot_(robot),
@@ -57,6 +57,6 @@ OpenRAVE::EnvironmentBasePtr OpenRaveBaseValidityChecker::getOpenRaveEnvironment
   return environment_;
 }
 
-}  // namespace pdt
+}  // namespace open_rave
 
-}  // namespace esp
+}  // namespace pdt

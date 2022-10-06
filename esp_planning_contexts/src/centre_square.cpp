@@ -49,12 +49,12 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/context_validity_checker.h"
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                           const std::shared_ptr<const Configuration>& config,
+                           const std::shared_ptr<const config::Configuration>& config,
                            const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name){
   // Get the obstacle widths.
@@ -75,7 +75,7 @@ CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& 
 
   // Create the obstacle.
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, *midpoint, widths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, *midpoint, widths));
 
   // Create the validity checker and add the obstacle.
   auto validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);
@@ -97,6 +97,6 @@ void CentreSquare::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

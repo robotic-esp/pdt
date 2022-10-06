@@ -46,12 +46,12 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/context_validity_checker.h"
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 GoalEnclosure::GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                             const std::shared_ptr<const Configuration>& config,
+                             const std::shared_ptr<const config::Configuration>& config,
                              const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     goalOutsideWidth_(config->get<double>("context/" + name + "/goalOutsideWidth")),
@@ -104,7 +104,7 @@ void GoalEnclosure::createObstacles() {
   }
   std::vector<double> goalWidths(dimensionality_, goalOutsideWidth_);
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, goalAnchor, goalWidths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, goalAnchor, goalWidths));
 }
 
 void GoalEnclosure::createAntiObstacles() {
@@ -115,7 +115,7 @@ void GoalEnclosure::createAntiObstacles() {
   }
   std::vector<double> goalWidths(dimensionality_, goalInsideWidth_);
   antiObstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, goalState, goalWidths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, goalState, goalWidths));
 
   // Create the gap.
   ompl::base::ScopedState<> goalGapMidpoint(spaceInfo_);
@@ -127,10 +127,10 @@ void GoalEnclosure::createAntiObstacles() {
   std::vector<double> goalGapWidths(dimensionality_, goalGapWidth_);
   goalGapWidths.at(0u) =
       (goalOutsideWidth_ - goalInsideWidth_) / 2.0 + std::numeric_limits<double>::epsilon();
-  antiObstacles_.emplace_back(std::make_shared<Hyperrectangle<BaseAntiObstacle>>(
+  antiObstacles_.emplace_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
       spaceInfo_, goalGapMidpoint, goalGapWidths));
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

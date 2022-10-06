@@ -39,12 +39,12 @@
 
 #include <vector>
 
-namespace esp {
-
 namespace pdt {
 
+namespace open_rave {
+
 OpenRaveKneeGoal::OpenRaveKneeGoal(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                                   const std::shared_ptr<const Configuration>& config,
+                                   const std::shared_ptr<const config::Configuration>& config,
                                    const std::string& name) :
     GoalSpace(spaceInfo),
     goalState_(spaceInfo) {
@@ -68,6 +68,6 @@ void OpenRaveKneeGoal::sampleGoal(ompl::base::State* st) const {
   ++numSampledGoals_;
 }
 
-}  // namespace pdt
+}  // namespace open_rave
 
-}  // namespace esp
+}  // namespace pdt

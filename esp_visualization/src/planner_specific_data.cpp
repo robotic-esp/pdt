@@ -37,9 +37,9 @@
 
 #include "esp_visualization/planner_specific_data.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace visualization {
 
 std::vector<LazyPRMstarData::Edge> LazyPRMstarData::getValidEdges() const{
   return validEdges_;
@@ -180,6 +180,6 @@ void EITstarData::setNextReverseEdge(const ompl::geometric::eitstar::Edge& edge)
   nextReverseEdge_ = edge;
 }
 
-}  // namespace pdt
+}  // namespace visualization
 
-}  // namespace esp
+}  // namespace pdt

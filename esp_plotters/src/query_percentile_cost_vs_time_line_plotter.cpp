@@ -45,15 +45,15 @@
 #include "esp_tikz/pgf_table.h"
 #include "esp_tikz/tikz_picture.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 QueryPercentileCostVsTimeLinePlotter::QueryPercentileCostVsTimeLinePlotter(
-    const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   // Compute the duration bin size.
@@ -71,9 +71,9 @@ QueryPercentileCostVsTimeLinePlotter::QueryPercentileCostVsTimeLinePlotter(
   maxDurationToBePlotted_ = binnedDurations_.back();
 }
 
-std::shared_ptr<PgfAxis> QueryPercentileCostVsTimeLinePlotter::createCostPercentileEvolutionAxis(
+std::shared_ptr<pgftikz::PgfAxis> QueryPercentileCostVsTimeLinePlotter::createCostPercentileEvolutionAxis(
     const std::string& plannerName) const {
-  auto axis = std::make_shared<PgfAxis>();
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setCostPercentileEvolutionAxisOptions(axis);
 
   // Add all the cost percentil evolution plots.
@@ -88,7 +88,7 @@ std::shared_ptr<PgfAxis> QueryPercentileCostVsTimeLinePlotter::createCostPercent
 fs::path QueryPercentileCostVsTimeLinePlotter::createCostPercentileEvolutionPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   picture.addAxis(createCostPercentileEvolutionAxis(plannerName));
 
   // Generate the tikz file.
@@ -99,7 +99,7 @@ fs::path QueryPercentileCostVsTimeLinePlotter::createCostPercentileEvolutionPict
 }
 
 void QueryPercentileCostVsTimeLinePlotter::setCostPercentileEvolutionAxisOptions(
-    std::shared_ptr<PgfAxis> axis) const {
+    std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("costPercentileEvolutionPlots/axisWidth");
   axis->options.height = config_->get<std::string>("costPercentileEvolutionPlots/axisHeight");
   axis->options.xmax = maxDurationToBePlotted_;
@@ -116,7 +116,7 @@ void QueryPercentileCostVsTimeLinePlotter::setCostPercentileEvolutionAxisOptions
   axis->options.legendStyle = "font=\\footnotesize, legend cell align=left, legend columns=-1";
 }
 
-std::shared_ptr<PgfPlot> QueryPercentileCostVsTimeLinePlotter::createCostPercentileEvolutionPlot(
+std::shared_ptr<pgftikz::PgfPlot> QueryPercentileCostVsTimeLinePlotter::createCostPercentileEvolutionPlot(
     const std::string& plannerName, double percentile) const {
   // This cannot be applied to planners that aren't anytime.
   if (!stats_.getConfig()->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
@@ -128,11 +128,11 @@ std::shared_ptr<PgfPlot> QueryPercentileCostVsTimeLinePlotter::createCostPercent
   // Get the table from the appropriate file.
   std::stringstream percentileName;
   percentileName << std::setprecision(3) << "percentile" << percentile;
-  auto table = std::make_shared<PgfTable>(stats_.extractCostPercentiles(plannerName, percentiles_),
+  auto table = std::make_shared<pgftikz::PgfTable>(stats_.extractCostPercentiles(plannerName, percentiles_),
                                           "durations", percentileName.str());
 
   // Create the plot and set the options.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   // Common plot options.
   plot->options.mark = "\"none\""s;
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
@@ -156,6 +156,6 @@ std::shared_ptr<PgfPlot> QueryPercentileCostVsTimeLinePlotter::createCostPercent
   return plot;
 }
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

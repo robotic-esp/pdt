@@ -45,9 +45,9 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
 
-namespace esp {
-
 namespace pdt {
+
+namespace obstacles {
 
 // Obstacles are geometric primitives.
 class GeometricShape {
@@ -114,8 +114,8 @@ class BaseAntiObstacle : public GeometricShape {
   virtual bool validates(const ompl::base::ScopedState<> state) const final;
 };
 
-}  // namespace pdt
+}  // namespace obstacles
 
-}  // namespace esp
+}  // namespace pdt
 
 #pragma GCC diagnostic pop

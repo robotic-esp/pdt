@@ -42,9 +42,10 @@
 
 #include "esp_spaces/SO3WAxisAngleBoundStateSpace.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace spaces {
+
 /** \brief A state space representing SE(3) with a rotation bound defined by axis angle. */
 class SE3WAxisAngleBoundStateSpace : public ompl::base::CompoundStateSpace {
  public:
@@ -121,6 +122,6 @@ class SE3WAxisAngleBoundStateSpace : public ompl::base::CompoundStateSpace {
   void freeState(ompl::base::State *state) const override;
 };
 
-}  // namespace pdt
+}  // namespace spaces
 
-}  // namespace esp
+}  // namespace pdt

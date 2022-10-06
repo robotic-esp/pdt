@@ -37,9 +37,9 @@
 
 #include "esp_planning_contexts/context_validity_checker_gnat.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 using namespace std::string_literals;
 
@@ -103,7 +103,7 @@ bool ContextValidityCheckerGNAT::isValid(const ompl::base::State* state) const {
   return true;
 }
 
-void ContextValidityCheckerGNAT::addObstacle(const std::shared_ptr<BaseObstacle>& obstacle) {
+void ContextValidityCheckerGNAT::addObstacle(const std::shared_ptr<obstacles::BaseObstacle>& obstacle) {
   if (maxObstacleRadius_ < obstacle->getCircumradius()) {
     maxObstacleRadius_ = obstacle->getCircumradius();
   }
@@ -112,7 +112,7 @@ void ContextValidityCheckerGNAT::addObstacle(const std::shared_ptr<BaseObstacle>
 }
 
 void ContextValidityCheckerGNAT::addObstacles(
-    const std::vector<std::shared_ptr<BaseObstacle>>& obstacles) {
+    const std::vector<std::shared_ptr<obstacles::BaseObstacle>>& obstacles) {
   // We could insert multiple elements at once, but have to be careful about indices and this is not
   // going to happen frequently, so better safe than fast.
   obstacles_.reserve(obstacles_.size() + obstacles.size());
@@ -125,7 +125,7 @@ void ContextValidityCheckerGNAT::addObstacles(
   }
 }
 
-void ContextValidityCheckerGNAT::addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti) {
+void ContextValidityCheckerGNAT::addAntiObstacle(const std::shared_ptr<obstacles::BaseAntiObstacle>& anti) {
   if (maxAntiObstacleRadius_ < anti->getCircumradius()) {
     maxAntiObstacleRadius_ = anti->getCircumradius();
   }
@@ -134,7 +134,7 @@ void ContextValidityCheckerGNAT::addAntiObstacle(const std::shared_ptr<BaseAntiO
 }
 
 void ContextValidityCheckerGNAT::addAntiObstacles(
-    const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis) {
+    const std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>>& antis) {
   antiObstacles_.reserve(antiObstacles_.size() + antis.size());
   for (const auto& anti : antis) {
     if (maxAntiObstacleRadius_ < anti->getCircumradius()) {
@@ -145,6 +145,6 @@ void ContextValidityCheckerGNAT::addAntiObstacles(
   }
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

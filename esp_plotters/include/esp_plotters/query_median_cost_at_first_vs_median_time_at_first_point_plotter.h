@@ -46,21 +46,21 @@
 #include "esp_statistics/statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter : public LatexPlotter {
  public:
-  QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(const std::shared_ptr<const Configuration>& config,
-                               const Statistics& stats);
+  QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(const std::shared_ptr<const config::Configuration>& config,
+                               const statistics::Statistics& stats);
   ~QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter() = default;
 
   // Creates a pgf axis that holds the median cost at binned durations for all planners.
-  std::shared_ptr<PgfAxis> createMedianInitialSolutionAxis() const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianInitialSolutionAxis() const;
 
   // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianInitialSolutionAxis(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianInitialSolutionAxis(const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the median cost axis of all planners.
   std::experimental::filesystem::path createMedianInitialSolutionPicture() const;
@@ -70,20 +70,20 @@ class QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter : public LatexPlotte
       const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionDurationCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialSolutionPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialSolutionDurationCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianInitialSolutionCostCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialSolutionCostCiPlot(
       const std::string& plannerName) const;
 
-  void setMedianInitialSolutionAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setMedianInitialSolutionAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
   double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
   double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
 
-  const Statistics& stats_;
+  const statistics::Statistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

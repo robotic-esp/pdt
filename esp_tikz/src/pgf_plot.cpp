@@ -39,9 +39,9 @@
 
 #include <sstream>
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 using namespace std::string_literals;
 
@@ -118,6 +118,6 @@ bool PgfPlot::empty() const {
   return !static_cast<bool>(plottable_);
 }
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

@@ -46,20 +46,20 @@
 #include "esp_statistics/multiquery_statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class MedianCostAtLastVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianCostAtLastVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  MedianCostAtLastVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
   ~MedianCostAtLastVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median final cost at each query for all planners.
-  std::shared_ptr<PgfAxis> createMedianFinalCostAxis() const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianFinalCostAxis() const;
 
   // Creates a pgf axis that holds the median final cost at each query for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianFinalCostAxis(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianFinalCostAxis(const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the median final cost axis of all planners.
   std::experimental::filesystem::path createMedianFinalCostPicture() const;
@@ -68,19 +68,19 @@ class MedianCostAtLastVsQueryLinePlotter : public LatexPlotter {
   std::experimental::filesystem::path createMedianFinalCostPicture(const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createMedianFinalCostPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianFinalCostUpperCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianFinalCostPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianFinalCostUpperCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianFinalCostLowerCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianFinalCostLowerCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianFinalCostFillCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianFinalCostFillCiPlot(
       const std::string& plannerName) const;
 
-  void setMedianFinalCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setMedianFinalCostAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
-  const MultiqueryStatistics& stats_;
+  const statistics::MultiqueryStatistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

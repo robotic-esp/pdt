@@ -45,14 +45,14 @@ Algorithm | t_init,min | t_init,med | t_init,max | c_init,min | c_init,med | c_i
 #include <fstream>
 #include <iomanip>
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-KpiTable::KpiTable(const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
+KpiTable::KpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats) :
     config_(config),
     stats_(stats) {
   options.rowSep = "\\\\[0.5em]"s;
@@ -155,6 +155,6 @@ std::string KpiTable::string() const {
   return stream.str();
 }
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

@@ -56,13 +56,13 @@
 #include "esp_statistics/statistics.h"
 #include "esp_tikz/tikz_picture.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace reports {
 
 class SingleQueryReport : public BaseReport {
  public:
-  SingleQueryReport(const std::shared_ptr<Configuration>& config, const Statistics& stats);
+  SingleQueryReport(const std::shared_ptr<config::Configuration>& config, const statistics::Statistics& stats);
   ~SingleQueryReport() = default;
 
   std::experimental::filesystem::path generateReport() override;
@@ -72,18 +72,18 @@ class SingleQueryReport : public BaseReport {
   std::stringstream individualResults() const;
 
   // Plotters.
-  LatexPlotter latexPlotter_;
-  OverviewPlotter overviewPlotter_;
-  QueryCostAtFirstVsTimeAtFirstScatterPlotter queryCostAtFirstVsTimeAtFirstScatterPlotter_;
-  QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_;
-  QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter_;
-  QueryPercentileCostVsTimeLinePlotter queryPercentileCostVsTimeLinePlotter_;
-  QuerySuccessVsTimeLinePlotter querySuccessVsTimeLinePlotter_;
-  QueryTimeAtFirstHistogramPlotter queryTimeAtFirstHistogramPlotter_;
+  plotters::LatexPlotter latexPlotter_;
+  plotters::OverviewPlotter overviewPlotter_;
+  plotters::QueryCostAtFirstVsTimeAtFirstScatterPlotter queryCostAtFirstVsTimeAtFirstScatterPlotter_;
+  plotters::QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_;
+  plotters::QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter_;
+  plotters::QueryPercentileCostVsTimeLinePlotter queryPercentileCostVsTimeLinePlotter_;
+  plotters::QuerySuccessVsTimeLinePlotter querySuccessVsTimeLinePlotter_;
+  plotters::QueryTimeAtFirstHistogramPlotter queryTimeAtFirstHistogramPlotter_;
 
-  const Statistics& stats_;
+  const statistics::Statistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace reports
 
-}  // namespace esp
+}  // namespace pdt

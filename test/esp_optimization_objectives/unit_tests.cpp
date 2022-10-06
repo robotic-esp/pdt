@@ -48,7 +48,6 @@
 #include "esp_optimization_objectives/reciprocal_clearance_optimization_objective.h"
 
 using namespace std::string_literals;
-using namespace esp::pdt;
 using namespace ompl::base;
 namespace fs = std::experimental::filesystem;
 
@@ -59,7 +58,7 @@ TEST_CASE("Optimization objectives") {
   // Instantiate an empty configuration.
   const char* argv[] = {"test_esp_configuration\0"};
   const int   argc   = sizeof(argv) / sizeof(char*) - 1;
-  auto config = std::make_shared<Configuration>(argc, argv);
+  auto config = std::make_shared<pdt::config::Configuration>(argc, argv);
   config->clear();
 
   // Get the path of the test configurations.
@@ -72,7 +71,7 @@ TEST_CASE("Optimization objectives") {
     config->load(configsDir / "path_length.json");
 
     // Prepare the context creation.
-    ContextFactory factory(config);
+    pdt::factories::ContextFactory factory(config);
     const std::vector<std::string> contextNames
       {"test2d", "test4d", "test8d", "test16d", "test32d"};
 
@@ -121,7 +120,7 @@ TEST_CASE("Optimization objectives") {
     config->load(configsDir / "obstacle_clearance.json");
     
     // Prepare the context creation.
-    ContextFactory factory(config);
+    pdt::factories::ContextFactory factory(config);
     const std::vector<std::string> contextNames
     {"test2d", "test4d", "test8d", "test16d", "test32d"};
 

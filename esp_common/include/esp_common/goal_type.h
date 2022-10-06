@@ -41,9 +41,9 @@
 
 #include "nlohmann/json.hpp"
 
-namespace esp {
-
 namespace pdt {
+
+namespace common {
 
 NLOHMANN_JSON_SERIALIZE_ENUM(ompl::base::GoalType,
                              {
@@ -57,6 +57,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(ompl::base::GoalType,
                                  {ompl::base::GoalType::GOAL_SPACE, "GoalSpace"},
                              });
 
-}  // namespace pdt
+}  // namespace common
 
-}  // namespace esp
+}  // namespace pdt

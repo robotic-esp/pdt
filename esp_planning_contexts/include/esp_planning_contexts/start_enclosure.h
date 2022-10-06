@@ -48,14 +48,14 @@
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 class StartEnclosure : public RealVectorGeometricContext {
  public:
   StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                 const std::shared_ptr<const Configuration>& config, const std::string& name);
+                 const std::shared_ptr<const config::Configuration>& config, const std::string& name);
   virtual ~StartEnclosure() = default;
 
   /** \brief Accept a context visitor. */
@@ -78,6 +78,6 @@ class StartEnclosure : public RealVectorGeometricContext {
   double startGapWidth_{0.0};
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

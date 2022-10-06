@@ -37,8 +37,6 @@
 
 #include "esp_time/time.h"
 
-namespace esp {
-
 namespace pdt {
 
 namespace time {
@@ -67,9 +65,7 @@ double seconds(Duration sec) {
 
 }  // namespace pdt
 
-}  // namespace esp
-
-std::ostream& operator<<(std::ostream& out, const esp::pdt::time::Duration& duration) {
+std::ostream& operator<<(std::ostream& out, const pdt::time::Duration& duration) {
   std::stringstream stream;
   // Handle the case of time with infinite value.
   if (duration.count() == std::numeric_limits<double>::infinity()) {

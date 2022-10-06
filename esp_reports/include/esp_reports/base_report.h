@@ -46,13 +46,13 @@
 #include "esp_configuration/configuration.h"
 #include "esp_plotters/latex_plotter.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace reports {
 
 class BaseReport {
  public:
-  BaseReport(const std::shared_ptr<Configuration>& config);
+  BaseReport(const std::shared_ptr<config::Configuration>& config);
   ~BaseReport() = default;
 
   virtual std::experimental::filesystem::path generateReport() = 0;
@@ -75,20 +75,20 @@ class BaseReport {
   std::map<std::string, std::string> plotPlannerNames_{};
 
   // Plotters.
-  LatexPlotter latexPlotter_;
+  plotters::LatexPlotter latexPlotter_;
 
   // Colors.
   std::map<std::string, std::array<int, 3>> espColors_{};
 
-  const std::shared_ptr<const Configuration> config_;
+  const std::shared_ptr<const config::Configuration> config_;
 
   // Helper to replace _ with \_, see [1].
   void findAndReplaceAll(std::string* string, const std::string& key,
                          const std::string& replacement) const;
 };
 
-}  // namespace pdt
+}  // namespace reports
 
-}  // namespace esp
+}  // namespace pdt
 
 // [1] https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c/

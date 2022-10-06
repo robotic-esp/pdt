@@ -37,9 +37,9 @@
 
 #include <string>
 
-namespace esp {
-
 namespace pdt {
+
+namespace config {
 
 struct Version {
   static const std::string GIT_SHA1;
@@ -47,6 +47,6 @@ struct Version {
   static const std::string GIT_STATUS;
 };
 
-}  // namespace pdt
+}  // namespace config
 
-}  // namespace esp
+}  // namespace pdt

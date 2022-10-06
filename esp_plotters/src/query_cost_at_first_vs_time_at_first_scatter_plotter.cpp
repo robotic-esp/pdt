@@ -48,22 +48,22 @@
 #include "esp_tikz/pgf_plot.h"
 #include "esp_tikz/pgf_table.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 QueryCostAtFirstVsTimeAtFirstScatterPlotter::QueryCostAtFirstVsTimeAtFirstScatterPlotter(
-    const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterAxis()
+std::shared_ptr<pgftikz::PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterAxis()
     const {
-  auto axis = std::make_shared<PgfAxis>();
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setInitialSolutionScatterAxisOptions(axis);
 
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
@@ -76,9 +76,9 @@ std::shared_ptr<PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInit
   return axis;
 }
 
-std::shared_ptr<PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterAxis(
+std::shared_ptr<pgftikz::PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterAxis(
     const std::string& plannerName) const {
-  auto axis = std::make_shared<PgfAxis>();
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setInitialSolutionScatterAxisOptions(axis);
   axis->options.name = plannerName + "InitialSolutionScatterAxis"s;
   axis->addPlot(createInitialSolutionScatterPlot(plannerName));
@@ -87,7 +87,7 @@ std::shared_ptr<PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInit
 
 fs::path QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterPicture() const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   picture.addAxis(createInitialSolutionScatterAxis());
 
   // Generate the tikz file.
@@ -100,7 +100,7 @@ fs::path QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatt
 fs::path QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   picture.addAxis(createInitialSolutionScatterAxis(plannerName));
 
   // Generate the tikz file.
@@ -110,17 +110,17 @@ fs::path QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatt
   return picturePath;
 }
 
-std::shared_ptr<PgfPlot> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterPlot(
+std::shared_ptr<pgftikz::PgfPlot> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterPlot(
     const std::string& plannerName) const {
   // Load the data into a pgf table.
-  auto table = std::make_shared<PgfTable>(stats_.extractInitialSolutions(plannerName),
+  auto table = std::make_shared<pgftikz::PgfTable>(stats_.extractInitialSolutions(plannerName),
                                           "durations", "costs");
 
   // This table should not clean its data (or should it?).
   table->setCleanData(false);
 
   // Create the plot.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = config_->get<double>("initialSolutionScatterPlots/markSize");
   plot->options.mark = "x";
   plot->options.lineWidth = 0.1;
@@ -133,7 +133,7 @@ std::shared_ptr<PgfPlot> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInit
 }
 
 void QueryCostAtFirstVsTimeAtFirstScatterPlotter::setInitialSolutionScatterAxisOptions(
-    std::shared_ptr<PgfAxis> axis) const {
+    std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.height = config_->get<std::string>("initialSolutionScatterPlots/axisHeight");
   axis->options.width = config_->get<std::string>("initialSolutionScatterPlots/axisWidth");
   axis->options.name = "InitialSolutionScatterAxis"s;
@@ -148,6 +148,6 @@ void QueryCostAtFirstVsTimeAtFirstScatterPlotter::setInitialSolutionScatterAxisO
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

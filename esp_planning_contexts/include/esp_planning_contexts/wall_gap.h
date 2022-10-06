@@ -48,16 +48,16 @@
 #include "esp_planning_contexts/context_validity_checker.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 /** \brief A single wall diving the problem space in two, with multiple narrow passages. Results in
  * a multiple homotopy-class experiment that scales to N dimensions. */
 class WallGap : public RealVectorGeometricContext {
  public:
   WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-          const std::shared_ptr<const Configuration>& config, const std::string& name);
+          const std::shared_ptr<const config::Configuration>& config, const std::string& name);
   virtual ~WallGap() = default;
 
   /** \brief Accepts a context visitor. */
@@ -80,6 +80,6 @@ class WallGap : public RealVectorGeometricContext {
   double gapOffset_;
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

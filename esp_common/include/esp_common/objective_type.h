@@ -39,9 +39,9 @@
 
 #include "nlohmann/json.hpp"
 
-namespace esp {
-
 namespace pdt {
+
+namespace common {
 
 enum class OBJECTIVE_TYPE {
   COSTMAP,
@@ -62,6 +62,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(OBJECTIVE_TYPE,
                                  {OBJECTIVE_TYPE::INVALID, "invalid"},
                              })
 
-}  // namespace pdt
+}  // namespace common
 
-}  // namespace esp
+}  // namespace pdt

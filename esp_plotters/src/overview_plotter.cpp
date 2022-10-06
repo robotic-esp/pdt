@@ -45,15 +45,15 @@
 #include "esp_tikz/pgf_table.h"
 #include "esp_tikz/tikz_picture.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-OverviewPlotter::OverviewPlotter(const std::shared_ptr<const Configuration>& config,
-                                 const Statistics& stats) :
+OverviewPlotter::OverviewPlotter(const std::shared_ptr<const config::Configuration>& config,
+                                 const statistics::Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
@@ -74,10 +74,10 @@ fs::path OverviewPlotter::createCombinedPicture() const {
   medianCostAxis->options.name = "AllPlannersCombinedMedianCostAxis"s;
 
   // Make sure these axis cover the same domain.
-  PgfAxis::alignAbszissen(medianCostAxis.get(), successAxis.get());
+  pgftikz::PgfAxis::alignAbszissen(medianCostAxis.get(), successAxis.get());
   
   // Create the picture and add the axes.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   picture.addAxis(successAxis);
   picture.addAxis(medianCostAxis);
 
@@ -105,7 +105,7 @@ fs::path OverviewPlotter::createCombinedPicture(const std::string& plannerName) 
   medianCostAxis->options.name = plannerName + "CombinedMedianCostAxis"s;
 
   // Create the picture and add the axes.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   picture.addAxis(successAxis);
   picture.addAxis(medianCostAxis);
 
@@ -116,6 +116,6 @@ fs::path OverviewPlotter::createCombinedPicture(const std::string& plannerName) 
   return picturePath;
 }
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

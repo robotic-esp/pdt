@@ -57,7 +57,7 @@ using AccumulatorSet = boost::accumulators::accumulator_set<
 
 int main(const int argc, const char** argv) {
   // Read the config files.
-  auto config = std::make_shared<esp::pdt::Configuration>(argc, argv);
+  auto config = std::make_shared<pdt::config::Configuration>(argc, argv);
   config->registerAsExperiment();
 
   // Get the ground truth resolution.
@@ -89,7 +89,7 @@ int main(const int argc, const char** argv) {
   std::size_t numTestedInvalid = 0u;
   for (std::size_t c = 0u; c < config->get<std::size_t>("experiment/numContexts"); ++c) {
     // Create the context.
-    esp::pdt::ContextFactory contextFactory(config);
+    pdt::factories::ContextFactory contextFactory(config);
     auto context = contextFactory.create(config->get<std::string>("experiment/context"));
 
     // Get the space info.
@@ -121,29 +121,29 @@ int main(const int argc, const char** argv) {
       spaceInfo->setStateValidityCheckingResolution(groundTruthResolution);
       spaceInfo->setup();
 
-      const auto start = esp::pdt::time::Clock::now();
+      const auto start = pdt::time::Clock::now();
       bool isValid = spaceInfo->checkMotion(state1, state2);
-      const auto stop = esp::pdt::time::Clock::now();
+      const auto stop = pdt::time::Clock::now();
 
       if (isValid) {
         ++numTestedValid;
         groundTruthTimingResults.first(
-            std::chrono::duration_cast<esp::pdt::time::Duration>(stop - start).count());
+            std::chrono::duration_cast<pdt::time::Duration>(stop - start).count());
         for (std::size_t j = 0u; j < candidateResolutions.size(); ++j) {
           spaceInfo->setStateValidityCheckingResolution(candidateResolutions[j]);
           spaceInfo->setup();
 
-          const auto start = esp::pdt::time::Clock::now();
+          const auto start = pdt::time::Clock::now();
           spaceInfo->checkMotion(state1, state2);
-          const auto stop = esp::pdt::time::Clock::now();
+          const auto stop = pdt::time::Clock::now();
 
           timingResults[j].first(
-              std::chrono::duration_cast<esp::pdt::time::Duration>(stop - start).count());
+              std::chrono::duration_cast<pdt::time::Duration>(stop - start).count());
         }
       } else {
         ++numTestedInvalid;
         groundTruthTimingResults.second(
-            std::chrono::duration_cast<esp::pdt::time::Duration>(stop - start).count());
+            std::chrono::duration_cast<pdt::time::Duration>(stop - start).count());
 
         for (std::size_t j = 0u; j < candidateResolutions.size(); ++j) {
           // Check the invalid edge with each candidate resolution.
@@ -151,9 +151,9 @@ int main(const int argc, const char** argv) {
           spaceInfo->setStateValidityCheckingResolution(candidateResolutions[j]);
           spaceInfo->setup();
 
-          const auto start = esp::pdt::time::Clock::now();
+          const auto start = pdt::time::Clock::now();
           bool isValid = spaceInfo->checkMotion(state1, state2);
-          const auto stop = esp::pdt::time::Clock::now();
+          const auto stop = pdt::time::Clock::now();
 
           if (isValid) {
             // The edge is invalid, but this resolution did not catch it.
@@ -161,7 +161,7 @@ int main(const int argc, const char** argv) {
           }
 
           timingResults[j].second(
-              std::chrono::duration_cast<esp::pdt::time::Duration>(stop - start).count());
+              std::chrono::duration_cast<pdt::time::Duration>(stop - start).count());
         }
       }
 

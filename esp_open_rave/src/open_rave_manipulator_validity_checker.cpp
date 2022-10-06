@@ -39,14 +39,14 @@
 
 using namespace std::string_literals;
 
-namespace esp {
-
 namespace pdt {
+
+namespace open_rave {
 
 OpenRaveManipulatorValidityChecker::OpenRaveManipulatorValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo,
     const OpenRAVE::EnvironmentBasePtr& environment, const OpenRAVE::RobotBasePtr& robot,
-    const std::shared_ptr<const Configuration>& config) :
+    const std::shared_ptr<const config::Configuration>& config) :
     OpenRaveBaseValidityChecker(spaceInfo, environment, robot, config),
     raveState_(static_cast<std::size_t>(robot->GetDOF())) {
 }
@@ -99,6 +99,6 @@ double OpenRaveManipulatorValidityChecker::clearance(const ompl::base::State* st
   return collisionReport_->minDistance;
 }
 
-}  // namespace pdt
+}  // namespace open_rave
 
-}  // namespace esp
+}  // namespace pdt

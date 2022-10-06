@@ -48,14 +48,14 @@
 
 #include "esp_time/time.h"
 
-namespace esp {
-
 namespace pdt {
 
+namespace visualization {
+
 BaseVisualizer::BaseVisualizer(
-    const std::shared_ptr<Configuration> &config,
-    const std::shared_ptr<BaseContext> &context,
-    const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair) :
+    const std::shared_ptr<config::Configuration> &config,
+    const std::shared_ptr<planning_contexts::BaseContext> &context,
+    const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> plannerPair) :
     context_(context),
     planner_(plannerPair.first),
     plannerType_(plannerPair.second),
@@ -70,7 +70,7 @@ BaseVisualizer::~BaseVisualizer() {
   dataThread_.join();
 }
 
-void BaseVisualizer::setContext(const std::shared_ptr<RealVectorGeometricContext> &context) {
+void BaseVisualizer::setContext(const std::shared_ptr<planning_contexts::RealVectorGeometricContext> &context) {
   // Setting a new context means all the data is invalid.
   displayIteration_ = 0u;
 
@@ -96,7 +96,7 @@ void BaseVisualizer::setContext(const std::shared_ptr<RealVectorGeometricContext
 }
 
 void BaseVisualizer::setPlanner(
-    const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> &plannerPair) {
+    const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> &plannerPair) {
   // Setting a new context means all the data is invalid.
   displayIteration_ = 0u;
 
@@ -208,16 +208,16 @@ void BaseVisualizer::createData() {
     setupDuration_ = time::Clock::now() - setupStartTime;
 
     if (config_->contains("experiment/seed")) {
-      if (plannerType_ == esp::pdt::PLANNER_TYPE::BITSTAR) {
+      if (plannerType_ == common::PLANNER_TYPE::BITSTAR) {
         planner_->as<ompl::geometric::BITstar>()->setLocalSeed(
             config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == esp::pdt::PLANNER_TYPE::ABITSTAR) {
+      } else if (plannerType_ == common::PLANNER_TYPE::ABITSTAR) {
         planner_->as<ompl::geometric::ABITstar>()->setLocalSeed(
             config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == esp::pdt::PLANNER_TYPE::AITSTAR) {
+      } else if (plannerType_ == common::PLANNER_TYPE::AITSTAR) {
         planner_->as<ompl::geometric::AITstar>()->setLocalSeed(
         config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == esp::pdt::PLANNER_TYPE::EITSTAR) {
+      } else if (plannerType_ == common::PLANNER_TYPE::EITSTAR) {
         planner_->as<ompl::geometric::EITstar>()->setLocalSeed(
         config_->get<std::size_t>("experiment/seed"));
       }
@@ -308,8 +308,8 @@ void BaseVisualizer::createData() {
 
       // Store the planner specific data.
       switch (plannerType_) {
-        case PLANNER_TYPE::BITSTAR:
-        case PLANNER_TYPE::ABITSTAR: {
+        case common::PLANNER_TYPE::BITSTAR:
+        case common::PLANNER_TYPE::ABITSTAR: {
           auto bitstarData = std::make_shared<BITstarData>(context_->getSpaceInformation());
 
           // Store the BIT* edge queue.
@@ -329,7 +329,7 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(bitstarData);
           break;
         }
-        case PLANNER_TYPE::AITSTAR: {
+        case common::PLANNER_TYPE::AITSTAR: {
           auto aitstarData = std::make_shared<AITstarData>(context_->getSpaceInformation());
 
           // Store the TBD* forward queue.
@@ -359,7 +359,7 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(aitstarData);
           break;
         }
-        case PLANNER_TYPE::EITSTAR: {
+        case common::PLANNER_TYPE::EITSTAR: {
           auto eitstarData = std::make_shared<EITstarData>(context_->getSpaceInformation());
 
           // Store the EIT* reverse tree.
@@ -392,7 +392,7 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(eitstarData);
           break;
         }
-        case PLANNER_TYPE::LAZYPRMSTAR: {
+        case common::PLANNER_TYPE::LAZYPRMSTAR: {
           auto lPRMstarData = std::make_shared<LazyPRMstarData>(context_->getSpaceInformation());
 
           lPRMstarData->setValidEdges(
@@ -418,6 +418,6 @@ void BaseVisualizer::createData() {
   }
 }
 
-}  // namespace pdt
+}  // namespace visualization
 
-}  // namespace esp
+}  // namespace pdt

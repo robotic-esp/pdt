@@ -41,13 +41,13 @@
 
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-namespace esp {
-
 namespace pdt {
+
+namespace objectives {
 
 PotentialFieldOptimizationObjective::PotentialFieldOptimizationObjective(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-    const std::shared_ptr<const Configuration> config) :
+    const std::shared_ptr<const config::Configuration> config) :
     ompl::base::StateCostIntegralObjective(spaceInfo, true),
     config_(config),
     spaceInfo_(spaceInfo) {
@@ -118,6 +118,6 @@ void PotentialFieldOptimizationObjective::accept(const ObjectiveVisitor& visitor
   visitor.visit(*this);
 }
 
-}  // namespace pdt
+}  // namespace objectives
 
-}  // namespace esp
+}  // namespace pdt

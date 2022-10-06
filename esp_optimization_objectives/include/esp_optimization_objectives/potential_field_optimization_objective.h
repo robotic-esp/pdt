@@ -45,9 +45,9 @@
 #include "esp_optimization_objectives/base_optimization_objective.h"
 #include "esp_optimization_objectives/optimization_objective_visitor.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace objectives {
 
 // Obstacles are geometric primitives.
 class PotentialFieldOptimizationObjective : public ompl::base::StateCostIntegralObjective,
@@ -55,7 +55,7 @@ class PotentialFieldOptimizationObjective : public ompl::base::StateCostIntegral
  public:
   PotentialFieldOptimizationObjective(
       const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-      const std::shared_ptr<const Configuration> config);
+      const std::shared_ptr<const config::Configuration> config);
   virtual ~PotentialFieldOptimizationObjective();
 
   ompl::base::Cost stateCost(const ompl::base::State* state) const override;
@@ -66,11 +66,11 @@ class PotentialFieldOptimizationObjective : public ompl::base::StateCostIntegral
   void accept(const ObjectiveVisitor& visitor) const override;
 
  private:
-  const std::shared_ptr<const Configuration> config_;
+  const std::shared_ptr<const config::Configuration> config_;
   std::vector<ompl::base::State*> pointSources_;
   const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
 };
 
-}  // namespace pdt
+}  // namespace objectives
 
-}  // namespace esp
+}  // namespace pdt

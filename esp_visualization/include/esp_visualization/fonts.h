@@ -37,15 +37,15 @@
 
 #include <experimental/filesystem>
 
-namespace esp {
-
 namespace pdt {
+
+namespace visualization {
 
 struct Fonts {
   static const std::experimental::filesystem::path ROBOTO_REGULAR;
   static const std::experimental::filesystem::path ROBOTO_BOLD;
 };
 
-}  // namespace pdt
+}  // namespace visualization
 
-}  // namespace esp
+}  // namespace pdt

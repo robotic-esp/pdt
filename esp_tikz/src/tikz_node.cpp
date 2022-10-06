@@ -39,9 +39,9 @@
 
 #include <sstream>
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 using namespace std::string_literals;
 
@@ -81,6 +81,6 @@ std::string TikzNode::string() const {
   return stream.str();
 }
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

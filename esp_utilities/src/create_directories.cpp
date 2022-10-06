@@ -46,9 +46,9 @@
 
 #include "esp_time/time.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace utilities {
 
 void createDirectories(const std::string& fileName) {
   boost::filesystem::path fullPath;
@@ -68,7 +68,6 @@ void createDirectories(const std::string& fileName) {
   // Else, do nothing
 }
 
+}  // namespace utilities
 
 }  // namespace pdt
-
-}  // namespace esp

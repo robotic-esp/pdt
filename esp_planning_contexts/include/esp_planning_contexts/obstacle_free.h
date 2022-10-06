@@ -48,21 +48,21 @@
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 /** \brief An experiment with a singularly placed square obstacle*/
 class ObstacleFree : public RealVectorGeometricContext {
  public:
   ObstacleFree(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-               const std::shared_ptr<const Configuration>& config, const std::string& name);
+               const std::shared_ptr<const config::Configuration>& config, const std::string& name);
   virtual ~ObstacleFree() = default;
 
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

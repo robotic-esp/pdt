@@ -43,9 +43,9 @@
 
 #include "esp_tikz/pgf_plottable.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 class PgfPlot {
  public:
@@ -91,6 +91,6 @@ class PgfPlot {
   } options{};
 };
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

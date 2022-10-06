@@ -42,9 +42,9 @@
 #include "nlohmann/json.hpp"
 #pragma GCC diagnostic pop
 
-namespace esp {
-
 namespace pdt {
+
+namespace common {
 
 enum class PLANNER_TYPE {
   INVALID,
@@ -84,6 +84,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(PLANNER_TYPE, {
                                                {PLANNER_TYPE::SPARSTWO, "SPARStwo"},
                                            })
 
-}  // namespace pdt
+}  // namespace common
 
-}  // namespace esp
+}  // namespace pdt

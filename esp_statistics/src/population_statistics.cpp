@@ -41,9 +41,9 @@
 #include <iostream>
 #include <string>
 
-namespace esp {
-
 namespace pdt {
+
+namespace statistics {
 
 using namespace std::string_literals;
 
@@ -51,7 +51,7 @@ bool operator<(const ConfidenceInterval& ci, const double confidence) {
   return ci.confidence < confidence;
 }
 
-PopulationStatistics::PopulationStatistics(const std::shared_ptr<Configuration>& config,
+PopulationStatistics::PopulationStatistics(const std::shared_ptr<config::Configuration>& config,
                                            const INDEX_ROUNDING round) :
     config_{config},
     round_{round} {
@@ -319,6 +319,6 @@ bool PopulationStatistics::ConfidenceIntervalIterator::operator!=(
   return !(*this == other);
 }
 
-}  // namespace pdt
+}  // namespace statistics
 
-}  // namespace esp
+}  // namespace pdt

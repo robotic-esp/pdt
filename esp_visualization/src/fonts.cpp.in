@@ -37,9 +37,9 @@
 
 #define PDT_VISUALIZATION_SOURCE_DIRECTORY "@PROJECT_SOURCE_DIR@"
 
-namespace esp {
-
 namespace pdt {
+
+namespace visualization {
 
 const std::experimental::filesystem::path Fonts::ROBOTO_REGULAR =
     std::experimental::filesystem::path(PDT_VISUALIZATION_SOURCE_DIRECTORY) /
@@ -48,6 +48,6 @@ const std::experimental::filesystem::path Fonts::ROBOTO_BOLD =
     std::experimental::filesystem::path(PDT_VISUALIZATION_SOURCE_DIRECTORY) /
     std::experimental::filesystem::path("resources/fonts/Roboto/Roboto-Bold.ttf");
 
-}  // namespace pdt
+}  // namespace visualization
 
-}  // namespace esp
+}  // namespace pdt

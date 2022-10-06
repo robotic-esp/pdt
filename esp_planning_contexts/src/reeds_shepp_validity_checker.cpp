@@ -39,9 +39,9 @@
 
 #include <ompl/base/spaces/SE2StateSpace.h>
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 ReedsSheppValidityChecker::ReedsSheppValidityChecker(
     const ompl::base::SpaceInformationPtr& spaceInfo) :
@@ -67,7 +67,7 @@ bool ReedsSheppValidityChecker::isValid(const ompl::base::State* state) const {
 
   // A state is invalid if it collides with an obstacle.
   for (const auto& obstacle : obstacles_) {
-    const auto obs = dynamic_cast<Hyperrectangle<BaseObstacle>*>(obstacle.get());
+    const auto obs = dynamic_cast<obstacles::Hyperrectangle<obstacles::BaseObstacle>*>(obstacle.get());
 
     // This is a tiny optimization: If the distance between the centers of both rectangles is larger
     // then the sum of the  circumscribing radii, then the orientation of the rectangles doesn't
@@ -169,19 +169,19 @@ double ReedsSheppValidityChecker::dotProduct(const Point& point, const Axis& axi
   return point[0u] * axis[0u] + point[1u] * axis[1u];
 }
 
-void ReedsSheppValidityChecker::addObstacle(const std::shared_ptr<BaseObstacle>& obstacle) {
+void ReedsSheppValidityChecker::addObstacle(const std::shared_ptr<obstacles::BaseObstacle>& obstacle) {
   obstacles_.emplace_back(obstacle);
 }
 
 void ReedsSheppValidityChecker::addObstacles(
-    const std::vector<std::shared_ptr<BaseObstacle>>& obstacles) {
+    const std::vector<std::shared_ptr<obstacles::BaseObstacle>>& obstacles) {
   obstacles_.insert(obstacles_.end(), obstacles.begin(), obstacles.end());
 }
 
-std::vector<std::shared_ptr<BaseObstacle>> ReedsSheppValidityChecker::getObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseObstacle>> ReedsSheppValidityChecker::getObstacles() const {
   return obstacles_;
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

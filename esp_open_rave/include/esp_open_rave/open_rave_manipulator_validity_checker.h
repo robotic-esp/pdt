@@ -57,9 +57,9 @@
 #include "esp_obstacles/obstacle_visitor.h"
 #include "esp_open_rave/open_rave_base_validity_checker.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace open_rave {
 
 class OpenRaveManipulatorValidityChecker : public OpenRaveBaseValidityChecker {
  public:
@@ -67,7 +67,7 @@ class OpenRaveManipulatorValidityChecker : public OpenRaveBaseValidityChecker {
   OpenRaveManipulatorValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
                                      const OpenRAVE::EnvironmentBasePtr& environment,
                                      const OpenRAVE::RobotBasePtr& robot,
-                                     const std::shared_ptr<const Configuration>& config);
+                                     const std::shared_ptr<const config::Configuration>& config);
 
   /** \brief The destructor. */
   virtual ~OpenRaveManipulatorValidityChecker() = default;
@@ -83,6 +83,6 @@ class OpenRaveManipulatorValidityChecker : public OpenRaveBaseValidityChecker {
   mutable std::vector<double> raveState_;
 };
 
-}  // namespace pdt
+}  // namespace open_rave
 
-}  // namespace esp
+}  // namespace pdt

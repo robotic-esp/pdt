@@ -45,13 +45,13 @@
 #include "esp_plotters/latex_plotter.h"
 #include "esp_statistics/statistics.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class OverviewPlotter : public LatexPlotter {
  public:
-  OverviewPlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
+  OverviewPlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats);
   ~OverviewPlotter() = default;
 
   // Creates a combined tikz picture with success and median costs of all planners.
@@ -61,9 +61,9 @@ class OverviewPlotter : public LatexPlotter {
   std::experimental::filesystem::path createCombinedPicture(const std::string& plannerName) const;
 
  private:
-  const Statistics& stats_;
+  const statistics::Statistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

@@ -44,12 +44,12 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/context_validity_checker.h"
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                             const std::shared_ptr<const Configuration>& config,
+                             const std::shared_ptr<const config::Configuration>& config,
                              const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     numWalls_(config->get<std::size_t>("context/" + name + "/numWalls")),
@@ -116,7 +116,7 @@ void DividingWalls::createObstacles() {
 
     // Add this wall to the obstacles.
     obstacles_.emplace_back(
-        std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, midpoint, widths));
+        std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, midpoint, widths));
   }
 }
 
@@ -154,10 +154,10 @@ void DividingWalls::createAntiObstacles() {
 
     // Add this gap to the anti obstacles.
     antiObstacles_.emplace_back(
-        std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, midpoint, widths));
+        std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, midpoint, widths));
   }
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

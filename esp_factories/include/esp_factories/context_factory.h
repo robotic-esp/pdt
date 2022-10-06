@@ -44,18 +44,18 @@
 #include "esp_configuration/configuration.h"
 #include "esp_planning_contexts/base_context.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace factories {
 
 /** A class to create planning contexts from config files. */
 class ContextFactory {
  public:
-  ContextFactory(const std::shared_ptr<const Configuration> &config);
+  ContextFactory(const std::shared_ptr<const config::Configuration> &config);
   ~ContextFactory() = default;
 
   /** \brief Creates a context. */
-  std::shared_ptr<BaseContext> create(const std::string &contextName) const;
+  std::shared_ptr<planning_contexts::BaseContext> create(const std::string &contextName) const;
 
  private:
   /** \brief Create a space info with a real vector state space. */
@@ -67,9 +67,9 @@ class ContextFactory {
       const std::string &parentKey) const;
 
   /** \brief The configuration which specifies the context properties. */
-  const std::shared_ptr<const Configuration> config_;
+  const std::shared_ptr<const config::Configuration> config_;
 };
 
-}  // namespace pdt
+}  // namespace factories
 
-}  // namespace esp
+}  // namespace pdt

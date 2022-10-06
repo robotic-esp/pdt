@@ -47,26 +47,26 @@
 
 #include "esp_common/planner_type.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace factories {
 
 // A class to create planners from config files.
 class PlannerFactory {
  public:
-  PlannerFactory(const std::shared_ptr<Configuration> &config,
-                 const std::shared_ptr<BaseContext> &context);
+  PlannerFactory(const std::shared_ptr<config::Configuration> &config,
+                 const std::shared_ptr<planning_contexts::BaseContext> &context);
   ~PlannerFactory() = default;
 
   // Create a planner.
-  std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> create(
+  std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> create(
       const std::string &plannerName) const;
 
  private:
-  const std::shared_ptr<const Configuration> config_;
-  const std::shared_ptr<const BaseContext> context_;
+  const std::shared_ptr<const config::Configuration> config_;
+  const std::shared_ptr<const planning_contexts::BaseContext> context_;
 };
 
-}  // namespace pdt
+}  // namespace factories
 
-}  // namespace esp
+}  // namespace pdt

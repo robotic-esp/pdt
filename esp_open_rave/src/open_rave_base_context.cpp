@@ -51,21 +51,21 @@
 
 using namespace std::string_literals;
 
-namespace esp {
-
 namespace pdt {
+
+namespace open_rave {
 
 OpenRaveBaseContext::OpenRaveBaseContext(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-    const std::shared_ptr<const Configuration>& config, const std::string& name) :
+    const std::shared_ptr<const config::Configuration>& config, const std::string& name) :
     BaseContext(spaceInfo, config, name) {
 }
 
-std::vector<std::shared_ptr<BaseObstacle>> OpenRaveBaseContext::getObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseObstacle>> OpenRaveBaseContext::getObstacles() const {
   return {};
 }
 
-std::vector<std::shared_ptr<BaseAntiObstacle>> OpenRaveBaseContext::getAntiObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> OpenRaveBaseContext::getAntiObstacles() const {
   return {};
 }
 
@@ -73,6 +73,6 @@ std::shared_ptr<ompl::base::Goal> OpenRaveBaseContext::createGoal() const {
   return std::make_shared<ompl::base::GoalState>(spaceInfo_);
 }
 
-}  // namespace pdt
+}  // namespace open_rave
 
-}  // namespace esp
+}  // namespace pdt

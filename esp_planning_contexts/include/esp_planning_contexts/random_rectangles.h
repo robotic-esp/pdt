@@ -50,16 +50,16 @@
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 /** \brief An experiment with a singularly placed square obstacle*/
 class RandomRectangles : public RealVectorGeometricContext {
  public:
   /** \brief The constructor. */
   RandomRectangles(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                   const std::shared_ptr<const Configuration>& config, const std::string& name);
+                   const std::shared_ptr<const config::Configuration>& config, const std::string& name);
 
   /** \brief The destructor. */
   virtual ~RandomRectangles() = default;
@@ -84,6 +84,6 @@ class RandomRectangles : public RealVectorGeometricContext {
   ompl::RNG rng_{};
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

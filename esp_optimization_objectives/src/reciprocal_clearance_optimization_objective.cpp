@@ -45,9 +45,9 @@
 
 using namespace std::string_literals;
 
-namespace esp {
-
 namespace pdt {
+
+namespace objectives {
 
 ReciprocalClearanceOptimizationObjective::ReciprocalClearanceOptimizationObjective(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
@@ -146,6 +146,6 @@ void ReciprocalClearanceOptimizationObjective::accept(const ObjectiveVisitor& vi
   visitor.visit(*this);
 }
 
-}  // namespace pdt
+}  // namespace objectives
 
-}  // namespace esp
+}  // namespace pdt

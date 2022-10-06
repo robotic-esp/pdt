@@ -46,12 +46,12 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/context_validity_checker.h"
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 DoubleEnclosure::DoubleEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                                 const std::shared_ptr<const Configuration>& config,
+                                 const std::shared_ptr<const config::Configuration>& config,
                                  const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     startOutsideWidth_(config->get<double>("context/" + name + "/startOutsideWidth")),
@@ -115,7 +115,7 @@ void DoubleEnclosure::createObstacles() {
 
   // Create the start enclosure obstacle.
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, startAnchor, startWidths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, startAnchor, startWidths));
 
   // Create the anchor for the goal enclosure obstacle.
   ompl::base::ScopedState<> goalAnchor(spaceInfo_);
@@ -128,7 +128,7 @@ void DoubleEnclosure::createObstacles() {
 
   // Create the goal enclosure obstacle.
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, goalAnchor, goalWidths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, goalAnchor, goalWidths));
 }
 
 void DoubleEnclosure::createAntiObstacles() {
@@ -143,7 +143,7 @@ void DoubleEnclosure::createAntiObstacles() {
 
   // Create the start enclosure anti obstacle.
   antiObstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, startAnchor, startWidths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, startAnchor, startWidths));
 
   // Create the anchor for the goal enclosure anti obstacle.
   ompl::base::ScopedState<> goalAnchor(spaceInfo_);
@@ -156,7 +156,7 @@ void DoubleEnclosure::createAntiObstacles() {
 
   // Create the goal enclosure anti obstacle.
   antiObstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, goalAnchor, goalWidths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, goalAnchor, goalWidths));
 
   // Create the start gap.
   ompl::base::ScopedState<> startGapMidpoint(spaceInfo_);
@@ -167,7 +167,7 @@ void DoubleEnclosure::createAntiObstacles() {
   }
   std::vector<double> startGapWidths(dimensionality_, startGapWidth_);
   startGapWidths.at(0u) = (startOutsideWidth_ - startInsideWidth_) / 2.0 + 1e-3;
-  antiObstacles_.emplace_back(std::make_shared<Hyperrectangle<BaseAntiObstacle>>(
+  antiObstacles_.emplace_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
       spaceInfo_, startGapMidpoint, startGapWidths));
 
   // Create the goal gap.
@@ -179,10 +179,10 @@ void DoubleEnclosure::createAntiObstacles() {
   }
   std::vector<double> goalGapWidths(dimensionality_, goalGapWidth_);
   goalGapWidths.at(0u) = (goalOutsideWidth_ - goalInsideWidth_) / 2.0 + 1e-3;
-  antiObstacles_.emplace_back(std::make_shared<Hyperrectangle<BaseAntiObstacle>>(
+  antiObstacles_.emplace_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
       spaceInfo_, goalGapMidpoint, goalGapWidths));
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

@@ -54,15 +54,15 @@
 #include "esp_tikz/pgf_plot.h"
 #include "esp_tikz/pgf_table.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace reports {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MultiqueryReport::MultiqueryReport(const std::shared_ptr<Configuration>& config,
-                                   const MultiqueryStatistics& stats) :
+MultiqueryReport::MultiqueryReport(const std::shared_ptr<config::Configuration>& config,
+                                   const statistics::MultiqueryStatistics& stats) :
     BaseReport(config),
     medianCostAtFirstVsQueryLinePlotter_(config, stats),
     medianCostAtLastVsQueryLinePlotter_(config, stats),
@@ -146,7 +146,7 @@ std::stringstream MultiqueryReport::overview() const {
   // Create the results summary section.
   overview << "\\subsection{Results Summary}\\label{sec:overview-results-summary}\n";
   // Create the KPI table.
-  MqKpiTable mqKpiTable(config_, stats_);
+  pgftikz::MqKpiTable mqKpiTable(config_, stats_);
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     mqKpiTable.addKpi(name, plotPlannerNames_.at(name));
   }
@@ -250,9 +250,9 @@ std::stringstream MultiqueryReport::overview() const {
     const auto n = static_cast<unsigned int>(std::floor(static_cast<double>(i*(stats_.getNumQueries()-1)) / static_cast<double>(numCostPlots-1)));
 
     auto nthQueryStatistics = stats_.getQueryStatistics(n);
-    QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter(config_, nthQueryStatistics);
-    QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(config_, nthQueryStatistics);
-    QuerySuccessVsTimeLinePlotter querySolvedVsTimeLinePlotter(config_, nthQueryStatistics);
+    plotters::QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter(config_, nthQueryStatistics);
+    plotters::QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(config_, nthQueryStatistics);
+    plotters::QuerySuccessVsTimeLinePlotter querySolvedVsTimeLinePlotter(config_, nthQueryStatistics);
 
     auto medianCostEvolutionAxis = queryMedianCostVsTimeLinePlotter.createMedianCostEvolutionAxis();
     auto medianInitialSolutionAxis = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter.createMedianInitialSolutionAxis();
@@ -272,7 +272,7 @@ std::stringstream MultiqueryReport::overview() const {
     overview << "\\subsubsection{Query " << std::to_string(n) << "}\n";
 
     // Create the KPI table.
-    KpiTable kpiTable(config_, nthQueryStatistics);
+    pgftikz::KpiTable kpiTable(config_, nthQueryStatistics);
     for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
       kpiTable.addKpi(name, plotPlannerNames_.at(name));
     }
@@ -314,6 +314,6 @@ std::stringstream MultiqueryReport::individualResults() const {
   return results;
 }
 
-}  // namespace pdt
+}  // namespace reports
 
-}  // namespace esp
+}  // namespace pdt

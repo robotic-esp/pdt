@@ -46,9 +46,9 @@
 
 #include "esp_common/planner_type.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace visualization {
 
 class PlannerSpecificData {
  public:
@@ -172,6 +172,6 @@ class EITstarData : public PlannerSpecificData {
   ompl::geometric::eitstar::Edge nextReverseEdge_{};
 };
 
-}  // namespace pdt
+}  // namespace visualization
 
-}  // namespace esp
+}  // namespace pdt

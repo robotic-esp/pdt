@@ -44,7 +44,6 @@
 #include "esp_configuration/directory.h"
 
 using namespace std::string_literals;
-using namespace esp::pdt;
 namespace fs = std::experimental::filesystem;
 
 TEST_CASE("Configuration") {
@@ -54,7 +53,7 @@ TEST_CASE("Configuration") {
   // Instantiate an empty configuration.
   const char* argv[] = {"test_esp_configuration\0"};
   const int   argc   = sizeof(argv) / sizeof(char*) - 1;
-  Configuration config(argc, argv);
+  pdt::config::Configuration config(argc, argv);
   config.clear();
 
   // Get the path of the test configurations.

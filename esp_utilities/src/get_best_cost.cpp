@@ -57,57 +57,55 @@
 
 #include "esp_common/planner_type.h"
 
-namespace esp {
-
 namespace pdt {
 
 namespace utilities {
 
-ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE plannerType) {
+ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, common::PLANNER_TYPE plannerType) {
   switch (plannerType) {
-    case PLANNER_TYPE::ABITSTAR: {
+    case common::PLANNER_TYPE::ABITSTAR: {
       return planner->as<ompl::geometric::ABITstar>()->bestCost();
     }
-    case PLANNER_TYPE::AITSTAR: {
+    case common::PLANNER_TYPE::AITSTAR: {
       return planner->as<ompl::geometric::AITstar>()->bestCost();
     }
-    case PLANNER_TYPE::BITSTAR: {
+    case common::PLANNER_TYPE::BITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
     }
-    case PLANNER_TYPE::EIRMSTAR: {
+    case common::PLANNER_TYPE::EIRMSTAR: {
       return planner->as<ompl::geometric::EIRMstar>()->bestCost();
     }
-    case PLANNER_TYPE::EITSTAR: {
+    case common::PLANNER_TYPE::EITSTAR: {
       return planner->as<ompl::geometric::EITstar>()->bestCost();
     }
-    case PLANNER_TYPE::FMTSTAR: {
+    case common::PLANNER_TYPE::FMTSTAR: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
-    case PLANNER_TYPE::INFORMEDRRTSTAR: {
+    case common::PLANNER_TYPE::INFORMEDRRTSTAR: {
       return planner->as<ompl::geometric::InformedRRTstar>()->bestCost();
     }
-    case PLANNER_TYPE::LAZYPRMSTAR: {
+    case common::PLANNER_TYPE::LAZYPRMSTAR: {
       return planner->as<ompl::geometric::LazyPRMstar>()->bestCost();
     }
-    case PLANNER_TYPE::LBTRRT: {
+    case common::PLANNER_TYPE::LBTRRT: {
       return planner->as<ompl::geometric::LBTRRT>()->bestCost();
     }
-    case PLANNER_TYPE::PRMSTAR: {
+    case common::PLANNER_TYPE::PRMSTAR: {
       return planner->as<ompl::geometric::PRMstar>()->bestCost();
     }
-    case PLANNER_TYPE::RRT: {
+    case common::PLANNER_TYPE::RRT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
-    case PLANNER_TYPE::RRTCONNECT: {
+    case common::PLANNER_TYPE::RRTCONNECT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
-    case PLANNER_TYPE::RRTSHARP: {
+    case common::PLANNER_TYPE::RRTSHARP: {
       return planner->as<ompl::geometric::RRTsharp>()->bestCost();
     }
-    case PLANNER_TYPE::RRTSTAR: {
+    case common::PLANNER_TYPE::RRTSTAR: {
       return planner->as<ompl::geometric::RRTstar>()->bestCost();
     }
-    case PLANNER_TYPE::SPARSTWO: {
+    case common::PLANNER_TYPE::SPARSTWO: {
       return planner->as<ompl::geometric::SPARStwo>()->bestCost();
     }
     default: {
@@ -119,5 +117,3 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, PLANNER_TYPE
 }  // namespace utilities
 
 }  // namespace pdt
-
-}  // namespace esp

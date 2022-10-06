@@ -53,9 +53,9 @@
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_time/time.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 /** \brief Struct defining the start/end points of a planning problem. */
 struct StartGoalPair {
@@ -67,7 +67,7 @@ struct StartGoalPair {
 class BaseContext {
  public:
   BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-              const std::shared_ptr<const Configuration>& config, const std::string& name);
+              const std::shared_ptr<const config::Configuration>& config, const std::string& name);
 
   /** \brief Returns the name of this context. */
   std::string getName() const;
@@ -103,10 +103,10 @@ class BaseContext {
   virtual void accept(const ContextVisitor& visitor) const = 0;
 
   /** \brief Get the obstacles. */
-  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const = 0;
+  virtual std::vector<std::shared_ptr<obstacles::BaseObstacle>> getObstacles() const = 0;
 
   /** \brief Get the antiobstacles */
-  virtual std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const = 0;
+  virtual std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> getAntiObstacles() const = 0;
 
   /** \brief Create a goal. */
   virtual std::shared_ptr<ompl::base::Goal> createGoal() const = 0;
@@ -150,9 +150,9 @@ class BaseContext {
   time::Duration maxSolveDuration_{};
 
   /** \brief The configuration. */
-  const std::shared_ptr<const Configuration> config_;
+  const std::shared_ptr<const config::Configuration> config_;
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

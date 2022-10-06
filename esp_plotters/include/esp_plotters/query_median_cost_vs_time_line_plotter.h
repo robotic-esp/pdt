@@ -46,20 +46,20 @@
 #include "esp_statistics/statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class QueryMedianCostVsTimeLinePlotter : public LatexPlotter {
  public:
-  QueryMedianCostVsTimeLinePlotter(const std::shared_ptr<const Configuration>& config, const Statistics& stats);
+  QueryMedianCostVsTimeLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats);
   ~QueryMedianCostVsTimeLinePlotter() = default;
 
   // Creates a pgf axis that holds the median cost at binned durations for all planners.
-  std::shared_ptr<PgfAxis> createMedianCostEvolutionAxis() const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianCostEvolutionAxis() const;
 
   // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
-  std::shared_ptr<PgfAxis> createMedianCostEvolutionAxis(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianCostEvolutionAxis(const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the median cost axis of all planners.
   std::experimental::filesystem::path createMedianCostEvolutionPicture() const;
@@ -68,23 +68,23 @@ class QueryMedianCostVsTimeLinePlotter : public LatexPlotter {
   std::experimental::filesystem::path createMedianCostEvolutionPicture(const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionPlot(const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionUpperCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCostEvolutionPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCostEvolutionUpperCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionLowerCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCostEvolutionLowerCiPlot(
       const std::string& plannerName) const;
-  std::shared_ptr<PgfPlot> createMedianCostEvolutionFillCiPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCostEvolutionFillCiPlot(
       const std::string& plannerName) const;
 
-  void setMedianCostAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setMedianCostAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
   std::vector<double> binnedDurations_{};
   double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
   double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
 
-  const Statistics& stats_;
+  const statistics::Statistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

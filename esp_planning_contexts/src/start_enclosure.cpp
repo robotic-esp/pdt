@@ -46,12 +46,12 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_planning_contexts/context_validity_checker.h"
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                               const std::shared_ptr<const Configuration>& config,
+                               const std::shared_ptr<const config::Configuration>& config,
                                const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     startOutsideWidth_(config->get<double>("context/" + name + "/startOutsideWidth")),
@@ -99,7 +99,7 @@ void StartEnclosure::createObstacles() {
   }
   std::vector<double> startWidths(dimensionality_, startOutsideWidth_);
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, startOutsideAnchor, startWidths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, startOutsideAnchor, startWidths));
 }
 
 void StartEnclosure::createAntiObstacles() {
@@ -109,7 +109,7 @@ void StartEnclosure::createAntiObstacles() {
     startInsideAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
   std::vector<double> startWidths(dimensionality_, startInsideWidth_);
-  antiObstacles_.emplace_back(std::make_shared<Hyperrectangle<BaseAntiObstacle>>(
+  antiObstacles_.emplace_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
       spaceInfo_, startInsideAnchor, startWidths));
 
   // Create the gap.
@@ -122,10 +122,10 @@ void StartEnclosure::createAntiObstacles() {
   std::vector<double> startGapWidths(dimensionality_, startGapWidth_);
   startGapWidths.at(0u) =
       (startOutsideWidth_ - startInsideWidth_) / 2.0 + std::numeric_limits<double>::epsilon();
-  antiObstacles_.emplace_back(std::make_shared<Hyperrectangle<BaseAntiObstacle>>(
+  antiObstacles_.emplace_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
       spaceInfo_, startGapAnchor, startGapWidths));
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

@@ -48,15 +48,15 @@
 #include "esp_planning_contexts/context_visitor.h"
 #include "esp_planning_contexts/real_vector_geometric_context.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 /** \brief An experiment with a singularly placed square obstacle*/
 class GoalEnclosure : public RealVectorGeometricContext {
  public:
   GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                const std::shared_ptr<const Configuration>& config, const std::string& name);
+                const std::shared_ptr<const config::Configuration>& config, const std::string& name);
   virtual ~GoalEnclosure() = default;
 
   /** \brief Accept a context visitor. */
@@ -79,6 +79,6 @@ class GoalEnclosure : public RealVectorGeometricContext {
   double goalGapWidth_{0.0};
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

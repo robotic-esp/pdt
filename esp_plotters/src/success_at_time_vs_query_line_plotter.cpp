@@ -43,27 +43,27 @@
 #include "esp_tikz/pgf_table.h"
 #include "esp_tikz/tikz_picture.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 SuccessAtTimeVsQueryLinePlotter::SuccessAtTimeVsQueryLinePlotter(
-    const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
-std::shared_ptr<PgfAxis> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryAxis(
+std::shared_ptr<pgftikz::PgfAxis> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryAxis(
     const unsigned int percentage) const {
   if (percentage != 100u && percentage != 75u && percentage != 50u && percentage != 25u){
     throw std::runtime_error("Invalid percentage in success per query plotter.");
   }
 
-  auto axis = std::make_shared<PgfAxis>();
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setSuccessRateQueryAxisOptions(axis);
 
   // Fill the axis with the success rate plots of all planners.
@@ -75,13 +75,13 @@ std::shared_ptr<PgfAxis> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQuery
   return axis;
 }
 
-std::shared_ptr<PgfAxis> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryAxis(
+std::shared_ptr<pgftikz::PgfAxis> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryAxis(
     const std::string& plannerName, const unsigned int percentage) const {
   if (percentage != 100u && percentage != 75u && percentage != 50u && percentage != 25u){
     throw std::runtime_error("Invalid percentage in success per query plotter.");
   }
 
-  auto axis = std::make_shared<PgfAxis>();
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setSuccessRateQueryAxisOptions(axis);
 
   axis->addPlot(createSuccessRateQueryPercentPlot(plannerName, percentage));
@@ -93,7 +93,7 @@ std::shared_ptr<PgfAxis> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQuery
 
 fs::path SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPicture(const unsigned int percentage) const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   auto axis = createSuccessRateQueryAxis(percentage);
   picture.addAxis(axis);
 
@@ -107,7 +107,7 @@ fs::path SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPicture(const un
 fs::path SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPicture(
     const std::string& plannerName, const unsigned int percentage) const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   auto axis = createSuccessRateQueryAxis(plannerName, percentage);
   picture.addAxis(axis);
 
@@ -118,7 +118,7 @@ fs::path SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPicture(
   return picturePath;
 }
 
-void SuccessAtTimeVsQueryLinePlotter::setSuccessRateQueryAxisOptions(std::shared_ptr<PgfAxis> axis) const {
+void SuccessAtTimeVsQueryLinePlotter::setSuccessRateQueryAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("successRatePlots/axisWidth");
   axis->options.height = config_->get<std::string>("successRatePlots/axisHeight");
   axis->options.ymin = 0.;
@@ -134,17 +134,17 @@ void SuccessAtTimeVsQueryLinePlotter::setSuccessRateQueryAxisOptions(std::shared
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPercentPlot(
+std::shared_ptr<pgftikz::PgfPlot> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPercentPlot(
     const std::string& plannerName, const unsigned int percentage) const {
 
   const auto percentString = std::to_string(percentage);
 
   // Get the table from the appropriate file.
   auto table =
-      std::make_shared<PgfTable>(stats_.extractSuccessPerQuery(plannerName), "query number", "success rate at " + percentString + " percent");
+      std::make_shared<pgftikz::PgfTable>(stats_.extractSuccessPerQuery(plannerName), "query number", "success rate at " + percentString + " percent");
 
   // Create the plot and set the options.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth = config_->get<double>("successRatePlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
@@ -153,6 +153,6 @@ std::shared_ptr<PgfPlot> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQuery
   return plot;
 }
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

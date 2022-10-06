@@ -49,9 +49,9 @@
 #include "csv/parser.hpp"
 #pragma GCC diagnostic pop
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -402,6 +402,6 @@ std::string PgfTable::string() const {
   return stream.str();
 }
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

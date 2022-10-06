@@ -42,9 +42,9 @@
 
 #include "esp_tikz/pgf_plottable.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 struct PgfFillBetweenOptions {
   std::string string() const;
@@ -65,6 +65,6 @@ class PgfFillBetween : public PlottableInterface {
   } options{};
 };
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

@@ -46,9 +46,9 @@
 
 #include "esp_tikz/pgf_plottable.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 class TabularX {
  public:
@@ -90,6 +90,6 @@ class TabularX {
   } options{};
 };
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

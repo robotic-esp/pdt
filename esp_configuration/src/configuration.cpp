@@ -48,9 +48,9 @@
 #include "esp_configuration/directory.h"
 #include "esp_configuration/version.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace config {
 
 // Convenience namespaces.
 using namespace std::string_literals;
@@ -676,6 +676,6 @@ void Configuration::handleSeedSpecification() {
   }
 }
 
-}  // namespace pdt
+}  // namespace config
 
-}  // namespace esp
+}  // namespace pdt

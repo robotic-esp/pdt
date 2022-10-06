@@ -73,9 +73,9 @@
 using namespace std::string_literals;
 using namespace std::chrono_literals;
 
-void planManipulator(std::shared_ptr<esp::pdt::Configuration> config,
-                     std::shared_ptr<esp::pdt::OpenRaveManipulator> context) {
-  esp::pdt::PlannerFactory plannerFactory(config, context);
+void planManipulator(std::shared_ptr<pdt::config::Configuration> config,
+                     std::shared_ptr<pdt::open_rave::OpenRaveManipulator> context) {
+  pdt::factories::PlannerFactory plannerFactory(config, context);
   auto [planner, plannerType] =
       plannerFactory.create(config->get<std::string>("experiment/planner"));
   (void)plannerType;
@@ -84,7 +84,7 @@ void planManipulator(std::shared_ptr<esp::pdt::Configuration> config,
   planner->setup();
 
   // Get the environment.
-  auto environment = std::dynamic_pointer_cast<esp::pdt::OpenRaveManipulatorValidityChecker>(
+  auto environment = std::dynamic_pointer_cast<pdt::open_rave::OpenRaveManipulatorValidityChecker>(
                          context->getSpaceInformation()->getStateValidityChecker())
                          ->getOpenRaveEnvironment();
 
@@ -163,9 +163,9 @@ void planManipulator(std::shared_ptr<esp::pdt::Configuration> config,
   }
 }
 
-void planMover(std::shared_ptr<esp::pdt::Configuration> config,
-               std::shared_ptr<esp::pdt::OpenRaveSE3> context) {
-  esp::pdt::PlannerFactory plannerFactory(config, context);
+void planMover(std::shared_ptr<pdt::config::Configuration> config,
+               std::shared_ptr<pdt::open_rave::OpenRaveSE3> context) {
+  pdt::factories::PlannerFactory plannerFactory(config, context);
   auto [planner, plannerType] =
       plannerFactory.create(config->get<std::string>("experiment/planner"));
   (void)plannerType;
@@ -174,7 +174,7 @@ void planMover(std::shared_ptr<esp::pdt::Configuration> config,
   planner->setup();
 
   // Get the environment.
-  auto environment = std::dynamic_pointer_cast<esp::pdt::OpenRaveSE3ValidityChecker>(
+  auto environment = std::dynamic_pointer_cast<pdt::open_rave::OpenRaveSE3ValidityChecker>(
                          context->getSpaceInformation()->getStateValidityChecker())
                          ->getOpenRaveEnvironment();
 
@@ -255,9 +255,9 @@ void planMover(std::shared_ptr<esp::pdt::Configuration> config,
   }
 }
 
-void planR3(std::shared_ptr<esp::pdt::Configuration> config,
-            std::shared_ptr<esp::pdt::OpenRaveR3> context) {
-  esp::pdt::PlannerFactory plannerFactory(config, context);
+void planR3(std::shared_ptr<pdt::config::Configuration> config,
+            std::shared_ptr<pdt::open_rave::OpenRaveR3> context) {
+  pdt::factories::PlannerFactory plannerFactory(config, context);
   auto [planner, plannerType] =
       plannerFactory.create(config->get<std::string>("experiment/planner"));
   (void)plannerType;
@@ -266,7 +266,7 @@ void planR3(std::shared_ptr<esp::pdt::Configuration> config,
   planner->setup();
 
   // Get the environment.
-  auto environment = std::dynamic_pointer_cast<esp::pdt::OpenRaveR3ValidityChecker>(
+  auto environment = std::dynamic_pointer_cast<pdt::open_rave::OpenRaveR3ValidityChecker>(
                          context->getSpaceInformation()->getStateValidityChecker())
                          ->getOpenRaveEnvironment();
 
@@ -344,9 +344,9 @@ void planR3(std::shared_ptr<esp::pdt::Configuration> config,
   }
 }
 
-void planR3xSO2(std::shared_ptr<esp::pdt::Configuration> config,
-                std::shared_ptr<esp::pdt::OpenRaveR3xSO2> context) {
-  esp::pdt::PlannerFactory plannerFactory(config, context);
+void planR3xSO2(std::shared_ptr<pdt::config::Configuration> config,
+                std::shared_ptr<pdt::open_rave::OpenRaveR3xSO2> context) {
+  pdt::factories::PlannerFactory plannerFactory(config, context);
   auto [planner, plannerType] =
       plannerFactory.create(config->get<std::string>("experiment/planner"));
   (void)plannerType;
@@ -355,7 +355,7 @@ void planR3xSO2(std::shared_ptr<esp::pdt::Configuration> config,
   planner->setup();
 
   // Get the environment.
-  auto environment = std::dynamic_pointer_cast<esp::pdt::OpenRaveR3xSO2ValidityChecker>(
+  auto environment = std::dynamic_pointer_cast<pdt::open_rave::OpenRaveR3xSO2ValidityChecker>(
                          context->getSpaceInformation()->getStateValidityChecker())
                          ->getOpenRaveEnvironment();
 
@@ -443,17 +443,17 @@ void planR3xSO2(std::shared_ptr<esp::pdt::Configuration> config,
 
 int main(const int argc, const char** argv) {
   // Instantiate the config.
-  auto config = std::make_shared<esp::pdt::Configuration>(argc, argv);
+  auto config = std::make_shared<pdt::config::Configuration>(argc, argv);
   config->registerAsExperiment();
 
   // Create the context.
-  auto contextFactory = std::make_shared<esp::pdt::ContextFactory>(config);
+  auto contextFactory = std::make_shared<pdt::factories::ContextFactory>(config);
   auto context = contextFactory->create(config->get<std::string>("experiment/context"));
 
-  if (std::dynamic_pointer_cast<esp::pdt::OpenRaveManipulator>(context)) {
+  if (std::dynamic_pointer_cast<pdt::open_rave::OpenRaveManipulator>(context)) {
     // Get the environment.
     auto environment =
-        std::dynamic_pointer_cast<esp::pdt::OpenRaveManipulatorValidityChecker>(
+        std::dynamic_pointer_cast<pdt::open_rave::OpenRaveManipulatorValidityChecker>(
             context->getSpaceInformation()->getStateValidityChecker())
             ->getOpenRaveEnvironment();
 
@@ -463,7 +463,7 @@ int main(const int argc, const char** argv) {
 
     auto planThread =
         std::thread(&planManipulator, config,
-                    std::dynamic_pointer_cast<esp::pdt::OpenRaveManipulator>(context));
+                    std::dynamic_pointer_cast<pdt::open_rave::OpenRaveManipulator>(context));
 
     viewer->main(true);
 
@@ -472,9 +472,9 @@ int main(const int argc, const char** argv) {
     }
 
     planThread.join();
-  } else if (std::dynamic_pointer_cast<esp::pdt::OpenRaveSE3>(context)) {
+  } else if (std::dynamic_pointer_cast<pdt::open_rave::OpenRaveSE3>(context)) {
     // Get the environment.
-    auto environment = std::dynamic_pointer_cast<esp::pdt::OpenRaveSE3ValidityChecker>(
+    auto environment = std::dynamic_pointer_cast<pdt::open_rave::OpenRaveSE3ValidityChecker>(
                            context->getSpaceInformation()->getStateValidityChecker())
                            ->getOpenRaveEnvironment();
 
@@ -483,7 +483,7 @@ int main(const int argc, const char** argv) {
         OpenRAVE::RaveCreateViewer(environment, config->get<std::string>("experiment/viewer"));
 
     auto planThread = std::thread(&planMover, config,
-                                  std::dynamic_pointer_cast<esp::pdt::OpenRaveSE3>(context));
+                                  std::dynamic_pointer_cast<pdt::open_rave::OpenRaveSE3>(context));
 
     viewer->main(true);
 
@@ -492,9 +492,9 @@ int main(const int argc, const char** argv) {
     }
 
     planThread.join();
-  } else if (std::dynamic_pointer_cast<esp::pdt::OpenRaveR3>(context)) {
+  } else if (std::dynamic_pointer_cast<pdt::open_rave::OpenRaveR3>(context)) {
     // Get the environment.
-    auto environment = std::dynamic_pointer_cast<esp::pdt::OpenRaveR3ValidityChecker>(
+    auto environment = std::dynamic_pointer_cast<pdt::open_rave::OpenRaveR3ValidityChecker>(
                            context->getSpaceInformation()->getStateValidityChecker())
                            ->getOpenRaveEnvironment();
 
@@ -503,7 +503,7 @@ int main(const int argc, const char** argv) {
         OpenRAVE::RaveCreateViewer(environment, config->get<std::string>("experiment/viewer"));
 
     auto planThread = std::thread(&planR3, config,
-                                  std::dynamic_pointer_cast<esp::pdt::OpenRaveR3>(context));
+                                  std::dynamic_pointer_cast<pdt::open_rave::OpenRaveR3>(context));
 
     viewer->main(true);
 
@@ -512,9 +512,9 @@ int main(const int argc, const char** argv) {
     }
 
     planThread.join();
-  } else if (std::dynamic_pointer_cast<esp::pdt::OpenRaveR3xSO2>(context)) {
+  } else if (std::dynamic_pointer_cast<pdt::open_rave::OpenRaveR3xSO2>(context)) {
     // Get the environment.
-    auto environment = std::dynamic_pointer_cast<esp::pdt::OpenRaveR3xSO2ValidityChecker>(
+    auto environment = std::dynamic_pointer_cast<pdt::open_rave::OpenRaveR3xSO2ValidityChecker>(
                            context->getSpaceInformation()->getStateValidityChecker())
                            ->getOpenRaveEnvironment();
 
@@ -523,7 +523,7 @@ int main(const int argc, const char** argv) {
         OpenRAVE::RaveCreateViewer(environment, config->get<std::string>("experiment/viewer"));
 
     auto planThread = std::thread(
-        &planR3xSO2, config, std::dynamic_pointer_cast<esp::pdt::OpenRaveR3xSO2>(context));
+        &planR3xSO2, config, std::dynamic_pointer_cast<pdt::open_rave::OpenRaveR3xSO2>(context));
 
     viewer->main(true);
 

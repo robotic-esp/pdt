@@ -37,14 +37,14 @@
 
 #include <experimental/filesystem>
 
-namespace esp {
-
 namespace pdt {
+
+namespace config {
 
 struct Directory {
   static const std::experimental::filesystem::path SOURCE;
 };
 
-}  // namespace pdt
+}  // namespace config
 
-}  // namespace esp
+}  // namespace pdt

@@ -39,9 +39,9 @@
 
 #include <sstream>
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -52,7 +52,7 @@ std::string TikzPictureOptions::string() const {
   return stream.str();
 }
 
-TikzPicture::TikzPicture(const std::shared_ptr<const Configuration>& config) : config_(config) {
+TikzPicture::TikzPicture(const std::shared_ptr<const config::Configuration>& config) : config_(config) {
   // Load colors from config.
   espColors_.emplace("espblack", config_->get<std::array<int, 3>>("colors/espblack"));
   espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("colors/espwhite"));
@@ -161,6 +161,6 @@ void TikzPicture::write(const std::experimental::filesystem::path& path) const {
   texFile << string();
 }
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

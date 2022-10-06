@@ -39,9 +39,9 @@
 
 #include <string>
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 class TikzDraw {
  public:
@@ -64,6 +64,6 @@ private:
   std::string connection_{""};
 };
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

@@ -51,9 +51,9 @@
 
 #include "esp_obstacles/base_obstacle.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace obstacles {
 
 class BinaryMap : public BaseObstacle {
  public:
@@ -94,6 +94,6 @@ class BinaryMap : public BaseObstacle {
   Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> obsData_{0, 0};
 };
 
-}  // namespace pdt
+}  // namespace obstacles
 
-}  // namespace esp
+}  // namespace pdt

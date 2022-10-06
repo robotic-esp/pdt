@@ -39,9 +39,9 @@
 
 #include <string>
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 class TikzNode {
  public:
@@ -63,6 +63,6 @@ private:
   std::string label_{""};
 };
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

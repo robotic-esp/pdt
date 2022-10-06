@@ -41,9 +41,9 @@
 
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-namespace esp {
-
 namespace pdt {
+
+namespace objectives {
 
 MaxMinClearanceOptimizationObjective::MaxMinClearanceOptimizationObjective(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo) :
@@ -128,6 +128,6 @@ void MaxMinClearanceOptimizationObjective::accept(const ObjectiveVisitor& visito
   visitor.visit(*this);
 }
 
-}  // namespace pdt
+}  // namespace objectives
 
-}  // namespace esp
+}  // namespace pdt

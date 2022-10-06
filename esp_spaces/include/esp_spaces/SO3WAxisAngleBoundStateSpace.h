@@ -42,9 +42,10 @@
 
 #include <boost/math/constants/constants.hpp>
 
-namespace esp {
-
 namespace pdt {
+
+namespace spaces {
+
 /** \brief State space sampler for SO(3) with a rotation bound defined by axis angle. */
 class SO3WAxisAngleBoundStateSampler : public ompl::base::SO3StateSampler {
  public:
@@ -87,6 +88,6 @@ class SO3WAxisAngleBoundStateSpace : public ompl::base::SO3StateSpace {
   double maxRotation_{boost::math::constants::pi<double>()};
 };
 
-}  // namespace pdt
+}  // namespace spaces
 
-}  // namespace esp
+}  // namespace pdt

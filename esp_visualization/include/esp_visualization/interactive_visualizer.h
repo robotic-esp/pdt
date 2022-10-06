@@ -52,18 +52,18 @@
 #include "esp_visualization/base_visualizer.h"
 #include "esp_visualization/tikz_visualizer.h"
 
-namespace esp {
-
 namespace pdt {
 
+namespace visualization {
+
 class InteractiveVisualizer : public BaseVisualizer,
-                              public ContextVisitor,
-                              public ObstacleVisitor,
-                              public ObjectiveVisitor {
+                              public planning_contexts::ContextVisitor,
+                              public obstacles::ObstacleVisitor,
+                              public objectives::ObjectiveVisitor {
  public:
   InteractiveVisualizer(
-      const std::shared_ptr<Configuration>& config, const std::shared_ptr<BaseContext>& context,
-      const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE> plannerPair);
+      const std::shared_ptr<config::Configuration>& config, const std::shared_ptr<planning_contexts::BaseContext>& context,
+      const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> plannerPair);
   ~InteractiveVisualizer() = default;
 
   void run();
@@ -137,29 +137,29 @@ class InteractiveVisualizer : public BaseVisualizer,
                 float alpha = 1.0) const;
 
   // Implement visualizations of contexts.
-  void visit(const CentreSquare& context) const override;
-  void visit(const DividingWalls& context) const override;
-  void visit(const DoubleEnclosure& context) const override;
-  void visit(const FlankingGap& context) const override;
-  void visit(const FourRooms& context) const override;
-  void visit(const GoalEnclosure& context) const override;
-  void visit(const NarrowPassage& context) const override;
-  void visit(const ObstacleFree& context) const override;
-  void visit(const RandomRectangles& context) const override;
-  void visit(const RandomRectanglesMultiStartGoal& context) const override;
-  void visit(const ReedsSheppRandomRectangles& context) const override;
-  void visit(const RepeatingRectangles& context) const override;
-  void visit(const StartEnclosure& context) const override;
-  void visit(const WallGap& context) const override;
+  void visit(const planning_contexts::CentreSquare& context) const override;
+  void visit(const planning_contexts::DividingWalls& context) const override;
+  void visit(const planning_contexts::DoubleEnclosure& context) const override;
+  void visit(const planning_contexts::FlankingGap& context) const override;
+  void visit(const planning_contexts::FourRooms& context) const override;
+  void visit(const planning_contexts::GoalEnclosure& context) const override;
+  void visit(const planning_contexts::NarrowPassage& context) const override;
+  void visit(const planning_contexts::ObstacleFree& context) const override;
+  void visit(const planning_contexts::RandomRectangles& context) const override;
+  void visit(const planning_contexts::RandomRectanglesMultiStartGoal& context) const override;
+  void visit(const planning_contexts::ReedsSheppRandomRectangles& context) const override;
+  void visit(const planning_contexts::RepeatingRectangles& context) const override;
+  void visit(const planning_contexts::StartEnclosure& context) const override;
+  void visit(const planning_contexts::WallGap& context) const override;
 
   // Implement visualizations of obstacles.
-  void visit(const Hyperrectangle<BaseObstacle>& obstacle) const override;
-  void visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const override;
+  void visit(const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const override;
+  void visit(const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const override;
 
   // Implement visualizations of objectives.
-  void visit(const PotentialFieldOptimizationObjective& objective) const override;
-  void visit(const ReciprocalClearanceOptimizationObjective& objective) const override;
-  void visit(const MaxMinClearanceOptimizationObjective& objective) const override;
+  void visit(const objectives::PotentialFieldOptimizationObjective& objective) const override;
+  void visit(const objectives::ReciprocalClearanceOptimizationObjective& objective) const override;
+  void visit(const objectives::MaxMinClearanceOptimizationObjective& objective) const override;
 
   // Objective coloring helpers.
   mutable float minOptimizationCost_{std::numeric_limits<float>::max()};
@@ -187,9 +187,9 @@ class InteractiveVisualizer : public BaseVisualizer,
   TikzVisualizer tikzVisualizer_;
 
   // The configuration.
-  std::shared_ptr<const Configuration> config_;
+  std::shared_ptr<const config::Configuration> config_;
 };
 
-}  // namespace pdt
+}  // namespace visualization
 
-}  // namespace esp
+}  // namespace pdt

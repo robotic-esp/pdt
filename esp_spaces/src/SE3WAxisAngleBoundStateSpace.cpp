@@ -37,12 +37,20 @@
 
 #include "esp_spaces/SE3WAxisAngleBoundStateSpace.h"
 
-ompl::base::State *esp::pdt::SE3WAxisAngleBoundStateSpace::allocState() const {
+namespace pdt {
+
+namespace spaces {
+
+ompl::base::State *SE3WAxisAngleBoundStateSpace::allocState() const {
   auto *state = new StateType();
   allocStateComponents(state);
   return state;
 }
 
-void esp::pdt::SE3WAxisAngleBoundStateSpace::freeState(ompl::base::State *state) const {
+void SE3WAxisAngleBoundStateSpace::freeState(ompl::base::State *state) const {
   ompl::base::CompoundStateSpace::freeState(state);
 }
+
+}  // namespace spaces
+
+}  // namespace pdt

@@ -49,9 +49,9 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_obstacles/obstacle_visitor.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 class ReedsSheppValidityChecker : public ompl::base::StateValidityChecker {
  public:
@@ -65,11 +65,11 @@ class ReedsSheppValidityChecker : public ompl::base::StateValidityChecker {
   virtual double clearance(const ompl::base::State* state) const override;
 
   // Add obstacles.
-  virtual void addObstacle(const std::shared_ptr<BaseObstacle>& obstacle);
-  virtual void addObstacles(const std::vector<std::shared_ptr<BaseObstacle>>& obstacles);
+  virtual void addObstacle(const std::shared_ptr<obstacles::BaseObstacle>& obstacle);
+  virtual void addObstacles(const std::vector<std::shared_ptr<obstacles::BaseObstacle>>& obstacles);
 
   // Make obstacles accessible.
-  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const;
+  virtual std::vector<std::shared_ptr<obstacles::BaseObstacle>> getObstacles() const;
 
  protected:
   // The normalized width and length of the Reeds-Shepp car.
@@ -86,9 +86,9 @@ class ReedsSheppValidityChecker : public ompl::base::StateValidityChecker {
   ompl::base::RealVectorStateSpace* vectorSpace_{};
   ompl::base::SO2StateSpace* so2Space_{};
 
-  std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
+  std::vector<std::shared_ptr<obstacles::BaseObstacle>> obstacles_{};
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

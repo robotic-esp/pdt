@@ -40,12 +40,12 @@
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 NarrowPassage::NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                             const std::shared_ptr<const Configuration>& config,
+                             const std::shared_ptr<const config::Configuration>& config,
                              const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
@@ -136,11 +136,11 @@ void NarrowPassage::createObstacles() {
 
   // Add both obstacles.
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, lowerAnchor, lowerWidths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, lowerAnchor, lowerWidths));
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, upperAnchor, upperWidths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, upperAnchor, upperWidths));
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

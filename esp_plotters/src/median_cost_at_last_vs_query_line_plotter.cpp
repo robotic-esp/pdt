@@ -43,30 +43,30 @@
 #include "esp_tikz/pgf_table.h"
 #include "esp_tikz/tikz_picture.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 MedianCostAtLastVsQueryLinePlotter::MedianCostAtLastVsQueryLinePlotter(
-    const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostAxis() const {
-  auto axis = std::make_shared<PgfAxis>();
+std::shared_ptr<pgftikz::PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostAxis() const {
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianFinalCostAxisOptions(axis);
 
   // Fill the axis with the median final cost plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("medianFinalCostPerQueryPlots/plotConfidenceIntervalInAllPlots")) {
-      std::shared_ptr<PgfPlot> upperCi = createMedianFinalCostUpperCiPlot(name);
-      std::shared_ptr<PgfPlot> lowerCi = createMedianFinalCostLowerCiPlot(name);
-      std::shared_ptr<PgfPlot> fillCi = createMedianFinalCostFillCiPlot(name);
+      std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianFinalCostUpperCiPlot(name);
+      std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianFinalCostLowerCiPlot(name);
+      std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianFinalCostFillCiPlot(name);
       if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
         axis->addPlot(upperCi);
         axis->addPlot(lowerCi);
@@ -82,15 +82,15 @@ std::shared_ptr<PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   return axis;
 }
 
-std::shared_ptr<PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostAxis(
+std::shared_ptr<pgftikz::PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostAxis(
     const std::string& plannerName) const {
-  auto axis = std::make_shared<PgfAxis>();
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianFinalCostAxisOptions(axis);
 
   // Add all the the median final cost plots.
-  std::shared_ptr<PgfPlot> upperCi = createMedianFinalCostUpperCiPlot(plannerName);
-  std::shared_ptr<PgfPlot> lowerCi = createMedianFinalCostLowerCiPlot(plannerName);
-  std::shared_ptr<PgfPlot> fillCi = createMedianFinalCostFillCiPlot(plannerName);
+  std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianFinalCostUpperCiPlot(plannerName);
+  std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianFinalCostLowerCiPlot(plannerName);
+  std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianFinalCostFillCiPlot(plannerName);
   if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
     axis->addPlot(upperCi);
     axis->addPlot(lowerCi);
@@ -104,7 +104,7 @@ std::shared_ptr<PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
 
 fs::path MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPicture() const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   auto axis = createMedianFinalCostAxis();
   picture.addAxis(axis);
 
@@ -118,7 +118,7 @@ fs::path MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPicture() cons
 fs::path MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   auto axis = createMedianFinalCostAxis(plannerName);
   picture.addAxis(axis);
 
@@ -130,7 +130,7 @@ fs::path MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPicture(
 }
 
 void MedianCostAtLastVsQueryLinePlotter::setMedianFinalCostAxisOptions(
-    std::shared_ptr<PgfAxis> axis) const {
+    std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("medianFinalCostPerQueryPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianFinalCostPerQueryPlots/axisHeight");
   // axis->options.xmax = maxCostToBePlotted_;
@@ -147,10 +147,10 @@ void MedianCostAtLastVsQueryLinePlotter::setMedianFinalCostAxisOptions(
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPlot(
+std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(
+  auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianFinalSolutionPerQuery(
           plannerName, config_->get<double>("medianFinalCostPerQueryPlots/confidence")),
       "query number", "median last solution cost");
@@ -160,7 +160,7 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   table->removeRowIfCodomainIsNan();
 
   // Create the plot and set the options.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth = config_->get<double>("medianFinalCostPerQueryPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
@@ -170,10 +170,10 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostUpperCiPlot(
+std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(
+  auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianFinalSolutionPerQuery(
           plannerName, config_->get<double>("medianFinalCostPerQueryPlots/confidence")),
       "query number", "upper last solution cost confidence bound");
@@ -183,14 +183,14 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return std::make_shared<PgfPlot>();
+    return std::make_shared<pgftikz::PgfPlot>();
   }
 
   // Replace the infinite values with very high values, otherwise they're not plotted.
   table->replaceInCodomain(std::numeric_limits<double>::infinity(), 3 * stats_.getMaxNonInfCost());
 
   // Create the plot and set the options.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth =
       config_->get<double>("medianFinalCostPerQueryPlots/confidenceIntervalLineWidth");
@@ -205,10 +205,10 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostLowerCiPlot(
+std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
-  auto table = std::make_shared<PgfTable>(
+  auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianFinalSolutionPerQuery(
           plannerName, config_->get<double>("medianFinalCostPerQueryPlots/confidence")),
       "query number", "lower last solution cost confidence bound");
@@ -218,11 +218,11 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   table->removeRowIfCodomainIsNan();
 
   if (table->empty()) {
-    return std::make_shared<PgfPlot>();
+    return std::make_shared<pgftikz::PgfPlot>();
   }
 
   // Create the plot and set the options.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth =
       config_->get<double>("medianFinalCostPerQueryPlots/confidenceIntervalLineWidth");
@@ -237,15 +237,15 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   return plot;
 }
 
-std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostFillCiPlot(
+std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =
-      std::make_shared<PgfFillBetween>(plannerName + "MedianFinalCostPerQueryUpperConfidence",
+      std::make_shared<pgftikz::PgfFillBetween>(plannerName + "MedianFinalCostPerQueryUpperConfidence",
                                        plannerName + "MedianFinalCostPerQueryLowerConfidence");
 
   // Create the plot.
-  auto plot = std::make_shared<PgfPlot>(fillBetween);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.fillOpacity =
       config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
@@ -255,6 +255,6 @@ std::shared_ptr<PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCo
   return plot;
 }
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

@@ -46,9 +46,9 @@
 
 #include "esp_tikz/pgf_plottable.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 class PgfTable : public PlottableInterface {
  public:
@@ -110,6 +110,6 @@ class PgfTable : public PlottableInterface {
   } options{};
 };
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

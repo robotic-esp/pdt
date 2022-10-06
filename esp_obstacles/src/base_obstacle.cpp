@@ -37,9 +37,9 @@
 
 #include "esp_obstacles/base_obstacle.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace obstacles {
 
 GeometricShape::GeometricShape(const ompl::base::SpaceInformationPtr& spaceInfo) :
     spaceInfo_(spaceInfo),
@@ -95,6 +95,6 @@ bool BaseAntiObstacle::validates(const ompl::base::ScopedState<> state) const {
   return validates(state.get());
 }
 
-}  // namespace pdt
+}  // namespace obstacles
 
-}  // namespace esp
+}  // namespace pdt

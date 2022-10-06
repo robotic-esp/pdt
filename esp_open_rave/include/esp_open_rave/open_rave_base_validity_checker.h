@@ -59,9 +59,9 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_obstacles/obstacle_visitor.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace open_rave {
 
 class OpenRaveBaseValidityChecker : public ompl::base::StateValidityChecker {
  public:
@@ -69,7 +69,7 @@ class OpenRaveBaseValidityChecker : public ompl::base::StateValidityChecker {
   OpenRaveBaseValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
                               const OpenRAVE::EnvironmentBasePtr& environment,
                               const OpenRAVE::RobotBasePtr& robot,
-                              const std::shared_ptr<const Configuration>& config);
+                              const std::shared_ptr<const config::Configuration>& config);
 
   /** \brief The destructor. */
   virtual ~OpenRaveBaseValidityChecker() = default;
@@ -94,9 +94,9 @@ class OpenRaveBaseValidityChecker : public ompl::base::StateValidityChecker {
   mutable boost::shared_ptr<OpenRAVE::CollisionReport> collisionReport_;
 
   /** \brief The configuration. */
-  const std::shared_ptr<const Configuration> config_;
+  const std::shared_ptr<const config::Configuration> config_;
 };
 
-}  // namespace pdt
+}  // namespace open_rave
 
-}  // namespace esp
+}  // namespace pdt

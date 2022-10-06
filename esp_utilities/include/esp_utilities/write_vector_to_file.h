@@ -43,8 +43,6 @@
 #include <vector>
 #include <fstream>
 
-namespace esp {
-
 namespace pdt {
 
 namespace utilities {
@@ -64,5 +62,3 @@ std::ofstream& writeVectorToFile(std::ofstream &filestream,
 }  // namespace utilities
 
 }  // namespace pdt
-
-}  // namespace esp

@@ -39,9 +39,9 @@
 
 #include <sstream>
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 PgfFillBetween::PgfFillBetween(const std::string& name1, const std::string& name2) {
   options.name1 = name1;
@@ -58,6 +58,6 @@ std::string PgfFillBetween::string() const {
   return stream.str();
 }
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

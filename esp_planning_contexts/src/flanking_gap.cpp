@@ -40,12 +40,12 @@
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 FlankingGap::FlankingGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                         const std::shared_ptr<const Configuration>& config,
+                         const std::shared_ptr<const config::Configuration>& config,
                          const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     wallWidth_(config->get<double>("context/" + name + "/wallWidth")),
@@ -114,7 +114,7 @@ void FlankingGap::createObstacles() {
     widths.at(j) = wallWidth_;
   }
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor, widths));
 }
 
 void FlankingGap::createAntiObstacles() {
@@ -145,9 +145,9 @@ void FlankingGap::createAntiObstacles() {
     widths.at(j) = gapWidth_;
   }
   antiObstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseAntiObstacle>>(spaceInfo_, anchor, widths));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, anchor, widths));
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

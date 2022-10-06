@@ -37,12 +37,12 @@
 
 #define PDT_SOURCE_DIRECTORY "@CMAKE_SOURCE_DIR@"
 
-namespace esp {
-
 namespace pdt {
+
+namespace config {
 
 const std::experimental::filesystem::path Directory::SOURCE = PDT_SOURCE_DIRECTORY;
 
-}  // namespace pdt
+}  // namespace config
 
-}  // namespace esp
+}  // namespace pdt

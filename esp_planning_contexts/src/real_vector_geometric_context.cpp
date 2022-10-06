@@ -42,13 +42,13 @@
 #include <ompl/base/goals/GoalStates.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 RealVectorGeometricContext::RealVectorGeometricContext(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-    const std::shared_ptr<const Configuration>& config, const std::string& name) :
+    const std::shared_ptr<const config::Configuration>& config, const std::string& name) :
     BaseContext(spaceInfo, config, name),
     bounds_(static_cast<unsigned int>(dimensionality_)) {
   // Fill the state space bounds.
@@ -60,11 +60,11 @@ RealVectorGeometricContext::RealVectorGeometricContext(
   }
 }
 
-std::vector<std::shared_ptr<BaseObstacle>> RealVectorGeometricContext::getObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseObstacle>> RealVectorGeometricContext::getObstacles() const {
   return obstacles_;
 }
 
-std::vector<std::shared_ptr<BaseAntiObstacle>> RealVectorGeometricContext::getAntiObstacles()
+std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> RealVectorGeometricContext::getAntiObstacles()
     const {
   return antiObstacles_;
 }
@@ -135,6 +135,6 @@ std::shared_ptr<ompl::base::Goal> RealVectorGeometricContext::createGoal() const
   }
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

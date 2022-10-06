@@ -44,9 +44,9 @@
 
 #include "esp_tikz/pgf_plot.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 class PgfAxis {
  public:
@@ -159,6 +159,6 @@ void PgfAxis::mergePlots(Axes... args) {
   }
 }
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt

@@ -46,22 +46,22 @@
 #include "esp_statistics/multiquery_statistics.h"
 #include "esp_tikz/pgf_axis.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class SuccessAtTimeVsQueryLinePlotter : public LatexPlotter {
  public:
-  SuccessAtTimeVsQueryLinePlotter(const std::shared_ptr<const Configuration>& config, const MultiqueryStatistics& stats);
+  SuccessAtTimeVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
   ~SuccessAtTimeVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the success rate at a given percentage of the total time for all planners.
   // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
-  std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(const unsigned int percentage) const;
+  std::shared_ptr<pgftikz::PgfAxis> createSuccessRateQueryAxis(const unsigned int percentage) const;
 
   // Creates a pgf axis that holds the success rate at a given percentage of the total time for the specified planner.
   // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
-  std::shared_ptr<PgfAxis> createSuccessRateQueryAxis(
+  std::shared_ptr<pgftikz::PgfAxis> createSuccessRateQueryAxis(
       const std::string& plannerName, const unsigned int percentage) const;
 
   // Creates a tikz picture that contains the success rate axis of all planners.
@@ -73,14 +73,14 @@ class SuccessAtTimeVsQueryLinePlotter : public LatexPlotter {
   std::experimental::filesystem::path createSuccessRateQueryPicture(const std::string& plannerName, const unsigned int percentage) const;
 
  private:
-  std::shared_ptr<PgfPlot> createSuccessRateQueryPercentPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createSuccessRateQueryPercentPlot(
       const std::string& plannerName, const unsigned int percentage) const;
 
-  void setSuccessRateQueryAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setSuccessRateQueryAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
-  const MultiqueryStatistics& stats_;
+  const statistics::MultiqueryStatistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

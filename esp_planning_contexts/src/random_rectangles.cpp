@@ -50,12 +50,12 @@
 
 using namespace std::string_literals;
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                                   const std::shared_ptr<const Configuration>& config,
+                                   const std::shared_ptr<const config::Configuration>& config,
                                    const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     numRectangles_(config->get<std::size_t>("context/" + name + "/numObstacles")),
@@ -145,7 +145,7 @@ void RandomRectangles::createObstacles() {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
 
-    auto obstacle = std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor, widths);
+    auto obstacle = std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor, widths);
 
     // Add this to the obstacles if it doesn't invalidate the start or goal state.
     bool invalidates = false;
@@ -189,6 +189,6 @@ void RandomRectangles::createObstacles() {
   }
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

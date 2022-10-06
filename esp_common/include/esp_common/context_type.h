@@ -42,9 +42,9 @@
 #include "nlohmann/json.hpp"
 #pragma GCC diagnostic pop
 
-namespace esp {
-
 namespace pdt {
+
+namespace common {
 
 enum class CONTEXT_TYPE {
   CENTRE_SQUARE,
@@ -93,6 +93,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(CONTEXT_TYPE,
                                  {CONTEXT_TYPE::WALL_GAP, "WallGap"},
                              })
 
-}  // namespace pdt
+}  // namespace common
 
-}  // namespace esp
+}  // namespace pdt

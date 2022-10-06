@@ -46,15 +46,15 @@
 #include "esp_tikz/tikz_draw.h"
 #include "esp_tikz/tikz_node.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace visualization {
 
 using namespace std::string_literals;
 
 TikzVisualizer::TikzVisualizer(
-    const std::shared_ptr<const Configuration>& config, const std::shared_ptr<BaseContext>& context,
-    const std::pair<std::shared_ptr<ompl::base::Planner>, PLANNER_TYPE>& plannerPair) :
+    const std::shared_ptr<const config::Configuration>& config, const std::shared_ptr<planning_contexts::BaseContext>& context,
+    const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE>& plannerPair) :
     config_(config),
     context_(context),
     plannerType_(plannerPair.second),
@@ -146,8 +146,8 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, const st
   drawSolution(path);
 
   // Clip the picture to the boundaries.
-  const auto vectorContext = std::dynamic_pointer_cast<RealVectorGeometricContext>(context_);
-  const auto se2Context = std::dynamic_pointer_cast<RealVectorGeometricContext>(context_);
+  const auto vectorContext = std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
+  const auto se2Context = std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
   auto boundaries = ompl::base::RealVectorBounds(2u);
   if (vectorContext) {
     boundaries = vectorContext->getBoundaries();
@@ -163,7 +163,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, const st
   picture_.setClipCommand("\\clip ("s + std::to_string(minX) + ", "s + std::to_string(minY) +
                           ") rectangle (" + std::to_string(maxX) + ", "s + std::to_string(maxY) +
                           ");");
-  picture_.setOptions(TikzPictureOptions({10, 10}));
+  picture_.setOptions(pgftikz::TikzPictureOptions({10, 10}));
 
   // Export to a file.
   std::stringstream texFilename;
@@ -296,88 +296,88 @@ void TikzVisualizer::logToFrameTimes(const std::experimental::filesystem::path& 
   frameTimes_.close();
 }
 
-void TikzVisualizer::visit(const CentreSquare& context) const {
+void TikzVisualizer::visit(const planning_contexts::CentreSquare& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const DividingWalls& context) const {
+void TikzVisualizer::visit(const planning_contexts::DividingWalls& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const DoubleEnclosure& context) const {
+void TikzVisualizer::visit(const planning_contexts::DoubleEnclosure& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const FlankingGap& context) const {
+void TikzVisualizer::visit(const planning_contexts::FlankingGap& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const FourRooms& context) const {
+void TikzVisualizer::visit(const planning_contexts::FourRooms& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const GoalEnclosure& context) const {
+void TikzVisualizer::visit(const planning_contexts::GoalEnclosure& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const NarrowPassage& context) const {
+void TikzVisualizer::visit(const planning_contexts::NarrowPassage& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const ObstacleFree& context) const {
+void TikzVisualizer::visit(const planning_contexts::ObstacleFree& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const RandomRectangles& context) const {
+void TikzVisualizer::visit(const planning_contexts::RandomRectangles& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const RandomRectanglesMultiStartGoal& context) const {
+void TikzVisualizer::visit(const planning_contexts::RandomRectanglesMultiStartGoal& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const ReedsSheppRandomRectangles& context) const {
+void TikzVisualizer::visit(const planning_contexts::ReedsSheppRandomRectangles& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const RepeatingRectangles& context) const {
+void TikzVisualizer::visit(const planning_contexts::RepeatingRectangles& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const StartEnclosure& context) const {
+void TikzVisualizer::visit(const planning_contexts::StartEnclosure& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const WallGap& context) const {
+void TikzVisualizer::visit(const planning_contexts::WallGap& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const Hyperrectangle<BaseObstacle>& obstacle) const {
+void TikzVisualizer::visit(const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const {
   drawRectangle(obstacle.getAnchorCoordinates().at(0), obstacle.getAnchorCoordinates().at(1),
                 obstacle.getWidths().at(0), obstacle.getWidths().at(1), "obstacle");
 }
 
-void TikzVisualizer::visit(const Hyperrectangle<BaseAntiObstacle>& antiObstacle) const {
+void TikzVisualizer::visit(const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const {
   drawRectangle(antiObstacle.getAnchorCoordinates().at(0),
                 antiObstacle.getAnchorCoordinates().at(1), antiObstacle.getWidths().at(0) + 1e-2,
                 antiObstacle.getWidths().at(1) + 1e-2, "antiobstacle");
 }
 
-void TikzVisualizer::drawBoundary(const RealVectorGeometricContext& context) const {
+void TikzVisualizer::drawBoundary(const planning_contexts::RealVectorGeometricContext& context) const {
   const auto boundaries = context.getBoundaries();
   double midX = (boundaries.low.at(0u) + boundaries.high.at(0u)) / 2.0;
   double midY = (boundaries.low.at(1u) + boundaries.high.at(1u)) / 2.0;
@@ -386,7 +386,7 @@ void TikzVisualizer::drawBoundary(const RealVectorGeometricContext& context) con
   drawRectangle(midX, midY, widthX, widthY, "boundary");
 }
 
-void TikzVisualizer::drawBoundary(const ReedsSheppRandomRectangles& context) const {
+void TikzVisualizer::drawBoundary(const planning_contexts::ReedsSheppRandomRectangles& context) const {
   const auto boundaries = context.getBoundaries();
   double midX = (boundaries.low.at(0u) + boundaries.high.at(0u)) / 2.0;
   double midY = (boundaries.low.at(1u) + boundaries.high.at(1u)) / 2.0;
@@ -400,7 +400,7 @@ void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) con
     case ompl::base::GoalType::GOAL_STATE: {
       ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(
           context_->getStateSpace(), goal->as<ompl::base::GoalState>()->getState());
-      auto goal = std::make_shared<TikzNode>();
+      auto goal = std::make_shared<pgftikz::TikzNode>();
       goal->setPosition(goalState[0], goalState[1]);
       goal->setOptions("goal");
       goal->setName("goal");
@@ -411,7 +411,7 @@ void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) con
       for (auto i = 0u; i < goal->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
         ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(
             context_->getStateSpace(), goal->as<ompl::base::GoalStates>()->getState(i));
-        auto goal = std::make_shared<TikzNode>();
+        auto goal = std::make_shared<pgftikz::TikzNode>();
         goal->setPosition(goalState[0], goalState[1]);
         goal->setOptions("goal");
         goal->setName("goal");
@@ -436,7 +436,7 @@ void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) con
 }
 
 void TikzVisualizer::drawStartVertex(const ompl::base::PlannerDataVertex& vertex) const {
-  auto start = std::make_shared<TikzNode>();
+  auto start = std::make_shared<pgftikz::TikzNode>();
   start->setOptions("start");
   double x = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](0u);
   double y = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](1u);
@@ -447,7 +447,7 @@ void TikzVisualizer::drawStartVertex(const ompl::base::PlannerDataVertex& vertex
 
 void TikzVisualizer::drawStartState(
     const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const {
-  auto start = std::make_shared<TikzNode>();
+  auto start = std::make_shared<pgftikz::TikzNode>();
   start->setOptions("start");
   start->setPosition(state[0], state[1]);
   start->setName("start" + std::to_string(state[0]) + std::to_string(state[1]));
@@ -462,7 +462,7 @@ void TikzVisualizer::drawStartStates(
 }
 
 void TikzVisualizer::drawGoalVertex(const ompl::base::PlannerDataVertex& vertex) const {
-  auto goal = std::make_shared<TikzNode>();
+  auto goal = std::make_shared<pgftikz::TikzNode>();
   goal->setOptions("goal");
   double x = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](0u);
   double y = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](1u);
@@ -473,7 +473,7 @@ void TikzVisualizer::drawGoalVertex(const ompl::base::PlannerDataVertex& vertex)
 
 void TikzVisualizer::drawGoalState(
     const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const {
-  auto goal = std::make_shared<TikzNode>();
+  auto goal = std::make_shared<pgftikz::TikzNode>();
   goal->setOptions("goal");
   goal->setPosition(state[0], state[1]);
   goal->setName("goal" + std::to_string(state[0]) + std::to_string(state[1]));
@@ -489,7 +489,7 @@ void TikzVisualizer::drawGoalStates(
 
 void TikzVisualizer::drawRectangle(double midX, double midY, double widthX, double widthY,
                                    const std::string& options) const {
-  auto rectangle = std::make_shared<TikzDraw>();
+  auto rectangle = std::make_shared<pgftikz::TikzDraw>();
   rectangle->setFromPosition(midX - widthX / 2.0, midY - widthY / 2.0);
   rectangle->setToPosition(midX + widthX / 2.0, midY + widthY / 2.0);
   rectangle->setConnection("rectangle");
@@ -504,23 +504,23 @@ void TikzVisualizer::drawPlannerSpecificVisualizations(
     return;
   }
   switch (plannerType_) {
-    case PLANNER_TYPE::BITSTAR:
-    case PLANNER_TYPE::ABITSTAR: {
+    case common::PLANNER_TYPE::BITSTAR:
+    case common::PLANNER_TYPE::ABITSTAR: {
       drawBITstarSpecificVisualizations(
           std::dynamic_pointer_cast<const BITstarData>(plannerSpecificData));
       break;
     }
-    case PLANNER_TYPE::AITSTAR: {
+    case common::PLANNER_TYPE::AITSTAR: {
       drawAITstarSpecificVisualizations(
           std::dynamic_pointer_cast<const AITstarData>(plannerSpecificData));
       break;
     }
-    case PLANNER_TYPE::EITSTAR: {
+    case common::PLANNER_TYPE::EITSTAR: {
       drawEITstarSpecificVisualizations(
           std::dynamic_pointer_cast<const EITstarData>(plannerSpecificData));
       break;
     }
-    case PLANNER_TYPE::LAZYPRMSTAR: {
+    case common::PLANNER_TYPE::LAZYPRMSTAR: {
       drawLazyPRMstarSpecificVisualizations(
           std::dynamic_pointer_cast<const LazyPRMstarData>(plannerSpecificData));
       break;
@@ -648,7 +648,7 @@ void TikzVisualizer::drawLazyPRMstarSpecificVisualizations(
 }
 
 void TikzVisualizer::drawVertex(const ompl::base::PlannerDataVertex& vertex) const {
-  auto node = std::make_shared<TikzNode>();
+  auto node = std::make_shared<pgftikz::TikzNode>();
   node->setOptions("vertex");
   double x = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](0u);
   double y = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](1u);
@@ -659,7 +659,7 @@ void TikzVisualizer::drawVertex(const ompl::base::PlannerDataVertex& vertex) con
 
 void TikzVisualizer::drawVertex(const ompl::base::RealVectorStateSpace::StateType* state,
                                 const std::string& options) const {
-  auto node = std::make_shared<TikzNode>();
+  auto node = std::make_shared<pgftikz::TikzNode>();
   node->setOptions(options);
   double x = state->operator[](0u);
   double y = state->operator[](1u);
@@ -670,7 +670,7 @@ void TikzVisualizer::drawVertex(const ompl::base::RealVectorStateSpace::StateTyp
 void TikzVisualizer::drawEdge(const ompl::base::PlannerDataVertex& parent,
                               const ompl::base::PlannerDataVertex& child,
                               const std::string& options) const {
-  auto draw = std::make_shared<TikzDraw>();
+  auto draw = std::make_shared<pgftikz::TikzDraw>();
   draw->setFromPosition("vertex" + std::to_string(parent.getTag()) + ".center");
   draw->setToPosition("vertex" + std::to_string(child.getTag()) + ".center");
   draw->setConnection("--");
@@ -681,7 +681,7 @@ void TikzVisualizer::drawEdge(const ompl::base::PlannerDataVertex& parent,
 void TikzVisualizer::drawEdge(const ompl::base::RealVectorStateSpace::StateType* parent,
                               const ompl::base::RealVectorStateSpace::StateType* child,
                               const std::string& options) const {
-  auto draw = std::make_shared<TikzDraw>();
+  auto draw = std::make_shared<pgftikz::TikzDraw>();
   draw->setFromPosition(parent->operator[](0u), parent->operator[](1u));
   draw->setToPosition(child->operator[](0u), child->operator[](1u));
   draw->setConnection("--");
@@ -740,6 +740,6 @@ void TikzVisualizer::drawEllipse(double cost) const {
   picture_.addText(ellipseCommand.str());
 }
 
-}  // namespace pdt
+}  // namespace visualization
 
-}  // namespace esp
+}  // namespace pdt

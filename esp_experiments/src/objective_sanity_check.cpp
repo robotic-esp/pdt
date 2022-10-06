@@ -58,11 +58,11 @@ using AccumulatorSet = boost::accumulators::accumulator_set<
 int main(const int argc, const char** argv) {
 
   // Load the config.
-  auto config = std::make_shared<esp::pdt::Configuration>(argc, argv);
+  auto config = std::make_shared<pdt::config::Configuration>(argc, argv);
   config->registerAsExperiment();
 
   // Create context factory.
-  esp::pdt::ContextFactory contextFactory(config);
+  pdt::factories::ContextFactory contextFactory(config);
 
   // Create an accumulator set to keep track of some statistics.
   AccumulatorSet accuracyStats;

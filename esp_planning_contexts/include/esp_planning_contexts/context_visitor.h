@@ -37,9 +37,9 @@
 
 #pragma once
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 // Forward declarations.
 class CentreSquare;
@@ -90,6 +90,6 @@ class ContextVisitor {
   }
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

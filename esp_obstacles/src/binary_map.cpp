@@ -44,9 +44,9 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/util/Exception.h>
 
-namespace esp {
-
 namespace pdt {
+
+namespace obstacles {
 
 BinaryMap::BinaryMap(const ompl::base::SpaceInformationPtr& si, const double obsThreshold,
                      const std::string& fullCsvFileName, const bool plotCsv,
@@ -204,6 +204,6 @@ std::string BinaryMap::mfile(const std::string& /*obsColour*/,
   return rval.str();
 }
 
-}  // namespace pdt
+}  // namespace obstacles
 
-}  // namespace esp
+}  // namespace pdt

@@ -49,9 +49,9 @@
 #include "esp_obstacles/base_obstacle.h"
 #include "esp_obstacles/obstacle_visitor.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace obstacles {
 
 // A hyperrectangluar obstacle. Must inherit from BaseObstacle or BaseAntiObstacle.
 // Anchor point is the middle of the rectangle.
@@ -247,6 +247,6 @@ bool Hyperrectangle<T>::operator!=(const Hyperrectangle<T>& rhs) const {
   return !(*this == rhs);
 }
 
-}  // namespace pdt
+}  // namespace obstacles
 
-}  // namespace esp
+}  // namespace pdt

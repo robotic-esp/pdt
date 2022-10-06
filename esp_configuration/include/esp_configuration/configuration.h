@@ -51,9 +51,9 @@
 #include "nlohmann/json.hpp"
 #pragma GCC diagnostic pop
 
-namespace esp {
-
 namespace pdt {
+
+namespace config {
 
 namespace json = nlohmann;
 
@@ -218,6 +218,6 @@ void Configuration::registerAccess(const std::string& key, const T& value,
   }
 }
 
-}  // namespace pdt
+}  // namespace config
 
-}  // namespace esp
+}  // namespace pdt

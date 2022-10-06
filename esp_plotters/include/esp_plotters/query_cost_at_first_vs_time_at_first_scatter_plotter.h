@@ -45,21 +45,21 @@
 #include "esp_plotters/latex_plotter.h"
 #include "esp_statistics/statistics.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class QueryCostAtFirstVsTimeAtFirstScatterPlotter : public LatexPlotter {
  public:
-  QueryCostAtFirstVsTimeAtFirstScatterPlotter(const std::shared_ptr<const Configuration>& config,
-                                const Statistics& stats);
+  QueryCostAtFirstVsTimeAtFirstScatterPlotter(const std::shared_ptr<const config::Configuration>& config,
+                                const statistics::Statistics& stats);
   ~QueryCostAtFirstVsTimeAtFirstScatterPlotter() = default;
 
   // Creates a pgf axis that hold the initial solution scatter plot of all planners.
-  std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis() const;
+  std::shared_ptr<pgftikz::PgfAxis> createInitialSolutionScatterAxis() const;
 
   // Creates a pgf axis that hold the initial solution scatter plot of the specified planner.
-  std::shared_ptr<PgfAxis> createInitialSolutionScatterAxis(
+  std::shared_ptr<pgftikz::PgfAxis> createInitialSolutionScatterAxis(
       const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the initial solution scatter plot of all planners.
@@ -70,14 +70,14 @@ class QueryCostAtFirstVsTimeAtFirstScatterPlotter : public LatexPlotter {
       const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createInitialSolutionScatterPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createInitialSolutionScatterPlot(
       const std::string& plannerName) const;
 
-  void setInitialSolutionScatterAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setInitialSolutionScatterAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
-  const Statistics& stats_;
+  const statistics::Statistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

@@ -46,21 +46,21 @@
 #include "esp_plotters/latex_plotter.h"
 #include "esp_statistics/statistics.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 class QueryTimeAtFirstHistogramPlotter : public LatexPlotter {
  public:
-  QueryTimeAtFirstHistogramPlotter(const std::shared_ptr<const Configuration>& config,
-                                          const Statistics& stats);
+  QueryTimeAtFirstHistogramPlotter(const std::shared_ptr<const config::Configuration>& config,
+                                          const statistics::Statistics& stats);
   ~QueryTimeAtFirstHistogramPlotter() = default;
 
   // Creates a pgf axis that hold the initial solution duration histogram of all planners.
-  std::shared_ptr<PgfAxis> createInitialSolutionDurationHistogramAxis() const;
+  std::shared_ptr<pgftikz::PgfAxis> createInitialSolutionDurationHistogramAxis() const;
 
   // Creates a pgf axis that hold the initial solution duration histogram of the specified planner.
-  std::shared_ptr<PgfAxis> createInitialSolutionDurationHistogramAxis(
+  std::shared_ptr<pgftikz::PgfAxis> createInitialSolutionDurationHistogramAxis(
       const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the initial solution duration histogram axis of all
@@ -73,15 +73,15 @@ class QueryTimeAtFirstHistogramPlotter : public LatexPlotter {
       const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<PgfPlot> createInitialSolutionDurationHistogramPlot(
+  std::shared_ptr<pgftikz::PgfPlot> createInitialSolutionDurationHistogramPlot(
       const std::string& plannerName) const;
 
-  void setInitialSolutionDurationHistogramAxisOptions(std::shared_ptr<PgfAxis> axis) const;
+  void setInitialSolutionDurationHistogramAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
-  mutable std::shared_ptr<PgfAxis> axis_;
-  const Statistics& stats_;
+  mutable std::shared_ptr<pgftikz::PgfAxis> axis_;
+  const statistics::Statistics& stats_;
 };
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

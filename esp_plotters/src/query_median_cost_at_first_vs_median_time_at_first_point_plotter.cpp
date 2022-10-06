@@ -43,15 +43,15 @@
 #include "esp_tikz/pgf_table.h"
 #include "esp_tikz/tikz_picture.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(
-    const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   // Determine the min and max durations to be plotted.
@@ -59,8 +59,8 @@ QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::QueryMedianCostAtFirstVsM
   minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 
-std::shared_ptr<PgfAxis> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionAxis() const {
-  auto axis = std::make_shared<PgfAxis>();
+std::shared_ptr<pgftikz::PgfAxis> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionAxis() const {
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianInitialSolutionAxisOptions(axis);
 
   // Add the initial solution plots.
@@ -73,9 +73,9 @@ std::shared_ptr<PgfAxis> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::
   return axis;
 }
 
-std::shared_ptr<PgfAxis> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionAxis(
+std::shared_ptr<pgftikz::PgfAxis> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionAxis(
     const std::string& plannerName) const {
-  auto axis = std::make_shared<PgfAxis>();
+  auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianInitialSolutionAxisOptions(axis);
 
   // Add the initial solution plots.
@@ -88,7 +88,7 @@ std::shared_ptr<PgfAxis> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::
 
 fs::path QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionPicture() const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   picture.addAxis(createMedianInitialSolutionAxis());
 
   // Generate the tikz file.
@@ -101,7 +101,7 @@ fs::path QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInit
 fs::path QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   picture.addAxis(createMedianInitialSolutionAxis(plannerName));
 
   // Generate the tikz file.
@@ -112,7 +112,7 @@ fs::path QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInit
 }
 
 void QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::setMedianInitialSolutionAxisOptions(
-    std::shared_ptr<PgfAxis> axis) const {
+    std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.name = "MedianCostAxis";
   axis->options.width = config_->get<std::string>("medianInitialSolutionPlots/axisWidth");
   axis->options.height = config_->get<std::string>("medianInitialSolutionPlots/axisHeight");
@@ -130,16 +130,16 @@ void QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::setMedianInitialSolu
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionPlot(
+std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionPlot(
     const std::string& plannerName) const {
   // Load the median initial duration and cost into a table.
-  auto table = std::make_shared<PgfTable>(
+  auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianInitialSolution(
           plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Create the plot.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = config_->get<double>("medianInitialSolutionPlots/markSize");
   plot->options.onlyMarks = true;
   plot->options.namePath = plannerName + "MedianInitialSolution"s;
@@ -148,17 +148,17 @@ std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::
   return plot;
 }
 
-std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionDurationCiPlot(
+std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionDurationCiPlot(
     const std::string& plannerName) const {
   // Totally misusing the table class for reading in values from csvs...
   // Load the median initial solution.
-  PgfTable medianInitialSolution(
+  pgftikz::PgfTable medianInitialSolution(
       stats_.extractMedianInitialSolution(
           plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Load the duration confidence interval.
-  PgfTable interval(stats_.extractMedianInitialSolution(
+  pgftikz::PgfTable interval(stats_.extractMedianInitialSolution(
                         plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
                     "lower initial solution duration confidence bound",
                     "upper initial solution duration confidence bound");
@@ -168,12 +168,12 @@ std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::
   double upperDurationBound = interval.getRow(0u).at(1u);
 
   // Create a table with the correct coordinates.
-  auto table = std::make_shared<PgfTable>();
+  auto table = std::make_shared<pgftikz::PgfTable>();
   table->appendRow({lowerDurationBound, medianCost});
   table->appendRow({upperDurationBound, medianCost});
 
   // Create the plot.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = config_->get<double>("medianInitialSolutionPlots/markSize");
   plot->options.mark = "|";
   plot->options.lineWidth = config_->get<double>("medianInitialSolutionPlots/lineWidth");
@@ -183,17 +183,17 @@ std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::
   return plot;
 }
 
-std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionCostCiPlot(
+std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInitialSolutionCostCiPlot(
     const std::string& plannerName) const {
   // Totally misusing the table class for reading in values from csvs...
   // Load the median initial solution.
-  PgfTable medianInitialSolution(
+  pgftikz::PgfTable medianInitialSolution(
       stats_.extractMedianInitialSolution(
           plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Load the duration confidence interval.
-  PgfTable interval(stats_.extractMedianInitialSolution(
+  pgftikz::PgfTable interval(stats_.extractMedianInitialSolution(
                         plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
                     "lower initial solution cost confidence bound",
                     "upper initial solution cost confidence bound");
@@ -203,12 +203,12 @@ std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::
   double upperCostBound = interval.getRow(0u).at(1u);
 
   // Create a table with the correct coordinates.
-  auto table = std::make_shared<PgfTable>();
+  auto table = std::make_shared<pgftikz::PgfTable>();
   table->appendRow({medianDuration, lowerCostBound});
   table->appendRow({medianDuration, upperCostBound});
 
   // Create the plot.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = config_->get<double>("medianInitialSolutionPlots/markSize");
   plot->options.mark = "-";
   plot->options.lineWidth = config_->get<double>("medianInitialSolutionPlots/lineWidth");
@@ -218,6 +218,6 @@ std::shared_ptr<PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::
   return plot;
 }
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

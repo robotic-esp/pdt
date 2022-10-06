@@ -48,9 +48,9 @@
 #include "esp_obstacles/hyperrectangle.h"
 #include "esp_obstacles/obstacle_visitor.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace planning_contexts {
 
 class ContextValidityChecker : public ompl::base::StateValidityChecker {
  public:
@@ -64,22 +64,22 @@ class ContextValidityChecker : public ompl::base::StateValidityChecker {
   virtual double clearance(const ompl::base::State* state) const override;
 
   // Add obstacles.
-  virtual void addObstacle(const std::shared_ptr<BaseObstacle>& obstacle);
-  virtual void addObstacles(const std::vector<std::shared_ptr<BaseObstacle>>& obstacles);
+  virtual void addObstacle(const std::shared_ptr<obstacles::BaseObstacle>& obstacle);
+  virtual void addObstacles(const std::vector<std::shared_ptr<obstacles::BaseObstacle>>& obstacles);
 
   // Add antiobstacles.
-  virtual void addAntiObstacle(const std::shared_ptr<BaseAntiObstacle>& anti);
-  virtual void addAntiObstacles(const std::vector<std::shared_ptr<BaseAntiObstacle>>& antis);
+  virtual void addAntiObstacle(const std::shared_ptr<obstacles::BaseAntiObstacle>& anti);
+  virtual void addAntiObstacles(const std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>>& antis);
 
   // Make obstacles accessible.
-  virtual std::vector<std::shared_ptr<BaseObstacle>> getObstacles() const;
-  virtual std::vector<std::shared_ptr<BaseAntiObstacle>> getAntiObstacles() const;
+  virtual std::vector<std::shared_ptr<obstacles::BaseObstacle>> getObstacles() const;
+  virtual std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> getAntiObstacles() const;
 
  protected:
-  std::vector<std::shared_ptr<BaseObstacle>> obstacles_{};
-  std::vector<std::shared_ptr<BaseAntiObstacle>> antiObstacles_{};
+  std::vector<std::shared_ptr<obstacles::BaseObstacle>> obstacles_{};
+  std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> antiObstacles_{};
 };
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

@@ -46,9 +46,9 @@
 #include "esp_configuration/configuration.h"
 #include "esp_statistics/population_statistics.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace statistics {
 
 class PlannerResults {
  public:
@@ -77,7 +77,7 @@ class Statistics {
   friend MultiqueryStatistics;
 
  public:
-  Statistics(const std::shared_ptr<Configuration>& config,
+  Statistics(const std::shared_ptr<config::Configuration>& config,
              const std::experimental::filesystem::path& resultsPath, const bool forceComputation);
   ~Statistics() = default;
 
@@ -132,7 +132,7 @@ class Statistics {
   double getSuccessRate(const std::string& plannerName) const;
 
   std::vector<double> getDefaultBinDurations() const;
-  std::shared_ptr<Configuration> getConfig() const;
+  std::shared_ptr<config::Configuration> getConfig() const;
 
  private:
   // The identifying header line that starts each file produced by this class.
@@ -157,7 +157,7 @@ class Statistics {
 
   double getNthValue(std::vector<double>* values, const std::size_t n) const;
 
-  std::shared_ptr<Configuration> config_;
+  std::shared_ptr<config::Configuration> config_;
   const std::experimental::filesystem::path statisticsDirectory_;
   PopulationStatistics populationStats_;
 
@@ -202,6 +202,6 @@ class Statistics {
   double maxNonInfInitialSolutionDuration_{std::numeric_limits<double>::lowest()};
 };
 
-}  // namespace pdt
+}  // namespace statistics
 
-}  // namespace esp
+}  // namespace pdt

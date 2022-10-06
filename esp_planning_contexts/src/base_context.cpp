@@ -52,12 +52,12 @@
 
 using namespace std::string_literals;
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                         const std::shared_ptr<const Configuration>& config,
+                         const std::shared_ptr<const config::Configuration>& config,
                          const std::string& name) :
     spaceInfo_(spaceInfo),
     dimensionality_(spaceInfo_->getStateDimension()),
@@ -69,13 +69,13 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
       "objective/"s + config_->get<std::string>("context/" + name_ + "/objective");
 
   // Get the optimization objective.
-  switch (config_->get<OBJECTIVE_TYPE>(parentKey + "/type")) {
-    case OBJECTIVE_TYPE::COSTMAP: {
+  switch (config_->get<common::OBJECTIVE_TYPE>(parentKey + "/type")) {
+    case common::OBJECTIVE_TYPE::COSTMAP: {
       throw std::runtime_error("CostMap objective is not yet implemented.");
       break;
     }
-    case OBJECTIVE_TYPE::MAXMINCLEARANCE: {
-      objective_ = std::make_shared<MaxMinClearanceOptimizationObjective>(spaceInfo_);
+    case common::OBJECTIVE_TYPE::MAXMINCLEARANCE: {
+      objective_ = std::make_shared<objectives::MaxMinClearanceOptimizationObjective>(spaceInfo_);
       objective_->setCostThreshold(
           ompl::base::Cost(config_->get<double>(parentKey + "/solvedCost")));
       objective_->setCostToGoHeuristic([this](const ompl::base::State*, const ompl::base::Goal*) {
@@ -83,15 +83,15 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
       });
       break;
     }
-    case OBJECTIVE_TYPE::RECIPROCALCLEARANCE: {
+    case common::OBJECTIVE_TYPE::RECIPROCALCLEARANCE: {
       if (config_->get<std::string>(parentKey + "/heuristicType") == "fraction"s) {
         const auto fraction = config_->get<double>(parentKey + "/heuristicFraction");
         objective_ =
-          std::make_shared<ReciprocalClearanceOptimizationObjective>(spaceInfo_, fraction);
+          std::make_shared<objectives::ReciprocalClearanceOptimizationObjective>(spaceInfo_, fraction);
       } else if (config_->get<std::string>(parentKey + "/heuristicType") == "factors"s) {
         const auto factors = config_->get<std::vector<double>>(parentKey + "/heuristicFactors");
         objective_ =
-          std::make_shared<ReciprocalClearanceOptimizationObjective>(spaceInfo_, factors);
+          std::make_shared<objectives::ReciprocalClearanceOptimizationObjective>(spaceInfo_, factors);
       } else {
         throw std::runtime_error("Unknown heuristic type for reciprocal clearance objective.");
       }
@@ -102,15 +102,15 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
       });
       break;
     }
-    case OBJECTIVE_TYPE::PATHLENGTH: {
+    case common::OBJECTIVE_TYPE::PATHLENGTH: {
       objective_ = std::make_shared<ompl::base::PathLengthOptimizationObjective>(spaceInfo_);
       objective_->setCostThreshold(
           ompl::base::Cost(config_->get<double>(parentKey + "/solvedCost")));
       objective_->setCostToGoHeuristic(&ompl::base::goalRegionCostToGo);
       break;
     }
-    case OBJECTIVE_TYPE::POTENTIALFIELD: {
-      objective_ = std::make_shared<PotentialFieldOptimizationObjective>(spaceInfo_, config_);
+    case common::OBJECTIVE_TYPE::POTENTIALFIELD: {
+      objective_ = std::make_shared<objectives::PotentialFieldOptimizationObjective>(spaceInfo_, config_);
       objective_->setCostThreshold(
           ompl::base::Cost(config_->get<double>(parentKey + "/solvedCost")));
       objective_->setCostToGoHeuristic([this](const ompl::base::State*, const ompl::base::Goal*) {
@@ -118,7 +118,7 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
       });
       break;
     }
-    case OBJECTIVE_TYPE::INVALID: {
+    case common::OBJECTIVE_TYPE::INVALID: {
       throw std::runtime_error("Invalid optimization objective.");
       break;
     }
@@ -411,6 +411,6 @@ void BaseContext::regenerateQueries(){
   startGoalPairs_ = makeStartGoalPair();
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

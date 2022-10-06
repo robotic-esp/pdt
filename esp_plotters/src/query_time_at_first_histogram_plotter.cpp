@@ -48,22 +48,22 @@
 #include "esp_tikz/pgf_plot.h"
 #include "esp_tikz/pgf_table.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace plotters {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 QueryTimeAtFirstHistogramPlotter::QueryTimeAtFirstHistogramPlotter(
-    const std::shared_ptr<const Configuration>& config, const Statistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<PgfAxis>
+std::shared_ptr<pgftikz::PgfAxis>
 QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramAxis() const {
-  axis_ = std::make_shared<PgfAxis>();
+  axis_ = std::make_shared<pgftikz::PgfAxis>();
   setInitialSolutionDurationHistogramAxisOptions(axis_);
 
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
@@ -76,10 +76,10 @@ QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramAxis() c
   return axis_;
 }
 
-std::shared_ptr<PgfAxis>
+std::shared_ptr<pgftikz::PgfAxis>
 QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramAxis(
     const std::string& plannerName) const {
-  axis_ = std::make_shared<PgfAxis>();
+  axis_ = std::make_shared<pgftikz::PgfAxis>();
   setInitialSolutionDurationHistogramAxisOptions(axis_);
   axis_->options.name = plannerName + "ISDPA"s;
   axis_->addPlot(createInitialSolutionDurationHistogramPlot(plannerName));
@@ -89,7 +89,7 @@ QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramAxis(
 fs::path QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPicture()
     const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   axis_ = createInitialSolutionDurationHistogramAxis();
   picture.addAxis(axis_);
 
@@ -103,7 +103,7 @@ fs::path QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogra
 fs::path QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPicture(
     const std::string& plannerName) const {
   // Create the picture and add the axis.
-  TikzPicture picture(config_);
+  pgftikz::TikzPicture picture(config_);
   axis_ = createInitialSolutionDurationHistogramAxis(plannerName);
   picture.addAxis(axis_);
 
@@ -114,12 +114,12 @@ fs::path QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogra
   return picturePath;
 }
 
-std::shared_ptr<PgfPlot>
+std::shared_ptr<pgftikz::PgfPlot>
 QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPlot(
     const std::string& plannerName) const {
   // Load the data into a pgf table.
   auto table =
-      std::make_shared<PgfTable>(stats_.extractInitialSolutionDurationHistogram(plannerName),
+      std::make_shared<pgftikz::PgfTable>(stats_.extractInitialSolutionDurationHistogram(plannerName),
                                  "bin begin durations", "bin counts");
 
   // This table should not clean its data (or should it?).
@@ -137,7 +137,7 @@ QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPlot(
   }
 
   // Create the plot.
-  auto plot = std::make_shared<PgfPlot>(table);
+  auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.mark = "\"none\"";
   plot->options.lineWidth = 0.0;
   plot->options.namePath = plannerName + "InitialSolutionDurationHistogram"s;
@@ -148,7 +148,7 @@ QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPlot(
 }
 
 void QueryTimeAtFirstHistogramPlotter::setInitialSolutionDurationHistogramAxisOptions(
-    std::shared_ptr<PgfAxis> axis) const {
+    std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.height = config_->get<std::string>("initialSolutionPlots/axisHeight");
   axis->options.width = config_->get<std::string>("initialSolutionPlots/axisWidth");
   axis->options.name = "InitialSolutionDurationHistogramAxis"s;
@@ -165,6 +165,6 @@ void QueryTimeAtFirstHistogramPlotter::setInitialSolutionDurationHistogramAxisOp
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-}  // namespace pdt
+}  // namespace plotters
 
-}  // namespace esp
+}  // namespace pdt

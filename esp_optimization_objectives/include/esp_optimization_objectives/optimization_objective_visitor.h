@@ -37,9 +37,9 @@
 
 #pragma once
 
-namespace esp {
-
 namespace pdt {
+
+namespace objectives {
 
 // Forward declarations.
 class PotentialFieldOptimizationObjective;
@@ -63,6 +63,6 @@ class ObjectiveVisitor {
   }
 };
 
-}  // namespace pdt
+}  // namespace objectives
 
-}  // namespace esp
+}  // namespace pdt

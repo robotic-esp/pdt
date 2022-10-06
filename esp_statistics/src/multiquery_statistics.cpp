@@ -55,14 +55,14 @@
 #include "esp_statistics/linear_interpolator.h"
 #include "esp_utilities/write_vector_to_file.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace statistics {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MultiqueryStatistics::MultiqueryStatistics(const std::shared_ptr<Configuration>& config,
+MultiqueryStatistics::MultiqueryStatistics(const std::shared_ptr<config::Configuration>& config,
     const std::vector<Statistics> &stats,
     bool forceComputation) :
     config_(config),
@@ -822,6 +822,7 @@ double MultiqueryStatistics::getMedianCumulativeFinalCost(const std::string& pla
 double MultiqueryStatistics::getMaxCumulativeFinalCost(const std::string& plannerName) const{
   return maxCumulativeFinalCosts_.at(plannerName);
 }
-}  // namespace pdt
 
-}  // namespace esp
+}  // namespace statistics
+
+}  // namespace pdt

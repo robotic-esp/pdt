@@ -40,12 +40,12 @@
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
 
-namespace esp {
-
 namespace pdt {
 
+namespace planning_contexts {
+
 WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                 const std::shared_ptr<const Configuration>& config, const std::string& name) :
+                 const std::shared_ptr<const config::Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     wallWidth_(config->get<double>("context/" + name + "/wallWidth")),
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
@@ -118,7 +118,7 @@ void WallGap::createObstacles() {
     widths_low.at(j) = bounds.high.at(j) - bounds.low.at(j);
   }
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor_low, widths_low));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor_low, widths_low));
 
   // Create an anchor for the upper obstacle.
   ompl::base::ScopedState<> anchor_up(spaceInfo_);
@@ -145,9 +145,9 @@ void WallGap::createObstacles() {
     widths_up.at(j) = bounds.high.at(j) - bounds.low.at(j);
   }
   obstacles_.emplace_back(
-      std::make_shared<Hyperrectangle<BaseObstacle>>(spaceInfo_, anchor_up, widths_up));
+      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor_up, widths_up));
 }
 
-}  // namespace pdt
+}  // namespace planning_contexts
 
-}  // namespace esp
+}  // namespace pdt

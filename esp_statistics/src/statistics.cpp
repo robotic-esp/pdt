@@ -57,9 +57,9 @@
 #include "esp_statistics/linear_interpolator.h"
 #include "esp_utilities/write_vector_to_file.h"
 
-namespace esp {
-
 namespace pdt {
+
+namespace statistics {
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -128,7 +128,7 @@ std::size_t PlannerResults::numMeasuredRuns() const {
   return measuredRuns_.size();
 }
 
-Statistics::Statistics(const std::shared_ptr<Configuration>& config, const fs::path& resultsPath,
+Statistics::Statistics(const std::shared_ptr<config::Configuration>& config, const fs::path& resultsPath,
                        const bool forceComputation) :
     config_(config),
     statisticsDirectory_(fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
@@ -777,7 +777,7 @@ std::vector<double> Statistics::getDefaultBinDurations() const {
   return defaultMedianBinDurations_;
 }
 
-std::shared_ptr<Configuration> Statistics::getConfig() const {
+std::shared_ptr<config::Configuration> Statistics::getConfig() const {
   return config_;
 }
 
@@ -931,6 +931,6 @@ double Statistics::getNthValue(std::vector<double>* values, const std::size_t n)
   return *nthIter;
 }
 
-}  // namespace pdt
+}  // namespace statistics
 
-}  // namespace esp
+}  // namespace pdt

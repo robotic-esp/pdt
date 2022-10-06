@@ -43,8 +43,6 @@
 #include <string>
 #include <type_traits>
 
-namespace esp {
-
 namespace pdt {
 
 namespace time {
@@ -79,10 +77,8 @@ double seconds(Duration sec);
 
 }  // namespace pdt
 
-}  // namespace esp
-
 // A pretty output operator for durations.
-std::ostream& operator<<(std::ostream& out, const esp::pdt::time::Duration& duration);
+std::ostream& operator<<(std::ostream& out, const pdt::time::Duration& duration);
 
 // A pretty output operator for times (dates).
 std::ostream& operator<<(std::ostream& out, const std::chrono::system_clock::time_point timePoint);

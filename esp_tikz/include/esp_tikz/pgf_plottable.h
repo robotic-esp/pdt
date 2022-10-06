@@ -40,9 +40,9 @@
 #include <string>
 #include <vector>
 
-namespace esp {
-
 namespace pdt {
+
+namespace pgftikz {
 
 class PlottableInterface {
  public:
@@ -51,6 +51,6 @@ class PlottableInterface {
   virtual std::string string() const = 0;
 };
 
-}  // namespace pdt
+}  // namespace pgftikz
 
-}  // namespace esp
+}  // namespace pdt
