@@ -35,31 +35,15 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_utilities/create_directories.h"
+#pragma once
 
-#include <experimental/filesystem>
+#include <string>
 
 namespace pdt {
 
 namespace utilities {
 
-void createDirectories(const std::string& fileName) {
-  boost::filesystem::path fullPath;
-
-  // Create a boost::path from the provided string
-  fullPath = fileName.c_str();
-
-  // Decompose the path into the parent directories and check if they exist
-  if (fullPath.parent_path().empty() == false) {
-    if (boost::filesystem::exists(fullPath.parent_path()) == false) {
-      // If they don't exist, make them
-      boost::filesystem::create_directories(fullPath.parent_path());
-
-      //    std::cout << "Created: " << boost::filesystem::absolute(fullPath.parent_path()) << "\n";
-    }
-  }
-  // Else, do nothing
-}
+void createDirectories(const std::string& fileName);
 
 }  // namespace utilities
 
