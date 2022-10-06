@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_pgftikz/pgf_table.h"
+#include "pdt/pgftikz/pgf_table.h"
 
 #include <algorithm>
 #include <cmath>

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
-project(esp_pgftikz)
+project(pdt_pgftikz)
 
 # Specify the library as a target.
-add_library(esp_pgftikz
+add_library(pdt_pgftikz
   src/kpi_table.cpp
   src/mq_kpi_table.cpp
   src/pgf_axis.cpp
@@ -15,16 +15,16 @@ add_library(esp_pgftikz
   src/tikz_picture.cpp)
 
 # Specify the include directories for this target.
-target_include_directories(esp_pgftikz
+target_include_directories(pdt_pgftikz
   PUBLIC
   ${PROJECT_SOURCE_DIR}/include)
 
 # Specify the link targets for this target.
-target_link_libraries(esp_pgftikz
+target_link_libraries(pdt_pgftikz
   PRIVATE
   pdt
   PUBLIC
-  esp_common
-  esp_config
-  esp_factories
-  esp_statistics)
+  pdt_common
+  pdt_config
+  pdt_factories
+  pdt_statistics)

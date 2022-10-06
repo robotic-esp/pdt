@@ -35,7 +35,7 @@
 
 /* Author: Marlin Strub */
 
-#include "esp_spaces/SE3WAxisAngleBoundStateSpace.h"
+#include "pdt/spaces/SE3WAxisAngleBoundStateSpace.h"
 
 namespace pdt {
 

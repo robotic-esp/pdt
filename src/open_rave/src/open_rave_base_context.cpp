@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_open_rave/open_rave_base_context.h"
+#include "pdt/open_rave/open_rave_base_context.h"
 
 #include <algorithm>
 
@@ -47,7 +47,7 @@
 
 #include <openrave/environment.h>
 
-#include "esp_open_rave/open_rave_manipulator_validity_checker.h"
+#include "pdt/open_rave/open_rave_manipulator_validity_checker.h"
 
 using namespace std::string_literals;
 

@@ -42,10 +42,10 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest/doctest.h"
-#include "esp_config/configuration.h"
-#include "esp_config/directory.h"
-#include "esp_factories/context_factory.h"
-#include "esp_objectives/reciprocal_clearance_optimization_objective.h"
+#include "pdt/config/configuration.h"
+#include "pdt/config/directory.h"
+#include "pdt/factories/context_factory.h"
+#include "pdt/objectives/reciprocal_clearance_optimization_objective.h"
 
 using namespace std::string_literals;
 using namespace ompl::base;
@@ -56,14 +56,14 @@ TEST_CASE("Optimization objectives") {
   ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
 
   // Instantiate an empty configuration.
-  const char* argv[] = {"test_esp_objectives\0"};
+  const char* argv[] = {"test_pdt_objectives\0"};
   const int   argc   = sizeof(argv) / sizeof(char*) - 1;
   auto config = std::make_shared<pdt::config::Configuration>(argc, argv);
   config->clear();
 
   // Get the path of the test configurations.
   const auto configsDir =
-    Directory::SOURCE / "test/esp_objectives/configs";
+    pdt::config::Directory::SOURCE / "test/pdt_objectives/configs";
 
   SUBCASE("Path length") {
     // Load the test configuration.
@@ -143,11 +143,11 @@ TEST_CASE("Optimization objectives") {
         // Get more convenient access to problem components.
         const auto spaceInfo = context->getSpaceInformation();
         const auto checker   = spaceInfo->getStateValidityChecker();
-        const auto objective1 = ReciprocalClearanceOptimizationObjective(spaceInfo,
+        const auto objective1 = pdt::objectives::ReciprocalClearanceOptimizationObjective(spaceInfo,
                                                                          {0.0, 1.0});
-        const auto objective2 = ReciprocalClearanceOptimizationObjective(spaceInfo,
+        const auto objective2 = pdt::objectives::ReciprocalClearanceOptimizationObjective(spaceInfo,
                                                                          {0.0, 0.5, 1.0});
-        const auto objective3 = ReciprocalClearanceOptimizationObjective(spaceInfo, 0.5);
+        const auto objective3 = pdt::objectives::ReciprocalClearanceOptimizationObjective(spaceInfo, 0.5);
 
         SUBCASE("Trivial costs") {
           SUBCASE("Objective 1") {

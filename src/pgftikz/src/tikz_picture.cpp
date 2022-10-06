@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_pgftikz/tikz_picture.h"
+#include "pdt/pgftikz/tikz_picture.h"
 
 #include <sstream>
 

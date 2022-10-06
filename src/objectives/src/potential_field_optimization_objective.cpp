@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_objectives/potential_field_optimization_objective.h"
+#include "pdt/objectives/potential_field_optimization_objective.h"
 
 #include <memory>
 

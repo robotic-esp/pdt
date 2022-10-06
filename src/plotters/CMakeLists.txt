@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
-project(esp_plotters)
+project(pdt_plotters)
 
 # Specify the library as a target.
-add_library(esp_plotters
+add_library(pdt_plotters
   src/latex_plotter.cpp
   src/median_cost_at_first_vs_query_line_plotter.cpp
   src/median_cost_at_last_vs_query_line_plotter.cpp
@@ -19,17 +19,17 @@ add_library(esp_plotters
   src/success_at_time_vs_query_line_plotter.cpp)
 
 # Specify the include directories for this target.
-target_include_directories(esp_plotters
+target_include_directories(pdt_plotters
   PUBLIC
   ${PROJECT_SOURCE_DIR}/include)
 
 # Specify the link targets for this target.
-target_link_libraries(esp_plotters
+target_link_libraries(pdt_plotters
   PRIVATE
   pdt
   PUBLIC
-  esp_common
-  esp_config
-  esp_factories
-  esp_pgftikz
-  esp_statistics)
+  pdt_common
+  pdt_config
+  pdt_factories
+  pdt_pgftikz
+  pdt_statistics)

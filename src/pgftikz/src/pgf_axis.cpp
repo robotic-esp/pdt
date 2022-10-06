@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_pgftikz/pgf_axis.h"
+#include "pdt/pgftikz/pgf_axis.h"
 
 #include <sstream>
 

@@ -35,7 +35,7 @@
 
 // Author: Marlin Strub
 
-#include "esp_factories/planner_factory.h"
+#include "pdt/factories/planner_factory.h"
 
 #include <ompl/geometric/planners/fmt/FMT.h>
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>

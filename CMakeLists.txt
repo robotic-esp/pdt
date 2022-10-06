@@ -62,45 +62,29 @@ target_compile_features(pdt
   INTERFACE
   cxx_std_17)
 
-# Add open-rave integration if requested. This option must be processed before
-# the local libraries as some of them depend on this option.
+# Add open-rave integration if requested. This option must be processed
+# first as some PDT libraries and/or source code depends on it.
 option(PDT_OPEN_RAVE "Enable OpenRAVE integration." OFF)
 if(PDT_OPEN_RAVE)
+  message(STATUS "Configuring OpenRAVE support")
   add_definitions(-DPDT_OPEN_RAVE)
-  add_subdirectory(esp_open_rave)
-  # See docs/DoxygenSettings.cmake for conditional Doxygen inclusion.
+  # See src/CMakeLists.txt and docs/DoxygenSettings.cmake for switches on this option.
 endif()
 
-# Add the local libraries & executables.
+# Add the documentation
 add_subdirectory(docs)
-add_subdirectory(esp_common)
-add_subdirectory(esp_config)
-add_subdirectory(esp_experiments)
-add_subdirectory(esp_factories)
-add_subdirectory(esp_loggers)
-add_subdirectory(esp_objectives)
-add_subdirectory(esp_obstacles)
-add_subdirectory(esp_pgftikz)
-add_subdirectory(esp_planning_contexts)
-add_subdirectory(esp_plotters)
-add_subdirectory(esp_reports)
-add_subdirectory(esp_spaces)
-add_subdirectory(esp_statistics)
-add_subdirectory(esp_time)
-add_subdirectory(esp_utilities)
-add_subdirectory(esp_visualization)
+# Add the libraries & executables.
+add_subdirectory(src)
 
 # Add the tests if requested.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+  message(STATUS "Configuring unit tests")
   # Include CMake's test utilities.
   include(CTest)
-  
   # Add doctest as a thirdparty project.
   add_subdirectory(thirdparty/doctest)
-
-  # Build the tests.
-  add_subdirectory(test/esp_config)
-  add_subdirectory(test/esp_objectives)
+  # Add the tests.
+  add_subdirectory(test)
 endif()
 
 # Helpful, but too noisy to leave on by default at the moment

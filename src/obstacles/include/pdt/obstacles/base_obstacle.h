@@ -40,7 +40,7 @@
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/SpaceInformation.h>
 
-#include "esp_obstacles/obstacle_visitor.h"
+#include "pdt/obstacles/obstacle_visitor.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"

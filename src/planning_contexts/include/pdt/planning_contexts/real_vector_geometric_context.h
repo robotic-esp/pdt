@@ -48,11 +48,11 @@
 #include <ompl/util/Console.h>
 #include <ompl/util/Exception.h>
 
-#include "esp_config/configuration.h"
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_planning_contexts/base_context.h"
-#include "esp_planning_contexts/context_visitor.h"
-#include "esp_time/time.h"
+#include "pdt/config/configuration.h"
+#include "pdt/obstacles/base_obstacle.h"
+#include "pdt/planning_contexts/base_context.h"
+#include "pdt/planning_contexts/context_visitor.h"
+#include "pdt/time/time.h"
 
 namespace pdt {
 

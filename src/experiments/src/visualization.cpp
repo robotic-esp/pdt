@@ -37,13 +37,13 @@
 
 #include <pangolin/pangolin.h>
 
-#include "esp_common/context_type.h"
-#include "esp_common/planner_type.h"
-#include "esp_config/configuration.h"
-#include "esp_factories/context_factory.h"
-#include "esp_factories/planner_factory.h"
-#include "esp_planning_contexts/all_contexts.h"
-#include "esp_visualization/interactive_visualizer.h"
+#include "pdt/common/context_type.h"
+#include "pdt/common/planner_type.h"
+#include "pdt/config/configuration.h"
+#include "pdt/factories/context_factory.h"
+#include "pdt/factories/planner_factory.h"
+#include "pdt/planning_contexts/all_contexts.h"
+#include "pdt/visualization/interactive_visualizer.h"
 
 using namespace std::string_literals;
 

@@ -40,7 +40,7 @@
 #include <ompl/base/StateSpace.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
-#include "esp_spaces/SO3WAxisAngleBoundStateSpace.h"
+#include "pdt/spaces/SO3WAxisAngleBoundStateSpace.h"
 
 namespace pdt {
 

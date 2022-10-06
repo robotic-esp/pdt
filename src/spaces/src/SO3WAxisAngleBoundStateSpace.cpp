@@ -35,7 +35,7 @@
 
 /* Author: Marlin Strub */
 
-#include "esp_spaces/SO3WAxisAngleBoundStateSpace.h"
+#include "pdt/spaces/SO3WAxisAngleBoundStateSpace.h"
 
 #include <algorithm>
 #include <cmath>

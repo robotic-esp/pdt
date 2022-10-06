@@ -35,7 +35,7 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_planning_contexts/narrow_passage.h"
+#include "pdt/planning_contexts/narrow_passage.h"
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>

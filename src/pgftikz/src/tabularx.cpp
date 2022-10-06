@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_pgftikz/tabularx.h"
+#include "pdt/pgftikz/tabularx.h"
 
 #include <algorithm>
 #include <fstream>

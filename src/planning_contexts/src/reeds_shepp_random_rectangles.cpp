@@ -35,7 +35,7 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_planning_contexts/reeds_shepp_random_rectangles.h"
+#include "pdt/planning_contexts/reeds_shepp_random_rectangles.h"
 
 #include <vector>
 
@@ -44,9 +44,9 @@
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/base/goals/GoalStates.h>
 
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_obstacles/hyperrectangle.h"
-#include "esp_planning_contexts/reeds_shepp_validity_checker.h"
+#include "pdt/obstacles/base_obstacle.h"
+#include "pdt/obstacles/hyperrectangle.h"
+#include "pdt/planning_contexts/reeds_shepp_validity_checker.h"
 
 using namespace std::string_literals;
 

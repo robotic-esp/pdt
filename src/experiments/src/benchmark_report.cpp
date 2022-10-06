@@ -42,9 +42,9 @@
 
 #include <experimental/filesystem>
 
-#include "esp_config/configuration.h"
-#include "esp_reports/single_query_report.h"
-#include "esp_statistics/planning_statistics.h"
+#include "pdt/config/configuration.h"
+#include "pdt/reports/single_query_report.h"
+#include "pdt/statistics/planning_statistics.h"
 
 using namespace std::string_literals;
 

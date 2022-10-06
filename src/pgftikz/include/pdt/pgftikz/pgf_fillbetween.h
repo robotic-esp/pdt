@@ -40,7 +40,7 @@
 #include <string>
 #include <vector>
 
-#include "esp_pgftikz/pgf_plottable.h"
+#include "pdt/pgftikz/pgf_plottable.h"
 
 namespace pdt {
 

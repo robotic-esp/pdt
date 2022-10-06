@@ -43,8 +43,8 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/datastructures/NearestNeighborsGNAT.h>
 
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_planning_contexts/context_validity_checker.h"
+#include "pdt/obstacles/base_obstacle.h"
+#include "pdt/planning_contexts/context_validity_checker.h"
 
 namespace pdt {
 

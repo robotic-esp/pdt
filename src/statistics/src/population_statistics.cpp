@@ -35,7 +35,7 @@
 
 // Authors: Jonathan Gammell
 
-#include "esp_statistics/population_statistics.h"
+#include "pdt/statistics/population_statistics.h"
 
 #include <boost/math/special_functions/beta.hpp>
 #include <iostream>

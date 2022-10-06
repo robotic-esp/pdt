@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_objectives/reciprocal_clearance_optimization_objective.h"
+#include "pdt/objectives/reciprocal_clearance_optimization_objective.h"
 
 #include <cmath>
 #include <memory>

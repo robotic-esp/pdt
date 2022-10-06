@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(esp_config)
+project(pdt_config)
 
 # Get the git branch, commit hash, and status.
 # See answers to https://stackoverflow.com/q/1435953/6333988
@@ -19,24 +19,24 @@ set_package_properties(Boost PROPERTIES
 find_package(Boost 1.58 REQUIRED COMPONENTS program_options)
 
 # Specify the library as a target.
-add_library(esp_config
+add_library(pdt_config
   STATIC
   src/configuration.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/directory.cpp)
 
 # Specify our include directories for this target.
-target_include_directories(esp_config
+target_include_directories(pdt_config
   PUBLIC
   ${PROJECT_SOURCE_DIR}/include)
 
 # Specify third-party include directories as system includes to suppress warnings.
-target_include_directories(esp_config SYSTEM
+target_include_directories(pdt_config SYSTEM
   PUBLIC
   ${OMPL_INCLUDE_DIRS})
 
 # Specify the link targets for this target.
-target_link_libraries(esp_config
+target_link_libraries(pdt_config
   PRIVATE
   pdt
   ${Boost_LIBRARIES}

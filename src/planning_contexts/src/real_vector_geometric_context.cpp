@@ -35,7 +35,7 @@
 
 /* Authors: Marlin Strub */
 
-#include "esp_planning_contexts/real_vector_geometric_context.h"
+#include "pdt/planning_contexts/real_vector_geometric_context.h"
 
 #include <ompl/base/goals/GoalSpace.h>
 #include <ompl/base/goals/GoalState.h>

@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_visualization/interactive_visualizer.h"
+#include "pdt/visualization/interactive_visualizer.h"
 
 #include <ompl/base/goals/GoalSpace.h>
 #include <ompl/base/goals/GoalState.h>
@@ -43,7 +43,7 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/planners/informedtrees/bitstar/Vertex.h>
 
-#include "esp_visualization/fonts.h"
+#include "pdt/visualization/fonts.h"
 
 namespace pdt {
 

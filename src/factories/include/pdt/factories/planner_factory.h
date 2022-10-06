@@ -42,10 +42,10 @@
 
 #include <ompl/base/Planner.h>
 
-#include "esp_config/configuration.h"
-#include "esp_planning_contexts/base_context.h"
+#include "pdt/config/configuration.h"
+#include "pdt/planning_contexts/base_context.h"
 
-#include "esp_common/planner_type.h"
+#include "pdt/common/planner_type.h"
 
 namespace pdt {
 

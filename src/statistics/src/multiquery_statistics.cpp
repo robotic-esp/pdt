@@ -35,7 +35,7 @@
 
 // Authors: Valentin Hartmann
 
-#include "esp_statistics/multiquery_statistics.h"
+#include "pdt/statistics/multiquery_statistics.h"
 
 #include <algorithm>
 #include <cassert>
@@ -52,8 +52,8 @@
 #include "csv/parser.hpp"
 #pragma GCC diagnostic pop
 
-#include "esp_statistics/linear_interpolator.h"
-#include "esp_utilities/write_vector_to_file.h"
+#include "pdt/statistics/linear_interpolator.h"
+#include "pdt/utilities/write_vector_to_file.h"
 
 namespace pdt {
 

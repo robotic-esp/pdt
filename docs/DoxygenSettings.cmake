@@ -36,7 +36,7 @@ set(DOXYGEN_EXCLUDE
 if(NOT PDT_OPEN_RAVE)
   set(DOXYGEN_EXCLUDE
     ${DOXYGEN_EXCLUDE}
-    "${PROJECT_SOURCE_DIR}/esp_open_rave/")
+    "${PROJECT_SOURCE_DIR}/src/open_rave/")
 endif()
 set(DOXYGEN_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/parameters/demo/") # This won't work, but I wish it did
 set(DOXYGEN_EXAMPLE_RECURSIVE YES)

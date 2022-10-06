@@ -42,14 +42,14 @@
 #include <ompl/base/Planner.h>
 #include <ompl/base/PlannerData.h>
 
-#include "esp_common/context_type.h"
-#include "esp_common/planner_type.h"
-#include "esp_config/configuration.h"
-#include "esp_obstacles/obstacle_visitor.h"
-#include "esp_pgftikz/tikz_picture.h"
-#include "esp_planning_contexts/all_contexts.h"
-#include "esp_planning_contexts/context_visitor.h"
-#include "esp_visualization/planner_specific_data.h"
+#include "pdt/common/context_type.h"
+#include "pdt/common/planner_type.h"
+#include "pdt/config/configuration.h"
+#include "pdt/obstacles/obstacle_visitor.h"
+#include "pdt/pgftikz/tikz_picture.h"
+#include "pdt/planning_contexts/all_contexts.h"
+#include "pdt/planning_contexts/context_visitor.h"
+#include "pdt/visualization/planner_specific_data.h"
 
 namespace pdt {
 

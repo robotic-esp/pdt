@@ -41,10 +41,10 @@
 #include <string>
 #include <vector>
 
-#include "esp_config/configuration.h"
-#include "esp_pgftikz/pgf_axis.h"
-#include "esp_pgftikz/tikz_draw.h"
-#include "esp_pgftikz/tikz_node.h"
+#include "pdt/config/configuration.h"
+#include "pdt/pgftikz/pgf_axis.h"
+#include "pdt/pgftikz/tikz_draw.h"
+#include "pdt/pgftikz/tikz_node.h"
 
 namespace pdt {
 

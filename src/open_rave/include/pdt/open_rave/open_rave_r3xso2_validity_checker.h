@@ -53,11 +53,11 @@
 #include <openrave-core.h>
 #pragma GCC diagnostic pop
 
-#include "esp_config/configuration.h"
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_obstacles/hyperrectangle.h"
-#include "esp_obstacles/obstacle_visitor.h"
-#include "esp_open_rave/open_rave_base_validity_checker.h"
+#include "pdt/config/configuration.h"
+#include "pdt/obstacles/base_obstacle.h"
+#include "pdt/obstacles/hyperrectangle.h"
+#include "pdt/obstacles/obstacle_visitor.h"
+#include "pdt/open_rave/open_rave_base_validity_checker.h"
 
 namespace pdt {
 

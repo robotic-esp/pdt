@@ -41,8 +41,8 @@
 
 #include <ompl/base/SpaceInformation.h>
 
-#include "esp_config/configuration.h"
-#include "esp_planning_contexts/base_context.h"
+#include "pdt/config/configuration.h"
+#include "pdt/planning_contexts/base_context.h"
 
 namespace pdt {
 

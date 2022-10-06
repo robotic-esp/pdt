@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_plotters/latex_plotter.h"
+#include "pdt/plotters/latex_plotter.h"
 
 #include <fstream>
 

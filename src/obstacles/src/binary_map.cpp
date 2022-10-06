@@ -35,7 +35,7 @@
 
 /* Authors: Jonathan Gammell */
 
-#include "esp_obstacles/binary_map.h"
+#include "pdt/obstacles/binary_map.h"
 
 #include <fstream>
 

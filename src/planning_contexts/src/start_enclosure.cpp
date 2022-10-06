@@ -35,16 +35,16 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_planning_contexts/start_enclosure.h"
+#include "pdt/planning_contexts/start_enclosure.h"
 
 #include <vector>
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>
 
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_obstacles/hyperrectangle.h"
-#include "esp_planning_contexts/context_validity_checker.h"
+#include "pdt/obstacles/base_obstacle.h"
+#include "pdt/obstacles/hyperrectangle.h"
+#include "pdt/planning_contexts/context_validity_checker.h"
 
 namespace pdt {
 

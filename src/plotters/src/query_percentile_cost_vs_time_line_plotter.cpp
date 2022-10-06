@@ -35,15 +35,15 @@
 
 // Authors: Marlin Strub
 
-#include "esp_plotters/query_percentile_cost_vs_time_line_plotter.h"
+#include "pdt/plotters/query_percentile_cost_vs_time_line_plotter.h"
 
 #include <iomanip>
 
-#include "esp_pgftikz/pgf_axis.h"
-#include "esp_pgftikz/pgf_fillbetween.h"
-#include "esp_pgftikz/pgf_plot.h"
-#include "esp_pgftikz/pgf_table.h"
-#include "esp_pgftikz/tikz_picture.h"
+#include "pdt/pgftikz/pgf_axis.h"
+#include "pdt/pgftikz/pgf_fillbetween.h"
+#include "pdt/pgftikz/pgf_plot.h"
+#include "pdt/pgftikz/pgf_table.h"
+#include "pdt/pgftikz/tikz_picture.h"
 
 namespace pdt {
 

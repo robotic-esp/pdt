@@ -35,7 +35,7 @@
 
 /* Authors: Jonathan Gammell */
 
-#include "esp_planning_contexts/context_validity_checker.h"
+#include "pdt/planning_contexts/context_validity_checker.h"
 
 namespace pdt {
 

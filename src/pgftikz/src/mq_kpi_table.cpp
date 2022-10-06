@@ -40,8 +40,8 @@ Algorithm | t_cum, init,min | t_cum,init,med | t_cum,init,max | c_cum,init,min |
 | c_cum,fin,med | c_cum,fin,max | success|
  */
 
-#include "esp_pgftikz/mq_kpi_table.h"
-#include "esp_statistics/multiquery_statistics.h"
+#include "pdt/pgftikz/mq_kpi_table.h"
+#include "pdt/statistics/multiquery_statistics.h"
 
 #include <fstream>
 #include <iomanip>

@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_plotters/query_time_at_first_histogram_plotter.h"
+#include "pdt/plotters/query_time_at_first_histogram_plotter.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -43,10 +43,10 @@
 
 #include <ompl/util/Console.h>
 
-#include "esp_pgftikz/pgf_axis.h"
-#include "esp_pgftikz/pgf_fillbetween.h"
-#include "esp_pgftikz/pgf_plot.h"
-#include "esp_pgftikz/pgf_table.h"
+#include "pdt/pgftikz/pgf_axis.h"
+#include "pdt/pgftikz/pgf_fillbetween.h"
+#include "pdt/pgftikz/pgf_plot.h"
+#include "pdt/pgftikz/pgf_table.h"
 
 namespace pdt {
 

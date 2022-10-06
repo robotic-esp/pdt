@@ -40,9 +40,9 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
 
-#include "esp_config/configuration.h"
-#include "esp_factories/context_factory.h"
-#include "esp_planning_contexts/all_contexts.h"
+#include "pdt/config/configuration.h"
+#include "pdt/factories/context_factory.h"
+#include "pdt/planning_contexts/all_contexts.h"
 
 using namespace std::string_literals;
 

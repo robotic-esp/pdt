@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_visualization/base_visualizer.h"
+#include "pdt/visualization/base_visualizer.h"
 
 #include <chrono>
 #include <exception>
@@ -46,7 +46,7 @@
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 
-#include "esp_time/time.h"
+#include "pdt/time/time.h"
 
 namespace pdt {
 

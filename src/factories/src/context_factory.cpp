@@ -35,7 +35,7 @@
 
 // Author: Marlin Strub
 
-#include "esp_factories/context_factory.h"
+#include "pdt/factories/context_factory.h"
 
 #include <ompl/base/StateSpace.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
@@ -46,15 +46,15 @@
 
 #include "nlohmann/json.hpp"
 
-#include "esp_common/context_type.h"
-#include "esp_planning_contexts/all_contexts.h"
+#include "pdt/common/context_type.h"
+#include "pdt/planning_contexts/all_contexts.h"
 
 #ifdef PDT_OPEN_RAVE
-#include "esp_spaces/SE3WAxisAngleBoundStateSpace.h"
-#include "esp_open_rave/open_rave_manipulator.h"
-#include "esp_open_rave/open_rave_r3.h"
-#include "esp_open_rave/open_rave_r3xso2.h"
-#include "esp_open_rave/open_rave_se3.h"
+#include "pdt/spaces/SE3WAxisAngleBoundStateSpace.h"
+#include "pdt/open_rave/open_rave_manipulator.h"
+#include "pdt/open_rave/open_rave_r3.h"
+#include "pdt/open_rave/open_rave_r3xso2.h"
+#include "pdt/open_rave/open_rave_se3.h"
 #endif
 
 namespace pdt {

@@ -42,7 +42,7 @@
 #include <vector>
 #include <limits>
 
-#include "esp_pgftikz/pgf_plot.h"
+#include "pdt/pgftikz/pgf_plot.h"
 
 namespace pdt {
 

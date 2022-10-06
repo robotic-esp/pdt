@@ -45,9 +45,9 @@
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/datastructures/NearestNeighborsGNAT.h>
 
-#include "esp_obstacles/base_obstacle.h"
-#include "esp_obstacles/hyperrectangle.h"
-#include "esp_obstacles/obstacle_visitor.h"
+#include "pdt/obstacles/base_obstacle.h"
+#include "pdt/obstacles/hyperrectangle.h"
+#include "pdt/obstacles/obstacle_visitor.h"
 
 namespace pdt {
 

@@ -1,20 +1,20 @@
 cmake_minimum_required(VERSION 3.10)
-project(esp_spaces)
+project(pdt_spaces)
 
 # Specify the library as a target.
-add_library(esp_spaces
+add_library(pdt_spaces
   src/SE3WAxisAngleBoundStateSpace.cpp
   src/SO3WAxisAngleBoundStateSpace.cpp)
 
 # Specify our include directories for this target.
-target_include_directories(esp_spaces
+target_include_directories(pdt_spaces
   PUBLIC
   ${PROJECT_SOURCE_DIR}/include)
 
 # Specify the link targets for this target.
-target_link_libraries(esp_spaces
+target_link_libraries(pdt_spaces
   PRIVATE
   pdt
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_config)
+  pdt_config)

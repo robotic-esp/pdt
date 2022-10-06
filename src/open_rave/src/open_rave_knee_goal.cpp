@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_open_rave/open_rave_knee_goal.h"
+#include "pdt/open_rave/open_rave_knee_goal.h"
 
 #include <vector>
 

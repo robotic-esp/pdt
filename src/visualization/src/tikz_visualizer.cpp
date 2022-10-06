@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_visualization/tikz_visualizer.h"
+#include "pdt/visualization/tikz_visualizer.h"
 
 #include <ompl/base/goals/GoalSpace.h>
 #include <ompl/base/goals/GoalState.h>
@@ -43,8 +43,8 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/planners/informedtrees/bitstar/Vertex.h>
 
-#include "esp_pgftikz/tikz_draw.h"
-#include "esp_pgftikz/tikz_node.h"
+#include "pdt/pgftikz/tikz_draw.h"
+#include "pdt/pgftikz/tikz_node.h"
 
 namespace pdt {
 

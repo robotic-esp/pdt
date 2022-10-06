@@ -35,7 +35,7 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_obstacles/base_obstacle.h"
+#include "pdt/obstacles/base_obstacle.h"
 
 namespace pdt {
 

@@ -1,7 +1,7 @@
 # TODO: Why it will not link when the boost libraries are not specified last is
 # beyond me.
 cmake_minimum_required(VERSION 3.10)
-project(esp_experiments)
+project(pdt_experiments)
 
 set_package_properties(Boost PROPERTIES
   URL "https://boost.org"
@@ -19,13 +19,13 @@ target_link_libraries(benchmark
   pdt
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_config
-  esp_factories
-  esp_planning_contexts
-  esp_loggers
-  esp_reports
-  esp_time
-  esp_utilities
+  pdt_config
+  pdt_factories
+  pdt_planning_contexts
+  pdt_loggers
+  pdt_reports
+  pdt_time
+  pdt_utilities
   ${Boost_LIBRARIES})
 
 # Specify the benchmark_report executable target.
@@ -37,9 +37,9 @@ target_link_libraries(benchmark_report
   PRIVATE
   pdt
   PUBLIC
-  esp_config
-  esp_reports
-  esp_statistics)
+  pdt_config
+  pdt_reports
+  pdt_statistics)
 
 # Specify the collision_detection_test executable target.
 add_executable(collision_detection_test
@@ -51,9 +51,9 @@ target_link_libraries(collision_detection_test
   pdt
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_config
-  esp_factories
-  esp_planning_contexts
+  pdt_config
+  pdt_factories
+  pdt_planning_contexts
   ${Boost_LIBRARIES})
 
 # Specify the visualization target.
@@ -67,12 +67,12 @@ target_link_libraries(visualization
   PUBLIC
   ${Pangolin_LIBRARIES}
   ${OMPL_LIBRARIES}
-  esp_config
-  esp_factories
-  esp_planning_contexts
-  esp_time
-  esp_utilities
-  esp_visualization
+  pdt_config
+  pdt_factories
+  pdt_planning_contexts
+  pdt_time
+  pdt_utilities
+  pdt_visualization
   ${Boost_LIBRARIES})
 
 # Specify the clearance objective test executable target.
@@ -83,7 +83,7 @@ target_link_libraries(objective_sanity_check
   PRIVATE
   pdt
   PUBLIC
-  esp_config
-  esp_factories
-  esp_planning_contexts
+  pdt_config
+  pdt_factories
+  pdt_planning_contexts
   ${Boost_LIBRARIES})

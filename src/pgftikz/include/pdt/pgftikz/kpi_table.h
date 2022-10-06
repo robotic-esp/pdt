@@ -39,9 +39,9 @@
 
 #include <experimental/filesystem>
 
-#include "esp_config/configuration.h"
-#include "esp_pgftikz/tabularx.h"
-#include "esp_statistics/planning_statistics.h"
+#include "pdt/config/configuration.h"
+#include "pdt/pgftikz/tabularx.h"
+#include "pdt/statistics/planning_statistics.h"
 
 namespace pdt {
 

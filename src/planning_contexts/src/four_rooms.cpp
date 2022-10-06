@@ -35,7 +35,7 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_planning_contexts/four_rooms.h"
+#include "pdt/planning_contexts/four_rooms.h"
 
 #include <ompl/base/StateValidityChecker.h>
 #include <ompl/base/goals/GoalState.h>

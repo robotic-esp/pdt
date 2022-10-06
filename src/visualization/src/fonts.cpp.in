@@ -33,7 +33,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include "esp_visualization/fonts.h"
+#include "pdt/visualization/fonts.h"
 
 #define PDT_VISUALIZATION_SOURCE_DIRECTORY "@PROJECT_SOURCE_DIR@"
 

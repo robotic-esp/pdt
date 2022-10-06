@@ -44,7 +44,7 @@
 #include <ompl/geometric/planners/informedtrees/eitstar/Edge.h>
 #include <ompl/geometric/planners/informedtrees/aitstar/Edge.h>
 
-#include "esp_common/planner_type.h"
+#include "pdt/common/planner_type.h"
 
 namespace pdt {
 

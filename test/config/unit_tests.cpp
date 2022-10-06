@@ -40,8 +40,8 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest/doctest.h"
-#include "esp_config/configuration.h"
-#include "esp_config/directory.h"
+#include "pdt/config/configuration.h"
+#include "pdt/config/directory.h"
 
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
@@ -51,14 +51,14 @@ TEST_CASE("Configuration") {
   ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_WARN);
 
   // Instantiate an empty configuration.
-  const char* argv[] = {"test_esp_config\0"};
+  const char* argv[] = {"test_pdt_config\0"};
   const int   argc   = sizeof(argv) / sizeof(char*) - 1;
   pdt::config::Configuration config(argc, argv);
   config.clear();
 
   // Get the path of the test configurations.
   const auto configsDir =
-    Directory::SOURCE / "test/esp_config/configs";
+    pdt::config::Directory::SOURCE / "test/pdt_config/configs";
 
   SUBCASE("Empty configuration") {
     // Check query behaviour of nonexistent parameter.

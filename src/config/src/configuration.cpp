@@ -35,7 +35,7 @@
 
 // Author: Marlin Strub
 
-#include "esp_config/configuration.h"
+#include "pdt/config/configuration.h"
 
 #include <exception>
 #include <iostream>
@@ -45,8 +45,8 @@
 #include <ompl/util/RandomNumbers.h>
 #include <boost/program_options.hpp>
 
-#include "esp_config/directory.h"
-#include "esp_config/version.h"
+#include "pdt/config/directory.h"
+#include "pdt/config/version.h"
 
 namespace pdt {
 

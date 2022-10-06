@@ -49,7 +49,7 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/StateValidityChecker.h>
 
-#include "esp_obstacles/base_obstacle.h"
+#include "pdt/obstacles/base_obstacle.h"
 
 namespace pdt {
 

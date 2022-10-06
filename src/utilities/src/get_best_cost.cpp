@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_utilities/get_best_cost.h"
+#include "pdt/utilities/get_best_cost.h"
 
 #include <limits>
 #include <string>
@@ -55,7 +55,7 @@
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/prm/SPARStwo.h>
 
-#include "esp_common/planner_type.h"
+#include "pdt/common/planner_type.h"
 
 namespace pdt {
 

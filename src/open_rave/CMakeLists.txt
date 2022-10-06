@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(esp_open_rave)
+project(pdt_open_rave)
 
 # Append the path to find installed third-party libraries.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -19,7 +19,7 @@ set_package_properties(Threads PROPERTIES
 find_package(Threads REQUIRED)
 
 # Specify the library as a target.
-add_library(esp_open_rave
+add_library(pdt_open_rave
   src/open_rave_base_context.cpp
   src/open_rave_base_validity_checker.cpp
   src/open_rave_knee_goal.cpp
@@ -33,18 +33,18 @@ add_library(esp_open_rave
   src/open_rave_se3_validity_checker.cpp)
 
 # Specify our include directories for this target.
-target_include_directories(esp_open_rave
+target_include_directories(pdt_open_rave
   PUBLIC
   ${PROJECT_SOURCE_DIR}/include)
 
 # Specify third-party include directories as system includes to suppress warnings.
-target_include_directories(esp_open_rave SYSTEM
+target_include_directories(pdt_open_rave SYSTEM
   PUBLIC
   ${OMPL_INCLUDE_DIRS}
   ${OpenRAVE_INCLUDE_DIRS})
 
 # Specify the link targets for this target.
-target_link_libraries(esp_open_rave
+target_link_libraries(pdt_open_rave
   PRIVATE
   pdt
   ${OpenRAVE_LIBRARIES}
@@ -52,8 +52,8 @@ target_link_libraries(esp_open_rave
   Threads::Threads
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_config
-  esp_planning_contexts)
+  pdt_config
+  pdt_planning_contexts)
 
 # Specify the gui as a target.
 add_executable(open_rave_gui
@@ -68,7 +68,7 @@ target_link_libraries(open_rave_gui
   ${OpenRAVE_LIBRARIES}
   ${OpenRAVE_CORE_LIBRARIES}
   ${OMPL_LIBRARIES}
-  esp_config
-  esp_factories
-  esp_planning_contexts
-  esp_open_rave)
+  pdt_config
+  pdt_factories
+  pdt_planning_contexts
+  pdt_open_rave)

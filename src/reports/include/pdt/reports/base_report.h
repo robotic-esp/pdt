@@ -43,8 +43,8 @@
 #include <sstream>
 #include <string>
 
-#include "esp_config/configuration.h"
-#include "esp_plotters/latex_plotter.h"
+#include "pdt/config/configuration.h"
+#include "pdt/plotters/latex_plotter.h"
 
 namespace pdt {
 

@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_open_rave/open_rave_r3_validity_checker.h"
+#include "pdt/open_rave/open_rave_r3_validity_checker.h"
 
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 

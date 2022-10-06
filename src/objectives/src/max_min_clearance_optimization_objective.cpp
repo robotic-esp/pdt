@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_objectives/max_min_clearance_optimization_objective.h"
+#include "pdt/objectives/max_min_clearance_optimization_objective.h"
 
 #include <memory>
 

@@ -35,13 +35,13 @@
 
 // Authors: Marlin Strub
 
-#include "esp_plotters/median_cost_at_last_vs_query_line_plotter.h"
+#include "pdt/plotters/median_cost_at_last_vs_query_line_plotter.h"
 
-#include "esp_pgftikz/pgf_axis.h"
-#include "esp_pgftikz/pgf_fillbetween.h"
-#include "esp_pgftikz/pgf_plot.h"
-#include "esp_pgftikz/pgf_table.h"
-#include "esp_pgftikz/tikz_picture.h"
+#include "pdt/pgftikz/pgf_axis.h"
+#include "pdt/pgftikz/pgf_fillbetween.h"
+#include "pdt/pgftikz/pgf_plot.h"
+#include "pdt/pgftikz/pgf_table.h"
+#include "pdt/pgftikz/tikz_picture.h"
 
 namespace pdt {
 

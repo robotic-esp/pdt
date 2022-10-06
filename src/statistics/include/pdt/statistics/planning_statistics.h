@@ -43,8 +43,8 @@
 #include <utility>
 #include <vector>
 
-#include "esp_config/configuration.h"
-#include "esp_statistics/population_statistics.h"
+#include "pdt/config/configuration.h"
+#include "pdt/statistics/population_statistics.h"
 
 namespace pdt {
 

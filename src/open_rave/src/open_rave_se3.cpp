@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_open_rave/open_rave_se3.h"
+#include "pdt/open_rave/open_rave_se3.h"
 
 #include <algorithm>
 
@@ -48,9 +48,9 @@
 
 #include <openrave/environment.h>
 
-#include "esp_config/directory.h"
-#include "esp_open_rave/open_rave_knee_goal.h"
-#include "esp_open_rave/open_rave_se3_validity_checker.h"
+#include "pdt/config/directory.h"
+#include "pdt/open_rave/open_rave_knee_goal.h"
+#include "pdt/open_rave/open_rave_se3_validity_checker.h"
 
 using namespace std::string_literals;
 

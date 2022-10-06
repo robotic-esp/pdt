@@ -41,10 +41,10 @@
 #include <memory>
 #include <string>
 
-#include "esp_config/configuration.h"
-#include "esp_pgftikz/pgf_axis.h"
-#include "esp_plotters/latex_plotter.h"
-#include "esp_statistics/multiquery_statistics.h"
+#include "pdt/config/configuration.h"
+#include "pdt/pgftikz/pgf_axis.h"
+#include "pdt/plotters/latex_plotter.h"
+#include "pdt/statistics/multiquery_statistics.h"
 
 namespace pdt {
 

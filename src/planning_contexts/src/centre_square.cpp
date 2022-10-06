@@ -35,7 +35,7 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "esp_planning_contexts/centre_square.h"
+#include "pdt/planning_contexts/centre_square.h"
 
 #include <cmath>
 #include <functional>
@@ -46,8 +46,8 @@
 #include <ompl/base/goals/GoalStates.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
-#include "esp_obstacles/hyperrectangle.h"
-#include "esp_planning_contexts/context_validity_checker.h"
+#include "pdt/obstacles/hyperrectangle.h"
+#include "pdt/planning_contexts/context_validity_checker.h"
 
 namespace pdt {
 

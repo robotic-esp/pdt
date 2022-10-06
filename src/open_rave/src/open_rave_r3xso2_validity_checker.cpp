@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_open_rave/open_rave_r3xso2_validity_checker.h"
+#include "pdt/open_rave/open_rave_r3xso2_validity_checker.h"
 
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/spaces/SO2StateSpace.h>

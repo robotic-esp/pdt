@@ -48,11 +48,11 @@
 #include <ompl/base/Planner.h>
 #include <ompl/base/PlannerData.h>
 
-#include "esp_common/planner_type.h"
-#include "esp_config/configuration.h"
-#include "esp_planning_contexts/real_vector_geometric_context.h"
-#include "esp_time/time.h"
-#include "esp_visualization/planner_specific_data.h"
+#include "pdt/common/planner_type.h"
+#include "pdt/config/configuration.h"
+#include "pdt/planning_contexts/real_vector_geometric_context.h"
+#include "pdt/time/time.h"
+#include "pdt/visualization/planner_specific_data.h"
 
 namespace pdt {
 

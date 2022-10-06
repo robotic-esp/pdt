@@ -53,22 +53,22 @@
 #include <openrave/viewer.h>
 #pragma GCC diagnostic pop
 
-#include "esp_common/context_type.h"
-#include "esp_common/planner_type.h"
-#include "esp_config/configuration.h"
-#include "esp_factories/context_factory.h"
-#include "esp_factories/planner_factory.h"
-#include "esp_open_rave/open_rave_base_context.h"
-#include "esp_open_rave/open_rave_manipulator.h"
-#include "esp_open_rave/open_rave_manipulator_validity_checker.h"
-#include "esp_open_rave/open_rave_r3.h"
-#include "esp_open_rave/open_rave_r3_validity_checker.h"
-#include "esp_open_rave/open_rave_r3xso2.h"
-#include "esp_open_rave/open_rave_r3xso2_validity_checker.h"
-#include "esp_open_rave/open_rave_se3.h"
-#include "esp_open_rave/open_rave_se3_validity_checker.h"
-#include "esp_planning_contexts/all_contexts.h"
-#include "esp_planning_contexts/context_visitor.h"
+#include "pdt/common/context_type.h"
+#include "pdt/common/planner_type.h"
+#include "pdt/config/configuration.h"
+#include "pdt/factories/context_factory.h"
+#include "pdt/factories/planner_factory.h"
+#include "pdt/open_rave/open_rave_base_context.h"
+#include "pdt/open_rave/open_rave_manipulator.h"
+#include "pdt/open_rave/open_rave_manipulator_validity_checker.h"
+#include "pdt/open_rave/open_rave_r3.h"
+#include "pdt/open_rave/open_rave_r3_validity_checker.h"
+#include "pdt/open_rave/open_rave_r3xso2.h"
+#include "pdt/open_rave/open_rave_r3xso2_validity_checker.h"
+#include "pdt/open_rave/open_rave_se3.h"
+#include "pdt/open_rave/open_rave_se3_validity_checker.h"
+#include "pdt/planning_contexts/all_contexts.h"
+#include "pdt/planning_contexts/context_visitor.h"
 
 using namespace std::string_literals;
 using namespace std::chrono_literals;

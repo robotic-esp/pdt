@@ -54,10 +54,10 @@
 #include <openrave-core.h>
 #pragma GCC diagnostic pop
 
-#include "esp_config/configuration.h"
-#include "esp_open_rave/open_rave_base_context.h"
-#include "esp_planning_contexts/base_context.h"
-#include "esp_planning_contexts/context_visitor.h"
+#include "pdt/config/configuration.h"
+#include "pdt/open_rave/open_rave_base_context.h"
+#include "pdt/planning_contexts/base_context.h"
+#include "pdt/planning_contexts/context_visitor.h"
 
 namespace pdt {
 

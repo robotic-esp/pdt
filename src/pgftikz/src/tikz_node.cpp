@@ -35,7 +35,7 @@
 
 // Authors: Marlin Strub
 
-#include "esp_pgftikz/tikz_node.h"
+#include "pdt/pgftikz/tikz_node.h"
 
 #include <sstream>
 

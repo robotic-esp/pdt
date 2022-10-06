@@ -20,7 +20,7 @@
             "lowerBounds": [-3.8, -3.8, 0.0],
             "upperBounds": [3.8, 3.8, 1.8],
             "maxTime": 60,
-            "environment": "esp_open_rave/resources/two_rooms_table.env.xml",
+            "environment": "src/open_rave/resources/two_rooms_table.env.xml",
             "robot": "table",
             "collisionCheckResolution": 0.01
         },
@@ -35,7 +35,7 @@
             "lowerBounds": [-3.8, -3.8, 0.0],
             "upperBounds": [3.8, 3.8, 1.8],
             "maxTime": 100,
-            "environment": "esp_open_rave/resources/four_rooms_table.env.xml",
+            "environment": "src/open_rave/resources/four_rooms_table.env.xml",
             "robot": "table",
             "collisionCheckResolution": 0.01
         },
@@ -50,7 +50,7 @@
             "lowerBounds": [-20.0, -30.0, 0.0],
             "upperBounds": [20.0, 30.0, 1.8],
             "maxTime": 200,
-            "environment": "esp_open_rave/resources/furnished_office_corridor_table.env.xml",
+            "environment": "src/open_rave/resources/furnished_office_corridor_table.env.xml",
             "robot": "table",
             "collisionCheckResolution": 0.01
         },
@@ -65,7 +65,7 @@
             "lowerBounds": [-20.0, -30.0, 0.0],
             "upperBounds": [20.0, 30.0, 2.5],
             "maxTime": 100,
-            "environment": "esp_open_rave/resources/furnished_office_corridor_drone_cylinder.env.xml",
+            "environment": "src/open_rave/resources/furnished_office_corridor_drone_cylinder.env.xml",
             "robot": "drone",
             "collisionCheckResolution": 0.01
         },
@@ -80,7 +80,7 @@
             "lowerBounds": [-20.0, -30.0, 0.0],
             "upperBounds": [20.0, 30.0, 2.5],
             "maxTime": 100,
-            "environment": "esp_open_rave/resources/furnished_office_corridor_drone_square.env.xml",
+            "environment": "src/open_rave/resources/furnished_office_corridor_drone_square.env.xml",
             "robot": "drone",
             "collisionCheckResolution": 0.01
         },
@@ -95,7 +95,7 @@
             "lowerBounds": [-4.0, -4.0, 0.0],
             "upperBounds": [4.0, 4.0, 1.8],
             "maxTime": 200,
-            "environment": "esp_open_rave/resources/four_rooms_table_furnished.env.xml",
+            "environment": "src/open_rave/resources/four_rooms_table_furnished.env.xml",
             "robot": "table",
             "collisionCheckResolution": 0.01
         },
@@ -112,7 +112,7 @@
             "maxTime": 10,
             "dimensions": 14,
             "activeDofIndices": [0, 1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16, 17],
-            "environment": "esp_open_rave/resources/cage.env.xml",
+            "environment": "src/open_rave/resources/cage.env.xml",
             "robot": "BarrettWAM-dual",
             "collisionCheckResolution": 0.01
         },
@@ -128,7 +128,7 @@
             "lowerBounds": [-15.0, -5.0, -2.0],
             "upperBounds": [15.0, 8.0, 17],
             "maxTime": 200,
-            "environment": "esp_open_rave/resources/knee.env.xml",
+            "environment": "src/open_rave/resources/knee.env.xml",
             "robot": "bearing",
             "collisionCheckResolution": 0.0001
         },
@@ -145,7 +145,7 @@
             "maxTime": 600,
             "dimensions": 14,
             "activeDofIndices": [0, 1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16, 17],
-            "environment": "esp_open_rave/resources/bookshelf.env.xml",
+            "environment": "src/open_rave/resources/bookshelf.env.xml",
             "robot": "BarrettWAM-dual",
             "collisionCheckResolution": 0.01
         },
@@ -160,7 +160,7 @@
             "maxTime": 600,
             "dimensions": 7,
             "activeDofIndices": [0, 1, 2, 3, 4, 5, 6],
-            "environment": "esp_open_rave/resources/bookshelf.env.xml",
+            "environment": "src/open_rave/resources/bookshelf.env.xml",
             "robot": "BarrettWAM-dual",
             "collisionCheckResolution": 0.01
         }

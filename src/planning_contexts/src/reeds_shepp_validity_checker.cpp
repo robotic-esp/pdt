@@ -35,7 +35,7 @@
 
 /* Authors: Marlin Strub */
 
-#include "esp_planning_contexts/reeds_shepp_validity_checker.h"
+#include "pdt/planning_contexts/reeds_shepp_validity_checker.h"
 
 #include <ompl/base/spaces/SE2StateSpace.h>
 

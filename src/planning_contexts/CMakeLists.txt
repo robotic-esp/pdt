@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
-project(esp_planning_contexts)
+project(pdt_planning_contexts)
 
 # Specify this library as a target.
-add_library(esp_planning_contexts
+add_library(pdt_planning_contexts
   src/base_context.cpp
   src/context_validity_checker.cpp
   src/context_validity_checker_gnat.cpp
@@ -25,24 +25,24 @@ add_library(esp_planning_contexts
   src/wall_gap.cpp)
 
 # Specify our include directories for this target.
-target_include_directories(esp_planning_contexts
+target_include_directories(pdt_planning_contexts
   PUBLIC
   ${PROJECT_SOURCE_DIR}/include)
 
 # Specify third-party include directories as system includes to suppress warnings.
-target_include_directories(esp_planning_contexts SYSTEM 
+target_include_directories(pdt_planning_contexts SYSTEM 
   PUBLIC
   ${OMPL_INCLUDE_DIRS})
 
 # Specify the link targets for this target.
-target_link_libraries(esp_planning_contexts
+target_link_libraries(pdt_planning_contexts
   PRIVATE
   pdt
   ${OpenRAVE_LIBRARIES}
   PUBLIC
   ${OMPL_LIBRARIES}
-  esp_common
-  esp_config
-  esp_objectives
-  esp_obstacles
-  esp_time)
+  pdt_common
+  pdt_config
+  pdt_objectives
+  pdt_obstacles
+  pdt_time)

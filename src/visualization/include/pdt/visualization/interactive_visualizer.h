@@ -39,18 +39,18 @@
 
 #include <pangolin/pangolin.h>
 
-#include "esp_common/context_type.h"
-#include "esp_common/planner_type.h"
-#include "esp_config/configuration.h"
-#include "esp_objectives/optimization_objective_visitor.h"
-#include "esp_objectives/potential_field_optimization_objective.h"
-#include "esp_objectives/reciprocal_clearance_optimization_objective.h"
-#include "esp_obstacles/obstacle_visitor.h"
-#include "esp_planning_contexts/all_contexts.h"
-#include "esp_planning_contexts/context_visitor.h"
-#include "esp_planning_contexts/real_vector_geometric_context.h"
-#include "esp_visualization/base_visualizer.h"
-#include "esp_visualization/tikz_visualizer.h"
+#include "pdt/common/context_type.h"
+#include "pdt/common/planner_type.h"
+#include "pdt/config/configuration.h"
+#include "pdt/objectives/optimization_objective_visitor.h"
+#include "pdt/objectives/potential_field_optimization_objective.h"
+#include "pdt/objectives/reciprocal_clearance_optimization_objective.h"
+#include "pdt/obstacles/obstacle_visitor.h"
+#include "pdt/planning_contexts/all_contexts.h"
+#include "pdt/planning_contexts/context_visitor.h"
+#include "pdt/planning_contexts/real_vector_geometric_context.h"
+#include "pdt/visualization/base_visualizer.h"
+#include "pdt/visualization/tikz_visualizer.h"
 
 namespace pdt {
 

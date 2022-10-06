@@ -33,7 +33,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include "esp_config/version.h"
+#include "pdt/config/version.h"
 
 #define PDT_VERSION_GIT_SHA1 "@GIT_SHA1@"
 #define PDT_VERSION_GIT_REFSPEC "@GIT_REFSPEC@"

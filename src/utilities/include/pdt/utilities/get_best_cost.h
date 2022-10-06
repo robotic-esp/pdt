@@ -40,7 +40,7 @@
 #include <ompl/base/Cost.h>
 #include <ompl/base/Planner.h>
 
-#include "esp_common/planner_type.h"
+#include "pdt/common/planner_type.h"
 
 namespace pdt {
 

@@ -40,7 +40,7 @@ Algorithm | t_init,min | t_init,med | t_init,max | c_init,min | c_init,med | c_i
 | c_fin,med | c_fin,max | success|
  */
 
-#include "esp_pgftikz/kpi_table.h"
+#include "pdt/pgftikz/kpi_table.h"
 
 #include <fstream>
 #include <iomanip>

@@ -41,8 +41,8 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/State.h>
 
-#include "esp_objectives/base_optimization_objective.h"
-#include "esp_objectives/optimization_objective_visitor.h"
+#include "pdt/objectives/base_optimization_objective.h"
+#include "pdt/objectives/optimization_objective_visitor.h"
 
 namespace pdt {
 
