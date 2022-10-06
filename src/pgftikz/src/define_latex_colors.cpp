@@ -33,74 +33,48 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Jonathan Gammell
 
-#pragma once
+#include "pdt/pgftikz/define_latex_colors.h"
 
-#include <memory>
-#include <string>
-#include <vector>
-
-#include "pdt/config/configuration.h"
-#include "pdt/pgftikz/pgf_axis.h"
-#include "pdt/pgftikz/tikz_draw.h"
-#include "pdt/pgftikz/tikz_node.h"
+#include <map>
+#include <sstream>
 
 namespace pdt {
 
 namespace pgftikz {
 
-struct TikzPictureOptions {
-  std::string string() const;
-  double xscale{1.0};
-  double yscale{1.0};
-};
+std::string defineLatexColors(const std::shared_ptr<const config::Configuration>& config)
+{
+  std::stringstream rval;
+  std::map<std::string, std::array<int, 3>> colors;
 
-class TikzPicture {
- public:
-  TikzPicture(const std::shared_ptr<const config::Configuration>& config);
-  ~TikzPicture() = default;
+  // Load the colors from the config.
+  colors.emplace("pdtblack", config->get<std::array<int, 3>>("colors/pdtblack"));
+  colors.emplace("pdtwhite", config->get<std::array<int, 3>>("colors/pdtwhite"));
+  colors.emplace("pdtgray", config->get<std::array<int, 3>>("colors/pdtgray"));
+  colors.emplace("pdtblue", config->get<std::array<int, 3>>("colors/pdtblue"));
+  colors.emplace("pdtlightblue", config->get<std::array<int, 3>>("colors/pdtlightblue"));
+  colors.emplace("pdtdarkblue", config->get<std::array<int, 3>>("colors/pdtdarkblue"));
+  colors.emplace("pdtred", config->get<std::array<int, 3>>("colors/pdtred"));
+  colors.emplace("pdtlightred", config->get<std::array<int, 3>>("colors/pdtlightred"));
+  colors.emplace("pdtdarkred", config->get<std::array<int, 3>>("colors/pdtdarkred"));
+  colors.emplace("pdtyellow", config->get<std::array<int, 3>>("colors/pdtyellow"));
+  colors.emplace("pdtgreen", config->get<std::array<int, 3>>("colors/pdtgreen"));
+  colors.emplace("pdtlightgreen", config->get<std::array<int, 3>>("colors/pdtlightgreen"));
+  colors.emplace("pdtdarkgreen", config->get<std::array<int, 3>>("colors/pdtdarkgreen"));
+  colors.emplace("pdtpurple", config->get<std::array<int, 3>>("colors/pdtpurple"));
+  colors.emplace("pdtlightpurple", config->get<std::array<int, 3>>("colors/pdtlightpurple"));
+  colors.emplace("pdtdarkpurple", config->get<std::array<int, 3>>("colors/pdtdarkpurple"));
 
-  // Clears the contents of this picture.
-  void clear();
+  // Output the colors
+  for (const auto& [name, values] : colors) {
+    rval << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
+             << values[2u] << "}\n";
+  }
 
-  // Sets the options for this tikz picture
-  void setOptions(const TikzPictureOptions& options);
-
-  // Adds an axis to this picture.
-  void addAxis(const std::shared_ptr<PgfAxis>& axis);
-
-  // Adds a node to this picture.
-  void addNode(const std::shared_ptr<TikzNode>& node);
-
-  // Adds a draw command to this picture.
-  void addDraw(const std::shared_ptr<TikzDraw>& draw);
-
-  // Adds a text line to this picture.
-  void addText(const std::string& line);
-
-  // Sets the clip command.
-  void setClipCommand(const std::string& clip);
-
-  // Get all axes of this picture.
-  std::vector<std::shared_ptr<PgfAxis>> getAxes();
-
-  // Returns this tikz picture as a string.
-  std::string string() const;
-
-  // Writes this tikz picture to a file.
-  void write(const std::experimental::filesystem::path& path) const;
-
- protected:
-  std::shared_ptr<PgfAxis> generateLegendAxis() const;
-  std::vector<std::shared_ptr<PgfAxis>> axes_{};
-  std::vector<std::shared_ptr<TikzNode>> nodes_{};
-  std::vector<std::shared_ptr<TikzDraw>> draws_{};
-  std::vector<std::string> texts_{};
-  std::string clip_{""};
-  TikzPictureOptions options_{};
-  const std::shared_ptr<const config::Configuration> config_;
-};
+  return rval.str();
+}
 
 }  // namespace pgftikz
 

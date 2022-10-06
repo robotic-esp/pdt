@@ -4,7 +4,7 @@
             "type": "RRT",
             "isAnytime": false,
             "report": {
-                "color": "espgray",
+                "color": "pdtgray",
                 "name": "RRT"
             },
             "options": {

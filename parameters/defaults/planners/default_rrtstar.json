@@ -4,7 +4,7 @@
             "type": "RRTstar",
             "isAnytime": true,
             "report": {
-                "color": "esppurple",
+                "color": "pdtpurple",
                 "name": "RRT*"
             },
             "options": {

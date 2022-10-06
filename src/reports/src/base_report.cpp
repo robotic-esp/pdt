@@ -43,6 +43,8 @@
 
 #include <ompl/util/Console.h>
 
+#include "pdt/pgftikz/define_latex_colors.h"
+
 namespace pdt {
 
 namespace reports {
@@ -66,24 +68,6 @@ BaseReport::BaseReport(const std::shared_ptr<config::Configuration>& config) :
       plotPlannerNames_[name] = name;
     }
   }
-
-  // Load the colors from the config.
-  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("colors/espblack"));
-  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("colors/espwhite"));
-  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("colors/espgray"));
-  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("colors/espblue"));
-  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("colors/esplightblue"));
-  espColors_.emplace("espdarkblue", config_->get<std::array<int, 3>>("colors/espdarkblue"));
-  espColors_.emplace("espred", config_->get<std::array<int, 3>>("colors/espred"));
-  espColors_.emplace("esplightred", config_->get<std::array<int, 3>>("colors/esplightred"));
-  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("colors/espdarkred"));
-  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("colors/espyellow"));
-  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("colors/espgreen"));
-  espColors_.emplace("esplightgreen", config_->get<std::array<int, 3>>("colors/esplightgreen"));
-  espColors_.emplace("espdarkgreen", config_->get<std::array<int, 3>>("colors/espdarkgreen"));
-  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("colors/esppurple"));
-  espColors_.emplace("esplightpurple", config_->get<std::array<int, 3>>("colors/esplightpurple"));
-  espColors_.emplace("espdarkpurple", config_->get<std::array<int, 3>>("colors/espdarkpurple"));
 }
 
 std::stringstream BaseReport::preamble() const {
@@ -161,10 +145,7 @@ std::stringstream BaseReport::preamble() const {
   preamble << "\\lstset{language=json}\n";
 
   // Include the colors.
-  for (const auto& [name, values] : espColors_) {
-    preamble << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
-             << values[2u] << "}\n";
-  }
+  preamble << pgftikz::defineLatexColors(config_);
 
   // Create the title.
   preamble << "\\title{\\bfseries\\LARGE Experiment \\\\ " << experimentName_ << "}\n";

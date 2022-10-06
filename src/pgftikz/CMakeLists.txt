@@ -3,6 +3,7 @@ project(pdt_pgftikz)
 
 # Specify the library as a target.
 add_library(pdt_pgftikz
+  src/define_latex_colors.cpp
   src/kpi_table.cpp
   src/mq_kpi_table.cpp
   src/pgf_axis.cpp

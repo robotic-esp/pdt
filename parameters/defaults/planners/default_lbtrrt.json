@@ -4,7 +4,7 @@
             "type": "LBTRRT",
             "isAnytime": true,
             "report": {
-                "color": "esplightpurple",
+                "color": "pdtlightpurple",
                 "name": "LBTRRT"
             },
             "options": {

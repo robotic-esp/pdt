@@ -4,7 +4,7 @@
             "type": "InformedRRTstar",
             "isAnytime": true,
             "report": {
-                "color": "esppurple",
+                "color": "pdtpurple",
                 "name": "Informed RRT*"
             },
             "options": {

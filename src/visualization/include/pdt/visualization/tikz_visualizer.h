@@ -79,9 +79,6 @@ class TikzVisualizer : public planning_contexts::ContextVisitor, public obstacle
   // The configuration.
   const std::shared_ptr<const config::Configuration> config_;
 
-  // The colors.
-  std::map<std::string, std::array<int, 3>> espColors_{};
-
   // Implement visualizations of contexts.
   void visit(const planning_contexts::CentreSquare& context) const override;
   void visit(const planning_contexts::DividingWalls& context) const override;

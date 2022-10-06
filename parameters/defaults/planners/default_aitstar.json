@@ -4,7 +4,7 @@
             "type": "AITstar",
             "isAnytime": true,
             "report": {
-                "color": "esplightgreen",
+                "color": "pdtlightgreen",
                 "name": "AIT*"
             },
             "options": {

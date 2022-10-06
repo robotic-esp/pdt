@@ -4,7 +4,7 @@
             "type": "LazyPRMstar",
             "isAnytime": true,
             "report": {
-                "color": "esplightred",
+                "color": "pdtlightred",
                 "name": "LazyPRM*"
             },
             "options": {

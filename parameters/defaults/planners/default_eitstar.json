@@ -4,7 +4,7 @@
             "type": "EITstar",
             "isAnytime": true,
             "report": {
-                "color": "espgreen",
+                "color": "pdtgreen",
                 "name": "EIT*"
             },
             "options": {

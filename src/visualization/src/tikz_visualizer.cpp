@@ -43,6 +43,7 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/planners/informedtrees/bitstar/Vertex.h>
 
+#include "pdt/pgftikz/define_latex_colors.h"
 #include "pdt/pgftikz/tikz_draw.h"
 #include "pdt/pgftikz/tikz_node.h"
 
@@ -66,17 +67,6 @@ TikzVisualizer::TikzVisualizer(
     OMPL_ERROR("Tikz visualizer only tested for real vector and SE2 state spaces.");
     throw std::runtime_error("Visualizer error.");
   }
-  // Load colors from config.
-  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("colors/espblack"));
-  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("colors/espwhite"));
-  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("colors/espgray"));
-  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("colors/espblue"));
-  espColors_.emplace("espred", config_->get<std::array<int, 3>>("colors/espred"));
-  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("colors/espyellow"));
-  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("colors/espgreen"));
-  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("colors/esppurple"));
-  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("colors/esplightblue"));
-  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("colors/espdarkred"));
 }
 
 void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, const std::size_t iteration,
@@ -221,19 +211,16 @@ std::experimental::filesystem::path TikzVisualizer::compile(
              << "\\usepackage{tikz}\n\n";
 
   // Define the colors.
-  for (const auto& [name, values] : espColors_) {
-    standalone << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
-               << values[2u] << "}\n";
-  }
+  standalone << pgftikz::defineLatexColors(config_);
 
   // Set the styles for the tikz elements.
   standalone << "\n\\tikzset{\n"
-             << "  start/.style={fill = espgreen, circle, inner sep = 0pt, minimum width = 4pt},\n"
-             << "  goal/.style={fill = espred, circle, inner sep = 0pt, minimum width = 4pt},\n"
-             << "  goal region/.style={fill = espred, inner sep = 0pt, opacity = 0.8},\n"
-             << "  vertex/.style={fill = espblue, circle, inner sep = 0pt, minimum width = 2pt},\n"
-             << "  edge/.style={espblue, thick},\n"
-             << "  solution/.style={espyellow, line width = 2.0pt},\n"
+             << "  start/.style={fill = pdtgreen, circle, inner sep = 0pt, minimum width = 4pt},\n"
+             << "  goal/.style={fill = pdtred, circle, inner sep = 0pt, minimum width = 4pt},\n"
+             << "  goal region/.style={fill = pdtred, inner sep = 0pt, opacity = 0.8},\n"
+             << "  vertex/.style={fill = pdtblue, circle, inner sep = 0pt, minimum width = 2pt},\n"
+             << "  edge/.style={pdtblue, thick},\n"
+             << "  solution/.style={pdtyellow, line width = 2.0pt},\n"
              << "  boundary/.style={draw = black, thick, fill = none},\n"
              << "  obstacle/.style={draw = none, fill = black},\n"
              << "  antiobstacle/.style={draw = white, fill = white}\n"
@@ -536,7 +523,7 @@ void TikzVisualizer::drawBITstarSpecificVisualizations(
   // for (const auto& edge : edgeQueue) {
   //   auto parent = edge.first->state()->as<ompl::base::RealVectorStateSpace::StateType>();
   //   auto child = edge.second->state()->as<ompl::base::RealVectorStateSpace::StateType>();
-  //   drawEdge(parent, child, "esplightblue, dash pattern=on 0.02mm off 0.03mm, line width =
+  //   drawEdge(parent, child, "pdtlightblue, dash pattern=on 0.02mm off 0.03mm, line width =
   //   0.02mm");
   // }
 
@@ -547,7 +534,7 @@ void TikzVisualizer::drawBITstarSpecificVisualizations(
   if (nextEdgeStates.first != nullptr && nextEdgeStates.second != nullptr) {
     auto parent = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
     auto child = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-    drawEdge(parent, child, "edge, espred");
+    drawEdge(parent, child, "edge, pdtred");
   }
 
   // Draw the ellipse.
@@ -563,13 +550,13 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
   // for (const auto& edge : aitstarData->getForwardQueue()) {
   //   drawEdge(edge.getParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
   //            edge.getChild()->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-  //            "esplightblue, dash pattern=on 0.02mm off 0.03mm, line width = 0.02mm");
+  //            "pdtlightblue, dash pattern=on 0.02mm off 0.03mm, line width = 0.02mm");
   // }
 
   // // Draw the backward queue.
   // for (const auto& vertex : aitstarData->getBackwardQueue()) {
   //   drawVertex(vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-  //              "fill = espgray, inner sep = 0mm, circle, minimum size = 0.2mm");
+  //              "fill = pdtgray, inner sep = 0mm, circle, minimum size = 0.2mm");
   // }
 
   // Draw the backward search tree.
@@ -580,7 +567,7 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
       auto parent = vertex->getReverseParent()
                         ->getState()
                         ->as<ompl::base::RealVectorStateSpace::StateType>();
-      drawEdge(parent, state, "edge, esplightblue");
+      drawEdge(parent, state, "edge, pdtlightblue");
     }
   }
 
@@ -588,14 +575,14 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
   auto nextEdge = aitstarData->getNextEdge();
   if (nextEdge.first && nextEdge.second) {
     drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
-             nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, espred");
+             nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, pdtred");
   }
 
   // // Draw the next vertex in the queue.
   // auto nextVertex = aitstarData->getNextVertex();
   // if (nextVertex) {
   //   drawVertex(nextVertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-  //              "fill = espred, inner sep = 0mm, circle, minimum size = 0.3mm");
+  //              "fill = pdtred, inner sep = 0mm, circle, minimum size = 0.3mm");
   // }
 }
 
@@ -605,7 +592,7 @@ void TikzVisualizer::drawEITstarSpecificVisualizations(
   // for (const auto& edge : eitstarData->getReverseTree()) {
   //   const auto source = edge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
   //   const auto target = edge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>();
-  //   drawEdge(source, target, "edge, esplightblue");
+  //   drawEdge(source, target, "edge, pdtlightblue");
   // }
 
   // Draw the top edge in the queue.
@@ -613,7 +600,7 @@ void TikzVisualizer::drawEITstarSpecificVisualizations(
   if (nextEdge.source && nextEdge.target) {
     drawEdge(nextEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>(),
              nextEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>(),
-             "edge, espred");
+             "edge, pdtred");
   }
 
   // // Draw the top edge in the queue.
@@ -621,7 +608,7 @@ void TikzVisualizer::drawEITstarSpecificVisualizations(
   // if (nextEdge.source && nextEdge.target) {
   //   drawEdge(nextEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>(),
   //            nextEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>(),
-  //            "edge, espred");
+  //            "edge, pdtred");
   // }
 }
 
@@ -634,7 +621,7 @@ void TikzVisualizer::drawLazyPRMstarSpecificVisualizations(
       auto source = edge.first.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto target = edge.second.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
 
-      drawEdge(source, target, "edge, espgray");
+      drawEdge(source, target, "edge, pdtgray");
     }
 
     // draw all new edges
@@ -642,7 +629,7 @@ void TikzVisualizer::drawLazyPRMstarSpecificVisualizations(
       auto source = edges[idx].first.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto target = edges[idx].second.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
 
-      drawEdge(source, target, "edge, espred");
+      drawEdge(source, target, "edge, pdtred");
     }
   }	  
 }

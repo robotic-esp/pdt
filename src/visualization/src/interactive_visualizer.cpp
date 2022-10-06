@@ -83,7 +83,7 @@ void InteractiveVisualizer::run() {
   costLog_.SetLabels(std::vector<std::string>({planner_->getName()}));
 
   // Create a window and bind it to the current OpenGL context.
-  pangolin::CreateWindowAndBind("pdt", windowWidth, windowHeight);
+  pangolin::CreateWindowAndBind("PDT Interactive Visualizer", windowWidth, windowHeight);
 
   // Set up a viewport. A viewport is where OpenGL draws to. We can
   // have multiple viewports for different parts of a window. Any draw

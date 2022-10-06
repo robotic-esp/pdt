@@ -53,17 +53,6 @@ std::string TikzPictureOptions::string() const {
 }
 
 TikzPicture::TikzPicture(const std::shared_ptr<const config::Configuration>& config) : config_(config) {
-  // Load colors from config.
-  espColors_.emplace("espblack", config_->get<std::array<int, 3>>("colors/espblack"));
-  espColors_.emplace("espwhite", config_->get<std::array<int, 3>>("colors/espwhite"));
-  espColors_.emplace("espgray", config_->get<std::array<int, 3>>("colors/espgray"));
-  espColors_.emplace("espblue", config_->get<std::array<int, 3>>("colors/espblue"));
-  espColors_.emplace("espred", config_->get<std::array<int, 3>>("colors/espred"));
-  espColors_.emplace("espyellow", config_->get<std::array<int, 3>>("colors/espyellow"));
-  espColors_.emplace("espgreen", config_->get<std::array<int, 3>>("colors/espgreen"));
-  espColors_.emplace("esppurple", config_->get<std::array<int, 3>>("colors/esppurple"));
-  espColors_.emplace("esplightblue", config_->get<std::array<int, 3>>("colors/esplightblue"));
-  espColors_.emplace("espdarkred", config_->get<std::array<int, 3>>("colors/espdarkred"));
 }
 
 void TikzPicture::clear() {

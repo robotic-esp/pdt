@@ -4,7 +4,7 @@
             "type": "PRMstar",
             "isAnytime": true,
             "report": {
-                "color": "espyellow",
+                "color": "pdtyellow",
                 "name": "PRM*"
             },
             "options": {

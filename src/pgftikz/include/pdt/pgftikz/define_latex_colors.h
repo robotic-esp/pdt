@@ -33,59 +33,19 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Jonathan Gammell
 
 #pragma once
 
-#include <experimental/filesystem>
-#include <memory>
-#include <set>
-#include <sstream>
 #include <string>
-
 #include "pdt/config/configuration.h"
-#include "pdt/plotters/latex_plotter.h"
 
 namespace pdt {
 
-namespace reports {
+namespace pgftikz {
 
-class BaseReport {
- public:
-  BaseReport(const std::shared_ptr<config::Configuration>& config);
-  ~BaseReport() = default;
+std::string defineLatexColors(const std::shared_ptr<const config::Configuration>& config);
 
-  virtual std::experimental::filesystem::path generateReport() = 0;
-  std::experimental::filesystem::path compileReport() const;
-
- protected:
-  std::stringstream preamble() const;
-  std::stringstream appendix() const;
-
-  const std::set<std::string> requirePackages_{"luatex85", "shellesc"};
-  const std::set<std::string> usePackages_{"appendix", "booktabs",  "caption",
-                                           "listings", "microtype", "tabularx",
-                                           "tikz",     "pgfplots",  "xcolor"};
-  const std::set<std::string> lstSet_{};
-  const std::set<std::string> tikzLibraries_{"calc", "plotmarks", "external"};
-  const std::set<std::string> pgfLibraries_{"fillbetween"};
-  const std::set<std::string> pgfPlotsset_{"compat=1.15"};
-
-  std::string experimentName_{};
-  std::map<std::string, std::string> plotPlannerNames_{};
-
-  // Plotters.
-  plotters::LatexPlotter latexPlotter_;
-
-  const std::shared_ptr<const config::Configuration> config_;
-
-  // Helper to replace _ with \_, see [1].
-  void findAndReplaceAll(std::string* string, const std::string& key,
-                         const std::string& replacement) const;
-};
-
-}  // namespace reports
+}  // namespace pgftikz
 
 }  // namespace pdt
-
-// [1] https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c/
