@@ -44,7 +44,7 @@
 #include "esp_config/configuration.h"
 #include "esp_pgftikz/pgf_axis.h"
 #include "esp_plotters/latex_plotter.h"
-#include "esp_statistics/statistics.h"
+#include "esp_statistics/planning_statistics.h"
 
 namespace pdt {
 
@@ -52,7 +52,7 @@ namespace plotters {
 
 class QuerySuccessVsTimeLinePlotter : public LatexPlotter {
  public:
-  QuerySuccessVsTimeLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats);
+  QuerySuccessVsTimeLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats);
   ~QuerySuccessVsTimeLinePlotter() = default;
 
   // Creates a pgf axis that holds the success percentage over time for all planners.
@@ -78,7 +78,7 @@ class QuerySuccessVsTimeLinePlotter : public LatexPlotter {
   double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
   double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
 
-  const statistics::Statistics& stats_;
+  const statistics::PlanningStatistics& stats_;
 };
 
 }  // namespace plotters

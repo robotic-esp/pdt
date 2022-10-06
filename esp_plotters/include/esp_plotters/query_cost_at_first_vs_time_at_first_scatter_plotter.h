@@ -43,7 +43,7 @@
 
 #include "esp_config/configuration.h"
 #include "esp_plotters/latex_plotter.h"
-#include "esp_statistics/statistics.h"
+#include "esp_statistics/planning_statistics.h"
 
 namespace pdt {
 
@@ -52,7 +52,7 @@ namespace plotters {
 class QueryCostAtFirstVsTimeAtFirstScatterPlotter : public LatexPlotter {
  public:
   QueryCostAtFirstVsTimeAtFirstScatterPlotter(const std::shared_ptr<const config::Configuration>& config,
-                                const statistics::Statistics& stats);
+                                const statistics::PlanningStatistics& stats);
   ~QueryCostAtFirstVsTimeAtFirstScatterPlotter() = default;
 
   // Creates a pgf axis that hold the initial solution scatter plot of all planners.
@@ -75,7 +75,7 @@ class QueryCostAtFirstVsTimeAtFirstScatterPlotter : public LatexPlotter {
 
   void setInitialSolutionScatterAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
-  const statistics::Statistics& stats_;
+  const statistics::PlanningStatistics& stats_;
 };
 
 }  // namespace plotters

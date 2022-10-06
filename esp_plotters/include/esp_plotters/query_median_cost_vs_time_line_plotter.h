@@ -44,7 +44,7 @@
 #include "esp_config/configuration.h"
 #include "esp_pgftikz/pgf_axis.h"
 #include "esp_plotters/latex_plotter.h"
-#include "esp_statistics/statistics.h"
+#include "esp_statistics/planning_statistics.h"
 
 namespace pdt {
 
@@ -52,7 +52,7 @@ namespace plotters {
 
 class QueryMedianCostVsTimeLinePlotter : public LatexPlotter {
  public:
-  QueryMedianCostVsTimeLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats);
+  QueryMedianCostVsTimeLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats);
   ~QueryMedianCostVsTimeLinePlotter() = default;
 
   // Creates a pgf axis that holds the median cost at binned durations for all planners.
@@ -82,7 +82,7 @@ class QueryMedianCostVsTimeLinePlotter : public LatexPlotter {
   double maxDurationToBePlotted_{std::numeric_limits<double>::infinity()};
   double minDurationToBePlotted_{std::numeric_limits<double>::infinity()};
 
-  const statistics::Statistics& stats_;
+  const statistics::PlanningStatistics& stats_;
 };
 
 }  // namespace plotters

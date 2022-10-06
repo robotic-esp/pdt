@@ -53,7 +53,7 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 OverviewPlotter::OverviewPlotter(const std::shared_ptr<const config::Configuration>& config,
-                                 const statistics::Statistics& stats) :
+                                 const statistics::PlanningStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }

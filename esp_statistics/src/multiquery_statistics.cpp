@@ -63,7 +63,7 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 MultiqueryStatistics::MultiqueryStatistics(const std::shared_ptr<config::Configuration>& config,
-    const std::vector<Statistics> &stats,
+    const std::vector<PlanningStatistics> &stats,
     bool forceComputation) :
     config_(config),
     statisticsDirectory_(fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
@@ -745,7 +745,7 @@ std::experimental::filesystem::path MultiqueryStatistics::extractSuccessPerQuery
   return filepath;
 }
 
-Statistics MultiqueryStatistics::getQueryStatistics(const unsigned int i) const {
+PlanningStatistics MultiqueryStatistics::getQueryStatistics(const unsigned int i) const {
   if (i >= stats_.size()){
     throw std::runtime_error("i is too large");
   }

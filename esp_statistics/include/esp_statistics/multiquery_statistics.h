@@ -46,7 +46,7 @@
 #include <iostream>
 
 #include "esp_config/configuration.h"
-#include "esp_statistics/statistics.h"
+#include "esp_statistics/planning_statistics.h"
 
 namespace pdt {
 
@@ -54,7 +54,7 @@ namespace statistics {
 
 class MultiqueryStatistics {
  public:
-  MultiqueryStatistics(const std::shared_ptr<config::Configuration>& config, const std::vector<Statistics> &stats,
+  MultiqueryStatistics(const std::shared_ptr<config::Configuration>& config, const std::vector<PlanningStatistics> &stats,
       bool forceComputation);
   ~MultiqueryStatistics() = default;
 
@@ -111,7 +111,7 @@ class MultiqueryStatistics {
   double getMedianCumulativeFinalCost(const std::string& plannerName) const;
   double getMaxCumulativeFinalCost(const std::string& plannerName) const;
 
-  Statistics getQueryStatistics(const unsigned int i) const;
+  PlanningStatistics getQueryStatistics(const unsigned int i) const;
 
  private:
   void computeCumulativeMetricsForPlanner(const std::string& plannerName);
@@ -125,7 +125,7 @@ class MultiqueryStatistics {
   bool forceComputation_{false};
 
   // All the single-query statistics
-  std::vector<Statistics> stats_;
+  std::vector<PlanningStatistics> stats_;
 
   // Planner specific min and max values.
   std::map<std::string, double> medianCumulativeInitialSolutionCosts_{};

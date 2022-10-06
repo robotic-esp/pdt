@@ -44,7 +44,7 @@
 
 #include "esp_config/configuration.h"
 #include "esp_reports/single_query_report.h"
-#include "esp_statistics/statistics.h"
+#include "esp_statistics/planning_statistics.h"
 
 using namespace std::string_literals;
 
@@ -59,10 +59,10 @@ int main(const int argc, const char** argv) {
   const std::vector<std::string> resultPaths = config->get<std::vector<std::string>>("experiment/results");
 
   // Generate the statistic.
-  std::vector<pdt::statistics::Statistics> stats;
+  std::vector<pdt::statistics::PlanningStatistics> stats;
 
   for (const auto &path: resultPaths){
-    stats.push_back(pdt::statistics::Statistics(config, path, true));
+    stats.push_back(pdt::statistics::PlanningStatistics(config, path, true));
   }
 
   // Generate the report.

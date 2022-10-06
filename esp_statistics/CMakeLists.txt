@@ -4,7 +4,7 @@ project(esp_statistics)
 # Specify this library as a target.
 add_library(esp_statistics
   src/multiquery_statistics.cpp
-  src/statistics.cpp
+  src/planning_statistics.cpp
   src/population_statistics.cpp)
 
 # Specify the include directories for this library.

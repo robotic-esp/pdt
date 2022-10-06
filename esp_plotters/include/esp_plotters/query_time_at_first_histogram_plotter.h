@@ -44,7 +44,7 @@
 
 #include "esp_config/configuration.h"
 #include "esp_plotters/latex_plotter.h"
-#include "esp_statistics/statistics.h"
+#include "esp_statistics/planning_statistics.h"
 
 namespace pdt {
 
@@ -53,7 +53,7 @@ namespace plotters {
 class QueryTimeAtFirstHistogramPlotter : public LatexPlotter {
  public:
   QueryTimeAtFirstHistogramPlotter(const std::shared_ptr<const config::Configuration>& config,
-                                          const statistics::Statistics& stats);
+                                          const statistics::PlanningStatistics& stats);
   ~QueryTimeAtFirstHistogramPlotter() = default;
 
   // Creates a pgf axis that hold the initial solution duration histogram of all planners.
@@ -79,7 +79,7 @@ class QueryTimeAtFirstHistogramPlotter : public LatexPlotter {
   void setInitialSolutionDurationHistogramAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const;
 
   mutable std::shared_ptr<pgftikz::PgfAxis> axis_;
-  const statistics::Statistics& stats_;
+  const statistics::PlanningStatistics& stats_;
 };
 
 }  // namespace plotters

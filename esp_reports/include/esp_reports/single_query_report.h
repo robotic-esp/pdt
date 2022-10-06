@@ -54,7 +54,7 @@
 #include "esp_plotters/query_success_vs_time_line_plotter.h"
 #include "esp_plotters/query_time_at_first_histogram_plotter.h"
 #include "esp_reports/base_report.h"
-#include "esp_statistics/statistics.h"
+#include "esp_statistics/planning_statistics.h"
 
 namespace pdt {
 
@@ -62,7 +62,7 @@ namespace reports {
 
 class SingleQueryReport : public BaseReport {
  public:
-  SingleQueryReport(const std::shared_ptr<config::Configuration>& config, const statistics::Statistics& stats);
+  SingleQueryReport(const std::shared_ptr<config::Configuration>& config, const statistics::PlanningStatistics& stats);
   ~SingleQueryReport() = default;
 
   std::experimental::filesystem::path generateReport() override;
@@ -81,7 +81,7 @@ class SingleQueryReport : public BaseReport {
   plotters::QuerySuccessVsTimeLinePlotter querySuccessVsTimeLinePlotter_;
   plotters::QueryTimeAtFirstHistogramPlotter queryTimeAtFirstHistogramPlotter_;
 
-  const statistics::Statistics& stats_;
+  const statistics::PlanningStatistics& stats_;
 };
 
 }  // namespace reports

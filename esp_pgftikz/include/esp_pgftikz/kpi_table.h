@@ -41,7 +41,7 @@
 
 #include "esp_config/configuration.h"
 #include "esp_pgftikz/tabularx.h"
-#include "esp_statistics/statistics.h"
+#include "esp_statistics/planning_statistics.h"
 
 namespace pdt {
 
@@ -49,7 +49,7 @@ namespace pgftikz {
 
 class KpiTable : public TabularX {
  public:
-  KpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats);
+  KpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats);
   ~KpiTable() = default;
 
   void addKpi(const std::string& plannerName, const std::string& plannerPlotName);
@@ -59,7 +59,7 @@ class KpiTable : public TabularX {
  private:
   std::vector<std::string> plannerNames_{};
   const std::shared_ptr<const config::Configuration> config_;
-  const statistics::Statistics& stats_;
+  const statistics::PlanningStatistics& stats_;
 };
 
 }  // namespace pgftikz

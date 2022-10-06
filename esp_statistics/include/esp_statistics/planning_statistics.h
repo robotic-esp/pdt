@@ -73,13 +73,13 @@ class PlannerResults {
 
 class MultiqueryStatistics;
 
-class Statistics {
+class PlanningStatistics {
   friend MultiqueryStatistics;
 
  public:
-  Statistics(const std::shared_ptr<config::Configuration>& config,
+  PlanningStatistics(const std::shared_ptr<config::Configuration>& config,
              const std::experimental::filesystem::path& resultsPath, const bool forceComputation);
-  ~Statistics() = default;
+  ~PlanningStatistics() = default;
 
   std::experimental::filesystem::path extractMedians(
       const std::string& plannerName, const double confidence,

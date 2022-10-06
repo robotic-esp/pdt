@@ -58,7 +58,7 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 SingleQueryReport::SingleQueryReport(const std::shared_ptr<config::Configuration>& config,
-                                   const statistics::Statistics& stats) :
+                                   const statistics::PlanningStatistics& stats) :
     BaseReport(config),
     latexPlotter_(config),
     overviewPlotter_(config, stats),

@@ -52,7 +52,7 @@ namespace pgftikz {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-KpiTable::KpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats) :
+KpiTable::KpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats) :
     config_(config),
     stats_(stats) {
   options.rowSep = "\\\\[0.5em]"s;

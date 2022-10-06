@@ -51,7 +51,7 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(
-    const std::shared_ptr<const config::Configuration>& config, const statistics::Statistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   // Determine the min and max durations to be plotted.

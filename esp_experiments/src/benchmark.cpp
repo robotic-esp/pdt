@@ -56,7 +56,7 @@
 #include "esp_planning_contexts/all_contexts.h"
 #include "esp_reports/multiquery_report.h"
 #include "esp_reports/single_query_report.h"
-#include "esp_statistics/statistics.h"
+#include "esp_statistics/planning_statistics.h"
 #include "esp_time/time.h"
 #include "esp_utilities/get_best_cost.h"
 
@@ -475,10 +475,10 @@ int main(const int argc, const char **argv) {
             << "Compiling (this may take a couple of minutes)" << std::flush;
 
   // Generate the statistic.
-  std::vector<pdt::statistics::Statistics> stats;
+  std::vector<pdt::statistics::PlanningStatistics> stats;
 
   for (const auto &path: resultPaths){
-    stats.push_back(pdt::statistics::Statistics(config, path, false));
+    stats.push_back(pdt::statistics::PlanningStatistics(config, path, false));
   }
 
   // Generate the report.
