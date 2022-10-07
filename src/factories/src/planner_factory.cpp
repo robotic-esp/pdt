@@ -74,7 +74,8 @@ PlannerFactory::PlannerFactory(const std::shared_ptr<config::Configuration> &con
   }
 }
 
-std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFactory::create(
+std::tuple<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE, time::Duration>
+PlannerFactory::create(
     const std::string &plannerName) const {
   const std::string parentKey{"planner/" + plannerName};
   if (!config_->contains(parentKey)) {
@@ -86,8 +87,10 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
   switch (type) {
     case common::PLANNER_TYPE::ABITSTAR: {
       // Allocate and configure an ABIT* planner.
+      const auto constructTime = time::Clock::now();
       auto planner = std::make_shared<ompl::geometric::ABITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
@@ -103,12 +106,14 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
           config_->get<double>(optionsKey + "/inflationParameter"));
       planner->setTruncationScalingParameter(
           config_->get<double>(optionsKey + "/truncationParameter"));
-      return {planner, common::PLANNER_TYPE::ABITSTAR};
+      return {planner, common::PLANNER_TYPE::ABITSTAR, factoryDuration};
     }
     case common::PLANNER_TYPE::AITSTAR: {
-      // Allocate and configure a TBD* planner.
+      // Allocate and configure a AIT* planner.
+      const auto constructTime = time::Clock::now();
       auto planner = std::make_shared<ompl::geometric::AITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->enablePruning(config_->get<bool>(optionsKey + "/enablePruning"));
       planner->setBatchSize(config_->get<std::size_t>(optionsKey + "/batchSize"));
@@ -116,12 +121,14 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
       planner->trackApproximateSolutions(
           config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
-      return {planner, common::PLANNER_TYPE::AITSTAR};
+      return {planner, common::PLANNER_TYPE::AITSTAR, factoryDuration};
     }
     case common::PLANNER_TYPE::BITSTAR: {
       // Allocate and configure a BIT* planner.
+      const auto constructTime = time::Clock::now();
       auto planner = std::make_shared<ompl::geometric::BITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
@@ -132,13 +139,15 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
       planner->setJustInTimeSampling(config_->get<bool>(optionsKey + "/useJustInTimeSampling"));
       planner->setStopOnSolnImprovement(
           config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
-      return {planner, common::PLANNER_TYPE::BITSTAR};
+      return {planner, common::PLANNER_TYPE::BITSTAR, factoryDuration};
     }
 #ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::EIRMSTAR: {
       // Allocate and configure an EIRM* planner.
+      const auto constructTime = time::Clock::now();
       auto planner = std::make_shared<ompl::geometric::EIRMstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setStartGoalPruningThreshold(
           config_->get<unsigned>(optionsKey + "/startGoalPruningThreshold"));
@@ -150,12 +159,14 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->trackApproximateSolutions(
           config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
-      return {planner, common::PLANNER_TYPE::EIRMSTAR};
+      return {planner, common::PLANNER_TYPE::EIRMSTAR, factoryDuration};
     }
     case common::PLANNER_TYPE::EITSTAR: {
       // Allocate and configure an EIT* planner.
+      const auto constructTime = time::Clock::now();
       auto planner = std::make_shared<ompl::geometric::EITstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->enablePruning(config_->get<bool>(optionsKey + "/enablePruning"));
       planner->setBatchSize(config_->get<unsigned>(optionsKey + "/batchSize"));
@@ -165,13 +176,15 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
       planner->setUseKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->trackApproximateSolutions(
           config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
-      return {planner, common::PLANNER_TYPE::EITSTAR};
+      return {planner, common::PLANNER_TYPE::EITSTAR, factoryDuration};
     }
 #endif // #ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::FMTSTAR: {
       // Allocate and configure an FMT* planner.
+      const auto constructTime = time::Clock::now();
       auto planner = std::make_shared<ompl::geometric::FMT>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setNumSamples(config_->get<unsigned>(optionsKey + "/numSamples"));
       planner->setNearestK(config_->get<bool>(optionsKey + "/useKNearest"));
@@ -179,70 +192,89 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
       planner->setCacheCC(config_->get<bool>(optionsKey + "/useCollisionDetectionCache"));
       planner->setHeuristics(config_->get<bool>(optionsKey + "/useHeuristics"));
       planner->setExtendedFMT(config_->get<bool>(optionsKey + "/useMoreSamplesIfUnsuccessful"));
-      return {planner, common::PLANNER_TYPE::FMTSTAR};
+      return {planner, common::PLANNER_TYPE::FMTSTAR, factoryDuration};
     }
     case common::PLANNER_TYPE::INFORMEDRRTSTAR: {
+      // Allocate and configure an Informed RRT* planner.
+      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      const auto constructTime = time::Clock::now();
       auto planner =
           std::make_shared<ompl::geometric::InformedRRTstar>(context_->getSpaceInformation());
-      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
       planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
       planner->setRewireFactor(config_->get<double>(optionsKey + "/rewireFactor"));
       planner->setNumSamplingAttempts(config_->get<unsigned>(optionsKey + "/numSamplingAttempts"));
-      return {planner, common::PLANNER_TYPE::INFORMEDRRTSTAR};
+      return {planner, common::PLANNER_TYPE::INFORMEDRRTSTAR, factoryDuration};
     }
     case common::PLANNER_TYPE::LAZYPRMSTAR: {
+      // Allocate and configure a Lazy PRM* planner.
+      const auto constructTime = time::Clock::now();
       auto planner =
           std::make_shared<ompl::geometric::LazyPRMstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
-      return {planner, common::PLANNER_TYPE::LAZYPRMSTAR};
+      return {planner, common::PLANNER_TYPE::LAZYPRMSTAR, factoryDuration};
     }
     case common::PLANNER_TYPE::LBTRRT: {
-      auto planner = std::make_shared<ompl::geometric::LBTRRT>(context_->getSpaceInformation());
+      // Allocate and configure an LBTRRT planner.
       auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      const auto constructTime = time::Clock::now();
+      auto planner = std::make_shared<ompl::geometric::LBTRRT>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
       planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
       planner->setApproximationFactor(config_->get<double>(optionsKey + "/approximationFactor"));
-      return {planner, common::PLANNER_TYPE::LBTRRT};
+      return {planner, common::PLANNER_TYPE::LBTRRT, factoryDuration};
     }
     case common::PLANNER_TYPE::PRMSTAR: {
-      auto planner = std::make_shared<ompl::geometric::PRMstar>(context_->getSpaceInformation());
+      // Allocate and configure a PRM* planner.
+      const auto constructTime = time::Clock::now();
+      auto planner =
+          std::make_shared<ompl::geometric::PRMstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
-      return {planner, common::PLANNER_TYPE::PRMSTAR};
+      return {planner, common::PLANNER_TYPE::PRMSTAR, factoryDuration};
     }
     case common::PLANNER_TYPE::RRT: {
       // Allocate and configure an RRT planner.
-      auto planner = std::make_shared<ompl::geometric::RRT>(context_->getSpaceInformation());
       auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      const auto constructTime = time::Clock::now();
+      auto planner = std::make_shared<ompl::geometric::RRT>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setGoalBias(config_->get<double>(optionsKey + "/goalBias"));
       planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
       planner->setIntermediateStates(config_->get<bool>(optionsKey + "/addIntermediateStates"));
-      return {planner, common::PLANNER_TYPE::RRT};
+      return {planner, common::PLANNER_TYPE::RRT, factoryDuration};
     }
     case common::PLANNER_TYPE::RRTCONNECT: {
       // Allocate and configure an RRT-Connect planner.
-      auto planner = std::make_shared<ompl::geometric::RRTConnect>(context_->getSpaceInformation());
       auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      const auto constructTime = time::Clock::now();
+      auto planner = std::make_shared<ompl::geometric::RRTConnect>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
       planner->setIntermediateStates(config_->get<bool>(optionsKey + "/addIntermediateStates"));
-      return {planner, common::PLANNER_TYPE::RRTCONNECT};
+      return {planner, common::PLANNER_TYPE::RRTCONNECT, factoryDuration};
     }
     case common::PLANNER_TYPE::RRTSHARP: {
       // Allocate and configure an RRTSharp planner.
-      auto planner = std::make_shared<ompl::geometric::RRTsharp>(context_->getSpaceInformation());
       auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      const auto constructTime = time::Clock::now();
+      auto planner = std::make_shared<ompl::geometric::RRTsharp>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
@@ -251,13 +283,15 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
       planner->setSampleRejection(config_->get<bool>(optionsKey + "/enableSampleRejection"));
       planner->setVariant(config_->get<int>(optionsKey + "/variant"));
       planner->setInformedSampling(false);
-      return {planner, common::PLANNER_TYPE::RRTSHARP};
+      return {planner, common::PLANNER_TYPE::RRTSHARP, factoryDuration};
     }
     case common::PLANNER_TYPE::RRTSTAR: {
       // Allocate and configure an RRTstar planner.
+        auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      const auto constructTime = time::Clock::now();
       auto planner = std::make_shared<ompl::geometric::RRTstar>(context_->getSpaceInformation());
-      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setKNearest(config_->get<bool>(optionsKey + "/useKNearest"));
       planner->setRange(config_->get<double>(optionsKey + "/maxEdgeLength/" + dimKey));
@@ -270,17 +304,21 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
       planner->setSampleRejection(false);
       planner->setNewStateRejection(false);
       planner->setInformedSampling(false);
-      return {planner, common::PLANNER_TYPE::RRTSTAR};
+      return {planner, common::PLANNER_TYPE::RRTSTAR, factoryDuration};
     }
     case common::PLANNER_TYPE::SPARSTWO: {
-      auto planner = std::make_shared<ompl::geometric::SPARStwo>(context_->getSpaceInformation());
+      // Allocate and configure an SPARS2 planner.
+      const auto constructTime = time::Clock::now();
+      auto planner =
+          std::make_shared<ompl::geometric::SPARStwo>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
+      const auto factoryDuration = time::Clock::now() - constructTime;
       planner->setName(plannerName);
       planner->setStretchFactor(config_->get<double>(optionsKey + "/stretchFactor"));
       planner->setSparseDeltaFraction(config_->get<double>(optionsKey + "/sparseDeltaFraction"));
       planner->setDenseDeltaFraction(config_->get<double>(optionsKey + "/denseDeltaFraction"));
       planner->setMaxFailures(config_->get<unsigned>(optionsKey + "/maxFailures"));
-      return {planner, common::PLANNER_TYPE::SPARSTWO};
+      return {planner, common::PLANNER_TYPE::SPARSTWO, factoryDuration};
     }
     default: { throw std::runtime_error("Planner '"s + plannerName + "' is of unknown type."s); }
   }

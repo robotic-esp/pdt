@@ -119,7 +119,7 @@ bool checkContextValidity(const std::shared_ptr<pdt::config::Configuration> &con
 
     pdt::factories::PlannerFactory plannerFactory(config, context);
     std::shared_ptr<ompl::base::Planner> validPlanner;
-    std::tie(validPlanner, std::ignore) = plannerFactory.create(validPlannerName);
+    std::tie(validPlanner, std::ignore, std::ignore) = plannerFactory.create(validPlannerName);
 
     for (auto i=0u; i<numQueries; ++i) {
       const auto problemDefinition = context->instantiateNthProblemDefinition(i);
@@ -319,7 +319,10 @@ int main(const int argc, const char **argv) {
         }
 
       // Allocate the planner to be tested.
-        auto [planner, plannerType] = plannerFactory.create(plannerName);
+        std::shared_ptr<ompl::base::Planner> planner;
+        pdt::common::PLANNER_TYPE plannerType;
+        pdt::time::Duration factoryDuration;
+        std::tie(planner, plannerType, factoryDuration) = plannerFactory.create(plannerName);
 
       for (auto j=0u; j<numQueries; ++j){
         // Create the logger for this run.
@@ -327,21 +330,35 @@ int main(const int argc, const char **argv) {
                                               config->get<double>("experiment/logFrequency"));
 
         // Prepare the planner for this query.
-        pdt::time::Duration querySetupDuration;;
+        pdt::time::Duration querySetupDuration = std::chrono::seconds{0};
         if (j == 0){
-          // Set the planner up. The PlannerFactory starts the planner with the 0th query.
-          const auto setupStartTime = pdt::time::Clock::now();
+          // The PlannerFactory starts the planner with the 0th query. Account for the factory time.
+          querySetupDuration += factoryDuration;
+
+          // Set the planner up.
+          // Calculate the resulting duration directly and independently.
+          const auto setupTime = pdt::time::Clock::now();
           planner->setup();
-          querySetupDuration = pdt::time::Clock::now() - setupStartTime;
+          const auto setupDuration = pdt::time::Clock::now() - setupTime;
+          querySetupDuration += setupDuration;
         }
         else {
+          // Clear the current query
+          // Calculate the resulting duration directly and independently.
+          const auto clearQueryTime = pdt::time::Clock::now();
           planner->clearQuery();
+          const auto clearQueryDuration = pdt::time::Clock::now() - clearQueryTime;
+          querySetupDuration += clearQueryDuration;
 
-          // get the problem settng for the nth query, and hand it over to the planner.
+          // get the problem setting for the nth query
           const auto problemDefinition = context->instantiateNthProblemDefinition(j);
-          planner->setProblemDefinition(problemDefinition);
 
-          querySetupDuration = std::chrono::seconds{0};
+          // Give it to the current planner
+          // Calculate the resulting duration directly and independently.
+          const auto setPDefnTime = pdt::time::Clock::now();
+          planner->setProblemDefinition(problemDefinition);
+          const auto setPDefnDuration = pdt::time::Clock::now() - setPDefnTime;
+          querySetupDuration += setPDefnDuration;
         }
 
         // Create the performance log:

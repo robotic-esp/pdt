@@ -76,9 +76,9 @@ using namespace std::chrono_literals;
 void planManipulator(std::shared_ptr<pdt::config::Configuration> config,
                      std::shared_ptr<pdt::open_rave::OpenRaveManipulator> context) {
   pdt::factories::PlannerFactory plannerFactory(config, context);
-  auto [planner, plannerType] =
+  std::shared_ptr<ompl::base::Planner> planner;
+  std::tie(planner, std::ignore, std::ignore) =
       plannerFactory.create(config->get<std::string>("experiment/planner"));
-  (void)plannerType;
 
   // Setup the planner.
   planner->setup();
@@ -166,9 +166,9 @@ void planManipulator(std::shared_ptr<pdt::config::Configuration> config,
 void planMover(std::shared_ptr<pdt::config::Configuration> config,
                std::shared_ptr<pdt::open_rave::OpenRaveSE3> context) {
   pdt::factories::PlannerFactory plannerFactory(config, context);
-  auto [planner, plannerType] =
+  std::shared_ptr<ompl::base::Planner> planner;
+  std::tie(planner, std::ignore, std::ignore) =
       plannerFactory.create(config->get<std::string>("experiment/planner"));
-  (void)plannerType;
 
   // Setup the planner.
   planner->setup();
@@ -258,9 +258,9 @@ void planMover(std::shared_ptr<pdt::config::Configuration> config,
 void planR3(std::shared_ptr<pdt::config::Configuration> config,
             std::shared_ptr<pdt::open_rave::OpenRaveR3> context) {
   pdt::factories::PlannerFactory plannerFactory(config, context);
-  auto [planner, plannerType] =
+  std::shared_ptr<ompl::base::Planner> planner;
+  std::tie(planner, std::ignore, std::ignore) =
       plannerFactory.create(config->get<std::string>("experiment/planner"));
-  (void)plannerType;
 
   // Setup the planner.
   planner->setup();
@@ -347,9 +347,9 @@ void planR3(std::shared_ptr<pdt::config::Configuration> config,
 void planR3xSO2(std::shared_ptr<pdt::config::Configuration> config,
                 std::shared_ptr<pdt::open_rave::OpenRaveR3xSO2> context) {
   pdt::factories::PlannerFactory plannerFactory(config, context);
-  auto [planner, plannerType] =
+  std::shared_ptr<ompl::base::Planner> planner;
+  std::tie(planner, std::ignore, std::ignore) =
       plannerFactory.create(config->get<std::string>("experiment/planner"));
-  (void)plannerType;
 
   // Setup the planner.
   planner->setup();

@@ -56,7 +56,9 @@ int main(const int argc, const char** argv) {
   auto context = contextFactory->create(config->get<std::string>("experiment/context"));
 
   auto plannerFactory = std::make_shared<pdt::factories::PlannerFactory>(config, context);
-  auto [planner, plannerType] =
+  std::shared_ptr<ompl::base::Planner> planner;
+  pdt::common::PLANNER_TYPE plannerType;
+  std::tie(planner, plannerType, std::ignore) =
       plannerFactory->create(config->get<std::string>("experiment/planner"));
 
   // Get the experiment config.

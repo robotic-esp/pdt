@@ -59,8 +59,8 @@ class PlannerFactory {
   ~PlannerFactory() = default;
 
   // Create a planner.
-  std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> create(
-      const std::string &plannerName) const;
+  std::tuple<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE, time::Duration>
+  create(const std::string &plannerName) const;
 
  private:
   const std::shared_ptr<const config::Configuration> config_;
