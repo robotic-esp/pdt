@@ -199,6 +199,41 @@ bool Configuration::contains(const std::string &key, const json::json &parameter
   }
 }
 
+std::vector<std::string> Configuration::getChildren(const std::string &key) const {
+  if (!contains(key)) {
+    auto msg = "Requested children of nonexisting parameter '"s + key + "'.";
+    throw std::invalid_argument(msg);
+  }
+  return getChildren(key, parameters_);
+}
+
+std::vector<std::string> Configuration::getChildren(const std::string &key, const json::json &parameters) const {
+  if (isNestedKey(key)) {
+    auto [ns, rest] = split(key);
+    if (!parameters.contains(ns)) {
+      auto msg = "Internally requesting nonexisting parameter '"s + ns + "'. This is a bug."s;
+      throw std::invalid_argument(msg);
+    }
+    auto nestedParameters = parameters[ns];
+    return getChildren(rest, nestedParameters);
+  } else {
+    if (!parameters.contains(key)) {
+      auto msg = "Internally requesting nonexisting parameter '"s + key + "'. This is a bug."s;
+      throw std::invalid_argument(msg);
+    }
+
+    std::vector<std::string> children;
+    for (const auto &entry : parameters[key].items()) {
+      // If the key has no children (e.g., it's a key-value pair) then it has an item with an empty key string.
+      if (!entry.key().empty()) {
+        children.push_back(entry.key());
+      }
+    }
+
+    return children;
+  }
+}
+
 std::string Configuration::dump(const std::string &key) const {
   if (!contains(key)) {
     auto msg = "Requested to dump nonexisting parameter '"s + key + "'.";

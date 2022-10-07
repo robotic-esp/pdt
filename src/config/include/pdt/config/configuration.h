@@ -75,6 +75,12 @@ class Configuration {
   // Check if a key exists.
   bool contains(const std::string& key) const;
 
+  // Get the keys nested under a key
+  // Note: returns an empty vector for a key-value pair UNLESS the value is a vector,
+  // in which case it returns the "sub keys" 0, 1, 2, etc. The vector case could be filtered out,
+  // but then what if there was a case where there was actually integer subkeys?!?
+  std::vector<std::string> getChildren(const std::string& key) const;
+
   // Print a parameter.
   std::string dump(const std::string& key = "") const;
 
@@ -98,6 +104,9 @@ class Configuration {
  private:
   // Recursive implementation of public contains method.
   bool contains(const std::string& key, const json::json& parameters) const;
+
+  // Recursive implementation of public getChildren method.
+  std::vector<std::string> getChildren(const std::string& key, const json::json& parameters) const;
 
   // Recursive implementation of public dump method.
   std::string dump(const std::string& key, const json::json& parameters) const;

@@ -44,33 +44,23 @@ namespace pdt {
 
 namespace pgftikz {
 
+using namespace std::string_literals;
+
 std::string defineLatexColors(const std::shared_ptr<const config::Configuration>& config)
 {
   std::stringstream rval;
-  std::map<std::string, std::array<int, 3>> colors;
 
-  // Load the colors from the config.
-  colors.emplace("pdtblack", config->get<std::array<int, 3>>("colors/pdtblack"));
-  colors.emplace("pdtwhite", config->get<std::array<int, 3>>("colors/pdtwhite"));
-  colors.emplace("pdtgray", config->get<std::array<int, 3>>("colors/pdtgray"));
-  colors.emplace("pdtblue", config->get<std::array<int, 3>>("colors/pdtblue"));
-  colors.emplace("pdtlightblue", config->get<std::array<int, 3>>("colors/pdtlightblue"));
-  colors.emplace("pdtdarkblue", config->get<std::array<int, 3>>("colors/pdtdarkblue"));
-  colors.emplace("pdtred", config->get<std::array<int, 3>>("colors/pdtred"));
-  colors.emplace("pdtlightred", config->get<std::array<int, 3>>("colors/pdtlightred"));
-  colors.emplace("pdtdarkred", config->get<std::array<int, 3>>("colors/pdtdarkred"));
-  colors.emplace("pdtyellow", config->get<std::array<int, 3>>("colors/pdtyellow"));
-  colors.emplace("pdtgreen", config->get<std::array<int, 3>>("colors/pdtgreen"));
-  colors.emplace("pdtlightgreen", config->get<std::array<int, 3>>("colors/pdtlightgreen"));
-  colors.emplace("pdtdarkgreen", config->get<std::array<int, 3>>("colors/pdtdarkgreen"));
-  colors.emplace("pdtpurple", config->get<std::array<int, 3>>("colors/pdtpurple"));
-  colors.emplace("pdtlightpurple", config->get<std::array<int, 3>>("colors/pdtlightpurple"));
-  colors.emplace("pdtdarkpurple", config->get<std::array<int, 3>>("colors/pdtdarkpurple"));
+  // Get all keys in the colors group.
+  std::vector<std::string> childKeys = config->getChildren("colors");
 
-  // Output the colors
-  for (const auto& [name, values] : colors) {
+  // Iterate over the keys
+  for (const auto& name : childKeys) {
+    // Get the color
+    auto values = config->get<std::array<int, 3>>("colors/"s + name);
+
+    // Add the color definition to the string
     rval << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
-             << values[2u] << "}\n";
+            << values[2u] << "}\n";
   }
 
   return rval.str();
