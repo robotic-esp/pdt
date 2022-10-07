@@ -283,7 +283,7 @@ void TikzVisualizer::logToFrameTimes(const std::experimental::filesystem::path& 
   frameTimes_.close();
 }
 
-void TikzVisualizer::visit(const planning_contexts::CentreSquare& context) const {
+void TikzVisualizer::visit(const planning_contexts::CenterSquare& context) const {
   // Draw the boundary.
   drawBoundary(context);
 }

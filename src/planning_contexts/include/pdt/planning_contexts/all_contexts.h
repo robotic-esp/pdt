@@ -1,4 +1,4 @@
-#include "pdt/planning_contexts/centre_square.h"
+#include "pdt/planning_contexts/center_square.h"
 #include "pdt/planning_contexts/dividing_walls.h"
 #include "pdt/planning_contexts/double_enclosure.h"
 #include "pdt/planning_contexts/flanking_gap.h"

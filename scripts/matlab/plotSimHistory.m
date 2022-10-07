@@ -443,7 +443,7 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
                         end
                         
                         barTimes = centralFullSolnTime(:,barInterval);
-                        barCentres = centralFullSolnCost(:,barInterval);
+                        barCenters = centralFullSolnCost(:,barInterval);
                         barLowers = lowerBoundHistCost(:,barInterval);
                         barUppers = higherBoundHistCost(:,barInterval);
                                                 
@@ -453,9 +453,9 @@ function [succHandl, histHandl, solnRates] = plotSimHistory(interpPlannerData, p
                         end
                         
                         %%Mask off any infinities:
-                        barMask = isfinite(barCentres) & isfinite(barLowers) & isfinite(barUppers);
+                        barMask = isfinite(barCenters) & isfinite(barLowers) & isfinite(barUppers);
                         
-                        errHandle = errorbar(barTimes(barMask), barCentres(barMask), barLowers(barMask), barUppers(barMask));
+                        errHandle = errorbar(barTimes(barMask), barCenters(barMask), barLowers(barMask), barUppers(barMask));
                         set(errHandle, 'Color', plannerColours{i});
                         set(errHandle, 'LineStyle', 'none');
                         

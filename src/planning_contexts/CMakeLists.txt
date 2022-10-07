@@ -6,7 +6,7 @@ add_library(pdt_planning_contexts
   src/base_context.cpp
   src/context_validity_checker.cpp
   src/context_validity_checker_gnat.cpp
-  src/centre_square.cpp
+  src/center_square.cpp
   src/dividing_walls.cpp
   src/double_enclosure.cpp
   src/flanking_gap.cpp

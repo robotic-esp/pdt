@@ -514,7 +514,7 @@ void InteractiveVisualizer::drawStateIds(std::size_t iteration) {
   }
 }
 
-void InteractiveVisualizer::visit(const planning_contexts::CentreSquare& /* context */) const {
+void InteractiveVisualizer::visit(const planning_contexts::CenterSquare& /* context */) const {
 }
 
 void InteractiveVisualizer::visit(const planning_contexts::DividingWalls& /* context */) const {

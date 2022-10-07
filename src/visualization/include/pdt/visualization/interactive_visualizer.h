@@ -137,7 +137,7 @@ class InteractiveVisualizer : public BaseVisualizer,
                 float alpha = 1.0) const;
 
   // Implement visualizations of contexts.
-  void visit(const planning_contexts::CentreSquare& context) const override;
+  void visit(const planning_contexts::CenterSquare& context) const override;
   void visit(const planning_contexts::DividingWalls& context) const override;
   void visit(const planning_contexts::DoubleEnclosure& context) const override;
   void visit(const planning_contexts::FlankingGap& context) const override;

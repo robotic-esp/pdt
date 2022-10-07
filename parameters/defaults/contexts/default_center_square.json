@@ -1,7 +1,7 @@
 {
     "context": {
-        "defaultCentreSquare2D": {
-            "type": "CentreSquare",
+        "defaultCenterSquare2D": {
+            "type": "CenterSquare",
             "objective": "defaultPathLength",
             "start": [ -0.3, 0.0 ],
             "goalType": "GoalState",
@@ -12,8 +12,8 @@
             "collisionCheckResolution": 0.000005,
             "obstacleWidth": 0.4
         },
-        "defaultCentreSquare3D": {
-            "type": "CentreSquare",
+        "defaultCenterSquare3D": {
+            "type": "CenterSquare",
             "objective": "defaultPathLength",
             "start": [ -0.3, -0.3, -0.3 ],
             "goalType": "GoalSpace",
@@ -25,8 +25,8 @@
             "collisionCheckResolution": 0.000005,
             "obstacleWidth": 0.2
         },
-        "defaultCentreSquare4D": {
-            "type": "CentreSquare",
+        "defaultCenterSquare4D": {
+            "type": "CenterSquare",
             "objective": "defaultPathLength",
             "start": [ -0.3, -0.3, -0.3, -0.3 ],
             "goalType": "GoalSpace",
@@ -38,8 +38,8 @@
             "collisionCheckResolution": 0.000005,
             "obstacleWidth": 0.2
         },
-        "defaultCentreSquare8D": {
-            "type": "CentreSquare",
+        "defaultCenterSquare8D": {
+            "type": "CenterSquare",
             "objective": "defaultPathLength",
             "start": [ -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3 ],
             "goalType": "GoalSpace",
@@ -51,8 +51,8 @@
             "collisionCheckResolution": 0.000005,
             "obstacleWidth": 0.2
         },
-        "defaultCentreSquare16D": {
-            "type": "CentreSquare",
+        "defaultCenterSquare16D": {
+            "type": "CenterSquare",
             "objective": "defaultPathLength",
             "start": [ -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3 ],
             "goalType": "GoalSpace",
@@ -64,8 +64,8 @@
             "collisionCheckResolution": 0.000005,
             "obstacleWidth": 0.2
         },
-        "defaultCentreSquare32D": {
-            "type": "CentreSquare",
+        "defaultCenterSquare32D": {
+            "type": "CenterSquare",
             "objective": "defaultPathLength",
             "start": [ -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3 ],
             "goalType": "GoalSpace",

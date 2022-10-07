@@ -42,7 +42,7 @@ namespace pdt {
 namespace planning_contexts {
 
 // Forward declarations.
-class CentreSquare;
+class CenterSquare;
 class DividingWalls;
 class DoubleEnclosure;
 class FlankingGap;
@@ -66,7 +66,7 @@ class ContextVisitor {
   virtual ~ContextVisitor() = default;
 
   // Any context visitor must implement its actions on all contexts.
-  virtual void visit(const CentreSquare &context) const = 0;
+  virtual void visit(const CenterSquare &context) const = 0;
   virtual void visit(const DividingWalls &context) const = 0;
   virtual void visit(const DoubleEnclosure &context) const = 0;
   virtual void visit(const FlankingGap &context) const = 0;

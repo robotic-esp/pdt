@@ -112,7 +112,7 @@ class PopulationStatistics {
     // Member variables
     const PopulationStatistics* parent_;
     double percentile_;
-    std::size_t centreIdx_, maxDereferenceOffset_;
+    std::size_t centerIdx_, maxDereferenceOffset_;
     std::size_t offset_{0u};
     ConfidenceInterval value_{0u, 0u, 0.0};
   };

@@ -80,7 +80,7 @@ class TikzVisualizer : public planning_contexts::ContextVisitor, public obstacle
   const std::shared_ptr<const config::Configuration> config_;
 
   // Implement visualizations of contexts.
-  void visit(const planning_contexts::CentreSquare& context) const override;
+  void visit(const planning_contexts::CenterSquare& context) const override;
   void visit(const planning_contexts::DividingWalls& context) const override;
   void visit(const planning_contexts::DoubleEnclosure& context) const override;
   void visit(const planning_contexts::FlankingGap& context) const override;

@@ -24,7 +24,7 @@
     },
     "context": {
         "test2d": {
-            "type": "CentreSquare",
+            "type": "CenterSquare",
             "objective": "testObjectiveFactors(0,1)",
             "start": [ -0.3, -0.3 ],
             "goalType": "GoalState",
@@ -36,7 +36,7 @@
             "obstacleWidth": 0.4
         },
         "test4d": {
-            "type": "CentreSquare",
+            "type": "CenterSquare",
             "objective": "testObjectiveFactors(0,1)",
             "start": [ -0.3, -0.3, -0.3, -0.3 ],
             "goalType": "GoalState",
@@ -48,7 +48,7 @@
             "obstacleWidth": 0.4
         },
         "test8d": {
-            "type": "CentreSquare",
+            "type": "CenterSquare",
             "objective": "testObjectiveFactors(0,1)",
             "start": [ -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3 ],
             "goalType": "GoalState",
@@ -60,7 +60,7 @@
             "obstacleWidth": 0.4
         },
         "test16d": {
-            "type": "CentreSquare",
+            "type": "CenterSquare",
             "objective": "testObjectiveFactors(0,1)",
             "start": [ -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3 ],
             "goalType": "GoalState",
@@ -72,7 +72,7 @@
             "obstacleWidth": 0.4
         },
         "test32d": {
-            "type": "CentreSquare",
+            "type": "CenterSquare",
             "objective": "testObjectiveFactors(0,1)",
             "start": [ -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3, -0.3 ],
             "goalType": "GoalState",

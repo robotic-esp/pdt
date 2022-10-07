@@ -206,8 +206,8 @@ PopulationStatistics::ConfidenceIntervalIterator::ConfidenceIntervalIterator(
     const PopulationStatistics* parent, const double percentile, const difference_type offset) :
     parent_(parent),
     percentile_(percentile),
-    centreIdx_(parent_->estimatePercentileAsIndex(percentile_)),
-    maxDereferenceOffset_(std::max(centreIdx_, parent_->getSampleSize() - 1u - centreIdx_)) {
+    centerIdx_(parent_->estimatePercentileAsIndex(percentile_)),
+    maxDereferenceOffset_(std::max(centerIdx_, parent_->getSampleSize() - 1u - centerIdx_)) {
   *this += offset;
 }
 
@@ -215,8 +215,8 @@ PopulationStatistics::ConfidenceIntervalIterator::ConfidenceIntervalIterator(
     const PopulationStatistics* parent, const double percentile) :
     parent_(parent),
     percentile_(percentile),
-    centreIdx_(parent_->estimatePercentileAsIndex(percentile_)),
-    maxDereferenceOffset_(std::max(centreIdx_, parent_->getSampleSize() - 1u - centreIdx_)) {
+    centerIdx_(parent_->estimatePercentileAsIndex(percentile_)),
+    maxDereferenceOffset_(std::max(centerIdx_, parent_->getSampleSize() - 1u - centerIdx_)) {
   offset_ = maxDereferenceOffset_ + 1u;
 }
 
@@ -279,16 +279,16 @@ operator+=(const difference_type delta) {
     offset_ = offset_ + static_cast<std::size_t>(delta);
   }
 
-  // Offsets are valid until _both_ indices are at the limit in order to support asymmetric centre
+  // Offsets are valid until _both_ indices are at the limit in order to support asymmetric center
   // points.
   std::size_t lowerIdx = 0u;
-  if (offset_ < centreIdx_) {
-    lowerIdx = centreIdx_ - offset_;
+  if (offset_ < centerIdx_) {
+    lowerIdx = centerIdx_ - offset_;
   }
 
   std::size_t upperIdx = parent_->getSampleSize() - 1u;
-  if (offset_ < parent_->getSampleSize() - 1u - centreIdx_) {
-    upperIdx = centreIdx_ + offset_;
+  if (offset_ < parent_->getSampleSize() - 1u - centerIdx_) {
+    upperIdx = centerIdx_ + offset_;
   }
 
   // Calculate value if not out of bounds
@@ -310,7 +310,7 @@ PopulationStatistics::ConfidenceIntervalIterator::operator-(
 bool PopulationStatistics::ConfidenceIntervalIterator::operator==(
     const ConfidenceIntervalIterator& other) const {
   return parent_ == other.parent_ && percentile_ == other.percentile_ &&
-         centreIdx_ == other.centreIdx_ && maxDereferenceOffset_ == other.maxDereferenceOffset_ &&
+         centerIdx_ == other.centerIdx_ && maxDereferenceOffset_ == other.maxDereferenceOffset_ &&
          offset_ == other.offset_;
 }
 

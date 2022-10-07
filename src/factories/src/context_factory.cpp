@@ -86,12 +86,12 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
 
   // Allocate the correct context.
   switch (type) {
-    case common::CONTEXT_TYPE::CENTRE_SQUARE: {
+    case common::CONTEXT_TYPE::CENTER_SQUARE: {
       try {
-        return std::make_shared<planning_contexts::CentreSquare>(createRealVectorSpaceInfo(parentKey), config_,
+        return std::make_shared<planning_contexts::CenterSquare>(createRealVectorSpaceInfo(parentKey), config_,
                                               contextName);
       } catch (const json::detail::type_error& e) {
-        auto msg = "Error allocating a CentreSquare context with exception:\n    "s + e.what();
+        auto msg = "Error allocating a CenterSquare context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
       }
     }

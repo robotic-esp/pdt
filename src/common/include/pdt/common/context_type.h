@@ -47,7 +47,7 @@ namespace pdt {
 namespace common {
 
 enum class CONTEXT_TYPE {
-  CENTRE_SQUARE,
+  CENTER_SQUARE,
   DIVIDING_WALLS,
   DOUBLE_ENCLOSURE,
   FLANKING_GAP,
@@ -71,7 +71,7 @@ enum class CONTEXT_TYPE {
 
 NLOHMANN_JSON_SERIALIZE_ENUM(CONTEXT_TYPE,
                              {
-                                 {CONTEXT_TYPE::CENTRE_SQUARE, "CentreSquare"},
+                                 {CONTEXT_TYPE::CENTER_SQUARE, "CenterSquare"},
                                  {CONTEXT_TYPE::DIVIDING_WALLS, "DividingWalls"},
                                  {CONTEXT_TYPE::DOUBLE_ENCLOSURE, "DoubleEnclosure"},
                                  {CONTEXT_TYPE::FLANKING_GAP, "FlankingGap"},

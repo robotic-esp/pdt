@@ -162,14 +162,14 @@ function [succHandl, timeHandl] = plotTargetTimes(variateType, rawPlannerData, p
                 %Plot the y error bars on the full median
                 if plotMedianCIErrorBars == true || plotAverageSTDErrorBars == true
 
-                    barCentres = centralFullTime;
+                    barCenters = centralFullTime;
                     barLowers = lowerBoundTime;
                     barUppers = higherBoundTime;
 
                     %Plot infinites finitely:
                     barUppers(~isfinite(barUppers)) = (1 + 1.1*yLimMargin)*maxPlotTime;
 
-                    errHandle = errorbar(thisTarget, barCentres, barLowers, barUppers);
+                    errHandle = errorbar(thisTarget, barCenters, barLowers, barUppers);
                     set(errHandle, 'Color', plannerColours{i});
                     set(errHandle, 'LineStyle', 'none');
 %                     errorbar_tick(errHandle, vErrTick); %Set errorbar width

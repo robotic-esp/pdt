@@ -52,11 +52,11 @@ namespace pdt {
 namespace planning_contexts {
 
 /** \brief An experiment with a singularly placed square obstacle*/
-class CentreSquare : public RealVectorGeometricContext {
+class CenterSquare : public RealVectorGeometricContext {
  public:
-  CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+  CenterSquare(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                const std::shared_ptr<const config::Configuration>& config, const std::string& name);
-  virtual ~CentreSquare() = default;
+  virtual ~CenterSquare() = default;
 
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;

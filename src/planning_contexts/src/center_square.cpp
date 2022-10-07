@@ -35,7 +35,7 @@
 
 // Authors: Jonathan Gammell, Marlin Strub
 
-#include "pdt/planning_contexts/centre_square.h"
+#include "pdt/planning_contexts/center_square.h"
 
 #include <cmath>
 #include <functional>
@@ -53,7 +53,7 @@ namespace pdt {
 
 namespace planning_contexts {
 
-CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+CenterSquare::CenterSquare(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                            const std::shared_ptr<const config::Configuration>& config,
                            const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name){
@@ -93,7 +93,7 @@ CentreSquare::CentreSquare(const std::shared_ptr<ompl::base::SpaceInformation>& 
   startGoalPairs_ = makeStartGoalPair();
 }
 
-void CentreSquare::accept(const ContextVisitor& visitor) const {
+void CenterSquare::accept(const ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
