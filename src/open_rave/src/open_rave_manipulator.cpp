@@ -54,8 +54,6 @@ using namespace std::string_literals;
 
 namespace pdt {
 
-namespace planning_contexts {
-
 namespace open_rave {
 
 OpenRaveManipulator::OpenRaveManipulator(
@@ -151,7 +149,5 @@ void OpenRaveManipulator::accept(const ContextVisitor& visitor) const {
 }
 
 }  // namespace open_rave
-
-}  // namespace planning_contexts
 
 }  // namespace pdt

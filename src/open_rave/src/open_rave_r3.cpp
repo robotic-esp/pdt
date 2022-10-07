@@ -54,8 +54,6 @@ using namespace std::string_literals;
 
 namespace pdt {
 
-namespace planning_contexts {
-
 namespace open_rave {
 
 OpenRaveR3::OpenRaveR3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
@@ -154,7 +152,5 @@ void OpenRaveR3::accept(const ContextVisitor& visitor) const {
 }
 
 }  // namespace open_rave
-
-}  // namespace planning_contexts
 
 }  // namespace pdt

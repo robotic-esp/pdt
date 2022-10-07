@@ -59,8 +59,6 @@
 
 namespace pdt {
 
-namespace planning_contexts {
-
 namespace open_rave {
 
 /** \brief A planning context to plugin to the OpenRave simulator. */
@@ -80,7 +78,5 @@ class OpenRaveManipulator : public OpenRaveBaseContext {
 };
 
 }  // namespace open_rave
-
-}  // namespace planning_contexts
 
 }  // namespace pdt

@@ -41,8 +41,6 @@
 
 namespace pdt {
 
-namespace planning_contexts {
-
 namespace open_rave {
 
 OpenRaveKneeGoal::OpenRaveKneeGoal(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
@@ -71,7 +69,5 @@ void OpenRaveKneeGoal::sampleGoal(ompl::base::State* st) const {
 }
 
 }  // namespace open_rave
-
-}  // namespace planning_contexts
 
 }  // namespace pdt

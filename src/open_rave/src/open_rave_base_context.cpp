@@ -53,8 +53,6 @@ using namespace std::string_literals;
 
 namespace pdt {
 
-namespace planning_contexts {
-
 namespace open_rave {
 
 OpenRaveBaseContext::OpenRaveBaseContext(
@@ -77,7 +75,5 @@ std::shared_ptr<ompl::base::Goal> OpenRaveBaseContext::createGoal() const {
 }
 
 }  // namespace open_rave
-
-}  // namespace planning_contexts
 
 }  // namespace pdt
