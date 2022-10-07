@@ -15,7 +15,7 @@ include(FeatureSummary)
 # CMake paths
 set(CMAKE_MODULE_PATH
     "${CMAKE_MODULE_PATH}"
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Enforce out-of-source builds.
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
