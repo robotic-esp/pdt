@@ -58,6 +58,7 @@
 #include "pdt/reports/single_query_report.h"
 #include "pdt/statistics/planning_statistics.h"
 #include "pdt/time/time.h"
+#include "pdt/time/CumulativeTimer.h"
 #include "pdt/utilities/get_best_cost.h"
 
 using namespace std::string_literals;
@@ -325,6 +326,7 @@ int main(const int argc, const char **argv) {
         std::tie(planner, plannerType, factoryDuration) = plannerFactory.create(plannerName);
 
       for (auto j=0u; j<numQueries; ++j){
+        pdt::time::CumulativeTimer configTimer;
         // Create the logger for this run.
         pdt::loggers::TimeCostLogger logger(context->getMaxSolveDuration(),
                                               config->get<double>("experiment/logFrequency"));
@@ -332,33 +334,31 @@ int main(const int argc, const char **argv) {
         // Prepare the planner for this query.
         pdt::time::Duration querySetupDuration = std::chrono::seconds{0};
         if (j == 0){
-          // The PlannerFactory starts the planner with the 0th query. Account for the factory time.
-          querySetupDuration += factoryDuration;
-
+          // The PlannerFactory starts the planner with the 0th query.
           // Set the planner up.
-          // Calculate the resulting duration directly and independently.
-          const auto setupTime = pdt::time::Clock::now();
+          configTimer.start();
           planner->setup();
-          const auto setupDuration = pdt::time::Clock::now() - setupTime;
-          querySetupDuration += setupDuration;
+          configTimer.stop();
+
+          // Time is construction (from PlannerFactory) and setup.
+          querySetupDuration = factoryDuration + configTimer.duration();
         }
         else {
           // Clear the current query
-          // Calculate the resulting duration directly and independently.
-          const auto clearQueryTime = pdt::time::Clock::now();
+          configTimer.start();
           planner->clearQuery();
-          const auto clearQueryDuration = pdt::time::Clock::now() - clearQueryTime;
-          querySetupDuration += clearQueryDuration;
+          configTimer.stop();
 
           // get the problem setting for the nth query
           const auto problemDefinition = context->instantiateNthProblemDefinition(j);
 
           // Give it to the current planner
-          // Calculate the resulting duration directly and independently.
-          const auto setPDefnTime = pdt::time::Clock::now();
+          configTimer.start();
           planner->setProblemDefinition(problemDefinition);
-          const auto setPDefnDuration = pdt::time::Clock::now() - setPDefnTime;
-          querySetupDuration += setPDefnDuration;
+          configTimer.stop();
+
+          // Time is just setup as constructed for previous query.
+          querySetupDuration = configTimer.duration();
         }
 
         // Create the performance log:

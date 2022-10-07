@@ -33,52 +33,44 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+// Authors: Jonathan Gammell
 
-#pragma once
-
-#include <chrono>
-#include <iomanip>
-#include <sstream>
-#include <string>
-#include <type_traits>
+#include "pdt/time/CumulativeTimer.h"
 
 namespace pdt {
 
 namespace time {
 
-// There are two fundamentally different types of clocks, called steady and unsteady. Steady clocks
-// are monotonically increasing, which makes them good at measuring duration. Unsteady clocks
-// sometimes move backward in time to correct for accumulated drift, which makes them good for
-// telling the exact time. We need a steady clock because we care about measuring duration.
-using Clock = std::conditional<std::chrono::high_resolution_clock::is_steady,
-                               std::chrono::high_resolution_clock, std::chrono::steady_clock>::type;
+void CumulativeTimer::start() {
+  if (running) {
+    throw std::runtime_error("CumulativeTimer started when already running.");
+  }
 
-// Apparently sometimes even steady_clock is not steady. For example GCC 4.7 must be built with
-// --enable-libstdcxx-time=rt to get a steady std::steady_clock. Let's prevent nasty surprises.
-static_assert(Clock::is_steady);
+  // Always store start time last.
+  running = true;
+  start_ = Clock::now();
+}
 
-// Storing durations as seconds in doubles.
-using Duration = std::chrono::duration<double, std::ratio<1>>;
+void CumulativeTimer::stop() {
+  // Always store stop time first.
+  stop_ = Clock::now();
 
-// Convert a system_clock::TimePoint to a string.
-std::string toDateString(const std::chrono::system_clock::time_point& timePoint);
+  if (!running) {
+    throw std::runtime_error("CumulativeTimer stopped when not running.");
+  }
 
-// Convert a duration to a string.
-std::string toDurationString(const Duration& duration);
+  running = false;
+  duration_ += stop_ - start_;
+}
 
-// Convert a double to a duration.
-Duration seconds(double sec);
+Duration CumulativeTimer::duration() {
+  if (running) {
+    throw std::runtime_error("Accessed duration of running CumulativeTimer.");
+  }
 
-// Convert a duration to a double.
-double seconds(Duration sec);
+  return duration_;
+}
 
 }  // namespace time
 
 }  // namespace pdt
-
-// A pretty output operator for durations.
-std::ostream& operator<<(std::ostream& out, const pdt::time::Duration& duration);
-
-// A pretty output operator for system_clock::times (dates).
-std::ostream& operator<<(std::ostream& out, const std::chrono::system_clock::time_point timePoint);

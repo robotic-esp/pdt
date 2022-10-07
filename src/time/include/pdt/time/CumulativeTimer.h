@@ -33,52 +33,34 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Jonathan Gammell, Marlin Strub
+// Authors: Jonathan Gammell
 
 #pragma once
 
-#include <chrono>
-#include <iomanip>
-#include <sstream>
-#include <string>
-#include <type_traits>
+#include "pdt/time/time.h"
 
 namespace pdt {
 
 namespace time {
 
-// There are two fundamentally different types of clocks, called steady and unsteady. Steady clocks
-// are monotonically increasing, which makes them good at measuring duration. Unsteady clocks
-// sometimes move backward in time to correct for accumulated drift, which makes them good for
-// telling the exact time. We need a steady clock because we care about measuring duration.
-using Clock = std::conditional<std::chrono::high_resolution_clock::is_steady,
-                               std::chrono::high_resolution_clock, std::chrono::steady_clock>::type;
+class CumulativeTimer
+{
+  public:
+    CumulativeTimer() = default;
+    ~CumulativeTimer() = default;
 
-// Apparently sometimes even steady_clock is not steady. For example GCC 4.7 must be built with
-// --enable-libstdcxx-time=rt to get a steady std::steady_clock. Let's prevent nasty surprises.
-static_assert(Clock::is_steady);
+    void start();
+    void stop();
+    Duration duration();
 
-// Storing durations as seconds in doubles.
-using Duration = std::chrono::duration<double, std::ratio<1>>;
-
-// Convert a system_clock::TimePoint to a string.
-std::string toDateString(const std::chrono::system_clock::time_point& timePoint);
-
-// Convert a duration to a string.
-std::string toDurationString(const Duration& duration);
-
-// Convert a double to a duration.
-Duration seconds(double sec);
-
-// Convert a duration to a double.
-double seconds(Duration sec);
+  private:
+    // Define start/stop using the measuring clock (not the system clock):
+    bool running{false};
+    Clock::time_point start_;
+    Clock::time_point stop_;
+    Duration duration_{0.0};
+};
 
 }  // namespace time
 
 }  // namespace pdt
-
-// A pretty output operator for durations.
-std::ostream& operator<<(std::ostream& out, const pdt::time::Duration& duration);
-
-// A pretty output operator for system_clock::times (dates).
-std::ostream& operator<<(std::ostream& out, const std::chrono::system_clock::time_point timePoint);
