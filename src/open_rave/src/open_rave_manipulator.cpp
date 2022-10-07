@@ -77,7 +77,7 @@ OpenRaveManipulator::OpenRaveManipulator(
   environment->SetCollisionChecker(collisionChecker);
 
   // Load the specified environment.
-  environment->Load(std::string(Directory::SOURCE) + "/"s +
+  environment->Load(std::string(config::Directory::SOURCE) + "/"s +
                     config_->get<std::string>("context/" + name + "/environment"));
 
   // Load the robot.
