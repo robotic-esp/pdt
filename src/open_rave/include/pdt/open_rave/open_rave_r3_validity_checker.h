@@ -61,6 +61,8 @@
 
 namespace pdt {
 
+namespace planning_contexts {
+
 namespace open_rave {
 
 class OpenRaveR3ValidityChecker : public OpenRaveBaseValidityChecker {
@@ -86,5 +88,7 @@ class OpenRaveR3ValidityChecker : public OpenRaveBaseValidityChecker {
 };
 
 }  // namespace open_rave
+
+}  // namespace planning_contexts
 
 }  // namespace pdt

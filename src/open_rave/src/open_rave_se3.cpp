@@ -56,12 +56,14 @@ using namespace std::string_literals;
 
 namespace pdt {
 
+namespace planning_contexts {
+
 namespace open_rave {
 
 OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                          const std::shared_ptr<const config::Configuration>& config,
                          const std::string& name) :
-    OpenRaveBaseContext(spaceInfo, config, name){
+    OpenRaveBaseContext(spaceInfo, config, name) {
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
 
@@ -116,7 +118,7 @@ OpenRaveSE3::~OpenRaveSE3() {
   OpenRAVE::RaveDestroy();
 }
 
-std::vector<StartGoalPair> OpenRaveSE3::makeStartGoalPair() const{
+std::vector<StartGoalPair> OpenRaveSE3::makeStartGoalPair() const {
   if (config_->contains("context/" + name_ + "/starts")) {
     OMPL_ERROR("OpenRaveSE3 context does not support multiple queries.");
     throw std::runtime_error("Context error.");
@@ -204,5 +206,7 @@ void OpenRaveSE3::accept(const ContextVisitor& visitor) const {
 }
 
 }  // namespace open_rave
+
+}  // namespace planning_contexts
 
 }  // namespace pdt

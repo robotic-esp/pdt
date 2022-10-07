@@ -54,13 +54,14 @@ using namespace std::string_literals;
 
 namespace pdt {
 
+namespace planning_contexts {
+
 namespace open_rave {
 
 OpenRaveR3xSO2::OpenRaveR3xSO2(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                                const std::shared_ptr<const config::Configuration>& config,
                                const std::string& name) :
-    OpenRaveBaseContext(spaceInfo, config, name){
-
+    OpenRaveBaseContext(spaceInfo, config, name) {
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
 
@@ -117,7 +118,7 @@ OpenRaveR3xSO2::~OpenRaveR3xSO2() {
   OpenRAVE::RaveDestroy();
 }
 
-std::vector<StartGoalPair> OpenRaveR3xSO2::makeStartGoalPair() const{
+std::vector<StartGoalPair> OpenRaveR3xSO2::makeStartGoalPair() const {
   if (config_->contains("context/" + name_ + "/starts")) {
     OMPL_ERROR("OpenRaveR3xSO2 context does not support multiple queries.");
     throw std::runtime_error("Context error.");
@@ -127,18 +128,20 @@ std::vector<StartGoalPair> OpenRaveR3xSO2::makeStartGoalPair() const{
   ompl::base::ScopedState<ompl::base::CompoundStateSpace> goalState(spaceInfo_);
 
   // Get the start and goal positions.
-  const auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");  // x y z yaw
-  const auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");    // x y z yaw
+  const auto startPosition =
+      config_->get<std::vector<double>>("context/" + name_ + "/start");  // x y z yaw
+  const auto goalPosition =
+      config_->get<std::vector<double>>("context/" + name_ + "/goal");  // x y z yaw
 
-  for (auto i=0u; i<3; ++i){
+  for (auto i = 0u; i < 3; ++i) {
     // Set the real component of the start position.
     startState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[i] =
-      startPosition.at(i);
-    
+        startPosition.at(i);
+
     // Set the real component of the goal position.
     goalState->as<ompl::base::RealVectorStateSpace::StateType>(0u)->values[i] = goalPosition.at(i);
   }
-  
+
   // Set the SO2-component of the start position.
   startState->as<ompl::base::SO2StateSpace::StateType>(1u)->value = startPosition.at(3u);
 
@@ -160,5 +163,7 @@ void OpenRaveR3xSO2::accept(const ContextVisitor& visitor) const {
 }
 
 }  // namespace open_rave
+
+}  // namespace planning_contexts
 
 }  // namespace pdt

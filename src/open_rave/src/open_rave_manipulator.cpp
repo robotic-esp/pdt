@@ -54,12 +54,14 @@ using namespace std::string_literals;
 
 namespace pdt {
 
+namespace planning_contexts {
+
 namespace open_rave {
 
 OpenRaveManipulator::OpenRaveManipulator(
     const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
     const std::shared_ptr<const config::Configuration>& config, const std::string& name) :
-    OpenRaveBaseContext(spaceInfo, config, name){
+    OpenRaveBaseContext(spaceInfo, config, name) {
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
 
@@ -115,7 +117,7 @@ OpenRaveManipulator::~OpenRaveManipulator() {
   OpenRAVE::RaveDestroy();
 }
 
-std::vector<StartGoalPair> OpenRaveManipulator::makeStartGoalPair() const{
+std::vector<StartGoalPair> OpenRaveManipulator::makeStartGoalPair() const {
   if (config_->contains("context/" + name_ + "/starts")) {
     OMPL_ERROR("OpenRaveManipulator context does not support multiple queries.");
     throw std::runtime_error("Context error.");
@@ -133,7 +135,7 @@ std::vector<StartGoalPair> OpenRaveManipulator::makeStartGoalPair() const{
     startState[i] = startPosition.at(i);
     goalState[i] = goalPosition.at(i);
   }
-  
+
   StartGoalPair pair;
   pair.start = {startState};
 
@@ -149,5 +151,7 @@ void OpenRaveManipulator::accept(const ContextVisitor& visitor) const {
 }
 
 }  // namespace open_rave
+
+}  // namespace planning_contexts
 
 }  // namespace pdt

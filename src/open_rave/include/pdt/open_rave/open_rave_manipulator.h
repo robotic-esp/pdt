@@ -59,13 +59,16 @@
 
 namespace pdt {
 
+namespace planning_contexts {
+
 namespace open_rave {
 
 /** \brief A planning context to plugin to the OpenRave simulator. */
 class OpenRaveManipulator : public OpenRaveBaseContext {
  public:
   OpenRaveManipulator(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                      const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                      const std::shared_ptr<const config::Configuration>& config,
+                      const std::string& name);
   virtual ~OpenRaveManipulator();
 
   /** \brief Accepts a context visitor. */
@@ -77,5 +80,7 @@ class OpenRaveManipulator : public OpenRaveBaseContext {
 };
 
 }  // namespace open_rave
+
+}  // namespace planning_contexts
 
 }  // namespace pdt

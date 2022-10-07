@@ -54,12 +54,14 @@ using namespace std::string_literals;
 
 namespace pdt {
 
+namespace planning_contexts {
+
 namespace open_rave {
 
 OpenRaveR3::OpenRaveR3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                        const std::shared_ptr<const config::Configuration>& config,
                        const std::string& name) :
-    OpenRaveBaseContext(spaceInfo, config, name){
+    OpenRaveBaseContext(spaceInfo, config, name) {
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
 
@@ -115,20 +117,21 @@ OpenRaveR3::~OpenRaveR3() {
   OpenRAVE::RaveDestroy();
 }
 
-std::vector<StartGoalPair> OpenRaveR3::makeStartGoalPair() const{
-  if (config_->contains("context/" + name_ + "/starts")) { // if a 'starts' spec is given, read that
+std::vector<StartGoalPair> OpenRaveR3::makeStartGoalPair() const {
+  if (config_->contains("context/" + name_ +
+                        "/starts")) {  // if a 'starts' spec is given, read that
     OMPL_ERROR("OpenRaveR3 context does not support multiple queries.");
     throw std::runtime_error("Context error.");
   }
 
   ompl::base::ScopedState<ompl::base::RealVectorStateSpace> startState(spaceInfo_);
   ompl::base::ScopedState<ompl::base::RealVectorStateSpace> goalState(spaceInfo_);
-  
+
   // Get the start and goal positions.
   auto startPosition = config_->get<std::vector<double>>("context/" + name_ + "/start");
   auto goalPosition = config_->get<std::vector<double>>("context/" + name_ + "/goal");
 
-  for (auto i=0u; i<3u; ++i){
+  for (auto i = 0u; i < 3u; ++i) {
     // Set the start position.
     (*startState)[i] = startPosition.at(i);
 
@@ -151,5 +154,7 @@ void OpenRaveR3::accept(const ContextVisitor& visitor) const {
 }
 
 }  // namespace open_rave
+
+}  // namespace planning_contexts
 
 }  // namespace pdt

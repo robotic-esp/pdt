@@ -61,13 +61,16 @@
 
 namespace pdt {
 
+namespace planning_contexts {
+
 namespace open_rave {
 
 /** \brief A planning context to plugin to the OpenRave simulator. */
 class OpenRaveR3xSO2 : public OpenRaveBaseContext {
  public:
   OpenRaveR3xSO2(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                 const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                 const std::shared_ptr<const config::Configuration>& config,
+                 const std::string& name);
   virtual ~OpenRaveR3xSO2();
 
   /** \brief Accepts a context visitor. */
@@ -79,5 +82,7 @@ class OpenRaveR3xSO2 : public OpenRaveBaseContext {
 };
 
 }  // namespace open_rave
+
+}  // namespace planning_contexts
 
 }  // namespace pdt

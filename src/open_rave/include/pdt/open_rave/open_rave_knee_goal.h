@@ -46,13 +46,16 @@
 
 namespace pdt {
 
+namespace planning_contexts {
+
 namespace open_rave {
 
 /** \brief A planning context to plugin to the OpenRave simulator. */
 class OpenRaveKneeGoal : public ompl::base::GoalSpace {
  public:
   OpenRaveKneeGoal(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                   const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                   const std::shared_ptr<const config::Configuration>& config,
+                   const std::string& name);
   virtual ~OpenRaveKneeGoal() = default;
 
   void sampleGoal(ompl::base::State* st) const override;
@@ -66,5 +69,7 @@ class OpenRaveKneeGoal : public ompl::base::GoalSpace {
 };
 
 }  // namespace open_rave
+
+}  // namespace planning_contexts
 
 }  // namespace pdt

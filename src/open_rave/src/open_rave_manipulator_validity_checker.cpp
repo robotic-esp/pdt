@@ -41,6 +41,8 @@ using namespace std::string_literals;
 
 namespace pdt {
 
+namespace planning_contexts {
+
 namespace open_rave {
 
 OpenRaveManipulatorValidityChecker::OpenRaveManipulatorValidityChecker(
@@ -100,5 +102,7 @@ double OpenRaveManipulatorValidityChecker::clearance(const ompl::base::State* st
 }
 
 }  // namespace open_rave
+
+}  // namespace planning_contexts
 
 }  // namespace pdt
