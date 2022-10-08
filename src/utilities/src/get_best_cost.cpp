@@ -43,8 +43,6 @@
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
-#include <ompl/geometric/planners/informedtrees/EITstar.h>
-#include <ompl/geometric/planners/informedtrees/EIRMstar.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
@@ -54,6 +52,11 @@
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/prm/SPARStwo.h>
+
+#ifndef PDT_UPSTREAM_OMPL
+#include <ompl/geometric/planners/informedtrees/EITstar.h>
+#include <ompl/geometric/planners/informedtrees/EIRMstar.h>
+#endif
 
 #include "pdt/common/planner_type.h"
 
@@ -72,18 +75,21 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, common::PLAN
     case common::PLANNER_TYPE::BITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
     }
+#ifndef PDT_UPSTREAM_OMPL
     case common::PLANNER_TYPE::EIRMSTAR: {
       return planner->as<ompl::geometric::EIRMstar>()->bestCost();
     }
     case common::PLANNER_TYPE::EITSTAR: {
       return planner->as<ompl::geometric::EITstar>()->bestCost();
     }
+#endif
     case common::PLANNER_TYPE::FMTSTAR: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
     case common::PLANNER_TYPE::INFORMEDRRTSTAR: {
       return planner->as<ompl::geometric::InformedRRTstar>()->bestCost();
     }
+#ifndef PDT_UPSTREAM_OMPL      
     case common::PLANNER_TYPE::LAZYPRMSTAR: {
       return planner->as<ompl::geometric::LazyPRMstar>()->bestCost();
     }
@@ -93,6 +99,7 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, common::PLAN
     case common::PLANNER_TYPE::PRMSTAR: {
       return planner->as<ompl::geometric::PRMstar>()->bestCost();
     }
+#endif
     case common::PLANNER_TYPE::RRT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
@@ -105,9 +112,11 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, common::PLAN
     case common::PLANNER_TYPE::RRTSTAR: {
       return planner->as<ompl::geometric::RRTstar>()->bestCost();
     }
+#ifndef PDT_UPSTREAM_OMPL
     case common::PLANNER_TYPE::SPARSTWO: {
       return planner->as<ompl::geometric::SPARStwo>()->bestCost();
     }
+#endif
     default: {
       throw std::runtime_error("Received request to get best cost of unknown planner type.");
     }

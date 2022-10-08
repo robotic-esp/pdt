@@ -45,17 +45,20 @@ namespace pdt {
 
 namespace common {
 
+// clang-format off
 NLOHMANN_JSON_SERIALIZE_ENUM(ompl::base::GoalType,
                              {
                                  {ompl::base::GoalType::GOAL_ANY, "GoalAny"},
                                  {ompl::base::GoalType::GOAL_REGION, "GoalRegion"},
-                                 {ompl::base::GoalType::GOAL_SAMPLEABLE_REGION,
-                                  "GoalSampleableRegion"},
+                                 {ompl::base::GoalType::GOAL_SAMPLEABLE_REGION, "GoalSampleableRegion"},
                                  {ompl::base::GoalType::GOAL_STATE, "GoalState"},
                                  {ompl::base::GoalType::GOAL_STATES, "GoalStates"},
                                  {ompl::base::GoalType::GOAL_LAZY_SAMPLES, "GoalLazySamples"},
+#ifndef PDT_UPSTREAM_OMPL
                                  {ompl::base::GoalType::GOAL_SPACE, "GoalSpace"},
+#endif
                              });
+// clang-format on
 
 }  // namespace common
 

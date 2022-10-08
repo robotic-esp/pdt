@@ -132,9 +132,13 @@ BaseContext::BaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& sp
     goalType_ = ompl::base::GoalType::GOAL_STATE;
   } else if (goalType == "GoalStates"s) {
     goalType_ = ompl::base::GoalType::GOAL_STATES;
-  } else if (goalType == "GoalSpace"s) {
+  }
+#ifndef PDT_UPSTREAM_OMPL
+  else if (goalType == "GoalSpace"s) {
     goalType_ = ompl::base::GoalType::GOAL_SPACE;
-  } else {
+  }
+#endif
+  else {
     throw std::runtime_error("Invalid goal type.");
   }
 

@@ -35,6 +35,8 @@ sudo make install
 
 Make sure you are on the `esp-master` branch. You can use `git branch` to check which branch you have checked out.
 
+Alternatively, you can get the upstream version of OMPL and add `-DPDT_UPSTREAM_OMPL` when invoking `cmake`.
+
 #### Boost
 
 Our tools depend on the `thread` and `program_options` components of [Boost](https://www.boost.org/), which were installed as dependencies of OMPL above.
@@ -97,6 +99,8 @@ mkdir build && cd build
 cmake ..
 make
 ```
+
+Remember that if you want to compile against the upstream version of OMPL you have to replace `cmake ..` with `cmake -DPDT_UPSTREAM_OMPL ..` in the instructions above.
 
 If you have Doxygen installed, you can also build the documentation
 ```bash

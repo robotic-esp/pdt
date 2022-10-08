@@ -41,18 +41,21 @@
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
-#include <ompl/geometric/planners/informedtrees/EIRMstar.h>
-#include <ompl/geometric/planners/informedtrees/EITstar.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
+#include <ompl/geometric/planners/prm/PRMstar.h>
+#include <ompl/geometric/planners/prm/SPARStwo.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
-#include <ompl/geometric/planners/prm/PRMstar.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRTsharp.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
-#include <ompl/geometric/planners/prm/SPARStwo.h>
+
+#ifndef PDT_UPSTREAM_OMPL
+#include <ompl/geometric/planners/informedtrees/EIRMstar.h>
+#include <ompl/geometric/planners/informedtrees/EITstar.h>
+#endif
 
 #include "nlohmann/json.hpp"
 
@@ -131,12 +134,14 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
           config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
       return {planner, common::PLANNER_TYPE::BITSTAR};
     }
+#ifndef PDT_UPSTREAM_OMPL
     case common::PLANNER_TYPE::EIRMSTAR: {
       // Allocate and configure an EIRM* planner.
       auto planner = std::make_shared<ompl::geometric::EIRMstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
-      planner->setStartGoalPruningThreshold(config_->get<unsigned>(optionsKey + "/startGoalPruningThreshold"));
+      planner->setStartGoalPruningThreshold(
+          config_->get<unsigned>(optionsKey + "/startGoalPruningThreshold"));
       planner->enablePruning(config_->get<bool>(optionsKey + "/enablePruning"));
       planner->setBatchSize(config_->get<unsigned>(optionsKey + "/batchSize"));
       planner->setInitialNumberOfSparseCollisionChecks(
@@ -162,6 +167,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
           config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
       return {planner, common::PLANNER_TYPE::EITSTAR};
     }
+#endif
     case common::PLANNER_TYPE::FMTSTAR: {
       // Allocate and configure an FMT* planner.
       auto planner = std::make_shared<ompl::geometric::FMT>(context_->getSpaceInformation());
@@ -206,8 +212,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
       return {planner, common::PLANNER_TYPE::LBTRRT};
     }
     case common::PLANNER_TYPE::PRMSTAR: {
-      auto planner =
-          std::make_shared<ompl::geometric::PRMstar>(context_->getSpaceInformation());
+      auto planner = std::make_shared<ompl::geometric::PRMstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       return {planner, common::PLANNER_TYPE::PRMSTAR};
@@ -268,8 +273,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
       return {planner, common::PLANNER_TYPE::RRTSTAR};
     }
     case common::PLANNER_TYPE::SPARSTWO: {
-      auto planner =
-          std::make_shared<ompl::geometric::SPARStwo>(context_->getSpaceInformation());
+      auto planner = std::make_shared<ompl::geometric::SPARStwo>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       planner->setName(plannerName);
       planner->setStretchFactor(config_->get<double>(optionsKey + "/stretchFactor"));

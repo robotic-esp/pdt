@@ -241,6 +241,7 @@ std::shared_ptr<ompl::base::Goal> ReedsSheppRandomRectangles::createGoal() const
       }
       return goal;
     }
+#ifndef PDT_UPSTREAM_OMPL
     case ompl::base::GoalType::GOAL_SPACE: {
       // Get the goal bounds.
       ompl::base::RealVectorBounds goalBounds(static_cast<unsigned>(2u));
@@ -258,6 +259,7 @@ std::shared_ptr<ompl::base::Goal> ReedsSheppRandomRectangles::createGoal() const
       goal->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
       return goal;
     }
+#endif
     default: { throw std::runtime_error("Goal type not implemented."); }
   }
 }

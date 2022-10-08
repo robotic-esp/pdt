@@ -40,9 +40,12 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/aitstar/Edge.h>
+
+#ifndef PDT_UPSTREAM_OMPL
 #include <ompl/geometric/planners/informedtrees/EITstar.h>
 #include <ompl/geometric/planners/informedtrees/eitstar/Edge.h>
-#include <ompl/geometric/planners/informedtrees/aitstar/Edge.h>
+#endif
 
 #include "pdt/common/planner_type.h"
 
@@ -60,20 +63,20 @@ class PlannerSpecificData {
   ompl::base::SpaceInformationPtr spaceInfo_{};
 };
 
-class LazyPRMstarData: public PlannerSpecificData {
+class LazyPRMstarData : public PlannerSpecificData {
  public:
   LazyPRMstarData(const ompl::base::SpaceInformationPtr& spaceInfo) :
       PlannerSpecificData(spaceInfo) {}
 
-  using Edge = std::pair<ompl::base::PlannerDataVertex,ompl::base::PlannerDataVertex >;
+  using Edge = std::pair<ompl::base::PlannerDataVertex, ompl::base::PlannerDataVertex>;
 
   // getter
   std::vector<Edge> getValidEdges() const;
   std::vector<std::size_t> getNewEdgeIndices() const;
 
   // setter
-  void setValidEdges(const std::vector<Edge> &edges);
-  void setNewEdgeIndices(const std::vector<std::size_t> &newEdges);
+  void setValidEdges(const std::vector<Edge>& edges);
+  void setNewEdgeIndices(const std::vector<std::size_t>& newEdges);
 
  private:
   std::vector<Edge> validEdges_{};
@@ -147,6 +150,7 @@ class AITstarData : public PlannerSpecificData {
   std::shared_ptr<ompl::geometric::aitstar::Vertex> nextVertex_{};
 };
 
+#ifndef PDT_UPSTREAM_OMPL  
 class EITstarData : public PlannerSpecificData {
  public:
   EITstarData(const ompl::base::SpaceInformationPtr& spaceInfo) : PlannerSpecificData(spaceInfo) {}
@@ -171,7 +175,8 @@ class EITstarData : public PlannerSpecificData {
   ompl::geometric::eitstar::Edge nextForwardEdge_{};
   ompl::geometric::eitstar::Edge nextReverseEdge_{};
 };
-
+#endif
+  
 }  // namespace visualization
 
 }  // namespace pdt

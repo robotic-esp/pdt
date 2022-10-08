@@ -103,7 +103,9 @@ class InteractiveVisualizer : public BaseVisualizer,
   void drawPlannerSpecificVisualizations(const std::size_t iteration) const;
   void drawBITstarSpecificVisualizations(const std::size_t iteration) const;
   void drawAITstarSpecificVisualizations(const std::size_t iteration) const;
+  #ifndef PDT_UPSTREAM_OMPL
   void drawEITstarSpecificVisualizations(const std::size_t iteration) const;
+  #endif
   void drawLazyPRMstarSpecificVisualizations(const std::size_t iteration) const;
 
   // Lowlevel drawing.

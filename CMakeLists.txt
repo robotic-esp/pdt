@@ -4,13 +4,17 @@ message(STATUS "CMake ${CMAKE_VERSION}")
 cmake_minimum_required(VERSION 3.10)
 project(pdt)
 
+# Build in release mode if no build type is specified.
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 # Display compiler and build info.
 message(STATUS "Configuring Planner Developer Tools (PDT) for ${CMAKE_BUILD_TYPE} mode.")
 message(STATUS "Compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
 # CMake includes
 include(FeatureSummary)
-# include(GNUInstallDirs)
 
 # CMake paths
 set(CMAKE_MODULE_PATH
@@ -20,11 +24,6 @@ set(CMAKE_MODULE_PATH
 # Enforce out-of-source builds.
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
    message(SEND_ERROR "Please build this project out-of-source.")
-endif()
-
-# Build in release mode if no build type is specified.
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
 endif()
 
 # Put executables in a bin directory.
@@ -66,9 +65,16 @@ target_compile_features(pdt
 # first as some PDT libraries and/or source code depends on it.
 option(PDT_OPEN_RAVE "Enable OpenRAVE integration." OFF)
 if(PDT_OPEN_RAVE)
-  message(STATUS "Configuring OpenRAVE support")
+  message(STATUS "Configuring PDT for OpenRAVE support.")
   add_definitions(-DPDT_OPEN_RAVE)
   # See src/CMakeLists.txt and docs/DoxygenSettings.cmake for switches on this option.
+endif()
+
+# Configure the project to compile with the upstream OMPL repo.
+option(PDT_UPSTREAM_OMPL "Configure PDT for upstream OMPL." OFF)
+if (PDT_UPSTREAM_OMPL)
+  message(STATUS "Configuring PDT for upstream OMPL.")
+  add_definitions(-DPDT_UPSTREAM_OMPL)
 endif()
 
 # Add the documentation
