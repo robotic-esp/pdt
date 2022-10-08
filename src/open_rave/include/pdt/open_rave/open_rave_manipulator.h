@@ -70,11 +70,11 @@ class OpenRaveManipulator : public OpenRaveBaseContext {
   virtual ~OpenRaveManipulator();
 
   /** \brief Accepts a context visitor. */
-  virtual void accept(const ContextVisitor& visitor) const override final;
+  virtual void accept(const planning_contexts::ContextVisitor& visitor) const override final;
 
  private:
   /** \brief Return a start/goal pair. */
-  virtual std::vector<StartGoalPair> makeStartGoalPair() const override;
+  virtual std::vector<planning_contexts::StartGoalPair> makeStartGoalPair() const override;
 };
 
 }  // namespace open_rave

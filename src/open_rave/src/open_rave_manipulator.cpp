@@ -115,7 +115,7 @@ OpenRaveManipulator::~OpenRaveManipulator() {
   OpenRAVE::RaveDestroy();
 }
 
-std::vector<StartGoalPair> OpenRaveManipulator::makeStartGoalPair() const {
+std::vector<planning_contexts::StartGoalPair> OpenRaveManipulator::makeStartGoalPair() const {
   if (config_->contains("context/" + name_ + "/starts")) {
     OMPL_ERROR("OpenRaveManipulator context does not support multiple queries.");
     throw std::runtime_error("Context error.");
@@ -134,7 +134,7 @@ std::vector<StartGoalPair> OpenRaveManipulator::makeStartGoalPair() const {
     goalState[i] = goalPosition.at(i);
   }
 
-  StartGoalPair pair;
+  planning_contexts::StartGoalPair pair;
   pair.start = {startState};
 
   const auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
@@ -144,7 +144,7 @@ std::vector<StartGoalPair> OpenRaveManipulator::makeStartGoalPair() const {
   return {pair};
 }
 
-void OpenRaveManipulator::accept(const ContextVisitor& visitor) const {
+void OpenRaveManipulator::accept(const planning_contexts::ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 

@@ -115,7 +115,7 @@ OpenRaveR3::~OpenRaveR3() {
   OpenRAVE::RaveDestroy();
 }
 
-std::vector<StartGoalPair> OpenRaveR3::makeStartGoalPair() const {
+std::vector<planning_contexts::StartGoalPair> OpenRaveR3::makeStartGoalPair() const {
   if (config_->contains("context/" + name_ +
                         "/starts")) {  // if a 'starts' spec is given, read that
     OMPL_ERROR("OpenRaveR3 context does not support multiple queries.");
@@ -137,7 +137,7 @@ std::vector<StartGoalPair> OpenRaveR3::makeStartGoalPair() const {
     (*goalState)[i] = goalPosition.at(i);
   }
 
-  StartGoalPair pair;
+  planning_contexts::StartGoalPair pair;
   pair.start = {startState};
 
   const auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
@@ -147,7 +147,7 @@ std::vector<StartGoalPair> OpenRaveR3::makeStartGoalPair() const {
   return {pair};
 }
 
-void OpenRaveR3::accept(const ContextVisitor& visitor) const {
+void OpenRaveR3::accept(const planning_contexts::ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 

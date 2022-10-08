@@ -116,7 +116,7 @@ OpenRaveR3xSO2::~OpenRaveR3xSO2() {
   OpenRAVE::RaveDestroy();
 }
 
-std::vector<StartGoalPair> OpenRaveR3xSO2::makeStartGoalPair() const {
+std::vector<planning_contexts::StartGoalPair> OpenRaveR3xSO2::makeStartGoalPair() const {
   if (config_->contains("context/" + name_ + "/starts")) {
     OMPL_ERROR("OpenRaveR3xSO2 context does not support multiple queries.");
     throw std::runtime_error("Context error.");
@@ -146,7 +146,7 @@ std::vector<StartGoalPair> OpenRaveR3xSO2::makeStartGoalPair() const {
   // Set the sO2-component of the goal position.
   goalState->as<ompl::base::SO2StateSpace::StateType>(1u)->value = goalPosition.at(3u);
 
-  StartGoalPair pair;
+  planning_contexts::StartGoalPair pair;
   pair.start = {startState};
 
   const auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
@@ -156,7 +156,7 @@ std::vector<StartGoalPair> OpenRaveR3xSO2::makeStartGoalPair() const {
   return {pair};
 }
 
-void OpenRaveR3xSO2::accept(const ContextVisitor& visitor) const {
+void OpenRaveR3xSO2::accept(const planning_contexts::ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 
