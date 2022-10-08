@@ -50,11 +50,11 @@
 #include "pdt/planning_contexts/all_contexts.h"
 
 #ifdef PDT_OPEN_RAVE
-#include "pdt/spaces/SE3WAxisAngleBoundStateSpace.h"
 #include "pdt/open_rave/open_rave_manipulator.h"
 #include "pdt/open_rave/open_rave_r3.h"
 #include "pdt/open_rave/open_rave_r3xso2.h"
 #include "pdt/open_rave/open_rave_se3.h"
+#include "pdt/spaces/SE3WAxisAngleBoundStateSpace.h"
 #endif
 
 namespace pdt {
@@ -72,7 +72,8 @@ ContextFactory::ContextFactory(const std::shared_ptr<const config::Configuration
   }
 }
 
-std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std::string& contextName) const {
+std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(
+    const std::string& contextName) const {
   // Generate the parent key for convenient lookups in the config.
   const std::string parentKey{"context/" + contextName};
 
@@ -88,8 +89,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
   switch (type) {
     case common::CONTEXT_TYPE::CENTER_SQUARE: {
       try {
-        return std::make_shared<planning_contexts::CenterSquare>(createRealVectorSpaceInfo(parentKey), config_,
-                                              contextName);
+        return std::make_shared<planning_contexts::CenterSquare>(
+            createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a CenterSquare context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -97,8 +98,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
     }
     case common::CONTEXT_TYPE::DIVIDING_WALLS: {
       try {
-        return std::make_shared<planning_contexts::DividingWalls>(createRealVectorSpaceInfo(parentKey), config_,
-                                               contextName);
+        return std::make_shared<planning_contexts::DividingWalls>(
+            createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a DividingWalls context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -106,8 +107,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
     }
     case common::CONTEXT_TYPE::DOUBLE_ENCLOSURE: {
       try {
-        return std::make_shared<planning_contexts::DoubleEnclosure>(createRealVectorSpaceInfo(parentKey), config_,
-                                                 contextName);
+        return std::make_shared<planning_contexts::DoubleEnclosure>(
+            createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a DoubleEnclosure context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -115,8 +116,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
     }
     case common::CONTEXT_TYPE::FLANKING_GAP: {
       try {
-        return std::make_shared<planning_contexts::FlankingGap>(createRealVectorSpaceInfo(parentKey), config_,
-                                             contextName);
+        return std::make_shared<planning_contexts::FlankingGap>(
+            createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a FlankingGap context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -124,8 +125,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
     }
     case common::CONTEXT_TYPE::FOUR_ROOMS: {
       try {
-        return std::make_shared<planning_contexts::FourRooms>(createRealVectorSpaceInfo(parentKey), config_,
-                                           contextName);
+        return std::make_shared<planning_contexts::FourRooms>(createRealVectorSpaceInfo(parentKey),
+                                                              config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a FourRooms context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -133,8 +134,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
     }
     case common::CONTEXT_TYPE::GOAL_ENCLOSURE: {
       try {
-        return std::make_shared<planning_contexts::GoalEnclosure>(createRealVectorSpaceInfo(parentKey), config_,
-                                               contextName);
+        return std::make_shared<planning_contexts::GoalEnclosure>(
+            createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a GoalEnclosure context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -142,8 +143,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
     }
     case common::CONTEXT_TYPE::NARROW_PASSAGE: {
       try {
-        return std::make_shared<planning_contexts::NarrowPassage>(createRealVectorSpaceInfo(parentKey), config_,
-                                               contextName);
+        return std::make_shared<planning_contexts::NarrowPassage>(
+            createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a NarrowPassage context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -151,8 +152,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
     }
     case common::CONTEXT_TYPE::OBSTACLE_FREE: {
       try {
-        return std::make_shared<planning_contexts::ObstacleFree>(createRealVectorSpaceInfo(parentKey), config_,
-                                              contextName);
+        return std::make_shared<planning_contexts::ObstacleFree>(
+            createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a ObstacleFree context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -168,9 +169,11 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
 
         // Allocate the state information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<open_rave::OpenRaveManipulator>(spaceInfo, config_, contextName);
+        return std::make_shared<open_rave::OpenRaveManipulator>(
+            spaceInfo, config_, contextName);
       } catch (const json::detail::type_error& e) {
-        auto msg = "Error allocating a OpenRaveManipulator context with exception:\n    "s + e.what();
+        auto msg =
+            "Error allocating a OpenRaveManipulator context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
       }
     }
@@ -182,7 +185,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
 
         // Allocate the state information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<open_rave::OpenRaveR3>(spaceInfo, config_, contextName);
+        return std::make_shared<open_rave::OpenRaveR3>(spaceInfo, config_,
+                                                                          contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a OpenRaveR3 context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -204,7 +208,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
 
         // Allocate the space information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<open_rave::OpenRaveR3xSO2>(spaceInfo, config_, contextName);
+        return std::make_shared<open_rave::OpenRaveR3xSO2>(spaceInfo, config_,
+                                                                              contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a OpenRaveR3xSO2 context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -218,7 +223,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
 
         // Allocate the state information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<open_rave::OpenRaveSE3>(spaceInfo, config_, contextName);
+        return std::make_shared<open_rave::OpenRaveSE3>(spaceInfo, config_,
+                                                                           contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a OpenRaveSE3 context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -233,17 +239,19 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
 
         // Allocate the state information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<open_rave::OpenRaveSE3>(spaceInfo, config_, contextName);
+        return std::make_shared<open_rave::OpenRaveSE3>(spaceInfo, config_,
+                                                                           contextName);
       } catch (const json::detail::type_error& e) {
-        auto msg = "Error allocating a ConstrainedOpenRaveSE3 context with exception:\n    "s + e.what();
+        auto msg =
+            "Error allocating a ConstrainedOpenRaveSE3 context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
       }
     }
 #endif
     case common::CONTEXT_TYPE::RANDOM_RECTANGLES: {
       try {
-        return std::make_shared<planning_contexts::RandomRectangles>(createRealVectorSpaceInfo(parentKey), config_,
-                                                  contextName);
+        return std::make_shared<planning_contexts::RandomRectangles>(
+            createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a RandomRectangles context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -254,32 +262,36 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
         return std::make_shared<planning_contexts::RandomRectanglesMultiStartGoal>(
             createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
-        auto msg = "Error allocating a RandomRectanglesMultiStartGoal context with exception:\n    "s + e.what();
+        auto msg =
+            "Error allocating a RandomRectanglesMultiStartGoal context with exception:\n    "s +
+            e.what();
         throw std::runtime_error(msg);
       }
     }
     case common::CONTEXT_TYPE::REEDS_SHEPP_RANDOM_RECTANGLES: {
       try {
-        return std::make_shared<planning_contexts::ReedsSheppRandomRectangles>(createReedsSheppSpaceInfo(parentKey),
-                                                            config_, contextName);
+        return std::make_shared<planning_contexts::ReedsSheppRandomRectangles>(
+            createReedsSheppSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
-        auto msg = "Error allocating a ReedsSheppRandomRectangles context with exception:\n    "s + e.what();
+        auto msg = "Error allocating a ReedsSheppRandomRectangles context with exception:\n    "s +
+                   e.what();
         throw std::runtime_error(msg);
       }
     }
     case common::CONTEXT_TYPE::REPEATING_RECTANGLES: {
       try {
-        return std::make_shared<planning_contexts::RepeatingRectangles>(createRealVectorSpaceInfo(parentKey), config_,
-                                                     contextName);
+        return std::make_shared<planning_contexts::RepeatingRectangles>(
+            createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
-        auto msg = "Error allocating a RepeatingRectangles context with exception:\n    "s + e.what();
+        auto msg =
+            "Error allocating a RepeatingRectangles context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
       }
     }
     case common::CONTEXT_TYPE::START_ENCLOSURE: {
       try {
-        return std::make_shared<planning_contexts::StartEnclosure>(createRealVectorSpaceInfo(parentKey), config_,
-                                                contextName);
+        return std::make_shared<planning_contexts::StartEnclosure>(
+            createRealVectorSpaceInfo(parentKey), config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a StartEnclosure context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -287,8 +299,8 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(const std
     }
     case common::CONTEXT_TYPE::WALL_GAP: {
       try {
-        return std::make_shared<planning_contexts::WallGap>(createRealVectorSpaceInfo(parentKey), config_,
-                                         contextName);
+        return std::make_shared<planning_contexts::WallGap>(createRealVectorSpaceInfo(parentKey),
+                                                            config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a WallGap context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);

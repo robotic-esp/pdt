@@ -61,7 +61,7 @@ namespace open_rave {
 OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                          const std::shared_ptr<const config::Configuration>& config,
                          const std::string& name) :
-    OpenRaveBaseContext(spaceInfo, config, name){
+    OpenRaveBaseContext(spaceInfo, config, name) {
   // Initialize rave.
   OpenRAVE::RaveInitialize(true, OpenRAVE::Level_Warn);
 
@@ -79,7 +79,7 @@ OpenRaveSE3::OpenRaveSE3(const std::shared_ptr<ompl::base::SpaceInformation>& sp
   environment->SetCollisionChecker(collisionChecker);
 
   // Load the specified environment.
-  environment->Load(std::string(Directory::SOURCE) + "/"s +
+  environment->Load(std::string(config::Directory::SOURCE) + "/"s +
                     config_->get<std::string>("context/" + name + "/environment"));
 
   // Load the robot.
@@ -116,7 +116,7 @@ OpenRaveSE3::~OpenRaveSE3() {
   OpenRAVE::RaveDestroy();
 }
 
-std::vector<StartGoalPair> OpenRaveSE3::makeStartGoalPair() const{
+std::vector<planning_contexts::StartGoalPair> OpenRaveSE3::makeStartGoalPair() const {
   if (config_->contains("context/" + name_ + "/starts")) {
     OMPL_ERROR("OpenRaveSE3 context does not support multiple queries.");
     throw std::runtime_error("Context error.");
@@ -131,7 +131,7 @@ std::vector<StartGoalPair> OpenRaveSE3::makeStartGoalPair() const{
   startState.get()->rotation().z = startPosition.at(5u);
   startState.get()->rotation().w = startPosition.at(6u);
 
-  StartGoalPair pair;
+  planning_contexts::StartGoalPair pair;
   pair.start = {startState};
   pair.goal = createGoal();
 
@@ -199,7 +199,7 @@ std::shared_ptr<ompl::base::Goal> OpenRaveSE3::createGoal() const {
   }
 }
 
-void OpenRaveSE3::accept(const ContextVisitor& visitor) const {
+void OpenRaveSE3::accept(const planning_contexts::ContextVisitor& visitor) const {
   visitor.visit(*this);
 }
 

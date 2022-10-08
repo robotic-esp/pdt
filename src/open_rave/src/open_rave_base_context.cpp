@@ -65,7 +65,8 @@ std::vector<std::shared_ptr<obstacles::BaseObstacle>> OpenRaveBaseContext::getOb
   return {};
 }
 
-std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> OpenRaveBaseContext::getAntiObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> OpenRaveBaseContext::getAntiObstacles()
+    const {
   return {};
 }
 

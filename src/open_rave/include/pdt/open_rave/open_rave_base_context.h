@@ -61,20 +61,22 @@ namespace pdt {
 namespace open_rave {
 
 /** \brief A planning context to plugin to the OpenRave simulator. */
-class OpenRaveBaseContext : public BaseContext {
+class OpenRaveBaseContext : public planning_contexts::BaseContext {
  public:
   OpenRaveBaseContext(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                      const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                      const std::shared_ptr<const config::Configuration>& config,
+                      const std::string& name);
   virtual ~OpenRaveBaseContext() = default;
 
   /** \brief Accepts a context visitor. */
-  virtual void accept(const ContextVisitor& visitor) const override = 0;
+  virtual void accept(const planning_contexts::ContextVisitor& visitor) const override = 0;
 
   /** \brief Get the obstacles. */
   virtual std::vector<std::shared_ptr<obstacles::BaseObstacle>> getObstacles() const override;
 
   /** \brief Get the antiobstacles. */
-  virtual std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> getAntiObstacles() const override;
+  virtual std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> getAntiObstacles()
+      const override;
 
   /** \brief Create a new goal. */
   virtual std::shared_ptr<ompl::base::Goal> createGoal() const override;

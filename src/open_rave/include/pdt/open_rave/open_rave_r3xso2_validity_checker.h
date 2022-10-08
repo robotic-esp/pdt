@@ -67,9 +67,9 @@ class OpenRaveR3xSO2ValidityChecker : public OpenRaveBaseValidityChecker {
  public:
   /** \brief The constructor. */
   OpenRaveR3xSO2ValidityChecker(const ompl::base::SpaceInformationPtr& spaceInfo,
-                            const OpenRAVE::EnvironmentBasePtr& environment,
-                            const OpenRAVE::RobotBasePtr& robot,
-                            const std::shared_ptr<const config::Configuration>& config);
+                                const OpenRAVE::EnvironmentBasePtr& environment,
+                                const OpenRAVE::RobotBasePtr& robot,
+                                const std::shared_ptr<const config::Configuration>& config);
 
   /** \brief The destructor. */
   virtual ~OpenRaveR3xSO2ValidityChecker() = default;

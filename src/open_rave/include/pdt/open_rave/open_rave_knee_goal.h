@@ -52,7 +52,8 @@ namespace open_rave {
 class OpenRaveKneeGoal : public ompl::base::GoalSpace {
  public:
   OpenRaveKneeGoal(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                   const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                   const std::shared_ptr<const config::Configuration>& config,
+                   const std::string& name);
   virtual ~OpenRaveKneeGoal() = default;
 
   void sampleGoal(ompl::base::State* st) const override;

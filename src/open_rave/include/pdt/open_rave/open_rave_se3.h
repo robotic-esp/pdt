@@ -71,14 +71,14 @@ class OpenRaveSE3 : public OpenRaveBaseContext {
   virtual ~OpenRaveSE3();
 
   /** \brief Accepts a context visitor. */
-  virtual void accept(const ContextVisitor& visitor) const override final;
+  virtual void accept(const planning_contexts::ContextVisitor& visitor) const override final;
 
  private:
   /** \brief Return a start/goal pair. */
-  virtual std::vector<StartGoalPair> makeStartGoalPair() const override;
+  virtual std::vector<planning_contexts::StartGoalPair> makeStartGoalPair() const override;
 
   /** \brief Create a new goal. */
-  std::shared_ptr<ompl::base::Goal> createGoal() const;
+  std::shared_ptr<ompl::base::Goal> createGoal() const override;
 };
 
 }  // namespace open_rave
