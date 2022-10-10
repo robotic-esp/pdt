@@ -54,9 +54,9 @@ NLOHMANN_JSON_SERIALIZE_ENUM(ompl::base::GoalType,
                                  {ompl::base::GoalType::GOAL_STATE, "GoalState"},
                                  {ompl::base::GoalType::GOAL_STATES, "GoalStates"},
                                  {ompl::base::GoalType::GOAL_LAZY_SAMPLES, "GoalLazySamples"},
-#ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_GOAL_SPACE
                                  {ompl::base::GoalType::GOAL_SPACE, "GoalSpace"},
-#endif
+#endif // #ifdef PDT_EXTRA_GOAL_SPACE
                              });
 // clang-format on
 

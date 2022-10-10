@@ -52,10 +52,10 @@
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
 
-#ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_EITSTAR_PR
 #include <ompl/geometric/planners/informedtrees/EIRMstar.h>
 #include <ompl/geometric/planners/informedtrees/EITstar.h>
-#endif
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
 
 #include "nlohmann/json.hpp"
 
@@ -134,7 +134,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
           config_->get<bool>(optionsKey + "/stopOnSolutionImprovement"));
       return {planner, common::PLANNER_TYPE::BITSTAR};
     }
-#ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::EIRMSTAR: {
       // Allocate and configure an EIRM* planner.
       auto planner = std::make_shared<ompl::geometric::EIRMstar>(context_->getSpaceInformation());
@@ -167,7 +167,7 @@ std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> PlannerFac
           config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
       return {planner, common::PLANNER_TYPE::EITSTAR};
     }
-#endif
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::FMTSTAR: {
       // Allocate and configure an FMT* planner.
       auto planner = std::make_shared<ompl::geometric::FMT>(context_->getSpaceInformation());

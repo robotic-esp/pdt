@@ -407,9 +407,9 @@ TEST_CASE("Optimization objectives") {
         SUBCASE("1000 Random edges") {
           // Check the admissibility of the heuristic for 1000 random edges per objective.
           const auto sampler = spaceInfo->allocStateSampler();
-          #ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_SET_LOCAL_SEEDS
           sampler->setLocalSeed(42u);  // The tests should never fail/succeed randomly.
-          #endif
+#endif // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
           for (auto i = 0u; i < 1000u; ++i) {
             sampler->sampleUniform(s1);
             sampler->sampleUniform(s2);

@@ -70,11 +70,16 @@ if(PDT_OPEN_RAVE)
   # See src/CMakeLists.txt and docs/DoxygenSettings.cmake for switches on this option.
 endif()
 
-# Configure the project to compile with the upstream OMPL repo.
-option(PDT_UPSTREAM_OMPL "Configure PDT for upstream OMPL." OFF)
-if (PDT_UPSTREAM_OMPL)
-  message(STATUS "Configuring PDT for upstream OMPL.")
-  add_definitions(-DPDT_UPSTREAM_OMPL)
+# Add flag to disable features that require the ESP OMPL fork.
+option(PDT_BASE_OMPL_ONLY "Configure PDT to use only mainline OMPL features." OFF)
+if (PDT_BASE_OMPL_ONLY)
+  # Remove optional parts
+  message(STATUS "Configuring PDT to use only mainline OMPL features.")
+else()
+  add_definitions(-DPDT_EXTRA_SET_LOCAL_SEEDS)
+  add_definitions(-DPDT_EXTRA_GET_BEST_COSTS)
+  add_definitions(-DPDT_EXTRA_GOAL_SPACE)
+  add_definitions(-DPDT_EXTRA_EITSTAR_PR)
 endif()
 
 # Add the documentation

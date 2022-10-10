@@ -53,10 +53,10 @@
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/prm/SPARStwo.h>
 
-#ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_EITSTAR_PR
 #include <ompl/geometric/planners/informedtrees/EITstar.h>
 #include <ompl/geometric/planners/informedtrees/EIRMstar.h>
-#endif
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
 
 #include "pdt/common/planner_type.h"
 
@@ -75,21 +75,21 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, common::PLAN
     case common::PLANNER_TYPE::BITSTAR: {
       return planner->as<ompl::geometric::BITstar>()->bestCost();
     }
-#ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::EIRMSTAR: {
       return planner->as<ompl::geometric::EIRMstar>()->bestCost();
     }
     case common::PLANNER_TYPE::EITSTAR: {
       return planner->as<ompl::geometric::EITstar>()->bestCost();
     }
-#endif
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::FMTSTAR: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
     case common::PLANNER_TYPE::INFORMEDRRTSTAR: {
       return planner->as<ompl::geometric::InformedRRTstar>()->bestCost();
     }
-#ifndef PDT_UPSTREAM_OMPL      
+#ifdef PDT_EXTRA_GET_BEST_COSTS
     case common::PLANNER_TYPE::LAZYPRMSTAR: {
       return planner->as<ompl::geometric::LazyPRMstar>()->bestCost();
     }
@@ -99,7 +99,7 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, common::PLAN
     case common::PLANNER_TYPE::PRMSTAR: {
       return planner->as<ompl::geometric::PRMstar>()->bestCost();
     }
-#endif
+#endif // #ifdef PDT_EXTRA_GET_BEST_COSTS
     case common::PLANNER_TYPE::RRT: {
       return ompl::base::Cost(std::numeric_limits<double>::infinity());
     }
@@ -112,11 +112,11 @@ ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, common::PLAN
     case common::PLANNER_TYPE::RRTSTAR: {
       return planner->as<ompl::geometric::RRTstar>()->bestCost();
     }
-#ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_GET_BEST_COSTS
     case common::PLANNER_TYPE::SPARSTWO: {
       return planner->as<ompl::geometric::SPARStwo>()->bestCost();
     }
-#endif
+#endif // #ifdef PDT_EXTRA_GET_BEST_COSTS
     default: {
       throw std::runtime_error("Received request to get best cost of unknown planner type.");
     }

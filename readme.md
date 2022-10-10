@@ -100,7 +100,7 @@ cmake ..
 make
 ```
 
-If you are compiling against an upstream version of OMPL, you must add `-DPDT_UPSTREAM_OMPL=TRUE` to the `cmake` call above.
+If you are compiling against an upstream version of OMPL, you must add `-DPDT_BASE_OMPL_ONLY=TRUE` to the `cmake` call above.
 
 If you have Doxygen installed, you can also build the documentation
 ```bash

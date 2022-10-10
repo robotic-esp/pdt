@@ -207,7 +207,7 @@ void BaseVisualizer::createData() {
     planner_->setup();
     setupDuration_ = time::Clock::now() - setupStartTime;
 
-#ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_SET_LOCAL_SEEDS
     if (config_->contains("experiment/seed")) {
       if (plannerType_ == common::PLANNER_TYPE::BITSTAR) {
         planner_->as<ompl::geometric::BITstar>()->setLocalSeed(
@@ -225,7 +225,7 @@ void BaseVisualizer::createData() {
     } else {
       throw std::runtime_error("Unknown seed.");
     }
-#endif
+#endif // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
   }
 
   double timePerQuery = 0.0;
@@ -361,7 +361,7 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(aitstarData);
           break;
         }
-#ifndef PDT_UPSTREAM_OMPL          
+#ifdef PDT_EXTRA_EITSTAR_PR
         case common::PLANNER_TYPE::EITSTAR: {
           auto eitstarData = std::make_shared<EITstarData>(context_->getSpaceInformation());
 
@@ -406,7 +406,7 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(lPRMstarData);
           break;
         }
-#endif
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
         default:
           // Defaults to not getting any data.
           break;

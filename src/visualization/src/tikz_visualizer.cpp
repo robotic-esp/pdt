@@ -406,7 +406,7 @@ void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) con
       }
       break;
     }
-#ifndef PDT_UPSTREAM_OMPL      
+#ifdef PDT_EXTRA_GOAL_SPACE
     case ompl::base::GoalType::GOAL_SPACE: {
       auto goalSpace = goal->as<ompl::base::GoalSpace>()->getSpace();
       auto bounds = goalSpace->as<ompl::base::RealVectorStateSpace>()->getBounds();
@@ -419,7 +419,7 @@ void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) con
       drawRectangle(anchor[0], anchor[1], widths[0], widths[1], "goal region");
       break;
     }
-#endif
+#endif // #ifdef PDT_EXTRA_GOAL_SPACE
     default: { throw std::runtime_error("Can not visualize goal type."); }
   }
 }
@@ -504,13 +504,13 @@ void TikzVisualizer::drawPlannerSpecificVisualizations(
           std::dynamic_pointer_cast<const AITstarData>(plannerSpecificData));
       break;
     }
-#ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::EITSTAR: {
       drawEITstarSpecificVisualizations(
           std::dynamic_pointer_cast<const EITstarData>(plannerSpecificData));
       break;
     }
-#endif
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::LAZYPRMSTAR: {
       drawLazyPRMstarSpecificVisualizations(
           std::dynamic_pointer_cast<const LazyPRMstarData>(plannerSpecificData));
@@ -590,7 +590,7 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
   // }
 }
 
-#ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_EITSTAR_PR
 void TikzVisualizer::drawEITstarSpecificVisualizations(
     const std::shared_ptr<const EITstarData>& eitstarData) const {
   // // Draw the backward search tree.
@@ -616,7 +616,7 @@ void TikzVisualizer::drawEITstarSpecificVisualizations(
   //            "edge, pdtred");
   // }
 }
-#endif
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
   
 void TikzVisualizer::drawLazyPRMstarSpecificVisualizations(
     const std::shared_ptr<const LazyPRMstarData>& lPRMstarData) const {

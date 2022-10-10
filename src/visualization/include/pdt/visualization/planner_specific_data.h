@@ -42,10 +42,10 @@
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
 #include <ompl/geometric/planners/informedtrees/aitstar/Edge.h>
 
-#ifndef PDT_UPSTREAM_OMPL
+#ifdef PDT_EXTRA_EITSTAR_PR
 #include <ompl/geometric/planners/informedtrees/EITstar.h>
 #include <ompl/geometric/planners/informedtrees/eitstar/Edge.h>
-#endif
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
 
 #include "pdt/common/planner_type.h"
 
@@ -150,7 +150,7 @@ class AITstarData : public PlannerSpecificData {
   std::shared_ptr<ompl::geometric::aitstar::Vertex> nextVertex_{};
 };
 
-#ifndef PDT_UPSTREAM_OMPL  
+#ifdef PDT_EXTRA_EITSTAR_PR
 class EITstarData : public PlannerSpecificData {
  public:
   EITstarData(const ompl::base::SpaceInformationPtr& spaceInfo) : PlannerSpecificData(spaceInfo) {}
@@ -175,7 +175,7 @@ class EITstarData : public PlannerSpecificData {
   ompl::geometric::eitstar::Edge nextForwardEdge_{};
   ompl::geometric::eitstar::Edge nextReverseEdge_{};
 };
-#endif
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
   
 }  // namespace visualization
 
