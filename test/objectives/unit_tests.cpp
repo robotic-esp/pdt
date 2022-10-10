@@ -409,6 +409,8 @@ TEST_CASE("Optimization objectives") {
           const auto sampler = spaceInfo->allocStateSampler();
 #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
           sampler->setLocalSeed(42u);  // The tests should never fail/succeed randomly.
+#else
+          OMPL_WARN("PDT was compiled without support for setting local seeds which makes this unit test random.");
 #endif // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
           for (auto i = 0u; i < 1000u; ++i) {
             sampler->sampleUniform(s1);

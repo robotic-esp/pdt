@@ -43,4 +43,5 @@ target_link_libraries(pdt_visualization
   pdt_factories
   pdt_objectives
   pdt_pgftikz
-  pdt_planning_contexts)
+  pdt_planning_contexts
+  pdt_utilities)
