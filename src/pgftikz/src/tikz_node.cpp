@@ -65,6 +65,14 @@ void TikzNode::setLabel(const std::string& label) {
   label_ = label;
 }
 
+void TikzNode::setZLevel(std::size_t z) {
+  zLevel_ = z;
+}
+
+std::size_t TikzNode::getZLevel() {
+  return zLevel_;
+}
+
 std::string TikzNode::string() const {
   std::ostringstream stream{};
   stream << "\\node ";

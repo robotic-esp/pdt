@@ -55,6 +55,9 @@ class TikzDraw {
   void setConnection(const std::string& connection);
   void setOptions(const std::string& options);
 
+  void setZLevel(std::size_t z);
+  std::size_t getZLevel();
+
   std::string string() const;
 
 private:
@@ -62,6 +65,7 @@ private:
   std::string to_{""};
   std::string options_{""};
   std::string connection_{""};
+  std::size_t zLevel_{0};
 };
 
 }  // namespace pgftikz

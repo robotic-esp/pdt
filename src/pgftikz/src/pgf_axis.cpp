@@ -53,6 +53,14 @@ void PgfAxis::addLegendEntry(const std::string& entry, const std::string& imageO
   legendEntries_.emplace_back(entry, imageOptions);
 }
 
+void PgfAxis::setZLevel(std::size_t z) {
+  zLevel_ = z;
+}
+
+std::size_t PgfAxis::getZLevel() {
+  return zLevel_;
+}
+
 std::vector<std::shared_ptr<PgfPlot>> PgfAxis::getPlots() {
   return plots_;
 }

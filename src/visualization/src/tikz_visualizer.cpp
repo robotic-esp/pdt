@@ -118,7 +118,7 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, const st
         // Draw the edge if the child is valid.
         if (child != ompl::base::PlannerData::NO_VERTEX) {
           drawEdge(vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-                   child.getState()->as<ompl::base::RealVectorStateSpace::StateType>(), "edge");
+                   child.getState()->as<ompl::base::RealVectorStateSpace::StateType>(), pgftikz::zlevels::EDGE, "edge");
         }
       }
     }
@@ -355,13 +355,13 @@ void TikzVisualizer::visit(const planning_contexts::WallGap& context) const {
 
 void TikzVisualizer::visit(const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const {
   drawRectangle(obstacle.getAnchorCoordinates().at(0), obstacle.getAnchorCoordinates().at(1),
-                obstacle.getWidths().at(0), obstacle.getWidths().at(1), "obstacle");
+                obstacle.getWidths().at(0), obstacle.getWidths().at(1), pgftikz::zlevels::OBSTACLE, "obstacle");
 }
 
 void TikzVisualizer::visit(const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const {
   drawRectangle(antiObstacle.getAnchorCoordinates().at(0),
                 antiObstacle.getAnchorCoordinates().at(1), antiObstacle.getWidths().at(0) + 1e-2,
-                antiObstacle.getWidths().at(1) + 1e-2, "antiobstacle");
+                antiObstacle.getWidths().at(1) + 1e-2, pgftikz::zlevels::ANTIOBSTACLE, "antiobstacle");
 }
 
 void TikzVisualizer::drawBoundary(const planning_contexts::RealVectorGeometricContext& context) const {
@@ -370,7 +370,7 @@ void TikzVisualizer::drawBoundary(const planning_contexts::RealVectorGeometricCo
   double midY = (boundaries.low.at(1u) + boundaries.high.at(1u)) / 2.0;
   double widthX = boundaries.high.at(0u) - boundaries.low.at(0u);
   double widthY = boundaries.high.at(1u) - boundaries.low.at(1u);
-  drawRectangle(midX, midY, widthX, widthY, "boundary");
+  drawRectangle(midX, midY, widthX, widthY, pgftikz::zlevels::BOUNDARY, "boundary");
 }
 
 void TikzVisualizer::drawBoundary(const planning_contexts::ReedsSheppRandomRectangles& context) const {
@@ -379,7 +379,7 @@ void TikzVisualizer::drawBoundary(const planning_contexts::ReedsSheppRandomRecta
   double midY = (boundaries.low.at(1u) + boundaries.high.at(1u)) / 2.0;
   double widthX = boundaries.high.at(0u) - boundaries.low.at(0u);
   double widthY = boundaries.high.at(1u) - boundaries.low.at(1u);
-  drawRectangle(midX, midY, widthX, widthY, "boundary");
+  drawRectangle(midX, midY, widthX, widthY, pgftikz::zlevels::BOUNDARY, "boundary");
 }
 
 void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) const {
@@ -389,6 +389,7 @@ void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) con
           context_->getStateSpace(), goal->as<ompl::base::GoalState>()->getState());
       auto goal = std::make_shared<pgftikz::TikzNode>();
       goal->setPosition(goalState[0], goalState[1]);
+      goal->setZLevel(pgftikz::zlevels::GOAL);
       goal->setOptions("goal");
       goal->setName("goal");
       picture_.addNode(goal);
@@ -400,6 +401,7 @@ void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) con
             context_->getStateSpace(), goal->as<ompl::base::GoalStates>()->getState(i));
         auto goal = std::make_shared<pgftikz::TikzNode>();
         goal->setPosition(goalState[0], goalState[1]);
+        goal->setZLevel(pgftikz::zlevels::GOAL);
         goal->setOptions("goal");
         goal->setName("goal");
         picture_.addNode(goal);
@@ -416,7 +418,7 @@ void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) con
         widths.push_back(bounds.high[i] - bounds.low[i]);
         anchor.push_back((bounds.high[i] + bounds.low[i]) / 2.0);
       }
-      drawRectangle(anchor[0], anchor[1], widths[0], widths[1], "goal region");
+      drawRectangle(anchor[0], anchor[1], widths[0], widths[1], pgftikz::zlevels::GOAL, "goal region");
       break;
     }
 #endif // #ifdef PDT_EXTRA_GOAL_SPACE
@@ -430,6 +432,7 @@ void TikzVisualizer::drawStartVertex(const ompl::base::PlannerDataVertex& vertex
   double x = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](0u);
   double y = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](1u);
   start->setPosition(x, y);
+  start->setZLevel(pgftikz::zlevels::START);
   start->setName("vertex" + std::to_string(vertex.getTag()));
   picture_.addNode(start);
 }
@@ -439,6 +442,7 @@ void TikzVisualizer::drawStartState(
   auto start = std::make_shared<pgftikz::TikzNode>();
   start->setOptions("start");
   start->setPosition(state[0], state[1]);
+  start->setZLevel(pgftikz::zlevels::START);
   start->setName("start" + std::to_string(state[0]) + std::to_string(state[1]));
   picture_.addNode(start);
 }
@@ -456,6 +460,7 @@ void TikzVisualizer::drawGoalVertex(const ompl::base::PlannerDataVertex& vertex)
   double x = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](0u);
   double y = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](1u);
   goal->setPosition(x, y);
+  goal->setZLevel(pgftikz::zlevels::GOAL);
   goal->setName("vertex" + std::to_string(vertex.getTag()));
   picture_.addNode(goal);
 }
@@ -465,6 +470,7 @@ void TikzVisualizer::drawGoalState(
   auto goal = std::make_shared<pgftikz::TikzNode>();
   goal->setOptions("goal");
   goal->setPosition(state[0], state[1]);
+  goal->setZLevel(pgftikz::zlevels::GOAL);
   goal->setName("goal" + std::to_string(state[0]) + std::to_string(state[1]));
   picture_.addNode(goal);
 }
@@ -477,11 +483,12 @@ void TikzVisualizer::drawGoalStates(
 }
 
 void TikzVisualizer::drawRectangle(double midX, double midY, double widthX, double widthY,
-                                   const std::string& options) const {
+                                   std::size_t zLevel, const std::string& options) const {
   auto rectangle = std::make_shared<pgftikz::TikzDraw>();
   rectangle->setFromPosition(midX - widthX / 2.0, midY - widthY / 2.0);
   rectangle->setToPosition(midX + widthX / 2.0, midY + widthY / 2.0);
   rectangle->setConnection("rectangle");
+  rectangle->setZLevel(zLevel);
   rectangle->setOptions(options);
 
   picture_.addDraw(rectangle);
@@ -539,7 +546,7 @@ void TikzVisualizer::drawBITstarSpecificVisualizations(
   if (nextEdgeStates.first != nullptr && nextEdgeStates.second != nullptr) {
     auto parent = nextEdgeStates.first->as<ompl::base::RealVectorStateSpace::StateType>();
     auto child = nextEdgeStates.second->as<ompl::base::RealVectorStateSpace::StateType>();
-    drawEdge(parent, child, "edge, pdtred");
+    drawEdge(parent, child, pgftikz::zlevels::EDGE_HIGHLIGHT, "edge, pdtred");
   }
 
   // Draw the ellipse.
@@ -572,7 +579,7 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
       auto parent = vertex->getReverseParent()
                         ->getState()
                         ->as<ompl::base::RealVectorStateSpace::StateType>();
-      drawEdge(parent, state, "edge, pdtlightblue");
+      drawEdge(parent, state, pgftikz::zlevels::EDGE, "edge, pdtlightblue");
     }
   }
 
@@ -580,7 +587,8 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
   auto nextEdge = aitstarData->getNextEdge();
   if (nextEdge.first && nextEdge.second) {
     drawEdge(nextEdge.first->as<ompl::base::RealVectorStateSpace::StateType>(),
-             nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(), "edge, pdtred");
+             nextEdge.second->as<ompl::base::RealVectorStateSpace::StateType>(),
+             pgftikz::zlevels::EDGE_HIGHLIGHT, "edge, pdtred");
   }
 
   // // Draw the next vertex in the queue.
@@ -606,7 +614,7 @@ void TikzVisualizer::drawEITstarSpecificVisualizations(
   if (nextEdge.source && nextEdge.target) {
     drawEdge(nextEdge.source->raw()->as<ompl::base::RealVectorStateSpace::StateType>(),
              nextEdge.target->raw()->as<ompl::base::RealVectorStateSpace::StateType>(),
-             "edge, pdtred");
+             pgftikz::zlevels::EDGE_HIGHLIGHT, "edge, pdtred");
   }
 
   // // Draw the top edge in the queue.
@@ -628,7 +636,7 @@ void TikzVisualizer::drawLazyPRMstarSpecificVisualizations(
       auto source = edge.first.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto target = edge.second.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
 
-      drawEdge(source, target, "edge, pdtgray");
+      drawEdge(source, target, pgftikz::zlevels::EDGE_LOWLIGHT, "edge, pdtgray");
     }
 
     // draw all new edges
@@ -636,7 +644,7 @@ void TikzVisualizer::drawLazyPRMstarSpecificVisualizations(
       auto source = edges[idx].first.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto target = edges[idx].second.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
 
-      drawEdge(source, target, "edge, pdtred");
+      drawEdge(source, target, pgftikz::zlevels::EDGE_HIGHLIGHT, "edge, pdtred");
     }
   }	  
 }
@@ -647,6 +655,7 @@ void TikzVisualizer::drawVertex(const ompl::base::PlannerDataVertex& vertex) con
   double x = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](0u);
   double y = vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>()->operator[](1u);
   node->setPosition(x, y);
+  node->setZLevel(pgftikz::zlevels::VERTEX);
   node->setName("vertex"s + std::to_string(vertex.getTag()));
   picture_.addNode(node);
 }
@@ -658,27 +667,30 @@ void TikzVisualizer::drawVertex(const ompl::base::RealVectorStateSpace::StateTyp
   double x = state->operator[](0u);
   double y = state->operator[](1u);
   node->setPosition(x, y);
+  node->setZLevel(pgftikz::zlevels::VERTEX);
   picture_.addNode(node);
 }
 
 void TikzVisualizer::drawEdge(const ompl::base::PlannerDataVertex& parent,
                               const ompl::base::PlannerDataVertex& child,
-                              const std::string& options) const {
+                              std::size_t zLevel, const std::string& options) const {
   auto draw = std::make_shared<pgftikz::TikzDraw>();
   draw->setFromPosition("vertex" + std::to_string(parent.getTag()) + ".center");
   draw->setToPosition("vertex" + std::to_string(child.getTag()) + ".center");
   draw->setConnection("--");
+  draw->setZLevel(zLevel);
   draw->setOptions(options);
   picture_.addDraw(draw);
 }
 
 void TikzVisualizer::drawEdge(const ompl::base::RealVectorStateSpace::StateType* parent,
                               const ompl::base::RealVectorStateSpace::StateType* child,
-                              const std::string& options) const {
+                              std::size_t zLevel, const std::string& options) const {
   auto draw = std::make_shared<pgftikz::TikzDraw>();
   draw->setFromPosition(parent->operator[](0u), parent->operator[](1u));
   draw->setToPosition(child->operator[](0u), child->operator[](1u));
   draw->setConnection("--");
+  draw->setZLevel(zLevel);
   draw->setOptions(options);
   picture_.addDraw(draw);
 }
@@ -692,7 +704,7 @@ void TikzVisualizer::drawSolution(const ompl::base::PathPtr path) const {
     for (std::size_t i = 1u; i < states.size(); ++i) {
       auto parent = states.at(i - 1u)->as<ompl::base::RealVectorStateSpace::StateType>();
       auto child = states.at(i)->as<ompl::base::RealVectorStateSpace::StateType>();
-      drawEdge(parent, child, "solution");
+      drawEdge(parent, child, pgftikz::zlevels::SOLUTION, "solution");
     }
   }
 }

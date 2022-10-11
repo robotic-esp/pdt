@@ -138,8 +138,8 @@ std::experimental::filesystem::path LatexPlotter::createPicture(Axes... args) co
   // Create the name of this picture.
   auto path = std::experimental::filesystem::path(config_->get<std::string>("experiment/experimentDirectory")) /
               std::experimental::filesystem::path("tikz/");
-  for (const auto& axis : picture->getAxes()) {
-    path += std::experimental::filesystem::path(axis->options.name + '_');
+  for (const auto& keyAxis : picture->getAxes()) {
+    path += std::experimental::filesystem::path(keyAxis.second->options.name + '_');
   }
   path += ".tikz";
   picture->write(path);

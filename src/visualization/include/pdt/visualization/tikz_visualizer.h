@@ -116,14 +116,14 @@ class TikzVisualizer : public planning_contexts::ContextVisitor, public obstacle
                   const std::string& options) const;
   void drawEdge(const ompl::base::PlannerDataVertex& parent,
                 const ompl::base::PlannerDataVertex& child,
-                const std::string& options) const;
+                std::size_t zLevel, const std::string& options) const;
   void drawEdge(const ompl::base::RealVectorStateSpace::StateType* parent,
                 const ompl::base::RealVectorStateSpace::StateType* child,
-                const std::string& options) const;
+                std::size_t zLevel, const std::string& options) const;
   void drawSolution(const ompl::base::PathPtr path) const;
   void drawEllipse(double cost) const;
   void drawRectangle(double midX, double midY, double widthX, double widthY,
-                     const std::string& options) const;
+                     std::size_t zLevel, const std::string& options) const;
   void drawPlannerSpecificVisualizations(
       const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData) const;
   void drawBITstarSpecificVisualizations(

@@ -56,6 +56,9 @@ class PgfAxis {
   void addPlot(const std::shared_ptr<PgfPlot>& plot);
   void addLegendEntry(const std::string& entry, const std::string& imageOptions = "");
 
+  void setZLevel(std::size_t z);
+  std::size_t getZLevel();
+
   template <typename... Axes>
   void mergePlots(Axes... args);
 
@@ -81,6 +84,7 @@ class PgfAxis {
  private:
   std::vector<std::shared_ptr<PgfPlot>> plots_{};
   std::vector<std::pair<std::string, std::string>> legendEntries_{};
+  std::size_t zLevel_;
 
  public:
   struct {

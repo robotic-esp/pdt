@@ -52,7 +52,10 @@ class TikzNode {
   void setPosition(const std::string& position);
   void setName(const std::string& name);
   void setOptions(const std::string& options);
-  void setLabel(const std::string& label); 
+  void setLabel(const std::string& label);
+
+  void setZLevel(std::size_t z);
+  std::size_t getZLevel();
 
   std::string string() const;
 
@@ -61,6 +64,7 @@ private:
   std::string name_{""};
   std::string options_{""};
   std::string label_{""};
+  std::size_t zLevel_{0};
 };
 
 }  // namespace pgftikz

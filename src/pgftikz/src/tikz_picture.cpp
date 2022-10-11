@@ -67,15 +67,15 @@ void TikzPicture::setOptions(const TikzPictureOptions& options) {
 }
 
 void TikzPicture::addAxis(const std::shared_ptr<PgfAxis>& axis) {
-  axes_.push_back(axis);
+  axes_.emplace(axis->getZLevel(), axis);
 }
 
 void TikzPicture::addNode(const std::shared_ptr<TikzNode>& node) {
-  nodes_.push_back(node);
+  nodes_.emplace(node->getZLevel(), node);
 }
 
 void TikzPicture::addDraw(const std::shared_ptr<TikzDraw>& draw) {
-  draws_.push_back(draw);
+  draws_.emplace(draw->getZLevel(), draw);
 }
 
 void TikzPicture::addText(const std::string& line) {
@@ -86,7 +86,7 @@ void TikzPicture::setClipCommand(const std::string& clip) {
   clip_ = clip;
 }
 
-std::vector<std::shared_ptr<PgfAxis>> TikzPicture::getAxes() {
+std::multimap<std::size_t, std::shared_ptr<PgfAxis>> TikzPicture::getAxes() {
   return axes_;
 }
 
@@ -117,15 +117,39 @@ std::string TikzPicture::string() const {
     stream << clip_ << '\n';
   }
 
-  for (const auto& axis : axes_) {
-    stream << axis->string() << '\n';
+  // Output the axes_, nodes_, and draws_ in ascending z level.
+  auto axisIter = axes_.begin();
+  auto nodeIter = nodes_.begin();
+  auto drawIter = draws_.begin();
+  while (axisIter != axes_.end() || nodeIter != nodes_.end() || drawIter != draws_.end()) {
+    // axes <= nodes <= draws:
+    if ((axisIter != axes_.end() && nodeIter != nodes_.end() && axisIter->first <= nodeIter->first) || 
+        (axisIter != axes_.end() && drawIter != draws_.end() && axisIter->first <= drawIter->first)) {
+      stream << axisIter->second->string() << '\n';
+      ++axisIter;
+    } else if ((nodeIter != nodes_.end() && axisIter != axes_.end() && nodeIter->first < axisIter->first) || 
+               (nodeIter != nodes_.end() && drawIter != draws_.end() && nodeIter->first <= drawIter->first)) {
+      stream << nodeIter->second->string() << '\n';
+      ++nodeIter;
+    } else if ((drawIter != draws_.end() && axisIter != axes_.end() && drawIter->first < axisIter->first) || 
+               (drawIter != draws_.end() && nodeIter != nodes_.end() && drawIter->first < nodeIter->first)) {
+      stream << drawIter->second->string() << '\n';
+      ++drawIter;
+    } else {
+      // Only one iterator must still be valid.
+      if (axisIter != axes_.end()) {
+        stream << axisIter->second->string() << '\n';
+        ++axisIter;
+      } else if (nodeIter != nodes_.end()) {
+        stream << nodeIter->second->string() << '\n';
+        ++nodeIter;
+      } else if (drawIter != draws_.end()) {
+        stream << drawIter->second->string() << '\n';
+        ++drawIter;
+      }
+    }
   }
-  for (const auto& node : nodes_) {
-    stream << node->string() << '\n';
-  }
-  for (const auto& draw : draws_) {
-    stream << draw->string() << '\n';
-  }
+
   for (const auto& text : texts_) {
     stream << text << '\n';
   }

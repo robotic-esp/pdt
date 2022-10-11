@@ -69,6 +69,14 @@ void TikzDraw::setOptions(const std::string& options) {
   options_ = options;
 }
 
+void TikzDraw::setZLevel(std::size_t z) {
+  zLevel_ = z;
+}
+
+std::size_t TikzDraw::getZLevel() {
+  return zLevel_;
+}
+
 std::string TikzDraw::string() const {
   std::ostringstream stream{};
   stream << "\\draw ";
