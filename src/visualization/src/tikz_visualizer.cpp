@@ -505,6 +505,7 @@ void TikzVisualizer::drawPlannerSpecificVisualizations(
       break;
     }
 #ifdef PDT_EXTRA_EITSTAR_PR
+    case common::PLANNER_TYPE::EIRMSTAR:
     case common::PLANNER_TYPE::EITSTAR: {
       drawEITstarSpecificVisualizations(
           std::dynamic_pointer_cast<const EITstarData>(plannerSpecificData));

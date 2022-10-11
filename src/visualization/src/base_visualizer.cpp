@@ -345,6 +345,7 @@ void BaseVisualizer::createData() {
           break;
         }
 #ifdef PDT_EXTRA_EITSTAR_PR
+        case common::PLANNER_TYPE::EIRMSTAR:
         case common::PLANNER_TYPE::EITSTAR: {
           auto eitstarData = std::make_shared<EITstarData>(context_->getSpaceInformation());
 

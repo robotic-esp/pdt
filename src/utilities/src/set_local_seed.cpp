@@ -95,6 +95,7 @@ void setLocalSeed(const std::shared_ptr<const config::Configuration> config,
         break;
       }
 #ifdef PDT_EXTRA_EITSTAR_PR
+      case common::PLANNER_TYPE::EIRMSTAR:
       case common::PLANNER_TYPE::EITSTAR: {
         #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
         planner->as<ompl::geometric::EITstar>()->setLocalSeed(

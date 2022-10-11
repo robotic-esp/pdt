@@ -968,6 +968,7 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(const std::size_t 
       return;
     }
 #ifdef PDT_EXTRA_EITSTAR_PR
+    case common::PLANNER_TYPE::EIRMSTAR:
     case common::PLANNER_TYPE::EITSTAR: {
       drawEITstarSpecificVisualizations(iteration);
       return;
