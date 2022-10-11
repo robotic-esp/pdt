@@ -37,9 +37,9 @@
 
 #include "pdt/utilities/set_local_seed.h"
 
-// #include <ompl/geometric/planners/informedtrees/ABITstar.h>
-// #include <ompl/geometric/planners/informedtrees/AITstar.h>
-// #include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/ABITstar.h>
+#include <ompl/geometric/planners/informedtrees/AITstar.h>
+#include <ompl/geometric/planners/informedtrees/BITstar.h>
 
 #ifdef PDT_EXTRA_EITSTAR_PR
 #include <ompl/geometric/planners/informedtrees/EIRMstar.h>
@@ -55,12 +55,12 @@ namespace utilities {
 void warnSetLocalSeed() {
 #ifndef PDT_EXTRA_SET_LOCAL_SEEDS
   static bool warnOnce = false;
-#endif  // #ifndef PDT_EXTRA_SET_LOCAL_SEEDS
 
   if (!warnOnce) {
     warnOnce = true;
     OMPL_WARN("PDT has not been compiled with support for setting a planner's local seed.");
   }
+#endif  // #ifndef PDT_EXTRA_SET_LOCAL_SEEDS
 }
 
 void setLocalSeed(const std::shared_ptr<const config::Configuration> config,

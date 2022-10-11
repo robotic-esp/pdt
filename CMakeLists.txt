@@ -73,7 +73,7 @@ endif()
 # Add flag to disable features that require the ESP OMPL fork.
 option(PDT_BASE_OMPL_ONLY "Configure PDT to use only mainline OMPL features." OFF)
 if (PDT_BASE_OMPL_ONLY)
-  # Remove optional parts
+  # Disable optional parts by not setting them.
   message(STATUS "Configuring PDT to use only mainline OMPL features.")
 else()
   add_definitions(-DPDT_EXTRA_SET_LOCAL_SEEDS)
