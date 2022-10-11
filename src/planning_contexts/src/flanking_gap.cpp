@@ -113,7 +113,7 @@ void FlankingGap::createObstacles() {
   for (std::size_t j = 1u; j < dimensionality_; ++j) {
     widths.at(j) = wallWidth_;
   }
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor, widths));
 }
 
@@ -144,7 +144,7 @@ void FlankingGap::createAntiObstacles() {
   for (std::size_t j = 1u; j < dimensionality_; ++j) {
     widths.at(j) = gapWidth_;
   }
-  antiObstacles_.emplace_back(
+  antiObstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, anchor, widths));
 }
 

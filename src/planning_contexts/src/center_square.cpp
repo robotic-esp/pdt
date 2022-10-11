@@ -74,7 +74,7 @@ CenterSquare::CenterSquare(const std::shared_ptr<ompl::base::SpaceInformation>& 
   }
 
   // Create the obstacle.
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, *midpoint, widths));
 
   // Create the validity checker and add the obstacle.

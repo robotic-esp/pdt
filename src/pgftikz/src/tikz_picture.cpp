@@ -67,19 +67,19 @@ void TikzPicture::setOptions(const TikzPictureOptions& options) {
 }
 
 void TikzPicture::addAxis(const std::shared_ptr<PgfAxis>& axis) {
-  axes_.emplace_back(axis);
+  axes_.push_back(axis);
 }
 
 void TikzPicture::addNode(const std::shared_ptr<TikzNode>& node) {
-  nodes_.emplace_back(node);
+  nodes_.push_back(node);
 }
 
 void TikzPicture::addDraw(const std::shared_ptr<TikzDraw>& draw) {
-  draws_.emplace_back(draw);
+  draws_.push_back(draw);
 }
 
 void TikzPicture::addText(const std::string& line) {
-  texts_.emplace_back(line);
+  texts_.push_back(line);
 }
 
 void TikzPicture::setClipCommand(const std::string& clip) {

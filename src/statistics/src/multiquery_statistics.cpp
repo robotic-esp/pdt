@@ -164,19 +164,19 @@ void MultiqueryStatistics::computeCumulativeMetricsForPlanner(
     const auto initial_cost_interval = stats_[i].populationStats_.findPercentileConfidenceInterval(0.5, initial_cost_confidence);
 
     // Get the upper and lower confidence bounds on the median initial solution duration and cost.
-    const auto lowerDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), initial_duration_interval.lower);
-    const auto upperDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), initial_duration_interval.upper);
-    const auto lowerCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), initial_cost_interval.lower);
-    const auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), initial_cost_interval.upper);
+    const double lowerDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), initial_duration_interval.lower);
+    const double upperDurationBound = stats_[i].getNthInitialSolutionDuration(stats_[i].results_.at(plannerName), initial_duration_interval.upper);
+    const double lowerCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), initial_cost_interval.lower);
+    const double upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), initial_cost_interval.upper);
 
     // save the results
-    medianDurations.emplace_back(medianDuration);
-    lowerDurationBounds.emplace_back(lowerDurationBound);
-    upperDurationBounds.emplace_back(upperDurationBound);
+    medianDurations.push_back(medianDuration);
+    lowerDurationBounds.push_back(lowerDurationBound);
+    upperDurationBounds.push_back(upperDurationBound);
 
-    medianCosts.emplace_back(medianCost);
-    lowerCostBounds.emplace_back(lowerCostBound);
-    upperCostBounds.emplace_back(upperCostBound);
+    medianCosts.push_back(medianCost);
+    lowerCostBounds.push_back(lowerCostBound);
+    upperCostBounds.push_back(upperCostBound);
   }
 
   std::vector<double> medianCumulativeDuration;
@@ -266,9 +266,9 @@ void MultiqueryStatistics::computeCumulativeFinalCost(
     const auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), final_cost_interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
 
     // save the results
-    medianCosts.emplace_back(medianCost);
-    lowerCostBounds.emplace_back(lowerCostBound);
-    upperCostBounds.emplace_back(upperCostBound);
+    medianCosts.push_back(medianCost);
+    lowerCostBounds.push_back(lowerCostBound);
+    upperCostBounds.push_back(upperCostBound);
 
     if (std::isfinite(upperCostBound) &&  upperCostBound > maxNonInfCost_){
       maxNonInfCost_ = upperCostBound;
@@ -349,13 +349,13 @@ fs::path MultiqueryStatistics::extractMedianInitialSolutionPerQuery(
     const auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.upper);
 
     // save the results
-    medianDurations.emplace_back(medianDuration);
-    lowerDurationBounds.emplace_back(lowerDurationBound);
-    upperDurationBounds.emplace_back(upperDurationBound);
+    medianDurations.push_back(medianDuration);
+    lowerDurationBounds.push_back(lowerDurationBound);
+    upperDurationBounds.push_back(upperDurationBound);
 
-    medianCosts.emplace_back(medianCost);
-    lowerCostBounds.emplace_back(lowerCostBound);
-    upperCostBounds.emplace_back(upperCostBound);
+    medianCosts.push_back(medianCost);
+    lowerCostBounds.push_back(lowerCostBound);
+    upperCostBounds.push_back(upperCostBound);
   }
 
   // Write to file.
@@ -423,13 +423,13 @@ fs::path MultiqueryStatistics::extractMedianCumulativeInitialSolutionPerQuery(
     const auto upperCostBound = stats_[i].getNthInitialSolutionCost(stats_[i].results_.at(plannerName), interval.upper);
 
     // save the results
-    medianDurations.emplace_back(medianDuration);
-    lowerDurationBounds.emplace_back(lowerDurationBound);
-    upperDurationBounds.emplace_back(upperDurationBound);
+    medianDurations.push_back(medianDuration);
+    lowerDurationBounds.push_back(lowerDurationBound);
+    upperDurationBounds.push_back(upperDurationBound);
 
-    medianCosts.emplace_back(medianCost);
-    lowerCostBounds.emplace_back(lowerCostBound);
-    upperCostBounds.emplace_back(upperCostBound);
+    medianCosts.push_back(medianCost);
+    lowerCostBounds.push_back(lowerCostBound);
+    upperCostBounds.push_back(upperCostBound);
   }
 
   std::vector<double> medianCumulativeDuration;
@@ -526,9 +526,9 @@ fs::path MultiqueryStatistics::extractMedianFinalSolutionPerQuery(
     const auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
 
     // save the results
-    medianCosts.emplace_back(medianCost);
-    lowerCostBounds.emplace_back(lowerCostBound);
-    upperCostBounds.emplace_back(upperCostBound);
+    medianCosts.push_back(medianCost);
+    lowerCostBounds.push_back(lowerCostBound);
+    upperCostBounds.push_back(upperCostBound);
   }
   
   // Write to file.
@@ -583,9 +583,9 @@ fs::path MultiqueryStatistics::extractMedianCumulativeFinalCostPerQuery(
     const auto upperCostBound = stats_[i].getNthCosts(stats_[i].results_.at(plannerName), interval.upper, {stats_[i].defaultMedianBinDurations_.back()}).back();
 
     // save the results
-    medianCosts.emplace_back(medianCost);
-    lowerCostBounds.emplace_back(lowerCostBound);
-    upperCostBounds.emplace_back(upperCostBound);
+    medianCosts.push_back(medianCost);
+    lowerCostBounds.push_back(lowerCostBound);
+    upperCostBounds.push_back(upperCostBound);
   }
 
   std::vector<double> medianCumulativeCost;

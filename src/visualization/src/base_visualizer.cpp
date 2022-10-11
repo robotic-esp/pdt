@@ -264,30 +264,30 @@ void BaseVisualizer::createData() {
 
       {  // Store the duration.
         std::scoped_lock lock(durationsMutex_);
-        durations_.emplace_back(iterationDuration);
+        durations_.push_back(iterationDuration);
       }
 
       {  // Store the query number.
         std::scoped_lock lock(queryNumbersMutex_);
-        queryNumbers_.emplace_back(queryNumber);
+        queryNumbers_.push_back(queryNumber);
       }
 
       {  // Store the solution path.
         std::scoped_lock lock(solutionPathsMutex_);
         if (planner_->getProblemDefinition()->hasExactSolution()) {
-          solutionPaths_.emplace_back(planner_->getProblemDefinition()->getSolutionPath());
+          solutionPaths_.push_back(planner_->getProblemDefinition()->getSolutionPath());
         } else {
-          solutionPaths_.emplace_back(nullptr);
+          solutionPaths_.push_back(nullptr);
         }
       }
 
       {  // Store the solution cost.
         std::scoped_lock lock(solutionCostsMutex_);
         if (planner_->getProblemDefinition()->hasExactSolution()) {
-          solutionCosts_.emplace_back(
+          solutionCosts_.push_back(
               planner_->getProblemDefinition()->getSolutionPath()->cost(context_->getObjective()));
         } else {
-          solutionCosts_.emplace_back(std::numeric_limits<double>::infinity());
+          solutionCosts_.push_back(context_->getObjective()->infiniteCost());
         }
       }
 
@@ -311,7 +311,7 @@ void BaseVisualizer::createData() {
 
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
-          plannerSpecificData_.emplace_back(bitstarData);
+          plannerSpecificData_.push_back(bitstarData);
           break;
         }
         case common::PLANNER_TYPE::AITSTAR: {
@@ -341,7 +341,7 @@ void BaseVisualizer::createData() {
 
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
-          plannerSpecificData_.emplace_back(aitstarData);
+          plannerSpecificData_.push_back(aitstarData);
           break;
         }
 #ifdef PDT_EXTRA_EITSTAR_PR
@@ -375,7 +375,7 @@ void BaseVisualizer::createData() {
 
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
-          plannerSpecificData_.emplace_back(eitstarData);
+          plannerSpecificData_.push_back(eitstarData);
           break;
         }
         case common::PLANNER_TYPE::LAZYPRMSTAR: {
@@ -386,7 +386,7 @@ void BaseVisualizer::createData() {
 
           // Store the data.
           std::scoped_lock lock(plannerSpecificDataMutex_);
-          plannerSpecificData_.emplace_back(lPRMstarData);
+          plannerSpecificData_.push_back(lPRMstarData);
           break;
         }
 #endif // #ifdef PDT_EXTRA_EITSTAR_PR
@@ -398,7 +398,7 @@ void BaseVisualizer::createData() {
       {  // Store the planner data.
         std::scoped_lock lock(plannerDataMutex_);
         plannerData->decoupleFromPlanner();
-        plannerData_.emplace_back(plannerData);
+        plannerData_.push_back(plannerData);
         largestIteration_ = plannerData_.size() - 1u;
       }
     }

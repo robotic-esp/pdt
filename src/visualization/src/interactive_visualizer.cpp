@@ -715,7 +715,7 @@ void InteractiveVisualizer::drawPoint(const Eigen::Vector2f& point, const float*
 void InteractiveVisualizer::drawPoint(const Eigen::Vector3f& point, const float* color,
                                       float size) const {
   std::vector<Eigen::Vector3f> points;
-  points.emplace_back(point);
+  points.push_back(point);
   drawPoints(points, color, size);
 }
 

@@ -200,7 +200,7 @@ void ReedsSheppRandomRectangles::createObstacles() {
     }
 
     if (!invalidates) {
-      obstacles_.emplace_back(obstacle);
+      obstacles_.push_back(obstacle);
     }
   }
 }

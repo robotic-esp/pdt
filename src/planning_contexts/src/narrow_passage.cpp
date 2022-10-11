@@ -135,9 +135,9 @@ void NarrowPassage::createObstacles() {
   }
 
   // Add both obstacles.
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, lowerAnchor, lowerWidths));
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, upperAnchor, upperWidths));
 }
 

@@ -170,7 +170,7 @@ double ReedsSheppValidityChecker::dotProduct(const Point& point, const Axis& axi
 }
 
 void ReedsSheppValidityChecker::addObstacle(const std::shared_ptr<obstacles::BaseObstacle>& obstacle) {
-  obstacles_.emplace_back(obstacle);
+  obstacles_.push_back(obstacle);
 }
 
 void ReedsSheppValidityChecker::addObstacles(

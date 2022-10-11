@@ -105,7 +105,7 @@ void FourRooms::createObstacles() {
   widthsX.at(1u) = wallThickness_;
 
   // Emplace this obstacle.
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, midpointX, widthsX));
 
   // Create the obstacle that divides the space parallel to the x axis.
@@ -120,7 +120,7 @@ void FourRooms::createObstacles() {
   widthsY.at(1u) = bounds.high.at(1u) - bounds.low.at(1u);
 
   // Emplace this obstacle.
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, midpointY, widthsY));
 }
 
@@ -139,7 +139,7 @@ void FourRooms::createAntiObstacles() {
   widthsSouth.at(0u) = wallThickness_ + std::numeric_limits<double>::epsilon();
   widthsSouth.at(1u) = gapWidth_;
 
-  antiObstacles_.emplace_back(
+  antiObstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, midpointSouth, widthsSouth));
 
   // Create the gap in the north.
@@ -153,7 +153,7 @@ void FourRooms::createAntiObstacles() {
   widthsNorth.at(0u) = wallThickness_ + std::numeric_limits<double>::epsilon();
   widthsNorth.at(1u) = gapWidth_;
 
-  antiObstacles_.emplace_back(
+  antiObstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, midpointNorth, widthsNorth));
 
   // Create the gap in the west.
@@ -167,7 +167,7 @@ void FourRooms::createAntiObstacles() {
   widthsWest.at(0u) = gapWidth_;
   widthsWest.at(1u) = wallThickness_ + std::numeric_limits<double>::epsilon();
 
-  antiObstacles_.emplace_back(
+  antiObstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, midpointWest, widthsWest));
 }
 

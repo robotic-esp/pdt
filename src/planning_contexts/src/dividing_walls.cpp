@@ -115,7 +115,7 @@ void DividingWalls::createObstacles() {
     }
 
     // Add this wall to the obstacles.
-    obstacles_.emplace_back(
+    obstacles_.push_back(
         std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, midpoint, widths));
   }
 }
@@ -153,7 +153,7 @@ void DividingWalls::createAntiObstacles() {
     }
 
     // Add this gap to the anti obstacles.
-    antiObstacles_.emplace_back(
+    antiObstacles_.push_back(
         std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, midpoint, widths));
   }
 }

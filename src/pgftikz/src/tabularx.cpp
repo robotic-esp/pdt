@@ -103,10 +103,10 @@ void TabularX::loadFromPath(const std::experimental::filesystem::path& path,
 
     std::vector<double> rowAsDoubles{};
     rowAsDoubles.reserve(row.size());
-    data_.emplace_back(std::deque<double>());
+    data_.push_back(std::deque<double>());
     for (std::size_t i = 1u; i < row.size(); ++i) {
       try {
-        data_.back().emplace_back(std::stod(row.at(i)));
+        data_.back().push_back(std::stod(row.at(i)));
       } catch (const std::invalid_argument& e) {
         auto msg = "TabularX cannot convert entry '"s + row.at(i) + "' from file '"s +
                    path.string() + "' to double:\n    "s + e.what();
@@ -123,12 +123,12 @@ void TabularX::loadFromPath(const std::experimental::filesystem::path& path,
 }
 
 void TabularX::appendCol(const std::vector<double>& col) {
-  data_.emplace_back(std::deque<double>());
+  data_.push_back(std::deque<double>());
   data_.back().insert(data_.back().end(), col.begin(), col.end());
 }
 
 void TabularX::prependCol(const std::vector<double>& col) {
-  data_.emplace_back(std::deque<double>());
+  data_.push_back(std::deque<double>());
   data_.back().insert(data_.back().begin(), col.begin(), col.end());
 }
 
@@ -141,7 +141,7 @@ void TabularX::appendRow(const std::vector<double>& row) {
     data_.resize(row.size(), {});
   }
   for (std::size_t i = 0u; i < row.size(); ++i) {
-    data_.at(i).emplace_back(row.at(i));
+    data_.at(i).push_back(row.at(i));
   }
 }
 
@@ -176,7 +176,7 @@ std::vector<double> TabularX::getRow(std::size_t index) const {
   std::vector<double> row;
   row.reserve(data_.size());
   for (const auto& col : data_) {
-    row.emplace_back(col.at(index));
+    row.push_back(col.at(index));
   }
   return row;
 }

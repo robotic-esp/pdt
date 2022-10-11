@@ -98,7 +98,7 @@ void StartEnclosure::createObstacles() {
     startOutsideAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
   std::vector<double> startWidths(dimensionality_, startOutsideWidth_);
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, startOutsideAnchor, startWidths));
 }
 
@@ -109,7 +109,7 @@ void StartEnclosure::createAntiObstacles() {
     startInsideAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
   std::vector<double> startWidths(dimensionality_, startInsideWidth_);
-  antiObstacles_.emplace_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
       spaceInfo_, startInsideAnchor, startWidths));
 
   // Create the gap.
@@ -122,7 +122,7 @@ void StartEnclosure::createAntiObstacles() {
   std::vector<double> startGapWidths(dimensionality_, startGapWidth_);
   startGapWidths.at(0u) =
       (startOutsideWidth_ - startInsideWidth_) / 2.0 + std::numeric_limits<double>::epsilon();
-  antiObstacles_.emplace_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
       spaceInfo_, startGapAnchor, startGapWidths));
 }
 

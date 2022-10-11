@@ -413,8 +413,8 @@ void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) con
       std::vector<double> widths;
       std::vector<double> anchor;
       for (auto i = 0u; i < goalSpace->getDimension(); ++i) {
-        widths.emplace_back(bounds.high[i] - bounds.low[i]);
-        anchor.emplace_back((bounds.high[i] + bounds.low[i]) / 2.0);
+        widths.push_back(bounds.high[i] - bounds.low[i]);
+        anchor.push_back((bounds.high[i] + bounds.low[i]) / 2.0);
       }
       drawRectangle(anchor[0], anchor[1], widths[0], widths[1], "goal region");
       break;

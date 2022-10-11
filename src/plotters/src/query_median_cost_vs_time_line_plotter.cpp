@@ -61,7 +61,7 @@ QueryMedianCostVsTimeLinePlotter::QueryMedianCostVsTimeLinePlotter(
   double binSize = 1.0 / config_->get<double>("experiment/logFrequency");
   binnedDurations_.reserve(numBins);
   for (std::size_t i = 0u; i < numBins; ++i) {
-    binnedDurations_.emplace_back(static_cast<double>(i + 1u) * binSize);
+    binnedDurations_.push_back(static_cast<double>(i + 1u) * binSize);
   }
 
   // Determine the min and max durations to be plotted.

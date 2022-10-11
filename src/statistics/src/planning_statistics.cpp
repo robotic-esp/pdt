@@ -83,6 +83,7 @@ const std::vector<PlannerResults::PlannerResult>& PlannerResults::getAllRunsAt(
   interpolatedRuns_.clear();
 
   // Generate values (i.e., interpolate or make infinity) for each run.
+  interpolatedRuns_.reserve(measuredRuns_.size());
   for (const auto& measuredRun : measuredRuns_) {
     // Each measured run gets an associated interpolated run.
     interpolatedRuns_.emplace_back();
@@ -113,7 +114,7 @@ const std::vector<PlannerResults::PlannerResult>& PlannerResults::getAllRunsAt(
 }
 
 void PlannerResults::addMeasuredRun(const PlannerResults::PlannerResult& run) {
-  measuredRuns_.emplace_back(run);
+  measuredRuns_.push_back(run);
 }
 
 const PlannerResults::PlannerResult& PlannerResults::getMeasuredRun(const std::size_t i) const {
@@ -326,7 +327,7 @@ PlanningStatistics::PlanningStatistics(const std::shared_ptr<config::Configurati
   double medianBinSize = 1.0 / config_->get<double>("experiment/logFrequency");
   defaultMedianBinDurations_.reserve(numMeasurements);
   for (std::size_t i = 0u; i < numMeasurements; ++i) {
-    defaultMedianBinDurations_.emplace_back(static_cast<double>(i + 1u) * medianBinSize);
+    defaultMedianBinDurations_.push_back(static_cast<double>(i + 1u) * medianBinSize);
   }
 
   // Compute the default binning durations for the initial solution histogram.
@@ -336,7 +337,7 @@ PlanningStatistics::PlanningStatistics(const std::shared_ptr<config::Configurati
   double maxExp = std::log10(maxNonInfInitialSolutionDuration_);
   double binExpStep = (maxExp - minExp) / static_cast<double>(initDurationNumBins);
   for (std::size_t i = 0u; i < initDurationNumBins; ++i) {
-    defaultInitialSolutionBinDurations_.emplace_back(
+    defaultInitialSolutionBinDurations_.push_back(
         std::pow(10.0, minExp + static_cast<double>(i) * binExpStep));
   }
 }
@@ -809,14 +810,14 @@ std::vector<double> PlanningStatistics::getNthCosts(const PlannerResults& result
     costs.reserve(interpolatedRuns.size());
     for (const auto& run : interpolatedRuns) {
       assert(run.at(durationIndex).first == durations.at(durationIndex));
-      costs.emplace_back(run.at(durationIndex).second);
+      costs.push_back(run.at(durationIndex).second);
     }
     if (n > costs.size()) {
       auto msg = "Cannot get "s + std::to_string(n) + "th cost, there are only "s +
                  std::to_string(costs.size()) + " costs at this time."s;
       throw std::runtime_error(msg);
     }
-    nthCosts.emplace_back(getNthValue(&costs, n));
+    nthCosts.push_back(getNthValue(&costs, n));
   }
   return nthCosts;
 }
@@ -832,14 +833,14 @@ std::vector<double> PlanningStatistics::getInitialSolutionDurations(const Planne
     // Find the first cost that's less than infinity.
     for (const auto& measurement : measuredRun) {
       if (measurement.second < std::numeric_limits<double>::infinity()) {
-        initialDurations.emplace_back(measurement.first);
+        initialDurations.push_back(measurement.first);
         break;
       }
     }
 
     // If all costs are infinity, there is no initial solution.
     if (initialDurations.size() == run) {
-      initialDurations.emplace_back(std::numeric_limits<double>::infinity());
+      initialDurations.push_back(std::numeric_limits<double>::infinity());
     }
   }
 
@@ -853,7 +854,7 @@ std::vector<double> PlanningStatistics::getLastSolutionDurations(const PlannerRe
   for (auto run = 0u; run < results.numMeasuredRuns(); ++run) {
     // Get the durations and costs of this run.
     const auto& measuredRun = results.getMeasuredRun(run);
-    lastDurations.emplace_back(measuredRun.back().first);
+    lastDurations.push_back(measuredRun.back().first);
   }
 
   return lastDurations;
@@ -870,14 +871,14 @@ std::vector<double> PlanningStatistics::getInitialSolutionCosts(const PlannerRes
     // Find the first cost that's less than infinity.
     for (const auto& measurement : measuredRun) {
       if (measurement.second < std::numeric_limits<double>::infinity()) {
-        initialCosts.emplace_back(measurement.second);
+        initialCosts.push_back(measurement.second);
         break;
       }
     }
 
     // If none was less than infinity, the initial solution is infinity...?
     if (initialCosts.size() == run) {
-      initialCosts.emplace_back(std::numeric_limits<double>::infinity());
+      initialCosts.push_back(std::numeric_limits<double>::infinity());
     }
   }
 
@@ -891,7 +892,7 @@ std::vector<double> PlanningStatistics::getLastSolutionCosts(const PlannerResult
   for (auto run = 0u; run < results.numMeasuredRuns(); ++run) {
     // Get the durations and costs of this run.
     const auto& measuredRun = results.getMeasuredRun(run);
-    lastCosts.emplace_back(measuredRun.back().second);
+    lastCosts.push_back(measuredRun.back().second);
   }
 
   return lastCosts;

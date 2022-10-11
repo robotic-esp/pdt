@@ -46,7 +46,7 @@ namespace pgftikz {
 using namespace std::string_literals;
 
 void PgfAxis::addPlot(const std::shared_ptr<PgfPlot>& plot) {
-  plots_.emplace_back(plot);
+  plots_.push_back(plot);
 }
 
 void PgfAxis::addLegendEntry(const std::string& entry, const std::string& imageOptions) {

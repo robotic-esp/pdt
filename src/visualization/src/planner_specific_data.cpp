@@ -135,7 +135,7 @@ void AITstarData::setVerticesInBackwardSearchTree(
   // We need to create a deep copy here.
   verticesInBackwardSearchTree_.reserve(vertices.size());
   for (const auto& vertex : vertices) {
-    verticesInBackwardSearchTree_.emplace_back(
+    verticesInBackwardSearchTree_.push_back(
         std::make_shared<ompl::geometric::aitstar::Vertex>(vertex));
   }
 }

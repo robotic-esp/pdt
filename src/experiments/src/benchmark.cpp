@@ -275,7 +275,7 @@ int main(const int argc, const char **argv) {
   // Preallocate the paths of the files we are about to create
   for (auto i=0u; i<numQueries; ++i){
     const fs::path path = (fs::absolute(experimentDirectory) / ("raw/results_" + std::to_string(i) + ".csv"s));
-    resultPaths.emplace_back(path.string());
+    resultPaths.push_back(path.string());
   }
   
   // Add the result path to the experiment.

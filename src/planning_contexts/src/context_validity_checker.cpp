@@ -81,7 +81,7 @@ double ContextValidityChecker::clearance(const ompl::base::State* state) const {
 }
 
 void ContextValidityChecker::addObstacle(const std::shared_ptr<obstacles::BaseObstacle>& obstacle) {
-  obstacles_.emplace_back(obstacle);
+  obstacles_.push_back(obstacle);
 }
 
 void ContextValidityChecker::addObstacles(
@@ -90,7 +90,7 @@ void ContextValidityChecker::addObstacles(
 }
 
 void ContextValidityChecker::addAntiObstacle(const std::shared_ptr<obstacles::BaseAntiObstacle>& anti) {
-  antiObstacles_.emplace_back(anti);
+  antiObstacles_.push_back(anti);
 }
 
 void ContextValidityChecker::addAntiObstacles(

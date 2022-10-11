@@ -161,7 +161,7 @@ void RepeatingRectangles::createObstacles() {
   for (auto i = 0u; i < numObsPerDim_; ++i) {
     // The context assumes a hyperrectangle.
     // Thus, all bounds are the same, and we can stick to the 0th index of the bounds.
-    coordinates.emplace_back(
+    coordinates.push_back(
         (static_cast<double>((i + 1u)) *
          (bounds.high.at(0u) - bounds.low.at(0u)) /
          static_cast<double>((numObsPerDim_ + 1u))) +
@@ -191,7 +191,7 @@ void RepeatingRectangles::createObstacles() {
     std::vector<double> widths(dimensionality_, obsWidth_);
 
     // Add the obstacle.
-    obstacles_.emplace_back(
+    obstacles_.push_back(
         std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, midpoint, widths));
   }
 }

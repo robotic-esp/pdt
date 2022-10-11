@@ -181,7 +181,7 @@ std::stringstream SingleQueryReport::overview() const {
   // Collect all initial solution duration histogram plots.
   std::vector<std::shared_ptr<pgftikz::PgfAxis>> initialSolutionDurationHistogramAxes{};
   for (const auto& name : plannerNames) {
-    initialSolutionDurationHistogramAxes.emplace_back(
+    initialSolutionDurationHistogramAxes.push_back(
         queryTimeAtFirstHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name));
   }
   latexPlotter_.alignAbszissen(initialSolutionDurationHistogramAxes);

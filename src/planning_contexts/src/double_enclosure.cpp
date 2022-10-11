@@ -114,7 +114,7 @@ void DoubleEnclosure::createObstacles() {
   std::vector<double> startWidths(dimensionality_, startOutsideWidth_);
 
   // Create the start enclosure obstacle.
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, startAnchor, startWidths));
 
   // Create the anchor for the goal enclosure obstacle.
@@ -127,7 +127,7 @@ void DoubleEnclosure::createObstacles() {
   std::vector<double> goalWidths(dimensionality_, goalOutsideWidth_);
 
   // Create the goal enclosure obstacle.
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, goalAnchor, goalWidths));
 }
 
@@ -142,7 +142,7 @@ void DoubleEnclosure::createAntiObstacles() {
   std::vector<double> startWidths(dimensionality_, startInsideWidth_);
 
   // Create the start enclosure anti obstacle.
-  antiObstacles_.emplace_back(
+  antiObstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, startAnchor, startWidths));
 
   // Create the anchor for the goal enclosure anti obstacle.
@@ -155,7 +155,7 @@ void DoubleEnclosure::createAntiObstacles() {
   std::vector<double> goalWidths(dimensionality_, goalInsideWidth_);
 
   // Create the goal enclosure anti obstacle.
-  antiObstacles_.emplace_back(
+  antiObstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, goalAnchor, goalWidths));
 
   // Create the start gap.
@@ -167,7 +167,7 @@ void DoubleEnclosure::createAntiObstacles() {
   }
   std::vector<double> startGapWidths(dimensionality_, startGapWidth_);
   startGapWidths.at(0u) = (startOutsideWidth_ - startInsideWidth_) / 2.0 + 1e-3;
-  antiObstacles_.emplace_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
       spaceInfo_, startGapMidpoint, startGapWidths));
 
   // Create the goal gap.
@@ -179,7 +179,7 @@ void DoubleEnclosure::createAntiObstacles() {
   }
   std::vector<double> goalGapWidths(dimensionality_, goalGapWidth_);
   goalGapWidths.at(0u) = (goalOutsideWidth_ - goalInsideWidth_) / 2.0 + 1e-3;
-  antiObstacles_.emplace_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
       spaceInfo_, goalGapMidpoint, goalGapWidths));
 }
 

@@ -68,7 +68,7 @@ PotentialFieldOptimizationObjective::PotentialFieldOptimizationObjective(
                                      "/objective") +
            "/sources")) {
     // allocate a state for each point source.
-    pointSources_.emplace_back(spaceInfo_->allocState());
+    pointSources_.push_back(spaceInfo_->allocState());
 
     // Ensure the point source has the correct dimension.
     if (point.size() != spaceInfo_->getStateDimension()) {

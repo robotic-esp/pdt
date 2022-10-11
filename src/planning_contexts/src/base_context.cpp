@@ -276,7 +276,7 @@ std::vector<ompl::base::ScopedState<>> BaseContext::generateRandomStates(const s
       } while (!spaceInfo_->isValid(s.get()));
     }
 
-    states.emplace_back(s);
+    states.push_back(s);
   }
 
   return states;
@@ -318,7 +318,7 @@ std::vector<StartGoalPair> BaseContext::parseMultiqueryStartGoalPairs() const{
   std::vector<std::vector<ompl::base::ScopedState<>>> starts;
   for (const auto &state: startStates){
     std::vector<ompl::base::ScopedState<>> tmp{state};
-    starts.emplace_back(tmp);
+    starts.push_back(tmp);
   }
 
   // read goals from config
@@ -356,7 +356,7 @@ std::vector<StartGoalPair> BaseContext::parseMultiqueryStartGoalPairs() const{
   for (const auto &state: goalStates){
     auto goal = std::make_shared<ompl::base::GoalState>(spaceInfo_);
     goal->as<ompl::base::GoalState>()->setState(state);
-    goals.emplace_back(goal);
+    goals.push_back(goal);
   }
 
   // merge starts and goals
@@ -369,7 +369,7 @@ std::vector<StartGoalPair> BaseContext::parseMultiqueryStartGoalPairs() const{
     pair.start = starts[i];
     pair.goal = goals[i];
 
-    pairs.emplace_back(pair);
+    pairs.push_back(pair);
   }
 
   return pairs;
@@ -401,7 +401,7 @@ std::vector<StartGoalPair> BaseContext::makeStartGoalPair() const{
     pair.start = {startState};
     pair.goal = createGoal();
 
-    pairs.emplace_back(pair);
+    pairs.push_back(pair);
   }
   else{
     OMPL_ERROR("%s: Neither 'start' nor 'starts' specified.", name_.c_str());

@@ -109,9 +109,9 @@ void PgfTable::loadFromPath(const std::experimental::filesystem::path& path,
     for (std::size_t i = 1u; i < row.size(); ++i) {
       try {
         if (rowName == domain) {
-          data_.at(0u).emplace_back(std::stod(row.at(i)));
+          data_.at(0u).push_back(std::stod(row.at(i)));
         } else if (rowName == codomain) {
-          data_.at(1u).emplace_back(std::stod(row.at(i)));
+          data_.at(1u).push_back(std::stod(row.at(i)));
         }
       } catch (const std::invalid_argument& e) {
         auto msg = "Pgf Table cannot convert entry '"s + row.at(i) + "' from file '"s +
@@ -195,7 +195,7 @@ void PgfTable::appendRow(const std::vector<double>& row) {
     data_.resize(row.size(), {});
   }
   for (std::size_t i = 0u; i < row.size(); ++i) {
-    data_.at(i).emplace_back(row.at(i));
+    data_.at(i).push_back(row.at(i));
   }
 }
 
@@ -270,7 +270,7 @@ std::vector<double> PgfTable::getRow(std::size_t index) const {
   std::vector<double> row;
   row.reserve(data_.size());
   for (const auto& col : data_) {
-    row.emplace_back(col.at(index));
+    row.push_back(col.at(index));
   }
   return row;
 }

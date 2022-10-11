@@ -117,7 +117,7 @@ void WallGap::createObstacles() {
   for (std::size_t j = 2u; j < dimensionality_; ++j) {
     widths_low.at(j) = bounds.high.at(j) - bounds.low.at(j);
   }
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor_low, widths_low));
 
   // Create an anchor for the upper obstacle.
@@ -144,7 +144,7 @@ void WallGap::createObstacles() {
   for (std::size_t j = 2u; j < dimensionality_; ++j) {
     widths_up.at(j) = bounds.high.at(j) - bounds.low.at(j);
   }
-  obstacles_.emplace_back(
+  obstacles_.push_back(
       std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor_up, widths_up));
 }
 
