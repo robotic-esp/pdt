@@ -9,7 +9,8 @@ find_package(Eigen3 REQUIRED)
 
 # Specify the library as a target.
 add_library(pdt_utilities
-  src/get_best_cost.cpp)
+  src/get_best_cost.cpp
+  src/set_local_seed.cpp)
 
 # Specify our include directories for this target.
 target_include_directories(pdt_utilities
@@ -29,4 +30,5 @@ target_link_libraries(pdt_utilities
   pdt
   PUBLIC
   ${OMPL_LIBRARIES}
-  pdt_common)
+  pdt_common
+  pdt_config)

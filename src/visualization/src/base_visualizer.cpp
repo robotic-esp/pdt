@@ -47,6 +47,7 @@
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 
 #include "pdt/time/time.h"
+#include "pdt/utilities/set_local_seed.h"
 
 namespace pdt {
 
@@ -207,23 +208,7 @@ void BaseVisualizer::createData() {
     planner_->setup();
     setupDuration_ = time::Clock::now() - setupStartTime;
 
-    if (config_->contains("experiment/seed")) {
-      if (plannerType_ == common::PLANNER_TYPE::BITSTAR) {
-        planner_->as<ompl::geometric::BITstar>()->setLocalSeed(
-            config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == common::PLANNER_TYPE::ABITSTAR) {
-        planner_->as<ompl::geometric::ABITstar>()->setLocalSeed(
-            config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == common::PLANNER_TYPE::AITSTAR) {
-        planner_->as<ompl::geometric::AITstar>()->setLocalSeed(
-        config_->get<std::size_t>("experiment/seed"));
-      } else if (plannerType_ == common::PLANNER_TYPE::EITSTAR) {
-        planner_->as<ompl::geometric::EITstar>()->setLocalSeed(
-        config_->get<std::size_t>("experiment/seed"));
-      }
-    } else {
-      throw std::runtime_error("Unknown seed.");
-    }
+    utilities::setLocalSeed(config_, planner_, plannerType_);
   }
 
   double timePerQuery = 0.0;
@@ -359,6 +344,7 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(aitstarData);
           break;
         }
+#ifdef PDT_EXTRA_EITSTAR_PR
         case common::PLANNER_TYPE::EITSTAR: {
           auto eitstarData = std::make_shared<EITstarData>(context_->getSpaceInformation());
 
@@ -403,6 +389,7 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.emplace_back(lPRMstarData);
           break;
         }
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
         default:
           // Defaults to not getting any data.
           break;

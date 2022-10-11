@@ -140,6 +140,7 @@ void AITstarData::setVerticesInBackwardSearchTree(
   }
 }
 
+#ifdef PDT_EXTRA_EITSTAR_PR
 std::vector<ompl::geometric::eitstar::Edge> EITstarData::getReverseTree() const {
   return reverseTree_;
 }
@@ -179,6 +180,7 @@ void EITstarData::setNextForwardEdge(const ompl::geometric::eitstar::Edge& edge)
 void EITstarData::setNextReverseEdge(const ompl::geometric::eitstar::Edge& edge) {
   nextReverseEdge_ = edge;
 }
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
 
 }  // namespace visualization
 

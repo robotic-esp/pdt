@@ -582,6 +582,7 @@ void InteractiveVisualizer::drawGoal() const {
       }
       break;
     }
+#ifdef PDT_EXTRA_GOAL_SPACE
     case ompl::base::GoalType::GOAL_SPACE: {
       float goalColor[4] = {0.808f, 0.243f, 0.082f, 0.3f};
       auto goalSpace = goal->as<ompl::base::GoalSpace>()->getSpace();
@@ -595,6 +596,7 @@ void InteractiveVisualizer::drawGoal() const {
       drawRectangle(anchor, widths, goalColor, goalColor);
       break;
     }
+#endif // #ifdef PDT_EXTRA_GOAL_SPACE
     default: {
       throw std::runtime_error("Can not visualize goal type.");
     }
@@ -965,10 +967,12 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(const std::size_t 
       drawAITstarSpecificVisualizations(iteration);
       return;
     }
+#ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::EITSTAR: {
       drawEITstarSpecificVisualizations(iteration);
       return;
     }
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::LAZYPRMSTAR: {
       drawLazyPRMstarSpecificVisualizations(iteration);
       return;
@@ -1169,6 +1173,7 @@ void InteractiveVisualizer::drawAITstarSpecificVisualizations(const std::size_t 
   }
 }
 
+#ifdef PDT_EXTRA_EITSTAR_PR
 void InteractiveVisualizer::drawEITstarSpecificVisualizations(const std::size_t iteration) const {
   // Get the EIT* specific data.
   auto eitstarData =
@@ -1353,6 +1358,7 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(const std::size_t 
     }
   }
 }
+#endif // #ifdef PDT_EXTRA_EITSTAR_PR
 
 void InteractiveVisualizer::drawLazyPRMstarSpecificVisualizations(std::size_t iteration) const {
   // Get the LPRM* specific data.

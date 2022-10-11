@@ -33,33 +33,23 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-// Authors: Marlin Strub
+// Authors: Jonathan Gammell, Marlin Strub
 
 #pragma once
 
-#include <ompl/base/GoalTypes.h>
+#include <ompl/base/Planner.h>
 
-#include "nlohmann/json.hpp"
+#include "pdt/common/planner_type.h"
+#include "pdt/config/configuration.h"
 
 namespace pdt {
 
-namespace common {
+namespace utilities {
 
-// clang-format off
-NLOHMANN_JSON_SERIALIZE_ENUM(ompl::base::GoalType,
-                             {
-                                 {ompl::base::GoalType::GOAL_ANY, "GoalAny"},
-                                 {ompl::base::GoalType::GOAL_REGION, "GoalRegion"},
-                                 {ompl::base::GoalType::GOAL_SAMPLEABLE_REGION, "GoalSampleableRegion"},
-                                 {ompl::base::GoalType::GOAL_STATE, "GoalState"},
-                                 {ompl::base::GoalType::GOAL_STATES, "GoalStates"},
-                                 {ompl::base::GoalType::GOAL_LAZY_SAMPLES, "GoalLazySamples"},
-#ifdef PDT_EXTRA_GOAL_SPACE
-                                 {ompl::base::GoalType::GOAL_SPACE, "GoalSpace"},
-#endif // #ifdef PDT_EXTRA_GOAL_SPACE
-                             });
-// clang-format on
+void warnSetLocalSeed();
+void setLocalSeed(const std::shared_ptr<const config::Configuration> config,
+                  const ompl::base::PlannerPtr& planner, const common::PLANNER_TYPE plannerType);
 
-}  // namespace common
+}  // namespace utilities
 
 }  // namespace pdt
