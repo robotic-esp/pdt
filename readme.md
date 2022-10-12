@@ -2,6 +2,8 @@
 
 This repository contains tools developed at ESP that aim to facilitate scientifically sound path planning research.
 
+We're working on better documentation, but for now here's our internal documentation.
+
 ## Installation
 
 ### Dependencies
@@ -20,22 +22,19 @@ sudo apt install libboost-all-dev
 sudo apt install libeigen3-dev
 sudo apt install libode-dev # optional
 ```
-We want to test our own planners, which are developed in our private OMPL fork:
+Some of the PDT features require our OMPL fork. You could alternatively use the regular upstream version of OMPL but will not be able to use all the PDT features.
 
 ```bash
-git clone git@github.com:robotic-esp/ompl-private.git
-cd ompl-private
+git clone git@github.com:robotic-esp/ompl.git
+cd ompl
 git fetch
-git checkout esp-master
+git checkout main_esp
 mkdir build && cd build
 cmake ..
 make -j 4
 sudo make install
 ```
-
-Make sure you are on the `esp-master` branch. You can use `git branch` to check which branch you have checked out.
-
-You can alternatively use an upstream version of OMPL but will not be able to use all the PDT features.
+You can use `git branch` to check which branch you have checked out, if you are not on the `main_esp` branch you will need to disable some features in PDT below.
 
 #### Boost
 
@@ -185,15 +184,6 @@ Turn on the verbose compilation in the benchmark configuration `.json` file. If 
 
 # Miscellaneous
 
-## Why OMPL?
-
-- Already well adopted in field (helps our mission)
-- Major changes in OMPL base classes needed
-- Mark & Lydia have release experience
-- Mark & Lydia can help with reasonable problem definitions
-- Possible integration with PlannerArena
-- Possible integration in core OMPL
-
 ## Formatting code
 
 We format our code on a style based on [Google's style guide](https://google.github.io/styleguide/cppguide.html). A good way to ensure that your contribution conforms to this style is to run `clang-format` on it before committing. You can format a specific file with
@@ -232,16 +222,7 @@ run-clang-tidy
 
 The `run-clang-tidy` executable is included in the `clang-tidy` package installed with `sudo apt install clang-tidy`.
 
-## Backlog
-
-### Planner Developer Tools (PDT)
-
-- [ ] Improve visualization tool.
-
-### OMPL
-
-- [ ] Add method to scale costs. When the objective is a minimization (e.g., of path length) scaling a cost means multiplying it with the scaling factor, but when the objective is a maximization (e.g., of minimum clearance) scaling a cost means dividing it by the scaling factor.
-- [ ] Add a method to generate (possibly inadmissible) estimates of motion and state costs.
+## Old Notes
 
 ## How to create maps from `.png`s
 
@@ -260,9 +241,9 @@ To create a map from a `.png` follow these steps:
    9. Export to a csv file `csvwrite('filename.csv', bmpFileName)`
    10. Use the csvObstacle class (currently not implemented)
 
-## Create a regression class of BIT*
+## Create a regression class of a planner
 
-This allows for testing different versions of the algorithm in the same executable.
+This allows for testing different versions of the algorithm (e.g., BIT*) in the same executable.
 
 ```bash
 cd ompl/geometric/planners/
@@ -277,17 +258,3 @@ sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regressi
 cd src
 sed -i.bak -e 's|_BITSTAR|_BITSTARREGRESSION|g' -e 's|/bitstar|/bitstar_regression|g' -e 's|BITstar|BITstarRegression|g' *.cpp
 ```
-
-## Features
-
-- [x] Reproducible experiments
-- [x] Automatic report generation
-- [x] Interactive visualization of planner progress
-- [x] Videos of planner progress
-- [x] Easy to define experiments (obstacles and antiobstacles)
-- [x] Statistical analysis
-- [ ] Automatic stopping based on p-values
-- [ ] Guidance on number of runs
-- [ ] Reporting of p-values
-- [ ] Large automated runs
-- [ ] Physically founded generated experiments (remove bespoke problems from literature)
