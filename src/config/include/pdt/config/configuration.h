@@ -122,12 +122,12 @@ class Configuration {
   template <typename T>
   void registerAccess(const std::string& key, const T& value, json::json* accessedParameters) const;
 
-  // Helper to load the default config from the default path.
-  void loadDefaultConfigs(bool loadDefaultContextConfigs = true,
-                          bool loadDefaultPlannerConfigs = true,
-                          bool loadDefaultObjectiveConfigs = true);
-
-  void loadReportConfig(const std::experimental::filesystem::path& path);
+  // Helpers to load the default configs from the default paths.
+  void loadDefaultConfigs();
+  void loadDefaultContextConfig();
+  void loadDefaultObjectiveConfig();
+  void loadDefaultPlannerConfig();
+  void loadDefaultReportConfig();
 
   // Check if the name is nested, i.e., contains a '/'.
   bool isNestedKey(const std::string& name) const;

@@ -93,6 +93,7 @@ void Configuration::load(const std::experimental::filesystem::path& config) {
   bool loadDefaultPlannerConfigs{true};
   bool loadDefaultContextConfigs{true};
   bool loadDefaultObjectiveConfigs{true};
+  bool loadDefaultReportConfigs{true};
   if (patch.contains("experiment")) {
     if (patch["experiment"].contains("loadDefaultPlannerConfig")) {
       loadDefaultPlannerConfigs = patch["experiment"]["loadDefaultPlannerConfig"].get<bool>();
@@ -104,8 +105,12 @@ void Configuration::load(const std::experimental::filesystem::path& config) {
       loadDefaultObjectiveConfigs =
         patch["experiment"]["loadDefaultObjectiveConfig"].get<bool>();
     }
+    if (patch["experiment"].contains("loadDefaultReportConfig")) {
+      loadDefaultReportConfigs =
+        patch["experiment"]["loadDefaultReportConfig"].get<bool>();
+    }
   }
-    
+
   // Set the appropriate log level.
   if (patch.count("log") != 0) {
     auto level = patch["log"]["level"];
@@ -132,8 +137,27 @@ void Configuration::load(const std::experimental::filesystem::path& config) {
   }
 
   // Load the default config.
-  loadDefaultConfigs(loadDefaultContextConfigs, loadDefaultPlannerConfigs,
-                     loadDefaultObjectiveConfigs);
+  if (loadDefaultContextConfigs) {
+    loadDefaultContextConfig();
+  } else {
+    OMPL_INFORM("Not loading default context configs.");
+  }
+  if (loadDefaultObjectiveConfigs) {
+    loadDefaultObjectiveConfig();
+  } else {
+    OMPL_INFORM("Not loading default objective configs.");
+  }
+  if (loadDefaultPlannerConfigs) {
+    loadDefaultPlannerConfig();
+  } else {
+    OMPL_INFORM("Not loading default planner configs.");
+  }
+  if (loadDefaultReportConfigs) {
+    loadDefaultReportConfig();
+  } else {
+    OMPL_INFORM("Not loading default report configs.");
+  }
+
   // Merge the patch, possibly overriding default values.
   parameters_.merge_patch(patch);
   OMPL_INFORM("Loaded configuration patch from %s", config.c_str());
@@ -308,257 +332,255 @@ void Configuration::dumpAccessed(const std::string &filename) const {
   fs::permissions(filename, fs::perms::owner_read | fs::perms::group_read | fs::perms::others_read);
 }
 
-void Configuration::loadDefaultConfigs(bool loadDefaultContextConfigs,
-                                       bool loadDefaultPlannerConfigs,
-                                       bool loadDefaultObjectiveConfigs) {
-  // Load the default planner configs.
-  if (loadDefaultPlannerConfigs) {
-    fs::path defaultPlannerConfigDirectory(Directory::SOURCE / "parameters/defaults/planners/");
-    if (fs::exists(defaultPlannerConfigDirectory)) {
-      // Load all files in this directory as patches.
-      for (auto &directoryEntry : fs::directory_iterator(defaultPlannerConfigDirectory)) {
-        // Make sure the file exists.
-        if (!fs::exists(directoryEntry.path())) {
-          OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
-                    defaultPlannerConfigDirectory.c_str(), directoryEntry.path().c_str());
-          continue;
-        }
-
-        // Make sure the file can be opened.
-        std::ifstream configFile(directoryEntry.path().string());
-        if (configFile.fail()) {
-          OMPL_ERROR("File '%s' exists but cannot be opened.",
-                     directoryEntry.path().string().c_str());
-          throw std::ios_base::failure("Configuration error.");
-        }
-
-        OMPL_DEBUG("Loading configuration from '%s'", directoryEntry.path().c_str());
-
-        // Load the file into a temporary config.
-        json::json config;
-        configFile >> config;
-
-        // Make sure the config is a sane planner configuration.
-        if (!config.contains("planner")) {
-          throw std::invalid_argument("Default planner configuration at '"s +
-                                      directoryEntry.path().string() +
-                                      "' is not a valid planner configuration. Valid planner "
-                                      "configurations must be encapsulated in a 'planner' key."s);
-        }
-
-        if (config.size() > 1) {
-          throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
-                                      "' must only contain one planner configuration."s);
-        }
-        if (!config.front().front().contains("type")) {
-          throw std::invalid_argument(directoryEntry.path().string() +
-                                      ": Planner configurations must specify the type of a planner "
-                                      "in a field named \"type\"."s);
-        }
-        if (!config.front().front().contains("isAnytime")) {
-          throw std::invalid_argument(directoryEntry.path().string() +
-                                      ": Planner configurations must specify whether a planner is "
-                                      "anytime in a field named \"isAnytime\"."s);
-        }
-        if (!config.front().front().contains("report")) {
-          throw std::invalid_argument(
-              directoryEntry.path().string() +
-              ": Planner configurations must specify the color and name to be used in the report in a field named \"report\"."s);
-        }
-        if (!config.front().front()["report"].contains("color")) {
-          throw std::invalid_argument(
-              directoryEntry.path().string() +
-              ": Planner configurations must specify the color to be used in the report in a field "
-              "named \"color\" under the \"report\" field."s);
-        }
-        if (!config.front().front()["report"].contains("name")) {
-          throw std::invalid_argument(
-              directoryEntry.path().string() +
-              ": Planner configurations must specify the name to be used in the report in a field named \"name\" under the \"report\" field."s);
-        }
-
-        // Check that the default configs don't specify the same parameter twice.
-        for (const auto &entry : config.front().items()) {
-          if (parameters_["planner"].contains(entry.key())) {
-            throw std::invalid_argument(directoryEntry.path().string() +
-                                        ": Overwrites existing config for planner '"s +
-                                        entry.key().c_str() + "'."s);
-          }
-        }
-        parameters_.merge_patch(config);
-        OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
-        // No need to close config, std::ifstreams are closed on destruction.
-      }
-    } else {
-      // Cannot find default planner config at default location.
-      auto msg = "Default planner config directory does not exist at '"s +
-                 defaultPlannerConfigDirectory.string() + "'."s;
-      throw std::ios_base::failure(msg.c_str());
-    }
-    OMPL_INFORM("Loaded default planner configs.");
-  } else {
-    OMPL_INFORM("Not loading default planner configs.");
-  }
-
-  // Load the default context configs.
-  if (loadDefaultContextConfigs) {
-    fs::path defaultContextConfigDirectory(Directory::SOURCE / "parameters/defaults/contexts/");
-    if (fs::exists(defaultContextConfigDirectory)) {
-      // Load all files in this directory as patches.
-      for (auto &directoryEntry : fs::directory_iterator(defaultContextConfigDirectory)) {
-        // Make sure the file exists.
-        if (!fs::exists(directoryEntry.path())) {
-          OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
-                    defaultContextConfigDirectory.c_str(), directoryEntry.path().c_str());
-          continue;
-        }
-
-        // Make sure the file can be opened.
-        std::ifstream configFile(directoryEntry.path().string());
-        if (configFile.fail()) {
-          OMPL_ERROR("File '%s' exists but cannot be opened.",
-                     directoryEntry.path().string().c_str());
-          throw std::ios_base::failure("Configuration error.");
-        }
-
-        OMPL_DEBUG("Loading configuration from '%s'", directoryEntry.path().c_str());
-
-        // Load the file into a temporary config.
-        json::json config;
-        configFile >> config;
-
-        // Make sure the config is a sane planner configuration.
-        if (!config.contains("context")) {
-          throw std::invalid_argument("Default context configuration at '"s +
-                                      directoryEntry.path().string() +
-                                      "' is not a valid context configuration. Valid context "
-                                      "configurations must be encapsulated in a 'context' key."s);
-        }
-        if (config.size() > 1) {
-          throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
-                                      "' must only contain one context configuration."s);
-        }
-        if (!config.front().front().contains("type")) {
-          throw std::invalid_argument(
-              directoryEntry.path().string() +
-              ": Context configurations must specify the type of the context in a field named "
-              "\"type\".");
-        }
-        if (!config.front().front().contains("objective")) {
-          throw std::invalid_argument(directoryEntry.path().string() +
-                                      ": Context configurations must specify the optimization "
-                                      "objective of the context in a "
-                                      "field named \"objective\".");
-        }
-        if (!config.front().front().contains("dimensions")) {
-          throw std::invalid_argument(
-              directoryEntry.path().string() +
-              ": Context configurations must specify the dimensions of the context in a "
-              "field named \"dimensions\".");
-        }
-        if (!config.front().front().contains("collisionCheckResolution")) {
-          throw std::invalid_argument(
-              directoryEntry.path().string() +
-              ": Context configurations must specify the collision check resolution of the context "
-              "in a field named \"collisionCheckResolution\".");
-        }
-
-        // Check that the default configs don't specify the same parameter twice.
-        for (const auto &entry : config.front().items()) {
-          if (parameters_["context"].contains(entry.key())) {
-            throw std::invalid_argument(directoryEntry.path().string() +
-                                        ": Overwrites existing config for context '"s +
-                                        entry.key().c_str() + "'."s);
-          }
-        }
-        parameters_.merge_patch(config);
-        OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
-        // No need to close config, std::ifstreams are closed on destruction.
-      }
-    } else {
-      // Cannot find default context config at default location.
-      auto msg = "Default context config directory does not exist at '"s +
-                 defaultContextConfigDirectory.string() + "'."s;
-      throw std::ios_base::failure(msg.c_str());
-    }
-    OMPL_INFORM("Loaded default context configs.");
-  } else {
-    OMPL_INFORM("Not loading default context configs.");
-  }
-
-  // Load the default objective configs.
-  if (loadDefaultObjectiveConfigs) {
-    fs::path defaultObjectiveConfigDirectory(Directory::SOURCE / "parameters/defaults/objectives/");
-    if (fs::exists(defaultObjectiveConfigDirectory)) {
-      // Load all files in this directory as patches.
-      for (auto &directoryEntry : fs::directory_iterator(defaultObjectiveConfigDirectory)) {
-        // Make sure the file exists.
-        if (!fs::exists(directoryEntry.path())) {
-          OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
-                    defaultObjectiveConfigDirectory.c_str(), directoryEntry.path().c_str());
-          continue;
-        }
-
-        // Make sure the file can be opened.
-        std::ifstream configFile(directoryEntry.path().string());
-        if (configFile.fail()) {
-          OMPL_ERROR("File '%s' exists but cannot be opened.",
-                     directoryEntry.path().string().c_str());
-          throw std::ios_base::failure("Configuration error.");
-        }
-
-        // Load the file into a temporary config.
-        json::json config;
-        configFile >> config;
-
-        // Make sure the config is a sane planner configuration.
-        if (!config.contains("objective")) {
-          throw std::invalid_argument("Default objective configuration at '"s +
-                                      directoryEntry.path().string() +
-                                      "' is not a valid objective configuration. Valid objective "
-                                      "configurations must be encapsulated in a 'objective' key."s);
-        }
-        if (config.size() > 1) {
-          throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
-                                      "' must only contain one objective configuration."s);
-        }
-        if (!config.front().front().contains("type")) {
-          throw std::invalid_argument(
-              directoryEntry.path().string() +
-              ": Objective configurations must specify the type of the context in a field named "
-              "\"type\".");
-        }
-
-        // Check that the default configs don't specify the same parameter twice.
-        for (const auto &entry : config.front().items()) {
-          if (parameters_["objective"].contains(entry.key())) {
-            throw std::invalid_argument(directoryEntry.path().string() +
-                                        ": Overwrites existing config for objective '"s +
-                                        entry.key().c_str() + "'."s);
-          }
-        }
-        parameters_.merge_patch(config);
-        OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
-        // No need to close config, std::ifstreams are closed on destruction.
-      }
-    } else {
-      // Cannot find default objective config at default location.
-      auto msg = "Default objective config directory does not exist at '"s +
-                 defaultObjectiveConfigDirectory.string() + "'."s;
-      throw std::ios_base::failure(msg.c_str());
-    }
-    OMPL_INFORM("Loaded default objective configs.");
-  } else {
-    OMPL_INFORM("Not loading default objective configs.");
-  }
+void Configuration::loadDefaultConfigs() {
+  loadDefaultContextConfig();
+  loadDefaultObjectiveConfig();
+  loadDefaultPlannerConfig();
+  loadDefaultReportConfig();
 }
 
-void Configuration::loadReportConfig(const std::experimental::filesystem::path &path) {
-  if (fs::exists(path)) {
+void Configuration::loadDefaultPlannerConfig() {
+  // Load the default planner configs.
+  fs::path defaultPlannerConfigDirectory(Directory::SOURCE / "parameters/defaults/planners/");
+  if (fs::exists(defaultPlannerConfigDirectory)) {
+    // Load all files in this directory as patches.
+    for (auto &directoryEntry : fs::directory_iterator(defaultPlannerConfigDirectory)) {
+      // Make sure the file exists.
+      if (!fs::exists(directoryEntry.path())) {
+        OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
+                  defaultPlannerConfigDirectory.c_str(), directoryEntry.path().c_str());
+        continue;
+      }
+
+      // Make sure the file can be opened.
+      std::ifstream configFile(directoryEntry.path().string());
+      if (configFile.fail()) {
+        OMPL_ERROR("File '%s' exists but cannot be opened.",
+                  directoryEntry.path().string().c_str());
+        throw std::ios_base::failure("Configuration error.");
+      }
+
+      OMPL_DEBUG("Loading configuration from '%s'", directoryEntry.path().c_str());
+
+      // Load the file into a temporary config.
+      json::json config;
+      configFile >> config;
+
+      // Make sure the config is a sane planner configuration.
+      if (!config.contains("planner")) {
+        throw std::invalid_argument("Default planner configuration at '"s +
+                                    directoryEntry.path().string() +
+                                    "' is not a valid planner configuration. Valid planner "
+                                    "configurations must be encapsulated in a 'planner' key."s);
+      }
+
+      if (config.size() > 1) {
+        throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
+                                    "' must only contain one planner configuration."s);
+      }
+      if (!config.front().front().contains("type")) {
+        throw std::invalid_argument(directoryEntry.path().string() +
+                                    ": Planner configurations must specify the type of a planner "
+                                    "in a field named \"type\"."s);
+      }
+      if (!config.front().front().contains("isAnytime")) {
+        throw std::invalid_argument(directoryEntry.path().string() +
+                                    ": Planner configurations must specify whether a planner is "
+                                    "anytime in a field named \"isAnytime\"."s);
+      }
+      if (!config.front().front().contains("report")) {
+        throw std::invalid_argument(
+            directoryEntry.path().string() +
+            ": Planner configurations must specify the color and name to be used in the report in a field named \"report\"."s);
+      }
+      if (!config.front().front()["report"].contains("color")) {
+        throw std::invalid_argument(
+            directoryEntry.path().string() +
+            ": Planner configurations must specify the color to be used in the report in a field "
+            "named \"color\" under the \"report\" field."s);
+      }
+      if (!config.front().front()["report"].contains("name")) {
+        throw std::invalid_argument(
+            directoryEntry.path().string() +
+            ": Planner configurations must specify the name to be used in the report in a field named \"name\" under the \"report\" field."s);
+      }
+
+      // Check that the default configs don't specify the same parameter twice.
+      for (const auto &entry : config.front().items()) {
+        if (parameters_["planner"].contains(entry.key())) {
+          throw std::invalid_argument(directoryEntry.path().string() +
+                                      ": Overwrites existing config for planner '"s +
+                                      entry.key().c_str() + "'."s);
+        }
+      }
+      parameters_.merge_patch(config);
+      OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
+      // No need to close config, std::ifstreams are closed on destruction.
+    }
+  } else {
+    // Cannot find default planner config at default location.
+    auto msg = "Default planner config directory does not exist at '"s +
+              defaultPlannerConfigDirectory.string() + "'."s;
+    throw std::ios_base::failure(msg.c_str());
+  }
+  OMPL_INFORM("Loaded default planner configs.");
+}
+
+void Configuration::loadDefaultContextConfig() {
+  // Load the default context configs.
+  fs::path defaultContextConfigDirectory(Directory::SOURCE / "parameters/defaults/contexts/");
+  if (fs::exists(defaultContextConfigDirectory)) {
+    // Load all files in this directory as patches.
+    for (auto &directoryEntry : fs::directory_iterator(defaultContextConfigDirectory)) {
+      // Make sure the file exists.
+      if (!fs::exists(directoryEntry.path())) {
+        OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
+                  defaultContextConfigDirectory.c_str(), directoryEntry.path().c_str());
+        continue;
+      }
+
+      // Make sure the file can be opened.
+      std::ifstream configFile(directoryEntry.path().string());
+      if (configFile.fail()) {
+        OMPL_ERROR("File '%s' exists but cannot be opened.",
+                    directoryEntry.path().string().c_str());
+        throw std::ios_base::failure("Configuration error.");
+      }
+
+      OMPL_DEBUG("Loading configuration from '%s'", directoryEntry.path().c_str());
+
+      // Load the file into a temporary config.
+      json::json config;
+      configFile >> config;
+
+      // Make sure the config is a sane planner configuration.
+      if (!config.contains("context")) {
+        throw std::invalid_argument("Default context configuration at '"s +
+                                    directoryEntry.path().string() +
+                                    "' is not a valid context configuration. Valid context "
+                                    "configurations must be encapsulated in a 'context' key."s);
+      }
+      if (config.size() > 1) {
+        throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
+                                    "' must only contain one context configuration."s);
+      }
+      if (!config.front().front().contains("type")) {
+        throw std::invalid_argument(
+            directoryEntry.path().string() +
+            ": Context configurations must specify the type of the context in a field named "
+            "\"type\".");
+      }
+      if (!config.front().front().contains("objective")) {
+        throw std::invalid_argument(directoryEntry.path().string() +
+                                    ": Context configurations must specify the optimization "
+                                    "objective of the context in a "
+                                    "field named \"objective\".");
+      }
+      if (!config.front().front().contains("dimensions")) {
+        throw std::invalid_argument(
+            directoryEntry.path().string() +
+            ": Context configurations must specify the dimensions of the context in a "
+            "field named \"dimensions\".");
+      }
+      if (!config.front().front().contains("collisionCheckResolution")) {
+        throw std::invalid_argument(
+            directoryEntry.path().string() +
+            ": Context configurations must specify the collision check resolution of the context "
+            "in a field named \"collisionCheckResolution\".");
+      }
+
+      // Check that the default configs don't specify the same parameter twice.
+      for (const auto &entry : config.front().items()) {
+        if (parameters_["context"].contains(entry.key())) {
+          throw std::invalid_argument(directoryEntry.path().string() +
+                                      ": Overwrites existing config for context '"s +
+                                      entry.key().c_str() + "'."s);
+        }
+      }
+      parameters_.merge_patch(config);
+      OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
+      // No need to close config, std::ifstreams are closed on destruction.
+    }
+  } else {
+    // Cannot find default context config at default location.
+    auto msg = "Default context config directory does not exist at '"s +
+                defaultContextConfigDirectory.string() + "'."s;
+    throw std::ios_base::failure(msg.c_str());
+  }
+  OMPL_INFORM("Loaded default context configs.");
+}
+
+void Configuration::loadDefaultObjectiveConfig() {
+  // Load the default objective configs.
+  fs::path defaultObjectiveConfigDirectory(Directory::SOURCE / "parameters/defaults/objectives/");
+  if (fs::exists(defaultObjectiveConfigDirectory)) {
+    // Load all files in this directory as patches.
+    for (auto &directoryEntry : fs::directory_iterator(defaultObjectiveConfigDirectory)) {
+      // Make sure the file exists.
+      if (!fs::exists(directoryEntry.path())) {
+        OMPL_WARN("'%s' contains irregular file '%s' which is not loaded into the configuration.",
+                  defaultObjectiveConfigDirectory.c_str(), directoryEntry.path().c_str());
+        continue;
+      }
+
+      // Make sure the file can be opened.
+      std::ifstream configFile(directoryEntry.path().string());
+      if (configFile.fail()) {
+        OMPL_ERROR("File '%s' exists but cannot be opened.",
+                    directoryEntry.path().string().c_str());
+        throw std::ios_base::failure("Configuration error.");
+      }
+
+      // Load the file into a temporary config.
+      json::json config;
+      configFile >> config;
+
+      // Make sure the config is a sane planner configuration.
+      if (!config.contains("objective")) {
+        throw std::invalid_argument("Default objective configuration at '"s +
+                                    directoryEntry.path().string() +
+                                    "' is not a valid objective configuration. Valid objective "
+                                    "configurations must be encapsulated in a 'objective' key."s);
+      }
+      if (config.size() > 1) {
+        throw std::invalid_argument("Configuration at '"s + directoryEntry.path().string() +
+                                    "' must only contain one objective configuration."s);
+      }
+      if (!config.front().front().contains("type")) {
+        throw std::invalid_argument(
+            directoryEntry.path().string() +
+            ": Objective configurations must specify the type of the context in a field named "
+            "\"type\".");
+      }
+
+      // Check that the default configs don't specify the same parameter twice.
+      for (const auto &entry : config.front().items()) {
+        if (parameters_["objective"].contains(entry.key())) {
+          throw std::invalid_argument(directoryEntry.path().string() +
+                                      ": Overwrites existing config for objective '"s +
+                                      entry.key().c_str() + "'."s);
+        }
+      }
+      parameters_.merge_patch(config);
+      OMPL_INFORM("Loaded configuration from '%s'", directoryEntry.path().c_str());
+      // No need to close config, std::ifstreams are closed on destruction.
+    }
+  } else {
+    // Cannot find default objective config at default location.
+    auto msg = "Default objective config directory does not exist at '"s +
+                defaultObjectiveConfigDirectory.string() + "'."s;
+    throw std::ios_base::failure(msg.c_str());
+  }
+  OMPL_INFORM("Loaded default objective configs.");
+}
+
+void Configuration::loadDefaultReportConfig() {
+  fs::path defaultReportConfigFile(Directory::SOURCE / "parameters/defaults/default_report.json");
+  if (fs::exists(defaultReportConfigFile)) {
     // Make sure the file can be opened.
-    std::ifstream configFile(path.string());
+    std::ifstream configFile(defaultReportConfigFile.string());
     if (configFile.fail()) {
-      OMPL_ERROR("File '%s' exists but cannot be opened.", path.string().c_str());
+      OMPL_ERROR("File '%s' exists but cannot be opened.", defaultReportConfigFile.string().c_str());
       throw std::ios_base::failure("Configuration error.");
     }
 
@@ -581,14 +603,14 @@ void Configuration::loadReportConfig(const std::experimental::filesystem::path &
     for (const auto &key : necessaryKeys) {
       if (!config["report"].contains(key)) {
         throw std::invalid_argument(
-            "Report configuration at '"s + path.string() +
+            "Report configuration at '"s + defaultReportConfigFile.string() +
             "' is not a valid report configuration. Valid report configurations must contain a '"s +
             key + "' key."s);
       } else if (key != "colors"s) {
         for (const auto &subKey : necessarySubkeys) {
           if (!config["report"][key].contains(subKey)) {
             throw std::invalid_argument(
-                "Report configuration at '"s + path.string() +
+                "Report configuration at '"s + defaultReportConfigFile.string() +
                 "' is not a valid report configuration. Valid report configurations must contain a '"s +
                 key + "' key with a '" + subKey + "' subkey."s);
           }
@@ -597,11 +619,15 @@ void Configuration::loadReportConfig(const std::experimental::filesystem::path &
     }
 
     parameters_.merge_patch(config);
-    OMPL_INFORM("Loaded configuration from '%s'", path.c_str());
+    OMPL_INFORM("Loaded configuration from '%s'", defaultReportConfigFile.c_str());
     // No need to close config, std::ifstreams are closed on destruction.
   } else {
-    throw std::invalid_argument("Could not load report config from '"s + path.string() + "'."s);
+    // Cannot find default report config at default location.
+    auto msg = "Default report config does not exist at '"s +
+              defaultReportConfigFile.string() + "'."s;
+    throw std::ios_base::failure(msg.c_str());
   }
+  OMPL_INFORM("Loaded default report configs.");
 }
 
 bool Configuration::isNestedKey(const std::string &name) const {
@@ -669,13 +695,6 @@ void Configuration::registerAsExperiment() {
             parameters_["experiment"]["report"]["automatic"];
         accessedParameters_["experiment"]["report"]["verboseCompilation"] =
             parameters_["experiment"]["report"]["verboseCompilation"];
-      }
-      if (parameters_["experiment"]["report"].contains("config")) {
-        OMPL_INFORM("Loading custom report config.");
-        loadReportConfig(parameters_["experiment"]["report"]["config"].get<std::string>());
-      } else {
-        OMPL_INFORM("Loading default report config.");
-        loadReportConfig(Directory::SOURCE / "parameters/defaults/default_report.json");
       }
     }
   }
