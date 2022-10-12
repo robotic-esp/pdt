@@ -117,22 +117,25 @@ std::string TikzPicture::string() const {
     stream << clip_ << '\n';
   }
 
-  // Output the axes_, nodes_, and draws_ in ascending z level.
+  // Output the axes_, nodes_, and draws_ in ascending z level. Multimaps are already sorted.
   auto axisIter = axes_.begin();
   auto nodeIter = nodes_.begin();
   auto drawIter = draws_.begin();
   while (axisIter != axes_.end() || nodeIter != nodes_.end() || drawIter != draws_.end()) {
     // axes <= nodes <= draws:
-    if ((axisIter != axes_.end() && nodeIter != nodes_.end() && axisIter->first <= nodeIter->first) || 
+    if ((axisIter != axes_.end() && nodeIter != nodes_.end() && axisIter->first <= nodeIter->first) &&
         (axisIter != axes_.end() && drawIter != draws_.end() && axisIter->first <= drawIter->first)) {
+      // axis <= node && axis <= draw: axis is smallest
       stream << axisIter->second->string() << '\n';
       ++axisIter;
-    } else if ((nodeIter != nodes_.end() && axisIter != axes_.end() && nodeIter->first < axisIter->first) || 
+    } else if ((nodeIter != nodes_.end() && axisIter != axes_.end() && nodeIter->first < axisIter->first) &&
                (nodeIter != nodes_.end() && drawIter != draws_.end() && nodeIter->first <= drawIter->first)) {
+      // node < axis && node <= draw: node is the smallest
       stream << nodeIter->second->string() << '\n';
       ++nodeIter;
-    } else if ((drawIter != draws_.end() && axisIter != axes_.end() && drawIter->first < axisIter->first) || 
+    } else if ((drawIter != draws_.end() && axisIter != axes_.end() && drawIter->first < axisIter->first) &&
                (drawIter != draws_.end() && nodeIter != nodes_.end() && drawIter->first < nodeIter->first)) {
+      // draw < axis && draw < node: draw is the smallest
       stream << drawIter->second->string() << '\n';
       ++drawIter;
     } else {
