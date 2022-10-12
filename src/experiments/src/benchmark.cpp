@@ -545,6 +545,7 @@ int main(const int argc, const char **argv) {
       std::cout << std::setw(2u) << std::setfill(' ') << ' '  << "Compilation skipped" << "\n\n" << std::flush;
     }
   }
+
   // Log some info to a log file.
   auto logPath = experimentDirectory / "log.txt"s;
   ompl::msg::OutputHandlerFile log(logPath.c_str());

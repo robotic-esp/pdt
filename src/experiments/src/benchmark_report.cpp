@@ -43,20 +43,19 @@
 #include <experimental/filesystem>
 
 #include "pdt/config/configuration.h"
+#include "pdt/reports/multiquery_report.h"
 #include "pdt/reports/single_query_report.h"
 #include "pdt/statistics/planning_statistics.h"
 
 using namespace std::string_literals;
+namespace fs = std::experimental::filesystem;
 
 int main(const int argc, const char** argv) {
   // Read the config files.
   auto config = std::make_shared<pdt::config::Configuration>(argc, argv);
 
-  std::cout << "\nReport\n"
-            << std::setw(2u) << std::setfill(' ') << ' '
-            << "Compiling (this may take a couple of minutes)" << std::flush;
-
   const std::vector<std::string> resultPaths = config->get<std::vector<std::string>>("experiment/results");
+  fs::path reportPath;
 
   // Generate the statistic.
   std::vector<pdt::statistics::PlanningStatistics> stats;
@@ -65,24 +64,30 @@ int main(const int argc, const char** argv) {
     stats.push_back(pdt::statistics::PlanningStatistics(config, path, true));
   }
 
-  // Generate the report.
-  if (stats.size() == 0u){
+  // Inform that the report is being compiled.
+  std::cout << "Report\n" << std::setw(2u) << std::setfill(' ') << ' '
+            << "Compiling (this may take a couple of minutes)" << std::flush;
+  if (stats.size() == 0u) {
     throw std::runtime_error(
         "No statistics were generated, thus no report can be compiled.");
-  }
-  else if(stats.size() == 1u){ // Single query report
+  } else if(stats.size() == 1u) { // Single query report
     pdt::reports::SingleQueryReport report(config, stats[0u]);
     report.generateReport();
-    report.compileReport();
+    reportPath = report.compileReport();
+  } else { // Multiquery report
+    pdt::statistics::MultiqueryStatistics mqstats(config, stats, true);
+    pdt::reports::MultiqueryReport report(config, mqstats);
+    report.generateReport();
+    reportPath = report.compileReport();
   }
-  else{ // Multiquery report
 
-  }
-  
-  // Inform that we are done compiling the report.
-  std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
-            << std::setfill(' ') << ' ' << "Compilation done\n"
-            << std::flush;
+    // Inform that we are done compiling the report.
+    std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
+              << std::setfill(' ') << ' ' << "Compilation done\n"
+              << std::flush;
+
+    // Inform where we wrote the report to.
+    std::cout << std::setw(2u) << std::setfill(' ') << ' ' << "Location " << reportPath << "\n\n";
 
   return 0;
 }
