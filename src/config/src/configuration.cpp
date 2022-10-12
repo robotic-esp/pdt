@@ -573,20 +573,20 @@ void Configuration::loadReportConfig(const std::experimental::filesystem::path &
                                                     "medianInitialSolutionPlots",
                                                     "initialSolutionScatterPlots",
                                                     "initialSolutionPlots",
-                                                    "costPercentileEvolutionPlots",
-                                                    "statistics"};
+                                                    "costPercentileEvolutionPlots"};
+                                                    // "statistics"};
     const std::vector<std::string> necessarySubkeys = {"axisWidth",   "axisHeight",  "xminorgrids",
                                                        "xmajorgrids", "yminorgrids", "ymajorgrids",
                                                        "xlog",        "markSize"};
     for (const auto &key : necessaryKeys) {
-      if (!config.contains(key)) {
+      if (!config["report"].contains(key)) {
         throw std::invalid_argument(
             "Report configuration at '"s + path.string() +
             "' is not a valid report configuration. Valid report configurations must contain a '"s +
             key + "' key."s);
-      } else if (key != "colors"s && key != "statistics"s) {
+      } else if (key != "colors"s) {
         for (const auto &subKey : necessarySubkeys) {
-          if (!config[key].contains(subKey)) {
+          if (!config["report"][key].contains(subKey)) {
             throw std::invalid_argument(
                 "Report configuration at '"s + path.string() +
                 "' is not a valid report configuration. Valid report configurations must contain a '"s +

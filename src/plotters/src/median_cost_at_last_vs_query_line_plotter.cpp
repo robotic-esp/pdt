@@ -63,7 +63,7 @@ std::shared_ptr<pgftikz::PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedi
   // Fill the axis with the median final cost plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
-    if (config_->get<bool>("medianFinalCostPerQueryPlots/plotConfidenceIntervalInAllPlots")) {
+    if (config_->get<bool>("report/medianFinalCostPerQueryPlots/plotConfidenceIntervalInAllPlots")) {
       std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianFinalCostUpperCiPlot(name);
       std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianFinalCostLowerCiPlot(name);
       std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianFinalCostFillCiPlot(name);
@@ -131,16 +131,16 @@ fs::path MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPicture(
 
 void MedianCostAtLastVsQueryLinePlotter::setMedianFinalCostAxisOptions(
     std::shared_ptr<pgftikz::PgfAxis> axis) const {
-  axis->options.width = config_->get<std::string>("medianFinalCostPerQueryPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("medianFinalCostPerQueryPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("report/medianFinalCostPerQueryPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("report/medianFinalCostPerQueryPlots/axisHeight");
   // axis->options.xmax = maxCostToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
-  // axis->options.xlog = config_->get<bool>("medianFinalCostPerQueryPlots/xlog");
+  // axis->options.xlog = config_->get<bool>("report/medianFinalCostPerQueryPlots/xlog");
   axis->options.ylog = true;
-  axis->options.xminorgrids = config_->get<bool>("medianFinalCostPerQueryPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("medianFinalCostPerQueryPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("medianFinalCostPerQueryPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("medianFinalCostPerQueryPlots/ymajorgrids");
+  axis->options.xminorgrids = config_->get<bool>("report/medianFinalCostPerQueryPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("report/medianFinalCostPerQueryPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("report/medianFinalCostPerQueryPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("report/medianFinalCostPerQueryPlots/ymajorgrids");
   axis->options.xlabel = "Query Number"s;
   axis->options.ylabel = "Final Cost [s]"s;
   axis->options.ylabelAbsolute = true;
@@ -152,7 +152,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedi
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianFinalSolutionPerQuery(
-          plannerName, config_->get<double>("medianFinalCostPerQueryPlots/confidence")),
+          plannerName, config_->get<double>("report/medianFinalCostPerQueryPlots/confidence")),
       "query number", "median last solution cost");
 
   // Remove all nans from the table.
@@ -162,7 +162,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedi
   // Create the plot and set the options.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianFinalCostPerQueryPlots/lineWidth");
+  plot->options.lineWidth = config_->get<double>("report/medianFinalCostPerQueryPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianFinalCostPerQuery"s;
   plot->options.constPlot = false;
@@ -175,7 +175,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedi
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianFinalSolutionPerQuery(
-          plannerName, config_->get<double>("medianFinalCostPerQueryPlots/confidence")),
+          plannerName, config_->get<double>("report/medianFinalCostPerQueryPlots/confidence")),
       "query number", "upper last solution cost confidence bound");
 
   // Remove all nans from the table.
@@ -193,13 +193,13 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedi
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth =
-      config_->get<double>("medianFinalCostPerQueryPlots/confidenceIntervalLineWidth");
+      config_->get<double>("report/medianFinalCostPerQueryPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianFinalCostPerQueryUpperConfidence"s;
   plot->options.drawOpacity =
-      config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalDrawOpacity");
+      config_->get<float>("report/medianFinalCostPerQueryPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
-      config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
+      config_->get<float>("report/medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
   plot->options.constPlot = false;
 
   return plot;
@@ -210,7 +210,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedi
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianFinalSolutionPerQuery(
-          plannerName, config_->get<double>("medianFinalCostPerQueryPlots/confidence")),
+          plannerName, config_->get<double>("report/medianFinalCostPerQueryPlots/confidence")),
       "query number", "lower last solution cost confidence bound");
 
   // Remove all nans from the table.
@@ -225,13 +225,13 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedi
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth =
-      config_->get<double>("medianFinalCostPerQueryPlots/confidenceIntervalLineWidth");
+      config_->get<double>("report/medianFinalCostPerQueryPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianFinalCostPerQueryLowerConfidence"s;
   plot->options.drawOpacity =
-      config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalDrawOpacity");
+      config_->get<float>("report/medianFinalCostPerQueryPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
-      config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
+      config_->get<float>("report/medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
   plot->options.constPlot = false;
 
   return plot;
@@ -248,7 +248,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedi
   auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.fillOpacity =
-      config_->get<float>("medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
+      config_->get<float>("report/medianFinalCostPerQueryPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
   plot->options.constPlot = false;
 

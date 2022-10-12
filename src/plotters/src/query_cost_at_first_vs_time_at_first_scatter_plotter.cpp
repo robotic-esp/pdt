@@ -68,8 +68,8 @@ std::shared_ptr<pgftikz::PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::c
 
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     auto plot = createInitialSolutionScatterPlot(name);
-    plot->options.fillOpacity = config_->get<float>("initialSolutionScatterPlots/combinedFillOpacity");
-    plot->options.lineWidth = config_->get<double>("initialSolutionScatterPlots/lineWidth");
+    plot->options.fillOpacity = config_->get<float>("report/initialSolutionScatterPlots/combinedFillOpacity");
+    plot->options.lineWidth = config_->get<double>("report/initialSolutionScatterPlots/lineWidth");
     axis->addPlot(plot);
   }
 
@@ -121,7 +121,7 @@ std::shared_ptr<pgftikz::PgfPlot> QueryCostAtFirstVsTimeAtFirstScatterPlotter::c
 
   // Create the plot.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
-  plot->options.markSize = config_->get<double>("initialSolutionScatterPlots/markSize");
+  plot->options.markSize = config_->get<double>("report/initialSolutionScatterPlots/markSize");
   plot->options.mark = "x";
   plot->options.lineWidth = 0.1;
   plot->options.constPlot = false;
@@ -134,14 +134,14 @@ std::shared_ptr<pgftikz::PgfPlot> QueryCostAtFirstVsTimeAtFirstScatterPlotter::c
 
 void QueryCostAtFirstVsTimeAtFirstScatterPlotter::setInitialSolutionScatterAxisOptions(
     std::shared_ptr<pgftikz::PgfAxis> axis) const {
-  axis->options.height = config_->get<std::string>("initialSolutionScatterPlots/axisHeight");
-  axis->options.width = config_->get<std::string>("initialSolutionScatterPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("report/initialSolutionScatterPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("report/initialSolutionScatterPlots/axisWidth");
   axis->options.name = "InitialSolutionScatterAxis"s;
-  axis->options.xlog = config_->get<bool>("initialSolutionScatterPlots/xlog");
-  axis->options.xminorgrids = config_->get<bool>("initialSolutionScatterPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("initialSolutionScatterPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("initialSolutionScatterPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("initialSolutionScatterPlots/ymajorgrids");
+  axis->options.xlog = config_->get<bool>("report/initialSolutionScatterPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("report/initialSolutionScatterPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("report/initialSolutionScatterPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("report/initialSolutionScatterPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("report/initialSolutionScatterPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]";
   axis->options.ylabel = "Cost";
   axis->options.ylabelAbsolute = true;

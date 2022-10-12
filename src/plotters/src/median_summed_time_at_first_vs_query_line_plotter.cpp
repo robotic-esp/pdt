@@ -66,7 +66,7 @@ std::shared_ptr<pgftikz::PgfAxis> MedianSummedTimeAtFirstVsQueryLinePlotter::cre
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>(
-            "medianCumulativeInitialDurationPlots/plotConfidenceIntervalInAllPlots")) {
+            "report/medianCumulativeInitialDurationPlots/plotConfidenceIntervalInAllPlots")) {
       std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianCumulativeDurationUpperCiPlot(name);
       std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianCumulativeDurationLowerCiPlot(name);
       std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianCumulativeDurationFillCiPlot(name);
@@ -134,20 +134,20 @@ fs::path MedianSummedTimeAtFirstVsQueryLinePlotter::createMedianCumulativeDurati
 
 void MedianSummedTimeAtFirstVsQueryLinePlotter::setMedianCumulativeDurationAxisOptions(
     std::shared_ptr<pgftikz::PgfAxis> axis) const {
-  axis->options.width = config_->get<std::string>("medianCumulativeInitialDurationPlots/axisWidth");
+  axis->options.width = config_->get<std::string>("report/medianCumulativeInitialDurationPlots/axisWidth");
   axis->options.height =
-      config_->get<std::string>("medianCumulativeInitialDurationPlots/axisHeight");
+      config_->get<std::string>("report/medianCumulativeInitialDurationPlots/axisHeight");
   // axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCumulativeDuration();
   axis->options.ylog = true;
   axis->options.xminorgrids =
-      config_->get<bool>("medianCumulativeInitialDurationPlots/xminorgrids");
+      config_->get<bool>("report/medianCumulativeInitialDurationPlots/xminorgrids");
   axis->options.xmajorgrids =
-      config_->get<bool>("medianCumulativeInitialDurationPlots/xmajorgrids");
+      config_->get<bool>("report/medianCumulativeInitialDurationPlots/xmajorgrids");
   axis->options.yminorgrids =
-      config_->get<bool>("medianCumulativeInitialDurationPlots/yminorgrids");
+      config_->get<bool>("report/medianCumulativeInitialDurationPlots/yminorgrids");
   axis->options.ymajorgrids =
-      config_->get<bool>("medianCumulativeInitialDurationPlots/ymajorgrids");
+      config_->get<bool>("report/medianCumulativeInitialDurationPlots/ymajorgrids");
   axis->options.xlabel = "Query Number"s;
   axis->options.ylabel = "\\footnotesize Cumulative Duration [s]"s;
   axis->options.ylabelAbsolute = true;
@@ -159,7 +159,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedTimeAtFirstVsQueryLinePlotter::cre
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianCumulativeInitialSolutionPerQuery(
-          plannerName, config_->get<double>("medianCumulativeInitialDurationPlots/confidence")),
+          plannerName, config_->get<double>("report/medianCumulativeInitialDurationPlots/confidence")),
       "query number", "cumulative median initial solution duration");
 
   // Remove all nans from the table.
@@ -169,7 +169,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedTimeAtFirstVsQueryLinePlotter::cre
   // Create the plot and set the options.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianCumulativeInitialDurationPlots/lineWidth");
+  plot->options.lineWidth = config_->get<double>("report/medianCumulativeInitialDurationPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCumulativeInitialDuration"s;
 
@@ -181,7 +181,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedTimeAtFirstVsQueryLinePlotter::cre
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianCumulativeInitialSolutionPerQuery(
-          plannerName, config_->get<double>("medianCumulativeInitialDurationPlots/confidence")),
+          plannerName, config_->get<double>("report/medianCumulativeInitialDurationPlots/confidence")),
       "query number", "upper cumulative initial solution duration confidence bound");
 
   // Remove all nans from the table.
@@ -200,13 +200,13 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedTimeAtFirstVsQueryLinePlotter::cre
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth =
-      config_->get<double>("medianCumulativeInitialDurationPlots/confidenceIntervalLineWidth");
+      config_->get<double>("report/medianCumulativeInitialDurationPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCumulativeInitialDurationUpperConfidence"s;
   plot->options.drawOpacity =
-      config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalDrawOpacity");
+      config_->get<float>("report/medianCumulativeInitialDurationPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
-      config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
+      config_->get<float>("report/medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -216,7 +216,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedTimeAtFirstVsQueryLinePlotter::cre
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianCumulativeInitialSolutionPerQuery(
-          plannerName, config_->get<double>("medianCumulativeInitialDurationPlots/confidence")),
+          plannerName, config_->get<double>("report/medianCumulativeInitialDurationPlots/confidence")),
       "query number", "lower cumulative initial solution duration confidence bound");
 
   // Remove all nans from the table.
@@ -231,13 +231,13 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedTimeAtFirstVsQueryLinePlotter::cre
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth =
-      config_->get<double>("medianCumulativeInitialDurationPlots/confidenceIntervalLineWidth");
+      config_->get<double>("report/medianCumulativeInitialDurationPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCumulativeInitialDurationLowerConfidence"s;
   plot->options.drawOpacity =
-      config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalDrawOpacity");
+      config_->get<float>("report/medianCumulativeInitialDurationPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
-      config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
+      config_->get<float>("report/medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -253,7 +253,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedTimeAtFirstVsQueryLinePlotter::cre
   auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.fillOpacity =
-      config_->get<float>("medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
+      config_->get<float>("report/medianCumulativeInitialDurationPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
 
   return plot;

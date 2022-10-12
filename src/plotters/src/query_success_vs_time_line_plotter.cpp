@@ -66,7 +66,7 @@ std::shared_ptr<pgftikz::PgfAxis> QuerySuccessVsTimeLinePlotter::createSuccessAx
   // Fill the axis with the success plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
-    if (config_->get<bool>("successPlots/plotConfidenceIntervalInAllPlots")) {
+    if (config_->get<bool>("report/successPlots/plotConfidenceIntervalInAllPlots")) {
       std::shared_ptr<pgftikz::PgfPlot> upperCi = createSuccessUpperCiPlot(name);
       std::shared_ptr<pgftikz::PgfPlot> lowerCi = createSuccessLowerCiPlot(name);
       std::shared_ptr<pgftikz::PgfPlot> fillCi = createSuccessFillCiPlot(name);
@@ -89,7 +89,7 @@ std::shared_ptr<pgftikz::PgfAxis> QuerySuccessVsTimeLinePlotter::createSuccessAx
   setSuccessAxisOptions(axis);
 
   // First the lower and upper confidence bounds, if desired.
-  if (config_->get<bool>("successPlots/plotConfidenceIntervalInAllPlots")) {
+  if (config_->get<bool>("report/successPlots/plotConfidenceIntervalInAllPlots")) {
     std::shared_ptr<pgftikz::PgfPlot> upperCi = createSuccessUpperCiPlot(plannerName);
     std::shared_ptr<pgftikz::PgfPlot> lowerCi = createSuccessLowerCiPlot(plannerName);
     std::shared_ptr<pgftikz::PgfPlot> fillCi = createSuccessFillCiPlot(plannerName);
@@ -131,19 +131,19 @@ fs::path QuerySuccessVsTimeLinePlotter::createSuccessPicture(const std::string& 
 
 void QuerySuccessVsTimeLinePlotter::setSuccessAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.name = "SuccessAxis";
-  axis->options.width = config_->get<std::string>("successPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("successPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("report/successPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("report/successPlots/axisHeight");
   axis->options.xmin = minDurationToBePlotted_;
   axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymin = 0;
   axis->options.ymax = 100;
-  axis->options.xlog = config_->get<bool>("successPlots/xlog");
-  axis->options.xminorgrids = config_->get<bool>("successPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("successPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("successPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("successPlots/ymajorgrids");
+  axis->options.xlog = config_->get<bool>("report/successPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("report/successPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("report/successPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("report/successPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("report/successPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]"s;
-  axis->options.ytick = config_->get<std::string>("successPlots/ytick");
+  axis->options.ytick = config_->get<std::string>("report/successPlots/ytick");
   axis->options.ylabel = "Success [\\%]"s;
   axis->options.ylabelAbsolute = true;
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
@@ -153,7 +153,7 @@ std::shared_ptr<pgftikz::PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessPl
   // Store the initial solution edf in a pgf table.
   auto table =
       std::make_shared<pgftikz::PgfTable>(stats_.extractInitialSolutionDurationEdf(
-                                     plannerName, config_->get<double>("successPlots/confidence")),
+                                     plannerName, config_->get<double>("report/successPlots/confidence")),
                                           "durations", "edf");
 
   // Remove all rows for which domain is infinite.
@@ -173,7 +173,7 @@ std::shared_ptr<pgftikz::PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessPl
 
   // Add the appropriate options.
   plot->options.mark = "\"none\""s;
-  plot->options.lineWidth = config_->get<double>("successPlots/lineWidth");
+  plot->options.lineWidth = config_->get<double>("report/successPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "Success"s;
 
@@ -185,7 +185,7 @@ std::shared_ptr<pgftikz::PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessUp
   // Get the table from the appropriate file.
   auto table =
       std::make_shared<pgftikz::PgfTable>(stats_.extractInitialSolutionDurationEdf(
-                                     plannerName, config_->get<double>("successPlots/confidence")),
+                                     plannerName, config_->get<double>("report/successPlots/confidence")),
                                  "durations", "upper confidence bound");
 
   // Remove all rows for which domain is infinite.
@@ -207,11 +207,11 @@ std::shared_ptr<pgftikz::PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessUp
   // Create the plot and set the options.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.mark = "\"none\""s;
-  plot->options.lineWidth = config_->get<double>("successPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth = config_->get<double>("report/successPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "SuccessUpperConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("successPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("successPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity = config_->get<float>("report/successPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity = config_->get<float>("report/successPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -221,7 +221,7 @@ std::shared_ptr<pgftikz::PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessLo
   // Get the table from the appropriate file.
   auto table =
       std::make_shared<pgftikz::PgfTable>(stats_.extractInitialSolutionDurationEdf(
-                                     plannerName, config_->get<double>("successPlots/confidence")),
+                                     plannerName, config_->get<double>("report/successPlots/confidence")),
                                  "durations", "lower confidence bound");
 
   // Remove all rows for which domain is infinite.
@@ -243,11 +243,11 @@ std::shared_ptr<pgftikz::PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessLo
   // Create the plot and set the options.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.mark = "\"none\""s;
-  plot->options.lineWidth = config_->get<double>("successPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth = config_->get<double>("report/successPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "SuccessLowerConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("successPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("successPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity = config_->get<float>("report/successPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity = config_->get<float>("report/successPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -261,7 +261,7 @@ std::shared_ptr<pgftikz::PgfPlot> QuerySuccessVsTimeLinePlotter::createSuccessFi
   // Create the plot.
   auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
-  plot->options.fillOpacity = config_->get<float>("successPlots/confidenceIntervalFillOpacity");
+  plot->options.fillOpacity = config_->get<float>("report/successPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
 
   return plot;

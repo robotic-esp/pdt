@@ -148,8 +148,8 @@ void MultiqueryStatistics::computeCumulativeMetricsForPlanner(
   std::vector<double> upperCostBounds;
 
   // the confidence intervals we use here come from where the maximum values are used
-  const double initial_duration_confidence = config_->get<double>("medianCumulativeInitialDurationPlots/confidence");
-  const double initial_cost_confidence = config_->get<double>("medianCumulativeCostPlots/confidence");
+  const double initial_duration_confidence = config_->get<double>("report/medianCumulativeInitialDurationPlots/confidence");
+  const double initial_cost_confidence = config_->get<double>("report/medianCumulativeCostPlots/confidence");
 
   // merge together the stuff that is computed in the separate statistics
   for (auto i=0u; i<numQueries_; ++i){
@@ -251,7 +251,7 @@ void MultiqueryStatistics::computeCumulativeFinalCost(
   std::vector<double> upperCostBounds;
 
   // the confidence intervals we use here come from where the maximum values are used
-  const double final_cost_confidence = config_->get<double>("medianFinalCostPerQueryPlots/confidence");
+  const double final_cost_confidence = config_->get<double>("report/medianFinalCostPerQueryPlots/confidence");
 
   // merge together the stuff that is computed in the separate statistics
   for (auto i=0u; i<numQueries_; ++i){

@@ -114,16 +114,16 @@ fs::path QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::createMedianInit
 void QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter::setMedianInitialSolutionAxisOptions(
     std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.name = "MedianCostAxis";
-  axis->options.width = config_->get<std::string>("medianInitialSolutionPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("medianInitialSolutionPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("report/medianInitialSolutionPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("report/medianInitialSolutionPlots/axisHeight");
   axis->options.xmin = minDurationToBePlotted_;
   axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
-  axis->options.xlog = config_->get<bool>("medianInitialSolutionPlots/xlog");
-  axis->options.xminorgrids = config_->get<bool>("medianInitialSolutionPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("medianInitialSolutionPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("medianInitialSolutionPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("medianInitialSolutionPlots/ymajorgrids");
+  axis->options.xlog = config_->get<bool>("report/medianInitialSolutionPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("report/medianInitialSolutionPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("report/medianInitialSolutionPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("report/medianInitialSolutionPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("report/medianInitialSolutionPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]"s;
   axis->options.ylabel = "Median cost"s;
   axis->options.ylabelAbsolute = true;
@@ -135,12 +135,12 @@ std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPoint
   // Load the median initial duration and cost into a table.
   auto table = std::make_shared<pgftikz::PgfTable>(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("report/medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Create the plot.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
-  plot->options.markSize = config_->get<double>("medianInitialSolutionPlots/markSize");
+  plot->options.markSize = config_->get<double>("report/medianInitialSolutionPlots/markSize");
   plot->options.onlyMarks = true;
   plot->options.namePath = plannerName + "MedianInitialSolution"s;
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
@@ -154,12 +154,12 @@ std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPoint
   // Load the median initial solution.
   pgftikz::PgfTable medianInitialSolution(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("report/medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Load the duration confidence interval.
   pgftikz::PgfTable interval(stats_.extractMedianInitialSolution(
-                        plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
+                        plannerName, config_->get<double>("report/medianInitialSolutionPlots/confidence")),
                     "lower initial solution duration confidence bound",
                     "upper initial solution duration confidence bound");
 
@@ -174,9 +174,9 @@ std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPoint
 
   // Create the plot.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
-  plot->options.markSize = config_->get<double>("medianInitialSolutionPlots/markSize");
+  plot->options.markSize = config_->get<double>("report/medianInitialSolutionPlots/markSize");
   plot->options.mark = "|";
-  plot->options.lineWidth = config_->get<double>("medianInitialSolutionPlots/lineWidth");
+  plot->options.lineWidth = config_->get<double>("report/medianInitialSolutionPlots/lineWidth");
   plot->options.namePath = plannerName + "MedianInitialSolutionDurationConfidenceInterval"s;
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
 
@@ -189,12 +189,12 @@ std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPoint
   // Load the median initial solution.
   pgftikz::PgfTable medianInitialSolution(
       stats_.extractMedianInitialSolution(
-          plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
+          plannerName, config_->get<double>("report/medianInitialSolutionPlots/confidence")),
       "median initial solution duration", "median initial solution cost");
 
   // Load the duration confidence interval.
   pgftikz::PgfTable interval(stats_.extractMedianInitialSolution(
-                        plannerName, config_->get<double>("medianInitialSolutionPlots/confidence")),
+                        plannerName, config_->get<double>("report/medianInitialSolutionPlots/confidence")),
                     "lower initial solution cost confidence bound",
                     "upper initial solution cost confidence bound");
 
@@ -209,9 +209,9 @@ std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostAtFirstVsMedianTimeAtFirstPoint
 
   // Create the plot.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
-  plot->options.markSize = config_->get<double>("medianInitialSolutionPlots/markSize");
+  plot->options.markSize = config_->get<double>("report/medianInitialSolutionPlots/markSize");
   plot->options.mark = "-";
-  plot->options.lineWidth = config_->get<double>("medianInitialSolutionPlots/lineWidth");
+  plot->options.lineWidth = config_->get<double>("report/medianInitialSolutionPlots/lineWidth");
   plot->options.namePath = plannerName + "MedianInitialSolutionDurationConfidenceInterval"s;
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
 

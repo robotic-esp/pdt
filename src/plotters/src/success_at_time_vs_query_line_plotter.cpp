@@ -119,15 +119,15 @@ fs::path SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPicture(
 }
 
 void SuccessAtTimeVsQueryLinePlotter::setSuccessRateQueryAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const {
-  axis->options.width = config_->get<std::string>("successRatePlots/axisWidth");
-  axis->options.height = config_->get<std::string>("successRatePlots/axisHeight");
+  axis->options.width = config_->get<std::string>("report/successRatePlots/axisWidth");
+  axis->options.height = config_->get<std::string>("report/successRatePlots/axisHeight");
   axis->options.ymin = 0.;
   axis->options.ymax = 1.05;
   axis->options.ylog = false;
-  axis->options.xminorgrids = config_->get<bool>("successRatePlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("successRatePlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("successRatePlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("successRatePlots/ymajorgrids");
+  axis->options.xminorgrids = config_->get<bool>("report/successRatePlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("report/successRatePlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("report/successRatePlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("report/successRatePlots/ymajorgrids");
   axis->options.xlabel = "Query Number"s;
   axis->options.ylabel = "Success Rate [\\%]"s;
   axis->options.ylabelAbsolute = true;
@@ -146,7 +146,7 @@ std::shared_ptr<pgftikz::PgfPlot> SuccessAtTimeVsQueryLinePlotter::createSuccess
   // Create the plot and set the options.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("successRatePlots/lineWidth");
+  plot->options.lineWidth = config_->get<double>("report/successRatePlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "SuccessRatePerQuery"s + percentString;
 

@@ -162,13 +162,13 @@ std::stringstream SingleQueryReport::overview() const {
   medianCiKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
               << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed
               << std::setfill('0') << std::setw(4) << std::setprecision(2)
-        << config_->get<double>("medianInitialSolutionPlots/confidence") << "/confidence"s;
+        << config_->get<double>("report/medianInitialSolutionPlots/confidence") << "/confidence"s;
 
   overview << "\\begin{center}\n\\input{"
       << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
            << "}\n\\captionof{figure}{\\footnotesize \\textbf{Top:} Percentage of runs that found "
               "a solution at any given time with a Clopper-Pearson (nonparametric) "
-           << 100.0 * config_->get<double>("successPlots/confidence")
+           << 100.0 * config_->get<double>("report/successPlots/confidence")
            << "\\% confidence interval. \\textbf{Bottom:} Median cost evolution and median of "
               "initial solution with nonparametric "
       << std::floor(100.0 * config_->get<double>(medianCiKey.str()))
@@ -251,7 +251,7 @@ std::stringstream SingleQueryReport::individualResults() const {
     initialCiKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
                  << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed
                  << std::setfill('0') << std::setw(4) << std::setprecision(2)
-                 << config_->get<double>("medianInitialSolutionPlots/confidence") << "/confidence"s;
+                 << config_->get<double>("report/medianInitialSolutionPlots/confidence") << "/confidence"s;
 
     // Create a picture out of the three initial solution axes.
     results << "\\begin{center}\n\\input{"
@@ -259,7 +259,7 @@ std::stringstream SingleQueryReport::individualResults() const {
             << "}\n\\captionof{figure}{\\footnotesize \\textbf{Top:} Histogram and associated "
                "empirical distribution function (EDF) of "
             << plotPlannerNames_.at(name) << " with a Clopper-Pearson (nonparametric) "
-            << 100.0 * config_->get<double>("successPlots/confidence")
+            << 100.0 * config_->get<double>("report/successPlots/confidence")
             << "\\% confidence interval for the underlying CDF. \\textbf{Bottom:} All initial "
                "solutions of "
             << plotPlannerNames_.at(name) << " and their median with a nonparametric "
@@ -279,7 +279,7 @@ std::stringstream SingleQueryReport::individualResults() const {
       costCiKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
                 << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed
                 << std::setfill('0') << std::setw(4) << std::setprecision(2)
-                << config_->get<double>("medianCostPlots/confidence") << "/confidence"s;
+                << config_->get<double>("report/medianCostPlots/confidence") << "/confidence"s;
 
       results << "\\subsection{Cost Evolution}\\label{sec:" << name << "-cost-evolution}\n";
       results << "\\begin{center}\n\\input{"

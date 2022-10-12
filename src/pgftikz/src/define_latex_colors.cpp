@@ -48,15 +48,16 @@ using namespace std::string_literals;
 
 std::string defineLatexColors(const std::shared_ptr<const config::Configuration>& config)
 {
+  std::string colorKey = "report/colors";
   std::stringstream rval;
 
   // Get all keys in the colors group.
-  std::vector<std::string> childKeys = config->getChildren("colors");
+  std::vector<std::string> childKeys = config->getChildren(colorKey);
 
   // Iterate over the keys
   for (const auto& name : childKeys) {
     // Get the color
-    auto values = config->get<std::array<int, 3>>("colors/"s + name);
+    auto values = config->get<std::array<int, 3>>(colorKey + "/"s + name);
 
     // Add the color definition to the string
     rval << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','

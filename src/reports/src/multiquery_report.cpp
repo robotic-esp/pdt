@@ -166,11 +166,11 @@ std::stringstream MultiqueryReport::overview() const {
           << latexPlotter_.createPicture(medianQueryDurationAxis, medianCumulativeDurationAxis, legend).string()
           << "}\n\\captionof{figure}{\\footnotesize (Top) Median duration per query of the initial solution of "
           << "all planners with "
-          << 100.0 * config_->get<double>("medianInitialDurationPlots/confidence")
+          << 100.0 * config_->get<double>("report/medianInitialDurationPlots/confidence")
           << "\\% confidence interval. "
           << "(Bottom) Cumulative median duration per query of the initial solution of "
           << "all planners with "
-          << 100.0 * config_->get<double>("medianCumulativeInitialDurationPlots/confidence")
+          << 100.0 * config_->get<double>("report/medianCumulativeInitialDurationPlots/confidence")
           << "\\% confidence interval. "
           << "}\\end{center}\n";
 
@@ -186,11 +186,11 @@ std::stringstream MultiqueryReport::overview() const {
           << latexPlotter_.createPicture(medianQueryInitialCostAxis, medianCumulativeInitialCostAxis, legend).string()
           << "}\n\\captionof{figure}{\\footnotesize (Top) Median initial cost per query for "
           << "all planners" << " with "
-          << 100.0 * config_->get<double>("medianInitialCostPerQueryPlots/confidence")
+          << 100.0 * config_->get<double>("report/medianInitialCostPerQueryPlots/confidence")
           << "\\% confidence interval. "
           << "(Bottom) Cumulative median cost per query of the initial solution of "
           << "all planners with "
-          << 100.0 * config_->get<double>("medianCumulativeCostPlots/confidence")
+          << 100.0 * config_->get<double>("report/medianCumulativeCostPlots/confidence")
           << "\\% confidence interval. "
           << "}\\end{center}\n";
 
@@ -207,11 +207,11 @@ std::stringstream MultiqueryReport::overview() const {
           << latexPlotter_.createPicture(medianQueryLastCostAxis, medianCumulativeLastCostAxis, legend).string()
           << "}\n\\captionof{figure}{\\footnotesize (Top) Median final cost per query for "
           << "all planners" << " with "
-          << 100.0 * config_->get<double>("medianFinalCostPerQueryPlots/confidence")
+          << 100.0 * config_->get<double>("report/medianFinalCostPerQueryPlots/confidence")
           << "\\% confidence interval. "
           << "(Bottom) Cumulative median cost per query of the final solution of "
           << "all planners with "
-          << 100.0 * config_->get<double>("medianCumulativeCostPlots/confidence")
+          << 100.0 * config_->get<double>("report/medianCumulativeCostPlots/confidence")
           << "\\% confidence interval. "
           << "}\\end{center}\n";
 
@@ -283,7 +283,7 @@ std::stringstream MultiqueryReport::overview() const {
             << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
                "at any given time. (Bottom) Median cost evolution for query "
             << std::to_string(n) + " of all planners" << " with "
-            << 100.0 * config_->get<double>("medianCostPlots/confidence")
+            << 100.0 * config_->get<double>("report/medianCostPlots/confidence")
             << "\\% confidence interval.} \\end{center}\n";
 
     overview << "\n\\pagebreak\n";
@@ -307,7 +307,7 @@ std::stringstream MultiqueryReport::individualResults() const {
             << medianTimeAtFirstVsQueryLinePlotter_.createMedianInitialDurationPicture(name).string()
             << "}\n\\captionof{figure}{\\footnotesize (Top) Median duration per query of the initial solution of "
             << plotPlannerNames_.at(name) << " with "
-            << 100.0 * config_->get<double>("medianInitialDurationPlots/confidence")
+            << 100.0 * config_->get<double>("report/medianInitialDurationPlots/confidence")
             << "\\% confidence interval.} \\end{center}\n";
   }
 

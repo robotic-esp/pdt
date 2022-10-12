@@ -65,7 +65,7 @@ std::shared_ptr<pgftikz::PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   // Fill the axis with the median cumulative cost plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
-    if (config_->get<bool>("medianCumulativeCostPlots/plotConfidenceIntervalInAllPlots")) {
+    if (config_->get<bool>("report/medianCumulativeCostPlots/plotConfidenceIntervalInAllPlots")) {
       std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianCumulativeCostUpperCiPlot(name, initial);
       std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianCumulativeCostLowerCiPlot(name, initial);
       std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianCumulativeCostFillCiPlot(name);
@@ -145,16 +145,16 @@ fs::path MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPic
 
 void MedianSummedCostAtTimeVsQueryLinePlotter::setMedianCumulativeCostAxisOptions(
     std::shared_ptr<pgftikz::PgfAxis> axis) const {
-  axis->options.width = config_->get<std::string>("medianCumulativeCostPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("medianCumulativeCostPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("report/medianCumulativeCostPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("report/medianCumulativeCostPlots/axisHeight");
   // axis->options.xmax = maxCostToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCumulativeCost();
-  // axis->options.xlog = config_->get<bool>("medianCumulativeCostPlots/xlog");
+  // axis->options.xlog = config_->get<bool>("report/medianCumulativeCostPlots/xlog");
   axis->options.ylog = true;
-  axis->options.xminorgrids = config_->get<bool>("medianCumulativeCostPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("medianCumulativeCostPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("medianCumulativeCostPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("medianCumulativeCostPlots/ymajorgrids");
+  axis->options.xminorgrids = config_->get<bool>("report/medianCumulativeCostPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("report/medianCumulativeCostPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("report/medianCumulativeCostPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("report/medianCumulativeCostPlots/ymajorgrids");
   axis->options.xlabel = "Query Number"s;
   axis->options.ylabel = "Cumulative Cost"s;
   axis->options.ylabelAbsolute = true;
@@ -168,12 +168,12 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   if (initial) {
     table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeInitialSolutionPerQuery(
-            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+            plannerName, config_->get<double>("report/medianCumulativeCostPlots/confidence")),
         "query number", "cumulative median initial solution cost");
   } else {
     table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeFinalCostPerQuery(
-            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+            plannerName, config_->get<double>("report/medianCumulativeCostPlots/confidence")),
         "query number", "cumulative median final solution cost");
   }
 
@@ -184,7 +184,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   // Create the plot and set the options.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
-  plot->options.lineWidth = config_->get<double>("medianCumulativeCostPlots/lineWidth");
+  plot->options.lineWidth = config_->get<double>("report/medianCumulativeCostPlots/lineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolution"s;
 
@@ -198,12 +198,12 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   if (initial) {
     table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeInitialSolutionPerQuery(
-            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+            plannerName, config_->get<double>("report/medianCumulativeCostPlots/confidence")),
         "query number", "upper cumulative initial solution cost confidence bound");
   } else {
     table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeFinalCostPerQuery(
-            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+            plannerName, config_->get<double>("report/medianCumulativeCostPlots/confidence")),
         "query number", "upper cumulative final solution cost confidence bound");
   }
 
@@ -223,13 +223,13 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth =
-      config_->get<double>("medianCumulativeCostPlots/confidenceIntervalLineWidth");
+      config_->get<double>("report/medianCumulativeCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCumulativeCostUpperConfidence"s;
   plot->options.drawOpacity =
-      config_->get<float>("medianCumulativeCostPlots/confidenceIntervalDrawOpacity");
+      config_->get<float>("report/medianCumulativeCostPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
-      config_->get<float>("medianCumulativeCostPlots/confidenceIntervalFillOpacity");
+      config_->get<float>("report/medianCumulativeCostPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -241,12 +241,12 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   if (initial) {
     table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeInitialSolutionPerQuery(
-            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+            plannerName, config_->get<double>("report/medianCumulativeCostPlots/confidence")),
         "query number", "lower cumulative initial solution cost confidence bound");
   } else {
     table = std::make_shared<pgftikz::PgfTable>(
         stats_.extractMedianCumulativeFinalCostPerQuery(
-            plannerName, config_->get<double>("medianCumulativeCostPlots/confidence")),
+            plannerName, config_->get<double>("report/medianCumulativeCostPlots/confidence")),
         "query number", "lower cumulative final solution cost confidence bound");
   }
 
@@ -262,13 +262,13 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.markSize = 0.0;
   plot->options.lineWidth =
-      config_->get<double>("medianCumulativeCostPlots/confidenceIntervalLineWidth");
+      config_->get<double>("report/medianCumulativeCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCumulativeCostLowerConfidence"s;
   plot->options.drawOpacity =
-      config_->get<float>("medianCumulativeCostPlots/confidenceIntervalDrawOpacity");
+      config_->get<float>("report/medianCumulativeCostPlots/confidenceIntervalDrawOpacity");
   plot->options.fillOpacity =
-      config_->get<float>("medianCumulativeCostPlots/confidenceIntervalFillOpacity");
+      config_->get<float>("report/medianCumulativeCostPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
@@ -284,7 +284,7 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.fillOpacity =
-      config_->get<float>("medianCumulativeCostPlots/confidenceIntervalFillOpacity");
+      config_->get<float>("report/medianCumulativeCostPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
 
   return plot;

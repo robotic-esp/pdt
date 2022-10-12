@@ -100,15 +100,15 @@ fs::path QueryPercentileCostVsTimeLinePlotter::createCostPercentileEvolutionPict
 
 void QueryPercentileCostVsTimeLinePlotter::setCostPercentileEvolutionAxisOptions(
     std::shared_ptr<pgftikz::PgfAxis> axis) const {
-  axis->options.width = config_->get<std::string>("costPercentileEvolutionPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("costPercentileEvolutionPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("report/costPercentileEvolutionPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("report/costPercentileEvolutionPlots/axisHeight");
   axis->options.xmax = maxDurationToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
-  axis->options.xlog = config_->get<bool>("costPercentileEvolutionPlots/xlog");
-  axis->options.xminorgrids = config_->get<bool>("costPercentileEvolutionPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("costPercentileEvolutionPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("costPercentileEvolutionPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("costPercentileEvolutionPlots/ymajorgrids");
+  axis->options.xlog = config_->get<bool>("report/costPercentileEvolutionPlots/xlog");
+  axis->options.xminorgrids = config_->get<bool>("report/costPercentileEvolutionPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("report/costPercentileEvolutionPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("report/costPercentileEvolutionPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("report/costPercentileEvolutionPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]"s;
   axis->options.ylabel = "Cost"s;
   axis->options.ylabelAbsolute = true;

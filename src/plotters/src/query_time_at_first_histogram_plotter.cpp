@@ -68,8 +68,8 @@ QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramAxis() c
 
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     auto plot = createInitialSolutionDurationHistogramPlot(name);
-    plot->options.fillOpacity = config_->get<float>("initialSolutionPlots/combinedFillOpacity");
-    plot->options.lineWidth = config_->get<double>("initialSolutionPlots/lineWidth");
+    plot->options.fillOpacity = config_->get<float>("report/initialSolutionPlots/combinedFillOpacity");
+    plot->options.lineWidth = config_->get<double>("report/initialSolutionPlots/lineWidth");
     axis_->addPlot(plot);
   }
 
@@ -149,16 +149,16 @@ QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPlot(
 
 void QueryTimeAtFirstHistogramPlotter::setInitialSolutionDurationHistogramAxisOptions(
     std::shared_ptr<pgftikz::PgfAxis> axis) const {
-  axis->options.height = config_->get<std::string>("initialSolutionPlots/axisHeight");
-  axis->options.width = config_->get<std::string>("initialSolutionPlots/axisWidth");
+  axis->options.height = config_->get<std::string>("report/initialSolutionPlots/axisHeight");
+  axis->options.width = config_->get<std::string>("report/initialSolutionPlots/axisWidth");
   axis->options.name = "InitialSolutionDurationHistogramAxis"s;
-  axis->options.xlog = config_->get<bool>("initialSolutionPlots/xlog");
+  axis->options.xlog = config_->get<bool>("report/initialSolutionPlots/xlog");
   axis->options.ymin = 0.0;
   axis->options.enlargeYLimits = "upper";
-  axis->options.xminorgrids = config_->get<bool>("initialSolutionPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("initialSolutionPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("initialSolutionPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("initialSolutionPlots/ymajorgrids");
+  axis->options.xminorgrids = config_->get<bool>("report/initialSolutionPlots/xminorgrids");
+  axis->options.xmajorgrids = config_->get<bool>("report/initialSolutionPlots/xmajorgrids");
+  axis->options.yminorgrids = config_->get<bool>("report/initialSolutionPlots/yminorgrids");
+  axis->options.ymajorgrids = config_->get<bool>("report/initialSolutionPlots/ymajorgrids");
   axis->options.xlabel = "Computation time [s]";
   axis->options.ylabel = "Counts";
   axis->options.ylabelAbsolute = true;
