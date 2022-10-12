@@ -11,15 +11,12 @@
         "numRuns": 50,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
-        "loadDefaultPlannerConfig": true,
         "loadDefaultObjectiveConfig": true,
+        "loadDefaultPlannerConfig": true,
+        "loadDefaultReportConfig": true,
         "validateProblemDefinitions": true,
         "validateProblemDefinitionsDuration": 10.0,
         "validateProblemDefinitionsPlanner": "defaultRRTConnect",
-        "report": {
-            "automatic": true,
-            "verboseCompilation": false
-        },
         "regenerateQueries": false
     },
     "context": {

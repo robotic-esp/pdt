@@ -679,23 +679,6 @@ void Configuration::registerAsExperiment() {
                      executable.c_str(), executable_.c_str());
         }
       }
-
-      // Handle executable specific configuration.
-      if (executable == "benchmark"s) {
-        if (parameters_["experiment"].contains("report")) {
-          if (!parameters_["experiment"]["report"].contains("automatic")) {
-            parameters_["experiment"]["report"]["automatic"] = false;
-            parameters_["experiment"]["report"]["verboseCompilation"] = false;
-          }
-        } else {
-          parameters_["experiment"]["report"]["automatic"] = false;
-          parameters_["experiment"]["report"]["verboseCompilation"] = false;
-        }
-        accessedParameters_["experiment"]["report"]["automatic"] =
-            parameters_["experiment"]["report"]["automatic"];
-        accessedParameters_["experiment"]["report"]["verboseCompilation"] =
-            parameters_["experiment"]["report"]["verboseCompilation"];
-      }
     }
   }
 
@@ -707,10 +690,12 @@ void Configuration::registerAsExperiment() {
   accessedParameters_["experiment"]["version"]["branch"] = Version::GIT_REFSPEC;
   accessedParameters_["experiment"]["version"]["status"] = Version::GIT_STATUS;
 
-  // This ensures we don't load any additional context or planner config when rerunning this
-  // experiment.
+  // Force context, objective, or planner loadDefault*Config keys to false to ensure rerunning
+  // the experiment will be the same.
   accessedParameters_["experiment"]["loadDefaultContextConfig"] = false;
+  accessedParameters_["experiment"]["loadDefaultObjectiveConfig"] = false;
   accessedParameters_["experiment"]["loadDefaultPlannerConfig"] = false;
+  accessedParameters_["experiment"]["loadDefaultReportConfig"] = parameters_["experiment"]["loadDefaultReportConfig"];
 
   // Handle seed specifications.
   handleSeedSpecification();

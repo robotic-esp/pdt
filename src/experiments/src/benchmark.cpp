@@ -486,11 +486,6 @@ int main(const int argc, const char **argv) {
                    100.0f
             << " %\n";
 
-  // Inform that the report is being compiled.
-  std::cout << "\nReport\n"
-            << std::setw(2u) << std::setfill(' ') << ' '
-            << "Compiling (this may take a couple of minutes)" << std::flush;
-
   // Generate the statistic.
   std::vector<pdt::statistics::PlanningStatistics> stats;
 
@@ -499,7 +494,7 @@ int main(const int argc, const char **argv) {
   }
 
   // Generate the report.
-  fs::path reportPath;
+  std::cout << "\nReport\n" <<std::flush;
   if (stats.size() == 0u){
     throw std::runtime_error(
         "No statistics were generated, thus no report can be compiled.");
@@ -507,21 +502,49 @@ int main(const int argc, const char **argv) {
   else if(stats.size() == 1u){ // Single query report
     pdt::reports::SingleQueryReport report(config, stats[0u]);
     report.generateReport();
-    reportPath = report.compileReport();
+    if (config->get<bool>("report/automaticCompilation")) {
+      // Inform that the report is being compiled.
+      std::cout << std::setw(2u) << std::setfill(' ') << ' '
+                << "Compiling (this may take a couple of minutes)" << std::flush;
+
+      fs::path reportPath;
+      reportPath = report.compileReport();
+
+      // Inform that we are done compiling the report.
+      std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
+                << std::setfill(' ') << ' ' << "Compilation done\n"
+                << std::flush;
+
+      // Inform where we wrote the report to.
+      std::cout << std::setw(2u) << std::setfill(' ') << ' ' << "Location " << reportPath << "\n\n";
+    } else {
+      std::cout << std::setw(2u) << std::setfill(' ') << ' '  << "Compilation skipped" << "\n\n" << std::flush;
+    }
   }
   else{ // Multiquery report
     pdt::statistics::MultiqueryStatistics mqstats(config, stats, false);
 
     pdt::reports::MultiqueryReport report(config, mqstats);
     report.generateReport();
-    reportPath = report.compileReport();
+    if (config->get<bool>("report/automaticCompilation")) {
+      // Inform that the report is being compiled.
+      std::cout << std::setw(2u) << std::setfill(' ') << ' '
+                << "Compiling (this may take a couple of minutes)" << std::flush;
+
+      fs::path reportPath;
+      reportPath = report.compileReport();
+
+      // Inform that we are done compiling the report.
+      std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
+                << std::setfill(' ') << ' ' << "Compilation done\n"
+                << std::flush;
+
+      // Inform where we wrote the report to.
+      std::cout << std::setw(2u) << std::setfill(' ') << ' ' << "Location " << reportPath << "\n\n";
+    } else {
+      std::cout << std::setw(2u) << std::setfill(' ') << ' '  << "Compilation skipped" << "\n\n" << std::flush;
+    }
   }
-
-  // Inform that we are done compiling the report.
-  std::cout << '\r' << std::setw(47u) << std::setfill(' ') << ' ' << '\r' << std::setw(2u)
-            << std::setfill(' ') << ' ' << "Compilation done\n"
-            << std::flush;
-
   // Log some info to a log file.
   auto logPath = experimentDirectory / "log.txt"s;
   ompl::msg::OutputHandlerFile log(logPath.c_str());
@@ -534,9 +557,6 @@ int main(const int argc, const char **argv) {
   OMPL_INFORM("Duration of experiment: '%s'",
               pdt::time::toDurationString(experimentDuration).c_str());
   OMPL_INFORM("Wrote results to '%s'", experimentDirectory.string());
-
-  // Inform where we wrote the report to.
-  std::cout << std::setw(2u) << std::setfill(' ') << ' ' << "Location " << reportPath << "\n\n";
 
   // Dump the accessed parameters next to the results file.
   // This overwrites the previously dumped config with one that only consists of the

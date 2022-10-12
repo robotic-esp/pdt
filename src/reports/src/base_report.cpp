@@ -202,7 +202,7 @@ fs::path BaseReport::compileReport() const {
   auto cmd = "cd \""s + reportPath.parent_path().string() +
              "\" && lualatex --interaction=nonstopmode --shell-escape \""s + reportPath.string() +
              "\""s;
-  if (!config_->get<bool>("experiment/report/verboseCompilation")) {
+  if (!config_->get<bool>("report/verboseCompilation")) {
     cmd += " > /dev/null";
   }
   cmd += " && cd \""s + currentPath.string() + '\"';

@@ -1,5 +1,7 @@
 {
     "report": {
+        "automaticCompilation": true,
+        "verboseCompilation": false,
         "colors": {
             "pdtblack": [ 0, 0, 0 ],
             "pdtwhite": [ 255, 255, 255 ],

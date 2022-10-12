@@ -12,11 +12,8 @@
         "numRuns": 100,
         "logFrequency": 10000,
         "loadDefaultContextConfig": true,
-        "loadDefaultPlannerConfig": true,
         "loadDefaultObjectiveConfig": true,
-        "report": {
-            "automatic": true,
-            "verboseCompilation": false
-        }
+        "loadDefaultPlannerConfig": true,
+        "loadDefaultReportConfig": true
     }
 }
