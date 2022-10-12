@@ -94,7 +94,7 @@ RandomRectanglesMultiStartGoal::RandomRectanglesMultiStartGoal(
   spaceInfo_->setup();
 }
 
-std::vector<StartGoalPair> RandomRectanglesMultiStartGoal::makeStartGoalPair() const{
+std::vector<StartGoalPair> RandomRectanglesMultiStartGoal::makeStartGoalPair() const {
   if (config_->contains("context/" + name_ + "/starts")) {
     OMPL_ERROR("MultiStartGoal context does not support multiple queries.");
     throw std::runtime_error("Context error.");
@@ -132,7 +132,8 @@ void RandomRectanglesMultiStartGoal::createObstacles() {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
     bool invalidates = false;
-    auto obstacle = std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor, widths);
+    auto obstacle = std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+        spaceInfo_, anchor, widths);
     // Add this to the obstacles if it doesn't invalidate the start or goal states.
     for (const auto& start : startGoalPairs_[0].start) {
       if (obstacle->invalidates(start)) {

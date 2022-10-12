@@ -69,7 +69,7 @@ void Configuration::clear() {
 }
 
 // Full namespace on the parameter to keep Doxygen happy
-void Configuration::load(const std::experimental::filesystem::path& config) {
+void Configuration::load(const std::experimental::filesystem::path &config) {
   if (!fs::exists(config)) {
     OMPL_ERROR("Cannot find provided configuration file at %s", config.c_str());
     throw std::ios_base::failure("Cannot find config file.");
@@ -102,12 +102,10 @@ void Configuration::load(const std::experimental::filesystem::path& config) {
       loadDefaultContextConfigs = patch["experiment"]["loadDefaultContextConfig"].get<bool>();
     }
     if (patch["experiment"].contains("loadDefaultObjectiveConfig")) {
-      loadDefaultObjectiveConfigs =
-        patch["experiment"]["loadDefaultObjectiveConfig"].get<bool>();
+      loadDefaultObjectiveConfigs = patch["experiment"]["loadDefaultObjectiveConfig"].get<bool>();
     }
     if (patch["experiment"].contains("loadDefaultReportConfig")) {
-      loadDefaultReportConfigs =
-        patch["experiment"]["loadDefaultReportConfig"].get<bool>();
+      loadDefaultReportConfigs = patch["experiment"]["loadDefaultReportConfig"].get<bool>();
     }
   }
 
@@ -195,7 +193,8 @@ void Configuration::load(const int argc, const char **argv) {
     } else {
       // We create the folder directly here, since
       // fs::canonical requires the folder that we are trying to resolve to exist.
-      // fs::weakly_canonical relaxes this requirement, but is not in the experimental filesystem header
+      // fs::weakly_canonical relaxes this requirement, but is not in the experimental filesystem
+      // header
       const auto absolutePath = fs::absolute(invokedOptions["path"].as<std::string>());
       fs::create_directories(absolutePath);
       add<std::string>("experiment/baseDirectory", fs::canonical(absolutePath.string()));
@@ -233,7 +232,8 @@ std::vector<std::string> Configuration::getChildren(const std::string &key) cons
   return getChildren(key, parameters_);
 }
 
-std::vector<std::string> Configuration::getChildren(const std::string &key, const json::json &parameters) const {
+std::vector<std::string> Configuration::getChildren(const std::string &key,
+                                                    const json::json &parameters) const {
   if (isNestedKey(key)) {
     auto [ns, rest] = split(key);
     if (!parameters.contains(ns)) {
@@ -250,7 +250,8 @@ std::vector<std::string> Configuration::getChildren(const std::string &key, cons
 
     std::vector<std::string> children;
     for (const auto &entry : parameters[key].items()) {
-      // If the key has no children (e.g., it's a key-value pair) then it has an item with an empty key string.
+      // If the key has no children (e.g., it's a key-value pair) then it has an item with an empty
+      // key string.
       if (!entry.key().empty()) {
         children.push_back(entry.key());
       }
@@ -358,7 +359,7 @@ void Configuration::loadDefaultPlannerConfig() {
       std::ifstream configFile(directoryEntry.path().string());
       if (configFile.fail()) {
         OMPL_ERROR("File '%s' exists but cannot be opened.",
-                  directoryEntry.path().string().c_str());
+                   directoryEntry.path().string().c_str());
         throw std::ios_base::failure("Configuration error.");
       }
 
@@ -422,7 +423,7 @@ void Configuration::loadDefaultPlannerConfig() {
   } else {
     // Cannot find default planner config at default location.
     auto msg = "Default planner config directory does not exist at '"s +
-              defaultPlannerConfigDirectory.string() + "'."s;
+               defaultPlannerConfigDirectory.string() + "'."s;
     throw std::ios_base::failure(msg.c_str());
   }
   OMPL_INFORM("Loaded default planner configs.");
@@ -445,7 +446,7 @@ void Configuration::loadDefaultContextConfig() {
       std::ifstream configFile(directoryEntry.path().string());
       if (configFile.fail()) {
         OMPL_ERROR("File '%s' exists but cannot be opened.",
-                    directoryEntry.path().string().c_str());
+                   directoryEntry.path().string().c_str());
         throw std::ios_base::failure("Configuration error.");
       }
 
@@ -506,7 +507,7 @@ void Configuration::loadDefaultContextConfig() {
   } else {
     // Cannot find default context config at default location.
     auto msg = "Default context config directory does not exist at '"s +
-                defaultContextConfigDirectory.string() + "'."s;
+               defaultContextConfigDirectory.string() + "'."s;
     throw std::ios_base::failure(msg.c_str());
   }
   OMPL_INFORM("Loaded default context configs.");
@@ -529,7 +530,7 @@ void Configuration::loadDefaultObjectiveConfig() {
       std::ifstream configFile(directoryEntry.path().string());
       if (configFile.fail()) {
         OMPL_ERROR("File '%s' exists but cannot be opened.",
-                    directoryEntry.path().string().c_str());
+                   directoryEntry.path().string().c_str());
         throw std::ios_base::failure("Configuration error.");
       }
 
@@ -570,7 +571,7 @@ void Configuration::loadDefaultObjectiveConfig() {
   } else {
     // Cannot find default objective config at default location.
     auto msg = "Default objective config directory does not exist at '"s +
-                defaultObjectiveConfigDirectory.string() + "'."s;
+               defaultObjectiveConfigDirectory.string() + "'."s;
     throw std::ios_base::failure(msg.c_str());
   }
   OMPL_INFORM("Loaded default objective configs.");
@@ -582,7 +583,8 @@ void Configuration::loadDefaultReportConfig() {
     // Make sure the file can be opened.
     std::ifstream configFile(defaultReportConfigFile.string());
     if (configFile.fail()) {
-      OMPL_ERROR("File '%s' exists but cannot be opened.", defaultReportConfigFile.string().c_str());
+      OMPL_ERROR("File '%s' exists but cannot be opened.",
+                 defaultReportConfigFile.string().c_str());
       throw std::ios_base::failure("Configuration error.");
     }
 
@@ -598,7 +600,7 @@ void Configuration::loadDefaultReportConfig() {
                                                     "initialSolutionScatterPlots",
                                                     "initialSolutionPlots",
                                                     "costPercentileEvolutionPlots"};
-                                                    // "statistics"};
+    // "statistics"};
     const std::vector<std::string> necessarySubkeys = {"axisWidth",   "axisHeight",  "xminorgrids",
                                                        "xmajorgrids", "yminorgrids", "ymajorgrids",
                                                        "xlog",        "markSize"};
@@ -625,8 +627,8 @@ void Configuration::loadDefaultReportConfig() {
     // No need to close config, std::ifstreams are closed on destruction.
   } else {
     // Cannot find default report config at default location.
-    auto msg = "Default report config does not exist at '"s +
-              defaultReportConfigFile.string() + "'."s;
+    auto msg =
+        "Default report config does not exist at '"s + defaultReportConfigFile.string() + "'."s;
     throw std::ios_base::failure(msg.c_str());
   }
   OMPL_INFORM("Loaded default report configs.");
@@ -697,7 +699,8 @@ void Configuration::registerAsExperiment() {
   accessedParameters_["experiment"]["loadDefaultContextConfig"] = false;
   accessedParameters_["experiment"]["loadDefaultObjectiveConfig"] = false;
   accessedParameters_["experiment"]["loadDefaultPlannerConfig"] = false;
-  accessedParameters_["experiment"]["loadDefaultReportConfig"] = parameters_["experiment"]["loadDefaultReportConfig"];
+  accessedParameters_["experiment"]["loadDefaultReportConfig"] =
+      parameters_["experiment"]["loadDefaultReportConfig"];
 
   // Handle seed specifications.
   handleSeedSpecification();

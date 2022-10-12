@@ -43,22 +43,21 @@ namespace pdt {
 
 namespace time {
 
-class CumulativeTimer
-{
-  public:
-    CumulativeTimer() = default;
-    ~CumulativeTimer() = default;
+class CumulativeTimer {
+ public:
+  CumulativeTimer() = default;
+  ~CumulativeTimer() = default;
 
-    void start();
-    void stop();
-    Duration duration();
+  void start();
+  void stop();
+  Duration duration();
 
-  private:
-    // Define start/stop using the measuring clock (not the system clock):
-    bool running{false};
-    Clock::time_point start_;
-    Clock::time_point stop_;
-    Duration duration_{0.0};
+ private:
+  // Define start/stop using the measuring clock (not the system clock):
+  bool running{false};
+  Clock::time_point start_;
+  Clock::time_point stop_;
+  Duration duration_{0.0};
 };
 
 }  // namespace time

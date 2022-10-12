@@ -60,7 +60,7 @@ namespace planning_contexts {
 /** \brief Struct defining the start/end points of a planning problem. */
 struct StartGoalPair {
   std::vector<ompl::base::ScopedState<>> start;
-  std::shared_ptr<ompl::base::Goal> goal;                                                                                                  
+  std::shared_ptr<ompl::base::Goal> goal;
 };
 
 /** \brief The base class for an experiment */
@@ -93,11 +93,13 @@ class BaseContext {
   /** \brief Returns the start/goal pair. */
   StartGoalPair getNthStartGoalPair(const std::size_t n) const;
 
-  /** \brief Return a newly generated problem definition. Equivalent to  instantiateNthNewProblemDefinition(0u). */
+  /** \brief Return a newly generated problem definition. Equivalent to
+   * instantiateNthNewProblemDefinition(0u). */
   virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNewProblemDefinition() const;
 
   /** \brief Return a newly generated problem definition for the n-th query. */
-  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNthProblemDefinition(const std::size_t n) const;
+  virtual std::shared_ptr<ompl::base::ProblemDefinition> instantiateNthProblemDefinition(
+      const std::size_t n) const;
 
   /** \brief Accepts a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const = 0;
@@ -111,21 +113,23 @@ class BaseContext {
   /** \brief Create a goal. */
   virtual std::shared_ptr<ompl::base::Goal> createGoal() const = 0;
 
-  /** \brief Regenerates the queries: In case they are generated randomly, this gives a new set of queries.*/
+  /** \brief Regenerates the queries: In case they are generated randomly, this gives a new set of
+   * queries.*/
   void regenerateQueries();
 
  protected:
-  /** \brief Loads the specified or randomly generates the start/goal pairs (depending on the config file). */
+  /** \brief Loads the specified or randomly generates the start/goal pairs (depending on the config
+   * file). */
   virtual std::vector<StartGoalPair> makeStartGoalPair() const;
 
   /** \brief Parse start and goal specification used for multiquery benchmarking. */
   std::vector<StartGoalPair> parseMultiqueryStartGoalPairs() const;
 
   /** \brief Parse explicitly specified starts/goals. */
-  std::vector<ompl::base::ScopedState<>> parseSpecifiedStates(const std::string &key) const;
+  std::vector<ompl::base::ScopedState<>> parseSpecifiedStates(const std::string& key) const;
 
   /** \brief Generate randomly sampled starts/goals. */
-  std::vector<ompl::base::ScopedState<>> generateRandomStates(const std::string &key) const;
+  std::vector<ompl::base::ScopedState<>> generateRandomStates(const std::string& key) const;
 
   /** \brief The space information associated with this context. */
   ompl::base::SpaceInformationPtr spaceInfo_{};

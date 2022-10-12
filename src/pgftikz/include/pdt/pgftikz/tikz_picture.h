@@ -37,10 +37,10 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "pdt/config/configuration.h"
 #include "pdt/pgftikz/pgf_axis.h"
@@ -58,18 +58,18 @@ struct TikzPictureOptions {
 };
 
 namespace zlevels {
-  constexpr std::size_t UNSET = 0;
-  constexpr std::size_t OBSTACLE = 1;
-  constexpr std::size_t ANTIOBSTACLE = 2;
-  constexpr std::size_t BOUNDARY = 3;
-  constexpr std::size_t EDGE_LOWLIGHT = 10;
-  constexpr std::size_t EDGE = 11;
-  constexpr std::size_t EDGE_HIGHLIGHT = 12;
-  constexpr std::size_t SOLUTION = 20;
-  constexpr std::size_t VERTEX = 30;
-  constexpr std::size_t START = 31;
-  constexpr std::size_t GOAL = 32;
-} // namespace zlevels
+constexpr std::size_t UNSET = 0;
+constexpr std::size_t OBSTACLE = 1;
+constexpr std::size_t ANTIOBSTACLE = 2;
+constexpr std::size_t BOUNDARY = 3;
+constexpr std::size_t EDGE_LOWLIGHT = 10;
+constexpr std::size_t EDGE = 11;
+constexpr std::size_t EDGE_HIGHLIGHT = 12;
+constexpr std::size_t SOLUTION = 20;
+constexpr std::size_t VERTEX = 30;
+constexpr std::size_t START = 31;
+constexpr std::size_t GOAL = 32;
+}  // namespace zlevels
 
 class TikzPicture {
  public:

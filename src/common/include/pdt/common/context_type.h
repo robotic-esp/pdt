@@ -69,29 +69,29 @@ enum class CONTEXT_TYPE {
   WALL_GAP,
 };
 
-NLOHMANN_JSON_SERIALIZE_ENUM(CONTEXT_TYPE,
-                             {
-                                 {CONTEXT_TYPE::CENTER_SQUARE, "CenterSquare"},
-                                 {CONTEXT_TYPE::DIVIDING_WALLS, "DividingWalls"},
-                                 {CONTEXT_TYPE::DOUBLE_ENCLOSURE, "DoubleEnclosure"},
-                                 {CONTEXT_TYPE::FLANKING_GAP, "FlankingGap"},
-                                 {CONTEXT_TYPE::FOUR_ROOMS, "FourRooms"},
-                                 {CONTEXT_TYPE::GOAL_ENCLOSURE, "GoalEnclosure"},
-                                 {CONTEXT_TYPE::NARROW_PASSAGE, "NarrowPassage"},
-                                 {CONTEXT_TYPE::OBSTACLE_FREE, "ObstacleFree"},
-                                 {CONTEXT_TYPE::OPEN_RAVE_MANIPULATOR, "OpenRaveManipulator"},
-                                 {CONTEXT_TYPE::OPEN_RAVE_R3, "OpenRaveR3"},
-                                 {CONTEXT_TYPE::OPEN_RAVE_R3XSO2, "OpenRaveR3xSO2"},
-                                 {CONTEXT_TYPE::OPEN_RAVE_SE3, "OpenRaveSE3"},
-                                 {CONTEXT_TYPE::OPEN_RAVE_CONSTRAINED_SE3, "OpenRaveConstrainedSE3"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES, "RandomRectangles"},
-                                 {CONTEXT_TYPE::RANDOM_RECTANGLES_MULTI_START_GOAL, "MultiStartGoal"},
-                                 {CONTEXT_TYPE::REEDS_SHEPP_RANDOM_RECTANGLES, "ReedsSheppRandomRectangles"},
-                                 {CONTEXT_TYPE::REPEATING_RECTANGLES, "RepeatingRectangles"},
-                                 {CONTEXT_TYPE::SPIRAL, "Spiral"},
-                                 {CONTEXT_TYPE::START_ENCLOSURE, "StartEnclosure"},
-                                 {CONTEXT_TYPE::WALL_GAP, "WallGap"},
-                             })
+NLOHMANN_JSON_SERIALIZE_ENUM(
+    CONTEXT_TYPE, {
+                      {CONTEXT_TYPE::CENTER_SQUARE, "CenterSquare"},
+                      {CONTEXT_TYPE::DIVIDING_WALLS, "DividingWalls"},
+                      {CONTEXT_TYPE::DOUBLE_ENCLOSURE, "DoubleEnclosure"},
+                      {CONTEXT_TYPE::FLANKING_GAP, "FlankingGap"},
+                      {CONTEXT_TYPE::FOUR_ROOMS, "FourRooms"},
+                      {CONTEXT_TYPE::GOAL_ENCLOSURE, "GoalEnclosure"},
+                      {CONTEXT_TYPE::NARROW_PASSAGE, "NarrowPassage"},
+                      {CONTEXT_TYPE::OBSTACLE_FREE, "ObstacleFree"},
+                      {CONTEXT_TYPE::OPEN_RAVE_MANIPULATOR, "OpenRaveManipulator"},
+                      {CONTEXT_TYPE::OPEN_RAVE_R3, "OpenRaveR3"},
+                      {CONTEXT_TYPE::OPEN_RAVE_R3XSO2, "OpenRaveR3xSO2"},
+                      {CONTEXT_TYPE::OPEN_RAVE_SE3, "OpenRaveSE3"},
+                      {CONTEXT_TYPE::OPEN_RAVE_CONSTRAINED_SE3, "OpenRaveConstrainedSE3"},
+                      {CONTEXT_TYPE::RANDOM_RECTANGLES, "RandomRectangles"},
+                      {CONTEXT_TYPE::RANDOM_RECTANGLES_MULTI_START_GOAL, "MultiStartGoal"},
+                      {CONTEXT_TYPE::REEDS_SHEPP_RANDOM_RECTANGLES, "ReedsSheppRandomRectangles"},
+                      {CONTEXT_TYPE::REPEATING_RECTANGLES, "RepeatingRectangles"},
+                      {CONTEXT_TYPE::SPIRAL, "Spiral"},
+                      {CONTEXT_TYPE::START_ENCLOSURE, "StartEnclosure"},
+                      {CONTEXT_TYPE::WALL_GAP, "WallGap"},
+                  })
 
 }  // namespace common
 

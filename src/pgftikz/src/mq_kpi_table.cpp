@@ -36,8 +36,8 @@
 // Authors: Valentin Hartmann
 
 /*
-Algorithm | t_cum, init,min | t_cum,init,med | t_cum,init,max | c_cum,init,min | c_cum,init,med | c_cum,init,max | c_cum,fin,min
-| c_cum,fin,med | c_cum,fin,max | success|
+Algorithm | t_cum, init,min | t_cum,init,med | t_cum,init,max | c_cum,init,min | c_cum,init,med |
+c_cum,init,max | c_cum,fin,min | c_cum,fin,med | c_cum,fin,max | success|
  */
 
 #include "pdt/pgftikz/mq_kpi_table.h"
@@ -53,7 +53,8 @@ namespace pgftikz {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-MqKpiTable::MqKpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats) :
+MqKpiTable::MqKpiTable(const std::shared_ptr<const config::Configuration>& config,
+                       const statistics::MultiqueryStatistics& stats) :
     config_(config),
     stats_(stats) {
   options.rowSep = "\\\\[0.5em]"s;
@@ -76,14 +77,16 @@ void MqKpiTable::addKpi(const std::string& plannerName, const std::string& plann
     auto cumFinalMinCost = stats_.getMinCumulativeFinalCost(plannerName);
     auto cumFinalMedCost = stats_.getMedianCumulativeFinalCost(plannerName);
     auto cumFinalMaxCost = stats_.getMaxCumulativeFinalCost(plannerName);
-    appendRow({cumInitMinDuration, cumInitMedDuration, cumInitMaxDuration, cumInitMinCost, cumInitMedCost,
-        cumInitMaxCost, cumFinalMinCost, cumFinalMedCost, cumFinalMaxCost, success});
+    appendRow({cumInitMinDuration, cumInitMedDuration, cumInitMaxDuration, cumInitMinCost,
+               cumInitMedCost, cumInitMaxCost, cumFinalMinCost, cumFinalMedCost, cumFinalMaxCost,
+               success});
   } else {
     auto cumFinalMinCost = cumInitMinCost;
     auto cumFinalMedCost = cumInitMedCost;
     auto cumFinalMaxCost = cumInitMaxCost;
-    appendRow({cumInitMinDuration, cumInitMedDuration, cumInitMaxDuration, cumInitMinCost, cumInitMedCost,
-        cumInitMaxCost, cumFinalMinCost, cumFinalMedCost, cumFinalMaxCost, success});
+    appendRow({cumInitMinDuration, cumInitMedDuration, cumInitMaxDuration, cumInitMinCost,
+               cumInitMedCost, cumInitMaxCost, cumFinalMinCost, cumFinalMedCost, cumFinalMaxCost,
+               success});
   }
 }
 
@@ -115,7 +118,8 @@ std::string MqKpiTable::string() const {
   std::stringstream stream;
   stream << std::fixed;
   stream << "\\begin{table}[!h]\n";
-  stream << "\\caption{Summary of cumulative solution durations and costs, and average planner success.}";
+  stream << "\\caption{Summary of cumulative solution durations and costs, and average planner "
+            "success.}";
   stream << "{\\tiny\n";
   stream << "\\setlength{\\tabcolsep}{0.8em}\n";
   stream << "\\begin{tabularx}{\\textwidth}[c]{Xcccccccccc}\\toprule\n";
@@ -137,7 +141,7 @@ std::string MqKpiTable::string() const {
       } else {
         stream << std::setprecision(3);
       }
-      
+
       if (data_.at(col).at(row) == std::numeric_limits<double>::infinity()) {
         stream << "\\infty ";
       } else {

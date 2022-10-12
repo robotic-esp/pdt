@@ -51,7 +51,8 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 SuccessAtTimeVsQueryLinePlotter::SuccessAtTimeVsQueryLinePlotter(
-    const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config,
+    const statistics::MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   auto contextName = config_->get<std::string>("experiment/context");
@@ -59,7 +60,7 @@ SuccessAtTimeVsQueryLinePlotter::SuccessAtTimeVsQueryLinePlotter(
 
 std::shared_ptr<pgftikz::PgfAxis> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryAxis(
     const unsigned int percentage) const {
-  if (percentage != 100u && percentage != 75u && percentage != 50u && percentage != 25u){
+  if (percentage != 100u && percentage != 75u && percentage != 50u && percentage != 25u) {
     throw std::runtime_error("Invalid percentage in success per query plotter.");
   }
 
@@ -77,7 +78,7 @@ std::shared_ptr<pgftikz::PgfAxis> SuccessAtTimeVsQueryLinePlotter::createSuccess
 
 std::shared_ptr<pgftikz::PgfAxis> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryAxis(
     const std::string& plannerName, const unsigned int percentage) const {
-  if (percentage != 100u && percentage != 75u && percentage != 50u && percentage != 25u){
+  if (percentage != 100u && percentage != 75u && percentage != 50u && percentage != 25u) {
     throw std::runtime_error("Invalid percentage in success per query plotter.");
   }
 
@@ -91,15 +92,17 @@ std::shared_ptr<pgftikz::PgfAxis> SuccessAtTimeVsQueryLinePlotter::createSuccess
   return axis;
 }
 
-fs::path SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPicture(const unsigned int percentage) const {
+fs::path SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPicture(
+    const unsigned int percentage) const {
   // Create the picture and add the axis.
   pgftikz::TikzPicture picture(config_);
   auto axis = createSuccessRateQueryAxis(percentage);
   picture.addAxis(axis);
 
   // Generate the tikz file.
-  auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                     fs::path("tikz/all_success_rate_query_plot_" + std::to_string(percentage) + "_percent.tikz");
+  auto picturePath =
+      fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
+      fs::path("tikz/all_success_rate_query_plot_" + std::to_string(percentage) + "_percent.tikz");
   picture.write(picturePath);
   return picturePath;
 }
@@ -113,12 +116,14 @@ fs::path SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPicture(
 
   // Generate the tikz file.
   auto picturePath = fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
-                     fs::path("tikz/"s + plannerName + "_success_rate_query_plot_" + std::to_string(percentage) + "_percent.tikz"s);
+                     fs::path("tikz/"s + plannerName + "_success_rate_query_plot_" +
+                              std::to_string(percentage) + "_percent.tikz"s);
   picture.write(picturePath);
   return picturePath;
 }
 
-void SuccessAtTimeVsQueryLinePlotter::setSuccessRateQueryAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const {
+void SuccessAtTimeVsQueryLinePlotter::setSuccessRateQueryAxisOptions(
+    std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("report/successRatePlots/axisWidth");
   axis->options.height = config_->get<std::string>("report/successRatePlots/axisHeight");
   axis->options.ymin = 0.;
@@ -134,14 +139,15 @@ void SuccessAtTimeVsQueryLinePlotter::setSuccessRateQueryAxisOptions(std::shared
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<pgftikz::PgfPlot> SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPercentPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+SuccessAtTimeVsQueryLinePlotter::createSuccessRateQueryPercentPlot(
     const std::string& plannerName, const unsigned int percentage) const {
-
   const auto percentString = std::to_string(percentage);
 
   // Get the table from the appropriate file.
-  auto table =
-      std::make_shared<pgftikz::PgfTable>(stats_.extractSuccessPerQuery(plannerName), "query number", "success rate at " + percentString + " percent");
+  auto table = std::make_shared<pgftikz::PgfTable>(stats_.extractSuccessPerQuery(plannerName),
+                                                   "query number",
+                                                   "success rate at " + percentString + " percent");
 
   // Create the plot and set the options.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);

@@ -64,7 +64,6 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
     maxSideLength_(config->get<double>("context/" + name + "/maxSideLength")),
     realVectorSubspaceInfo_(std::make_shared<ompl::base::SpaceInformation>(
         spaceInfo_->getStateSpace()->as<ompl::base::SE2StateSpace>()->getSubspace(0u))) {
-
   if (minSideLength_ > maxSideLength_) {
     OMPL_ERROR("%s: Specified min side length is greater than specified max side length.",
                name.c_str());
@@ -88,24 +87,20 @@ ReedsSheppRandomRectangles::ReedsSheppRandomRectangles(
         generateQueriesBeforeObstacles = true;
       } else {
         throw std::runtime_error(
-          "Context error. Multiple specified starts/goals are not supported for this context at "
-          "the moment.");
+            "Context error. Multiple specified starts/goals are not supported for this context at "
+            "the moment.");
       }
-    }
-    else if (config_->get<std::string>("context/" + name + "/starts/type") == "generated"){
+    } else if (config_->get<std::string>("context/" + name + "/starts/type") == "generated") {
       generateQueriesBeforeObstacles = false;
-    }
-    else{
+    } else {
       throw std::runtime_error(
-        "Context error. The only start types that are currently supported are 'specified' and 'generated'.");
+          "Context error. The only start types that are currently supported are 'specified' and "
+          "'generated'.");
     }
-  }
-  else if (config_->contains("context/" + name_ + "/start")) {
+  } else if (config_->contains("context/" + name_ + "/start")) {
     generateQueriesBeforeObstacles = true;
-  } 
-  else{
-    throw std::runtime_error(
-      "Context error. Neither 'start' nor 'starts' specified.");
+  } else {
+    throw std::runtime_error("Context error. Neither 'start' nor 'starts' specified.");
   }
 
   if (generateQueriesBeforeObstacles) {
@@ -155,8 +150,8 @@ void ReedsSheppRandomRectangles::createObstacles() {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
 
-    auto obstacle =
-        std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(realVectorSubspaceInfo_, anchor, widths);
+    auto obstacle = std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+        realVectorSubspaceInfo_, anchor, widths);
 
     auto validityChecker = std::make_shared<ReedsSheppValidityChecker>(spaceInfo_);
     validityChecker->addObstacle(obstacle);
@@ -259,17 +254,18 @@ std::shared_ptr<ompl::base::Goal> ReedsSheppRandomRectangles::createGoal() const
       goal->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
       return goal;
     }
-#endif // #ifdef PDT_EXTRA_GOAL_SPACE
+#endif  // #ifdef PDT_EXTRA_GOAL_SPACE
     default: { throw std::runtime_error("Goal type not implemented."); }
   }
 }
 
-std::vector<std::shared_ptr<obstacles::BaseObstacle>> ReedsSheppRandomRectangles::getObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseObstacle>> ReedsSheppRandomRectangles::getObstacles()
+    const {
   return obstacles_;
 }
 
-std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> ReedsSheppRandomRectangles::getAntiObstacles()
-    const {
+std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>>
+ReedsSheppRandomRectangles::getAntiObstacles() const {
   return {};
 }
 

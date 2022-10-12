@@ -38,12 +38,12 @@
 #pragma once
 
 #include <experimental/filesystem>
+#include <iomanip>
+#include <iostream>
 #include <map>
 #include <set>
 #include <utility>
 #include <vector>
-#include <iomanip>
-#include <iostream>
 
 #include "pdt/config/configuration.h"
 #include "pdt/statistics/planning_statistics.h"
@@ -54,8 +54,8 @@ namespace statistics {
 
 class MultiqueryStatistics {
  public:
-  MultiqueryStatistics(const std::shared_ptr<config::Configuration>& config, const std::vector<PlanningStatistics> &stats,
-      bool forceComputation);
+  MultiqueryStatistics(const std::shared_ptr<config::Configuration>& config,
+                       const std::vector<PlanningStatistics>& stats, bool forceComputation);
   ~MultiqueryStatistics() = default;
 
   std::experimental::filesystem::path extractMedianInitialSolutionPerQuery(
@@ -74,12 +74,9 @@ class MultiqueryStatistics {
   std::experimental::filesystem::path extractFinalSolutionPerQuery(
       const std::string& plannerName) const;
 
-  std::experimental::filesystem::path extractSuccessPerQuery(
-      const std::string& plannerName) const;
+  std::experimental::filesystem::path extractSuccessPerQuery(const std::string& plannerName) const;
 
-  std::size_t getNumQueries() const{
-    return numQueries_;
-  };
+  std::size_t getNumQueries() const { return numQueries_; };
 
   double getMaxDuration() const;
   double getMaxNonInfInitialDuration() const;

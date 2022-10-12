@@ -36,9 +36,9 @@
 #include <string>
 #include <vector>
 
-#include <ompl/util/Console.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
+#include <ompl/util/Console.h>
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest/doctest.h"
@@ -57,13 +57,12 @@ TEST_CASE("Optimization objectives") {
 
   // Instantiate an empty configuration.
   const char* argv[] = {"test_pdt_objectives\0"};
-  const int   argc   = sizeof(argv) / sizeof(char*) - 1;
+  const int argc = sizeof(argv) / sizeof(char*) - 1;
   auto config = std::make_shared<pdt::config::Configuration>(argc, argv);
   config->clear();
 
   // Get the path of the test configurations.
-  const auto configsDir =
-    pdt::config::Directory::SOURCE / "test/pdt_objectives/configs";
+  const auto configsDir = pdt::config::Directory::SOURCE / "test/pdt_objectives/configs";
 
   SUBCASE("Path length") {
     // Load the test configuration.
@@ -72,8 +71,7 @@ TEST_CASE("Optimization objectives") {
 
     // Prepare the context creation.
     pdt::factories::ContextFactory factory(config);
-    const std::vector<std::string> contextNames
-      {"test2d", "test4d", "test8d", "test16d", "test32d"};
+    const std::vector<std::string> contextNames{"test2d", "test4d", "test8d", "test16d", "test32d"};
 
     // Loop over all contexts.
     for (const auto& name : contextNames) {
@@ -104,7 +102,7 @@ TEST_CASE("Optimization objectives") {
       }
 
       // Check cost along all dimensions.
-      double sumOfSquares { 0.0 };
+      double sumOfSquares{0.0};
       for (auto i = 0u; i < context->getDimension(); ++i) {
         (*s2)[i] = 0.25;
         sumOfSquares += 0.25 * 0.25;
@@ -113,28 +111,27 @@ TEST_CASE("Optimization objectives") {
       }
     }
   }
-  
+
   SUBCASE("Reciprocal obstacle clearance") {
     // Load the test configuration.
     CHECK(fs::exists(configsDir / "obstacle_clearance.json"));
     config->load(configsDir / "obstacle_clearance.json");
-    
+
     // Prepare the context creation.
     pdt::factories::ContextFactory factory(config);
-    const std::vector<std::string> contextNames
-    {"test2d", "test4d", "test8d", "test16d", "test32d"};
+    const std::vector<std::string> contextNames{"test2d", "test4d", "test8d", "test16d", "test32d"};
 
     // Loop over all contexts.
     for (const auto& name : contextNames) {
-
       SUBCASE(name.c_str()) {
-      
         // Create the context.
         auto context = factory.create(name);
 
         // Allocate test states.
-        auto s1 = context->getSpaceInformation()->allocState()->as<RealVectorStateSpace::StateType>();
-        auto s2 = context->getSpaceInformation()->allocState()->as<RealVectorStateSpace::StateType>();
+        auto s1 =
+            context->getSpaceInformation()->allocState()->as<RealVectorStateSpace::StateType>();
+        auto s2 =
+            context->getSpaceInformation()->allocState()->as<RealVectorStateSpace::StateType>();
         for (auto i = 0u; i < context->getDimension(); ++i) {
           (*s1)[i] = 0.0;
           (*s2)[i] = 0.0;
@@ -142,12 +139,13 @@ TEST_CASE("Optimization objectives") {
 
         // Get more convenient access to problem components.
         const auto spaceInfo = context->getSpaceInformation();
-        const auto checker   = spaceInfo->getStateValidityChecker();
-        const auto objective1 = pdt::objectives::ReciprocalClearanceOptimizationObjective(spaceInfo,
-                                                                         {0.0, 1.0});
-        const auto objective2 = pdt::objectives::ReciprocalClearanceOptimizationObjective(spaceInfo,
-                                                                         {0.0, 0.5, 1.0});
-        const auto objective3 = pdt::objectives::ReciprocalClearanceOptimizationObjective(spaceInfo, 0.5);
+        const auto checker = spaceInfo->getStateValidityChecker();
+        const auto objective1 =
+            pdt::objectives::ReciprocalClearanceOptimizationObjective(spaceInfo, {0.0, 1.0});
+        const auto objective2 =
+            pdt::objectives::ReciprocalClearanceOptimizationObjective(spaceInfo, {0.0, 0.5, 1.0});
+        const auto objective3 =
+            pdt::objectives::ReciprocalClearanceOptimizationObjective(spaceInfo, 0.5);
 
         SUBCASE("Trivial costs") {
           SUBCASE("Objective 1") {
@@ -166,7 +164,7 @@ TEST_CASE("Optimization objectives") {
 
         SUBCASE("Parallel edge") {
           // Check cost parallel to obstacle.
-          /*    s1    s2    
+          /*    s1    s2
            *     x----x
            *   +--------+
            *   |        |
@@ -174,10 +172,10 @@ TEST_CASE("Optimization objectives") {
            *   |        |
            *   +--------+
            */
-          (*s1)[0u] =  0.1;
+          (*s1)[0u] = 0.1;
           (*s2)[0u] = -0.1;
-          (*s1)[1u] =  0.3;
-          (*s2)[1u] =  0.3;
+          (*s1)[1u] = 0.3;
+          (*s2)[1u] = 0.3;
 
           // Make sure the setup is actually what's pictured above.
           CHECK(spaceInfo->distance(s1, s2) == doctest::Approx(0.2));
@@ -210,8 +208,8 @@ TEST_CASE("Optimization objectives") {
             // + ln((c2 + c3 - (t2 - t3))^2 / (4 * c2 * c3)) = ln(9/4)
             // + ln((l - t3 + c3) / c3) = 0
             // = 2 * ln(9/4)
-            CHECK(objective2.motionCostHeuristic(s1, s2).value()
-                  == doctest::Approx(2.0 * std::log(9.0/4.0)));
+            CHECK(objective2.motionCostHeuristic(s1, s2).value() ==
+                  doctest::Approx(2.0 * std::log(9.0 / 4.0)));
 
             // Make sure the heuristic is admissible
             CHECK_FALSE(objective1.isCostBetterThan(objective1.motionCost(s1, s2),
@@ -223,13 +221,12 @@ TEST_CASE("Optimization objectives") {
           // 0.0056417526832828026
           // 0.0056417526832823611 ?
 
-
           SUBCASE("Objective 3") {
             // The cost should still be the same, so 10 * 0.2 = 2.
             CHECK(objective3.motionCost(s1, s2).value() == doctest::Approx(2.0));
             const auto numSegments = spaceInfo->getStateSpace()->validSegmentCount(s1, s2);
             const auto numSamples =
-              std::max(2u, static_cast<unsigned>(std::ceil((numSegments + 1u) / 2.0)));
+                std::max(2u, static_cast<unsigned>(std::ceil((numSegments + 1u) / 2.0)));
 
             // The first and last term will be zero, as the first and last state will be at the
             // boundaries. The terms in between will all be the same because the clearance is the
@@ -241,15 +238,15 @@ TEST_CASE("Optimization objectives") {
             // numSamples * ln((0.2 + 0.2/(numSamples - 1))^2 / 0.04).
             // Note that the validSegmentCount depends on the collision detection resolution as
             // well as the state space dimension.
-            CHECK(objective3.motionCostHeuristic(s1, s2).value()
-                  == doctest::Approx((numSamples - 1) *
-                                     std::log(std::pow(0.2 + 0.2 / (numSamples - 1), 2.0) / 0.04)));
+            CHECK(objective3.motionCostHeuristic(s1, s2).value() ==
+                  doctest::Approx((numSamples - 1) *
+                                  std::log(std::pow(0.2 + 0.2 / (numSamples - 1), 2.0) / 0.04)));
           }
         }
 
         SUBCASE("Perpendicular edge") {
           // Check cost perpendicular to obstacle.
-          /* 
+          /*
            *   +--------+
            *   |        | s1    s2
            *   |  obs.  |  x----x
@@ -258,8 +255,8 @@ TEST_CASE("Optimization objectives") {
            */
           (*s1)[0u] = -0.3;
           (*s2)[0u] = -0.5;
-          (*s1)[1u] =  0.0;
-          (*s2)[1u] =  0.0;
+          (*s1)[1u] = 0.0;
+          (*s2)[1u] = 0.0;
 
           // Make sure the setup is actually what's pictured above.
           CHECK(spaceInfo->distance(s1, s2) == doctest::Approx(0.2));
@@ -323,7 +320,7 @@ TEST_CASE("Optimization objectives") {
            */
           (*s1)[0u] = -0.3;
           (*s2)[0u] = -0.5;
-          (*s1)[1u] =  0.1;
+          (*s1)[1u] = 0.1;
           (*s2)[1u] = -0.1;
 
           // Make sure the setup is actually what's pictured above.
@@ -331,77 +328,76 @@ TEST_CASE("Optimization objectives") {
           CHECK(checker->clearance(s1) == doctest::Approx(0.1));
           CHECK(checker->clearance(s2) == doctest::Approx(0.3));
 
-          SUBCASE ("Objective 1") {
+          SUBCASE("Objective 1") {
             // Make sure the cost is as expected. The cost should be
             // integral from 0 to sqrt(0.08) of 1 / ((sqrt(2)/2) t + 0.1) dt
             // = [2/sqrt(2) * ln((sqrt(2)/2)t + 0.1)|_0^0.2
             // = 2/sqrt(2) * ln(10 * (sqrt(2)/2 * sqrt(0.08) + 0.1)).
             CHECK(objective1.motionCost(s1, s2).value() ==
-                  doctest::Approx(2.0/std::sqrt(2.0) *
-                                  std::log(10.0 * (std::sqrt(2) /
-                                                   2.0 * std::sqrt(0.08) + 0.1))));
+                  doctest::Approx(2.0 / std::sqrt(2.0) *
+                                  std::log(10.0 * (std::sqrt(2) / 2.0 * std::sqrt(0.08) + 0.1))));
 
             // Make sure the heuristic is as expected.
-            const auto heuristicAngle = std::log(std::pow(0.1 + 0.3 + std::sqrt(0.08), 2.0) /
-                                                 (4.0 * 0.1 * 0.3));
-            CHECK(objective1.motionCostHeuristic(s1, s2).value() == doctest::Approx(heuristicAngle));
+            const auto heuristicAngle =
+                std::log(std::pow(0.1 + 0.3 + std::sqrt(0.08), 2.0) / (4.0 * 0.1 * 0.3));
+            CHECK(objective1.motionCostHeuristic(s1, s2).value() ==
+                  doctest::Approx(heuristicAngle));
 
             // Make sure the heuristic is admissible
             CHECK_FALSE(objective1.isCostBetterThan(objective1.motionCost(s1, s2),
                                                     objective1.motionCostHeuristic(s1, s2)));
           }
 
-          SUBCASE ("Objective 2") {
+          SUBCASE("Objective 2") {
             // Make sure the cost is still as expected.
             CHECK(objective2.motionCost(s1, s2).value() ==
-                  doctest::Approx(2.0/std::sqrt(2.0) *
-                                  std::log(10.0 * (std::sqrt(2) /
-                                                   2.0 * std::sqrt(0.08) + 0.1))));
+                  doctest::Approx(2.0 / std::sqrt(2.0) *
+                                  std::log(10.0 * (std::sqrt(2) / 2.0 * std::sqrt(0.08) + 0.1))));
 
             // Make sure the heuristic is as expected.
-            const auto heuristicAngle = std::log((std::pow(0.1 + 0.2 + std::sqrt(0.08) / 2.0, 2.0) /
-                                                  (4.0 * 0.1 * 0.2)))
-                                      + std::log((std::pow(0.2 + 0.3 + std::sqrt(0.08) / 2.0, 2.0) /
-                                                  (4.0 * 0.2 * 0.3)));
-            CHECK(objective2.motionCostHeuristic(s1, s2).value() == doctest::Approx(heuristicAngle));
+            const auto heuristicAngle =
+                std::log((std::pow(0.1 + 0.2 + std::sqrt(0.08) / 2.0, 2.0) / (4.0 * 0.1 * 0.2))) +
+                std::log((std::pow(0.2 + 0.3 + std::sqrt(0.08) / 2.0, 2.0) / (4.0 * 0.2 * 0.3)));
+            CHECK(objective2.motionCostHeuristic(s1, s2).value() ==
+                  doctest::Approx(heuristicAngle));
 
             // Make sure the heuristic is admissible
             CHECK_FALSE(objective2.isCostBetterThan(objective2.motionCost(s1, s2),
                                                     objective2.motionCostHeuristic(s1, s2)));
           }
 
-          SUBCASE ("Objective 3") {
+          SUBCASE("Objective 3") {
             // Make sure the cost is still as expected.
             CHECK(objective3.motionCost(s1, s2).value() ==
-                  doctest::Approx(2.0/std::sqrt(2.0) *
-                                  std::log(10.0 * (std::sqrt(2) /
-                                                   2.0 * std::sqrt(0.08) + 0.1))));
+                  doctest::Approx(2.0 / std::sqrt(2.0) *
+                                  std::log(10.0 * (std::sqrt(2) / 2.0 * std::sqrt(0.08) + 0.1))));
 
             // Make sure the heuristic is as expected.
             const auto numSegments = spaceInfo->getStateSpace()->validSegmentCount(s1, s2);
             const auto numSamples =
-              std::max(2u, static_cast<unsigned>(std::ceil((numSegments + 1u) / 2.0)));
+                std::max(2u, static_cast<unsigned>(std::ceil((numSegments + 1u) / 2.0)));
 
             // The first and last term will be zero, as the first and last state will bet at the
             // boundaries. The term clearance of the terms in between will all linearly scale with
-            // the distance along the edge. The states are evenly spaced (sqrt(0.08) / numSamples - 1
-            // apart. The clearance of the i-th state is 0.1 + i * 0.2 / (numSamples - 1.0).
+            // the distance along the edge. The states are evenly spaced (sqrt(0.08) / numSamples -
+            // 1 apart. The clearance of the i-th state is 0.1 + i * 0.2 / (numSamples - 1.0).
             auto heuristicAngle = 0.0;
             for (auto i = 0u; i < numSamples - 1u; ++i) {
-              heuristicAngle += std::log(std::pow(0.1 + i * 0.2 / (numSamples - 1.0) +
-                                                  0.1 + (i + 1) * 0.2 / (numSamples - 1.0) +
-                                                  std::sqrt(0.08) / (numSamples - 1), 2.0) /
+              heuristicAngle += std::log(std::pow(0.1 + i * 0.2 / (numSamples - 1.0) + 0.1 +
+                                                      (i + 1) * 0.2 / (numSamples - 1.0) +
+                                                      std::sqrt(0.08) / (numSamples - 1),
+                                                  2.0) /
                                          (4.0 * (0.1 + i * 0.2 / (numSamples - 1.0)) *
                                           (0.1 + (i + 1) * 0.2 / (numSamples - 1.0))));
             }
-              
-            CHECK(objective3.motionCostHeuristic(s1, s2).value() == doctest::Approx(heuristicAngle));
+
+            CHECK(objective3.motionCostHeuristic(s1, s2).value() ==
+                  doctest::Approx(heuristicAngle));
 
             // Make sure the heuristic is admissible
             CHECK_FALSE(objective3.isCostBetterThan(objective3.motionCost(s1, s2),
                                                     objective3.motionCostHeuristic(s1, s2)));
           }
-          
         }
 
         SUBCASE("1000 Random edges") {
@@ -410,8 +406,10 @@ TEST_CASE("Optimization objectives") {
 #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
           sampler->setLocalSeed(42u);  // The tests should never fail/succeed randomly.
 #else
-          OMPL_WARN("PDT was compiled without support for setting local seeds which makes this unit test random.");
-#endif // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+          OMPL_WARN(
+              "PDT was compiled without support for setting local seeds which makes this unit test "
+              "random.");
+#endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
           for (auto i = 0u; i < 1000u; ++i) {
             sampler->sampleUniform(s1);
             sampler->sampleUniform(s2);
@@ -422,7 +420,6 @@ TEST_CASE("Optimization objectives") {
                                                     objective2.motionCostHeuristic(s1, s2)));
             CHECK_FALSE(objective3.isCostBetterThan(objective3.motionCost(s1, s2),
                                                     objective3.motionCostHeuristic(s1, s2)));
-
           }
         }
       }

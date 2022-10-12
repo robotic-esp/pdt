@@ -75,7 +75,8 @@ class ReedsSheppRandomRectangles : public BaseContext {
   virtual std::vector<std::shared_ptr<obstacles::BaseObstacle>> getObstacles() const override;
 
   /** \brief Get the antiobstacles */
-  virtual std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> getAntiObstacles() const override;
+  virtual std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> getAntiObstacles()
+      const override;
 
   /** \brief Create the goal. */
   std::shared_ptr<ompl::base::Goal> createGoal() const override;

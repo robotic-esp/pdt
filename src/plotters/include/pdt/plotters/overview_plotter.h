@@ -51,7 +51,8 @@ namespace plotters {
 
 class OverviewPlotter : public LatexPlotter {
  public:
-  OverviewPlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats);
+  OverviewPlotter(const std::shared_ptr<const config::Configuration>& config,
+                  const statistics::PlanningStatistics& stats);
   ~OverviewPlotter() = default;
 
   // Creates a combined tikz picture with success and median costs of all planners.

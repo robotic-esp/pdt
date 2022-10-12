@@ -55,7 +55,7 @@
 #ifdef PDT_EXTRA_EITSTAR_PR
 #include <ompl/geometric/planners/informedtrees/EIRMstar.h>
 #include <ompl/geometric/planners/informedtrees/EITstar.h>
-#endif // #ifdef PDT_EXTRA_EITSTAR_PR
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
 
 #include "pdt/time/CumulativeTimer.h"
 
@@ -77,8 +77,7 @@ PlannerFactory::PlannerFactory(const std::shared_ptr<config::Configuration> &con
 }
 
 std::tuple<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE, time::Duration>
-PlannerFactory::create(
-    const std::string &plannerName) const {
+PlannerFactory::create(const std::string &plannerName) const {
   const std::string parentKey{"planner/" + plannerName};
   if (!config_->contains(parentKey)) {
     throw std::invalid_argument("Requested unknown planner '"s + plannerName + "'."s);
@@ -181,7 +180,7 @@ PlannerFactory::create(
           config_->get<bool>(optionsKey + "/trackApproximateSolutions"));
       return {planner, common::PLANNER_TYPE::EITSTAR, createTimer.duration()};
     }
-#endif // #ifdef PDT_EXTRA_EITSTAR_PR
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::FMTSTAR: {
       // Allocate and configure an FMT* planner.
       createTimer.start();
@@ -239,8 +238,7 @@ PlannerFactory::create(
     case common::PLANNER_TYPE::PRMSTAR: {
       // Allocate and configure a PRM* planner.
       createTimer.start();
-      auto planner =
-          std::make_shared<ompl::geometric::PRMstar>(context_->getSpaceInformation());
+      auto planner = std::make_shared<ompl::geometric::PRMstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       createTimer.stop();
       planner->setName(plannerName);
@@ -290,7 +288,7 @@ PlannerFactory::create(
     }
     case common::PLANNER_TYPE::RRTSTAR: {
       // Allocate and configure an RRTstar planner.
-        auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
+      auto dimKey = std::to_string(context_->getSpaceInformation()->getStateDimension()) + "d";
       createTimer.start();
       auto planner = std::make_shared<ompl::geometric::RRTstar>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
@@ -312,8 +310,7 @@ PlannerFactory::create(
     case common::PLANNER_TYPE::SPARSTWO: {
       // Allocate and configure an SPARS2 planner.
       createTimer.start();
-      auto planner =
-          std::make_shared<ompl::geometric::SPARStwo>(context_->getSpaceInformation());
+      auto planner = std::make_shared<ompl::geometric::SPARStwo>(context_->getSpaceInformation());
       planner->setProblemDefinition(context_->instantiateNewProblemDefinition());
       createTimer.stop();
       planner->setName(plannerName);

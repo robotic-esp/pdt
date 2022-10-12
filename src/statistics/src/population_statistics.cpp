@@ -96,7 +96,8 @@ std::size_t PopulationStatistics::estimatePercentileAsIndex(const double percent
   return config_->get<std::size_t>(key);
 }
 
-double PopulationStatistics::calcPercentileConfidence(const double percentile, const std::size_t lowerIdx,
+double PopulationStatistics::calcPercentileConfidence(const double percentile,
+                                                      const std::size_t lowerIdx,
                                                       const std::size_t upperIdx) const {
   if (sampleSize_ == 0u) {
     throw std::out_of_range("Requested the percentile confidence for a sample size of 0.");
@@ -141,8 +142,8 @@ double PopulationStatistics::calcPercentileConfidence(const double percentile, c
          boost::math::ibeta(sampleSize_ - lowerIdx, lowerIdx + 1u, 1.0 - percentile);
 }
 
-ConfidenceInterval PopulationStatistics::findPercentileConfidenceInterval(const double percentile,
-                                                                          const double confidence) const {
+ConfidenceInterval PopulationStatistics::findPercentileConfidenceInterval(
+    const double percentile, const double confidence) const {
   if (sampleSize_ == 0u) {
     throw std::out_of_range("Requested a confidence interval for a sample size of 0.");
   }

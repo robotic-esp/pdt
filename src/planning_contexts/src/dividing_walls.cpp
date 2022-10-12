@@ -55,7 +55,7 @@ DividingWalls::DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>
     numWalls_(config->get<std::size_t>("context/" + name + "/numWalls")),
     wallThicknesses_(config->get<std::vector<double>>("context/" + name + "/wallThicknesses")),
     numGaps_(config->get<std::size_t>("context/" + name + "/numGaps")),
-    gapWidths_(config->get<std::vector<double>>("context/" + name + "/gapWidths")){
+    gapWidths_(config->get<std::vector<double>>("context/" + name + "/gapWidths")) {
   if (numWalls_ != wallThicknesses_.size()) {
     OMPL_ERROR("%s: Number of walls number of wall thicknesses do not match.", name.c_str());
     throw std::runtime_error("Context error.");
@@ -115,8 +115,8 @@ void DividingWalls::createObstacles() {
     }
 
     // Add this wall to the obstacles.
-    obstacles_.push_back(
-        std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, midpoint, widths));
+    obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+        spaceInfo_, midpoint, widths));
   }
 }
 
@@ -127,10 +127,9 @@ void DividingWalls::createAntiObstacles() {
     ompl::base::ScopedState<> midpoint(spaceInfo_);
 
     // Set the obstacle midpoint in the second dimension.
-    midpoint[1u] =
-      static_cast<double>((i + 1u)) *
-      (bounds_.high.at(1u) - bounds_.low.at(1u)) /
-      static_cast<double>((numGaps_ + 1u)) + bounds_.low.at(1);
+    midpoint[1u] = static_cast<double>((i + 1u)) * (bounds_.high.at(1u) - bounds_.low.at(1u)) /
+                       static_cast<double>((numGaps_ + 1u)) +
+                   bounds_.low.at(1);
 
     // Set the obstacle midpoint in the remaining dimension.
     for (auto j = 0u; j < dimensionality_; ++j) {
@@ -154,7 +153,8 @@ void DividingWalls::createAntiObstacles() {
 
     // Add this gap to the anti obstacles.
     antiObstacles_.push_back(
-        std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, midpoint, widths));
+        std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_,
+                                                                                 midpoint, widths));
   }
 }
 

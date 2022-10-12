@@ -120,13 +120,16 @@ std::stringstream MultiqueryReport::overview() const {
   overview << "\n\\pagebreak\n";
 
   // Provide some basic info about this experiment.
-  overview << "\\section{" << "Overview" << "}\\label{sec:" << "all" << "}\n";
+  overview << "\\section{Overview}\\label{sec:all}\n";
   overview << "This report was automatically generated using Planner "
               "Developer Tools (PDT). It presents the results "
               "for the "
            << experimentName_ << " experiment, which executed "
            << config_->get<std::size_t>("experiment/numRuns") << " runs of "
-           << config_->get<std::size_t>("context/" + config_->get<std::string>("experiment/context")  + "/starts/numGenerated") << " queries each with ";
+           << config_->get<std::size_t>("context/" +
+                                        config_->get<std::string>("experiment/context") +
+                                        "/starts/numGenerated")
+           << " queries each with ";
   for (std::size_t i = 0u; i < plannerNames.size() - 1u; ++i) {
     overview << plotPlannerNames_.at(plannerNames.at(i)) << ", ";
   }
@@ -136,11 +139,15 @@ std::stringstream MultiqueryReport::overview() const {
               "information about the "
               "experiment setup. ";
 
-  if (config_->get<std::string>("context/" + config_->get<std::string>("experiment/context") + "/starts/type") == "specified"){
+  if (config_->get<std::string>("context/" + config_->get<std::string>("experiment/context") +
+                                "/starts/type") == "specified") {
     overview << "Start/goals: prespecified.";
-  }
-  else{
-    overview << "Start/goals: " << config_->get<std::string>("context/"+config_->get<std::string>("experiment/context")+"/starts/generativeModel") << " sampled.";
+  } else {
+    overview << "Start/goals: "
+             << config_->get<std::string>("context/" +
+                                          config_->get<std::string>("experiment/context") +
+                                          "/starts/generativeModel")
+             << " sampled.";
   }
 
   // Create the results summary section.
@@ -152,110 +159,134 @@ std::stringstream MultiqueryReport::overview() const {
   }
   overview << mqKpiTable.string() << '\n';
 
-  overview << "\\subsection{" << "Initial solution time" << "}\\label{sec:" << "soltime" << "}\n";
+  overview << "\\subsection{Initial solution time}\\label{sec:soltime}\n";
   auto legend =
       latexPlotter_.createLegendAxis(config_->get<std::vector<std::string>>("experiment/planners"));
 
-  auto medianQueryDurationAxis = medianTimeAtFirstVsQueryLinePlotter_.createMedianInitialDurationAxis();
-  auto medianCumulativeDurationAxis = medianSummedTimeAtFirstVsQueryLinePlotter_.createMedianCumulativeDurationAxis();
+  auto medianQueryDurationAxis =
+      medianTimeAtFirstVsQueryLinePlotter_.createMedianInitialDurationAxis();
+  auto medianCumulativeDurationAxis =
+      medianSummedTimeAtFirstVsQueryLinePlotter_.createMedianCumulativeDurationAxis();
 
   // Stack the axes
   latexPlotter_.stack(medianQueryDurationAxis, medianCumulativeDurationAxis, legend);
 
   overview << "\\begin{center}\n\\input{"
-          << latexPlotter_.createPicture(medianQueryDurationAxis, medianCumulativeDurationAxis, legend).string()
-          << "}\n\\captionof{figure}{\\footnotesize (Top) Median duration per query of the initial solution of "
-          << "all planners with "
-          << 100.0 * config_->get<double>("report/medianInitialDurationPlots/confidence")
-          << "\\% confidence interval. "
-          << "(Bottom) Cumulative median duration per query of the initial solution of "
-          << "all planners with "
-          << 100.0 * config_->get<double>("report/medianCumulativeInitialDurationPlots/confidence")
-          << "\\% confidence interval. "
-          << "}\\end{center}\n";
+           << latexPlotter_
+                  .createPicture(medianQueryDurationAxis, medianCumulativeDurationAxis, legend)
+                  .string()
+           << "}\n\\captionof{figure}{\\footnotesize (Top) Median duration per query of the "
+              "initial solution of "
+           << "all planners with "
+           << 100.0 * config_->get<double>("report/medianInitialDurationPlots/confidence")
+           << "\\% confidence interval. "
+           << "(Bottom) Cumulative median duration per query of the initial solution of "
+           << "all planners with "
+           << 100.0 * config_->get<double>("report/medianCumulativeInitialDurationPlots/confidence")
+           << "\\% confidence interval. "
+           << "}\\end{center}\n";
 
-  auto medianQueryInitialCostAxis = medianCostAtFirstVsQueryLinePlotter_.createMedianInitialCostAxis();
-  auto medianCumulativeInitialCostAxis = medianSummedCostAtTimeVsQueryLinePlotter_.createMedianCumulativeCostAxis(true);
+  auto medianQueryInitialCostAxis =
+      medianCostAtFirstVsQueryLinePlotter_.createMedianInitialCostAxis();
+  auto medianCumulativeInitialCostAxis =
+      medianSummedCostAtTimeVsQueryLinePlotter_.createMedianCumulativeCostAxis(true);
 
   // Stack the axes
   latexPlotter_.stack(medianQueryInitialCostAxis, medianCumulativeInitialCostAxis, legend);
 
   overview << "\n\\pagebreak\n";
-  overview << "\\subsection{" << "Initial solution cost" << "}\\label{sec:" << "cost" << "}\n";
+  overview << "\\subsection{Initial solution cost}\\label{sec:cost}\n";
   overview << "\\begin{center}\n\\input{"
-          << latexPlotter_.createPicture(medianQueryInitialCostAxis, medianCumulativeInitialCostAxis, legend).string()
-          << "}\n\\captionof{figure}{\\footnotesize (Top) Median initial cost per query for "
-          << "all planners" << " with "
-          << 100.0 * config_->get<double>("report/medianInitialCostPerQueryPlots/confidence")
-          << "\\% confidence interval. "
-          << "(Bottom) Cumulative median cost per query of the initial solution of "
-          << "all planners with "
-          << 100.0 * config_->get<double>("report/medianCumulativeCostPlots/confidence")
-          << "\\% confidence interval. "
-          << "}\\end{center}\n";
+           << latexPlotter_
+                  .createPicture(medianQueryInitialCostAxis, medianCumulativeInitialCostAxis,
+                                 legend)
+                  .string()
+           << "}\n\\captionof{figure}{\\footnotesize (Top) Median initial cost per query for "
+           << "all planners with "
+           << 100.0 * config_->get<double>("report/medianInitialCostPerQueryPlots/confidence")
+           << "\\% confidence interval. "
+           << "(Bottom) Cumulative median cost per query of the initial solution of "
+           << "all planners with "
+           << 100.0 * config_->get<double>("report/medianCumulativeCostPlots/confidence")
+           << "\\% confidence interval. "
+           << "}\\end{center}\n";
 
   auto medianQueryLastCostAxis = medianCostAtLastVsQueryLinePlotter_.createMedianFinalCostAxis();
-  auto medianCumulativeLastCostAxis = medianSummedCostAtTimeVsQueryLinePlotter_.createMedianCumulativeCostAxis(false);
+  auto medianCumulativeLastCostAxis =
+      medianSummedCostAtTimeVsQueryLinePlotter_.createMedianCumulativeCostAxis(false);
 
   medianCumulativeLastCostAxis->options.name += "_final";
 
   // Stack the axes
   latexPlotter_.stack(medianQueryLastCostAxis, medianCumulativeLastCostAxis, legend);
 
-  overview << "\\subsection{" << "Final solution cost" << "}\\label{sec:" << "cost" << "}\n";
+  overview << "\\subsection{Final solution cost}\\label{sec:cost}\n";
   overview << "\\begin{center}\n\\input{"
-          << latexPlotter_.createPicture(medianQueryLastCostAxis, medianCumulativeLastCostAxis, legend).string()
-          << "}\n\\captionof{figure}{\\footnotesize (Top) Median final cost per query for "
-          << "all planners" << " with "
-          << 100.0 * config_->get<double>("report/medianFinalCostPerQueryPlots/confidence")
-          << "\\% confidence interval. "
-          << "(Bottom) Cumulative median cost per query of the final solution of "
-          << "all planners with "
-          << 100.0 * config_->get<double>("report/medianCumulativeCostPlots/confidence")
-          << "\\% confidence interval. "
-          << "}\\end{center}\n";
+           << latexPlotter_
+                  .createPicture(medianQueryLastCostAxis, medianCumulativeLastCostAxis, legend)
+                  .string()
+           << "}\n\\captionof{figure}{\\footnotesize (Top) Median final cost per query for "
+           << "all planners with "
+           << 100.0 * config_->get<double>("report/medianFinalCostPerQueryPlots/confidence")
+           << "\\% confidence interval. "
+           << "(Bottom) Cumulative median cost per query of the final solution of "
+           << "all planners with "
+           << 100.0 * config_->get<double>("report/medianCumulativeCostPlots/confidence")
+           << "\\% confidence interval. "
+           << "}\\end{center}\n";
 
   auto successRateQueryAxis = successAtTimeVsQueryLinePlotter_.createSuccessRateQueryAxis(100u);
 
   // Stack the axes
   latexPlotter_.stack(successRateQueryAxis, legend);
 
-  overview << "\\subsection{" << "Success Rates" << "}\\label{sec:succ" << "}\n";
+  overview << "\\subsection{Success Rates}\\label{sec:succ}\n";
   overview << "\\begin{center}\n\\input{"
-          << latexPlotter_.createPicture(successRateQueryAxis, legend).string()
-          << "}\n\\captionof{figure}{\\footnotesize Success rate "
-          << " of all planners" << " at "
-          << "the maximum solve time.} \\end{center}\n";
+           << latexPlotter_.createPicture(successRateQueryAxis, legend).string()
+           << "}\n\\captionof{figure}{\\footnotesize Success rate "
+           << " of all planners at "
+           << "the maximum solve time.} \\end{center}\n";
 
-  auto successRateHalfTimeQueryAxis = successAtTimeVsQueryLinePlotter_.createSuccessRateQueryAxis(50u);
+  auto successRateHalfTimeQueryAxis =
+      successAtTimeVsQueryLinePlotter_.createSuccessRateQueryAxis(50u);
 
   // Stack the axes
   latexPlotter_.stack(successRateHalfTimeQueryAxis, legend);
 
   overview << "\\begin{center}\n\\input{"
-          << latexPlotter_.createPicture(successRateHalfTimeQueryAxis, legend).string()
-          << "}\n\\captionof{figure}{\\footnotesize Success rate "
-          << " of all planners" << " at "
-          << "50\\% of the maximal solve time.} \\end{center}\n";
+           << latexPlotter_.createPicture(successRateHalfTimeQueryAxis, legend).string()
+           << "}\n\\captionof{figure}{\\footnotesize Success rate "
+           << " of all planners at "
+           << "50\\% of the maximal solve time.} \\end{center}\n";
 
   overview << "\n\\pagebreak\n";
-  overview << "\\subsection{" << "Breakout cost convergence plots" << "}\\label{sec:" << "cost" << "}\n";
+  overview << "\\subsection{"
+           << "Breakout cost convergence plots"
+           << "}\\label{sec:"
+           << "cost"
+           << "}\n";
 
   const auto maxBreakoutPlots = 10u;
   auto numCostPlots = stats_.getNumQueries();
-  if (numCostPlots > maxBreakoutPlots){
+  if (numCostPlots > maxBreakoutPlots) {
     numCostPlots = maxBreakoutPlots;
   }
-  for (auto i=0u; i<numCostPlots; ++i){
-    const auto n = static_cast<unsigned int>(std::floor(static_cast<double>(i*(stats_.getNumQueries()-1)) / static_cast<double>(numCostPlots-1)));
+  for (auto i = 0u; i < numCostPlots; ++i) {
+    const auto n =
+        static_cast<unsigned int>(std::floor(static_cast<double>(i * (stats_.getNumQueries() - 1)) /
+                                             static_cast<double>(numCostPlots - 1)));
 
     auto nthQueryStatistics = stats_.getQueryStatistics(n);
-    plotters::QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter(config_, nthQueryStatistics);
-    plotters::QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(config_, nthQueryStatistics);
-    plotters::QuerySuccessVsTimeLinePlotter querySolvedVsTimeLinePlotter(config_, nthQueryStatistics);
+    plotters::QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter(config_,
+                                                                                nthQueryStatistics);
+    plotters::QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter
+        queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter(config_, nthQueryStatistics);
+    plotters::QuerySuccessVsTimeLinePlotter querySolvedVsTimeLinePlotter(config_,
+                                                                         nthQueryStatistics);
 
     auto medianCostEvolutionAxis = queryMedianCostVsTimeLinePlotter.createMedianCostEvolutionAxis();
-    auto medianInitialSolutionAxis = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter.createMedianInitialSolutionAxis();
+    auto medianInitialSolutionAxis =
+        queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter.createMedianInitialSolutionAxis();
     auto successAxis = querySolvedVsTimeLinePlotter.createSuccessAxis();
 
     medianCostEvolutionAxis->options.name += std::to_string(n);
@@ -278,13 +309,14 @@ std::stringstream MultiqueryReport::overview() const {
     }
     overview << kpiTable.string() << '\n';
 
-    overview << "\\begin{center}\n\\input{"
-            << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
-            << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
-               "at any given time. (Bottom) Median cost evolution for query "
-            << std::to_string(n) + " of all planners" << " with "
-            << 100.0 * config_->get<double>("report/medianCostPlots/confidence")
-            << "\\% confidence interval.} \\end{center}\n";
+    overview
+        << "\\begin{center}\n\\input{"
+        << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
+        << "}\n\\captionof{figure}{\\footnotesize (Top) Percentage of runs that found a solution "
+           "at any given time. (Bottom) Median cost evolution for query "
+        << std::to_string(n) + " of all planners with "
+        << 100.0 * config_->get<double>("report/medianCostPlots/confidence")
+        << "\\% confidence interval.} \\end{center}\n";
 
     overview << "\n\\pagebreak\n";
   }
@@ -303,12 +335,14 @@ std::stringstream MultiqueryReport::individualResults() const {
     results << "\\section{" << plotPlannerNames_.at(name) << "}\\label{sec:" << name << "}\n";
 
     results << "\\subsection{Duration per Query}\\label{sec:" << name << "-query-duration}\n";
-    results << "\\begin{center}\n\\input{"
-            << medianTimeAtFirstVsQueryLinePlotter_.createMedianInitialDurationPicture(name).string()
-            << "}\n\\captionof{figure}{\\footnotesize (Top) Median duration per query of the initial solution of "
-            << plotPlannerNames_.at(name) << " with "
-            << 100.0 * config_->get<double>("report/medianInitialDurationPlots/confidence")
-            << "\\% confidence interval.} \\end{center}\n";
+    results
+        << "\\begin{center}\n\\input{"
+        << medianTimeAtFirstVsQueryLinePlotter_.createMedianInitialDurationPicture(name).string()
+        << "}\n\\captionof{figure}{\\footnotesize (Top) Median duration per query of the initial "
+           "solution of "
+        << plotPlannerNames_.at(name) << " with "
+        << 100.0 * config_->get<double>("report/medianInitialDurationPlots/confidence")
+        << "\\% confidence interval.} \\end{center}\n";
   }
 
   return results;

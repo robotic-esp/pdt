@@ -62,7 +62,8 @@ namespace reports {
 
 class SingleQueryReport : public BaseReport {
  public:
-  SingleQueryReport(const std::shared_ptr<config::Configuration>& config, const statistics::PlanningStatistics& stats);
+  SingleQueryReport(const std::shared_ptr<config::Configuration>& config,
+                    const statistics::PlanningStatistics& stats);
   ~SingleQueryReport() = default;
 
   std::experimental::filesystem::path generateReport() override;
@@ -74,8 +75,10 @@ class SingleQueryReport : public BaseReport {
   // Plotters.
   plotters::LatexPlotter latexPlotter_;
   plotters::OverviewPlotter overviewPlotter_;
-  plotters::QueryCostAtFirstVsTimeAtFirstScatterPlotter queryCostAtFirstVsTimeAtFirstScatterPlotter_;
-  plotters::QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_;
+  plotters::QueryCostAtFirstVsTimeAtFirstScatterPlotter
+      queryCostAtFirstVsTimeAtFirstScatterPlotter_;
+  plotters::QueryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter
+      queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_;
   plotters::QueryMedianCostVsTimeLinePlotter queryMedianCostVsTimeLinePlotter_;
   plotters::QueryPercentileCostVsTimeLinePlotter queryPercentileCostVsTimeLinePlotter_;
   plotters::QuerySuccessVsTimeLinePlotter querySuccessVsTimeLinePlotter_;

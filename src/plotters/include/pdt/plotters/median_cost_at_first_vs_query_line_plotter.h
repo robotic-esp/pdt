@@ -52,23 +52,29 @@ namespace plotters {
 
 class MedianCostAtFirstVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianCostAtFirstVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
+  MedianCostAtFirstVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config,
+                                      const statistics::MultiqueryStatistics& stats);
   ~MedianCostAtFirstVsQueryLinePlotter() = default;
 
-  // Creates a pgf axis that holds the median cost of the initial solutions at each query for all planners.
+  // Creates a pgf axis that holds the median cost of the initial solutions at each query for all
+  // planners.
   std::shared_ptr<pgftikz::PgfAxis> createMedianInitialCostAxis() const;
 
-  // Creates a pgf axis that holds the median cost of the initial solutions at each query for the specified planner.
-  std::shared_ptr<pgftikz::PgfAxis> createMedianInitialCostAxis(const std::string& plannerName) const;
+  // Creates a pgf axis that holds the median cost of the initial solutions at each query for the
+  // specified planner.
+  std::shared_ptr<pgftikz::PgfAxis> createMedianInitialCostAxis(
+      const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the median initial cost axis of all planners.
   std::experimental::filesystem::path createMedianInitialCostPicture() const;
 
   // Creates a tikz picture that contains the median initial cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianInitialCostPicture(const std::string& plannerName) const;
+  std::experimental::filesystem::path createMedianInitialCostPicture(
+      const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialCostPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialCostPlot(
+      const std::string& plannerName) const;
   std::shared_ptr<pgftikz::PgfPlot> createMedianInitialCostUpperCiPlot(
       const std::string& plannerName) const;
   std::shared_ptr<pgftikz::PgfPlot> createMedianInitialCostLowerCiPlot(

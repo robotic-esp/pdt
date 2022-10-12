@@ -51,8 +51,9 @@ namespace plotters {
 
 class QueryCostAtFirstVsTimeAtFirstScatterPlotter : public LatexPlotter {
  public:
-  QueryCostAtFirstVsTimeAtFirstScatterPlotter(const std::shared_ptr<const config::Configuration>& config,
-                                const statistics::PlanningStatistics& stats);
+  QueryCostAtFirstVsTimeAtFirstScatterPlotter(
+      const std::shared_ptr<const config::Configuration>& config,
+      const statistics::PlanningStatistics& stats);
   ~QueryCostAtFirstVsTimeAtFirstScatterPlotter() = default;
 
   // Creates a pgf axis that hold the initial solution scatter plot of all planners.

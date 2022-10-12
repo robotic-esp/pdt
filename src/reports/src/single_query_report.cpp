@@ -58,7 +58,7 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 SingleQueryReport::SingleQueryReport(const std::shared_ptr<config::Configuration>& config,
-                                   const statistics::PlanningStatistics& stats) :
+                                     const statistics::PlanningStatistics& stats) :
     BaseReport(config),
     latexPlotter_(config),
     overviewPlotter_(config, stats),
@@ -69,7 +69,7 @@ SingleQueryReport::SingleQueryReport(const std::shared_ptr<config::Configuration
     querySuccessVsTimeLinePlotter_(config, stats),
     queryTimeAtFirstHistogramPlotter_(config, stats),
     stats_(stats) {
-  }
+}
 
 fs::path SingleQueryReport::generateReport() {
   auto reportPath =
@@ -143,7 +143,8 @@ std::stringstream SingleQueryReport::overview() const {
 
   // Create all axes to be displayed in the results summary.
   auto medianCostEvolutionAxis = queryMedianCostVsTimeLinePlotter_.createMedianCostEvolutionAxis();
-  auto medianInitialSolutionAxis = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_.createMedianInitialSolutionAxis();
+  auto medianInitialSolutionAxis =
+      queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_.createMedianInitialSolutionAxis();
   auto successAxis = querySuccessVsTimeLinePlotter_.createSuccessAxis();
   // Merge the intial solution axis into the cost evolution axis.
   medianCostEvolutionAxis->mergePlots(medianInitialSolutionAxis);
@@ -162,17 +163,18 @@ std::stringstream SingleQueryReport::overview() const {
   medianCiKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
               << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed
               << std::setfill('0') << std::setw(4) << std::setprecision(2)
-        << config_->get<double>("report/medianInitialSolutionPlots/confidence") << "/confidence"s;
+              << config_->get<double>("report/medianInitialSolutionPlots/confidence")
+              << "/confidence"s;
 
   overview << "\\begin{center}\n\\input{"
-      << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
+           << latexPlotter_.createPicture(successAxis, medianCostEvolutionAxis, legend).string()
            << "}\n\\captionof{figure}{\\footnotesize \\textbf{Top:} Percentage of runs that found "
               "a solution at any given time with a Clopper-Pearson (nonparametric) "
            << 100.0 * config_->get<double>("report/successPlots/confidence")
            << "\\% confidence interval. \\textbf{Bottom:} Median cost evolution and median of "
               "initial solution with nonparametric "
-      << std::floor(100.0 * config_->get<double>(medianCiKey.str()))
-      << "\\% confidence intervals.}\n\\end{center}\n";
+           << std::floor(100.0 * config_->get<double>(medianCiKey.str()))
+           << "\\% confidence intervals.}\n\\end{center}\n";
 
   // Create the initial solution overview section.
   overview << "\\pagebreak\n";
@@ -216,8 +218,7 @@ std::stringstream SingleQueryReport::individualResults() const {
     edf->options.xmax = config_->get<double>(
         "context/"s + config_->get<std::string>("experiment/context") + "/maxTime");
     edf->options.ytickPos = "left";
-    auto histo =
-        queryTimeAtFirstHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name);
+    auto histo = queryTimeAtFirstHistogramPlotter_.createInitialSolutionDurationHistogramAxis(name);
     histo->overlay(edf.get());
     for (const auto& plot : histo->getPlots()) {
       plot->options.drawOpacity = 0.2f;
@@ -225,10 +226,13 @@ std::stringstream SingleQueryReport::individualResults() const {
     }
 
     // Create the scatter axis of all initial solutions.
-    auto scatter = queryCostAtFirstVsTimeAtFirstScatterPlotter_.createInitialSolutionScatterAxis(name);
+    auto scatter =
+        queryCostAtFirstVsTimeAtFirstScatterPlotter_.createInitialSolutionScatterAxis(name);
 
     // Create a median plot of all initial solutions.
-    auto median = queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_.createMedianInitialSolutionAxis(name);
+    auto median =
+        queryMedianCostAtFirstVsMedianTimeAtFirstPointPlotter_.createMedianInitialSolutionAxis(
+            name);
     for (const auto& plot : median->getPlots()) {
       plot->options.markSize = 2.0;
       plot->options.lineWidth = 1.0;
@@ -251,7 +255,8 @@ std::stringstream SingleQueryReport::individualResults() const {
     initialCiKey << "statistics/percentiles/sampleSize/"s << stats_.getNumRunsPerPlanner()
                  << "/populationPercentile/0.50/confidenceInterval/"s << std::fixed
                  << std::setfill('0') << std::setw(4) << std::setprecision(2)
-                 << config_->get<double>("report/medianInitialSolutionPlots/confidence") << "/confidence"s;
+                 << config_->get<double>("report/medianInitialSolutionPlots/confidence")
+                 << "/confidence"s;
 
     // Create a picture out of the three initial solution axes.
     results << "\\begin{center}\n\\input{"

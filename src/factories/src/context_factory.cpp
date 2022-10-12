@@ -169,8 +169,7 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(
 
         // Allocate the state information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<open_rave::OpenRaveManipulator>(
-            spaceInfo, config_, contextName);
+        return std::make_shared<open_rave::OpenRaveManipulator>(spaceInfo, config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg =
             "Error allocating a OpenRaveManipulator context with exception:\n    "s + e.what();
@@ -185,8 +184,7 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(
 
         // Allocate the state information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<open_rave::OpenRaveR3>(spaceInfo, config_,
-                                                                          contextName);
+        return std::make_shared<open_rave::OpenRaveR3>(spaceInfo, config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a OpenRaveR3 context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -208,8 +206,7 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(
 
         // Allocate the space information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<open_rave::OpenRaveR3xSO2>(spaceInfo, config_,
-                                                                              contextName);
+        return std::make_shared<open_rave::OpenRaveR3xSO2>(spaceInfo, config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a OpenRaveR3xSO2 context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -223,8 +220,7 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(
 
         // Allocate the state information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<open_rave::OpenRaveSE3>(spaceInfo, config_,
-                                                                           contextName);
+        return std::make_shared<open_rave::OpenRaveSE3>(spaceInfo, config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg = "Error allocating a OpenRaveSE3 context with exception:\n    "s + e.what();
         throw std::runtime_error(msg);
@@ -239,8 +235,7 @@ std::shared_ptr<planning_contexts::BaseContext> ContextFactory::create(
 
         // Allocate the state information for this space.
         auto spaceInfo = std::make_shared<ompl::base::SpaceInformation>(stateSpace);
-        return std::make_shared<open_rave::OpenRaveSE3>(spaceInfo, config_,
-                                                                           contextName);
+        return std::make_shared<open_rave::OpenRaveSE3>(spaceInfo, config_, contextName);
       } catch (const json::detail::type_error& e) {
         auto msg =
             "Error allocating a ConstrainedOpenRaveSE3 context with exception:\n    "s + e.what();

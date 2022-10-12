@@ -59,9 +59,10 @@ namespace pdt {
 
 namespace reports {
 
-class MultiqueryReport : public BaseReport{
+class MultiqueryReport : public BaseReport {
  public:
-  MultiqueryReport(const std::shared_ptr<config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
+  MultiqueryReport(const std::shared_ptr<config::Configuration>& config,
+                   const statistics::MultiqueryStatistics& stats);
   ~MultiqueryReport() = default;
 
   std::experimental::filesystem::path generateReport() override;

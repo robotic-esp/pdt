@@ -45,7 +45,7 @@
 #ifdef PDT_EXTRA_EITSTAR_PR
 #include <ompl/geometric/planners/informedtrees/EITstar.h>
 #include <ompl/geometric/planners/informedtrees/eitstar/Edge.h>
-#endif // #ifdef PDT_EXTRA_EITSTAR_PR
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
 
 #include "pdt/common/planner_type.h"
 
@@ -175,8 +175,8 @@ class EITstarData : public PlannerSpecificData {
   ompl::geometric::eitstar::Edge nextForwardEdge_{};
   ompl::geometric::eitstar::Edge nextReverseEdge_{};
 };
-#endif // #ifdef PDT_EXTRA_EITSTAR_PR
-  
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
+
 }  // namespace visualization
 
 }  // namespace pdt

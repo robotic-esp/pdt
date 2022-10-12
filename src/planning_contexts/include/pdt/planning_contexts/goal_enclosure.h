@@ -56,7 +56,8 @@ namespace planning_contexts {
 class GoalEnclosure : public RealVectorGeometricContext {
  public:
   GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                const std::shared_ptr<const config::Configuration>& config,
+                const std::string& name);
   virtual ~GoalEnclosure() = default;
 
   /** \brief Accept a context visitor. */

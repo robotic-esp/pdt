@@ -48,7 +48,8 @@ namespace fs = std::experimental::filesystem;
 
 std::size_t LatexPlotter::plotId_ = 0u;
 
-LatexPlotter::LatexPlotter(const std::shared_ptr<const config::Configuration>& config) : config_(config) {
+LatexPlotter::LatexPlotter(const std::shared_ptr<const config::Configuration>& config) :
+    config_(config) {
 }
 
 std::shared_ptr<pgftikz::PgfAxis> LatexPlotter::createLegendAxis(
@@ -71,7 +72,8 @@ std::shared_ptr<pgftikz::PgfAxis> LatexPlotter::createLegendAxis(
   return legend;
 }
 
-void LatexPlotter::alignAbszissen(const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const {
+void LatexPlotter::alignAbszissen(
+    const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const {
   // Align all pairs.
   for (auto a : axes) {
     for (auto b : axes) {
@@ -81,7 +83,8 @@ void LatexPlotter::alignAbszissen(const std::vector<std::shared_ptr<pgftikz::Pgf
   }
 }
 
-void LatexPlotter::alignOrdinates(const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const {
+void LatexPlotter::alignOrdinates(
+    const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const {
   // Align all pairs.
   for (auto a : axes) {
     for (auto b : axes) {
@@ -131,7 +134,8 @@ std::experimental::filesystem::path LatexPlotter::createPicture(
   auto picture = collect(axes);
 
   // Create the name of this picture.
-  auto path = std::experimental::filesystem::path(config_->get<std::string>("experiment/experimentDirectory")) /
+  auto path = std::experimental::filesystem::path(
+                  config_->get<std::string>("experiment/experimentDirectory")) /
               std::experimental::filesystem::path("tikz/");
   path += "axes_collection_" + std::to_string(plotId_++) + ".tikz";
   picture->write(path);

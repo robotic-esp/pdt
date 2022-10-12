@@ -45,12 +45,13 @@ namespace pdt {
 namespace planning_contexts {
 
 WallGap::WallGap(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                 const std::shared_ptr<const config::Configuration>& config, const std::string& name) :
+                 const std::shared_ptr<const config::Configuration>& config,
+                 const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     wallWidth_(config->get<double>("context/" + name + "/wallWidth")),
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
     gapWidth_(config->get<double>("context/" + name + "/gapWidth")),
-    gapOffset_(config->get<double>("context/" + name + "/gapOffset")){
+    gapOffset_(config->get<double>("context/" + name + "/gapOffset")) {
   if (wallWidth_ < 0.0) {
     OMPL_ERROR("%s: Wall width is negative.", name.c_str());
     throw std::runtime_error("Context error.");
@@ -117,8 +118,8 @@ void WallGap::createObstacles() {
   for (std::size_t j = 2u; j < dimensionality_; ++j) {
     widths_low.at(j) = bounds.high.at(j) - bounds.low.at(j);
   }
-  obstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor_low, widths_low));
+  obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+      spaceInfo_, anchor_low, widths_low));
 
   // Create an anchor for the upper obstacle.
   ompl::base::ScopedState<> anchor_up(spaceInfo_);
@@ -129,7 +130,8 @@ void WallGap::createObstacles() {
   }
 
   // Move it up in second dimension.
-  anchor_up[1u] = bounds.low.at(1u) + extent2d / 4.0 + gapOffset_ / 2.0 + gapWidth_ / 4.0 + wallWidth_ / 2.0;
+  anchor_up[1u] =
+      bounds.low.at(1u) + extent2d / 4.0 + gapOffset_ / 2.0 + gapWidth_ / 4.0 + wallWidth_ / 2.0;
 
   // Create the widths of this wall.
   std::vector<double> widths_up(dimensionality_, 0.0);
@@ -144,8 +146,8 @@ void WallGap::createObstacles() {
   for (std::size_t j = 2u; j < dimensionality_; ++j) {
     widths_up.at(j) = bounds.high.at(j) - bounds.low.at(j);
   }
-  obstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor_up, widths_up));
+  obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+      spaceInfo_, anchor_up, widths_up));
 }
 
 }  // namespace planning_contexts

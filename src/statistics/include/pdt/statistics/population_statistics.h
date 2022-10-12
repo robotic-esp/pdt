@@ -66,7 +66,8 @@ class PopulationStatistics {
   };
 
   // Construct/initialize
-  PopulationStatistics(const std::shared_ptr<config::Configuration>& config, const INDEX_ROUNDING rounding);
+  PopulationStatistics(const std::shared_ptr<config::Configuration>& config,
+                       const INDEX_ROUNDING rounding);
   ~PopulationStatistics() = default;
 
   void setSampleSize(const std::size_t sampleSize);
@@ -77,7 +78,8 @@ class PopulationStatistics {
   // Finds an estimate for the specified percentile with the specified confidence. Specifically
   // finds a symmetric interval centered about the best-estimate of the percentile that contains the
   // true percentile with the specified confidence.
-  ConfidenceInterval findPercentileConfidenceInterval(const double percentile, const double confidence) const;
+  ConfidenceInterval findPercentileConfidenceInterval(const double percentile,
+                                                      const double confidence) const;
   // Calculates the confidence with which an interval estimates a percentile
   double calcPercentileConfidence(const double percentile, const std::size_t lowerIdx,
                                   const std::size_t upperIdx) const;

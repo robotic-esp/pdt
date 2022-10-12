@@ -55,7 +55,8 @@ namespace planning_contexts {
 class StartEnclosure : public RealVectorGeometricContext {
  public:
   StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                 const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                 const std::shared_ptr<const config::Configuration>& config,
+                 const std::string& name);
   virtual ~StartEnclosure() = default;
 
   /** \brief Accept a context visitor. */

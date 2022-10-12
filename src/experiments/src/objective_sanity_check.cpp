@@ -56,7 +56,6 @@ using AccumulatorSet = boost::accumulators::accumulator_set<
                 boost::accumulators::tag::median, boost::accumulators::tag::lazy_variance>>;
 
 int main(const int argc, const char** argv) {
-
   // Load the config.
   auto config = std::make_shared<pdt::config::Configuration>(argc, argv);
   config->registerAsExperiment();
@@ -77,7 +76,7 @@ int main(const int argc, const char** argv) {
     auto context = contextFactory.create(config->get<std::string>("experiment/context"));
     auto problem = context->instantiateNewProblemDefinition();
     auto objective = problem->getOptimizationObjective();
-    
+
     // Get the space info and state sampler.
     auto spaceInfo = context->getSpaceInformation();
     auto sampler = spaceInfo->allocStateSampler();
@@ -91,7 +90,7 @@ int main(const int argc, const char** argv) {
       if (numEdges % 1000 == 0u) {
         std::cout << "Tested " << numEdges << " edges.\n";
       }
-      
+
       // Sample two valid states.
       do {
         sampler->sampleUniform(state1);
@@ -109,19 +108,21 @@ int main(const int argc, const char** argv) {
         std::cout << std::boolalpha << std::setprecision(12);
         std::cout << "Cost: " << trueCost << ", heuristic: " << heuristicCost << '\n';
         std::cout << "Edge index (i/ii): " << i << '/' << ii << '\n';
-        std::cout << "Edge valid: " << spaceInfo->getMotionValidator()->checkMotion(state1, state2) << '\n';
+        std::cout << "Edge valid: " << spaceInfo->getMotionValidator()->checkMotion(state1, state2)
+                  << '\n';
         std::cout << "Distance: " << spaceInfo->distance(state1, state2) << '\n';
         std::cout << "Cost 1: " << objective->stateCost(state1) << '\n';
         std::cout << "Cost 2: " << objective->stateCost(state2) << '\n';
-        std::cout << "Clearance 1: " << spaceInfo->getStateValidityChecker()->clearance(state1) << '\n';
-        std::cout << "Clearance 2: " << spaceInfo->getStateValidityChecker()->clearance(state2) << '\n';
+        std::cout << "Clearance 1: " << spaceInfo->getStateValidityChecker()->clearance(state1)
+                  << '\n';
+        std::cout << "Clearance 2: " << spaceInfo->getStateValidityChecker()->clearance(state2)
+                  << '\n';
         OMPL_WARN("Found edge with inadmissible cost.");
       }
       if (spaceInfo->checkMotion(state1, state2)) {
         ++numValidEdges;
         accuracyStats(heuristicCost.value() / trueCost.value());
       }
-      
 
       // Keep track of the tested edges.
       ++numEdges;
@@ -134,18 +135,25 @@ int main(const int argc, const char** argv) {
 
   config->dumpAccessed();
 
-  auto numTestedEdges = config->get<std::size_t>("experiment/numContexts")
-    * config->get<std::size_t>("experiment/numEdges");
+  auto numTestedEdges = config->get<std::size_t>("experiment/numContexts") *
+                        config->get<std::size_t>("experiment/numEdges");
 
   std::cout << "Num tested edges: " << numTestedEdges << ", Num valid edges: " << numValidEdges
-            << " (" << static_cast<float>(numValidEdges) /
-                       static_cast<float>(numTestedEdges) * 100.0f << ")\n";
+            << " ("
+            << static_cast<float>(numValidEdges) / static_cast<float>(numTestedEdges) * 100.0f
+            << ")\n";
   std::cout << "Accuracy [mean, median, stddev, min, max]:\n"
-            << boost::accumulators::extract_result<boost::accumulators::tag::mean>(accuracyStats) << ", "
-            << boost::accumulators::extract_result<boost::accumulators::tag::median>(accuracyStats) << ", "
-            << boost::accumulators::extract_result<boost::accumulators::tag::variance>(accuracyStats) << ", "
-            << boost::accumulators::extract_result<boost::accumulators::tag::min>(accuracyStats) << ", "
-            << boost::accumulators::extract_result<boost::accumulators::tag::max>(accuracyStats) << '\n';
-  
+            << boost::accumulators::extract_result<boost::accumulators::tag::mean>(accuracyStats)
+            << ", "
+            << boost::accumulators::extract_result<boost::accumulators::tag::median>(accuracyStats)
+            << ", "
+            << boost::accumulators::extract_result<boost::accumulators::tag::variance>(
+                   accuracyStats)
+            << ", "
+            << boost::accumulators::extract_result<boost::accumulators::tag::min>(accuracyStats)
+            << ", "
+            << boost::accumulators::extract_result<boost::accumulators::tag::max>(accuracyStats)
+            << '\n';
+
   return 0;
 }

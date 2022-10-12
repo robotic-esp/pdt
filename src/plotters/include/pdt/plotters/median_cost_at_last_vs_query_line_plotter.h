@@ -52,7 +52,8 @@ namespace plotters {
 
 class MedianCostAtLastVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianCostAtLastVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
+  MedianCostAtLastVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config,
+                                     const statistics::MultiqueryStatistics& stats);
   ~MedianCostAtLastVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median final cost at each query for all planners.
@@ -65,7 +66,8 @@ class MedianCostAtLastVsQueryLinePlotter : public LatexPlotter {
   std::experimental::filesystem::path createMedianFinalCostPicture() const;
 
   // Creates a tikz picture that contains the median final cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianFinalCostPicture(const std::string& plannerName) const;
+  std::experimental::filesystem::path createMedianFinalCostPicture(
+      const std::string& plannerName) const;
 
  private:
   std::shared_ptr<pgftikz::PgfPlot> createMedianFinalCostPlot(const std::string& plannerName) const;

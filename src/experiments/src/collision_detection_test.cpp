@@ -166,13 +166,15 @@ int main(const int argc, const char** argv) {
       }
 
       if (numTestedEdges % 5 == 0) {
-        std::cout << "Tested a total of " << numTestedEdges << " edges (valid: " << numTestedValid << ", invalid: " << numTestedInvalid
-                  << ") from " << c + 1 << " contexts." << std::endl;
+        std::cout << "Tested a total of " << numTestedEdges << " edges (valid: " << numTestedValid
+                  << ", invalid: " << numTestedInvalid << ") from " << c + 1 << " contexts."
+                  << std::endl;
         for (std::size_t i = 0u; i < candidateResolutions.size(); ++i) {
           std::cout << "  " << std::fixed << candidateResolutions[i] << "  "
                     << falseNegativesResults[i] << " / " << numTestedInvalid << " -> "
                     << static_cast<double>(falseNegativesResults[i]) /
-                       static_cast<double>(numTestedInvalid) << "\n";
+                           static_cast<double>(numTestedInvalid)
+                    << "\n";
         }
       }
     }
@@ -182,21 +184,38 @@ int main(const int argc, const char** argv) {
     spaceInfo->freeState(state2);
   }
 
-  std::cout << "\nFinal Results for " << numTestedEdges << " edges (valid: " << numTestedValid << ", invalid: " << numTestedInvalid << ")\n\n";
+  std::cout << "\nFinal Results for " << numTestedEdges << " edges (valid: " << numTestedValid
+            << ", invalid: " << numTestedInvalid << ")\n\n";
   std::cout.width(10);
   for (std::size_t i = 0u; i < candidateResolutions.size(); ++i) {
     std::cout << "Resolution: " << std::fixed << candidateResolutions[i]
-              << "\n\tFalse Neg: " << falseNegativesResults[i]
-              << "\tFalse Neg [%]: " << static_cast<float>(falseNegativesResults[i]) /
-                                        static_cast<float>(numTestedInvalid)
-              << "\tValid Mean: " << boost::accumulators::extract_result<boost::accumulators::tag::mean>(timingResults[i].first)
-              << "\tValid Max: " << boost::accumulators::extract_result<boost::accumulators::tag::max>(timingResults[i].first)
-              << "\tValid Min: " << boost::accumulators::extract_result<boost::accumulators::tag::min>(timingResults[i].first)
-              << "\tValid Std: " << boost::accumulators::extract_result<boost::accumulators::tag::variance>(timingResults[i].first)
-              << "\tInvalid Mean " << boost::accumulators::extract_result<boost::accumulators::tag::mean>(timingResults[i].second)
-              << "\tInvalid Max: " << boost::accumulators::extract_result<boost::accumulators::tag::max>(timingResults[i].second)
-              << "\tInvalid Min: " << boost::accumulators::extract_result<boost::accumulators::tag::min>(timingResults[i].second)
-              << "\tInvalid Std: " << boost::accumulators::extract_result<boost::accumulators::tag::variance>(timingResults[i].second) << "\n\n";
+              << "\n\tFalse Neg: " << falseNegativesResults[i] << "\tFalse Neg [%]: "
+              << static_cast<float>(falseNegativesResults[i]) / static_cast<float>(numTestedInvalid)
+              << "\tValid Mean: "
+              << boost::accumulators::extract_result<boost::accumulators::tag::mean>(
+                     timingResults[i].first)
+              << "\tValid Max: "
+              << boost::accumulators::extract_result<boost::accumulators::tag::max>(
+                     timingResults[i].first)
+              << "\tValid Min: "
+              << boost::accumulators::extract_result<boost::accumulators::tag::min>(
+                     timingResults[i].first)
+              << "\tValid Std: "
+              << boost::accumulators::extract_result<boost::accumulators::tag::variance>(
+                     timingResults[i].first)
+              << "\tInvalid Mean "
+              << boost::accumulators::extract_result<boost::accumulators::tag::mean>(
+                     timingResults[i].second)
+              << "\tInvalid Max: "
+              << boost::accumulators::extract_result<boost::accumulators::tag::max>(
+                     timingResults[i].second)
+              << "\tInvalid Min: "
+              << boost::accumulators::extract_result<boost::accumulators::tag::min>(
+                     timingResults[i].second)
+              << "\tInvalid Std: "
+              << boost::accumulators::extract_result<boost::accumulators::tag::variance>(
+                     timingResults[i].second)
+              << "\n\n";
   }
 
   config->dumpAccessed();

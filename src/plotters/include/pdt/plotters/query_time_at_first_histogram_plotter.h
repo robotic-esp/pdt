@@ -53,7 +53,7 @@ namespace plotters {
 class QueryTimeAtFirstHistogramPlotter : public LatexPlotter {
  public:
   QueryTimeAtFirstHistogramPlotter(const std::shared_ptr<const config::Configuration>& config,
-                                          const statistics::PlanningStatistics& stats);
+                                   const statistics::PlanningStatistics& stats);
   ~QueryTimeAtFirstHistogramPlotter() = default;
 
   // Creates a pgf axis that hold the initial solution duration histogram of all planners.

@@ -55,7 +55,7 @@ namespace planning_contexts {
 ObstacleFree::ObstacleFree(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                            const std::shared_ptr<const config::Configuration>& config,
                            const std::string& name) :
-    RealVectorGeometricContext(spaceInfo, config, name){
+    RealVectorGeometricContext(spaceInfo, config, name) {
   // Create the validity checker without any obstacles and anti obstacles.
   auto validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);
 

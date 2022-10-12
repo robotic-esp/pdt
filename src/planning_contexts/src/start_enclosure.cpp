@@ -56,7 +56,7 @@ StartEnclosure::StartEnclosure(const std::shared_ptr<ompl::base::SpaceInformatio
     RealVectorGeometricContext(spaceInfo, config, name),
     startOutsideWidth_(config->get<double>("context/" + name + "/startOutsideWidth")),
     startInsideWidth_(config->get<double>("context/" + name + "/startInsideWidth")),
-    startGapWidth_(config->get<double>("context/" + name + "/startGapWidth")){
+    startGapWidth_(config->get<double>("context/" + name + "/startGapWidth")) {
   if (startInsideWidth_ > startOutsideWidth_) {
     OMPL_ERROR("%s: Start inside width is greater than start outside width.", name.c_str());
     throw std::runtime_error("Context error.");
@@ -98,8 +98,8 @@ void StartEnclosure::createObstacles() {
     startOutsideAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/start").at(i);
   }
   std::vector<double> startWidths(dimensionality_, startOutsideWidth_);
-  obstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, startOutsideAnchor, startWidths));
+  obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+      spaceInfo_, startOutsideAnchor, startWidths));
 }
 
 void StartEnclosure::createAntiObstacles() {

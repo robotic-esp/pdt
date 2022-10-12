@@ -46,8 +46,7 @@ namespace pgftikz {
 
 using namespace std::string_literals;
 
-std::string defineLatexColors(const std::shared_ptr<const config::Configuration>& config)
-{
+std::string defineLatexColors(const std::shared_ptr<const config::Configuration>& config) {
   std::string colorKey = "report/colors";
   std::stringstream rval;
 
@@ -61,7 +60,7 @@ std::string defineLatexColors(const std::shared_ptr<const config::Configuration>
 
     // Add the color definition to the string
     rval << "\\definecolor{" << name << "}{RGB}{" << values[0u] << ',' << values[1u] << ','
-            << values[2u] << "}\n";
+         << values[2u] << "}\n";
   }
 
   return rval.str();

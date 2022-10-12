@@ -62,7 +62,8 @@ class InteractiveVisualizer : public BaseVisualizer,
                               public objectives::ObjectiveVisitor {
  public:
   InteractiveVisualizer(
-      const std::shared_ptr<config::Configuration>& config, const std::shared_ptr<planning_contexts::BaseContext>& context,
+      const std::shared_ptr<config::Configuration>& config,
+      const std::shared_ptr<planning_contexts::BaseContext>& context,
       const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> plannerPair);
   ~InteractiveVisualizer() = default;
 
@@ -103,9 +104,9 @@ class InteractiveVisualizer : public BaseVisualizer,
   void drawPlannerSpecificVisualizations(const std::size_t iteration) const;
   void drawBITstarSpecificVisualizations(const std::size_t iteration) const;
   void drawAITstarSpecificVisualizations(const std::size_t iteration) const;
-  #ifdef PDT_EXTRA_EITSTAR_PR
+#ifdef PDT_EXTRA_EITSTAR_PR
   void drawEITstarSpecificVisualizations(const std::size_t iteration) const;
-  #endif // #ifdef PDT_EXTRA_EITSTAR_PR
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
   void drawLazyPRMstarSpecificVisualizations(const std::size_t iteration) const;
 
   // Lowlevel drawing.
@@ -124,9 +125,8 @@ class InteractiveVisualizer : public BaseVisualizer,
                  const float* color, float size) const;
   void drawPoints(const std::vector<Eigen::Vector2f>& points, const float* color, float size) const;
   void drawPoints(const std::vector<Eigen::Vector3f>& points, const float* color, float size) const;
-  void drawPoints(
-      const std::vector<ompl::base::ScopedState<>>& states,
-      const float* color, float size) const;
+  void drawPoints(const std::vector<ompl::base::ScopedState<>>& states, const float* color,
+                  float size) const;
   void drawLines(const std::vector<Eigen::Vector2f>& points, float width, const float* color,
                  float alpha = 1.0) const;
   void drawLines(const std::vector<Eigen::Vector3f>& points, float width, const float* color,
@@ -156,7 +156,8 @@ class InteractiveVisualizer : public BaseVisualizer,
 
   // Implement visualizations of obstacles.
   void visit(const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const override;
-  void visit(const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const override;
+  void visit(
+      const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const override;
 
   // Implement visualizations of objectives.
   void visit(const objectives::PotentialFieldOptimizationObjective& objective) const override;

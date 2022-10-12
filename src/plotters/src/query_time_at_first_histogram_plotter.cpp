@@ -56,7 +56,8 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 QueryTimeAtFirstHistogramPlotter::QueryTimeAtFirstHistogramPlotter(
-    const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config,
+    const statistics::PlanningStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
@@ -68,7 +69,8 @@ QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramAxis() c
 
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     auto plot = createInitialSolutionDurationHistogramPlot(name);
-    plot->options.fillOpacity = config_->get<float>("report/initialSolutionPlots/combinedFillOpacity");
+    plot->options.fillOpacity =
+        config_->get<float>("report/initialSolutionPlots/combinedFillOpacity");
     plot->options.lineWidth = config_->get<double>("report/initialSolutionPlots/lineWidth");
     axis_->addPlot(plot);
   }
@@ -86,8 +88,7 @@ QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramAxis(
   return axis_;
 }
 
-fs::path QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPicture()
-    const {
+fs::path QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPicture() const {
   // Create the picture and add the axis.
   pgftikz::TikzPicture picture(config_);
   axis_ = createInitialSolutionDurationHistogramAxis();
@@ -118,9 +119,9 @@ std::shared_ptr<pgftikz::PgfPlot>
 QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPlot(
     const std::string& plannerName) const {
   // Load the data into a pgf table.
-  auto table =
-      std::make_shared<pgftikz::PgfTable>(stats_.extractInitialSolutionDurationHistogram(plannerName),
-                                 "bin begin durations", "bin counts");
+  auto table = std::make_shared<pgftikz::PgfTable>(
+      stats_.extractInitialSolutionDurationHistogram(plannerName), "bin begin durations",
+      "bin counts");
 
   // This table should not clean its data (or should it?).
   table->setCleanData(false);
@@ -131,7 +132,8 @@ QueryTimeAtFirstHistogramPlotter::createInitialSolutionDurationHistogramPlot(
   table->prependRow({firstRow.at(0u), 0.0});
   table->appendRow({lastRow.at(0u), 0.0});
 
-  // This is a bit of a hack, but I don't see an elegant way of doing this given the class architecture.
+  // This is a bit of a hack, but I don't see an elegant way of doing this given the class
+  // architecture.
   if (!std::isfinite(axis_->options.ymax) || axis_->options.ymax < table->getMaxValueInCol(1u)) {
     axis_->options.ymax = table->getMaxValueInCol(1u);
   }

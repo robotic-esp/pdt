@@ -56,7 +56,8 @@ namespace planning_contexts {
 class DoubleEnclosure : public RealVectorGeometricContext {
  public:
   DoubleEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                  const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                  const std::shared_ptr<const config::Configuration>& config,
+                  const std::string& name);
   virtual ~DoubleEnclosure() = default;
 
   /** \brief Accepts a context visitor. */

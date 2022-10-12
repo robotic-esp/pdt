@@ -59,7 +59,7 @@ DoubleEnclosure::DoubleEnclosure(const std::shared_ptr<ompl::base::SpaceInformat
     startGapWidth_(config->get<double>("context/" + name + "/startGapWidth")),
     goalOutsideWidth_(config->get<double>("context/" + name + "/goalOutsideWidth")),
     goalInsideWidth_(config->get<double>("context/" + name + "/goalInsideWidth")),
-    goalGapWidth_(config->get<double>("context/" + name + "/goalGapWidth")){
+    goalGapWidth_(config->get<double>("context/" + name + "/goalGapWidth")) {
   if (startInsideWidth_ > startOutsideWidth_) {
     OMPL_ERROR("%s: Start inside width is greater than start outside width.", name.c_str());
     throw std::runtime_error("Context error.");
@@ -114,8 +114,8 @@ void DoubleEnclosure::createObstacles() {
   std::vector<double> startWidths(dimensionality_, startOutsideWidth_);
 
   // Create the start enclosure obstacle.
-  obstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, startAnchor, startWidths));
+  obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+      spaceInfo_, startAnchor, startWidths));
 
   // Create the anchor for the goal enclosure obstacle.
   ompl::base::ScopedState<> goalAnchor(spaceInfo_);
@@ -127,8 +127,8 @@ void DoubleEnclosure::createObstacles() {
   std::vector<double> goalWidths(dimensionality_, goalOutsideWidth_);
 
   // Create the goal enclosure obstacle.
-  obstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, goalAnchor, goalWidths));
+  obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+      spaceInfo_, goalAnchor, goalWidths));
 }
 
 void DoubleEnclosure::createAntiObstacles() {
@@ -142,8 +142,8 @@ void DoubleEnclosure::createAntiObstacles() {
   std::vector<double> startWidths(dimensionality_, startInsideWidth_);
 
   // Create the start enclosure anti obstacle.
-  antiObstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, startAnchor, startWidths));
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+      spaceInfo_, startAnchor, startWidths));
 
   // Create the anchor for the goal enclosure anti obstacle.
   ompl::base::ScopedState<> goalAnchor(spaceInfo_);
@@ -155,8 +155,8 @@ void DoubleEnclosure::createAntiObstacles() {
   std::vector<double> goalWidths(dimensionality_, goalInsideWidth_);
 
   // Create the goal enclosure anti obstacle.
-  antiObstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, goalAnchor, goalWidths));
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+      spaceInfo_, goalAnchor, goalWidths));
 
   // Create the start gap.
   ompl::base::ScopedState<> startGapMidpoint(spaceInfo_);

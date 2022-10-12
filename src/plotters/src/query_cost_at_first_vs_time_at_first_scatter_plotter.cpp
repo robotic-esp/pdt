@@ -56,19 +56,21 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 QueryCostAtFirstVsTimeAtFirstScatterPlotter::QueryCostAtFirstVsTimeAtFirstScatterPlotter(
-    const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config,
+    const statistics::PlanningStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<pgftikz::PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterAxis()
-    const {
+std::shared_ptr<pgftikz::PgfAxis>
+QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterAxis() const {
   auto axis = std::make_shared<pgftikz::PgfAxis>();
   setInitialSolutionScatterAxisOptions(axis);
 
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     auto plot = createInitialSolutionScatterPlot(name);
-    plot->options.fillOpacity = config_->get<float>("report/initialSolutionScatterPlots/combinedFillOpacity");
+    plot->options.fillOpacity =
+        config_->get<float>("report/initialSolutionScatterPlots/combinedFillOpacity");
     plot->options.lineWidth = config_->get<double>("report/initialSolutionScatterPlots/lineWidth");
     axis->addPlot(plot);
   }
@@ -76,7 +78,8 @@ std::shared_ptr<pgftikz::PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::c
   return axis;
 }
 
-std::shared_ptr<pgftikz::PgfAxis> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterAxis(
+std::shared_ptr<pgftikz::PgfAxis>
+QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<pgftikz::PgfAxis>();
   setInitialSolutionScatterAxisOptions(axis);
@@ -110,11 +113,12 @@ fs::path QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatt
   return picturePath;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+QueryCostAtFirstVsTimeAtFirstScatterPlotter::createInitialSolutionScatterPlot(
     const std::string& plannerName) const {
   // Load the data into a pgf table.
   auto table = std::make_shared<pgftikz::PgfTable>(stats_.extractInitialSolutions(plannerName),
-                                          "durations", "costs");
+                                                   "durations", "costs");
 
   // This table should not clean its data (or should it?).
   table->setCleanData(false);

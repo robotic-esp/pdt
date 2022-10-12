@@ -51,13 +51,14 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 MedianTimeAtFirstVsQueryLinePlotter::MedianTimeAtFirstVsQueryLinePlotter(
-    const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config,
+    const statistics::MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<pgftikz::PgfAxis> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationAxis()
-    const {
+std::shared_ptr<pgftikz::PgfAxis>
+MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationAxis() const {
   auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianInitialDurationAxisOptions(axis);
 
@@ -83,7 +84,8 @@ std::shared_ptr<pgftikz::PgfAxis> MedianTimeAtFirstVsQueryLinePlotter::createMed
   return axis;
 }
 
-std::shared_ptr<pgftikz::PgfAxis> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationAxis(
+std::shared_ptr<pgftikz::PgfAxis>
+MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationAxis(
     const std::string& plannerName) const {
   auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianInitialDurationAxisOptions(axis);
@@ -147,7 +149,8 @@ void MedianTimeAtFirstVsQueryLinePlotter::setMedianInitialDurationAxisOptions(
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
@@ -170,7 +173,8 @@ std::shared_ptr<pgftikz::PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMed
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationUpperCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
@@ -205,7 +209,8 @@ std::shared_ptr<pgftikz::PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMed
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationLowerCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
@@ -237,12 +242,13 @@ std::shared_ptr<pgftikz::PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMed
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationFillCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianTimeAtFirstVsQueryLinePlotter::createMedianInitialDurationFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
-  auto fillBetween =
-      std::make_shared<pgftikz::PgfFillBetween>(plannerName + "MedianInitialDurationUpperConfidence",
-                                       plannerName + "MedianInitialDurationLowerConfidence");
+  auto fillBetween = std::make_shared<pgftikz::PgfFillBetween>(
+      plannerName + "MedianInitialDurationUpperConfidence",
+      plannerName + "MedianInitialDurationLowerConfidence");
 
   // Create the plot.
   auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);

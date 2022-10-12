@@ -52,7 +52,8 @@ std::string TikzPictureOptions::string() const {
   return stream.str();
 }
 
-TikzPicture::TikzPicture(const std::shared_ptr<const config::Configuration>& config) : config_(config) {
+TikzPicture::TikzPicture(const std::shared_ptr<const config::Configuration>& config) :
+    config_(config) {
 }
 
 void TikzPicture::clear() {
@@ -123,18 +124,24 @@ std::string TikzPicture::string() const {
   auto drawIter = draws_.begin();
   while (axisIter != axes_.end() || nodeIter != nodes_.end() || drawIter != draws_.end()) {
     // axes <= nodes <= draws:
-    if ((axisIter != axes_.end() && nodeIter != nodes_.end() && axisIter->first <= nodeIter->first) &&
-        (axisIter != axes_.end() && drawIter != draws_.end() && axisIter->first <= drawIter->first)) {
+    if ((axisIter != axes_.end() && nodeIter != nodes_.end() &&
+         axisIter->first <= nodeIter->first) &&
+        (axisIter != axes_.end() && drawIter != draws_.end() &&
+         axisIter->first <= drawIter->first)) {
       // axis <= node && axis <= draw: axis is smallest
       stream << axisIter->second->string() << '\n';
       ++axisIter;
-    } else if ((nodeIter != nodes_.end() && axisIter != axes_.end() && nodeIter->first < axisIter->first) &&
-               (nodeIter != nodes_.end() && drawIter != draws_.end() && nodeIter->first <= drawIter->first)) {
+    } else if ((nodeIter != nodes_.end() && axisIter != axes_.end() &&
+                nodeIter->first < axisIter->first) &&
+               (nodeIter != nodes_.end() && drawIter != draws_.end() &&
+                nodeIter->first <= drawIter->first)) {
       // node < axis && node <= draw: node is the smallest
       stream << nodeIter->second->string() << '\n';
       ++nodeIter;
-    } else if ((drawIter != draws_.end() && axisIter != axes_.end() && drawIter->first < axisIter->first) &&
-               (drawIter != draws_.end() && nodeIter != nodes_.end() && drawIter->first < nodeIter->first)) {
+    } else if ((drawIter != draws_.end() && axisIter != axes_.end() &&
+                drawIter->first < axisIter->first) &&
+               (drawIter != draws_.end() && nodeIter != nodes_.end() &&
+                drawIter->first < nodeIter->first)) {
       // draw < axis && draw < node: draw is the smallest
       stream << drawIter->second->string() << '\n';
       ++drawIter;

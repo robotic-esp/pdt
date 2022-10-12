@@ -41,19 +41,19 @@ namespace pdt {
 
 namespace visualization {
 
-std::vector<LazyPRMstarData::Edge> LazyPRMstarData::getValidEdges() const{
+std::vector<LazyPRMstarData::Edge> LazyPRMstarData::getValidEdges() const {
   return validEdges_;
 }
 
-void LazyPRMstarData::setValidEdges(const std::vector<LazyPRMstarData::Edge> &edges){
+void LazyPRMstarData::setValidEdges(const std::vector<LazyPRMstarData::Edge>& edges) {
   validEdges_ = edges;
 }
 
-std::vector<std::size_t> LazyPRMstarData::getNewEdgeIndices() const{
+std::vector<std::size_t> LazyPRMstarData::getNewEdgeIndices() const {
   return newEdgeIndices_;
 }
 
-void LazyPRMstarData::setNewEdgeIndices(const std::vector<std::size_t> &newEdgeIndices){
+void LazyPRMstarData::setNewEdgeIndices(const std::vector<std::size_t>& newEdgeIndices) {
   newEdgeIndices_ = newEdgeIndices;
 }
 
@@ -180,7 +180,7 @@ void EITstarData::setNextForwardEdge(const ompl::geometric::eitstar::Edge& edge)
 void EITstarData::setNextReverseEdge(const ompl::geometric::eitstar::Edge& edge) {
   nextReverseEdge_ = edge;
 }
-#endif // #ifdef PDT_EXTRA_EITSTAR_PR
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
 
 }  // namespace visualization
 

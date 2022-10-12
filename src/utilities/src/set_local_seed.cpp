@@ -68,52 +68,52 @@ void setLocalSeed(const std::shared_ptr<const config::Configuration> config,
   if (config->contains("experiment/seed")) {
     switch (plannerType) {
       case common::PLANNER_TYPE::ABITSTAR: {
-        #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+#ifdef PDT_EXTRA_SET_LOCAL_SEEDS
         planner->as<ompl::geometric::ABITstar>()->setLocalSeed(
             config->get<std::size_t>("experiment/seed"));
-        #else
+#else
         warnSetLocalSeed();
-        #endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+#endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
         break;
       }
       case common::PLANNER_TYPE::AITSTAR: {
-        #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+#ifdef PDT_EXTRA_SET_LOCAL_SEEDS
         planner->as<ompl::geometric::AITstar>()->setLocalSeed(
             config->get<std::size_t>("experiment/seed"));
-        #else
+#else
         warnSetLocalSeed();
-        #endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+#endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
         break;
       }
       case common::PLANNER_TYPE::BITSTAR: {
-        #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+#ifdef PDT_EXTRA_SET_LOCAL_SEEDS
         planner->as<ompl::geometric::BITstar>()->setLocalSeed(
             config->get<std::size_t>("experiment/seed"));
-        #else
+#else
         warnSetLocalSeed();
-        #endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+#endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
         break;
       }
 #ifdef PDT_EXTRA_EITSTAR_PR
       case common::PLANNER_TYPE::EIRMSTAR:
       case common::PLANNER_TYPE::EITSTAR: {
-        #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+#ifdef PDT_EXTRA_SET_LOCAL_SEEDS
         planner->as<ompl::geometric::EITstar>()->setLocalSeed(
             config->get<std::size_t>("experiment/seed"));
-        #else
+#else
         warnSetLocalSeed();
-        #endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+#endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
         break;
       }
 #endif  // #ifdef PDT_EXTRA_EITSTAR_PR
       default: { static_cast<void>(planner); }
     }
   }
-  #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+#ifdef PDT_EXTRA_SET_LOCAL_SEEDS
   else {
     throw std::runtime_error("Unknown seed.");
   }
-  #endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
+#endif  // #ifdef PDT_EXTRA_SET_LOCAL_SEEDS
 }
 
 }  // namespace utilities

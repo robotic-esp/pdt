@@ -40,9 +40,9 @@
 #include <memory>
 #include <string>
 
-#include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/base/ProblemDefinition.h>
 #include <ompl/base/SpaceInformation.h>
+#include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/util/RandomNumbers.h>
 
@@ -59,7 +59,8 @@ class RandomRectangles : public RealVectorGeometricContext {
  public:
   /** \brief The constructor. */
   RandomRectangles(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                   const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                   const std::shared_ptr<const config::Configuration>& config,
+                   const std::string& name);
 
   /** \brief The destructor. */
   virtual ~RandomRectangles() = default;

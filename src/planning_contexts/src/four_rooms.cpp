@@ -45,10 +45,11 @@ namespace pdt {
 namespace planning_contexts {
 
 FourRooms::FourRooms(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                     const std::shared_ptr<const config::Configuration>& config, const std::string& name) :
+                     const std::shared_ptr<const config::Configuration>& config,
+                     const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
-    gapWidth_(config->get<double>("context/" + name + "/gapWidth")){
+    gapWidth_(config->get<double>("context/" + name + "/gapWidth")) {
   // Assert configuration sanity.
   if (dimensionality_ != 2u) {
     OMPL_ERROR("%s: Currently only implemented for two dimensional state spaces.", name.c_str());
@@ -105,8 +106,8 @@ void FourRooms::createObstacles() {
   widthsX.at(1u) = wallThickness_;
 
   // Emplace this obstacle.
-  obstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, midpointX, widthsX));
+  obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+      spaceInfo_, midpointX, widthsX));
 
   // Create the obstacle that divides the space parallel to the x axis.
   ompl::base::ScopedState<> midpointY(spaceInfo_);
@@ -120,8 +121,8 @@ void FourRooms::createObstacles() {
   widthsY.at(1u) = bounds.high.at(1u) - bounds.low.at(1u);
 
   // Emplace this obstacle.
-  obstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, midpointY, widthsY));
+  obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+      spaceInfo_, midpointY, widthsY));
 }
 
 void FourRooms::createAntiObstacles() {
@@ -139,8 +140,8 @@ void FourRooms::createAntiObstacles() {
   widthsSouth.at(0u) = wallThickness_ + std::numeric_limits<double>::epsilon();
   widthsSouth.at(1u) = gapWidth_;
 
-  antiObstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, midpointSouth, widthsSouth));
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+      spaceInfo_, midpointSouth, widthsSouth));
 
   // Create the gap in the north.
   ompl::base::ScopedState<> midpointNorth(spaceInfo_);
@@ -153,8 +154,8 @@ void FourRooms::createAntiObstacles() {
   widthsNorth.at(0u) = wallThickness_ + std::numeric_limits<double>::epsilon();
   widthsNorth.at(1u) = gapWidth_;
 
-  antiObstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, midpointNorth, widthsNorth));
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+      spaceInfo_, midpointNorth, widthsNorth));
 
   // Create the gap in the west.
   ompl::base::ScopedState<> midpointWest(spaceInfo_);
@@ -167,8 +168,8 @@ void FourRooms::createAntiObstacles() {
   widthsWest.at(0u) = gapWidth_;
   widthsWest.at(1u) = wallThickness_ + std::numeric_limits<double>::epsilon();
 
-  antiObstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, midpointWest, widthsWest));
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+      spaceInfo_, midpointWest, widthsWest));
 }
 
 }  // namespace planning_contexts

@@ -213,7 +213,7 @@ fs::path BaseReport::compileReport() const {
 }
 
 void BaseReport::findAndReplaceAll(std::string* string, const std::string& key,
-                                         const std::string& replacement) const {
+                                   const std::string& replacement) const {
   // Get the first occurrence.
   size_t pos = string->find(key);
 

@@ -77,24 +77,20 @@ RandomRectangles::RandomRectangles(const std::shared_ptr<ompl::base::SpaceInform
         generateQueriesBeforeObstacles = true;
       } else {
         throw std::runtime_error(
-          "Context error. Multiple specified starts/goals are not supported for this context at "
-          "the moment.");
+            "Context error. Multiple specified starts/goals are not supported for this context at "
+            "the moment.");
       }
-    }
-    else if (config_->get<std::string>("context/" + name + "/starts/type") == "generated"){
+    } else if (config_->get<std::string>("context/" + name + "/starts/type") == "generated") {
       generateQueriesBeforeObstacles = false;
-    }
-    else{
+    } else {
       throw std::runtime_error(
-        "Context error. The only start types that are currently supported are 'specified' and 'generated'.");
+          "Context error. The only start types that are currently supported are 'specified' and "
+          "'generated'.");
     }
-  }
-  else if (config_->contains("context/" + name_ + "/start")) {
+  } else if (config_->contains("context/" + name_ + "/start")) {
     generateQueriesBeforeObstacles = true;
-  } 
-  else{
-    throw std::runtime_error(
-      "Context error. Neither 'start' nor 'starts' specified.");
+  } else {
+    throw std::runtime_error("Context error. Neither 'start' nor 'starts' specified.");
   }
 
   if (generateQueriesBeforeObstacles) {
@@ -145,7 +141,8 @@ void RandomRectangles::createObstacles() {
       widths[j] = rng_.uniformReal(minSideLength_, maxSideLength_);
     }
 
-    auto obstacle = std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor, widths);
+    auto obstacle = std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+        spaceInfo_, anchor, widths);
 
     // Add this to the obstacles if it doesn't invalidate the start or goal state.
     bool invalidates = false;
@@ -166,10 +163,11 @@ void RandomRectangles::createObstacles() {
         if (obstacle->invalidates(startGoalPair.goal->as<ompl::base::GoalState>()->getState())) {
           invalidates = true;
         }
-      } 
-      else if (goalType_ == ompl::base::GoalType::GOAL_STATES) {
-        for (auto i = 0u; i < startGoalPair.goal->as<ompl::base::GoalStates>()->getStateCount(); ++i) {
-          if (obstacle->invalidates(startGoalPair.goal->as<ompl::base::GoalStates>()->getState(i))) {
+      } else if (goalType_ == ompl::base::GoalType::GOAL_STATES) {
+        for (auto i = 0u; i < startGoalPair.goal->as<ompl::base::GoalStates>()->getStateCount();
+             ++i) {
+          if (obstacle->invalidates(
+                  startGoalPair.goal->as<ompl::base::GoalStates>()->getState(i))) {
             invalidates = true;
             // Break out of inner for loop over goals
             break;

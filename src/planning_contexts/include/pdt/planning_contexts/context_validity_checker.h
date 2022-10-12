@@ -69,7 +69,8 @@ class ContextValidityChecker : public ompl::base::StateValidityChecker {
 
   // Add antiobstacles.
   virtual void addAntiObstacle(const std::shared_ptr<obstacles::BaseAntiObstacle>& anti);
-  virtual void addAntiObstacles(const std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>>& antis);
+  virtual void addAntiObstacles(
+      const std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>>& antis);
 
   // Make obstacles accessible.
   virtual std::vector<std::shared_ptr<obstacles::BaseObstacle>> getObstacles() const;

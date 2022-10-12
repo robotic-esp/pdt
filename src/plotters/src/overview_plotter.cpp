@@ -75,7 +75,7 @@ fs::path OverviewPlotter::createCombinedPicture() const {
 
   // Make sure these axis cover the same domain.
   pgftikz::PgfAxis::alignAbszissen(medianCostAxis.get(), successAxis.get());
-  
+
   // Create the picture and add the axes.
   pgftikz::TikzPicture picture(config_);
   picture.addAxis(successAxis);

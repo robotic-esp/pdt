@@ -51,8 +51,10 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 QueryMedianCostVsTimeLinePlotter::QueryMedianCostVsTimeLinePlotter(
-    const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats) :
-    LatexPlotter(config), stats_(stats) {
+    const std::shared_ptr<const config::Configuration>& config,
+    const statistics::PlanningStatistics& stats) :
+    LatexPlotter(config),
+    stats_(stats) {
   // Compute the duration bin size.
   auto contextName = config_->get<std::string>("experiment/context");
   std::size_t numBins = static_cast<std::size_t>(
@@ -69,7 +71,8 @@ QueryMedianCostVsTimeLinePlotter::QueryMedianCostVsTimeLinePlotter(
   minDurationToBePlotted_ = stats_.getMinInitialSolutionDuration();
 }
 
-std::shared_ptr<pgftikz::PgfAxis> QueryMedianCostVsTimeLinePlotter::createMedianCostEvolutionAxis() const {
+std::shared_ptr<pgftikz::PgfAxis> QueryMedianCostVsTimeLinePlotter::createMedianCostEvolutionAxis()
+    const {
   auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianCostAxisOptions(axis);
 
@@ -144,7 +147,8 @@ fs::path QueryMedianCostVsTimeLinePlotter::createMedianCostEvolutionPicture(
   return picturePath;
 }
 
-void QueryMedianCostVsTimeLinePlotter::setMedianCostAxisOptions(std::shared_ptr<pgftikz::PgfAxis> axis) const {
+void QueryMedianCostVsTimeLinePlotter::setMedianCostAxisOptions(
+    std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("report/medianCostPlots/axisWidth");
   axis->options.height = config_->get<std::string>("report/medianCostPlots/axisHeight");
   axis->options.xmax = maxDurationToBePlotted_;
@@ -188,7 +192,8 @@ std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostVsTimeLinePlotter::createMedian
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostVsTimeLinePlotter::createMedianCostEvolutionUpperCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+QueryMedianCostVsTimeLinePlotter::createMedianCostEvolutionUpperCiPlot(
     const std::string& plannerName) const {
   // This cannot be applied to planners that aren't anytime.
   if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
@@ -216,16 +221,20 @@ std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostVsTimeLinePlotter::createMedian
   // Create the plot and set the options.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.mark = "\"none\""s;
-  plot->options.lineWidth = config_->get<double>("report/medianCostPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth =
+      config_->get<double>("report/medianCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolutionUpperConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("report/medianCostPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("report/medianCostPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity =
+      config_->get<float>("report/medianCostPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("report/medianCostPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostVsTimeLinePlotter::createMedianCostEvolutionLowerCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+QueryMedianCostVsTimeLinePlotter::createMedianCostEvolutionLowerCiPlot(
     const std::string& plannerName) const {
   // This cannot be applied to planners that aren't anytime.
   if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
@@ -250,26 +259,31 @@ std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostVsTimeLinePlotter::createMedian
   // Create the plot and set the options.
   auto plot = std::make_shared<pgftikz::PgfPlot>(table);
   plot->options.mark = "\"none\""s;
-  plot->options.lineWidth = config_->get<double>("report/medianCostPlots/confidenceIntervalLineWidth");
+  plot->options.lineWidth =
+      config_->get<double>("report/medianCostPlots/confidenceIntervalLineWidth");
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
   plot->options.namePath = plannerName + "MedianCostEvolutionLowerConfidence"s;
-  plot->options.drawOpacity = config_->get<float>("report/medianCostPlots/confidenceIntervalDrawOpacity");
-  plot->options.fillOpacity = config_->get<float>("report/medianCostPlots/confidenceIntervalFillOpacity");
+  plot->options.drawOpacity =
+      config_->get<float>("report/medianCostPlots/confidenceIntervalDrawOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("report/medianCostPlots/confidenceIntervalFillOpacity");
 
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> QueryMedianCostVsTimeLinePlotter::createMedianCostEvolutionFillCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+QueryMedianCostVsTimeLinePlotter::createMedianCostEvolutionFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
   auto fillBetween =
       std::make_shared<pgftikz::PgfFillBetween>(plannerName + "MedianCostEvolutionUpperConfidence",
-                                       plannerName + "MedianCostEvolutionLowerConfidence");
+                                                plannerName + "MedianCostEvolutionLowerConfidence");
 
   // Create the plot.
   auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);
   plot->options.color = config_->get<std::string>("planner/"s + plannerName + "/report/color"s);
-  plot->options.fillOpacity = config_->get<float>("report/medianCostPlots/confidenceIntervalFillOpacity");
+  plot->options.fillOpacity =
+      config_->get<float>("report/medianCostPlots/confidenceIntervalFillOpacity");
   plot->options.drawOpacity = 0.0;
 
   return plot;

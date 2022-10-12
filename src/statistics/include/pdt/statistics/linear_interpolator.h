@@ -123,7 +123,7 @@ Y LinearInterpolator<X, Y>::operator()(X x) const {
 
   // the lower iterator is smaller equal, the upper is _greater_.
   // Thus we can check if we can simply return the lower iterator here.
-  if (std::abs(lower->first - x) < 1e-6){
+  if (std::abs(lower->first - x) < 1e-6) {
     return lower->second;
   }
 

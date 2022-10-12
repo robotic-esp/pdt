@@ -52,7 +52,8 @@ namespace pgftikz {
 using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
-KpiTable::KpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats) :
+KpiTable::KpiTable(const std::shared_ptr<const config::Configuration>& config,
+                   const statistics::PlanningStatistics& stats) :
     config_(config),
     stats_(stats) {
   options.rowSep = "\\\\[0.5em]"s;
@@ -76,13 +77,13 @@ void KpiTable::addKpi(const std::string& plannerName, const std::string& planner
     auto finalMedCost = stats_.getMedianFinalCost(plannerName);
     auto finalMaxCost = stats_.getMaxFinalCost(plannerName);
     appendRow({initMinDuration, initMedDuration, initMaxDuration, initMinCost, initMedCost,
-        initMaxCost, finalMinCost, finalMedCost, finalMaxCost, success});
+               initMaxCost, finalMinCost, finalMedCost, finalMaxCost, success});
   } else {
     auto finalMinCost = initMinCost;
     auto finalMedCost = initMedCost;
     auto finalMaxCost = initMaxCost;
     appendRow({initMinDuration, initMedDuration, initMaxDuration, initMinCost, initMedCost,
-        initMaxCost, finalMinCost, finalMedCost, finalMaxCost, success});
+               initMaxCost, finalMinCost, finalMedCost, finalMaxCost, success});
   }
 }
 
@@ -124,8 +125,8 @@ std::string KpiTable::string() const {
          << " \\(c_\\mathrm{init}^\\mathrm{max}\\) " << options.colSep
          << " \\(c_\\mathrm{final}^\\mathrm{min}\\) " << options.colSep
          << " \\(c_\\mathrm{final}^\\mathrm{med}\\) " << options.colSep
-         << " \\(c_\\mathrm{final}^\\mathrm{max}\\) " << options.colSep
-         << " Success " << options.rowSep << "\\midrule\n";
+         << " \\(c_\\mathrm{final}^\\mathrm{max}\\) " << options.colSep << " Success "
+         << options.rowSep << "\\midrule\n";
   for (std::size_t row = 0u; row < data_.at(0u).size(); ++row) {
     stream << plannerNames_.at(row) << options.colSep << ' ';
     for (std::size_t col = 0u; col < data_.size(); ++col) {
@@ -134,7 +135,7 @@ std::string KpiTable::string() const {
       } else {
         stream << std::setprecision(4);
       }
-      
+
       if (data_.at(col).at(row) == std::numeric_limits<double>::infinity()) {
         stream << "\\infty ";
       } else {

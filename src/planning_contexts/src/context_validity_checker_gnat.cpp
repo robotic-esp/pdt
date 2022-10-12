@@ -80,7 +80,8 @@ bool ContextValidityCheckerGNAT::isValid(const ompl::base::State* state) const {
         return true;
       }
     } catch (const std::out_of_range& e) {
-      auto msg = "Nearest neighbour lookup for antiobstacles returned invalid index:\n    "s + e.what();
+      auto msg =
+          "Nearest neighbour lookup for antiobstacles returned invalid index:\n    "s + e.what();
       throw std::out_of_range(msg);
     }
   }
@@ -103,7 +104,8 @@ bool ContextValidityCheckerGNAT::isValid(const ompl::base::State* state) const {
   return true;
 }
 
-void ContextValidityCheckerGNAT::addObstacle(const std::shared_ptr<obstacles::BaseObstacle>& obstacle) {
+void ContextValidityCheckerGNAT::addObstacle(
+    const std::shared_ptr<obstacles::BaseObstacle>& obstacle) {
   if (maxObstacleRadius_ < obstacle->getCircumradius()) {
     maxObstacleRadius_ = obstacle->getCircumradius();
   }
@@ -125,7 +127,8 @@ void ContextValidityCheckerGNAT::addObstacles(
   }
 }
 
-void ContextValidityCheckerGNAT::addAntiObstacle(const std::shared_ptr<obstacles::BaseAntiObstacle>& anti) {
+void ContextValidityCheckerGNAT::addAntiObstacle(
+    const std::shared_ptr<obstacles::BaseAntiObstacle>& anti) {
   if (maxAntiObstacleRadius_ < anti->getCircumradius()) {
     maxAntiObstacleRadius_ = anti->getCircumradius();
   }

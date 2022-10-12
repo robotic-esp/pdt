@@ -58,7 +58,8 @@ namespace planning_contexts {
 class DividingWalls : public RealVectorGeometricContext {
  public:
   DividingWalls(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                const std::shared_ptr<const config::Configuration>& config,
+                const std::string& name);
 
   /** \brief Accept a context visitor. */
   virtual void accept(const ContextVisitor& visitor) const override;

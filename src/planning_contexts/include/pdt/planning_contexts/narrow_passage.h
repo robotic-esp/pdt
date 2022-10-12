@@ -57,7 +57,8 @@ namespace planning_contexts {
 class NarrowPassage : public RealVectorGeometricContext {
  public:
   NarrowPassage(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-          const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                const std::shared_ptr<const config::Configuration>& config,
+                const std::string& name);
   virtual ~NarrowPassage() = default;
 
   /** \brief Accepts a context visitor. */

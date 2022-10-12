@@ -52,25 +52,29 @@ namespace plotters {
 
 class SuccessAtTimeVsQueryLinePlotter : public LatexPlotter {
  public:
-  SuccessAtTimeVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
+  SuccessAtTimeVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config,
+                                  const statistics::MultiqueryStatistics& stats);
   ~SuccessAtTimeVsQueryLinePlotter() = default;
 
-  // Creates a pgf axis that holds the success rate at a given percentage of the total time for all planners.
-  // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
+  // Creates a pgf axis that holds the success rate at a given percentage of the total time for all
+  // planners. 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
   std::shared_ptr<pgftikz::PgfAxis> createSuccessRateQueryAxis(const unsigned int percentage) const;
 
-  // Creates a pgf axis that holds the success rate at a given percentage of the total time for the specified planner.
-  // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
-  std::shared_ptr<pgftikz::PgfAxis> createSuccessRateQueryAxis(
-      const std::string& plannerName, const unsigned int percentage) const;
+  // Creates a pgf axis that holds the success rate at a given percentage of the total time for the
+  // specified planner. 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e.
+  // quartiles.
+  std::shared_ptr<pgftikz::PgfAxis> createSuccessRateQueryAxis(const std::string& plannerName,
+                                                               const unsigned int percentage) const;
 
   // Creates a tikz picture that contains the success rate axis of all planners.
   // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
-  std::experimental::filesystem::path createSuccessRateQueryPicture(const unsigned int percentage) const;
+  std::experimental::filesystem::path createSuccessRateQueryPicture(
+      const unsigned int percentage) const;
 
   // Creates a tikz picture that contains the success rate axis of the specified planner.
   // 'percentage' currently only allows for [25, 50, 75, 100] as values, i.e. quartiles.
-  std::experimental::filesystem::path createSuccessRateQueryPicture(const std::string& plannerName, const unsigned int percentage) const;
+  std::experimental::filesystem::path createSuccessRateQueryPicture(
+      const std::string& plannerName, const unsigned int percentage) const;
 
  private:
   std::shared_ptr<pgftikz::PgfPlot> createSuccessRateQueryPercentPlot(

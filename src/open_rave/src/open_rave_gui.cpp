@@ -97,7 +97,7 @@ void planManipulator(std::shared_ptr<pdt::config::Configuration> config,
       config->get<std::vector<double>>("context/" + context->getName() + "/start");
 
   double timePerQuery = 0.0;
-  if (config->contains("experiment/time")){
+  if (config->contains("experiment/time")) {
     timePerQuery = config->get<double>("experiment/time");
   }
 
@@ -107,10 +107,9 @@ void planManipulator(std::shared_ptr<pdt::config::Configuration> config,
 
   // Work it.
   while (true) {
-    if (queryNumber + 1 < context->getNumQueries() && 
+    if (queryNumber + 1 < context->getNumQueries() &&
         ((planner->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
-         totalSolveDuration - currentIterationStartTime > timePerQuery)){
-
+         totalSolveDuration - currentIterationStartTime > timePerQuery)) {
       planner->clearQuery();
       ++queryNumber;
 
@@ -186,7 +185,7 @@ void planMover(std::shared_ptr<pdt::config::Configuration> config,
   OpenRAVE::Transform raveState;
 
   double timePerQuery = 0.0;
-  if (config->contains("experiment/time")){
+  if (config->contains("experiment/time")) {
     timePerQuery = config->get<double>("experiment/time");
   }
 
@@ -196,10 +195,9 @@ void planMover(std::shared_ptr<pdt::config::Configuration> config,
 
   // Work it.
   while (true) {
-    if (queryNumber + 1 < context->getNumQueries() && 
+    if (queryNumber + 1 < context->getNumQueries() &&
         ((planner->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
-         totalSolveDuration - currentIterationStartTime > timePerQuery)){
-
+         totalSolveDuration - currentIterationStartTime > timePerQuery)) {
       planner->clearQuery();
       ++queryNumber;
 
@@ -279,7 +277,7 @@ void planR3(std::shared_ptr<pdt::config::Configuration> config,
   raveState.identity();
 
   double timePerQuery = 0.0;
-  if (config->contains("experiment/time")){
+  if (config->contains("experiment/time")) {
     timePerQuery = config->get<double>("experiment/time");
   }
 
@@ -289,10 +287,9 @@ void planR3(std::shared_ptr<pdt::config::Configuration> config,
 
   // Work it.
   while (true) {
-    if (queryNumber + 1 < context->getNumQueries() && 
+    if (queryNumber + 1 < context->getNumQueries() &&
         ((planner->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
-         totalSolveDuration - currentIterationStartTime > timePerQuery)){
-
+         totalSolveDuration - currentIterationStartTime > timePerQuery)) {
       planner->clearQuery();
       ++queryNumber;
 
@@ -368,7 +365,7 @@ void planR3xSO2(std::shared_ptr<pdt::config::Configuration> config,
   raveState.identity();
 
   double timePerQuery = 0.0;
-  if (config->contains("experiment/time")){
+  if (config->contains("experiment/time")) {
     timePerQuery = config->get<double>("experiment/time");
   }
 
@@ -378,10 +375,9 @@ void planR3xSO2(std::shared_ptr<pdt::config::Configuration> config,
 
   // Work it.
   while (true) {
-    if (queryNumber + 1 < context->getNumQueries() && 
+    if (queryNumber + 1 < context->getNumQueries() &&
         ((planner->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
-         totalSolveDuration - currentIterationStartTime > timePerQuery)){
-
+         totalSolveDuration - currentIterationStartTime > timePerQuery)) {
       planner->clearQuery();
       ++queryNumber;
 

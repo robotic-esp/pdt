@@ -49,7 +49,8 @@ namespace pgftikz {
 
 class KpiTable : public TabularX {
  public:
-  KpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats);
+  KpiTable(const std::shared_ptr<const config::Configuration>& config,
+           const statistics::PlanningStatistics& stats);
   ~KpiTable() = default;
 
   void addKpi(const std::string& plannerName, const std::string& plannerPlotName);

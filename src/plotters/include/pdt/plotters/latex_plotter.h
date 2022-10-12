@@ -52,7 +52,8 @@ class LatexPlotter {
   virtual ~LatexPlotter() = default;
 
   // Create the legend axis.
-  std::shared_ptr<pgftikz::PgfAxis> createLegendAxis(const std::vector<std::string>& plannerNames) const;
+  std::shared_ptr<pgftikz::PgfAxis> createLegendAxis(
+      const std::vector<std::string>& plannerNames) const;
 
   // Align multiple axes' abszissen.
   template <typename... Axes>
@@ -72,7 +73,8 @@ class LatexPlotter {
   // Collect multiple axes in a tikzpicture.
   template <typename... Axes>
   std::shared_ptr<pgftikz::TikzPicture> collect(Axes... args) const;
-  std::shared_ptr<pgftikz::TikzPicture> collect(const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const;
+  std::shared_ptr<pgftikz::TikzPicture> collect(
+      const std::vector<std::shared_ptr<pgftikz::PgfAxis>>& axes) const;
 
   // Create a tikzpicture from multiple axes.
   template <typename... Axes>
@@ -136,7 +138,8 @@ std::experimental::filesystem::path LatexPlotter::createPicture(Axes... args) co
   auto picture = collect(args...);
 
   // Create the name of this picture.
-  auto path = std::experimental::filesystem::path(config_->get<std::string>("experiment/experimentDirectory")) /
+  auto path = std::experimental::filesystem::path(
+                  config_->get<std::string>("experiment/experimentDirectory")) /
               std::experimental::filesystem::path("tikz/");
   for (const auto& keyAxis : picture->getAxes()) {
     path += std::experimental::filesystem::path(keyAxis.second->options.name + '_');

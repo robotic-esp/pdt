@@ -66,8 +66,7 @@ class NullLogger {
   NullLogger(double /*runTimeSeconds*/, unsigned int /*recordPeriodMicrosecond*/) {
     empty_ = false;
   };
-  NullLogger(const time::Duration& /*runTime*/,
-             unsigned int /*recordPeriodMicrosecond*/) {
+  NullLogger(const time::Duration& /*runTime*/, unsigned int /*recordPeriodMicrosecond*/) {
     empty_ = false;
   };
 
@@ -124,8 +123,7 @@ class TimeIterationCostLogger {
 
   /** \brief Constructors */
   TimeIterationCostLogger(double runTimeSeconds, unsigned int recordPeriodMicrosecond);
-  TimeIterationCostLogger(const time::Duration& runTime,
-                          unsigned int recordPeriodMicrosecond);
+  TimeIterationCostLogger(const time::Duration& runTime, unsigned int recordPeriodMicrosecond);
 
   /** \brief Output the data with the appropriate label*/
   std::string output(const std::string& labelPrefix);
@@ -152,8 +150,7 @@ class IterationCostLogger {
   /** \brief Constructors */
   IterationCostLogger(unsigned int numIterations);
   IterationCostLogger(double runTimeSeconds, unsigned int recordPeriodMicrosecond);
-  IterationCostLogger(const time::Duration& runTime,
-                      unsigned int recordPeriodMicrosecond);
+  IterationCostLogger(const time::Duration& runTime, unsigned int recordPeriodMicrosecond);
 
   /** \brief Output the data with the appropriate label*/
   std::string output(const std::string& labelPrefix);
@@ -201,9 +198,9 @@ class TargetTimeResults {
 /** \brief A class to write results to disk. */
 template <class Logger>
 class ResultLog {
-
  public:
-  ResultLog(const std::experimental::filesystem::path& filepath, const bool append) : filepath_(filepath) {
+  ResultLog(const std::experimental::filesystem::path& filepath, const bool append) :
+      filepath_(filepath) {
     // Create parent directories, if needed.
     fs::create_directories(filepath_.parent_path());
 

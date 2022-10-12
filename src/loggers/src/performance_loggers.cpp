@@ -58,17 +58,14 @@ constexpr double ALLOC_SAFETY_FACTOR = 10.0;
 // Convenience namespace.
 namespace fs = std::experimental::filesystem;
 
-TimeCostLogger::TimeCostLogger(const time::Duration& maxDuration,
-                               double logFrequency) :
-  allocSize_(static_cast<std::size_t>(
-               std::ceil(ALLOC_SAFETY_FACTOR *
-                         std::chrono::duration<double, std::ratio<1>>(maxDuration).count() *
-                         logFrequency))) {
+TimeCostLogger::TimeCostLogger(const time::Duration& maxDuration, double logFrequency) :
+    allocSize_(static_cast<std::size_t>(std::ceil(
+        ALLOC_SAFETY_FACTOR * std::chrono::duration<double, std::ratio<1>>(maxDuration).count() *
+        logFrequency))) {
   measurements_.reserve(allocSize_);
 }
 
-void TimeCostLogger::addMeasurement(const time::Duration& duration,
-                                    const ompl::base::Cost& cost) {
+void TimeCostLogger::addMeasurement(const time::Duration& duration, const ompl::base::Cost& cost) {
   measurements_.emplace_back(duration, cost);
 }
 
@@ -111,15 +108,13 @@ std::string TimeCostLogger::createLogString(const std::string& prefix) const {
 TimeIterationCostLogger::TimeIterationCostLogger(double runTimeSeconds,
                                                  unsigned int recordPeriodMicrosecond) {
   allocSize_ =
-    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * runTimeSeconds /
-                          (recordPeriodMicrosecond / 1e6));
+      static_cast<unsigned>(ALLOC_SAFETY_FACTOR * runTimeSeconds / (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
 TimeIterationCostLogger::TimeIterationCostLogger(const time::Duration& runTime,
                                                  unsigned int recordPeriodMicrosecond) {
-  allocSize_ =
-    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * time::seconds(runTime) /
-                          (recordPeriodMicrosecond / 1e6));
+  allocSize_ = static_cast<unsigned>(ALLOC_SAFETY_FACTOR * time::seconds(runTime) /
+                                     (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
 std::string TimeIterationCostLogger::output(const std::string& labelPrefix) {
@@ -176,15 +171,13 @@ IterationCostLogger::IterationCostLogger(unsigned int numIterations) {
 IterationCostLogger::IterationCostLogger(double runTimeSeconds,
                                          unsigned int recordPeriodMicrosecond) {
   allocSize_ =
-    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * runTimeSeconds /
-                          (recordPeriodMicrosecond / 1e6));
+      static_cast<unsigned>(ALLOC_SAFETY_FACTOR * runTimeSeconds / (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
 IterationCostLogger::IterationCostLogger(const time::Duration& runTime,
                                          unsigned int recordPeriodMicrosecond) {
-  allocSize_ =
-    static_cast<unsigned>(ALLOC_SAFETY_FACTOR * time::seconds(runTime) /
-                          (recordPeriodMicrosecond / 1e6));
+  allocSize_ = static_cast<unsigned>(ALLOC_SAFETY_FACTOR * time::seconds(runTime) /
+                                     (recordPeriodMicrosecond / 1e6));
   data_.reserve(allocSize_);
 }
 std::string IterationCostLogger::output(const std::string& labelPrefix) {

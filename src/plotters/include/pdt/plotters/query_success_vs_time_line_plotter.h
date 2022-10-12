@@ -52,7 +52,8 @@ namespace plotters {
 
 class QuerySuccessVsTimeLinePlotter : public LatexPlotter {
  public:
-  QuerySuccessVsTimeLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats);
+  QuerySuccessVsTimeLinePlotter(const std::shared_ptr<const config::Configuration>& config,
+                                const statistics::PlanningStatistics& stats);
   ~QuerySuccessVsTimeLinePlotter() = default;
 
   // Creates a pgf axis that holds the success percentage over time for all planners.

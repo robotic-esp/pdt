@@ -56,7 +56,7 @@ GoalEnclosure::GoalEnclosure(const std::shared_ptr<ompl::base::SpaceInformation>
     RealVectorGeometricContext(spaceInfo, config, name),
     goalOutsideWidth_(config->get<double>("context/" + name + "/goalOutsideWidth")),
     goalInsideWidth_(config->get<double>("context/" + name + "/goalInsideWidth")),
-    goalGapWidth_(config->get<double>("context/" + name + "/goalGapWidth")){
+    goalGapWidth_(config->get<double>("context/" + name + "/goalGapWidth")) {
   if (config->get<std::vector<double>>("context/" + name + "/goal").size() != dimensionality_) {
     OMPL_ERROR("%s: Dimensionality of problem and of goal specification does not match.",
                name.c_str());
@@ -103,8 +103,8 @@ void GoalEnclosure::createObstacles() {
     goalAnchor[i] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(i);
   }
   std::vector<double> goalWidths(dimensionality_, goalOutsideWidth_);
-  obstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, goalAnchor, goalWidths));
+  obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+      spaceInfo_, goalAnchor, goalWidths));
 }
 
 void GoalEnclosure::createAntiObstacles() {
@@ -114,8 +114,8 @@ void GoalEnclosure::createAntiObstacles() {
     goalState[i] = config_->get<std::vector<double>>("context/" + name_ + "/goal").at(i);
   }
   std::vector<double> goalWidths(dimensionality_, goalInsideWidth_);
-  antiObstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, goalState, goalWidths));
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+      spaceInfo_, goalState, goalWidths));
 
   // Create the gap.
   ompl::base::ScopedState<> goalGapMidpoint(spaceInfo_);

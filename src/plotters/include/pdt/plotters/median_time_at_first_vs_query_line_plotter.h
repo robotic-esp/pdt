@@ -52,23 +52,28 @@ namespace plotters {
 
 class MedianTimeAtFirstVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianTimeAtFirstVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
+  MedianTimeAtFirstVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config,
+                                      const statistics::MultiqueryStatistics& stats);
   ~MedianTimeAtFirstVsQueryLinePlotter() = default;
 
   // Creates a pgf axis that holds the median initial solution duration per query for all planners.
   std::shared_ptr<pgftikz::PgfAxis> createMedianInitialDurationAxis() const;
 
   // Creates a pgf axis that holds the median initial solution durations for the specified planner.
-  std::shared_ptr<pgftikz::PgfAxis> createMedianInitialDurationAxis(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianInitialDurationAxis(
+      const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the median initial solution duration axis of all planners.
   std::experimental::filesystem::path createMedianInitialDurationPicture() const;
 
-  // Creates a tikz picture that contains the median initial solution duration axis of the specified planner.
-  std::experimental::filesystem::path createMedianInitialDurationPicture(const std::string& plannerName) const;
+  // Creates a tikz picture that contains the median initial solution duration axis of the specified
+  // planner.
+  std::experimental::filesystem::path createMedianInitialDurationPicture(
+      const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialDurationPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianInitialDurationPlot(
+      const std::string& plannerName) const;
   std::shared_ptr<pgftikz::PgfPlot> createMedianInitialDurationUpperCiPlot(
       const std::string& plannerName) const;
   std::shared_ptr<pgftikz::PgfPlot> createMedianInitialDurationLowerCiPlot(

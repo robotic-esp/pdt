@@ -60,7 +60,7 @@ class TikzDraw {
 
   std::string string() const;
 
-private:
+ private:
   std::string from_{""};
   std::string to_{""};
   std::string options_{""};

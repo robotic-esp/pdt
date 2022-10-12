@@ -67,7 +67,8 @@ bool ReedsSheppValidityChecker::isValid(const ompl::base::State* state) const {
 
   // A state is invalid if it collides with an obstacle.
   for (const auto& obstacle : obstacles_) {
-    const auto obs = dynamic_cast<obstacles::Hyperrectangle<obstacles::BaseObstacle>*>(obstacle.get());
+    const auto obs =
+        dynamic_cast<obstacles::Hyperrectangle<obstacles::BaseObstacle>*>(obstacle.get());
 
     // This is a tiny optimization: If the distance between the centers of both rectangles is larger
     // then the sum of the  circumscribing radii, then the orientation of the rectangles doesn't
@@ -169,7 +170,8 @@ double ReedsSheppValidityChecker::dotProduct(const Point& point, const Axis& axi
   return point[0u] * axis[0u] + point[1u] * axis[1u];
 }
 
-void ReedsSheppValidityChecker::addObstacle(const std::shared_ptr<obstacles::BaseObstacle>& obstacle) {
+void ReedsSheppValidityChecker::addObstacle(
+    const std::shared_ptr<obstacles::BaseObstacle>& obstacle) {
   obstacles_.push_back(obstacle);
 }
 
@@ -178,7 +180,8 @@ void ReedsSheppValidityChecker::addObstacles(
   obstacles_.insert(obstacles_.end(), obstacles.begin(), obstacles.end());
 }
 
-std::vector<std::shared_ptr<obstacles::BaseObstacle>> ReedsSheppValidityChecker::getObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseObstacle>> ReedsSheppValidityChecker::getObstacles()
+    const {
   return obstacles_;
 }
 

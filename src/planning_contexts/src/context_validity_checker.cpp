@@ -89,7 +89,8 @@ void ContextValidityChecker::addObstacles(
   obstacles_.insert(obstacles_.end(), obstacles.begin(), obstacles.end());
 }
 
-void ContextValidityChecker::addAntiObstacle(const std::shared_ptr<obstacles::BaseAntiObstacle>& anti) {
+void ContextValidityChecker::addAntiObstacle(
+    const std::shared_ptr<obstacles::BaseAntiObstacle>& anti) {
   antiObstacles_.push_back(anti);
 }
 
@@ -102,7 +103,8 @@ std::vector<std::shared_ptr<obstacles::BaseObstacle>> ContextValidityChecker::ge
   return obstacles_;
 }
 
-std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> ContextValidityChecker::getAntiObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> ContextValidityChecker::getAntiObstacles()
+    const {
   return antiObstacles_;
 }
 

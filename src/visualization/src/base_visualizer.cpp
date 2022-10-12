@@ -41,8 +41,8 @@
 #include <exception>
 
 #include <ompl/base/terminationconditions/IterationTerminationCondition.h>
-#include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/ABITstar.h>
+#include <ompl/geometric/planners/informedtrees/AITstar.h>
 #include <ompl/geometric/planners/informedtrees/BITstar.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 
@@ -71,7 +71,8 @@ BaseVisualizer::~BaseVisualizer() {
   dataThread_.join();
 }
 
-void BaseVisualizer::setContext(const std::shared_ptr<planning_contexts::RealVectorGeometricContext> &context) {
+void BaseVisualizer::setContext(
+    const std::shared_ptr<planning_contexts::RealVectorGeometricContext> &context) {
   // Setting a new context means all the data is invalid.
   displayIteration_ = 0u;
 
@@ -181,8 +182,7 @@ time::Duration BaseVisualizer::getTotalElapsedDuration(const std::size_t iterati
     throw std::runtime_error(
         "Requested elapsed duration of iteration that has not yet been processed");
   }
-  return std::accumulate(durations_.begin(),
-                         durations_.begin() + static_cast<long int>(iteration),
+  return std::accumulate(durations_.begin(), durations_.begin() + static_cast<long int>(iteration),
                          setupDuration_);
 }
 
@@ -212,7 +212,7 @@ void BaseVisualizer::createData() {
   }
 
   double timePerQuery = 0.0;
-  if (config_->contains("experiment/time")){
+  if (config_->contains("experiment/time")) {
     timePerQuery = config_->get<double>("experiment/time");
   }
 
@@ -229,17 +229,20 @@ void BaseVisualizer::createData() {
          std::future_status::timeout) {
     // Create a new iteration if we we're viewing one thats uncomfortably close.
     if (displayIteration_ + iterationBuffer_ > largestIteration_) {
-      /* 
-       * If we are not at the last query, there are two cases under which we continue to the next query:
+      /*
+       * If we are not at the last query, there are two cases under which we continue to the next
+       * query:
        * - The time per query is smaller than 0, and the planner found a solution
-       * - the time per query is larger than 0, the planner found a solution, and the 
+       * - the time per query is larger than 0, the planner found a solution, and the
        *   time used for the current query is larger than the allowed time budget
        *
        * If we arrived at the last query, we run that one indefinitely.
        */
-      if (queryNumber + 1 < context_->getNumQueries() && 
+      if (queryNumber + 1 < context_->getNumQueries() &&
           ((planner_->getProblemDefinition()->hasExactSolution() && timePerQuery <= 0.0) ||
-           (largestIteration_ > 0 && timePerQuery > 0.0 && getTotalElapsedDuration(largestIteration_).count() - currentIterationStartTime > timePerQuery))){
+           (largestIteration_ > 0 && timePerQuery > 0.0 &&
+            getTotalElapsedDuration(largestIteration_).count() - currentIterationStartTime >
+                timePerQuery))) {
         planner_->clearQuery();
         ++queryNumber;
 
@@ -248,7 +251,6 @@ void BaseVisualizer::createData() {
 
         currentIterationStartTime = getTotalElapsedDuration(largestIteration_).count();
       }
-        
 
       // Create a termination condition that stops the planner after one iteration.
       ompl::base::IterationTerminationCondition terminationCondition(1u);
@@ -353,12 +355,10 @@ void BaseVisualizer::createData() {
           eitstarData->setReverseTree(planner_->as<ompl::geometric::EITstar>()->getReverseTree());
 
           // Store the EIT* forward queue.
-          eitstarData->setForwardQueue(
-              planner_->as<ompl::geometric::EITstar>()->getForwardQueue());
+          eitstarData->setForwardQueue(planner_->as<ompl::geometric::EITstar>()->getForwardQueue());
 
           // Store the EIT* reverse queue.
-          eitstarData->setReverseQueue(
-              planner_->as<ompl::geometric::EITstar>()->getReverseQueue());
+          eitstarData->setReverseQueue(planner_->as<ompl::geometric::EITstar>()->getReverseQueue());
 
           // Store the next forward edge.
           if (!planner_->as<ompl::geometric::EITstar>()->isForwardQueueEmpty()) {
@@ -390,7 +390,7 @@ void BaseVisualizer::createData() {
           plannerSpecificData_.push_back(lPRMstarData);
           break;
         }
-#endif // #ifdef PDT_EXTRA_EITSTAR_PR
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
         default:
           // Defaults to not getting any data.
           break;

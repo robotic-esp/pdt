@@ -57,21 +57,22 @@ namespace visualization {
 
 class TikzVisualizer : public planning_contexts::ContextVisitor, public obstacles::ObstacleVisitor {
  public:
-  TikzVisualizer(const std::shared_ptr<const config::Configuration>& config,
-                 const std::shared_ptr<planning_contexts::BaseContext>& context,
-                 const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE>& plannerPair);
+  TikzVisualizer(
+      const std::shared_ptr<const config::Configuration>& config,
+      const std::shared_ptr<planning_contexts::BaseContext>& context,
+      const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE>& plannerPair);
   ~TikzVisualizer() = default;
 
   void render(const ompl::base::PlannerData& plannerData, const std::size_t iteration,
-              const std::size_t queryNumber,
-              const ompl::base::PathPtr path,
+              const std::size_t queryNumber, const ompl::base::PathPtr path,
               const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData,
               const double iterationTime, const double totalTime, const double solutionCost);
 
  private:
   // Compile a picture to a standalone document.
   std::experimental::filesystem::path compile(const std::experimental::filesystem::path& texPath,
-                                              const double cost, const double time, const std::size_t queryNumber);
+                                              const double cost, const double time,
+                                              const std::size_t queryNumber);
 
   // Log to the frame times file.
   void logToFrameTimes(const std::experimental::filesystem::path& pngPath, double iterationTime);
@@ -97,7 +98,8 @@ class TikzVisualizer : public planning_contexts::ContextVisitor, public obstacle
 
   // Implement visualizations of obstacles.
   void visit(const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const override;
-  void visit(const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const override;
+  void visit(
+      const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const override;
 
   // Helper functions.
   void drawBoundary(const planning_contexts::RealVectorGeometricContext& context) const;
@@ -105,8 +107,7 @@ class TikzVisualizer : public planning_contexts::ContextVisitor, public obstacle
   void drawGoal(const std::shared_ptr<ompl::base::Goal>& context) const;
   void drawStartVertex(const ompl::base::PlannerDataVertex& vertex) const;
   void drawStartState(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const;
-  void drawStartStates(
-      const std::vector<ompl::base::ScopedState<>>& states) const;
+  void drawStartStates(const std::vector<ompl::base::ScopedState<>>& states) const;
   void drawGoalVertex(const ompl::base::PlannerDataVertex& vertex) const;
   void drawGoalState(const ompl::base::ScopedState<ompl::base::RealVectorStateSpace>& state) const;
   void drawGoalStates(
@@ -115,25 +116,25 @@ class TikzVisualizer : public planning_contexts::ContextVisitor, public obstacle
   void drawVertex(const ompl::base::RealVectorStateSpace::StateType* state,
                   const std::string& options) const;
   void drawEdge(const ompl::base::PlannerDataVertex& parent,
-                const ompl::base::PlannerDataVertex& child,
-                std::size_t zLevel, const std::string& options) const;
+                const ompl::base::PlannerDataVertex& child, std::size_t zLevel,
+                const std::string& options) const;
   void drawEdge(const ompl::base::RealVectorStateSpace::StateType* parent,
-                const ompl::base::RealVectorStateSpace::StateType* child,
-                std::size_t zLevel, const std::string& options) const;
+                const ompl::base::RealVectorStateSpace::StateType* child, std::size_t zLevel,
+                const std::string& options) const;
   void drawSolution(const ompl::base::PathPtr path) const;
   void drawEllipse(double cost) const;
-  void drawRectangle(double midX, double midY, double widthX, double widthY,
-                     std::size_t zLevel, const std::string& options) const;
+  void drawRectangle(double midX, double midY, double widthX, double widthY, std::size_t zLevel,
+                     const std::string& options) const;
   void drawPlannerSpecificVisualizations(
       const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData) const;
   void drawBITstarSpecificVisualizations(
       const std::shared_ptr<const BITstarData>& bitstarData) const;
   void drawAITstarSpecificVisualizations(
       const std::shared_ptr<const AITstarData>& aitstarData) const;
-  #ifdef PDT_EXTRA_EITSTAR_PR
+#ifdef PDT_EXTRA_EITSTAR_PR
   void drawEITstarSpecificVisualizations(
       const std::shared_ptr<const EITstarData>& aitstarData) const;
-  #endif // #ifdef PDT_EXTRA_EITSTAR_PR
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
   void drawLazyPRMstarSpecificVisualizations(
       const std::shared_ptr<const LazyPRMstarData>& lprmstarData) const;
 

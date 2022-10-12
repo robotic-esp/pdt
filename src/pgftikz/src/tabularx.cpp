@@ -38,9 +38,9 @@
 #include "pdt/pgftikz/tabularx.h"
 
 #include <algorithm>
+#include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <sstream>
-#include <boost/lexical_cast.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"

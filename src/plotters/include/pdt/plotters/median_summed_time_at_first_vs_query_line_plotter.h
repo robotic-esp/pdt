@@ -52,23 +52,32 @@ namespace plotters {
 
 class MedianSummedTimeAtFirstVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianSummedTimeAtFirstVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
+  MedianSummedTimeAtFirstVsQueryLinePlotter(
+      const std::shared_ptr<const config::Configuration>& config,
+      const statistics::MultiqueryStatistics& stats);
   ~MedianSummedTimeAtFirstVsQueryLinePlotter() = default;
 
-  // Creates a pgf axis that holds the median cumulative duration to find the initial solution at each query.
+  // Creates a pgf axis that holds the median cumulative duration to find the initial solution at
+  // each query.
   std::shared_ptr<pgftikz::PgfAxis> createMedianCumulativeDurationAxis() const;
 
-  // Creates a pgf axis that holds the median cumulative duration to find the initial solution at each query for the specified planner.
-  std::shared_ptr<pgftikz::PgfAxis> createMedianCumulativeDurationAxis(const std::string& plannerName) const;
+  // Creates a pgf axis that holds the median cumulative duration to find the initial solution at
+  // each query for the specified planner.
+  std::shared_ptr<pgftikz::PgfAxis> createMedianCumulativeDurationAxis(
+      const std::string& plannerName) const;
 
-  // Creates a tikz picture that contains the median cumulative duration to find the initial solution of all planners.
+  // Creates a tikz picture that contains the median cumulative duration to find the initial
+  // solution of all planners.
   std::experimental::filesystem::path createMedianCumulativeDurationPicture() const;
 
-  // Creates a tikz picture that contains the median cumulative duration to find the initial solution the specified planner.
-  std::experimental::filesystem::path createMedianCumulativeDurationPicture(const std::string& plannerName) const;
+  // Creates a tikz picture that contains the median cumulative duration to find the initial
+  // solution the specified planner.
+  std::experimental::filesystem::path createMedianCumulativeDurationPicture(
+      const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeDurationPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeDurationPlot(
+      const std::string& plannerName) const;
   std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeDurationUpperCiPlot(
       const std::string& plannerName) const;
   std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeDurationLowerCiPlot(

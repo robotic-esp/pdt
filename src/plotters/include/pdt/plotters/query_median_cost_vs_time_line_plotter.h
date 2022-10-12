@@ -52,23 +52,27 @@ namespace plotters {
 
 class QueryMedianCostVsTimeLinePlotter : public LatexPlotter {
  public:
-  QueryMedianCostVsTimeLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::PlanningStatistics& stats);
+  QueryMedianCostVsTimeLinePlotter(const std::shared_ptr<const config::Configuration>& config,
+                                   const statistics::PlanningStatistics& stats);
   ~QueryMedianCostVsTimeLinePlotter() = default;
 
   // Creates a pgf axis that holds the median cost at binned durations for all planners.
   std::shared_ptr<pgftikz::PgfAxis> createMedianCostEvolutionAxis() const;
 
   // Creates a pgf axis that holds the median cost at binned durations for the specified planner.
-  std::shared_ptr<pgftikz::PgfAxis> createMedianCostEvolutionAxis(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianCostEvolutionAxis(
+      const std::string& plannerName) const;
 
   // Creates a tikz picture that contains the median cost axis of all planners.
   std::experimental::filesystem::path createMedianCostEvolutionPicture() const;
 
   // Creates a tikz picture that contains the median cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianCostEvolutionPicture(const std::string& plannerName) const;
+  std::experimental::filesystem::path createMedianCostEvolutionPicture(
+      const std::string& plannerName) const;
 
  private:
-  std::shared_ptr<pgftikz::PgfPlot> createMedianCostEvolutionPlot(const std::string& plannerName) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCostEvolutionPlot(
+      const std::string& plannerName) const;
   std::shared_ptr<pgftikz::PgfPlot> createMedianCostEvolutionUpperCiPlot(
       const std::string& plannerName) const;
   std::shared_ptr<pgftikz::PgfPlot> createMedianCostEvolutionLowerCiPlot(

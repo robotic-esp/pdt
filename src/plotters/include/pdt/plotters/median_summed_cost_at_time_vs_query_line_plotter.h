@@ -52,25 +52,30 @@ namespace plotters {
 
 class MedianSummedCostAtTimeVsQueryLinePlotter : public LatexPlotter {
  public:
-  MedianSummedCostAtTimeVsQueryLinePlotter(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
+  MedianSummedCostAtTimeVsQueryLinePlotter(
+      const std::shared_ptr<const config::Configuration>& config,
+      const statistics::MultiqueryStatistics& stats);
   ~MedianSummedCostAtTimeVsQueryLinePlotter() = default;
 
-  // Creates a pgf axis that holds the median cumulative cost at either the first 
+  // Creates a pgf axis that holds the median cumulative cost at either the first
   // or the last solution (indicated by initial) at each query for all planners.
   std::shared_ptr<pgftikz::PgfAxis> createMedianCumulativeCostAxis(const bool initial) const;
 
   // Creates a pgf axis that holds the median cumulative cost at either the first
   // or the last solution (indicated by the parameter initial) for the specified planner.
-  std::shared_ptr<pgftikz::PgfAxis> createMedianCumulativeCostAxis(const std::string& plannerName, const bool initial) const;
+  std::shared_ptr<pgftikz::PgfAxis> createMedianCumulativeCostAxis(const std::string& plannerName,
+                                                                   const bool initial) const;
 
   // Creates a tikz picture that contains the median cumulative cost axis of all planners.
   std::experimental::filesystem::path createMedianCumulativeCostPicture(const bool initial) const;
 
   // Creates a tikz picture that contains the median cumulative cost axis of the specified planner.
-  std::experimental::filesystem::path createMedianCumulativeCostPicture(const std::string& plannerName, const bool initial) const;
+  std::experimental::filesystem::path createMedianCumulativeCostPicture(
+      const std::string& plannerName, const bool initial) const;
 
  private:
-  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeCostPlot(const std::string& plannerName, const bool initial) const;
+  std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeCostPlot(const std::string& plannerName,
+                                                                   const bool initial) const;
   std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeCostUpperCiPlot(
       const std::string& plannerName, const bool initial) const;
   std::shared_ptr<pgftikz::PgfPlot> createMedianCumulativeCostLowerCiPlot(

@@ -52,13 +52,12 @@ TEST_CASE("Configuration") {
 
   // Instantiate an empty configuration.
   const char* argv[] = {"test_pdt_config\0"};
-  const int   argc   = sizeof(argv) / sizeof(char*) - 1;
+  const int argc = sizeof(argv) / sizeof(char*) - 1;
   pdt::config::Configuration config(argc, argv);
   config.clear();
 
   // Get the path of the test configurations.
-  const auto configsDir =
-    pdt::config::Directory::SOURCE / "test/pdt_config/configs";
+  const auto configsDir = pdt::config::Directory::SOURCE / "test/pdt_config/configs";
 
   SUBCASE("Empty configuration") {
     // Check query behaviour of nonexistent parameter.
@@ -82,7 +81,7 @@ TEST_CASE("Configuration") {
     // Load the basic fonciguration.
     CHECK(fs::exists(configsDir / "basic.json"));
     config.load(configsDir / "basic.json");
-    
+
     // Make sure the config was loaded correctly.
     CHECK(config.get<std::string>("Hello") == std::string("World"));
     CHECK(config.get<std::string>("You/are") == std::string("beautiful!"));

@@ -46,7 +46,8 @@ namespace pdt {
 
 namespace utilities {
 
-ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner, common::PLANNER_TYPE plannerType);
+ompl::base::Cost getBestCost(const ompl::base::PlannerPtr& planner,
+                             common::PLANNER_TYPE plannerType);
 
 }  // namespace utilities
 

@@ -54,7 +54,8 @@ namespace visualization {
 using namespace std::string_literals;
 
 TikzVisualizer::TikzVisualizer(
-    const std::shared_ptr<const config::Configuration>& config, const std::shared_ptr<planning_contexts::BaseContext>& context,
+    const std::shared_ptr<const config::Configuration>& config,
+    const std::shared_ptr<planning_contexts::BaseContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE>& plannerPair) :
     config_(config),
     context_(context),
@@ -70,10 +71,10 @@ TikzVisualizer::TikzVisualizer(
 }
 
 void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, const std::size_t iteration,
-                            const std::size_t queryNumber,
-                            const ompl::base::PathPtr path,
+                            const std::size_t queryNumber, const ompl::base::PathPtr path,
                             const std::shared_ptr<const PlannerSpecificData>& plannerSpecificData,
-                            const double iterationTime, const double totalTime, const double solutionCost) {
+                            const double iterationTime, const double totalTime,
+                            const double solutionCost) {
   if (context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_REAL_VECTOR &&
       context_->getStateSpace()->getType() != ompl::base::StateSpaceType::STATE_SPACE_SE2) {
     OMPL_ERROR("Tikz visualizer can only visualize 2d real vector or se2 contexts.");
@@ -118,7 +119,8 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, const st
         // Draw the edge if the child is valid.
         if (child != ompl::base::PlannerData::NO_VERTEX) {
           drawEdge(vertex.getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
-                   child.getState()->as<ompl::base::RealVectorStateSpace::StateType>(), pgftikz::zlevels::EDGE, "edge");
+                   child.getState()->as<ompl::base::RealVectorStateSpace::StateType>(),
+                   pgftikz::zlevels::EDGE, "edge");
         }
       }
     }
@@ -136,8 +138,10 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, const st
   drawSolution(path);
 
   // Clip the picture to the boundaries.
-  const auto vectorContext = std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
-  const auto se2Context = std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
+  const auto vectorContext =
+      std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
+  const auto se2Context =
+      std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
   auto boundaries = ompl::base::RealVectorBounds(2u);
   if (vectorContext) {
     boundaries = vectorContext->getBoundaries();
@@ -181,7 +185,8 @@ void TikzVisualizer::render(const ompl::base::PlannerData& plannerData, const st
 }
 
 std::experimental::filesystem::path TikzVisualizer::compile(
-    const std::experimental::filesystem::path& texPath, const double cost, const double time, const std::size_t queryNumber) {
+    const std::experimental::filesystem::path& texPath, const double cost, const double time,
+    const std::size_t queryNumber) {
   // Get the current path.
   auto currentPath = std::experimental::filesystem::current_path();
 
@@ -233,7 +238,8 @@ std::experimental::filesystem::path TikzVisualizer::compile(
              << "\\begin{minipage}{10cm}\n"
              << "\n\\noindent\\Huge\\vphantom{pP}\\textbf{"
              << config_->get<std::string>("planner/" + name_ + "/report/name")
-             << "}\\vphantom{pP}\\\\\\LARGE Query: " << queryNumber << ", Time: " << time << "s, Cost: ";
+             << "}\\vphantom{pP}\\\\\\LARGE Query: " << queryNumber << ", Time: " << time
+             << "s, Cost: ";
   if (std::isfinite(cost)) {
     standalone << cost;
   } else {
@@ -353,18 +359,23 @@ void TikzVisualizer::visit(const planning_contexts::WallGap& context) const {
   drawBoundary(context);
 }
 
-void TikzVisualizer::visit(const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const {
+void TikzVisualizer::visit(
+    const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const {
   drawRectangle(obstacle.getAnchorCoordinates().at(0), obstacle.getAnchorCoordinates().at(1),
-                obstacle.getWidths().at(0), obstacle.getWidths().at(1), pgftikz::zlevels::OBSTACLE, "obstacle");
+                obstacle.getWidths().at(0), obstacle.getWidths().at(1), pgftikz::zlevels::OBSTACLE,
+                "obstacle");
 }
 
-void TikzVisualizer::visit(const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const {
+void TikzVisualizer::visit(
+    const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const {
   drawRectangle(antiObstacle.getAnchorCoordinates().at(0),
                 antiObstacle.getAnchorCoordinates().at(1), antiObstacle.getWidths().at(0) + 1e-2,
-                antiObstacle.getWidths().at(1) + 1e-2, pgftikz::zlevels::ANTIOBSTACLE, "antiobstacle");
+                antiObstacle.getWidths().at(1) + 1e-2, pgftikz::zlevels::ANTIOBSTACLE,
+                "antiobstacle");
 }
 
-void TikzVisualizer::drawBoundary(const planning_contexts::RealVectorGeometricContext& context) const {
+void TikzVisualizer::drawBoundary(
+    const planning_contexts::RealVectorGeometricContext& context) const {
   const auto boundaries = context.getBoundaries();
   double midX = (boundaries.low.at(0u) + boundaries.high.at(0u)) / 2.0;
   double midY = (boundaries.low.at(1u) + boundaries.high.at(1u)) / 2.0;
@@ -373,7 +384,8 @@ void TikzVisualizer::drawBoundary(const planning_contexts::RealVectorGeometricCo
   drawRectangle(midX, midY, widthX, widthY, pgftikz::zlevels::BOUNDARY, "boundary");
 }
 
-void TikzVisualizer::drawBoundary(const planning_contexts::ReedsSheppRandomRectangles& context) const {
+void TikzVisualizer::drawBoundary(
+    const planning_contexts::ReedsSheppRandomRectangles& context) const {
   const auto boundaries = context.getBoundaries();
   double midX = (boundaries.low.at(0u) + boundaries.high.at(0u)) / 2.0;
   double midY = (boundaries.low.at(1u) + boundaries.high.at(1u)) / 2.0;
@@ -418,10 +430,11 @@ void TikzVisualizer::drawGoal(const std::shared_ptr<ompl::base::Goal>& goal) con
         widths.push_back(bounds.high[i] - bounds.low[i]);
         anchor.push_back((bounds.high[i] + bounds.low[i]) / 2.0);
       }
-      drawRectangle(anchor[0], anchor[1], widths[0], widths[1], pgftikz::zlevels::GOAL, "goal region");
+      drawRectangle(anchor[0], anchor[1], widths[0], widths[1], pgftikz::zlevels::GOAL,
+                    "goal region");
       break;
     }
-#endif // #ifdef PDT_EXTRA_GOAL_SPACE
+#endif  // #ifdef PDT_EXTRA_GOAL_SPACE
     default: { throw std::runtime_error("Can not visualize goal type."); }
   }
 }
@@ -447,8 +460,7 @@ void TikzVisualizer::drawStartState(
   picture_.addNode(start);
 }
 
-void TikzVisualizer::drawStartStates(
-    const std::vector<ompl::base::ScopedState<>>& states) const {
+void TikzVisualizer::drawStartStates(const std::vector<ompl::base::ScopedState<>>& states) const {
   for (const auto& state : states) {
     drawStartState(state);
   }
@@ -518,7 +530,7 @@ void TikzVisualizer::drawPlannerSpecificVisualizations(
           std::dynamic_pointer_cast<const EITstarData>(plannerSpecificData));
       break;
     }
-#endif // #ifdef PDT_EXTRA_EITSTAR_PR
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::LAZYPRMSTAR: {
       drawLazyPRMstarSpecificVisualizations(
           std::dynamic_pointer_cast<const LazyPRMstarData>(plannerSpecificData));
@@ -576,9 +588,8 @@ void TikzVisualizer::drawAITstarSpecificVisualizations(
     // Add the edge to the parent.
     if (vertex->hasReverseParent()) {
       auto state = vertex->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
-      auto parent = vertex->getReverseParent()
-                        ->getState()
-                        ->as<ompl::base::RealVectorStateSpace::StateType>();
+      auto parent =
+          vertex->getReverseParent()->getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       drawEdge(parent, state, pgftikz::zlevels::EDGE, "edge, pdtlightblue");
     }
   }
@@ -625,14 +636,14 @@ void TikzVisualizer::drawEITstarSpecificVisualizations(
   //            "edge, pdtred");
   // }
 }
-#endif // #ifdef PDT_EXTRA_EITSTAR_PR
-  
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
+
 void TikzVisualizer::drawLazyPRMstarSpecificVisualizations(
     const std::shared_ptr<const LazyPRMstarData>& lPRMstarData) const {
   if (context_->getDimension() == 2u) {
     // draw all valid edges
-    const auto &edges = lPRMstarData->getValidEdges();
-    for (const auto &edge: edges){
+    const auto& edges = lPRMstarData->getValidEdges();
+    for (const auto& edge : edges) {
       auto source = edge.first.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto target = edge.second.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
 
@@ -640,13 +651,13 @@ void TikzVisualizer::drawLazyPRMstarSpecificVisualizations(
     }
 
     // draw all new edges
-    for (const auto &idx: lPRMstarData->getNewEdgeIndices()){
+    for (const auto& idx : lPRMstarData->getNewEdgeIndices()) {
       auto source = edges[idx].first.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       auto target = edges[idx].second.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
 
       drawEdge(source, target, pgftikz::zlevels::EDGE_HIGHLIGHT, "edge, pdtred");
     }
-  }	  
+  }
 }
 
 void TikzVisualizer::drawVertex(const ompl::base::PlannerDataVertex& vertex) const {
@@ -672,8 +683,8 @@ void TikzVisualizer::drawVertex(const ompl::base::RealVectorStateSpace::StateTyp
 }
 
 void TikzVisualizer::drawEdge(const ompl::base::PlannerDataVertex& parent,
-                              const ompl::base::PlannerDataVertex& child,
-                              std::size_t zLevel, const std::string& options) const {
+                              const ompl::base::PlannerDataVertex& child, std::size_t zLevel,
+                              const std::string& options) const {
   auto draw = std::make_shared<pgftikz::TikzDraw>();
   draw->setFromPosition("vertex" + std::to_string(parent.getTag()) + ".center");
   draw->setToPosition("vertex" + std::to_string(child.getTag()) + ".center");

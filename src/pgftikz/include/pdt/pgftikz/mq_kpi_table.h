@@ -50,7 +50,8 @@ namespace pgftikz {
 
 class MqKpiTable : public TabularX {
  public:
-  MqKpiTable(const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats);
+  MqKpiTable(const std::shared_ptr<const config::Configuration>& config,
+             const statistics::MultiqueryStatistics& stats);
   ~MqKpiTable() = default;
 
   void addKpi(const std::string& plannerName, const std::string& plannerPlotName);

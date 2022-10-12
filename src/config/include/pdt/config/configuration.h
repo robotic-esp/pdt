@@ -39,8 +39,8 @@
 
 #include <fstream>
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
 #include <experimental/filesystem>
 
@@ -179,8 +179,8 @@ T Configuration::get(const std::string& key, const json::json& parameters,
 
 template <typename T>
 void Configuration::add(const std::string& key, const T& value) {
-  // We allow overwriting the results/name field of the experiment. Conceptually this seems ok, but from
-  // a software architecture standpoint this hints at a flaw. Would it be cleaner to have an
+  // We allow overwriting the results/name field of the experiment. Conceptually this seems ok, but
+  // from a software architecture standpoint this hints at a flaw. Would it be cleaner to have an
   // "Accessed" element in parameters_ rather than having accessedParameters_?
   if (contains(key) && key == std::string("experiment/results")) {
     parameters_["experiment"].erase("results");

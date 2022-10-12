@@ -77,7 +77,8 @@ class RepeatingRectangles : public RealVectorGeometricContext {
  public:
   /** \brief The constructor */
   RepeatingRectangles(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-                      const std::shared_ptr<const config::Configuration>& config, const std::string& name);
+                      const std::shared_ptr<const config::Configuration>& config,
+                      const std::string& name);
 
   /** \brief The destructor. */
   virtual ~RepeatingRectangles() = default;

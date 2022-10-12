@@ -59,7 +59,7 @@ class TikzNode {
 
   std::string string() const;
 
-private:
+ private:
   std::string at_{""};
   std::string name_{""};
   std::string options_{""};

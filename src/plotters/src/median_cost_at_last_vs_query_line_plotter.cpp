@@ -51,19 +51,22 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 MedianCostAtLastVsQueryLinePlotter::MedianCostAtLastVsQueryLinePlotter(
-    const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config,
+    const statistics::MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
 
-std::shared_ptr<pgftikz::PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostAxis() const {
+std::shared_ptr<pgftikz::PgfAxis> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostAxis()
+    const {
   auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianFinalCostAxisOptions(axis);
 
   // Fill the axis with the median final cost plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
-    if (config_->get<bool>("report/medianFinalCostPerQueryPlots/plotConfidenceIntervalInAllPlots")) {
+    if (config_->get<bool>(
+            "report/medianFinalCostPerQueryPlots/plotConfidenceIntervalInAllPlots")) {
       std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianFinalCostUpperCiPlot(name);
       std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianFinalCostLowerCiPlot(name);
       std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianFinalCostFillCiPlot(name);
@@ -132,7 +135,8 @@ fs::path MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostPicture(
 void MedianCostAtLastVsQueryLinePlotter::setMedianFinalCostAxisOptions(
     std::shared_ptr<pgftikz::PgfAxis> axis) const {
   axis->options.width = config_->get<std::string>("report/medianFinalCostPerQueryPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("report/medianFinalCostPerQueryPlots/axisHeight");
+  axis->options.height =
+      config_->get<std::string>("report/medianFinalCostPerQueryPlots/axisHeight");
   // axis->options.xmax = maxCostToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
   // axis->options.xlog = config_->get<bool>("report/medianFinalCostPerQueryPlots/xlog");
@@ -170,7 +174,8 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedi
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostUpperCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
@@ -205,7 +210,8 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedi
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostLowerCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
@@ -237,12 +243,13 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedi
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostFillCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianCostAtLastVsQueryLinePlotter::createMedianFinalCostFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
-  auto fillBetween =
-      std::make_shared<pgftikz::PgfFillBetween>(plannerName + "MedianFinalCostPerQueryUpperConfidence",
-                                       plannerName + "MedianFinalCostPerQueryLowerConfidence");
+  auto fillBetween = std::make_shared<pgftikz::PgfFillBetween>(
+      plannerName + "MedianFinalCostPerQueryUpperConfidence",
+      plannerName + "MedianFinalCostPerQueryLowerConfidence");
 
   // Create the plot.
   auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);

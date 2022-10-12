@@ -51,14 +51,15 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 MedianSummedCostAtTimeVsQueryLinePlotter::MedianSummedCostAtTimeVsQueryLinePlotter(
-    const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config,
+    const statistics::MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
   auto contextName = config_->get<std::string>("experiment/context");
 }
 
-std::shared_ptr<pgftikz::PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostAxis(
-    const bool initial) const {
+std::shared_ptr<pgftikz::PgfAxis>
+MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostAxis(const bool initial) const {
   auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianCumulativeCostAxisOptions(axis);
 
@@ -66,8 +67,10 @@ std::shared_ptr<pgftikz::PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
     if (config_->get<bool>("report/medianCumulativeCostPlots/plotConfidenceIntervalInAllPlots")) {
-      std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianCumulativeCostUpperCiPlot(name, initial);
-      std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianCumulativeCostLowerCiPlot(name, initial);
+      std::shared_ptr<pgftikz::PgfPlot> upperCi =
+          createMedianCumulativeCostUpperCiPlot(name, initial);
+      std::shared_ptr<pgftikz::PgfPlot> lowerCi =
+          createMedianCumulativeCostLowerCiPlot(name, initial);
       std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianCumulativeCostFillCiPlot(name);
       if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
         axis->addPlot(upperCi);
@@ -84,14 +87,17 @@ std::shared_ptr<pgftikz::PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   return axis;
 }
 
-std::shared_ptr<pgftikz::PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostAxis(
+std::shared_ptr<pgftikz::PgfAxis>
+MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostAxis(
     const std::string& plannerName, const bool initial) const {
   auto axis = std::make_shared<pgftikz::PgfAxis>();
   setMedianCumulativeCostAxisOptions(axis);
 
   // Add all the the median cumulative cost plots.
-  std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianCumulativeCostUpperCiPlot(plannerName, initial);
-  std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianCumulativeCostLowerCiPlot(plannerName, initial);
+  std::shared_ptr<pgftikz::PgfPlot> upperCi =
+      createMedianCumulativeCostUpperCiPlot(plannerName, initial);
+  std::shared_ptr<pgftikz::PgfPlot> lowerCi =
+      createMedianCumulativeCostLowerCiPlot(plannerName, initial);
   std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianCumulativeCostFillCiPlot(plannerName);
   if (!upperCi->empty() && !lowerCi->empty() && !fillCi->empty()) {
     axis->addPlot(upperCi);
@@ -104,7 +110,8 @@ std::shared_ptr<pgftikz::PgfAxis> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   return axis;
 }
 
-fs::path MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPicture(const bool initial) const {
+fs::path MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPicture(
+    const bool initial) const {
   // Create the picture and add the axis.
   pgftikz::TikzPicture picture(config_);
   auto axis = createMedianCumulativeCostAxis(initial);
@@ -161,7 +168,8 @@ void MedianSummedCostAtTimeVsQueryLinePlotter::setMedianCumulativeCostAxisOption
   axis->options.ylabelStyle = "font=\\footnotesize, text depth=0.0em, text height=0.5em";
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
   std::shared_ptr<pgftikz::PgfTable> table;
@@ -191,7 +199,8 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostUpperCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostUpperCiPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
   std::shared_ptr<pgftikz::PgfTable> table;
@@ -234,7 +243,8 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostLowerCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostLowerCiPlot(
     const std::string& plannerName, const bool initial) const {
   // Get the table from the appropriate file.
   std::shared_ptr<pgftikz::PgfTable> table;
@@ -273,12 +283,13 @@ std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::crea
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostFillCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianSummedCostAtTimeVsQueryLinePlotter::createMedianCumulativeCostFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
-  auto fillBetween =
-      std::make_shared<pgftikz::PgfFillBetween>(plannerName + "MedianCumulativeCostUpperConfidence",
-                                       plannerName + "MedianCumulativeCostLowerConfidence");
+  auto fillBetween = std::make_shared<pgftikz::PgfFillBetween>(
+      plannerName + "MedianCumulativeCostUpperConfidence",
+      plannerName + "MedianCumulativeCostLowerConfidence");
 
   // Create the plot.
   auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);

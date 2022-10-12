@@ -38,10 +38,10 @@
 #include "pdt/pgftikz/pgf_table.h"
 
 #include <algorithm>
+#include <boost/lexical_cast.hpp>
 #include <cmath>
 #include <fstream>
 #include <sstream>
-#include <boost/lexical_cast.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
@@ -90,7 +90,7 @@ void PgfTable::loadFromPath(const std::experimental::filesystem::path& path,
       auto msg = "Pgf Table encountered unnamed row in '"s + path.string() +
                  "'. The first entry in every row is expected to be a string."s;
       throw std::invalid_argument(msg);
-    } else { 
+    } else {
       rowName = row.at(0);
     }
     if (rowName != domain && rowName != codomain) {

@@ -106,9 +106,8 @@ ompl::base::Cost MaxMinClearanceOptimizationObjective::motionCost(
 
   // Check all states along the edge.
   for (std::size_t i = 1; i < segmentCount; ++i) {
-    spaceInfo_->getStateSpace()->interpolate(state1, state2,
-                                             static_cast<double>(i) / static_cast<double>(segmentCount),
-                                             testState_);
+    spaceInfo_->getStateSpace()->interpolate(
+        state1, state2, static_cast<double>(i) / static_cast<double>(segmentCount), testState_);
     totalCost = combineCosts(stateCost(testState_), totalCost);
   }
 

@@ -51,7 +51,7 @@ FlankingGap::FlankingGap(const std::shared_ptr<ompl::base::SpaceInformation>& sp
     wallWidth_(config->get<double>("context/" + name + "/wallWidth")),
     wallThickness_(config->get<double>("context/" + name + "/wallThickness")),
     gapWidth_(config->get<double>("context/" + name + "/gapWidth")),
-    gapOffset_(config->get<double>("context/" + name + "/gapOffset")){
+    gapOffset_(config->get<double>("context/" + name + "/gapOffset")) {
   if (wallWidth_ < 0.0) {
     OMPL_ERROR("%s: Wall width is negative.", name.c_str());
     throw std::runtime_error("Context error.");
@@ -113,8 +113,8 @@ void FlankingGap::createObstacles() {
   for (std::size_t j = 1u; j < dimensionality_; ++j) {
     widths.at(j) = wallWidth_;
   }
-  obstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, anchor, widths));
+  obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+      spaceInfo_, anchor, widths));
 }
 
 void FlankingGap::createAntiObstacles() {
@@ -144,8 +144,8 @@ void FlankingGap::createAntiObstacles() {
   for (std::size_t j = 1u; j < dimensionality_; ++j) {
     widths.at(j) = gapWidth_;
   }
-  antiObstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(spaceInfo_, anchor, widths));
+  antiObstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>>(
+      spaceInfo_, anchor, widths));
 }
 
 }  // namespace planning_contexts

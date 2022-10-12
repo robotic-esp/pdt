@@ -50,7 +50,8 @@ namespace pdt {
 namespace visualization {
 
 InteractiveVisualizer::InteractiveVisualizer(
-    const std::shared_ptr<config::Configuration>& config, const std::shared_ptr<planning_contexts::BaseContext>& context,
+    const std::shared_ptr<config::Configuration>& config,
+    const std::shared_ptr<planning_contexts::BaseContext>& context,
     const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> plannerPair) :
     BaseVisualizer(config, context, plannerPair),
     bounds_(2u),
@@ -64,8 +65,10 @@ InteractiveVisualizer::InteractiveVisualizer(
   }
 
   // Get the bounds of the real vector part.
-  const auto vectorContext = std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
-  const auto se2Context = std::dynamic_pointer_cast<planning_contexts::ReedsSheppRandomRectangles>(context_);
+  const auto vectorContext =
+      std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
+  const auto se2Context =
+      std::dynamic_pointer_cast<planning_contexts::ReedsSheppRandomRectangles>(context_);
   if (vectorContext) {
     bounds_ = vectorContext->getBoundaries();
   } else if (se2Context) {
@@ -202,9 +205,9 @@ void InteractiveVisualizer::run() {
     double timeAtCurrentQuery = getTotalElapsedDuration(displayIteration_).count();
     const std::size_t queryNumber = getQueryNumber(displayIteration_);
 
-    if (queryNumber > 0u){
-      for(std::size_t i=displayIteration_; i>=1u; --i){
-        if (BaseVisualizer::getQueryNumber(i) != queryNumber){
+    if (queryNumber > 0u) {
+      for (std::size_t i = displayIteration_; i >= 1u; --i) {
+        if (BaseVisualizer::getQueryNumber(i) != queryNumber) {
           timeAtCurrentQuery -= getTotalElapsedDuration(i).count();
           break;
         }
@@ -229,15 +232,13 @@ void InteractiveVisualizer::run() {
                                getQueryNumber(displayIteration_),
                                getSolutionPath(displayIteration_),
                                getPlannerSpecificData(displayIteration_),
-                               getIterationDuration(displayIteration_).count(),
-                               timeAtCurrentQuery,
+                               getIterationDuration(displayIteration_).count(), timeAtCurrentQuery,
                                getSolutionCost(displayIteration_).value());
       } else {
         tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
                                getQueryNumber(displayIteration_),
                                getSolutionPath(displayIteration_), nullptr,
-                               getIterationDuration(displayIteration_).count(),
-                               timeAtCurrentQuery,
+                               getIterationDuration(displayIteration_).count(), timeAtCurrentQuery,
                                getSolutionCost(displayIteration_).value());
       }
     }
@@ -292,15 +293,13 @@ void InteractiveVisualizer::run() {
                                  getSolutionPath(displayIteration_),
                                  getPlannerSpecificData(displayIteration_),
                                  getIterationDuration(displayIteration_).count(),
-                                 timeAtCurrentQuery,
-                                 getSolutionCost(displayIteration_).value());
+                                 timeAtCurrentQuery, getSolutionCost(displayIteration_).value());
         } else {
           tikzVisualizer_.render(*getPlannerData(displayIteration_), displayIteration_,
                                  getQueryNumber(displayIteration_),
                                  getSolutionPath(displayIteration_), nullptr,
                                  getIterationDuration(displayIteration_).count(),
-                                 timeAtCurrentQuery,
-                                 getSolutionCost(displayIteration_).value());
+                                 timeAtCurrentQuery, getSolutionCost(displayIteration_).value());
         }
         incrementIteration();
       }
@@ -320,8 +319,8 @@ void InteractiveVisualizer::run() {
 
     // Draw the objective.
     if (optionDrawObjective) {
-      if (auto objective =
-              std::dynamic_pointer_cast<objectives::BaseOptimizationObjective>(context_->getObjective())) {
+      if (auto objective = std::dynamic_pointer_cast<objectives::BaseOptimizationObjective>(
+              context_->getObjective())) {
         objective->accept(*this);
       }
     }
@@ -541,13 +540,16 @@ void InteractiveVisualizer::visit(const planning_contexts::ObstacleFree& /* cont
 void InteractiveVisualizer::visit(const planning_contexts::RandomRectangles& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const planning_contexts::RandomRectanglesMultiStartGoal& /* context */) const {
+void InteractiveVisualizer::visit(
+    const planning_contexts::RandomRectanglesMultiStartGoal& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const planning_contexts::ReedsSheppRandomRectangles& /* context */) const {
+void InteractiveVisualizer::visit(
+    const planning_contexts::ReedsSheppRandomRectangles& /* context */) const {
 }
 
-void InteractiveVisualizer::visit(const planning_contexts::RepeatingRectangles& /* context */) const {
+void InteractiveVisualizer::visit(
+    const planning_contexts::RepeatingRectangles& /* context */) const {
 }
 
 void InteractiveVisualizer::visit(const planning_contexts::StartEnclosure& /* context */) const {
@@ -557,15 +559,17 @@ void InteractiveVisualizer::visit(const planning_contexts::WallGap& /* context *
 }
 
 void InteractiveVisualizer::drawStarts() const {
-  const auto &starts = context_->getNthStartGoalPair(BaseVisualizer::getQueryNumber(displayIteration_)).start;
+  const auto& starts =
+      context_->getNthStartGoalPair(BaseVisualizer::getQueryNumber(displayIteration_)).start;
 
-  for (const auto& start: starts){
+  for (const auto& start : starts) {
     drawPoint(start, green, 4.0);
   }
 }
 
 void InteractiveVisualizer::drawGoal() const {
-  const auto &goal = context_->getNthStartGoalPair(BaseVisualizer::getQueryNumber(displayIteration_)).goal;
+  const auto& goal =
+      context_->getNthStartGoalPair(BaseVisualizer::getQueryNumber(displayIteration_)).goal;
 
   switch (goal->getType()) {
     case ompl::base::GoalType::GOAL_STATE: {
@@ -596,10 +600,8 @@ void InteractiveVisualizer::drawGoal() const {
       drawRectangle(anchor, widths, goalColor, goalColor);
       break;
     }
-#endif // #ifdef PDT_EXTRA_GOAL_SPACE
-    default: {
-      throw std::runtime_error("Can not visualize goal type.");
-    }
+#endif  // #ifdef PDT_EXTRA_GOAL_SPACE
+    default: { throw std::runtime_error("Can not visualize goal type."); }
   }
 }
 
@@ -749,9 +751,8 @@ void InteractiveVisualizer::drawPoints(const std::vector<Eigen::Vector3f>& point
   pangolin::glDrawPoints(points);
 }
 
-void InteractiveVisualizer::drawPoints(
-    const std::vector<ompl::base::ScopedState<>>& states,
-    const float* color, float size) const {
+void InteractiveVisualizer::drawPoints(const std::vector<ompl::base::ScopedState<>>& states,
+                                       const float* color, float size) const {
   if (states.front().getSpace()->getDimension() == 2u) {
     std::vector<Eigen::Vector2f> points;
     for (const auto& state : states) {
@@ -843,7 +844,8 @@ void InteractiveVisualizer::drawCars(const std::vector<Eigen::Vector3f>& states,
   drawPath(points, width, color, alpha);
 }
 
-void InteractiveVisualizer::visit(const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const {
+void InteractiveVisualizer::visit(
+    const obstacles::Hyperrectangle<obstacles::BaseObstacle>& obstacle) const {
   const auto anchorCoords = obstacle.getAnchorCoordinates();
   std::vector<float> anchor(anchorCoords.begin(), anchorCoords.end());
   const auto obstacleWidth = obstacle.getWidths();
@@ -851,7 +853,8 @@ void InteractiveVisualizer::visit(const obstacles::Hyperrectangle<obstacles::Bas
   drawRectangle(anchor, widths, black, black);
 }
 
-void InteractiveVisualizer::visit(const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const {
+void InteractiveVisualizer::visit(
+    const obstacles::Hyperrectangle<obstacles::BaseAntiObstacle>& antiObstacle) const {
   const auto anchorCoords = antiObstacle.getAnchorCoordinates();
   std::vector<float> anchor(anchorCoords.begin(), anchorCoords.end());
   const auto antiObstacleWidth = antiObstacle.getWidths();
@@ -859,10 +862,13 @@ void InteractiveVisualizer::visit(const obstacles::Hyperrectangle<obstacles::Bas
   drawRectangle(anchor, widths, white, white);
 }
 
-void InteractiveVisualizer::visit(const objectives::PotentialFieldOptimizationObjective& objective) const {
+void InteractiveVisualizer::visit(
+    const objectives::PotentialFieldOptimizationObjective& objective) const {
   if (bounds_.low.size() == 2u) {
-    const auto vectorContext = std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
-    const auto se2Context = std::dynamic_pointer_cast<planning_contexts::ReedsSheppRandomRectangles>(context_);
+    const auto vectorContext =
+        std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
+    const auto se2Context =
+        std::dynamic_pointer_cast<planning_contexts::ReedsSheppRandomRectangles>(context_);
     auto boundaries = ompl::base::RealVectorBounds(2u);
 
     if (vectorContext) {
@@ -973,7 +979,7 @@ void InteractiveVisualizer::drawPlannerSpecificVisualizations(const std::size_t 
       drawEITstarSpecificVisualizations(iteration);
       return;
     }
-#endif // #ifdef PDT_EXTRA_EITSTAR_PR
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
     case common::PLANNER_TYPE::LAZYPRMSTAR: {
       drawLazyPRMstarSpecificVisualizations(iteration);
       return;
@@ -1359,7 +1365,7 @@ void InteractiveVisualizer::drawEITstarSpecificVisualizations(const std::size_t 
     }
   }
 }
-#endif // #ifdef PDT_EXTRA_EITSTAR_PR
+#endif  // #ifdef PDT_EXTRA_EITSTAR_PR
 
 void InteractiveVisualizer::drawLazyPRMstarSpecificVisualizations(std::size_t iteration) const {
   // Get the LPRM* specific data.
@@ -1367,19 +1373,17 @@ void InteractiveVisualizer::drawLazyPRMstarSpecificVisualizations(std::size_t it
       std::dynamic_pointer_cast<const LazyPRMstarData>(getPlannerSpecificData(iteration));
   if (context_->getDimension() == 2u) {
     std::vector<Eigen::Vector2f> edges{};
-    for (const auto &edge: lPRMstarData->getValidEdges()){
+    for (const auto& edge : lPRMstarData->getValidEdges()) {
       auto parentState = edge.first.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       edges.push_back(Eigen::Vector2f(static_cast<float>((*parentState)[0u]),
                                       static_cast<float>((*parentState)[1u])));
       auto childState = edge.second.getState()->as<ompl::base::RealVectorStateSpace::StateType>();
       edges.push_back(Eigen::Vector2f(static_cast<float>((*childState)[0u]),
                                       static_cast<float>((*childState)[1u])));
-
     }
     // Draw the edge queue.
     drawLines(edges, 1.5f, lightblue);
-  }
-  else{
+  } else {
     throw std::runtime_error(
         "LazyPRMstar specific visualizations only implemented for 2d contexts.");
   }
@@ -1388,8 +1392,10 @@ void InteractiveVisualizer::drawLazyPRMstarSpecificVisualizations(std::size_t it
 std::pair<std::vector<Eigen::Vector2f>, std::vector<Eigen::Vector2f>>
 InteractiveVisualizer::getVerticesAndEdges2D(std::size_t iteration) const {
   const auto& currentPlannerData = getPlannerData(iteration);
-  const auto vectorContext = std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
-  const auto se2Context = std::dynamic_pointer_cast<planning_contexts::ReedsSheppRandomRectangles>(context_);
+  const auto vectorContext =
+      std::dynamic_pointer_cast<planning_contexts::RealVectorGeometricContext>(context_);
+  const auto se2Context =
+      std::dynamic_pointer_cast<planning_contexts::ReedsSheppRandomRectangles>(context_);
 
   // Get the vertices and edges in the format supported by Panglin.
   std::vector<Eigen::Vector2f> vertices{};

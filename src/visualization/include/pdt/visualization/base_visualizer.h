@@ -61,22 +61,25 @@ namespace visualization {
 // The base class for a visualizer.
 class BaseVisualizer {
  public:
-  BaseVisualizer(const std::shared_ptr<config::Configuration> &config,
-                 const std::shared_ptr<planning_contexts::BaseContext> &context,
-                 const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> plannerPair);
+  BaseVisualizer(
+      const std::shared_ptr<config::Configuration> &config,
+      const std::shared_ptr<planning_contexts::BaseContext> &context,
+      const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> plannerPair);
   virtual ~BaseVisualizer();
 
  public:
   // Setters for context and planner. These are final because they need to be threadsafe, so
   // care has to be taken when implementing them.
-  virtual void setContext(const std::shared_ptr<planning_contexts::RealVectorGeometricContext> &context) final;
-  virtual void setPlanner(
-      const std::pair<std::shared_ptr<ompl::base::Planner>, common::PLANNER_TYPE> &plannerPair) final;
+  virtual void setContext(
+      const std::shared_ptr<planning_contexts::RealVectorGeometricContext> &context) final;
+  virtual void setPlanner(const std::pair<std::shared_ptr<ompl::base::Planner>,
+                                          common::PLANNER_TYPE> &plannerPair) final;
 
  protected:
   // Make data available to derived classes.
   std::shared_ptr<const ompl::base::PlannerData> getPlannerData(const std::size_t iteration) const;
-  std::shared_ptr<const PlannerSpecificData> getPlannerSpecificData(const std::size_t iteration) const;
+  std::shared_ptr<const PlannerSpecificData> getPlannerSpecificData(
+      const std::size_t iteration) const;
   time::Duration getIterationDuration(const std::size_t iteration) const;
   const ompl::base::PathPtr getSolutionPath(const std::size_t iteration) const;
   ompl::base::Cost getSolutionCost(const std::size_t iteration) const;

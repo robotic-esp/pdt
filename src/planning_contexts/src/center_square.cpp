@@ -56,7 +56,7 @@ namespace planning_contexts {
 CenterSquare::CenterSquare(const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
                            const std::shared_ptr<const config::Configuration>& config,
                            const std::string& name) :
-    RealVectorGeometricContext(spaceInfo, config, name){
+    RealVectorGeometricContext(spaceInfo, config, name) {
   // Get the obstacle widths.
   std::vector<double> widths(dimensionality_,
                              config_->get<double>("context/" + name + "/obstacleWidth"));
@@ -74,8 +74,8 @@ CenterSquare::CenterSquare(const std::shared_ptr<ompl::base::SpaceInformation>& 
   }
 
   // Create the obstacle.
-  obstacles_.push_back(
-      std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, *midpoint, widths));
+  obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+      spaceInfo_, *midpoint, widths));
 
   // Create the validity checker and add the obstacle.
   auto validityChecker = std::make_shared<ContextValidityChecker>(spaceInfo_);

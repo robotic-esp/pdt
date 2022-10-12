@@ -111,7 +111,7 @@ RepeatingRectangles::RepeatingRectangles(
     const std::shared_ptr<const config::Configuration>& config, const std::string& name) :
     RealVectorGeometricContext(spaceInfo, config, name),
     numObsPerDim_(config->get<std::size_t>("context/" + name + "/numObstaclesPerDim")),
-    obsWidth_(config->get<double>("context/" + name + "/obstacleWidth")){
+    obsWidth_(config->get<double>("context/" + name + "/obstacleWidth")) {
   // Get the state space bounds.
   auto bounds = spaceInfo_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds();
   for (auto i = 1u; i < dimensionality_; ++i) {
@@ -162,8 +162,7 @@ void RepeatingRectangles::createObstacles() {
     // The context assumes a hyperrectangle.
     // Thus, all bounds are the same, and we can stick to the 0th index of the bounds.
     coordinates.push_back(
-        (static_cast<double>((i + 1u)) *
-         (bounds.high.at(0u) - bounds.low.at(0u)) /
+        (static_cast<double>((i + 1u)) * (bounds.high.at(0u) - bounds.low.at(0u)) /
          static_cast<double>((numObsPerDim_ + 1u))) +
         bounds.low.at(0u));
   }
@@ -191,8 +190,8 @@ void RepeatingRectangles::createObstacles() {
     std::vector<double> widths(dimensionality_, obsWidth_);
 
     // Add the obstacle.
-    obstacles_.push_back(
-        std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(spaceInfo_, midpoint, widths));
+    obstacles_.push_back(std::make_shared<obstacles::Hyperrectangle<obstacles::BaseObstacle>>(
+        spaceInfo_, midpoint, widths));
   }
 }
 

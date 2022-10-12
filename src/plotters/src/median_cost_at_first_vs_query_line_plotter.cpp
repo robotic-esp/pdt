@@ -51,7 +51,8 @@ using namespace std::string_literals;
 namespace fs = std::experimental::filesystem;
 
 MedianCostAtFirstVsQueryLinePlotter::MedianCostAtFirstVsQueryLinePlotter(
-    const std::shared_ptr<const config::Configuration>& config, const statistics::MultiqueryStatistics& stats) :
+    const std::shared_ptr<const config::Configuration>& config,
+    const statistics::MultiqueryStatistics& stats) :
     LatexPlotter(config),
     stats_(stats) {
 }
@@ -64,7 +65,8 @@ std::shared_ptr<pgftikz::PgfAxis> MedianCostAtFirstVsQueryLinePlotter::createMed
   // Fill the axis with the median initial cost plots of all planners.
   for (const auto& name : config_->get<std::vector<std::string>>("experiment/planners")) {
     // First the lower and upper confidence bounds, if desired.
-    if (config_->get<bool>("report/medianInitialCostPerQueryPlots/plotConfidenceIntervalInAllPlots")) {
+    if (config_->get<bool>(
+            "report/medianInitialCostPerQueryPlots/plotConfidenceIntervalInAllPlots")) {
       std::shared_ptr<pgftikz::PgfPlot> upperCi = createMedianInitialCostUpperCiPlot(name);
       std::shared_ptr<pgftikz::PgfPlot> lowerCi = createMedianInitialCostLowerCiPlot(name);
       std::shared_ptr<pgftikz::PgfPlot> fillCi = createMedianInitialCostFillCiPlot(name);
@@ -132,15 +134,21 @@ fs::path MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostPicture(
 
 void MedianCostAtFirstVsQueryLinePlotter::setMedianInitialCostAxisOptions(
     std::shared_ptr<pgftikz::PgfAxis> axis) const {
-  axis->options.width = config_->get<std::string>("report/medianInitialCostPerQueryPlots/axisWidth");
-  axis->options.height = config_->get<std::string>("report/medianInitialCostPerQueryPlots/axisHeight");
+  axis->options.width =
+      config_->get<std::string>("report/medianInitialCostPerQueryPlots/axisWidth");
+  axis->options.height =
+      config_->get<std::string>("report/medianInitialCostPerQueryPlots/axisHeight");
   // axis->options.xmax = maxCostToBePlotted_;
   axis->options.ymax = stats_.getMaxNonInfCost();
   axis->options.ylog = true;
-  axis->options.xminorgrids = config_->get<bool>("report/medianInitialCostPerQueryPlots/xminorgrids");
-  axis->options.xmajorgrids = config_->get<bool>("report/medianInitialCostPerQueryPlots/xmajorgrids");
-  axis->options.yminorgrids = config_->get<bool>("report/medianInitialCostPerQueryPlots/yminorgrids");
-  axis->options.ymajorgrids = config_->get<bool>("report/medianInitialCostPerQueryPlots/ymajorgrids");
+  axis->options.xminorgrids =
+      config_->get<bool>("report/medianInitialCostPerQueryPlots/xminorgrids");
+  axis->options.xmajorgrids =
+      config_->get<bool>("report/medianInitialCostPerQueryPlots/xmajorgrids");
+  axis->options.yminorgrids =
+      config_->get<bool>("report/medianInitialCostPerQueryPlots/yminorgrids");
+  axis->options.ymajorgrids =
+      config_->get<bool>("report/medianInitialCostPerQueryPlots/ymajorgrids");
   axis->options.xlabel = "Query Number"s;
   axis->options.ylabel = "Initial Solution Cost [s]"s;
   axis->options.ylabelAbsolute = true;
@@ -170,7 +178,8 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMed
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostUpperCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostUpperCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
@@ -206,7 +215,8 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMed
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostLowerCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostLowerCiPlot(
     const std::string& plannerName) const {
   // Get the table from the appropriate file.
   auto table = std::make_shared<pgftikz::PgfTable>(
@@ -238,12 +248,13 @@ std::shared_ptr<pgftikz::PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMed
   return plot;
 }
 
-std::shared_ptr<pgftikz::PgfPlot> MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostFillCiPlot(
+std::shared_ptr<pgftikz::PgfPlot>
+MedianCostAtFirstVsQueryLinePlotter::createMedianInitialCostFillCiPlot(
     const std::string& plannerName) const {
   // Fill the areas between the upper and lower bound.
-  auto fillBetween =
-      std::make_shared<pgftikz::PgfFillBetween>(plannerName + "MedianInitialCostPerQueryUpperConfidence",
-                                       plannerName + "MedianInitialCostPerQueryLowerConfidence");
+  auto fillBetween = std::make_shared<pgftikz::PgfFillBetween>(
+      plannerName + "MedianInitialCostPerQueryUpperConfidence",
+      plannerName + "MedianInitialCostPerQueryLowerConfidence");
 
   // Create the plot.
   auto plot = std::make_shared<pgftikz::PgfPlot>(fillBetween);

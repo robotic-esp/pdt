@@ -37,26 +37,26 @@
 
 #pragma once
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <fstream>
 
 namespace pdt {
 
 namespace utilities {
 
-template<class T>
-std::ofstream& writeVectorToFile(std::ofstream &filestream, 
-    const std::string &name, const std::vector<T> &values){
+template <class T>
+std::ofstream &writeVectorToFile(std::ofstream &filestream, const std::string &name,
+                                 const std::vector<T> &values) {
   filestream << name;
   filestream << std::setprecision(21u);
-  for (const auto &val: values) {
+  for (const auto &val : values) {
     filestream << "," << val;
   }
 
-  return filestream; // this enables using this in a series of chained operations
+  return filestream;  // this enables using this in a series of chained operations
 }
 
 }  // namespace utilities

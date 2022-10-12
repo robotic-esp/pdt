@@ -37,9 +37,9 @@
 
 #pragma once
 
-#include <ompl/base/objectives/StateCostIntegralObjective.h>
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/State.h>
+#include <ompl/base/objectives/StateCostIntegralObjective.h>
 
 #include "pdt/objectives/base_optimization_objective.h"
 #include "pdt/objectives/optimization_objective_visitor.h"
@@ -53,13 +53,13 @@ class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostInt
                                                  public BaseOptimizationObjective {
  public:
   ReciprocalClearanceOptimizationObjective(
-    const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-    const double heuristicSampleFraction);
-  
+      const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+      const double heuristicSampleFraction);
+
   ReciprocalClearanceOptimizationObjective(
-    const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
-    const std::vector<double>& heuristicSampleFactors);
-                                           
+      const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo,
+      const std::vector<double>& heuristicSampleFactors);
+
   virtual ~ReciprocalClearanceOptimizationObjective() = default;
 
   ompl::base::Cost stateCost(const ompl::base::State* state) const override;
@@ -70,10 +70,9 @@ class ReciprocalClearanceOptimizationObjective : public ompl::base::StateCostInt
   void accept(const ObjectiveVisitor& visitor) const override;
 
  private:
-  ompl::base::Cost motionCostHeuristic(const ompl::base::State* s1,
-                                       const ompl::base::State* s2,
+  ompl::base::Cost motionCostHeuristic(const ompl::base::State* s1, const ompl::base::State* s2,
                                        const std::vector<double>& factors) const;
-  
+
   const std::shared_ptr<ompl::base::SpaceInformation>& spaceInfo_ = OptimizationObjective::si_;
   const double heuristicSampleFraction_{-1.0};
   // const unsigned heuristicSampleCount_{0u};

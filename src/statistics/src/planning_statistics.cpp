@@ -129,8 +129,8 @@ std::size_t PlannerResults::numMeasuredRuns() const {
   return measuredRuns_.size();
 }
 
-PlanningStatistics::PlanningStatistics(const std::shared_ptr<config::Configuration>& config, const fs::path& resultsPath,
-                       const bool forceComputation) :
+PlanningStatistics::PlanningStatistics(const std::shared_ptr<config::Configuration>& config,
+                                       const fs::path& resultsPath, const bool forceComputation) :
     config_(config),
     statisticsDirectory_(fs::path(config_->get<std::string>("experiment/experimentDirectory")) /
                          ("statistics/" + resultsPath.stem().string() + "/")),
@@ -343,7 +343,7 @@ PlanningStatistics::PlanningStatistics(const std::shared_ptr<config::Configurati
 }
 
 fs::path PlanningStatistics::extractMedians(const std::string& plannerName, const double confidence,
-                                    const std::vector<double>& binDurations) const {
+                                            const std::vector<double>& binDurations) const {
   if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "This method extracts median costs over time for anytime planners. '" + plannerName +
                "' is not an anytime planner."s;
@@ -406,8 +406,8 @@ fs::path PlanningStatistics::extractMedians(const std::string& plannerName, cons
 }
 
 fs::path PlanningStatistics::extractCostPercentiles(const std::string& plannerName,
-                                            const std::set<double>& percentiles,
-                                            const std::vector<double>& binDurations) const {
+                                                    const std::set<double>& percentiles,
+                                                    const std::vector<double>& binDurations) const {
   if (!config_->get<bool>("planner/"s + plannerName + "/isAnytime"s)) {
     auto msg = "This method extracts cost percentiles over time for anytime planners. '" +
                plannerName + "' is not an anytime planner."s;
@@ -459,7 +459,7 @@ fs::path PlanningStatistics::extractCostPercentiles(const std::string& plannerNa
 }
 
 fs::path PlanningStatistics::extractMedianInitialSolution(const std::string& plannerName,
-                                                  const double confidence) const {
+                                                          const double confidence) const {
   if (results_.find(plannerName) == results_.end()) {
     auto msg = "Cannot find results for '" + plannerName +
                "' and can therefore not extract median initial solution."s;
@@ -509,7 +509,7 @@ fs::path PlanningStatistics::extractMedianInitialSolution(const std::string& pla
 }
 
 fs::path PlanningStatistics::extractInitialSolutionDurationEdf(const std::string& plannerName,
-                                                       const double confidence) const {
+                                                               const double confidence) const {
   if (results_.find(plannerName) == results_.end()) {
     auto msg = "Cannot find results for '" + plannerName +
                "' and can therefore not extract initial solution duration edf."s;
@@ -660,7 +660,7 @@ fs::path PlanningStatistics::extractInitialSolutions(const std::string& plannerN
 }
 
 std::string PlanningStatistics::createHeader(const std::string& statisticType,
-                                     const std::string& plannerName) const {
+                                             const std::string& plannerName) const {
   std::stringstream stream;
   stream << "# Experiment: " << config_->get<std::string>("experiment/name") << '\n';
   stream << "# Planner: " << plannerName << '\n';
@@ -758,7 +758,8 @@ double PlanningStatistics::getMaxInitialSolutionDuration(const std::string& plan
   return maxInitialSolutionDurations_.at(plannerName);
 }
 
-double PlanningStatistics::getMaxNonInfInitialSolutionDuration(const std::string& plannerName) const {
+double PlanningStatistics::getMaxNonInfInitialSolutionDuration(
+    const std::string& plannerName) const {
   return maxNonInfInitialSolutionDurations_.at(plannerName);
 }
 
@@ -782,9 +783,9 @@ std::shared_ptr<config::Configuration> PlanningStatistics::getConfig() const {
   return config_;
 }
 
-std::vector<double> PlanningStatistics::getPercentileCosts(const PlannerResults& results,
-                                                   const double percentile,
-                                                   const std::vector<double>& durations) const {
+std::vector<double> PlanningStatistics::getPercentileCosts(
+    const PlannerResults& results, const double percentile,
+    const std::vector<double>& durations) const {
   return getNthCosts(results, populationStats_.estimatePercentileAsIndex(percentile), durations);
 }
 
@@ -796,8 +797,9 @@ double PlanningStatistics::getMedianInitialSolutionCost(const PlannerResults& re
   return getNthInitialSolutionCost(results, populationStats_.estimatePercentileAsIndex(0.50));
 }
 
-std::vector<double> PlanningStatistics::getNthCosts(const PlannerResults& results, const std::size_t n,
-                                            const std::vector<double>& durations) const {
+std::vector<double> PlanningStatistics::getNthCosts(const PlannerResults& results,
+                                                    const std::size_t n,
+                                                    const std::vector<double>& durations) const {
   if (durations.empty()) {
     auto msg = "Expected at least one duration."s;
     throw std::runtime_error(msg);
@@ -822,7 +824,8 @@ std::vector<double> PlanningStatistics::getNthCosts(const PlannerResults& result
   return nthCosts;
 }
 
-std::vector<double> PlanningStatistics::getInitialSolutionDurations(const PlannerResults& results) const {
+std::vector<double> PlanningStatistics::getInitialSolutionDurations(
+    const PlannerResults& results) const {
   // Get the durations of the initial solutions of all runs.
   std::vector<double> initialDurations{};
   initialDurations.reserve(results.numMeasuredRuns());
@@ -847,7 +850,8 @@ std::vector<double> PlanningStatistics::getInitialSolutionDurations(const Planne
   return initialDurations;
 }
 
-std::vector<double> PlanningStatistics::getLastSolutionDurations(const PlannerResults& results) const {
+std::vector<double> PlanningStatistics::getLastSolutionDurations(
+    const PlannerResults& results) const {
   // Get the durations of the initial solutions of all runs.
   std::vector<double> lastDurations{};
   lastDurations.reserve(results.numMeasuredRuns());
@@ -860,7 +864,8 @@ std::vector<double> PlanningStatistics::getLastSolutionDurations(const PlannerRe
   return lastDurations;
 }
 
-std::vector<double> PlanningStatistics::getInitialSolutionCosts(const PlannerResults& results) const {
+std::vector<double> PlanningStatistics::getInitialSolutionCosts(
+    const PlannerResults& results) const {
   // Get the costs of the initial solutions of all runs.
   std::vector<double> initialCosts{};
   initialCosts.reserve(results.numMeasuredRuns());
@@ -899,7 +904,7 @@ std::vector<double> PlanningStatistics::getLastSolutionCosts(const PlannerResult
 }
 
 double PlanningStatistics::getNthInitialSolutionDuration(const PlannerResults& results,
-                                                 const std::size_t n) const {
+                                                         const std::size_t n) const {
   // Get the durations of the initial solutions of all runs.
   auto initialDurations = getInitialSolutionDurations(results);
 
@@ -913,7 +918,7 @@ double PlanningStatistics::getNthInitialSolutionDuration(const PlannerResults& r
 }
 
 double PlanningStatistics::getNthInitialSolutionCost(const PlannerResults& result,
-                                             const std::size_t n) const {
+                                                     const std::size_t n) const {
   // Get the costs of the initial solutions of all runs.
   auto initialCosts = getInitialSolutionCosts(result);
 

@@ -60,12 +60,13 @@ RealVectorGeometricContext::RealVectorGeometricContext(
   }
 }
 
-std::vector<std::shared_ptr<obstacles::BaseObstacle>> RealVectorGeometricContext::getObstacles() const {
+std::vector<std::shared_ptr<obstacles::BaseObstacle>> RealVectorGeometricContext::getObstacles()
+    const {
   return obstacles_;
 }
 
-std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>> RealVectorGeometricContext::getAntiObstacles()
-    const {
+std::vector<std::shared_ptr<obstacles::BaseAntiObstacle>>
+RealVectorGeometricContext::getAntiObstacles() const {
   return antiObstacles_;
 }
 
@@ -132,7 +133,7 @@ std::shared_ptr<ompl::base::Goal> RealVectorGeometricContext::createGoal() const
       goal->as<ompl::base::GoalSpace>()->setSpace(goalSpace);
       return goal;
     }
-#endif // #ifdef PDT_EXTRA_GOAL_SPACE
+#endif  // #ifdef PDT_EXTRA_GOAL_SPACE
     default: { throw std::runtime_error("Goal type not implemented."); }
   }
 }
