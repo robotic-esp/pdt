@@ -1,0 +1,79 @@
+{
+    "experiment": {
+        "executable": "benchmark",
+        "planners": [
+            "firstPlanner",
+            "firstReset",
+            "secondPlanner"
+        ],
+        "context": "defaultCenterSquare2D",
+        "numRuns": 500,
+        "logFrequency": 1000000,
+        "loadDefaultContextConfig": true,
+        "loadDefaultObjectiveConfig": true,
+        "loadDefaultPlannerConfig": true,
+        "loadDefaultReportConfig": true,
+        "report": {
+            "automatic": true
+        }
+    },
+    "context": {
+      "defaultCenterSquare2D" : {
+        "maxTime": 0.05,
+        "collisionCheckResolution": 0.001
+      }
+    },
+    "planner": {
+      "firstReset": {
+        "type": "RRTConnect",
+        "isAnytime": false,
+        "report": {
+            "color": "pdtblack",
+            "name": "2 - Reset"
+        },
+        "options": {
+            "useKNearest": false,
+            "maxEdgeLength": {
+                "2d": 0.3
+            },
+            "addIntermediateStates": false
+        }
+      },
+      "firstPlanner": {
+          "type": "RRTstar",
+          "isAnytime": true,
+          "report": {
+              "color": "pdtred",
+              "name": "1 - Planner"
+          },
+          "options": {
+              "useKNearest": false,
+              "rewireFactor": 1.001,
+              "goalBias": 0.05,
+              "maxEdgeLength": {
+                  "2d": 0.3
+              },
+              "delayCollisionChecks": true,
+              "useAdmissibleCostToCome": true
+          }
+      },
+      "secondPlanner": {
+        "type": "RRTstar",
+        "isAnytime": true,
+        "report": {
+            "color": "pdtblue",
+            "name": "3 - Planner"
+        },
+        "options": {
+            "useKNearest": false,
+            "rewireFactor": 1.001,
+            "goalBias": 0.05,
+            "maxEdgeLength": {
+                "2d": 0.3
+            },
+            "delayCollisionChecks": true,
+            "useAdmissibleCostToCome": true
+        }
+    }
+  }
+}
