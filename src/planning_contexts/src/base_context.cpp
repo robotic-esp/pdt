@@ -336,7 +336,7 @@ std::vector<StartGoalPair> BaseContext::parseMultiqueryStartGoalPairs() const {
     const std::size_t numGoals = config_->get<std::size_t>(baseKey + "/goals/numGenerated");
     for (auto i = 0u; i < numGoals; ++i) {
       if (i + 1 < starts.size()) {
-        for (const auto tmp : starts[i + 1]) {
+        for (const auto &tmp : starts[i + 1]) {
           goalStates.push_back(tmp);
         }
       } else {

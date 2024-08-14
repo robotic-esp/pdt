@@ -75,7 +75,7 @@ MultiqueryStatistics::MultiqueryStatistics(const std::shared_ptr<config::Configu
   fs::create_directories(statisticsDirectory_);
 
   const auto& plannerNames = config_->get<std::vector<std::string>>("experiment/planners");
-  for (const auto name : plannerNames) {
+  for (const auto &name : plannerNames) {
     minCumulativeInitialSolutionCosts_[name] = std::numeric_limits<double>::infinity();
     maxCumulativeInitialSolutionCosts_[name] = std::numeric_limits<double>::lowest();
     minCumulativeFinalCosts_[name] = std::numeric_limits<double>::infinity();
@@ -128,12 +128,12 @@ MultiqueryStatistics::MultiqueryStatistics(const std::shared_ptr<config::Configu
     maxNonInfCumulativeCost_ += maxNonInfCost;
     maxNonInfCumulativeDuration_ += maxNonInfInitialDuration;
 
-    for (const auto name : plannerNames) {
+    for (const auto &name : plannerNames) {
       successRates_[name] += it->getSuccessRate(name);
     }
   }
 
-  for (const auto name : plannerNames) {
+  for (const auto &name : plannerNames) {
     successRates_[name] = successRates_[name] / static_cast<double>(numQueries_);
   }
 }
