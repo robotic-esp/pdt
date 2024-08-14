@@ -27,7 +27,7 @@ target_link_libraries(pdt_factories
   PRIVATE
   pdt
   PUBLIC
-  ${Boost_LIBRARIES}
+  Boost::system
   ${OMPL_LIBRARIES}
   pdt_common
   pdt_config

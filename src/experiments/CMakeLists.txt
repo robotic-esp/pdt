@@ -19,14 +19,16 @@ target_link_libraries(benchmark
   pdt
   PUBLIC
   ${OMPL_LIBRARIES}
+  Boost::boost
+  Boost::program_options
+  Boost::thread
   pdt_config
   pdt_factories
   pdt_planning_contexts
   pdt_loggers
   pdt_reports
   pdt_time
-  pdt_utilities
-  ${Boost_LIBRARIES})
+  pdt_utilities)
 
 # Specify the benchmark_report executable target.
 add_executable(benchmark_report
@@ -37,6 +39,7 @@ target_link_libraries(benchmark_report
   PRIVATE
   pdt
   PUBLIC
+  Boost::boost
   pdt_config
   pdt_reports
   pdt_statistics)
@@ -50,11 +53,13 @@ target_link_libraries(collision_detection_test
   PRIVATE
   pdt
   PUBLIC
+  Boost::boost
+  Boost::program_options
+  Boost::thread
   ${OMPL_LIBRARIES}
   pdt_config
   pdt_factories
-  pdt_planning_contexts
-  ${Boost_LIBRARIES})
+  pdt_planning_contexts)
 
 # Specify the visualization target.
 add_executable(visualization
@@ -65,6 +70,9 @@ target_link_libraries(visualization
   PRIVATE
   pdt
   PUBLIC
+  Boost::boost
+  Boost::program_options
+  Boost::thread
   ${Pangolin_LIBRARIES}
   ${OMPL_LIBRARIES}
   pdt_config
@@ -72,8 +80,7 @@ target_link_libraries(visualization
   pdt_planning_contexts
   pdt_time
   pdt_utilities
-  pdt_visualization
-  ${Boost_LIBRARIES})
+  pdt_visualization)
 
 # Specify the clearance objective test executable target.
 add_executable(objective_sanity_check
@@ -83,7 +90,9 @@ target_link_libraries(objective_sanity_check
   PRIVATE
   pdt
   PUBLIC
+  Boost::boost
+  Boost::program_options
+  Boost::thread
   pdt_config
   pdt_factories
-  pdt_planning_contexts
-  ${Boost_LIBRARIES})
+  pdt_planning_contexts)
