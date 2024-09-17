@@ -69,6 +69,13 @@ If running `which lualatex` echoes a path, you should be good to go, otherwise i
 
 The reporting tool loads the whole `result.csv` into memory. This file can be quite large, depending on `logFrequency`, `maxTime`, and the number of planners. If your system runs out of memory, ensure you have swap turned on ([see, e.g., here on how to do it](https://tecadmin.net/enable-swap-on-ubuntu/)), or rerun experiment with a lower `logFrequency`, a lower `maxTime`, or fewer planners.
 
+##### Visualization
+
+LaTeX is also used by the visualizer to export frames, which requires a system installation of the Roboto font:
+```bash
+sudo apt install fonts-roboto
+```
+
 #### ImageMagick
 
 The report generation uses ImageMagick to convert PDFs to PNGs. It is likely installed on your machine by default but can be installed with
