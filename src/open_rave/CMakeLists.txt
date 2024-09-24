@@ -12,7 +12,7 @@ find_package(OpenRAVE REQUIRED)
 set_package_properties(Boost PROPERTIES
   URL "https://boost.org"
   PURPOSE "Provides standardized libraries, such as program options, filesystem I/O, etc.")
-find_package(Boost 1.58 REQUIRED COMPONENTS system)
+find_package(Boost 1.58 REQUIRED COMPONENTS system thread)
 set_package_properties(Threads PROPERTIES
   URL "https://en.wikipedia.org/wiki/POSIX_Threads"
   PURPOSE "A standard multithreading library.")
@@ -51,6 +51,7 @@ target_link_libraries(pdt_open_rave
   ${OpenRAVE_CORE_LIBRARIES}
   Threads::Threads
   PUBLIC
+  Boost::thread
   ${OMPL_LIBRARIES}
   pdt_config
   pdt_planning_contexts)
@@ -64,7 +65,7 @@ target_link_libraries(open_rave_gui
   PRIVATE
   pdt
   PUBLIC
-  ${Boost_LIBRARIES}
+  Boost::system
   ${OpenRAVE_LIBRARIES}
   ${OpenRAVE_CORE_LIBRARIES}
   ${OMPL_LIBRARIES}

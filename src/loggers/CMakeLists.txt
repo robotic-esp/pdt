@@ -22,5 +22,5 @@ target_link_libraries(pdt_loggers
   stdc++fs
   PUBLIC
   ${OMPL_LIBRARIES}
-  ${Boost_LIBRARIES}
+  #${Boost_LIBRARIES}
   pdt_time)

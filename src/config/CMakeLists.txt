@@ -38,8 +38,8 @@ target_include_directories(pdt_config SYSTEM
 # Specify the link targets for this target.
 target_link_libraries(pdt_config
   PRIVATE
+  Boost::program_options
   pdt
-  ${Boost_LIBRARIES}
   PUBLIC
   nlohmann_json::nlohmann_json
   ${OMPL_LIBRARIES}
