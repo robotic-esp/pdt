@@ -35,10 +35,12 @@
 
 // Authors: Marlin Strub
 
+#include <algorithm>
 #include <functional>
 #include <future>
 #include <iomanip>
 #include <iostream>
+#include <random>
 #include <thread>
 #include <tuple>
 #include <vector>
@@ -292,8 +294,10 @@ int main(const int argc, const char **argv) {
   // May the best planner win.
   for (auto i = 0u; i < config->get<std::size_t>("experiment/numRuns"); ++i) {
     // Randomly shuffle the planners.
+    std::random_device rd;
+    std::mt19937 g(rd());
     auto plannerNames = config->get<std::vector<std::string>>("experiment/planners");
-    std::random_shuffle(plannerNames.begin(), plannerNames.end());
+    std::shuffle(plannerNames.begin(), plannerNames.end(), g);
 
     // In a multiquery setting: regenerate the start/goal pairs if so desired
     if (i > 0 && config->contains("experiment/regenerateQueries") &&
