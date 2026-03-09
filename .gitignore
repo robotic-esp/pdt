@@ -1,3 +1,5 @@
 build/
 scripts/matlab/data/
 parameters/executables/
+*.code-workspace
+.cache
